@@ -29,7 +29,7 @@ warnings.filterwarnings('error')
 import talib as ta
 
 start_time = time.time()
-systemName = 'QuadDF_ES'
+systemName = 'DoubleDF_ES'
 ticker = 'F_ES'
 nTopSystems = 1 #n top systems to show
 numRSCharts = 3
@@ -381,6 +381,9 @@ equityCurvesStatsByYear = createYearlyStats(equityCurves, benchStatsByYear)
 displayRankedCharts(1,benchmarks,benchStatsByYear,equityCurves,equityStats,equityCurvesStatsByYear)
 displayRankedCharts(equityStats.system.shape[0],benchmarks,benchStatsByYear,equityCurves,equityStats,equityCurvesStatsByYear)
 
+for i,sst in enumerate(equityStats.system.values): 
+    equityCurves[sst].to_csv(rsSavePath+str(i)+'_'+systemName+'_'+sst+'.csv')
+    
 #for RS check alignment and analysis
 RS_Analytics = {}
 for r in RS_DPS:

@@ -4,7 +4,7 @@ from threading import Event
 from swigibpy import EWrapper, EPosixClientSocket, Contract
 
 
-WAIT_TIME = 10.0
+WAIT_TIME = 30.0
 
 ###
 
@@ -59,13 +59,13 @@ callback = HistoricalDataExample()
 tws = EPosixClientSocket(callback)
 #tws = EPosixClientSocket(callback, reconnect_auto=True)
 # Connect to tws running on localhost
-if not tws.eConnect("", 7496, 55):
+if not tws.eConnect("", 7496, 10):
     raise RuntimeError('Failed to connect to TWS')
 
 # Simple contract for GOOG
 contract = Contract()
 contract.exchange = "SMART"
-contract.symbol = "GOOG"
+contract.symbol = "QQQ"
 contract.secType = "STK"
 contract.currency = "USD"
 today = datetime.today()
@@ -74,13 +74,13 @@ print("Requesting historical data for %s" % contract.symbol)
 
 # Request some historical data.
 tws.reqHistoricalData(
-    55,                                         # tickerId,
+    1,                                         # tickerId,
     contract,                                   # contract,
     today.strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
     "1 D",                                      # durationStr,
     "1 min",                                    # barSizeSetting,
-    "TRADES",                                   # whatToShow,
-    1,                                          # useRTH,
+    "MIDPOINT",                                   # whatToShow,
+    0,                                          # useRTH,
     1                                          # formatDate
 )
 

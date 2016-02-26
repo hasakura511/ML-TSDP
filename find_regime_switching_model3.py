@@ -56,7 +56,7 @@ PRT['maxLeverage'] = 2
 #PRT['CAR25_threshold'] = -20 #set safef to 0 if < car threshold
 
 #for CAR25 calc
-unfilteredDataFile = 'OHLCV_F_ES_TOX25_VotingHard_v2015-01-01to2017-01-01_20160206064413.csv'
+unfilteredDataFile = 'OHLCV_F_ES_TOX25_VotingHard_v2015-01-01to2017-01-01_20160226163023.csv'
 file_path = '/media/sf_Python/data/from_vf_to_df/'
 qt = pd.read_csv(file_path+unfilteredDataFile, index_col='dates')
 #ALIGNMENT CHECK

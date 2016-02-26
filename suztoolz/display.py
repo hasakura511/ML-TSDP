@@ -155,7 +155,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
         for i,sst in enumerate(topSystems): 
             dayAhead = (endDate+datetime.timedelta(days=1)).strftime("%Y-%m-%d")
             signalAhead = equityCurves[sst].signals[-1]
-            if 'safef' not in equityCurves[sst].columns:
+            if 'CAR25' not in equityCurves[sst].columns:
                 safefAhead = equityStats[equityStats.system==sst].safef.iloc[-1]
                 CAR25ahead = equityStats[equityStats.system==sst].CAR25.iloc[-1]
                 #dd100 as an approx for dd95 because forecast period is only 2 years for df_CAR25 calc

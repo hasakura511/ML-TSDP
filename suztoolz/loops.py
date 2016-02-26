@@ -730,7 +730,7 @@ def calcEquity_df(SST, title, leverage=1.0):
             #changeIndex = SSTcopy.signals[SST.signals==1].index
             SSTcopy.signals[SST.signals==1]=0
             
-        equityCurves[trade] = pd.concat([SSTcopy.reset_index(), trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
+        equityCurves[trade] = pd.concat([SSTcopy.reset_index(), safef, trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
     
     #  Compute cumulative equity for all days (buy and hold)   
     trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')
@@ -739,7 +739,7 @@ def calcEquity_df(SST, title, leverage=1.0):
     maxEquity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='maxEquity')
     drawdown = pd.Series(data=0.0,index=range(0,len(SST.index)), name='drawdown')
     maxDD = pd.Series(data=0.0,index=range(0,len(SST.index)),name='maxDD')
-    safef = pd.Series(data=1.0,index=range(0,len(SST.index)),name='safef')
+    safef = pd.Series(data=leverage,index=range(0,len(SST.index)),name='safef')
     for i in range(0,len(SST.index)):
         if i == 0:
             equity[i] = initialEquity
@@ -757,7 +757,7 @@ def calcEquity_df(SST, title, leverage=1.0):
             maxDD[i] = max(drawdown[i],maxDD[i-1])          
     SSTcopy.signals[SSTcopy.signals==-1]=1
     SSTcopy.signals[SSTcopy.signals==0]=1       
-    equityCurves['buyHold'] = pd.concat([SSTcopy.reset_index(), trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
+    equityCurves['buyHold'] = pd.concat([SSTcopy.reset_index(), safef, trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
     
         
     #plt.close('all')

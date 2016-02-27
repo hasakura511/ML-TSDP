@@ -8,9 +8,9 @@ import numpy as np
 import pandas as pd
 import Quandl
 dataLoadStartDate = "1998-12-22"
-dataLoadEndDate = "2016-02-04"
+dataLoadEndDate = "2017-01-01"
 print "\nReading data from Quandl... "
-savepath= '/media/sf_Python/TSDP/ml/data/quandl/'
+savepath= 'D:/Dropbox/SharedTSDP/data/quandl/'
 tickers = ["YAHOO/INDEX_SSEC","YAHOO/INDEX_HSI","GOOG/NYSE_XLY","GOOG/NYSE_XLP",\
             "GOOG/NYSE_XLE","GOOG/NYSE_XLU","GOOG/NYSE_XLF",\
         "GOOG/NYSE_XLV","GOOG/NYSE_XLI","GOOG/NYSE_XLB","GOOG/NYSE_XLK"]

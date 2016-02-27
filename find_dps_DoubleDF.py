@@ -31,7 +31,8 @@ warnings.filterwarnings('error')
 
 start_time = time.time()
 #  Set the path for the csv file
-mypath = '/media/sf_Python/data/from_df_to_dps2/'
+mypath = '/media/sf_Python/data/from_vf_to_dps/'
+#mypath = '/media/sf_Python/data/from_df_to_dps2/'
 dpsSavePath = '/media/sf_Python/data/from_DPS_to_RS/'
 #filename = 'SST_F_ES_vf_VotingHard df_KNeighborsRegressor-distance_is250oos1_2014-01-02to2015-12-31_20160113074238.csv'
 signal_type = 'ALL'

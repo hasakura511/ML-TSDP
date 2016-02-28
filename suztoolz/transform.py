@@ -2,6 +2,7 @@
 """
 Created on Sun Nov 22 20:57:32 2015
 
+
 @author: hidemi
 """
 import math

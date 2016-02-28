@@ -456,7 +456,7 @@ wf_is_periods = [60,90,120,180,250]
 #test_split = 0.33 #test split
 #iterations = 1 #for sss
 tox_adj_proportion = 0
-nfeatures = 34
+nfeatures = 10
 
 #charts to display in summary
 numCharts = 2

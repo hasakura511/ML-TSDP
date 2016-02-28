@@ -273,14 +273,14 @@ def compareEquity(sst, title):
     equityAllSignals = np.zeros(nrows)
     equityAllSignals[0] = 1
     for i in range(1,nrows):
-        equityAllSignals[i] = (1+sst.gainAhead[i-1])*equityAllSignals[i-1]
+        equityAllSignals[i] = (1+sst.gainAhead.iloc[i-1])*equityAllSignals[i-1]
         
     #  Compute cumulative equity for days with beLong signals    
     equityBeLongSignals = np.zeros(nrows)
     equityBeLongSignals[0] = 1
     for i in range(1,nrows):
-        if (sst.signals[i-1] > 0):
-            equityBeLongSignals[i] = (1+sst.gainAhead[i-1])*equityBeLongSignals[i-1]
+        if (sst.signals.iloc[i-1] > 0):
+            equityBeLongSignals[i] = (1+sst.gainAhead.iloc[i-1])*equityBeLongSignals[i-1]
         else:
             equityBeLongSignals[i] = equityBeLongSignals[i-1]
             
@@ -288,10 +288,10 @@ def compareEquity(sst, title):
     equityBeLongAndShortSignals = np.zeros(nrows)
     equityBeLongAndShortSignals[0] = 1
     for i in range(1,nrows):
-        if (sst.signals[i-1] < 0):
-            equityBeLongAndShortSignals[i] = (1+-sst.gainAhead[i-1])*equityBeLongAndShortSignals[i-1]
-        elif (sst.signals[i-1] > 0):
-            equityBeLongAndShortSignals[i] = (1+sst.gainAhead[i-1])*equityBeLongAndShortSignals[i-1]
+        if (sst.signals.iloc[i-1] < 0):
+            equityBeLongAndShortSignals[i] = (1+-sst.gainAhead.iloc[i-1])*equityBeLongAndShortSignals[i-1]
+        elif (sst.signals.iloc[i-1] > 0):
+            equityBeLongAndShortSignals[i] = (1+sst.gainAhead.iloc[i-1])*equityBeLongAndShortSignals[i-1]
         else:
             equityBeLongAndShortSignals[i] = equityBeLongAndShortSignals[i-1]
 
@@ -299,8 +299,8 @@ def compareEquity(sst, title):
     equityBeShortSignals = np.zeros(nrows)
     equityBeShortSignals[0] = 1
     for i in range(1,nrows):
-        if (sst.signals[i-1] < 0):
-            equityBeShortSignals[i] = (1+-sst.gainAhead[i-1])*equityBeShortSignals[i-1]
+        if (sst.signals.iloc[i-1] < 0):
+            equityBeShortSignals[i] = (1+-sst.gainAhead.iloc[i-1])*equityBeShortSignals[i-1]
         else:
             equityBeShortSignals[i] = equityBeShortSignals[i-1] 
             
@@ -321,7 +321,7 @@ def compareEquity(sst, title):
     plt.ylabel("TWR")
     plt.legend(loc="best")
     plt.show()
-    shortTrades, longTrades = numberZeros(sst.signals)
+    shortTrades, longTrades = numberZeros(sst.signals.values)
     allTrades = shortTrades+ longTrades
     print '\nValidation Period from', sst.index[0],'to',sst.index[-1]
     print 'TWR for Buy & Hold is %0.3f, %i days' % (equityAllSignals[nrows-1], nrows)

@@ -2,7 +2,6 @@
 """
 Created on Sun Nov 22 20:57:32 2015
 
-
 @author: hidemi
 """
 import math
@@ -244,17 +243,24 @@ def garch(returns):
     return forecast
     
 def autocorrel(close, lb, period=1):
-    close = close.values
+    if type(close) is pd.core.series.Series:
+        close = close.values
+
     ac = np.insert(ta.CORREL(close[0:len(close)-period], close[period:len(close)], timeperiod=lb),0,np.nan)
     return ac
     
 def kaufman_efficiency(close,lb):
-    ke = np.nan_to_num(abs(ta.CMO(close.values, timeperiod=lb)/100))
+    if type(close) is pd.core.series.Series:
+        close = close.values
+        
+    ke = np.nan_to_num(abs(ta.CMO(close, timeperiod=lb)/100))
     return ke
 
 def directionalVolumeSpike(volume, p, lb):
     # current volume / avg volume (* price chg week ago.)
-    volume = volume.values
+    if type(volume) is pd.core.series.Series:
+        close = volume.values
+        
     nrows = p.shape[0]
     r = np.zeros(nrows)
     dvs = np.zeros(nrows)
@@ -301,7 +307,8 @@ def adf_test(series):
     
 def volumeSpike(volume, lb):
     # current volume / avg volume (* price chg week ago.)
-    volume = volume.values
+    if type(volume) is pd.core.series.Series:
+        close = volume.values
     nrows = volume.shape[0]
     #r = np.zeros(nrows)
     vs = np.zeros(nrows)

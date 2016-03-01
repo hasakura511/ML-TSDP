@@ -5,6 +5,12 @@ from swigibpy import EWrapper, EPosixClientSocket, Contract
 
 
 WAIT_TIME = 30.0
+p_open=[];
+p_high=[];
+p_low=[];
+p_close=[];
+p_volume=[];
+p_chg=[];
 
 ###
 
@@ -45,10 +51,20 @@ class HistoricalDataExample(EWrapper):
             print("History request complete")
             self.got_history.set()
         else:
-            #date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
+	    chg=0;
+	    chgpt=0;
+	    if len(p_close) > 0:
+	    	chgpt=close-p_close[-1];
+		chg=chgpt/p_close[-1];
+		
+            p_open.append(open);
+            p_high.append(high);
+            p_low.append(low);
+            p_close.append(close);
+            p_volume.append(volume);
+	    date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
             print(("History %s - Open: %s, High: %s, Low: %s, Close: "
-                   "%s, Volume: %d") % (date, open, high, low, close, volume))
-
+                   "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg))
 
 # Instantiate our callback object
 callback = HistoricalDataExample()
@@ -77,8 +93,8 @@ tws.reqHistoricalData(
     1,                                         # tickerId,
     contract,                                   # contract,
     today.strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
-    "1 D",                                      # durationStr,
-    "1 hour",                                    # barSizeSetting,
+    "1 W",                                      # durationStr,
+    "1 day",                                    # barSizeSetting,
     "ASK",                                   # whatToShow,
     1,                                          # useRTH,
     1                                          # formatDate

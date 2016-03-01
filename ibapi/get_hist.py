@@ -131,8 +131,7 @@ def getHist(symbol, currency,client_id):
 	i = ['Date','Open','High','Low','Close','Volume','Change','Net']
 	dataSet=pd.DataFrame(data=d, columns=i);
 
-	#dataSet.to_csv('/media/sf_Python/data/OHLCV_'+filename_df, index=False)
-	dataSet.to_csv('./OHLCV_'+filename_df+'.csv', index=False)
+	dataSet.to_csv('/media/sf_Python/data/ibapi/OHLCV_'+filename_df+'.csv', index=False)
 
 
 

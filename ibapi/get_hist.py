@@ -64,10 +64,10 @@ if not tws.eConnect("", 7496, 10):
 
 # Simple contract for GOOG
 contract = Contract()
-contract.exchange = "SMART"
-contract.symbol = "QQQ"
-contract.secType = "STK"
-contract.currency = "USD"
+contract.exchange = "IDEALPRO"
+contract.symbol = "USD"
+contract.secType = "CASH"
+contract.currency = "JPY"
 today = datetime.today()
 
 print("Requesting historical data for %s" % contract.symbol)
@@ -77,9 +77,9 @@ tws.reqHistoricalData(
     1,                                         # tickerId,
     contract,                                   # contract,
     today.strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
-    "1 D",                                      # durationStr,
-    "1 min",                                    # barSizeSetting,
-    "MIDPOINT",                                   # whatToShow,
+    "1 M",                                      # durationStr,
+    "1 hour",                                    # barSizeSetting,
+    "TRADES",                                   # whatToShow,
     0,                                          # useRTH,
     1                                          # formatDate
 )

@@ -62,9 +62,10 @@ class HistoricalDataExample(EWrapper):
             p_low.append(low);
             p_close.append(close);
             p_volume.append(volume);
-	    date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
+	    #date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
             print(("History %s - Open: %s, High: %s, Low: %s, Close: "
-                   "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg))
+                   "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
+
 
 # Instantiate our callback object
 callback = HistoricalDataExample()

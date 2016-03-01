@@ -45,7 +45,7 @@ class HistoricalDataExample(EWrapper):
             print("History request complete")
             self.got_history.set()
         else:
-            date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
+            #date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
             print(("History %s - Open: %s, High: %s, Low: %s, Close: "
                    "%s, Volume: %d") % (date, open, high, low, close, volume))
 
@@ -59,7 +59,7 @@ callback = HistoricalDataExample()
 tws = EPosixClientSocket(callback)
 #tws = EPosixClientSocket(callback, reconnect_auto=True)
 # Connect to tws running on localhost
-if not tws.eConnect("", 7496, 10):
+if not tws.eConnect("", 7496, 111):
     raise RuntimeError('Failed to connect to TWS')
 
 # Simple contract for GOOG
@@ -77,10 +77,10 @@ tws.reqHistoricalData(
     1,                                         # tickerId,
     contract,                                   # contract,
     today.strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
-    "1 M",                                      # durationStr,
+    "1 D",                                      # durationStr,
     "1 hour",                                    # barSizeSetting,
-    "TRADES",                                   # whatToShow,
-    0,                                          # useRTH,
+    "ASK",                                   # whatToShow,
+    1,                                          # useRTH,
     1                                          # formatDate
 )
 

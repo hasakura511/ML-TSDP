@@ -36,9 +36,9 @@ filename = 'F_ES.txt'
 ticker = filename[:-4]
 
 #append price changes from files from this folder
-from_quantiacs = 'D:/DropBox/sharedTSDP/data/tickerData/'
-from_quandl = 'D:/Dropbox/SharedTSDP/data/quandl/'
-from_fileprep = 'D:/Dropbox/SharedTSDP/data/from_fileprep/'
+from_quantiacs = './data/tickerData/'
+from_quandl = './data/quandl/'
+from_fileprep = './data/from_fileprep/'
 
 #add aux data
 add_aux_quantiacs = ['F_ED','F_GC','F_DX','F_CL','F_US']

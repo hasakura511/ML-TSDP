@@ -81,7 +81,7 @@ for i,f in enumerate(aux_files):
 
 #change back zeros to 1's and -1's
 for dps in DPS:
-    #print dps
+    print dps
     if string.split(dps,'__')[1][0] == 's':
         DPS[dps].signals[DPS[dps].signals == 0] = 1
     elif string.split(dps,'__')[1][0] == 'l':

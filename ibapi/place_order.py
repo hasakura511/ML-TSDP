@@ -64,81 +64,84 @@ class PlaceOrderExample(EWrapper):
                                             commissionReport.commission,
                                             commissionReport.realizedPNL)
 
-prompt = input("WARNING: This example will place an order on your IB "
-               "account, are you sure? (Type yes to continue): ")
-if prompt.lower() != 'yes':
-    sys.exit()
+def place_order(action, quant, sym, type, currency, exchange):
+    prompt = input("WARNING: This example will place an order on your IB "
+                   "account, are you sure? (Type yes to continue): ")
+    if prompt.lower() != 'yes':
+        sys.exit()
+    
+    # Instantiate our callback object
+    callback = PlaceOrderExample()
+    
+    # Instantiate a socket object, allowing us to call TWS directly. Pass our
+    # callback object so TWS can respond.
+    tws = EPosixClientSocket(callback)
+    
+    # Connect to tws running on localhost
+    if not tws.eConnect("", 7496, 42):
+        raise RuntimeError('Failed to connect to TWS')
+    
+    # Simple contract for GOOG
+    contract = Contract()
+    contract.symbol = sym
+    contract.secType = type
+    contract.exchange = exchange
+    contract.currency = currency
 
-# Instantiate our callback object
-callback = PlaceOrderExample()
+    print('Waiting for valid order id')
+    order_id = callback.order_ids.get(timeout=WAIT_TIME)
+    if not order_id:
+        raise RuntimeError('Failed to receive order id after %ds' % WAIT_TIME)
+    
+    # Order details
+    algoParams = TagValueList()
+    algoParams.append(TagValue("componentSize", "3"))
+    algoParams.append(TagValue("timeBetweenOrders", "60"))
+    algoParams.append(TagValue("randomizeTime20", "1"))
+    algoParams.append(TagValue("randomizeSize55", "1"))
+    algoParams.append(TagValue("giveUp", "1"))
+    algoParams.append(TagValue("catchUp", "1"))
+    algoParams.append(TagValue("waitForFill", "1"))
+    #algoParams.append(TagValue("startTime", "20110302-14:30:00 GMT"))
+    #algoParams.append(TagValue("endTime", "20110302-21:00:00 GMT"))
 
-# Instantiate a socket object, allowing us to call TWS directly. Pass our
-# callback object so TWS can respond.
-tws = EPosixClientSocket(callback)
+    order = Order()
+    order.action = action
+    #order.lmtPrice = 140
+    order.orderType = 'MKT'
+    order.totalQuantity = quant
+    order.algoStrategy = "AD"
+    order.tif = 'DAT'
+    order.algoParams = algoParams
+    #order.transmit = False
 
-# Connect to tws running on localhost
-if not tws.eConnect("", 7496, 42):
-    raise RuntimeError('Failed to connect to TWS')
+    
+    print("Placing order for %d %s's (id: %d)" % (order.totalQuantity,
+                                                  contract.symbol, order_id))
+    
+    # Place the order
+    tws.placeOrder(
+        order_id,                                   # orderId,
+        contract,                                   # contract,
+        order                                       # order
+    )
+    
+    print("\n====================================================================")
+    print(" Order placed, waiting %ds for TWS responses" % WAIT_TIME)
+    print("====================================================================\n")
+    
+    
+    print("Waiting for order to be filled..")
+    
+    try:
+        callback.order_filled.wait(WAIT_TIME)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        if not callback.order_filled.is_set():
+            print('Failed to fill order')
+    
+        print("\nDisconnecting...")
+        tws.eDisconnect()
 
-# Simple contract for GOOG
-contract = Contract()
-contract.symbol = "IBM"
-contract.secType = "STK"
-contract.exchange = "SMART"
-contract.currency = "USD"
-
-print('Waiting for valid order id')
-order_id = callback.order_ids.get(timeout=WAIT_TIME)
-if not order_id:
-    raise RuntimeError('Failed to receive order id after %ds' % WAIT_TIME)
-
-# Order details
-algoParams = TagValueList()
-algoParams.append(TagValue("componentSize", "3"))
-algoParams.append(TagValue("timeBetweenOrders", "60"))
-algoParams.append(TagValue("randomizeTime20", "1"))
-algoParams.append(TagValue("randomizeSize55", "1"))
-algoParams.append(TagValue("giveUp", "1"))
-algoParams.append(TagValue("catchUp", "1"))
-algoParams.append(TagValue("waitForFill", "1"))
-algoParams.append(TagValue("startTime", "20110302-14:30:00 GMT"))
-algoParams.append(TagValue("endTime", "20110302-21:00:00 GMT"))
-
-order = Order()
-order.action = 'BUY'
-order.lmtPrice = 140
-order.orderType = 'LMT'
-order.totalQuantity = 10
-order.algoStrategy = "AD"
-order.tif = 'DAT'
-order.algoParams = algoParams
-#order.transmit = False
-
-
-print("Placing order for %d %s's (id: %d)" % (order.totalQuantity,
-                                              contract.symbol, order_id))
-
-# Place the order
-tws.placeOrder(
-    order_id,                                   # orderId,
-    contract,                                   # contract,
-    order                                       # order
-)
-
-print("\n====================================================================")
-print(" Order placed, waiting %ds for TWS responses" % WAIT_TIME)
-print("====================================================================\n")
-
-
-print("Waiting for order to be filled..")
-
-try:
-    callback.order_filled.wait(WAIT_TIME)
-except KeyboardInterrupt:
-    pass
-finally:
-    if not callback.order_filled.is_set():
-        print('Failed to fill order')
-
-    print("\nDisconnecting...")
-    tws.eDisconnect()
+#place_order("BUY", 1, "EUR", "CASH", "USD", "IDEALPRO");

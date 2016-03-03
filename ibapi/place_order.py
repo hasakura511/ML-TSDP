@@ -80,7 +80,7 @@ def place_order(action, quant, sym, type, currency, exchange, submit):
     tws = EPosixClientSocket(callback)
     
     # Connect to tws running on localhost
-    if not tws.eConnect("", 7496, 42):
+    if not tws.eConnect("", 7496, 111):
         raise RuntimeError('Failed to connect to TWS')
     
     # Simple contract for GOOG

@@ -65,10 +65,10 @@ class PlaceOrderExample(EWrapper):
                                             commissionReport.realizedPNL)
 
 def place_order(action, quant, sym, type, currency, exchange):
-    prompt = input("WARNING: This example will place an order on your IB "
-                   "account, are you sure? (Type yes to continue): ")
-    if prompt.lower() != 'yes':
-        sys.exit()
+    #prompt = input("WARNING: This example will place an order on your IB "
+    #               "account, are you sure? (Type yes to continue): ")
+    #if prompt.lower() != 'yes':
+    #    sys.exit()
     
     # Instantiate our callback object
     callback = PlaceOrderExample()

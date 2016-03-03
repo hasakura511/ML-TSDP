@@ -1,4 +1,5 @@
 import pandas as pd
+import sys
 from datetime import datetime
 from threading import Event
 
@@ -269,7 +270,8 @@ print classification_report(dy,ypred)
 sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
             pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)
 sst.index=sst.index.astype(str).to_datetime()
-compareEquity(sst, ticker)
+if len(sys.argv)==1:
+    compareEquity(sst, ticker)
 
 
 last = [mData.drop(['signal'],axis=1).values[-1]]

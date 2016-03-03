@@ -1,4 +1,5 @@
 import sys
+import random
 from threading import Event
 
 from swigibpy import (EWrapper, EPosixClientSocket, Contract, Order, TagValue,
@@ -80,7 +81,8 @@ def place_order(action, quant, sym, type, currency, exchange, submit):
     tws = EPosixClientSocket(callback)
     
     # Connect to tws running on localhost
-    if not tws.eConnect("", 7496, 42):
+    tid=random.randint(1,10000)
+    if not tws.eConnect("", 7496, tid):
         raise RuntimeError('Failed to connect to TWS')
     
     # Simple contract for GOOG
@@ -97,12 +99,12 @@ def place_order(action, quant, sym, type, currency, exchange, submit):
     
     # Order details
     algoParams = TagValueList()
-    algoParams.append(TagValue("componentSize", "3"))
-    algoParams.append(TagValue("timeBetweenOrders", "60"))
-    algoParams.append(TagValue("randomizeTime20", "1"))
-    algoParams.append(TagValue("randomizeSize55", "1"))
-    algoParams.append(TagValue("giveUp", "1"))
-    algoParams.append(TagValue("catchUp", "1"))
+    #algoParams.append(TagValue("componentSize", "3"))
+    #algoParams.append(TagValue("timeBetweenOrders", "60"))
+    #algoParams.append(TagValue("randomizeTime20", "1"))
+    #algoParams.append(TagValue("randomizeSize55", "1"))
+    #algoParams.append(TagValue("giveUp", "1"))
+    #algoParams.append(TagValue("catchUp", "1"))
     algoParams.append(TagValue("waitForFill", "1"))
     #algoParams.append(TagValue("startTime", "20110302-14:30:00 GMT"))
     #algoParams.append(TagValue("endTime", "20110302-21:00:00 GMT"))
@@ -112,7 +114,7 @@ def place_order(action, quant, sym, type, currency, exchange, submit):
     #order.lmtPrice = 140
     order.orderType = 'MKT'
     order.totalQuantity = quant
-    order.algoStrategy = "AD"
+    #order.algoStrategy = "AD"
     order.tif = 'DAT'
     order.algoParams = algoParams
     #order.transmit = False

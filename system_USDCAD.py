@@ -279,7 +279,7 @@ print "f1:   %.2f" % f1OOS
 print "\nend of run"
 model.fit(dX, dy)
 ypred = model.predict(dX)
-print metrics.classification_report(dy,ypred)
+print classification_report(dy,ypred)
 
 sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
             pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)

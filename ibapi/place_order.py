@@ -64,7 +64,9 @@ class PlaceOrderExample(EWrapper):
                                             commissionReport.commission,
                                             commissionReport.realizedPNL)
 
-def place_order(action, quant, sym, type, currency, exchange):
+def place_order(action, quant, sym, type, currency, exchange, submit):
+    if submit == False:
+          return 0;
     #prompt = input("WARNING: This example will place an order on your IB "
     #               "account, are you sure? (Type yes to continue): ")
     #if prompt.lower() != 'yes':
@@ -72,7 +74,7 @@ def place_order(action, quant, sym, type, currency, exchange):
     
     # Instantiate our callback object
     callback = PlaceOrderExample()
-    
+
     # Instantiate a socket object, allowing us to call TWS directly. Pass our
     # callback object so TWS can respond.
     tws = EPosixClientSocket(callback)

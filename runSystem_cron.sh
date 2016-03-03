@@ -1,4 +1,5 @@
 #!/bin/sh
+cd /Users/admin/ML-TSDP/
 python system_EURUSD.py 1
 python system_GBPUSD.py 1
 python system_USDJPY.py 1

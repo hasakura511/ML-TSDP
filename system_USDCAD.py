@@ -88,9 +88,9 @@ if not tws.eConnect("", 7496, 111):
 # Simple contract for GOOG
 contract = Contract()
 contract.exchange = "IDEALPRO"
-contract.symbol = "EUR"
+contract.symbol = "USD"
 contract.secType = "CASH"
-contract.currency = "USD"
+contract.currency = "CAD"
 today = datetime.today()
 
 print("Requesting historical data for %s" % contract.symbol)
@@ -136,15 +136,11 @@ import numpy as np
 import pandas as pd
 import Quandl
 from sklearn.cross_validation import StratifiedShuffleSplit
-from sklearn.linear_model import Perceptron, PassiveAggressiveClassifier, LogisticRegression
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier,\
                         BaggingClassifier, ExtraTreesClassifier, VotingClassifier
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.metrics import confusion_matrix
-from sklearn.svm import LinearSVC, SVC, NuSVC
-from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
+
 from sklearn.metrics import confusion_matrix
 from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros, runsZScore,\
                         gainAhead, ATR, priceChange, garch, autocorrel, kaufman_efficiency,\
@@ -158,7 +154,19 @@ zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
 DPOLookback = 3    
-model = SVC()
+dt_stump = DecisionTreeClassifier(max_depth=1, min_samples_leaf=1)        
+model = VotingClassifier(estimators=[\
+             ("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
+             ("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
+             ("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
+         #    ("QDA", QuadraticDiscriminantAnalysis()),\
+             ("GNBayes",GaussianNB()),\
+             #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
+             #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:500}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
+             #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=8, weights='distance')),\
+             #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
+             ("ETC", ExtraTreesClassifier(class_weight={1:500}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
+                ], voting='hard', weights=None)
 ticker = contract.symbol + contract.currency
 
 dataSet = data
@@ -267,24 +275,15 @@ print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
 print "f1:   %.2f" % f1OOS
 
 print "\nend of run"
-'''
-model = SVC()
-from sklearn.grid_search import GridSearchCV
-Crange = np.logspace(-2,2,40)
-grid = GridSearchCV(model, param_grid={'C':Crange},scoring='accuracy',cv=5)
-grid.fit(dX,dy)
-grid.best_params_
-score = [g[1] for g in grid.grid_scores_]
-score
-plt.semilogx(Crange,scores)
-plt.semilogx(Crange,score)
-'''
 model.fit(dX, dy)
 ypred = model.predict(dX)
+print metrics.classification_report(dy,ypred)
+
 sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
             pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)
 sst.index=sst.index.astype(str).to_datetime()
 compareEquity(sst, ticker)
 
-nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
-print 'Next Signal for',dataSet.index[-1],'is', nextSignal
+last = [mData.drop(['signal'],axis=1).values[-1]]
+print 'Next Signal for',dataSet.index[-1],'is', model.predict(last)
+        #, 'with', model.predict_proba(last).max()*100, '% probability'

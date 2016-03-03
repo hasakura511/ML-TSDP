@@ -88,7 +88,7 @@ if not tws.eConnect("", 7496, 111):
 # Simple contract for GOOG
 contract = Contract()
 contract.exchange = "IDEALPRO"
-contract.symbol = "EUR"
+contract.symbol = "AUD"
 contract.secType = "CASH"
 contract.currency = "USD"
 today = datetime.today()
@@ -136,15 +136,9 @@ import numpy as np
 import pandas as pd
 import Quandl
 from sklearn.cross_validation import StratifiedShuffleSplit
-from sklearn.linear_model import Perceptron, PassiveAggressiveClassifier, LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier,\
-                        BaggingClassifier, ExtraTreesClassifier, VotingClassifier
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.metrics import confusion_matrix
-from sklearn.svm import LinearSVC, SVC, NuSVC
-from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix
 from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros, runsZScore,\
                         gainAhead, ATR, priceChange, garch, autocorrel, kaufman_efficiency,\
@@ -158,7 +152,7 @@ zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
 DPOLookback = 3    
-model = SVC()
+model = QuadraticDiscriminantAnalysis()
 ticker = contract.symbol + contract.currency
 
 dataSet = data
@@ -267,24 +261,15 @@ print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
 print "f1:   %.2f" % f1OOS
 
 print "\nend of run"
-'''
-model = SVC()
-from sklearn.grid_search import GridSearchCV
-Crange = np.logspace(-2,2,40)
-grid = GridSearchCV(model, param_grid={'C':Crange},scoring='accuracy',cv=5)
-grid.fit(dX,dy)
-grid.best_params_
-score = [g[1] for g in grid.grid_scores_]
-score
-plt.semilogx(Crange,scores)
-plt.semilogx(Crange,score)
-'''
 model.fit(dX, dy)
 ypred = model.predict(dX)
+print metrics.classification_report(dy,ypred)
+
 sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
             pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)
 sst.index=sst.index.astype(str).to_datetime()
 compareEquity(sst, ticker)
 
-nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
-print 'Next Signal for',dataSet.index[-1],'is', nextSignal
+last = [mData.drop(['signal'],axis=1).values[-1]]
+print 'Next Signal for',dataSet.index[-1],'is', model.predict(last), 'with',\
+        model.predict_proba(last).max()*100, '% probability'

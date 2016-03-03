@@ -158,7 +158,7 @@ zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
 DPOLookback = 3
-model = KNeighborsClassifier()
+model = ExtraTreesClassifier()
 ticker = contract.symbol + contract.currency
 
 dataSet = data

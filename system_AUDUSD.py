@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from threading import Event
-
+from pytz import timezone
 from swigibpy import EWrapper, EPosixClientSocket, Contract
 
 
@@ -66,8 +66,8 @@ class HistoricalDataExample(EWrapper):
         #    p_volume.append(volume);
 	    #date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
             data.loc[date] = [open,high,low,close,volume]
-            #print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
-            #           % (date, open, high, low, close, volume)
+            print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+                       % (date, open, high, low, close, volume)
 
             #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
             #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
@@ -91,7 +91,7 @@ contract.exchange = "IDEALPRO"
 contract.symbol = "AUD"
 contract.secType = "CASH"
 contract.currency = "USD"
-today = datetime.today()
+#today = datetime.today()
 
 print("Requesting historical data for %s" % contract.symbol)
 
@@ -99,7 +99,7 @@ print("Requesting historical data for %s" % contract.symbol)
 tws.reqHistoricalData(
     1,                                         # tickerId,
     contract,                                   # contract,
-    today.strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
+    datetime.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
     "1 M",                                      # durationStr,
     "1 hour",                                    # barSizeSetting,
     "ASK",                                   # whatToShow,

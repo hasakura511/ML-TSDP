@@ -141,7 +141,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.metrics import confusion_matrix, classification_report
-
+from sklearn.svm import LinearSVC, SVC, NuSVC
 from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros, runsZScore,\
                         gainAhead, ATR, priceChange, garch, autocorrel, kaufman_efficiency,\
                         volumeSpike, softmax_score, create_indicators, ratio, getToxCutoff2,\
@@ -154,7 +154,7 @@ zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
 DPOLookback = 3    
-model = QuadraticDiscriminantAnalysis()
+model = SVC()
 ticker = contract.symbol + contract.currency
 
 dataSet = data

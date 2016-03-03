@@ -44,7 +44,7 @@ zz_steps = [0.005]
 #find signals with the highest CAR25
 #direction = 'LONG'
 start_date = 19981222
-end_date = 20160204
+end_date = 20160225
 years_in_study = int(str(end_date)[:4]) - int(str(start_date)[:4])
 
 hold_days = 1

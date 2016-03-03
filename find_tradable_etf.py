@@ -20,8 +20,8 @@ from datetime import datetime as dt
 
 start = '01/01/1999'
 end = '03/22/2016'
-rsPath = 'C:/Users/Hidemi/Desktop/Python/data/from_RS/'
-rsfile = '0_DoubleDF_ES_RegimeSwitching_wl2.0_CAR25.csv'
+rsPath = './data/from_RS/'
+rsfile = '0_DoubleDF_ES_RegimeSwitching_wl2.0_EMA30.csv'
 
 def getDailyGoogle(ticker, start, end):
     #ticker = 'SDS'

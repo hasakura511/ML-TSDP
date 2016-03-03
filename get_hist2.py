@@ -66,8 +66,8 @@ class HistoricalDataExample(EWrapper):
         #    p_volume.append(volume);
 	    #date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
             data.loc[date] = [open,high,low,close,volume]
-            #print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
-            #           % (date, open, high, low, close, volume)
+            print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+                       % (date, open, high, low, close, volume)
 
             #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
             #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
@@ -88,9 +88,9 @@ if not tws.eConnect("", 7496, 111):
 # Simple contract for GOOG
 contract = Contract()
 contract.exchange = "IDEALPRO"
-contract.symbol = "GBP"
+contract.symbol = "USD"
 contract.secType = "CASH"
-contract.currency = "USD"
+contract.currency = "JPY"
 today = datetime.today()
 
 print("Requesting historical data for %s" % contract.symbol)
@@ -100,8 +100,8 @@ tws.reqHistoricalData(
     1,                                         # tickerId,
     contract,                                   # contract,
     today.strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
-    "1 M",                                      # durationStr,
-    "1 hour",                                    # barSizeSetting,
+    "1 Y",                                      # durationStr,
+    "1 day",                                    # barSizeSetting,
     "ASK",                                   # whatToShow,
     1,                                          # useRTH,
     1                                          # formatDate
@@ -136,29 +136,19 @@ import numpy as np
 import pandas as pd
 import Quandl
 from sklearn.cross_validation import StratifiedShuffleSplit
-from sklearn.linear_model import Perceptron, PassiveAggressiveClassifier, LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier,\
-                        BaggingClassifier, ExtraTreesClassifier, VotingClassifier
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.metrics import confusion_matrix
-from sklearn.svm import LinearSVC, SVC, NuSVC
-from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros, runsZScore,\
                         gainAhead, ATR, priceChange, garch, autocorrel, kaufman_efficiency,\
                         volumeSpike, softmax_score, create_indicators, ratio, getToxCutoff2,\
                         percentUpDays
-from suztoolz.display import compareEquity                        
-
 iterations=10
 RSILookback = 1.5
 zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
 DPOLookback = 3    
-model = AdaBoostClassifier()
+model = LogisticRegression()
 ticker = contract.symbol + contract.currency
 
 dataSet = data
@@ -187,7 +177,7 @@ mData = dataSet.drop(['Open','High','Low','Close',
                        'Volume','Pri','gainAhead'],
                         axis=1).dropna()
 
-#  Select the date range to test no label for the last index
+#  Select the date range to test
 mmData = mData[:-1]
 
 datay = mmData.signal
@@ -246,7 +236,7 @@ accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
 f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
 
 print "\n\nSymbol is ", ticker
-print "Learning algorithm is", model
+print "Learning algorithm is Logistic Regression"
 print "Confusion matrix for %i randomized tests" % iterations
 print "for years ", dataSet.index[0] , " through ", dataSet.index[-2]  
 
@@ -268,18 +258,7 @@ print "f1:   %.2f" % f1OOS
 
 print "\nend of run"
 model.fit(dX, dy)
-ypred = model.predict(dX)
-sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
-            pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)
-sst.index=sst.index.astype(str).to_datetime()
-compareEquity(sst, ticker)
-
 nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
 print 'Next Signal for',dataSet.index[-1],'is', nextSignal
 
-system="GBPUSD"
-data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
-#data.to_csv('./data/signals/' + system + '.csv', index=False)
-signal=pd.read_csv('./data/signals/' + system + '.csv')
-signal=signal.append(data)
-signal.to_csv('./data/signals/' + system + '.csv', index=False)
+

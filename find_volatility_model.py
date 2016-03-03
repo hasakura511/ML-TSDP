@@ -62,7 +62,7 @@ from sknn.mlp import Classifier, Layer
 from sknn.backend import lasagne
 
 path = '/media/sf_Python/data/from_fileprep/'
-filename = 'F_ES_19981222to20160204signals.csv'
+filename = 'F_ES_19981222to20160225signals.csv'
 ticker = filename[:4]
 #signal = 'ZZ 0.02,-0.005'
 signal = 'volCheck'
@@ -82,7 +82,7 @@ initial_equity = 100000.0
 #offline learning
 testFirstYear = "2008-01-01"
 #adjust reserve for windowlength
-testFinalYear = "2014-12-31"
+testFinalYear = "2016-02-25"
 test_split = 0.33 #test split
 iterations = 10 #for sss
 

@@ -261,11 +261,18 @@ print "f1:   %.2f" % f1OOS
 print "\nend of run"
 model.fit(dX, dy)
 ypred = model.predict(dX)
+print metrics.classification_report(dy,ypred)
+
 sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
             pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)
 sst.index=sst.index.astype(str).to_datetime()
 compareEquity(sst, ticker)
 
+<<<<<<< HEAD
+last = [mData.drop(['signal'],axis=1).values[-1]]
+print 'Next Signal for',dataSet.index[-1],'is', model.predict(last), 'with',\
+        model.predict_proba(last).max()*100, '% probability'
+=======
 nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
 print 'Next Signal for',dataSet.index[-1],'is', nextSignal
 
@@ -275,3 +282,4 @@ data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Dat
 signal=pd.read_csv('./data/signals/' + system + '.csv')
 signal=signal.append(data)
 signal.to_csv('./data/signals/' + system + '.csv', index=False)
+>>>>>>> 2e8bea50575d3977cf7831f6700a0ddd507d262a

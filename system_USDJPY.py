@@ -268,18 +268,14 @@ sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
 sst.index=sst.index.astype(str).to_datetime()
 compareEquity(sst, ticker)
 
-<<<<<<< HEAD
+
 last = [mData.drop(['signal'],axis=1).values[-1]]
 print 'Next Signal for',dataSet.index[-1],'is', model.predict(last), 'with',\
         model.predict_proba(last).max()*100, '% probability'
-=======
-nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
-print 'Next Signal for',dataSet.index[-1],'is', nextSignal
 
 system="USDJPY"
-data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
+data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last)}, columns=['Date','Signal'])
 #data.to_csv('./data/signals/' + system + '.csv', index=False)
 signal=pd.read_csv('./data/signals/' + system + '.csv')
 signal=signal.append(data)
 signal.to_csv('./data/signals/' + system + '.csv', index=False)
->>>>>>> 2e8bea50575d3977cf7831f6700a0ddd507d262a

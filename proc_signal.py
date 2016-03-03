@@ -30,8 +30,12 @@ def proc_signal(system, systemid, c2quant, c2sym, c2type, ibquant, ibsym, ibcurr
     #os.remove('./data/signals/' + system + '.csv')
     
 
-proc_signal('EURUSD','100961267',1, 'EURUSD','forex',100000, 'EUR','USD','IDEALPRO','CASH')
+proc_signal('EURUSD','100961267',1, 'EURUSD','forex',100000,'EUR','USD','IDEALPRO','CASH')
 proc_signal('GBPUSD','100961267',1, 'GBPUSD','forex',100000,'GBP','USD','IDEALPRO','CASH')
 proc_signal('USDCHF','100961267',1, 'USDCHF','forex',100000,'USD','CHF','IDEALPRO','CASH')
 proc_signal('USDJPY','100961267',1, 'USDJPY','forex',100000,'USD','JPY','IDEALPRO','CASH')
 
+proc_signal('EURUSD','100961226',1, 'EURUSD','forex',100000,'EUR','USD','IDEALPRO','CASH')
+proc_signal('GBPUSD','100962402',1, 'GBPUSD','forex',100000,'GBP','USD','IDEALPRO','CASH')
+proc_signal('USDCHF','100962399',1, 'USDCHF','forex',100000,'USD','CHF','IDEALPRO','CASH')
+proc_signal('USDJPY','100962390',1, 'USDJPY','forex',100000,'USD','JPY','IDEALPRO','CASH')

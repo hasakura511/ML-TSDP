@@ -258,6 +258,8 @@ print "f1:   %.2f" % f1OOS
 
 print "\nend of run"
 model.fit(dX, dy)
+ypred = model.predict(dy)
+
 nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
 print 'Next Signal for',dataSet.index[-1],'is', nextSignal
 

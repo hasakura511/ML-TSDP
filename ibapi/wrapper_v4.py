@@ -123,9 +123,11 @@ class IBWrapper(EWrapper):
         symbol=contract.symbol
         expiry=contract.expiry
         side=execution.side
+        currency=contract.currency
         
-        execdetails=dict(side=str(side), times=str(exectime), orderid=str(thisorderid), qty=int(cumQty), price=float(avgprice), symbol=str(symbol), expiry=str(expiry), clientid=str(clientid), execid=str(execid), account=str(account), exchange=str(exchange), permid=int(permid))
-
+        
+        execdetails=dict(symbol_currency=str(currency), side=str(side), times=str(exectime), orderid=str(thisorderid), qty=int(cumQty), price=float(avgprice), symbol=str(symbol), expiry=str(expiry), clientid=str(clientid), execid=str(execid), account=str(account), exchange=str(exchange), permid=int(permid))
+       
         if reqId==FILL_CODE:
             ## This is a fill from a trade we've just done
             action_ib_fill(execdetails)

@@ -21,6 +21,7 @@ def get_ibtrades():
     datestr=strftime("%Y%m%d", localtime())
     data=get_ibexec()
     dataSet=pd.DataFrame(data)
+    dataSet=dataSet.sort_values(by='times')
     dataSet.to_csv('./data/ibapi/' +  datestr + '_' + 'trades' + '.csv', index=False)
     
 get_ibtrades()

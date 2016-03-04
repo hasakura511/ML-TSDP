@@ -1,8 +1,7 @@
 from swigibpy import EWrapper
 import time
 import pandas as pd
-from swigibpy import EPosixClientSocket, ExecutionFilter
-
+from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
 from swigibpy import Order as IBOrder
 from IButils import bs_resolve, action_ib_fill
 
@@ -22,7 +21,7 @@ def return_IB_connection_info():
    
     port=7496
     clientid=999
-   
+    
     return (host, port, clientid)
 
 class IBWrapper(EWrapper):
@@ -67,17 +66,32 @@ class IBWrapper(EWrapper):
             parentId, lastFilledPrice, clientId, whyHeld):
         pass
 
-    def commissionReport(self, blah):
-        pass
-
-
+    def commissionReport(self, commission):
+        print 'Commission %s %s P&L: %s' % (commission.currency,
+                                            commission.commission,
+                                            commission.realizedPNL)
+        filldata=self.data_fill_data
+        
+        #if reqId not in filldata.keys():
+        #    filldata[reqId]={}
+            
+        execid=commission.execId
+        
+        execdetails=filldata[execid]
+        execdetails['commission']=commission.commission
+        execdetails['commission_currency']=commission.currency
+        execdetails['realized_PnL']=commission.realizedPNL
+        execdetails['yield_redemption_date']=commission.yieldRedemptionDate
+        filldata[execid]=execdetails
+        self.data_fill_data=filldata
+        
 
     """
     get stuff
     """
 
     def init_fill_data(self):
-        setattr(self, "data_fill_data", [])
+        setattr(self, "data_fill_data", {})
         setattr(self, "flag_fill_data_finished", False)
 
     def add_fill_data(self, reqId, execdetails):
@@ -91,13 +105,13 @@ class IBWrapper(EWrapper):
             
         #execid=execdetails['execid']
         
-        filldata.append(execdetails)
+        filldata[execdetails['execid']]=execdetails
                         
         setattr(self, "data_fill_data", filldata)
 
 
     def execDetails(self, reqId, contract, execution):
-    
+        
         """
         This is called if 
         
@@ -110,7 +124,7 @@ class IBWrapper(EWrapper):
         See API docs, C++, SocketClient Properties, Contract and Execution for more details 
         """
         reqId=int(reqId)
-        
+       
         execid=execution.execId
         exectime=execution.time
         thisorderid=int(execution.orderId)
@@ -123,11 +137,12 @@ class IBWrapper(EWrapper):
         symbol=contract.symbol
         expiry=contract.expiry
         side=execution.side
+        #commission=execution.commission
         currency=contract.currency
         
         
-        execdetails=dict(symbol_currency=str(currency), side=str(side), times=str(exectime), orderid=str(thisorderid), qty=int(cumQty), price=float(avgprice), symbol=str(symbol), expiry=str(expiry), clientid=str(clientid), execid=str(execid), account=str(account), exchange=str(exchange), permid=int(permid))
-       
+        execdetails=dict( symbol_currency=str(currency), side=str(side), times=str(exectime), orderid=str(thisorderid), qty=int(cumQty), price=float(avgprice), symbol=str(symbol), expiry=str(expiry), clientid=str(clientid), execid=str(execid), account=str(account), exchange=str(exchange), permid=int(permid))
+        
         if reqId==FILL_CODE:
             ## This is a fill from a trade we've just done
             action_ib_fill(execdetails)
@@ -136,6 +151,7 @@ class IBWrapper(EWrapper):
             ## This is just execution data we've asked for
             self.add_fill_data(reqId, execdetails)
 
+        
             
     def execDetailsEnd(self, reqId):
         """
@@ -434,6 +450,7 @@ class IBclient(object):
         #ef.m_time="20160101"
         #ef.client_id=0;
         t=2;
+       
         while t > 1:
             reqId=reqId+1
             self.tws.reqExecutions(reqId, ef)
@@ -456,6 +473,6 @@ class IBclient(object):
             
             t=t-1;
             
-        execlist=self.cb.data_fill_data
+        execlist=self.cb.data_fill_data.values()
         
         return execlist

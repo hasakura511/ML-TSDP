@@ -3,7 +3,7 @@ from swigibpy import Contract as IBcontract
 
 import time
  
-if __name__=="__main__":
+def get_exec():
 
     """
     This simple example places an order, checks to see if it is active, and receives fill(s)

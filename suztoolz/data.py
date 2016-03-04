@@ -12,8 +12,6 @@ WAIT_TIME = 60.0
 
 
 class HistoricalDataExample(EWrapper):
-    data = pd.DataFrame(columns = ['Open','High','Low','Close','Volume'])
-
     '''Callback object passed to TWS, these functions will be called directly
     by TWS.
     '''
@@ -21,6 +19,7 @@ class HistoricalDataExample(EWrapper):
     def __init__(self):
         super(HistoricalDataExample, self).__init__()
         self.got_history = Event()
+        self.data = pd.DataFrame(columns = ['Open','High','Low','Close','Volume'])
 
     def orderStatus(self, id, status, filled, remaining, avgFillPrice, permId,
                     parentId, lastFilledPrice, clientId, whyHeld):
@@ -43,6 +42,7 @@ class HistoricalDataExample(EWrapper):
 
     def getData(self):
         return self.data;
+        
     def historicalData(self, reqId, date, open, high,
                        low, close, volume,
                        barCount, WAP, hasGaps):
@@ -58,7 +58,7 @@ class HistoricalDataExample(EWrapper):
             #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
             #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
 
-        return self.data
+        #return self.data
 
 
 def getDataFromIB(brokerData,getHistLoop):

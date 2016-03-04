@@ -180,7 +180,7 @@ dataSet = data
 nrows = data.shape[0]
 print nrows
 dataSet['Pri'] = data.Close
-#dataSet['Pri_RSI'] = RSI(dataSet.Pri,RSILookback)
+dataSet['Pri_RSI'] = RSI(dataSet.Pri,RSILookback)
 dataSet['Pri_DPO'] = DPO(dataSet.Close,DPOLookback)
 dataSet['Pri_ATR'] = zScore(ATR(data.High,data.Low,data.Close,ATRLookback),
                           zScoreLookback)

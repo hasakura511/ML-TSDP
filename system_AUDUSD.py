@@ -6,7 +6,7 @@ from threading import Event
 from pytz import timezone
 from swigibpy import EWrapper, EPosixClientSocket, Contract
 
-saveSignals= False
+saveSignals= True
 WAIT_TIME = 60.0
 data = pd.DataFrame(columns = ['Open','High','Low','Close','Volume'])
 #p_open=[];
@@ -68,8 +68,8 @@ class HistoricalDataExample(EWrapper):
         #    p_volume.append(volume);
 	    #date = dt.strptime(date, "%Y%m%d").strftime("%d %b %Y")
             data.loc[date] = [open,high,low,close,volume]
-            print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
-                       % (date, open, high, low, close, volume)
+            #print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+             #          % (date, open, high, low, close, volume)
 
             #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
             #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
@@ -93,25 +93,21 @@ contract.exchange = "IDEALPRO"
 contract.symbol = "AUD"
 contract.secType = "CASH"
 contract.currency = "USD"
-#today = dt.today()
+today = dt.today()
 
 print("Requesting historical data for %s" % contract.symbol)
-today = dt.now(timezone('US/Eastern'))
-getHistLoop = [today.strftime("%Y%m%d %H:%M:%S %Z")]
-getHistLoop.insert(0,(today-datetime.timedelta(365/12)).strftime("%Y%m%d %H:%M:%S %Z"))
-# Request some historical data.
 
-for endDateTime in getHistLoop:
-    tws.reqHistoricalData(
-        1,                                         # tickerId,
-        contract,                                   # contract,
-        endDateTime,                            #endDateTime
-        "1 M",                                      # durationStr,
-        "1 hour",                                    # barSizeSetting,
-        "MIDPOINT",                                   # whatToShow,
-        1,                                          # useRTH,
-        1                                          # formatDate
-    )
+# Request some historical data.
+tws.reqHistoricalData(
+    1,                                         # tickerId,
+    contract,                                   # contract,
+    today.strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
+    "1 M",                                      # durationStr,
+    "1 hour",                                    # barSizeSetting,
+    "MIDPOINT",                                   # whatToShow,
+    1,                                          # useRTH,
+    1                                          # formatDate
+)
 
 print("\n====================================================================")
 print(" History requested, waiting %ds for TWS responses" % WAIT_TIME)
@@ -172,6 +168,7 @@ nrows = data.shape[0]
 print nrows
 dataSet['Pri'] = data.Close
 dataSet['Pri_RSI'] = RSI(dataSet.Pri,RSILookback)
+dataSet['Pri_DPO'] = DPO(dataSet.Close,DPOLookback)
 dataSet['Pri_ATR'] = zScore(ATR(data.High,data.Low,data.Close,ATRLookback),
                           zScoreLookback)
 dataSet['Pri_ATR_Y1'] = dataSet['Pri_ATR'].shift(1)
@@ -288,9 +285,9 @@ print 'Next Signal for',dataSet.index[-1],'is', model.predict(last),\
             #'with', model.predict_proba(last).max()*100, '% probability'
         
 system="AUDUSD"
-saveData=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last), 'Model':model}, columns=['Date','Signal','Model'])
-if saveSignals:
-    signal=pd.read_csv('./data/signals/' + system + '.csv')
-    signal=signal.append(data)
-    signal.to_csv('./data/signals/' + system + '.csv', index=False)
- 
+data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
+
+signal=pd.read_csv('./data/signals/' + system + '.csv')
+signal=signal.append(data)
+signal.to_csv('./data/signals/' + system + '.csv', index=False)
+

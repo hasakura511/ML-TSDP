@@ -2,9 +2,9 @@ import pandas as pd
 import sys
 from datetime import datetime
 from threading import Event
-
+import time
 from swigibpy import EWrapper, EPosixClientSocket, Contract
-
+start_time = time.time()
 
 WAIT_TIME = 30.0
 data = pd.DataFrame(columns = ['Open','High','Low','Close','Volume'])
@@ -136,32 +136,52 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import Quandl
+from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.cross_validation import StratifiedShuffleSplit
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import Perceptron, PassiveAggressiveClassifier, LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier,\
                         BaggingClassifier, ExtraTreesClassifier, VotingClassifier
-from sklearn.metrics import confusion_matrix, classification_report
-
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.metrics import confusion_matrix
+from sklearn.svm import LinearSVC, SVC, NuSVC
+from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.metrics import confusion_matrix
 from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros, runsZScore,\
                         gainAhead, ATR, priceChange, garch, autocorrel, kaufman_efficiency,\
                         volumeSpike, softmax_score, create_indicators, ratio, getToxCutoff2,\
                         percentUpDays
 from suztoolz.display import compareEquity                        
+                    
 
 iterations=10
 RSILookback = 1.5
 zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
-DPOLookback = 3    
-model = GradientBoostingClassifier()
+DPOLookback = 3
+dt_stump = DecisionTreeClassifier(max_depth=1, min_samples_leaf=1)        
+model = VotingClassifier(estimators=[\
+             ("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
+             ("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
+             ("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
+         #    ("QDA", QuadraticDiscriminantAnalysis()),\
+             ("GNBayes",GaussianNB()),\
+             #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
+             ("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
+             #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=8, weights='distance')),\
+             #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
+             ("ETC", ExtraTreesClassifier(class_weight={1:1}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
+                ], voting='hard', weights=None)
 ticker = contract.symbol + contract.currency
 
 dataSet = data
 nrows = data.shape[0]
 print nrows
 dataSet['Pri'] = data.Close
-dataSet['Pri_RSI'] = RSI(dataSet.Pri,RSILookback)
+#dataSet['Pri_RSI'] = RSI(dataSet.Pri,RSILookback)
+dataSet['Pri_DPO'] = DPO(dataSet.Close,DPOLookback)
 dataSet['Pri_ATR'] = zScore(ATR(data.High,data.Low,data.Close,ATRLookback),
                           zScoreLookback)
 dataSet['Pri_ATR_Y1'] = dataSet['Pri_ATR'].shift(1)
@@ -171,10 +191,10 @@ dataSet['priceChange'] = priceChange(dataSet['Pri'])
 dataSet['priceChangeY1'] = dataSet['priceChange'].shift(1)
 dataSet['priceChangeY2'] = dataSet['priceChange'].shift(2)
 dataSet['priceChangeY3'] = dataSet['priceChange'].shift(3)
-dataSet['Pri_RSI_Y1'] = dataSet['Pri_RSI'].shift(1)
-dataSet['Pri_RSI_Y2'] = dataSet['Pri_RSI'].shift(2)
-dataSet['Pri_RSI_Y3'] = dataSet['Pri_RSI'].shift(3)
-dataSet['Pri_RSI_Y4'] = dataSet['Pri_RSI'].shift(4)
+dataSet['Pri_DPO_Y1'] = dataSet['Pri_DPO'].shift(1)
+dataSet['Pri_DPO_Y2'] = dataSet['Pri_DPO'].shift(2)
+dataSet['Pri_DPO_Y3'] = dataSet['Pri_DPO'].shift(3)
+dataSet['Pri_DPO_Y4'] = dataSet['Pri_DPO'].shift(4)
 
 dataSet['gainAhead'] = gainAhead(dataSet['Pri'])
 dataSet['signal'] = np.where(dataSet.gainAhead>beLongThreshold,1,-1)
@@ -284,3 +304,4 @@ data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last)}, colu
 signal=pd.read_csv('./data/signals/' + system + '.csv')
 signal=signal.append(data)
 signal.to_csv('./data/signals/' + system + '.csv', index=False)
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

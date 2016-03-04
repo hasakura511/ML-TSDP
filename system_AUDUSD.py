@@ -103,7 +103,7 @@ tws.reqHistoricalData(
     datetime.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
     "1 M",                                      # durationStr,
     "1 hour",                                    # barSizeSetting,
-    "ASK",                                   # whatToShow,
+    "MIDPOINT",                                   # whatToShow,
     1,                                          # useRTH,
     1                                          # formatDate
 )
@@ -274,8 +274,8 @@ if len(sys.argv)==1:
     compareEquity(sst, ticker)
 
 last = [mData.drop(['signal'],axis=1).values[-1]]
-print 'Next Signal for',dataSet.index[-1],'is', model.predict(last), 'with',\
-        model.predict_proba(last).max()*100, '% probability'
+print 'Next Signal for',dataSet.index[-1],'is', model.predict(last),\
+            #'with', model.predict_proba(last).max()*100, '% probability'
         
 system="AUDUSD"
 data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last)}, columns=['Date','Signal'])

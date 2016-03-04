@@ -41,6 +41,8 @@ class HistoricalDataExample(EWrapper):
         '''Called by TWS but not relevant for our example'''
         pass
 
+    def getData(self):
+        return self.data;
     def historicalData(self, reqId, date, open, high,
                        low, close, volume,
                        barCount, WAP, hasGaps):
@@ -49,14 +51,14 @@ class HistoricalDataExample(EWrapper):
             print("History request complete")
             self.got_history.set()
         else:
-            data.loc[date] = [open,high,low,close,volume]
+            self.data.loc[date] = [open,high,low,close,volume]
             print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
                        % (date, open, high, low, close, volume)
 
             #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
             #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
 
-        return data
+        return self.data
 
 
 def getDataFromIB(brokerData,getHistLoop):

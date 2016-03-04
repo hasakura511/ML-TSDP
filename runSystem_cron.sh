@@ -26,3 +26,4 @@ cd /Users/admin/ML-TSDP/
 /Users/admin/anaconda/bin/python system_AUDUSD.py 1
 /Users/admin/anaconda/bin/python system_USDCAD.py 1
 /Users/admin/anaconda/bin/python proc_signal.py
+/Users/admin/anaconda/bin/python get_exec.py

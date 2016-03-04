@@ -85,32 +85,35 @@ def getDataFromIB(brokerData,getHistLoop):
     # Request some historical data.
 
     for endDateTime in getHistLoop:
-        data = tws.reqHistoricalData(
-            brokerData['tickerId'],                                         # tickerId,
-            contract,                                   # contract,
-            endDateTime,                            #endDateTime
-            brokerData['durationStr'],                                      # durationStr,
-            brokerData['barSizeSetting'],                                    # barSizeSetting,
-            brokerData['whatToShow'],                                   # whatToShow,
-            brokerData['useRTH'],                                          # useRTH,
-            brokerData['formatDate']                                          # formatDate
-            )
-        data_cons = pd.concat([data_cons,data],axis=0)
+            tws.reqHistoricalData(
+                brokerData['tickerId'],                                         # tickerId,
+                contract,                                   # contract,
+                endDateTime,                            #endDateTime
+                brokerData['durationStr'],                                      # durationStr,
+                brokerData['barSizeSetting'],                                    # barSizeSetting,
+                brokerData['whatToShow'],                                   # whatToShow,
+                brokerData['useRTH'],                                          # useRTH,
+                brokerData['formatDate']                                          # formatDate
+                )
+       
 
-    print("\n====================================================================")
-    print(" History requested, waiting %ds for TWS responses" % WAIT_TIME)
-    print("====================================================================\n")
-
-
-    try:
-        callback.got_history.wait(timeout=WAIT_TIME)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        if not callback.got_history.is_set():
-            print('Failed to get history within %d seconds' % WAIT_TIME)
-
-        print("\nDisconnecting...")
-        tws.eDisconnect()
+            print("\n====================================================================")
+            print(" History requested, waiting %ds for TWS responses" % WAIT_TIME)
+            print("====================================================================\n")
+        
+        
+            try:
+                callback.got_history.wait(timeout=WAIT_TIME)
+            except KeyboardInterrupt:
+                pass
+            finally:
+                if not callback.got_history.is_set():
+                    print('Failed to get history within %d seconds' % WAIT_TIME)
+            
+            data=callback.data;
+            data_cons = pd.concat([data_cons,data],axis=0)
+             
+    print("\nDisconnecting...")
+    tws.eDisconnect()
         
     return data_cons

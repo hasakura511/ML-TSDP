@@ -6,3 +6,4 @@ python system_USDCHF.py
 python system_AUDUSD.py
 python system_USDCAD.py
 python proc_signal.py
+python get_exec.py

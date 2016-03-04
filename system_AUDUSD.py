@@ -1,12 +1,13 @@
 import pandas as pd
 import sys
-from datetime import datetime
+import datetime
+from datetime import datetime as dt
 from threading import Event
 from pytz import timezone
 from swigibpy import EWrapper, EPosixClientSocket, Contract
 
-
-WAIT_TIME = 30.0
+saveSignals= False
+WAIT_TIME = 60.0
 data = pd.DataFrame(columns = ['Open','High','Low','Close','Volume'])
 #p_open=[];
 #p_high=[];
@@ -65,7 +66,7 @@ class HistoricalDataExample(EWrapper):
         #    p_low.append(low);
         #    p_close.append(close);
         #    p_volume.append(volume);
-	    #date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
+	    #date = dt.strptime(date, "%Y%m%d").strftime("%d %b %Y")
             data.loc[date] = [open,high,low,close,volume]
             print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
                        % (date, open, high, low, close, volume)
@@ -92,21 +93,25 @@ contract.exchange = "IDEALPRO"
 contract.symbol = "AUD"
 contract.secType = "CASH"
 contract.currency = "USD"
-#today = datetime.today()
+#today = dt.today()
 
 print("Requesting historical data for %s" % contract.symbol)
-
+today = dt.now(timezone('US/Eastern'))
+getHistLoop = [today.strftime("%Y%m%d %H:%M:%S %Z")]
+getHistLoop.insert(0,(today-datetime.timedelta(365/12)).strftime("%Y%m%d %H:%M:%S %Z"))
 # Request some historical data.
-tws.reqHistoricalData(
-    1,                                         # tickerId,
-    contract,                                   # contract,
-    datetime.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
-    "1 M",                                      # durationStr,
-    "1 hour",                                    # barSizeSetting,
-    "MIDPOINT",                                   # whatToShow,
-    1,                                          # useRTH,
-    1                                          # formatDate
-)
+
+for endDateTime in getHistLoop:
+    tws.reqHistoricalData(
+        1,                                         # tickerId,
+        contract,                                   # contract,
+        endDateTime,                            #endDateTime
+        "1 M",                                      # durationStr,
+        "1 hour",                                    # barSizeSetting,
+        "MIDPOINT",                                   # whatToShow,
+        1,                                          # useRTH,
+        1                                          # formatDate
+    )
 
 print("\n====================================================================")
 print(" History requested, waiting %ds for TWS responses" % WAIT_TIME)
@@ -154,6 +159,11 @@ zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
 DPOLookback = 3    
+maxlb = max(RSILookback,
+                    zScoreLookback,
+                    ATRLookback,
+                    DPOLookback)
+                    
 model = SVC()
 ticker = contract.symbol + contract.currency
 
@@ -184,7 +194,7 @@ mData = dataSet.drop(['Open','High','Low','Close',
                         axis=1).dropna()
 
 #  Select the date range to test no label for the last index
-mmData = mData[:-1]
+mmData = mData[maxlb:-1]
 
 datay = mmData.signal
 mmData = mmData.drop(['signal'],axis=1)
@@ -278,8 +288,9 @@ print 'Next Signal for',dataSet.index[-1],'is', model.predict(last),\
             #'with', model.predict_proba(last).max()*100, '% probability'
         
 system="AUDUSD"
-data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last)}, columns=['Date','Signal'])
-#data.to_csv('./data/signals/' + system + '.csv', index=False)
-signal=pd.read_csv('./data/signals/' + system + '.csv')
-signal=signal.append(data)
-signal.to_csv('./data/signals/' + system + '.csv', index=False)
+saveData=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last), 'Model':model}, columns=['Date','Signal','Model'])
+if saveSignals:
+    signal=pd.read_csv('./data/signals/' + system + '.csv')
+    signal=signal.append(data)
+    signal.to_csv('./data/signals/' + system + '.csv', index=False)
+ 

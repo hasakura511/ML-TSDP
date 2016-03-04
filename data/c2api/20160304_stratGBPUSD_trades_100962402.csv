@@ -1,0 +1,12 @@
+PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,trade_id,underlying
+-7,,2016-03-04 02:01:07,1457074867,1.41618,,forex,short,,,closed,2016-03-04 00:01:26,1.41548,10000,,1,1,,GBPUSD,,100984287,
+1,,2016-03-03 03:24:25,1456993465,1.40751,,forex,short,,,closed,2016-03-03 02:41:17,1.40765,10000,,1,1,,GBPUSD,,100962529,
+1,,2016-03-03 06:12:47,1457003567,1.40711,,forex,short,,,closed,2016-03-03 05:01:46,1.40718,10000,,1,1,,GBPUSD,,100963635,
+3,,2016-03-03 05:01:45,1456999305,1.40718,,forex,long,,,closed,2016-03-03 03:24:37,1.40687,10000,,1,1,,GBPUSD,,100962936,
+-12,,2016-03-03 11:01:18,1457020878,1.41585,,forex,short,,,closed,2016-03-03 10:01:16,1.41464,10000,,1,1,,GBPUSD,,100968862,
+84,,2016-03-03 10:01:15,1457017275,1.41459,,forex,long,,,closed,2016-03-03 07:01:19,1.40619,10000,,1,1,,GBPUSD,,100964534,
+-1,,2016-03-03 06:17:08,1457003828,1.40693,,forex,long,,,closed,2016-03-03 06:12:48,1.40703,10000,,1,1,,GBPUSD,,100964164,
+-3,,2016-03-04 03:01:07,1457078467,1.41588,,forex,long,,,closed,2016-03-04 02:01:19,1.41613,10000,,1,1,,GBPUSD,,100986304,
+6,,2016-03-03 07:01:19,1457006479,1.40629,,forex,short,,,closed,2016-03-03 06:17:09,1.40692,10000,,1,1,,GBPUSD,,100964225,
+-2,,2016-03-04 00:01:25,1457067685,1.41611,,forex,long,,,closed,2016-03-03 11:01:20,1.4161525,10000,,4,4,,GBPUSD,,100970604,
+12,,,,1.41465,,forex,short,,,open,2016-03-04 03:01:18,1.41606,10000,,0,1,,GBPUSD,,100986720,

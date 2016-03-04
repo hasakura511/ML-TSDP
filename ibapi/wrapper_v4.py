@@ -1,5 +1,6 @@
 from swigibpy import EWrapper
 import time
+import pandas as pd
 from swigibpy import EPosixClientSocket, ExecutionFilter
 
 from swigibpy import Order as IBOrder
@@ -76,20 +77,21 @@ class IBWrapper(EWrapper):
     """
 
     def init_fill_data(self):
-        setattr(self, "data_fill_data", {})
+        setattr(self, "data_fill_data", [])
         setattr(self, "flag_fill_data_finished", False)
 
     def add_fill_data(self, reqId, execdetails):
-        if "data_fill_data" not in dir(self):
-            filldata={}
-        else:
-            filldata=self.data_fill_data
+        #if "data_fill_data" not in dir(self):
+        #    filldata=execdetails
+        #else:
+        filldata=self.data_fill_data
 
-        if reqId not in filldata.keys():
-            filldata[reqId]={}
+        #if reqId not in filldata.keys():
+        #    filldata[reqId]={}
             
-        execid=execdetails['orderid']
-        filldata[reqId][execid]=execdetails
+        #execid=execdetails['execid']
+        
+        filldata.append(execdetails)
                         
         setattr(self, "data_fill_data", filldata)
 
@@ -426,25 +428,32 @@ class IBclient(object):
         self.cb.init_error()
         
         ## We can change ExecutionFilter to subset different orders
-        
-        self.tws.reqExecutions(reqId, ExecutionFilter())
-
-        iserror=False
-        finished=False
-        
-        start_time=time.time()
-        
-        while not finished and not iserror:
-            finished=self.cb.flag_fill_data_finished
-            iserror=self.cb.flag_iserror
-            if (time.time() - start_time) > MAX_WAIT_SECONDS:
-                finished=True
-            pass
+        ef=ExecutionFilter();
+        #ef.m_time="20160101"
+        #ef.client_id=0;
+        t=2;
+        while t > 1:
+            reqId=reqId+1
+            self.tws.reqExecutions(reqId, ef)
     
-        if iserror:
-            print self.cb.error_msg
-            print "Problem getting executions"
+            iserror=False
+            finished=False
+            
+            start_time=time.time()
+            
+            while not finished and not iserror:
+                finished=self.cb.flag_fill_data_finished
+                iserror=self.cb.flag_iserror
+                if (time.time() - start_time) > MAX_WAIT_SECONDS:
+                    finished=True
+                pass
         
-        execlist=self.cb.data_fill_data[reqId]
+            if iserror:
+                print self.cb.error_msg
+                print "Problem getting executions"
+            
+            t=t-1;
+            
+        execlist=self.cb.data_fill_data
         
         return execlist

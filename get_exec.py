@@ -9,7 +9,10 @@ from c2api.get_exec import get_exec as get_c2exec
 data=get_c2exec(100961267);
 jsondata = json.loads(data)
 dataSet=json_normalize(jsondata['response'])
-#dataSet= pd.read_json(dataSet)
 dataSet.to_csv('./test.csv', index=False)
+
+data=get_ibexec()
+dataSet=pd.DataFrame(data)
+dataSet.to_csv('./test2.csv', index=False)
 
 

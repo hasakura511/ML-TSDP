@@ -76,13 +76,9 @@ def get_exec():
     ## Get the executions (gives you everything for last business day)
     execlist=client.get_executions()
     
-    print "Following executed since midnight this morning:"
-    print ""
-    print execlist
+    #print "Following executed since midnight this morning:"
+    #print ""
+    #print execlist
+    return execlist;
     
-     ## Get the executions (gives you everything for last business day)
-    execlist=client.get_executions()
-    
-    print "Following executed since midnight this morning:"
-    print ""
-    print execlist
+#get_exec();

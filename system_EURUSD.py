@@ -296,6 +296,7 @@ data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Dat
 #data.to_csv('./data/signals/' + system + '.csv', index=False)
 signal=pd.read_csv('./data/signals/' + system + '.csv')
 signal=signal.append(data)
-signal.to_csv('./data/signals/' + system + '.csv', index=False)
+if len(sys.argv) > 1:
+	signal.to_csv('./data/signals/' + system + '.csv', index=False)
  
  

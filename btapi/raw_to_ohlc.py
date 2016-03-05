@@ -6,7 +6,7 @@ low={}
 close={}
 open={}
 date={}
-df=pd.read_csv('./bitcoin_coindesk.csv')
+df=pd.read_csv('./1coinUSD.csv')
 for i in df.index:
     row=df.ix[i]
     hour=datetime.datetime.fromtimestamp(

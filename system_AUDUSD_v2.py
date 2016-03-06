@@ -5,28 +5,85 @@ Created on Sun Nov 22 20:57:32 2015
 
 @author: hidemi
 """
-
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import time
 import datetime
 from pytz import timezone
 from datetime import datetime as dt
+
+#classification
 from sklearn.cross_validation import StratifiedShuffleSplit
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.metrics import confusion_matrix
+from sklearn.linear_model import Perceptron, PassiveAggressiveClassifier, LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier,\
+                        BaggingClassifier, ExtraTreesClassifier, VotingClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import confusion_matrix
 from sklearn.svm import LinearSVC, SVC, NuSVC
-from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros, runsZScore,\
+from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+
+#regression
+from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor,\
+                        ExtraTreesRegressor, GradientBoostingRegressor
+from sklearn.isotonic import IsotonicRegression
+from sklearn.kernel_ridge import KernelRidge                       
+from sklearn.tree import DecisionTreeRegressor, ExtraTreeRegressor
+from sklearn.linear_model import ARDRegression, Ridge,RANSACRegressor,\
+                            LinearRegression, Lasso, LassoLars, BayesianRidge, PassiveAggressiveRegressor,\
+                            SGDRegressor,TheilSenRegressor
+from sklearn.neighbors import KNeighborsRegressor, RadiusNeighborsRegressor
+from sklearn.svm import LinearSVR, SVR
+
+#other
+from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
+
+#suztoolz
+from suztoolz.display import sss_display_cmatrix, is_display_cmatrix2,\
+                         oos_display_cmatrix2, init_report, update_report,\
+                         showPDF, showCDF, getToxCDF, plot_learning_curve,\
+                         directional_scoring, compareEquity, describeDistribution
+from suztoolz.loops import sss_iterate_train, adjustDataProportion, CAR25_df,\
+                            maxCAR25, wf_regress_validate2, sss_regress_train, calcDPS2,\
+                            calcEquity2, createBenchmark, createYearlyStats, findBestDPS
+from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
                         gainAhead, ATR, priceChange, garch, autocorrel, kaufman_efficiency,\
-                        volumeSpike, softmax_score, create_indicators, ratio, getToxCutoff2,\
-                        percentUpDays
-from suztoolz.display import compareEquity                        
+                        volumeSpike, softmax_score, create_indicators, ratio, perturb_data
 from suztoolz.data import getDataFromIB
 
-cycles = 1
+start_time = time.time()
+
+debug = False
+if debug:
+    showDist =  True
+    showPDFCDF = True
+    showAllCharts = True
+    perturbData = True
+    scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
+    equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
+    signalPath =  'C:/Users/Hidemi/Desktop/Python/'
+else:
+    showDist =  False
+    showPDFCDF = False
+    showAllCharts = False
+    perturbData = False
+    scorePath = None
+    equityStatsSavePath = None
+    signalPath = './data/signals/' 
+
+
+#system parameters
+version = 'v2'
+filterName = 'DF1'
+data_type = 'ALL'
+signal = 'LongGT0'
+
+#data Parameters
+cycles = 3
 exchange='IDEALPRO'
 symbol='AUD'
 secType='CASH'
@@ -35,160 +92,307 @@ endDateTime=dt.now(timezone('US/Eastern'))
 durationStr='1 M'
 barSizeSetting='1 hour'
 whatToShow='MIDPOINT'
+ticker = symbol + currency
 
-for i in range(0,cycles):
-    if i ==0:
-        getHistLoop = [endDateTime.strftime("%Y%m%d %H:%M:%S %Z")]
-    else:
-        getHistLoop.insert(0,(today-datetime.timedelta(365/12)).strftime("%Y%m%d %H:%M:%S %Z"))
+#Model Parameters
+perturbDataPct = 0.0002
+longMemory =  False
+iterations=1
+input_signal = 1
+feature_selection = 'None' #RFECV OR Univariate
+wfSteps=[1]
+wf_is_periods = [100,200,300,500]
+#wf_is_periods = [100]
+tox_adj_proportion = 0
+nfeatures = 10
 
-brokerData = {}
-brokerData =  {'port':7496, 'client_id':100,\
-                     'tickerId':1, 'exchange':exchange,'symbol':symbol,'secType':secType,'currency':currency,\
-                     'endDateTime':endDateTime, 'durationStr':durationStr,'barSizeSetting':barSizeSetting, 'whatToShow':whatToShow,\
-                     'useRTH':1, 'formatDate':1
-                      }
-                      
-getDataFromIB(brokerData, getHistLoop)
-
-iterations=10
+#feature Parameters
 RSILookback = 1.5
 zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
-DPOLookback = 3    
+DPOLookback = 10
+ACLookback = 10
+
+#DPS parameters
+windowLengths = [2,50,100]
+maxLeverage = [2,20]
+PRT={}
+PRT['DD95_limit'] = 0.05
+PRT['tailRiskPct'] = 95
+PRT['initial_equity'] = 1.0
+PRT['horizon'] = 250
+PRT['maxLeverage'] = 2
+CAR25_threshold=-np.inf
+
+#model selection
+RFE_estimator = [ 
+        ("GradientBoostingRegressor",GradientBoostingRegressor()),\
+        #("DecisionTreeRegressor",DecisionTreeRegressor()),\
+        #("ExtraTreeRegressor",ExtraTreeRegressor()),\
+        #("BayesianRidge", BayesianRidge()),\
+         ]
+
+models = [#("GA_Reg", SymbolicRegressor(population_size=5000, generations=20,
+          #                             tournament_size=20, stopping_criteria=0.0, 
+          #                             const_range=(-1.0, 1.0), init_depth=(2, 6), 
+          #                             init_method='half and half', transformer=True, 
+          #                             comparison=True, trigonometric=True, 
+          #                             metric='mean absolute error', parsimony_coefficient=0.001, 
+          #                             p_crossover=0.9, p_subtree_mutation=0.01, 
+          #                             p_hoist_mutation=0.01, p_point_mutation=0.01, 
+          #                             p_point_replace=0.05, max_samples=1.0, 
+          #                             n_jobs=1, verbose=0, random_state=None)),\
+         #("GA_Reg2", SymbolicRegressor(population_size=5000, generations=20, stopping_criteria=0.01, comparison=True, transformer=False, p_crossover=0.7, p_subtree_mutation=0.1, p_hoist_mutation=0.05, p_point_mutation=0.1, max_samples=1, verbose=0, parsimony_coefficient=0.01, random_state=0)),\
+        #("RandomForestRegressor",RandomForestRegressor()),\
+        #("AdaBoostRegressor",AdaBoostRegressor()),\
+        #("BaggingRegressor",BaggingRegressor()),\
+        #("_ET",ExtraTreesRegressor()),\
+        #("GradientBoostingRegressor",GradientBoostingRegressor()),\
+        #("IsotonicRegression",IsotonicRegression()),\ #ValueError: X should be a 1d array
+        #("KernelRidge",KernelRidge()),\
+        #("DecisionTreeRegressor",DecisionTreeRegressor()),\
+        #("ExtraTreeRegressor",ExtraTreeRegressor()),\
+        #("ARDRegression", ARDRegression()),\
+        #("LogisticRegression", LogisticRegression()),\ # ValueError("Unknown label type: %r" % y)
+        #("Ridge",Ridge()),\
+        #("RANSACRegressor",RANSACRegressor()),\
+        #("LinearRegression",LinearRegression()),\
+        #("Lasso",Lasso()),\
+        #("LassoLars",LassoLars()),\
+        #("BayesianRidge", BayesianRidge()),\
+        #("PassiveAggressiveRegressor",PassiveAggressiveRegressor()),\ #all zero array
+        #("SGDRegressor",SGDRegressor()),\
+        #("TheilSenRegressor",TheilSenRegressor()),\
+        #("KNNu", KNeighborsRegressor(n_neighbors=5, weights='uniform', algorithm='auto', leaf_size=30, p=2, metric='minkowski', metric_params=None, n_jobs=1)),\
+        #("KNNd", KNeighborsRegressor(n_neighbors=5, weights='distance', algorithm='auto', leaf_size=30, p=2, metric='minkowski', metric_params=None, n_jobs=1)),\
+        #("KNeighborsRegressor-u,p1,n15", KNeighborsRegressor(n_neighbors=3, weights='uniform', algorithm='auto', leaf_size=30, p=1, metric='minkowski', metric_params=None, n_jobs=-1)),\
+        #("RadiusNeighborsRegressor",RadiusNeighborsRegressor()),\
+        #("LinearSVR", LinearSVR()),\
+        #("rbf.01SVR",SVR(kernel='rbf', C=0.1, gamma=.01)),\
+        ("rbf1SVR",SVR(kernel='rbf', C=1, gamma=0.1)),\
+        #("rbf10SVR",SVR(kernel='rbf', C=10, gamma=0.1)),\
+        #("rbf100SVR",SVR(kernel='rbf', C=100, gamma=0.1)),\
+        #("rbf1000SVR",SVR(kernel='rbf', C=1000, gamma=0.1)),\
+        #("rbf100SVR",SVR(kernel='rbf', C=1e3, gamma=0.1)),\
+        #("polySVR",SVR(kernel='poly', C=1e3, degree=2)),\
+         ]
+
+
+############################################################
+for i in range(0,cycles):
+    if i ==0:
+        getHistLoop = [endDateTime]
+    else:
+        getHistLoop.insert(0,(getHistLoop[0]-datetime.timedelta(365/12)))
+
+getHistLoop =   [x.strftime("%Y%m%d %H:%M:%S %Z") for x in getHistLoop]
+
+brokerData = {}
+brokerData =  {'port':7496, 'client_id':101,\
+                     'tickerId':1, 'exchange':exchange,'symbol':symbol,'secType':secType,'currency':currency,\
+                     'endDateTime':endDateTime, 'durationStr':durationStr,'barSizeSetting':barSizeSetting,\
+                     'whatToShow':whatToShow, 'useRTH':1, 'formatDate':1
+                      }
+                      
+data = pd.DataFrame()                   
+for date in getHistLoop:
+    data = pd.concat([data,getDataFromIB(brokerData, date)],axis=0)
+###########################################################
+print 'Successfully Retrieved Data.  Begin Preprocessing...'
+#perturb dataSet
+if perturbData:
+    #dataSet['OPEN'] = perturb_data(dataSet['OPEN'].values,perturbDataLookback)
+    #dataSet['HIGH']= perturb_data(dataSet['HIGH'].values,perturbDataLookback)
+    #dataSet['LOW']= perturb_data(dataSet['LOW'].values,perturbDataLookback)
+    data['Close'] = perturb_data(data['Close'].values,perturbDataPct)
+    #dataSet['VOL'] = perturb_data(dataSet['VOL'].values,perturbDataLookback)
+    #dataSet['OI'] == perturb_data(dataSet['OI'].values,perturbDataLookback)
+    
+#find max lookback
 maxlb = max(RSILookback,
                     zScoreLookback,
                     ATRLookback,
-                    DPOLookback)
-                    
-model = SVC()
-ticker = contract.symbol + contract.currency
+                    DPOLookback,
+                    ACLookback)
+# add shift
+maxlb = maxlb+4
 
-dataSet = data
-nrows = data.shape[0]
-print nrows
-dataSet['Pri'] = data.Close
-dataSet['Pri_RSI'] = RSI(dataSet.Pri,RSILookback)
-dataSet['Pri_ATR'] = zScore(ATR(data.High,data.Low,data.Close,ATRLookback),
-                          zScoreLookback)
-dataSet['Pri_ATR_Y1'] = dataSet['Pri_ATR'].shift(1)
-dataSet['Pri_ATR_Y2'] = dataSet['Pri_ATR'].shift(2)
-dataSet['Pri_ATR_Y3'] = dataSet['Pri_ATR'].shift(3)
-dataSet['priceChange'] = priceChange(dataSet['Pri'])
-dataSet['priceChangeY1'] = dataSet['priceChange'].shift(1)
-dataSet['priceChangeY2'] = dataSet['priceChange'].shift(2)
-dataSet['priceChangeY3'] = dataSet['priceChange'].shift(3)
+dataSet = data.drop(data.index[data.index.duplicated()], axis=0).copy(deep=True)
+nrows = dataSet.shape[0]
+
+#short direction
+dataSet['Pri_RSI'] = RSI(dataSet.Close,RSILookback)
 dataSet['Pri_RSI_Y1'] = dataSet['Pri_RSI'].shift(1)
 dataSet['Pri_RSI_Y2'] = dataSet['Pri_RSI'].shift(2)
 dataSet['Pri_RSI_Y3'] = dataSet['Pri_RSI'].shift(3)
 dataSet['Pri_RSI_Y4'] = dataSet['Pri_RSI'].shift(4)
 
-dataSet['gainAhead'] = gainAhead(dataSet['Pri'])
+#long direction
+dataSet['Pri_DPO'] = DPO(dataSet.Close,DPOLookback)
+dataSet['Pri_DPO_Y1'] = dataSet['Pri_DPO'].shift(1)
+dataSet['Pri_DPO_Y2'] = dataSet['Pri_DPO'].shift(2)
+dataSet['Pri_DPO_Y3'] = dataSet['Pri_DPO'].shift(3)
+dataSet['Pri_DPO_Y4'] = dataSet['Pri_DPO'].shift(4)
+
+#volatility
+dataSet['Pri_ATR'] = zScore(ATR(dataSet.High,dataSet.Low,dataSet.Close,ATRLookback),
+                          zScoreLookback)
+dataSet['Pri_ATR_Y1'] = dataSet['Pri_ATR'].shift(1)
+dataSet['Pri_ATR_Y2'] = dataSet['Pri_ATR'].shift(2)
+dataSet['Pri_ATR_Y3'] = dataSet['Pri_ATR'].shift(3)
+dataSet['priceChange'] = priceChange(dataSet.Close)
+dataSet['priceChangeY1'] = dataSet['priceChange'].shift(1)
+dataSet['priceChangeY2'] = dataSet['priceChange'].shift(2)
+dataSet['priceChangeY3'] = dataSet['priceChange'].shift(3)
+
+#correlation
+dataSet['autoCor'] = autocorrel(dataSet.Close*100,ACLookback)
+dataSet['autoCor_Y1'] = dataSet['autoCor'].shift(1)
+dataSet['autoCor_Y2'] = dataSet['autoCor'].shift(2)
+dataSet['autoCor_Y3'] = dataSet['autoCor'].shift(3)
+
+#labels
+dataSet['gainAhead'] = gainAhead(dataSet.Close)
 dataSet['signal'] = np.where(dataSet.gainAhead>beLongThreshold,1,-1)
 
-mData = dataSet.drop(['Open','High','Low','Close',
-                       'Volume','Pri','gainAhead'],
-                        axis=1).dropna()
+#mData = dataSet.drop(['Open','High','Low','Close',
+#                      'Volume','gainAhead'],
+#                      axis=1).dropna()
+for col in dataSet:
+    if sum(np.isnan(dataSet[col][maxlb:].values))>0:
+        print dataSet[col][maxlb:][np.isnan(dataSet[col][maxlb:].values)]
+        raise ValueError, 'nan in %s' % col
+    elif sum(np.isinf(dataSet[col][maxlb:].values))>0:
+        print dataSet[col][maxlb:][np.isnan(dataSet[col][maxlb:].values)]
+        raise ValueError, 'inf in %s' % col
+    elif sum(np.isneginf(dataSet[col][maxlb:].values))>0:
+        print dataSet[col][maxlb:][np.isnan(dataSet[col][maxlb:].values)]
+        raise ValueError, '-inf in %s' % col
 
-#  Select the date range to test no label for the last index
-mmData = mData[maxlb:-1]
+dataSet = dataSet.ix[maxlb:].dropna()
+dataSet['prior_index'] = dataSet.dropna().reset_index().index
+dataSet.index = dataSet.index.values.astype(str)
+dataSet.index = dataSet.index.to_datetime()
+dataSet.index.name ='dates'
 
-datay = mmData.signal
-mmData = mmData.drop(['signal'],axis=1)
-dataX = mmData
 
-#  Copy from pandas dataframe to numpy arrays
-dy = np.zeros_like(datay)
-dX = np.zeros_like(dataX)
+print '\n\nNew simulation run... '
+if showDist:
+    describeDistribution(dataSet.reset_index()['Close'], dataSet.reset_index()['priceChange'], ticker)
 
-dy = datay.values
-dX = dataX.values
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+print 'Finished Pre-processing... Beginning Model Training..'
 
-#  Make 'iterations' index vectors for the train-test split
-sss = StratifiedShuffleSplit(dy,iterations,test_size=0.33,
-                             random_state=None)
+#########################################################
+model_metrics = init_report()       
+sstDictDF1_ = {}
 
-#  Initialize the confusion matrix
-cm_sum_is = np.zeros((2,2))
-cm_sum_oos = np.zeros((2,2))
+for i,m in enumerate(models):
+    for wfStep in wfSteps:
+        for wf_is_period in wf_is_periods:
+            testFirstYear = dataSet.index[0]
+            testFinalYear = dataSet.index[max(wf_is_periods)]
+            validationFirstYear =dataSet.index[max(wf_is_periods)+1]
+            validationFinalYear =dataSet.index[-1]
+            #check
+            nrows_is = dataSet.ix[:testFinalYear].dropna().shape[0]
+            if wf_is_period > nrows_is:
+                print 'Walkforward insample period of', wf_is_period, 'is greater than in-sample data of ', nrows_is, '!'
+                print 'Adjusting to', nrows_is, 'rows..'
+                wf_is_period = nrows_is
+                
+            metaData = {'ticker':ticker, 't_start':testFirstYear, 't_end':testFinalYear,\
+                     'signal':signal, 'data_type':data_type,'filter':filterName, 'input_signal':input_signal,\
+                     'test_split':0, 'iters':1, 'tox_adj':tox_adj_proportion,'longMemory':longMemory,\
+                     'n_features':nfeatures, 'FS':feature_selection,'rfe_model':RFE_estimator[0],\
+                     'v_start':validationFirstYear, 'v_end':validationFinalYear,'wf_step':wfStep\
+                      }
+            runName = ticker+'_'+data_type+'_'+filterName+'_' + m[0]+'_i'+str(wf_is_period)#+'_o'+str(wfStep)
+            model_metrics, sstDictDF1_[runName] = wf_regress_validate2(dataSet, dataSet, [m], model_metrics,\
+                                                wf_is_period, metaData, PRT, showPDFCDF=showPDFCDF,longMemory=longMemory)
+#score models
+scored_models, bestModel = directional_scoring(model_metrics,filterName)
+if scorePath is not None:
+    scored_models.to_csv(scorePath+filterName+'.csv')
+
+#keep original for other DF
+#sstDictDF1_Combined_DF1_beShorts_ = copy.deepcopy(sstDictDF1_)
+#sstDictDF1_DF1_Shorts_beFlat_ = copy.deepcopy(sstDictDF1_)
+if showAllCharts:
+    for runName in sstDictDF1_:
+        compareEquity(sstDictDF1_[runName],runName)
     
-#  For each entry in the set of splits, fit and predict
-for train_index,test_index in sss:
-    X_train, X_test = dX[train_index], dX[test_index]
-    y_train, y_test = dy[train_index], dy[test_index] 
+for m in models:
+    if bestModel['params'] == str(m[1]):
+        print  '\n\nBest model found...\n', m[1]
+        bm = m[1]
+print 'Number of features: ', bestModel.n_features, bestModel.FS
+print 'WF In-Sample Period:', bestModel.rows
+print 'WF Out-of-Sample Period:', bestModel.wf_step
+print 'Long Memory: ', longMemory
+DF1_BMrunName = ticker+'_'+bestModel.data_type+'_'+filterName+'_'  + bestModel.model + '_i'+str(bestModel.rows)
+if showAllCharts:
+    compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName)
+    
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+print 'Finished Model Training... Beginning Dynamic Position Sizing..'
+##############################################################
 
-#  fit the model to the in-sample data
-    model.fit(X_train, y_train)
+   
+sst_bestModel = sstDictDF1_[DF1_BMrunName].copy(deep=True)
 
-#  test the in-sample fit    
-    y_pred_is = model.predict(X_train)
-    cm_is = confusion_matrix(y_train, y_pred_is)
-    cm_sum_is = cm_sum_is + cm_is
+#DPS parameters
+windowLengths = [5,50]
+maxLeverage = [2,10,20]
+PRT={}
+PRT['DD95_limit'] = 0.01
+PRT['tailRiskPct'] = 95
+PRT['initial_equity'] = 1.0
+PRT['horizon'] = 250
+PRT['maxLeverage'] = 2
+CAR25_threshold=-np.inf
+#calc DPS
+DPS = {}
+DPS_both = {}
 
-#  test the out-of-sample data
-    y_pred_oos = model.predict(X_test)
-    cm_oos = confusion_matrix(y_test, y_pred_oos)
-    cm_sum_oos = cm_sum_oos + cm_oos
+startDate = sst_bestModel.index[max(windowLengths)]
+endDate = sst_bestModel.index[-1]
+for ml in maxLeverage:
+    PRT['maxLeverage'] = ml
+    for wl in windowLengths:
+        #sst_bestModel = pd.concat([pd.Series(data=systems[s].signals, name='signals', index=systems[s].index),\
+        #                   systems[s].gainAhead], axis=1)
 
-tpIS = cm_sum_is[1,1]
-fnIS = cm_sum_is[1,0]
-fpIS = cm_sum_is[0,1]
-tnIS = cm_sum_is[0,0]
-precisionIS = tpIS/(tpIS+fpIS)
-recallIS = tpIS/(tpIS+fnIS)
-accuracyIS = (tpIS+tnIS)/(tpIS+fnIS+fpIS+tnIS)
-f1IS = (2.0 * precisionIS * recallIS) / (precisionIS+recallIS) 
-
-tpOOS = cm_sum_oos[1,1]
-fnOOS = cm_sum_oos[1,0]
-fpOOS = cm_sum_oos[0,1]
-tnOOS = cm_sum_oos[0,0]
-precisionOOS = tpOOS/(tpOOS+fpOOS)
-recallOOS = tpOOS/(tpOOS+fnOOS)
-accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
-f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
-
-print "\n\nSymbol is ", ticker
-print "Learning algorithm is", model
-print "Confusion matrix for %i randomized tests" % iterations
-print "for years ", dataSet.index[0] , " through ", dataSet.index[-2]  
-
-print "\nIn sample"
-print "     predicted"
-print "      pos neg"
-print "pos:  %i  %i  %.2f" % (tpIS, fnIS, recallIS)
-print "neg:  %i  %i" % (fpIS, tnIS)
-print "      %.2f          %.2f " % (precisionIS, accuracyIS)
-print "f1:   %.2f" % f1IS
-
-print "\nOut of sample"
-print "     predicted"
-print "      pos neg"
-print "pos:  %i  %i  %.2f" % (tpOOS, fnOOS, recallOOS)
-print "neg:  %i  %i" % (fpOOS, tnOOS)
-print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
-print "f1:   %.2f" % f1OOS
-
-print "\nend of run"
-model.fit(dX, dy)
-ypred = model.predict(dX)
-print classification_report(dy,ypred)
-
-sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
-            pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)
-sst.index=sst.index.astype(str).to_datetime()
-if len(sys.argv)==1:
-    compareEquity(sst, ticker)
-
-last = [mData.drop(['signal'],axis=1).values[-1]]
-print 'Next Signal for',dataSet.index[-1],'is', model.predict(last),\
-            #'with', model.predict_proba(last).max()*100, '% probability'
+        #newStart = start            
+        #if sst_bestModel.ix[:startDate].shape[0] < wl:
+            #zerobegin = pd.DataFrame(data=0, columns= ['signals','gainAhead'],\
+            #    index = [sst_bestModel.index[0] - datetime.timedelta(days=x) for x in range(int(math.ceil(wl)),0,-1)])
+            #newStart = datetime.datetime.strftime(sst_bestModel.iloc[wl].name,'%Y-%m-%d')
+            #print 'both DPS', start,'<=',startDate.date(),'adjusting', start,'to', newStart
+            #sst_bestModel = pd.concat([zerobegin, sst_bestModel], axis=0)
+            
+        dpsRun, sst_save = calcDPS2(DF1_BMrunName, sst_bestModel, PRT, startDate, endDate, wl, 'both', threshold=CAR25_threshold)
+        DPS_both[dpsRun] = sst_save
         
-system="AUDUSD"
-saveData=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last), 'Model':model}, columns=['Date','Signal','Model'])
-if saveSignals:
-    signal=pd.read_csv('./data/signals/' + system + '.csv')
-    signal=signal.append(data)
-    signal.to_csv('./data/signals/' + system + '.csv', index=False)
+        #dpsRun, sst_save = calcDPS2('BuyHold', buyandhold, PRT, start, end, wl)
+        #DPS[dpsRun] = sst_save
+    
+dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
+                                            endDate,'both', DF1_BMrunName, yscale='linear',\
+                                            ticker=ticker,displayCharts=showAllCharts,\
+                                            equityStatsSavePath=equityStatsSavePath)
+bestBothDPS.index.name = 'dates'
+bestBothDPS = pd.concat([bestBothDPS, pd.Series(data = dpsRunName,index=bestBothDPS.index, name='system')], \
+                                                axis=1)
+print 'Next Signal:'
+print bestBothDPS.iloc[-1]
  
+print 'Saving Signals..'      
+#init file
+#bestBothDPS.tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
+signal=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv')
+signal=signal.append(bestBothDPS.reset_index().iloc[-1])
+signal.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
+                
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

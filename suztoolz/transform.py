@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import talib as ta
 import arch
+import random
 import statsmodels.tsa.stattools as ts
 from numpy import cumsum, log, polyfit, sqrt, std, subtract
 from numpy.random import randn
@@ -18,6 +19,7 @@ from scipy import stats
 #  Define functions.
 #  These are retained in the template for reference and
 #  use when needed.
+
 class zigzag(object):
     '''
     	all list parameters are expected to be an one dimensional
@@ -234,12 +236,49 @@ class ratio(object):
 			raise Exception("benchmark mismatch")
 
 		return benchmark
+        
+def perturb_data(p,mean):
+    #add guassian noise of rolling std lb
+    if type(p) is pd.core.series.Series:
+        p = p.values
 
+    #rstd = pd.rolling_std(p,lb)
+    #pc = ROC(p,lb)
+    nrows = p.shape[0]
+    purturbed_data = np.zeros(nrows)
+    for i in range(1, nrows):
+        perturb = p[i-1]*mean
+        if perturb == 0:
+            purturbed_data[i] = 0
+        else:
+            purturbed_data[i] = np.random.normal(0,perturb,1)
+    #purturbed_data = np.ceil(purturbed_data)
+    return p+purturbed_data
+    
 def garch(returns):
+    #this one is fast but has a future leak.
     am = arch.arch_model(returns*100)
     #res = am.fit(iter=10)
     res = am.fit()
     forecast = np.sqrt(res.params['omega'] + res.params['alpha[1]'] * res.resid**2 + res.conditional_volatility**2 * res.params['beta[1]'])
+    return forecast
+    
+def garch2(returns, maxlb):
+    if type(returns) is pd.core.series.Series:
+        returns = returns.values
+
+    nrows = returns.shape[0]
+    forecast = np.zeros(nrows)
+    print 'Adding GARCH...'
+    for i in range(maxlb, nrows):
+        #print i,returns[0:i+1].shape
+        #range nrows+1 is the last index
+        am = arch.arch_model(returns[0:i+1]*100)
+        #res = am.fit(iter=10)
+        res = am.fit(disp='off')
+        forecast[i] = np.sqrt(res.params['omega'] + res.params['alpha[1]'] * \
+                    res.resid[i]**2 + res.conditional_volatility[i]**2 * res.params['beta[1]'])
+    print res.summary()
     return forecast
     
 def autocorrel(close, lb, period=1):
@@ -279,31 +318,6 @@ def hurst(ts):
     #return the hurst exponent from the polyfit output
     return poly[0]*2.0
  
-def adf_test(series):
-    adf = ts.adfuller(series,1)
-    #create a GBM, MR, Trending series
-    gbm = log(cumsum(randn(100000))+1000)
-    mr = log(randn(100000)+1000)
-    tr = log(cumsum(randn(100000)+1)+1000)
-    
-    print ""
-    print "ADF test for mean reversion"
-    #print "Datapoints", adf[3]
-    #print "p-value", adf[1]
-    print "Test-Stat", adf[0]
-    for key in adf[4]:
-     print "Critical Values:",key, adf[4][key],
-     if adf[0] < adf[4][key]:
-         print 'PASS'
-     else:
-         print 'FAIL'
-    print ""
-    print "Hurst Exponent Test"
-    print "Hurst(Random Walk): %s" % hurst(gbm),
-    print "Hurst(MR): %s" % hurst(mr),
-    print "Hurst(Trend): %s" % hurst(tr)
-    print "Hurst(series): %s" % hurst(series)
-
     
 def volumeSpike(volume, lb):
     # current volume / avg volume (* price chg week ago.)

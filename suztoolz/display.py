@@ -13,19 +13,105 @@ import seaborn as sns
 import datetime
 from datetime import datetime as dt
 from scipy import stats
+from scipy.stats import kurtosis, skew
+import statsmodels.tsa.stattools as ts
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
 from sklearn.learning_curve import learning_curve
 from sklearn.metrics import accuracy_score,average_precision_score,f1_score,\
                             log_loss,precision_score,recall_score, roc_auc_score,\
                             confusion_matrix, hamming_loss, jaccard_similarity_score,\
                             zero_one_loss
-from transform import softmax_score, numberZeros, ratio
+from transform import softmax_score, numberZeros, ratio, hurst
 
 
 sns.set_style("darkgrid", {"axes.facecolor": ".9"})
 sns.color_palette("Set1", n_colors=8, desat=.5)
 
+def describeDistribution(qtC,qtP,ticker):
+    hold_days = 1
+    #qtC = dataSet.reset_index()['Close']
+    #qtP = dataSet.reset_index()['priceChange']
+    nrows = qtC.shape[0]
 
+    # ------------------------
+    #   Set up gainer and loser lists
+    gainer = np.zeros(nrows, dtype=int)
+    loser = np.zeros(nrows, dtype=int)
+    i_gainer = 0
+    i_loser = 0
+
+    for i in range(0,nrows-hold_days):
+        if (qtC[i+hold_days]>qtC[i]):
+            gainer[i_gainer] = i
+            i_gainer = i_gainer + 1
+        else:
+            loser[i_loser] = i
+            i_loser = i_loser + 1
+    number_gainers = i_gainer
+    number_losers = i_loser
+    print 'Issue:             ' + ticker
+    print 'Dates:             ' + str(qtC.index[0])
+    print '  to:              ' + str(qtC.index[-1])
+    print 'Rows:              ' + str(qtC.shape[0])
+    #print 'Cols:              ' + str(qtC.shape[1])
+    print 'Number Gainers:     %d ' % number_gainers
+    print 'Number Losers:      %d ' % number_losers
+    
+    hist, bins = np.histogram(qtP.values, bins=100)
+    width = 0.7 * (bins[1] - bins[0])
+    center = (bins[:-1] + bins[1:]) / 2
+    plt.bar(center, hist, align='center', width=width, color='r')
+    plt.title('____Price Distribution____')
+    plt.show()
+    kurt = kurtosis(qtP.values)
+    sk = skew(qtP.values)
+    print 'Mean: ', qtP.values.mean(), ' StDev: ',qtP.values.std()
+    print ' Kurtosis: ', kurt, ' Skew: ', sk
+
+
+    X2 = np.sort(qtP)
+    F2 = np.array(range(qtP.shape[0]), dtype=float)/qtP.shape[0]
+    plt.title( '____Cumulative Distribution____')
+    plt.plot(F2,X2, color='r')
+    plt.show()
+
+    tox  = getToxCDF(abs(qtP), display=True)
+
+    #entropy
+    ent = 0
+    hist = hist[np.nonzero(hist)].astype(float)
+    for i in hist/sum(hist):
+        ent -= i * math.log(i, len(hist))
+        #print i,ent
+    print '\nEntropy:              ', ent
+
+    #ADF, Hurst
+    adf_test(qtC)
+    
+def adf_test(series):
+    adf = ts.adfuller(series,1)
+    #create a GBM, MR, Trending series
+    gbm = np.log(np.cumsum(np.random.randn(100000))+1000)
+    mr = np.log(np.random.randn(100000)+1000)
+    tr = np.log(np.cumsum(np.random.randn(100000)+1)+1000)
+    
+    print ""
+    print "ADF test for mean reversion"
+    #print "Datapoints", adf[3]
+    #print "p-value", adf[1]
+    print "Test-Stat", adf[0]
+    for key in adf[4]:
+     print "Critical Values:",key, adf[4][key],
+     if adf[0] < adf[4][key]:
+         print 'PASS'
+     else:
+         print 'FAIL'
+    print ""
+    print "Hurst Exponent Test"
+    print "Hurst(Random Walk): %s" % hurst(gbm)
+    print "Hurst(MR): %s" % hurst(mr)
+    print "Hurst(Trend): %s" % hurst(tr)
+    print "Hurst(series): %s" % hurst(series)
 
     
 def showDistribution():
@@ -47,7 +133,8 @@ def showDistribution():
         print 'Mean: ', qt.gainAhead.values[i:end].mean(), 'StDev: ' ,qt.gainAhead.values[i:end].std()
         print 'Kurtosis: ', kurt, ' Skew: ', sk, 'Runs: ', runs
         
-def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equityStats,equityCurvesStatsByYear, vsDPS=False, dpsRank=None, dpsChartRank=0):
+def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equityStats,equityCurvesStatsByYear,\
+                                            vsDPS=False, dpsRank=None, dpsChartRank=0,yscale='log'):
     topSystem = equityStats.sort_values(['scoremm'], ascending=False).system.iloc[0]
     leftoverIndex = equityStats.shape[0]%numCharts
     eIndex = range(equityStats.shape[0]-numCharts,-numCharts,-numCharts)
@@ -107,7 +194,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
                 plt.title('Top '+str(chartRank).strip('[]')+' Systems')
             plt.ylabel('Equity')
             ax.grid('on')
-            ax.set_yscale('log')
+            ax.set_yscale(yscale)
             handles, labels = ax.get_legend_handles_labels()
             lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.1),prop={'size':10})
             #lgd=ax.legend(loc="upper left",prop={'size':10})
@@ -259,6 +346,102 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     plt.legend(loc="best")
     plt.show()
 
+def compareEquity_vf(sst, title):
+    nrows = sst.gainAhead.shape[0]
+    #signalCounts = sst.signals.shape[0]
+    
+    print '\nValidation Period from', sst.index[0],'to',sst.index[-1]
+    print '\nThere are %0.f signal counts' % nrows
+    if 1 in sst.signals.value_counts():
+        print sst.signals.value_counts()[1], 'High Volatility Signals',
+    if -1 in sst.signals.value_counts():
+        print sst.signals.value_counts()[-1], 'Low Volatility Signals'
+    #if 0 in sst.signals.value_counts():
+    #    print sst.signals.value_counts()[0], 'beFlat Signals',
+    #  Compute cumulative equity for all days
+    equityAllSignals = np.zeros(nrows)
+    equityAllSignals[0] = 1
+    for i in range(1,nrows):
+        equityAllSignals[i] = (1+sst.gainAhead.iloc[i-1])*equityAllSignals[i-1]
+        
+    #  Compute cumulative equity for days with HV signals    
+    equityHVLong = np.zeros(nrows)
+    equityHVLong[0] = 1
+    for i in range(1,nrows):
+        if (sst.signals.iloc[i-1] > 0):
+            equityHVLong[i] = (1+sst.gainAhead.iloc[i-1])*equityHVLong[i-1]
+        else:
+            equityHVLong[i] = equityHVLong[i-1]
+            
+    #  Compute cumulative equity for days with LV signals    
+    equityLVLong = np.zeros(nrows)
+    equityLVLong[0] = 1
+    for i in range(1,nrows):
+        if (sst.signals.iloc[i-1] < 0):
+            equityLVLong[i] = (1+sst.gainAhead.iloc[i-1])*equityLVLong[i-1]
+        else:
+            equityLVLong[i] = equityLVLong[i-1]
+
+    #  Compute cumulative equity for days with beShort signals    
+    equityHVShort = np.zeros(nrows)
+    equityHVShort[0] = 1
+    for i in range(1,nrows):
+        if (sst.signals.iloc[i-1] > 0):
+            equityHVShort[i] = (1+-sst.gainAhead.iloc[i-1])*equityHVShort[i-1]
+        else:
+            equityHVShort[i] = equityHVShort[i-1] 
+
+    equityLVShort = np.zeros(nrows)
+    equityLVShort[0] = 1
+    for i in range(1,nrows):
+        if (sst.signals.iloc[i-1] < 0):
+            equityLVShort[i] = (1+-sst.gainAhead.iloc[i-1])*equityLVShort[i-1]
+        else:
+            equityLVShort[i] = equityLVShort[i-1]
+            
+    LVtrades, HVtrades = numberZeros(sst.signals.values)
+    allTrades = LVtrades+ HVtrades        
+    #plt.close('all')
+    fig = plt.figure(1)#1, figsize=(6, 6))
+    ax1 = fig.add_subplot(111)
+    ax1.plot(sst.index.to_datetime(), equityHVLong,label="Long HV Signals",color='b')
+    ax1.plot(sst.index.to_datetime(), equityHVShort,label="Short HV Signals",color='r')
+    ax1.plot(sst.index.to_datetime(), equityAllSignals,label="BuyHold",ls='--',color='c')
+    fig.autofmt_xdate()
+    fig.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+    plt.title('High Volatility '+title)
+    plt.ylabel("TWR")
+    plt.legend(loc="best")
+    plt.show()
+    print 'TWR for Buy & Hold is %0.3f, %i days' % (equityAllSignals[nrows-1], nrows)
+    print 'TWR for %i HV Long trades is %0.3f' % (HVtrades, equityHVLong[nrows-1])
+    print 'TWR for %i HV Short trades is %0.3f' % (HVtrades,equityHVShort[nrows-1])
+    
+    fig2 = plt.figure(2)#, figsize=(6, 6))
+    ax2 = fig2.add_subplot(111)
+    ax2.plot(sst.index.to_datetime(), equityLVLong,label="Long LV Signals",color='b')   
+    ax2.plot(sst.index.to_datetime(), equityLVShort,label="Short LV Signals",color='r')
+    ax2.plot(sst.index.to_datetime(), equityAllSignals,label="BuyHold",ls='--',color='c')
+    #ax.plot(sst.index.to_datetime(), equityBeLongAndShortSignals,label="Long & Short",color='m')  
+    # rotate and align the tick labels so they look better
+    fig2.autofmt_xdate()
+    fig2.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+    plt.title('Low Volatility '+title)
+    plt.ylabel("TWR")
+    plt.legend(loc="best")
+    plt.show()
+    print 'TWR for Buy & Hold is %0.3f, %i days' % (equityAllSignals[nrows-1], nrows)
+    print 'TWR for %i LV Long trades is %0.3f' % (LVtrades, equityLVLong[nrows-1])
+    print 'TWR for %i LV Short trades is %0.3f' % (LVtrades,equityLVShort[nrows-1])
+    #print 'TWR for %i beLong and beShort trades is %0.3f' % (allTrades,equityBeLongAndShortSignals[nrows-1])
+    
+    #check
+    #pd.concat([sst,pd.Series(data=equityAllSignals,name='equityAllSignals',index=sst.index),\
+    #        pd.Series(data=equityHVLong,name='equityHVLong',index=sst.index),
+    #        pd.Series(data=equityBeShortSignals,name='equityBeShortSignals',index=sst.index),
+    #        pd.Series(data=equityBeLongAndShortSignals,name='equityBeLongAndShortSignals',index=sst.index),
+    #        ],axis=1)
+    
 def compareEquity(sst, title):
     nrows = sst.gainAhead.shape[0]
     #signalCounts = sst.signals.shape[0]
@@ -346,7 +529,7 @@ def getToxCDF(p, display=True):
     TOX20 = round(stats.scoreatpercentile(X2,80),6)
     TOX25 = round(stats.scoreatpercentile(X2,75),6)
     if display:
-        print '            ____Cumulative Distribution____'
+        plt.title( '____Volatility Distribution____')
         t25 = np.empty_like(X2)
         t25.fill(TOX25)
         plt.plot(F2,X2,'b-',F2, t25,'r--')
@@ -402,12 +585,18 @@ def showCDF(ytrue, ypred, gainAhead, index):
     F = np.array(range(gainAhead.iloc[tpfp_index].shape[0]), dtype=float)/gainAhead.iloc[tpfp_index].shape[0]
     ax0.plot(F,pd.Series.sort_values(gainAhead.iloc[tpfp_index]*100), color="b")
     split = float(tpfp_index.shape[0])/float((tpfp_index.shape[0]+fntn_index.shape[0]))
-    acc = float(tp_index.shape[0])/float(tpfp_index.shape[0])
+    if float(tpfp_index.shape[0]) != 0:
+        acc = float(tp_index.shape[0])/float(tpfp_index.shape[0])
+    else:
+        acc = 0.0
     ax0.set_title('1: TP+FP %i, Split: %.2f, Acc:  %.2f'% (tpfp_index.shape[0],split,acc))
     F = np.array(range(gainAhead.iloc[fntn_index].shape[0]), dtype=float)/gainAhead.iloc[fntn_index].shape[0]
     ax1.plot(F,pd.Series.sort_values(gainAhead.iloc[fntn_index]*100), color="b")
     split = float(fntn_index.shape[0])/float((tpfp_index.shape[0]+fntn_index.shape[0]))
-    acc = float(tn_index.shape[0])/float(fntn_index.shape[0])
+    if float(fntn_index.shape[0]) != 0:
+        acc = float(tn_index.shape[0])/float(fntn_index.shape[0])
+    else:
+        acc = 0.0
     ax1.set_title('-1: FN+TN %i, Split %.2f, Acc:  %.2f'% (fntn_index.shape[0],split,acc))
     #F = np.array(range(gainAhead.iloc[fp_index].shape[0]), dtype=float)/gainAhead.iloc[fp_index].shape[0]
     #ax2.plot(F,pd.Series.sort_values(gainAhead.iloc[fp_index]*100))

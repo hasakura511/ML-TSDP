@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import sys
 import datetime
 from datetime import datetime as dt
@@ -52,8 +53,8 @@ class HistoricalDataExample(EWrapper):
             self.got_history.set()
         else:
             self.data.loc[date] = [open,high,low,close,volume]
-            print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
-                       % (date, open, high, low, close, volume)
+            #print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+            #          % (date, open, high, low, close, volume)
 
             #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
             #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
@@ -61,8 +62,8 @@ class HistoricalDataExample(EWrapper):
         #return self.data
 
 
-def getDataFromIB(brokerData,getHistLoop):
-    data_cons = pd.DataFrame()
+def getDataFromIB(brokerData,endDateTime):
+    #data_cons = pd.DataFrame()
     # Instantiate our callback object
     callback = HistoricalDataExample()
 
@@ -86,36 +87,35 @@ def getDataFromIB(brokerData,getHistLoop):
 
     # Request some historical data.
 
-    for endDateTime in getHistLoop:
-            tws.reqHistoricalData(
-                brokerData['tickerId'],                                         # tickerId,
-                contract,                                   # contract,
-                endDateTime,                            #endDateTime
-                brokerData['durationStr'],                                      # durationStr,
-                brokerData['barSizeSetting'],                                    # barSizeSetting,
-                brokerData['whatToShow'],                                   # whatToShow,
-                brokerData['useRTH'],                                          # useRTH,
-                brokerData['formatDate']                                          # formatDate
-                )
-       
+    #for endDateTime in getHistLoop:
+    tws.reqHistoricalData(
+        brokerData['tickerId'],                                         # tickerId,
+        contract,                                   # contract,
+        endDateTime,                            #endDateTime
+        brokerData['durationStr'],                                      # durationStr,
+        brokerData['barSizeSetting'],                                    # barSizeSetting,
+        brokerData['whatToShow'],                                   # whatToShow,
+        brokerData['useRTH'],                                          # useRTH,
+        brokerData['formatDate']                                          # formatDate
+        )
 
-            print("\n====================================================================")
-            print(" History requested, waiting %ds for TWS responses" % WAIT_TIME)
-            print("====================================================================\n")
-        
-        
-            try:
-                callback.got_history.wait(timeout=WAIT_TIME)
-            except KeyboardInterrupt:
-                pass
-            finally:
-                if not callback.got_history.is_set():
-                    print('Failed to get history within %d seconds' % WAIT_TIME)
-            
-            data=callback.data;
-            data_cons = pd.concat([data_cons,data],axis=0)
+
+    print("\n====================================================================")
+    print(" %s History requested, waiting %ds for TWS responses" % (endDateTime, WAIT_TIME))
+    print("====================================================================\n")
+
+
+    try:
+        callback.got_history.wait(timeout=WAIT_TIME)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        if not callback.got_history.is_set():
+            print('Failed to get history within %d seconds' % WAIT_TIME)
+    
+    #data_cons = pd.concat([data_cons,callback.data],axis=0)
              
     print("\nDisconnecting...")
     tws.eDisconnect()
         
-    return data_cons
+    return callback.data

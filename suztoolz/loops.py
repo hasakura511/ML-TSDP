@@ -33,16 +33,247 @@ from sklearn.preprocessing import scale, robust_scale, minmax_scale
                         #import warnings
 #warnings.filterwarnings('error')                       
 
+def wf_regress_validate2(unfilteredData, dataSet, models, model_metrics, wf_is_period, \
+                           metaData, PRT, showPDFCDF=True, showLearningCurve=False, longMemory=False):
+    close = unfilteredData.reset_index().Close
+    #fill in the prior index. need this for the car25 calc uses the close index
+    unfilteredData['prior_index'] = pd.concat([dataSet.prior_index, unfilteredData.Close],axis=1,join='outer').prior_index.interpolate(method='linear').dropna()
+    ticker = metaData['ticker']
+    data_type = metaData['data_type']
+    iterations = metaData['iters']
+    testFinalYear= metaData['t_end']
+    validationFirstYear=metaData['v_start']
+    validationFinalYear=metaData['v_end']
+    wfStep=metaData['wf_step']
+    signal =  metaData['signal']
+    nfeatures = metaData['n_features']
+    tox_adj_proportion = metaData['tox_adj']
+    feature_selection = metaData['FS']
+    RFE_estimator = metaData['rfe_model'][1]
+    metaData['rfe_model'] = metaData['rfe_model'][0]
+    if 'filter' in metaData:
+        filterName = metaData['filter']
+    else:
+        filterName = 'OOS_V'
+    
+    dropCol = ['Open','High','Low','Close', 'Volume','gainAhead','signal','dates', 'prior_index']
 
-def createBenchmark(sst,initialEquity,direction, start,end,ticker):
-    #creates market benchmarks
-    benchmarks = {}
-    fract = pd.Series(data=1.0, index = sst.index, name='safef')
-    buyHoldSafef1 = pd.concat([pd.Series(data=1, index =  sst.index, name='signals'),\
-                    sst.gainAhead, fract], axis=1)
-    buyHoldSafef1.index = buyHoldSafef1.index.to_datetime()
-    benchmarks[ticker+' buyHoldSafef1'] = calcEquity2(buyHoldSafef1.ix[start:end],initialEquity,direction)
-    return benchmarks
+    #check
+    nrows_is = dataSet.ix[:testFinalYear].dropna().shape[0]
+    if wf_is_period > nrows_is:
+        print 'Walkforward insample period of', wf_is_period, 'is greater than in-sample data of ', nrows_is, '!'
+        print 'Adjusting to', nrows_is, 'rows..'
+        wf_is_period = nrows_is
+    
+    mmData = dataSet.ix[:testFinalYear].dropna()[-wf_is_period:]
+    mmData_adj = adjustDataProportion(mmData, tox_adj_proportion)  #drop last row for hold days =1
+    mmData_v = pd.concat([mmData_adj,dataSet.ix[validationFirstYear:validationFinalYear].dropna()], axis=0).reset_index()
+    
+    nrows_is = mmData.shape[0]
+    nrows_oos = mmData_v.shape[0]-nrows_is
+        
+    metaData['rows'] = nrows_is
+    
+    #nrows = mmData_adj.shape[0]
+    datay_signal = mmData_v[['signal', 'prior_index']]
+    datay_gainAhead = mmData_v.gainAhead
+    
+    dataX = mmData_v.drop(dropCol, axis=1) 
+    cols = dataX.columns.shape[0]
+    metaData['cols']=cols
+    feature_names = []
+    print '\nTotal %i features: ' % cols
+    for i,x in enumerate(dataX.columns):
+        print i,x+',',
+        feature_names = feature_names+[x]
+    if nfeatures > cols:
+        print 'nfeatures', nfeatures, 'is greater than total features ', cols, '!'
+        print 'Adjusting to', cols, 'features..'
+        nfeatures = cols  
+            
+    #  Copy from pandas dataframe to numpy arrays
+    dy = np.zeros_like(datay_gainAhead)
+    dX = np.zeros_like(dataX)
+    
+    dy = datay_gainAhead.values
+    dX = dataX.values
+    for m in models:
+        print '\n\nNew WF train/predict loop for', m[1]
+        print "\nStarting Walk Forward run on", metaData['data_type'], "data..."
+        if feature_selection == 'Univariate':
+            print "Using top %i %s features" % (nfeatures, feature_selection)
+        else:
+            print "Using %s features" % feature_selection
+        if longMemory == False:
+            print "%i rows in sample, %i rows out of sample, forecasting %i day(s) ahead.." % (nrows_is, nrows_oos,wfStep)
+        else:
+            print "long memory starting with %i rows in sample, %i rows out of sample, forecasting %i day(s) ahead.." % (nrows_is, nrows_oos,wfStep)
+        #cm_y_train = np.array([])
+        cm_y_test_ga = np.array([],dtype=float)
+        #cm_y_pred_is = np.array([])
+        cm_y_pred_oos_ga = np.array([],dtype=float)        
+        cm_train_index = np.array([],dtype=int)
+        cm_test_index = np.array([],dtype=int)
+        
+        leftoverIndex = nrows_oos%wfStep
+        
+        #reverse index to equate the wf tests of different periods, count backwards from the end
+        wfIndex = range(nrows_oos-wfStep,-wfStep,-wfStep)
+        tt_index =[]
+        for i in wfIndex:
+            #last wf index adjust the test index, else step
+            if leftoverIndex > 0 and i == wfIndex[-1]:
+                train_index = range(0,wf_is_period)        
+                test_index = range(wf_is_period,wf_is_period+leftoverIndex)
+                tt_index.insert(0,[train_index,test_index])
+                #print i, 't_start', mmData_v.dates.iloc[train_index[0]], 't_end', mmData_v.dates.iloc[train_index[-1]],\
+                #    'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
+                #print train_index, test_index
+            else:
+                if longMemory == True:
+                    train_index = range(0,wf_is_period+i)
+                else:
+                    train_index = range(i,wf_is_period+i)
+                test_index = range(wf_is_period+i,wf_is_period+i+wfStep)
+                tt_index.insert(0,[train_index,test_index])
+                #print i, 't_start', mmData_v.dates.iloc[train_index[0]], 't_end', mmData_v.dates.iloc[train_index[-1]],\
+                #    'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
+                #print train_index, test_index
+        #c=0
+        for train_index,test_index in tt_index:
+            #c+=1
+            X_train, X_test = dX[train_index], dX[test_index]
+            y_train_ga, y_test_ga = dy[train_index], dy[test_index]
+            #print mmData_v.dates.iloc[test_index[-1]],
+            #print 't_start', mmData_v.dates.iloc[train_index[0]], 't_end', mmData_v.dates.iloc[train_index[-1]],\
+            #        'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
+            #print train_index, test_index
+            #check if there are no intersections
+            intersect = np.intersect1d(datay_signal.reset_index().iloc[test_index]['index'].values,\
+                        datay_signal.reset_index().iloc[train_index]['index'].values)
+            if intersect.size != 0:
+                print "\nDuplicate indexes found in test/training set: Possible Future Leak!"
+            if feature_selection == 'RFECV':
+                #Recursive feature elimination with cross-validation: 
+                #A recursive feature elimination example with automatic tuning of the
+                #number of features selected with cross-validation.
+                rfe = RFECV(estimator=RFE_estimator, step=1)
+                rfe.fit(X_train, y_train_ga)
+                #featureRank = [ feature_names[i] for i in rfe.ranking_-1]
+                featureRank = [ feature_names[i] for i,b in enumerate(rfe.support_) if b==True]
+                print 'Top %i RFECV features' % len(featureRank)
+                print featureRank    
+                metaData['featureRank'] = str(featureRank)
+                X_train = rfe.transform(X_train)
+                X_test = rfe.transform(X_test)
+            else:
+                #Univariate feature selection
+                skb = SelectKBest(f_regression, k=nfeatures)
+                skb.fit(X_train, y_train_ga)
+                #dX_all = np.vstack((X_train.values, X_test.values))
+                #dX_t_rfe = X_new[range(0,dX_t.shape[0])]
+                #dX_v_rfe = X_new[dX_t.shape[0]:]
+                X_train = skb.transform(X_train)
+                X_test = skb.transform(X_test)
+                featureRank = [ feature_names[i] for i in skb.get_support(feature_names)]
+                metaData['featureRank'] = str(featureRank)
+                #print 'Top %i univariate features' % len(featureRank)
+                #print featureRank
+    
+            #  fit the model to the in-sample data
+            m[1].fit(X_train, y_train_ga)
+            #trained_models[m[0]] = pickle.dumps(m[1])
+                        
+            #y_pred_is = np.array(([-1 if x<0 else 1 for x in m[1].predict(X_train)]))              
+            y_pred_oos_ga = m[1].predict(X_test)
+    
+            if m[0][:2] == 'GA':
+                print featureRank
+                print '\nProgram:', m[1]._program
+                #print 'R^2:    ', m[1].score(X_test_all,y_test_all) 
+            
+            #cm_y_train = np.concatenate([cm_y_train,y_train])
+            cm_y_test_ga = np.concatenate([cm_y_test_ga,y_test_ga])
+            #cm_y_pred_is = np.concatenate([cm_y_pred_is,y_pred_is])
+            cm_y_pred_oos_ga = np.concatenate([cm_y_pred_oos_ga,y_pred_oos_ga])
+            #cm_train_index = np.concatenate([cm_train_index,train_index])
+            cm_test_index = np.concatenate([cm_test_index,test_index])
+            
+
+        #create signals 1 and -1
+        cm_y_pred_oos = np.array([-1 if x<0 else 1 for x in cm_y_pred_oos_ga])
+        cm_y_test = np.array([-1 if x<0 else 1 for x in cm_y_test_ga])
+        
+        #if data is filtered so need to fill in the holes. signal = 0 for days that filtered
+        st_oos_filt= pd.DataFrame()
+        st_oos_filt['signals'] =  pd.Series(cm_y_pred_oos)
+        st_oos_filt.index = mmData_v['dates'].iloc[cm_test_index]
+                
+        #compute car, show matrix if data is filtered
+        if data_type != 'ALL':
+            print 'Metrics for filtered Validation Datapoints'
+            prior_index_filt = pd.concat([st_oos_filt,unfilteredData.prior_index], axis=1,\
+                                join='inner').prior_index.values.astype(int)
+            #datay_gainAhead and cm_test_index have the same index. dont need to have same shape because iloc is used in display
+            oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cm_test_index, m[1],\
+                    ticker, validationFirstYear, validationFinalYear, iterations, metaData['filter'],showPDFCDF)
+            CAR25_oos = CAR25_df(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+                                    close, minFcst=PRT['horizon'], DD95_limit =PRT['DD95_limit'])
+            #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'LONG', 1)
+            #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'SHORT', -1)
+                                    
+        #add column prior index and gA.  if there are holes, nan values in signals
+        st_oos_filt = pd.concat([st_oos_filt,unfilteredData.gainAhead,unfilteredData.prior_index],\
+                                    axis=1, join='outer').ix[validationFirstYear:validationFinalYear]
+        #fills nan with zeros
+        st_oos_filt['signals'].fillna(0, inplace=True)
+        
+        #fill zeros with opposite of input signal, if there are zeros. to return full data
+        cm_y_pred_oos = np.where(st_oos_filt['signals'].values==0,metaData['input_signal']*-1,\
+                                                                    st_oos_filt['signals'].values)
+        cm_y_test = np.where(st_oos_filt.gainAhead>0,1,-1)
+        #datay_gainAhead and cmatrix_test_index have the same index
+        datay_gainAhead = st_oos_filt.gainAhead
+        cmatrix_test_index = st_oos_filt.reset_index().index
+
+        #plot learning curve, knn insufficient neighbors
+        if showLearningCurve:
+            try:
+                plot_learning_curve(m[1], m[0], X_train,y_train_ga, scoring='r2')        
+            except:
+                pass
+            
+        #plot out-of-sample data
+        if showPDFCDF:
+            plt.figure()
+            coef, b = np.polyfit(cm_y_pred_oos_ga, cm_y_test_ga, 1)
+            plt.title('Out-of-Sample')
+            plt.ylabel('gainAhead')
+            plt.xlabel('ypred gainAhead')
+            plt.plot(cm_y_pred_oos_ga, cm_y_test_ga, '.')
+            plt.plot(cm_y_pred_oos_ga, coef*cm_y_pred_oos_ga + b, '-')
+            plt.show()
+        
+        #compute car, show matrix for all data is unfiltered
+        if data_type == 'ALL':
+            print 'Metrics for All Validation Datapoints'
+            oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cmatrix_test_index, m[1], ticker,\
+                                validationFirstYear, validationFinalYear, iterations, signal,showPDFCDF)
+            CAR25_oos = CAR25_df(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+                                    close, minFcst=PRT['horizon'], DD95_limit =PRT['DD95_limit'])
+            #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+             #                       close, 'LONG', 1)
+            #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+             #                       close, 'SHORT', -1)
+        #update model metrics
+        #metaData['signal'] = 'LONG 1'
+        model_metrics = update_report(model_metrics, filterName, cm_y_pred_oos, cm_y_test, datay_gainAhead,\
+                                cmatrix_test_index, m, metaData,CAR25_oos)
+        #metaData['signal'] = 'SHORT -1'
+        #model_metrics = update_report(model_metrics, filterName, cm_y_pred_oos, cm_y_test, datay_gainAhead,\
+        #                       cmatrix_test_index, m, metaData,CAR25_Sn1_oos)
+    return model_metrics, st_oos_filt
+
     
 def wf_regress_validate(unfilteredData, dataSet, models, model_metrics, wf_is_period, \
                            metaData, showPDFCDF=True, showLearningCurve=False, longMemory=False):
@@ -275,14 +506,15 @@ def wf_regress_validate(unfilteredData, dataSet, models, model_metrics, wf_is_pe
                 pass
             
         #plot out-of-sample data
-        plt.figure()
-        coef, b = np.polyfit(cm_y_pred_oos_ga, cm_y_test_ga, 1)
-        plt.title('Out-of-Sample')
-        plt.ylabel('gainAhead')
-        plt.xlabel('ypred gainAhead')
-        plt.plot(cm_y_pred_oos_ga, cm_y_test_ga, '.')
-        plt.plot(cm_y_pred_oos_ga, coef*cm_y_pred_oos_ga + b, '-')
-        plt.show()
+        if showPDFCDF:
+            plt.figure()
+            coef, b = np.polyfit(cm_y_pred_oos_ga, cm_y_test_ga, 1)
+            plt.title('Out-of-Sample')
+            plt.ylabel('gainAhead')
+            plt.xlabel('ypred gainAhead')
+            plt.plot(cm_y_pred_oos_ga, cm_y_test_ga, '.')
+            plt.plot(cm_y_pred_oos_ga, coef*cm_y_pred_oos_ga + b, '-')
+            plt.show()
         
         #compute car, show matrix for all data is unfiltered
         if data_type == 'ALL':
@@ -459,15 +691,35 @@ def sss_regress_train(unfilteredData, dataSet, models, model_metrics, metaData, 
 
     return model_metrics
     
-def findBestDPS(DPS, PRT, system, start, end, direction, systemName):
+def createBenchmark(sst,initialEquity,direction, start,end,ticker):
+    #creates market benchmarks
+    benchmarks = {}
+    fract = pd.Series(data=1.0, index = sst.index, name='safef')
+    buyHoldSafef1 = pd.concat([pd.Series(data=1, index =  sst.index, name='signals'),\
+                    sst.gainAhead, fract], axis=1)
+    buyHoldSafef1.index = buyHoldSafef1.index.to_datetime()
+    benchmarks[ticker+' buyHoldSafef1'] = calcEquity2(buyHoldSafef1.ix[start:end],initialEquity,direction)
+    return benchmarks
+    
+def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log', ticker=None, \
+                            displayCharts=True, equityStatsSavePath=None):
     equityCurves = {}
     DPS_adj = {}
     #f = [s for s in systems][0]
-    ticker = systemName[systemName.find('__')-4:systemName.find('__')]
+    if ticker==None:
+        ticker = systemName[systemName.find('__')-4:systemName.find('__')]
+    
     #set the start/end dates to ones that all equity curves share for apples to apples comparison.
-    startDate = dt.strptime(start,'%Y-%m-%d')
-    endDate = dt.strptime(end,'%Y-%m-%d')
-
+    if type(start) == str:
+        startDate = dt.strptime(start,'%Y-%m-%d')
+    else:
+        startDate = start
+        
+    if type(end) == str:
+        endDate = dt.strptime(end,'%Y-%m-%d')
+    else:
+        endDate = end
+        
     for dps in DPS:
         if DPS[dps].index[0]>startDate:
             startDate =  DPS[dps].index[0]
@@ -580,8 +832,12 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName):
     benchStatsByYear = createYearlyStats(benchmarks)
     #create yearly stats for all equity curves with comparison against benchmark
     equityCurvesStatsByYear = createYearlyStats(equityCurves, benchStatsByYear)
-    displayRankedCharts(equityStats.system.shape[0],benchmarks,benchStatsByYear,equityCurves,equityStats,equityCurvesStatsByYear)
-
+    if displayCharts:
+        displayRankedCharts(equityStats.system.shape[0],benchmarks,benchStatsByYear,equityCurves,equityStats,\
+                                    equityCurvesStatsByYear, yscale=yscale)
+                                    
+    if equityStatsSavePath is not None:
+        equityStats.to_csv(equityStatsSavePath+'eStats_'+systemName+'_'+str(endDate).replace(':','')+'.csv')
     return topSystem, DPS_adj[topSystem]    
     
 def createYearlyStats(eCurves, benchStatsByYear=None):
@@ -1423,14 +1679,14 @@ def maxCAR25(*args):
                 global_max = loc_max
     return outer_d
 
-def CAR25_df(signal_type, signals, signal_index, Close, minFcst=1008):
+def CAR25_df(signal_type, signals, signal_index, Close, minFcst=1008, DD95_limit = .20):
     #edited to compute all trades.
     #forecast horizon minimum 1 year, or safef becomes very large
     hold_days = 1
     number_forecasts = 50
     fraction = 1.00
     accuracy_tolerance = 0.005
-    DD95_limit = .20
+    #DD95_limit = .20
     initial_equity = 100000
     forecast_horizon = min(minFcst,signal_index.shape[0]) #4 years because start date is 2007
     years_in_forecast = forecast_horizon/252.0

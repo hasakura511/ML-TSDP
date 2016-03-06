@@ -367,16 +367,6 @@ print 'Finished Model Training... Beginning Dynamic Position Sizing..'
    
 sst_bestModel = sstDictDF1_[DF1_BMrunName].copy(deep=True)
 
-#DPS parameters
-windowLengths = [2]
-maxLeverage = [2,10,20]
-PRT={}
-PRT['DD95_limit'] = 0.01
-PRT['tailRiskPct'] = 95
-PRT['initial_equity'] = 1.0
-PRT['horizon'] = 250
-PRT['maxLeverage'] = 2
-CAR25_threshold=-np.inf
 #calc DPS
 DPS = {}
 DPS_both = {}

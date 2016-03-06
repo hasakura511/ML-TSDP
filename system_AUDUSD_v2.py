@@ -11,8 +11,6 @@ import numpy as np
 import pandas as pd
 import time
 import datetime
-import random
-import sys
 from pytz import timezone
 from datetime import datetime as dt
 
@@ -58,7 +56,7 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
 from suztoolz.data import getDataFromIB
 
 start_time = time.time()
-
+'''
 debug = False
 
 if len(sys.argv)==1:
@@ -72,6 +70,25 @@ if debug:
     scorePath = './debug/scored_metrics_'
     equityStatsSavePath = './debug/'
     signalPath =  './debug/'
+else:
+    showDist =  False
+    showPDFCDF = False
+    showAllCharts = False
+    perturbData = False
+    scorePath = None
+    equityStatsSavePath = None
+    signalPath = './data/signals/' 
+'''
+
+debug = True
+if debug:
+    showDist =  True
+    showPDFCDF = True
+    showAllCharts = True
+    perturbData = True
+    scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
+    equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
+    signalPath =  'C:/Users/Hidemi/Desktop/Python/'
 else:
     showDist =  False
     showPDFCDF = False
@@ -121,15 +138,16 @@ DPOLookback = 10
 ACLookback = 10
 
 #DPS parameters
-windowLengths = [2,50,100]
-maxLeverage = [2,20]
+windowLengths = [12,24]
+maxLeverage = [10,20]
 PRT={}
 PRT['DD95_limit'] = 0.05
 PRT['tailRiskPct'] = 95
 PRT['initial_equity'] = 1.0
 PRT['horizon'] = 250
 PRT['maxLeverage'] = 2
-CAR25_threshold=-np.inf
+#CAR25_threshold=-np.inf
+CAR25_threshold=0
 
 #model selection
 RFE_estimator = [ 
@@ -350,7 +368,7 @@ print 'Finished Model Training... Beginning Dynamic Position Sizing..'
 sst_bestModel = sstDictDF1_[DF1_BMrunName].copy(deep=True)
 
 #DPS parameters
-windowLengths = [5,50]
+windowLengths = [2]
 maxLeverage = [2,10,20]
 PRT={}
 PRT['DD95_limit'] = 0.01
@@ -399,7 +417,7 @@ print 'Saving Signals..'
 #init file
 #bestBothDPS.tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
 signal=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv')
-signal=signal.append(bestBothDPS.reset_index().iloc[-1])
+signal=signal[:-1].append(bestBothDPS.reset_index().iloc[-2:])
 signal.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
                 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

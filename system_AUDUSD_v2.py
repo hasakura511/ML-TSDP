@@ -11,6 +11,8 @@ import numpy as np
 import pandas as pd
 import time
 import datetime
+import random
+import sys
 from pytz import timezone
 from datetime import datetime as dt
 
@@ -58,14 +60,18 @@ from suztoolz.data import getDataFromIB
 start_time = time.time()
 
 debug = False
+
+if len(sys.argv)==1:
+    debug=True
+    
 if debug:
     showDist =  True
     showPDFCDF = True
     showAllCharts = True
     perturbData = True
-    scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
-    equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
-    signalPath =  'C:/Users/Hidemi/Desktop/Python/'
+    scorePath = './debug/scored_metrics_'
+    equityStatsSavePath = './debug'
+    signalPath =  './debug'
 else:
     showDist =  False
     showPDFCDF = False
@@ -197,6 +203,7 @@ brokerData =  {'port':7496, 'client_id':101,\
                       
 data = pd.DataFrame()                   
 for date in getHistLoop:
+    brokerData['client_id']=random.randint(100,1000)
     data = pd.concat([data,getDataFromIB(brokerData, date)],axis=0)
 ###########################################################
 print 'Successfully Retrieved Data.  Begin Preprocessing...'

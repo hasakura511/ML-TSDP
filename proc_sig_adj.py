@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import json
@@ -10,10 +9,7 @@ def proc_sig_adj(systemid):
     data=get_working_signals(systemid);
     jsondata = json.loads(data)
     if len(jsondata['response']) > 0:
-    
         dataSet=json_normalize(jsondata['response'])
-       
-       
         for i in dataSet.index:
             row=dataSet.ix[i]
             cancel_signal(row['signal_id'], systemid)

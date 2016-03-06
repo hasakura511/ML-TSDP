@@ -7,3 +7,8 @@ python system_AUDUSD.py
 python system_USDCAD.py
 python proc_signal.py
 python get_exec.py
+
+python system_AUDUSD_v2.py 1
+python proc_signal_v2.py
+python get_exec.py
+~                                                

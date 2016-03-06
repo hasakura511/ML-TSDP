@@ -70,8 +70,8 @@ if debug:
     showAllCharts = True
     perturbData = True
     scorePath = './debug/scored_metrics_'
-    equityStatsSavePath = './debug'
-    signalPath =  './debug'
+    equityStatsSavePath = './debug/'
+    signalPath =  './debug/'
 else:
     showDist =  False
     showPDFCDF = False

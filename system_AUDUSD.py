@@ -285,7 +285,7 @@ print 'Next Signal for',dataSet.index[-1],'is', model.predict(last),\
             #'with', model.predict_proba(last).max()*100, '% probability'
         
 system="AUDUSD"
-data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
+data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last)}, columns=['Date','Signal'])
 
 signal=pd.read_csv('./data/signals/' + system + '.csv')
 signal=signal.append(data)

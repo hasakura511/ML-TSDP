@@ -8,8 +8,8 @@ def proc_signal_dsp(system, systemid,  c2sym, c2type, c2submit, ibsym, ibcurrenc
     data = pd.read_csv('./data/signals/' + system + '.csv', index_col='dates')
     signals=data['signals'];
     safef=data['safef'];
-    if qty=safef[-1]*signals[-1] == 0:
-        qty=0
+    if safef[-1]*signals[-1] == 0:
+        qty=safef[-2]*signals[-2]
      else:
         qty=safef[-1]*signals[-1]-safef[-2]*signals[-2]
     #signal=signals[-1];
@@ -17,13 +17,15 @@ def proc_signal_dsp(system, systemid,  c2sym, c2type, c2submit, ibsym, ibcurrenc
     ibquant=qty * 10000
     
     print qty;
-    if qty== 0:
-       if signals[-2] > 0:
+    if safef[-1]*signals[-1]== 0:
+      if safef[-2]*signals[-2] > 0:
           place_c2order('STC', c2quant, c2sym, c2type, systemid, c2submit)
           place_iborder("SELL", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
-      if signals[-2] < 0:
+      if safef[-2]*signals[-2] < 0:
           place_c2order('BTC', c2quant, c2sym, c2type, systemid, c2submit)
           place_iborder("BUY", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);       
+      if safef[-2]*signals[-2] == 0:
+        pass
       #if len(signals) > 1:
       #        if signals[-2] == signals[-1]:
       #            signal=0;

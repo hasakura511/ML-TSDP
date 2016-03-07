@@ -413,7 +413,9 @@ print 'Saving Signals..'
 #init file
 #bestBothDPS.tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
 signal=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv')
-signal=signal[:-1].append(bestBothDPS.reset_index().iloc[-2:])
+if bestBothDPS.reset_index().iloc[-2].dates == signal.iloc[-1].dates:
+    signal.gainAhead.iloc[-1] = bestBothDPS.gainAhead.iloc[-2]
+signal=signal.append(bestBothDPS.reset_index().iloc[-1])
 signal.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
                 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

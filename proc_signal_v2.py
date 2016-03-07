@@ -42,6 +42,6 @@ def proc_signal_dsp(system, systemid,  c2sym, c2type, c2submit, ibsym, ibcurrenc
 #proc_signal('USDJPY','100962390',2, 'USDJPY','forex',True, 20000,'USD','JPY','IDEALPRO','CASH', False)
 #proc_signal('USDCAD','100962769',1, 'USDCAD','forex',True, 10000,'USD','CAD','IDEALPRO','CASH', False)
 proc_signal_dsp('v2_AUDUSD','101008882','AUDUSD','forex',True, 'AUD','USD','IDEALPRO','CASH', False)
-#proc_signal_dsp('v2_AUDUSD','100962754','AUDUSD','forex',True, 'AUD','USD','IDEALPRO','CASH', False)
+proc_signal_dsp('v2_AUDUSD','100962754','AUDUSD','forex',True, 'AUD','USD','IDEALPRO','CASH', False)
 
 

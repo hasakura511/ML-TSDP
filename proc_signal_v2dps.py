@@ -31,7 +31,7 @@ def proc_signal_dsp(system, systemid,  c2sym, c2type, c2submit, ibsym, ibcurrenc
       #        if signals[-2] == signals[-1]:
       #            signal=0;
 
-  
+    else:
     　time.sleep( 10 )
     　if qty<0:
         place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit)

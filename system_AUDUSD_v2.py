@@ -11,6 +11,8 @@ import numpy as np
 import pandas as pd
 import time
 import datetime
+import sys
+import random
 from pytz import timezone
 from datetime import datetime as dt
 
@@ -79,6 +81,8 @@ else:
     equityStatsSavePath = None
     signalPath = './data/signals/' 
 '''
+
+debug=False
 
 if len(sys.argv)==1:
     debug=True

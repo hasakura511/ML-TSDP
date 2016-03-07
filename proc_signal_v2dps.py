@@ -10,7 +10,7 @@ def proc_signal_dsp(system, systemid,  c2sym, c2type, c2submit, ibsym, ibcurrenc
     safef=data['safef'];
     if safef[-1]*signals[-1] == 0:
         qty=safef[-2]*signals[-2]
-     else:
+    else:
         qty=safef[-1]*signals[-1]-safef[-2]*signals[-2]
     #signal=signals[-1];
     qty=round(qty)
@@ -26,17 +26,13 @@ def proc_signal_dsp(system, systemid,  c2sym, c2type, c2submit, ibsym, ibcurrenc
           place_c2order('BTC', c2quant, c2sym, c2type, systemid, c2submit)
           place_iborder("BUY", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);       
       if safef[-2]*signals[-2] == 0:
-        pass
-      #if len(signals) > 1:
-      #        if signals[-2] == signals[-1]:
-      #            signal=0;
-
+          pass
     else:
-    　time.sleep( 10 )
-    　if qty<0:
+     time.sleep( 10 )
+     if qty<0:
         place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit)
         place_iborder("SELL", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
-    　if qty>0:
+     if qty>0:
         place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit)
         place_iborder("BUY", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
         

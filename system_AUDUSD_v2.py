@@ -80,7 +80,9 @@ else:
     signalPath = './data/signals/' 
 '''
 
-debug = True
+if len(sys.argv)==1:
+    debug=True
+
 if debug:
     showDist =  True
     showPDFCDF = True

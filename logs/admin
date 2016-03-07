@@ -14,6 +14,11 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303111714.3D125828BB79@Homes-MBP.localdomain>
 Date: Thu,  3 Mar 2016 20:16:01 +0900 (JST)
+X-IMAPbase: 1457324636 13
+Status: O
+X-Status: 
+X-Keywords:                      
+X-UID: 1
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -1065,6 +1070,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303120122.F3C4E828CBA6@Homes-MBP.localdomain>
 Date: Thu,  3 Mar 2016 21:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 2
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -2114,6 +2123,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303130059.A3F29828DE33@Homes-MBP.localdomain>
 Date: Thu,  3 Mar 2016 22:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 3
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -2447,6 +2460,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303140117.400548291156@Homes-MBP.localdomain>
 Date: Thu,  3 Mar 2016 23:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 4
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -3129,6 +3146,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303150122.648948294C1D@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 00:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 5
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -4151,6 +4172,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303160120.4BE8E829ECF3@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 01:00:05 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 6
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -4654,6 +4679,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303170205.CB84782A21D3@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 02:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 7
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -4980,6 +5009,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303180104.6E0DD82A2809@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 03:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 8
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -5486,6 +5519,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303190108.F04E482A2FD8@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 04:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 9
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -6126,6 +6163,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303200111.46A2782A3613@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 05:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 10
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -6801,6 +6842,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303210126.7C89482A3CC5@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 06:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 11
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -7614,6 +7659,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303220058.EA5B582A43A5@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 07:00:01 +0900 (JST)
+Status: O
+X-Status: 
+X-Keywords:                  
+X-UID: 12
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):
@@ -7948,6 +7997,10 @@ X-Cron-Env: <USER=admin>
 X-Cron-Env: <HOME=/Users/admin>
 Message-Id: <20160303230119.8CD9082A4A4D@Homes-MBP.localdomain>
 Date: Fri,  4 Mar 2016 08:00:01 +0900 (JST)
+Status: RO
+X-Status: 
+X-Keywords:                 
+X-UID: 13
 
 /Users/admin/anaconda/lib/python2.7/site-packages/numexpr/cpuinfo.py:76: UserWarning: [Errno 2] No such file or directory
   stacklevel=stacklevel + 1):

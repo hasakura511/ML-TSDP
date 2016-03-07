@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import time
@@ -15,25 +14,26 @@ def proc_signal_dsp(system, systemid,  c2sym, c2type, c2submit, ibsym, ibcurrenc
     ibquant=qty * 10000
     
     print signal;
-    if len(signals) > 1:
-          if signals[-2] == signals[-1]:
-              signal=0;
-          if signals[-2] > signals[-1]:
-              place_c2order('STC', c2quant, c2sym, c2type, systemid, c2submit)
-              place_iborder("SELL", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
-          if signals[-2] < signals[-1]:
-              place_c2order('BTC', c2quant, c2sym, c2type, systemid, c2submit)
-              place_iborder("BUY", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
-     
-    time.sleep( 10 )
-    if signal == -1:
-        place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit)
-        place_iborder("SELL", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
-    if signal == 1:
-        place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit)
-        place_iborder("BUY", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
-    
-    #os.remove('./data/signals/' + system + '.csv')
+    if qty > 0:
+        if len(signals) > 1:
+              if signals[-2] == signals[-1]:
+                  signal=0;
+              if signals[-2] > signals[-1]:
+                  place_c2order('STC', c2quant, c2sym, c2type, systemid, c2submit)
+                  place_iborder("SELL", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
+              if signals[-2] < signals[-1]:
+                  place_c2order('BTC', c2quant, c2sym, c2type, systemid, c2submit)
+                  place_iborder("BUY", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
+         
+        time.sleep( 10 )
+        if signal == -1:
+            place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit)
+            place_iborder("SELL", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
+        if signal == 1:
+            place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit)
+            place_iborder("BUY", ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
+        
+        #os.remove('./data/signals/' + system + '.csv')
     
 
 #proc_signal('EURUSD','100961226',1, 'EURUSD','forex',True, 10000,'EUR','USD','IDEALPRO','CASH', False)

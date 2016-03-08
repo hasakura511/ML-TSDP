@@ -32,7 +32,7 @@ cd /Users/admin/ML-TSDP/
 /Users/admin/anaconda/bin/python get_ibpos.py
 
 #/Users/admin/anaconda/bin/python system_AUDUSD_v2.py 1
-/Users/admin/anaconda/bin/python system_AUDUSD_v2.01.py 1
+/Users/admin/anaconda/bin/python system_AUDUSD_v2.1.py 1
 /Users/admin/anaconda/bin/python proc_signal_v2dps.py
 /Users/admin/anaconda/bin/python get_exec.py
 sleep 10

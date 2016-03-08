@@ -38,7 +38,7 @@ def adj_size(model_pos, ib_pos, system, systemid, c2quant, c2sym, c2type, c2subm
                 place_c2order('BTC', qty, c2sym, c2type, systemid, c2submit)
                 
                 c2quant = c2quant - qty
-                sleep(5)
+                sleep(2)
             
             if c2quant > 0:
                 print 'BTO: ' + str(c2quant)
@@ -52,7 +52,7 @@ def adj_size(model_pos, ib_pos, system, systemid, c2quant, c2sym, c2type, c2subm
                 place_c2order('STC', qty, c2sym, c2type, systemid, c2submit)
                 
                 c2quant = c2quant - qty
-                sleep(5)
+                sleep(2)
             if c2quant > 0:
                 print 'STO: ' + str(c2quant)
                 place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit)

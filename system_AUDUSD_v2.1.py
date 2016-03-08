@@ -3,13 +3,16 @@
 """
 Created on Sun Nov 22 20:57:32 2015
 changelog
+v2.10
+added other pairs as features
+
 v2.01
 added roofing filter indicators
 
 v2.0
 added in-sample period walk forward optemization
 added dps optimization
-added perturb data
+added perturb data for robustness
 
 
 @author: hidemi
@@ -22,6 +25,7 @@ import time
 import datetime
 import sys
 import random
+import copy
 from pytz import timezone
 from datetime import datetime as dt
 
@@ -67,14 +71,6 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
                         roofingFilter
 from suztoolz.data import getDataFromIB
 
-import time
-from time import gmtime, strftime, localtime
-from io import StringIO
-
-from btapi.get_hist_btcharts import  get_hist_btcharts
-from btapi.raw_to_ohlc import raw_to_ohlc_min, raw_to_ohlc
-from btapi.sort_dates import sort_dates
-
 start_time = time.time()
 
 
@@ -109,8 +105,8 @@ signal = 'LongGT0'
 
 #data Parameters
 cycles = 3
-exchange='bitstampUSD'
-symbol='BTC'
+exchange='IDEALPRO'
+symbol='EUR'
 secType='CASH'
 currency='USD'
 endDateTime=dt.now(timezone('US/Eastern'))
@@ -118,6 +114,7 @@ durationStr='1 M'
 barSizeSetting='1 hour'
 whatToShow='MIDPOINT'
 ticker = symbol + currency
+currencyPairs = ['AUDUSD','EURUSD','GBPUSD','USDCAD','USDCHF','USDJPY']
 
 #Model Parameters
 perturbDataPct = 0.0002
@@ -137,13 +134,14 @@ zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
 DPOLookback = 10
-ACLookback = 10
+ACLookback = 12
+CCLookback = 60
 rStochLookback = 300
 statsLookback = 100
 
 #DPS parameters
 windowLengths = [12,24]
-maxLeverage = [10,20]
+maxLeverage = [5]
 PRT={}
 PRT['DD95_limit'] = 0.05
 PRT['tailRiskPct'] = 95
@@ -198,7 +196,7 @@ models = [#("GA_Reg", SymbolicRegressor(population_size=5000, generations=20,
         #("RadiusNeighborsRegressor",RadiusNeighborsRegressor()),\
         #("LinearSVR", LinearSVR()),\
         #("rbf.01SVR",SVR(kernel='rbf', C=0.1, gamma=.01)),\
-        #("rbf1SVR",SVR(kernel='rbf', C=1, gamma=0.1)),\
+        ("rbf1SVR",SVR(kernel='rbf', C=1, gamma=0.1)),\
         #("rbf10SVR",SVR(kernel='rbf', C=10, gamma=0.1)),\
         #("rbf100SVR",SVR(kernel='rbf', C=100, gamma=0.1)),\
         #("rbf1000SVR",SVR(kernel='rbf', C=1000, gamma=0.1)),\
@@ -206,58 +204,74 @@ models = [#("GA_Reg", SymbolicRegressor(population_size=5000, generations=20,
         #("polySVR",SVR(kernel='poly', C=1e3, degree=2)),\
          ]
 
-
 ############################################################
-def get_bthist(symbol):
-    datestr=strftime("%Y%m%d", localtime())
-    data=get_hist_btcharts(symbol);
-    dataSet = pd.read_csv(StringIO(data))
-    #dataSet.to_csv('./data/btapi/' + symbol + '_hourly.csv', index=False)
-    dataSet=raw_to_ohlc(dataSet,'./data/btapi/' + symbol + '_hourly.csv')
-    #sort_dates('./data/btapi/' + symbol + '_hourly.csv','./data/btapi/' + symbol + '_hourly.csv')
+for i in range(0,cycles):
+    if i ==0:
+        getHistLoop = [endDateTime]
+    else:
+        getHistLoop.insert(0,(getHistLoop[0]-datetime.timedelta(365/12)))
 
-    #dataSet = pd.read_csv('./data/btapi/' + symbol + '.csv', index_col='Date')
-    dataSet=dataSet.reset_index()
-    return dataSet
-    
-def get_bthist_from_csv():
-    dataSet = pd.read_csv('./data/btapi/BTCUSD_updated.csv', index_col='Date')
-    return dataSet
+getHistLoop = [x.strftime("%Y%m%d %H:%M:%S %Z") for x in getHistLoop]
 
-data=get_bthist_from_csv()
-data=data.loc['2015-12-01 00:00':]
-data=data.reset_index()
-data=data.append(get_bthist('bitstampUSD'))
-
-data=data.drop_duplicates(subset=['Date'],keep='last').set_index('Date')
-data.to_csv('./data/btapi/BTCUSD_updated.csv')
-data=data.iloc[100:]
+currencyPairsDict = {}
+for pair in currencyPairs:
+    symbol = pair[0:3]
+    currency = pair[3:6]
+    brokerData = {}
+    brokerData =  {'port':7496, 'client_id':101,\
+                         'tickerId':1, 'exchange':exchange,'symbol':symbol,\
+                         'secType':secType,'currency':currency,\
+                         'endDateTime':endDateTime, 'durationStr':durationStr,\
+                         'barSizeSetting':barSizeSetting,\
+                         'whatToShow':whatToShow, 'useRTH':1, 'formatDate':1
+                          }
+                          
+    data = pd.DataFrame()                   
+    for date in getHistLoop:
+        brokerData['client_id']=random.randint(100,1000)
+        data = pd.concat([data,getDataFromIB(brokerData, date)],axis=0)
+    currencyPairsDict[pair] = data
+print 'Successfully Retrieved Data.'
 ###########################################################
-print 'Successfully Retrieved Data.  Begin Preprocessing...'
-#perturb dataSet
-if perturbData:
-    data['Open'] = perturb_data(data['Open'].values,perturbDataPct)
-    data['High']= perturb_data(data['High'].values,perturbDataPct)
-    data['Low']= perturb_data(data['Low'].values,perturbDataPct)
-    data['Close'] = perturb_data(data['Close'].values,perturbDataPct)
-    #data['VOL'] = perturb_data(data['VOL'].values,perturbDataPct)
-    #data['OI'] == perturb_data(data['OI'].values,perturbDataPct)
-    
-#find max lookback
-maxlb = max(RSILookback,
-                    zScoreLookback,
-                    ATRLookback,
-                    DPOLookback,
-                    ACLookback,
-                    rStochLookback)
-# add shift
-maxlb = maxlb+4
+print 'Begin Preprocessing...'
 
-#drop dupes
-dataSet = data.drop(data.index[data.index.duplicated()], axis=0).copy(deep=True)
-#drop weekends
+#add cross pair features
+currencyPairsDict2 = copy.deepcopy(currencyPairsDict)
+for pair in currencyPairsDict2:
+    data = currencyPairsDict2[pair].copy(deep=True)
+    #perturb dataSet
+    if perturbData:
+        print 'perturbing OHLC and',
+        data['Open'] = perturb_data(data['Open'].values,perturbDataPct)
+        data['High']= perturb_data(data['High'].values,perturbDataPct)
+        data['Low']= perturb_data(data['Low'].values,perturbDataPct)
+        data['Close'] = perturb_data(data['Close'].values,perturbDataPct)
+        
+    print 'removing dupes..'
+    print pair, currencyPairsDict2[pair].shape
+    currencyPairsDict2[pair] = data.drop(data.index[data.index.duplicated()],\
+                                         axis=0)
+    print pair, currencyPairsDict2[pair].shape
+
+#if last index exists in all pairs append to dataSet
+dataSet = currencyPairsDict2[ticker].copy(deep=True)
 nrows = dataSet.shape[0]
-
+lastIndex = currencyPairsDict2[ticker].index[-1]
+for pair in currencyPairsDict2:
+    if lastIndex in currencyPairsDict2[pair].index and pair != ticker:
+        closes = pd.concat([dataSet.Close, currencyPairsDict2[pair].Close],\
+                                axis=1, join='inner')
+                                
+        if closes.shape[0] != nrows:
+            print 'Warning: row mismatch. Some Data may be lost.'
+            print 'rows in dataSet', ticker, nrows, 'rows in cross-pair',\
+                        pair, currencyPairsDict2[pair].shape[0]
+                        
+        dataSet['corr'+pair] = pd.rolling_corr(closes.iloc[:,0],\
+                                        closes.iloc[:,1], window=CCLookback)
+        dataSet['priceChange'+pair] = priceChange(closes.iloc[:,1])
+        dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,500)
+        
 #short direction
 dataSet['Pri_RSI'] = RSI(dataSet.Close,RSILookback)
 dataSet['Pri_RSI_Y1'] = dataSet['Pri_RSI'].shift(1)
@@ -296,9 +310,17 @@ dataSet['autoCor_Y3'] = dataSet['autoCor'].shift(3)
 dataSet['gainAhead'] = gainAhead(dataSet.Close)
 dataSet['signal'] = np.where(dataSet.gainAhead>beLongThreshold,1,-1)
 
-#mData = dataSet.drop(['Open','High','Low','Close',
-#                      'Volume','gainAhead'],
-#                      axis=1).dropna()
+#find max lookback
+maxlb = max(RSILookback,
+                    zScoreLookback,
+                    ATRLookback,
+                    DPOLookback,
+                    ACLookback,
+                    rStochLookback)
+# add shift
+maxlb = maxlb+4
+
+#raise error if nan/inf in dataSet
 for col in dataSet:
     if sum(np.isnan(dataSet[col][maxlb:].values))>0:
         print dataSet[col][maxlb:][np.isnan(dataSet[col][maxlb:].values)]
@@ -416,15 +438,16 @@ bestBothDPS.index.name = 'dates'
 bestBothDPS = pd.concat([bestBothDPS, pd.Series(data = dpsRunName,index=bestBothDPS.index, name='system')], \
                                                 axis=1)
 print 'Next Signal:'
-print bestBothDPS.iloc[-1]
+print bestBothDPS.iloc[-1].system
+print bestBothDPS.drop(['system','prior_index'],axis=1).iloc[-1]
  
 print 'Saving Signals..'      
 #init file
 #bestBothDPS.tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
-signal=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv')
-if bestBothDPS.reset_index().iloc[-2].dates == signal.iloc[-1].dates:
-    signal.gainAhead.iloc[-1] = bestBothDPS.gainAhead.iloc[-2]
-signal=signal.append(bestBothDPS.reset_index().iloc[-1])
-signal.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
+signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv')
+if bestBothDPS.reset_index().iloc[-2].dates == signalFile.iloc[-1].dates:
+    signalFile.gainAhead.iloc[-1] = bestBothDPS.gainAhead.iloc[-2]
+signalFile=signalFile.append(bestBothDPS.reset_index().iloc[-1])
+signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
                 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

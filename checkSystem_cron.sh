@@ -21,4 +21,5 @@ export LANG=en_US.UTF-8
 cd /Users/admin/ML-TSDP/
 /Users/admin/anaconda/bin/python proc_pos_adj.py	
 /Users/admin/anaconda/bin/python proc_signal_v2dps.py
-
+sleep 100
+/Users/admin/anaconda/bin/python get_ibpos.py

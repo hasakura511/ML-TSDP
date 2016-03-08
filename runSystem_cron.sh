@@ -19,6 +19,7 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
 cd /Users/admin/ML-TSDP/
+/Users/admin/anaconda/bin/python get_ibpos.py
 /Users/admin/anaconda/bin/python system_EURUSD.py 1
 /Users/admin/anaconda/bin/python system_GBPUSD.py 1
 /Users/admin/anaconda/bin/python system_USDJPY.py 1
@@ -28,10 +29,16 @@ cd /Users/admin/ML-TSDP/
 /Users/admin/anaconda/bin/python proc_signal_v2.py
 /Users/admin/anaconda/bin/python get_exec.py
 
+/Users/admin/anaconda/bin/python get_ibpos.py
+
 #/Users/admin/anaconda/bin/python system_AUDUSD_v2.py 1
 /Users/admin/anaconda/bin/python system_AUDUSD_v2.01.py 1
 /Users/admin/anaconda/bin/python proc_signal_v2dps.py
 /Users/admin/anaconda/bin/python get_exec.py
 sleep 100
+/Users/admin/anaconda/bin/python get_ibpos.py
+sleep 10
 /Users/admin/anaconda/bin/python proc_pos_adj.py	
+
+/Users/admin/anaconda/bin/python get_ibpos.py
 

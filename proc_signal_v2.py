@@ -6,14 +6,15 @@ import json
 from pandas.io.json import json_normalize
 from ibapi.place_order import place_order as place_iborder
 from c2api.place_order import place_order as place_c2order
-from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open
+from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
 from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open
 from seitoolz.signal import get_model_pos
 from seitoolz.order import adj_size
 from time import gmtime, strftime, time, localtime, sleep
     
 model_pos=get_model_pos(['EURUSD','GBPUSD','USDCHF','USDJPY','AUDUSD','USDCAD'])
-ib_pos=get_ibpos()
+#ib_pos=get_ibpos()
+ib_pos=get_ibpos_from_csv()
 
 adj_size(model_pos, ib_pos,'EURUSD','100961226',1, 'EURUSD','forex',True, 10000,'EUR','USD','IDEALPRO','CASH', False)
 adj_size(model_pos, ib_pos,'GBPUSD','100962402',1, 'GBPUSD','forex',True, 10000,'GBP','USD','IDEALPRO','CASH', False)

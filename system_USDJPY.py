@@ -295,8 +295,8 @@ if len(sys.argv)==1:
 
 
 last = [mData.drop(['signal'],axis=1).values[-1]]
-print 'Next Signal for',dataSet.index[-1],'is', model.predict(last), 'with',\
-        model.predict_proba(last).max()*100, '% probability'
+print 'Next Signal for',dataSet.index[-1],'is', model.predict(last), 'with',
+#        model.predict_proba(last).max()*100, '% probability'
 
 system="USDJPY"
 data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':model.predict(last)}, columns=['Date','Signal'])

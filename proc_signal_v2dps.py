@@ -13,18 +13,8 @@ from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.order import adj_size
 from time import gmtime, strftime, time, localtime, sleep
     
-model_pos=get_dps_model_pos(['v2_AUDUSD'])
 ib_pos=get_ibpos()
 
-#proc_signal('EURUSD','100961226',1, 'EURUSD','forex',True, 10000,'EUR','USD','IDEALPRO','CASH', False)
-#proc_signal('GBPUSD','100962402',1, 'GBPUSD','forex',True, 10000,'GBP','USD','IDEALPRO','CASH', False)
-#proc_signal('USDCHF','100962399',1, 'USDCHF','forex',True, 10000,'USD','CHF','IDEALPRO','CASH', False)
-#proc_signal('USDJPY','100962390',2, 'USDJPY','forex',True, 20000,'USD','JPY','IDEALPRO','CASH', False)
-#proc_signal('USDCAD','100962769',1, 'USDCAD','forex',True, 10000,'USD','CAD','IDEALPRO','CASH', False)
-adj_size(model_pos, ib_pos,'v2_AUDUSD','101008882',1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
-adj_size(model_pos, ib_pos,'v2_AUDUSD','100962754',1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
-
-#proc_signal_dsp('v2_AUDUSD','101008882','AUDUSD','forex',True, 'AUD','USD','IDEALPRO','CASH', False)
-#proc_signal_dsp('v2_AUDUSD','100962754','AUDUSD','forex',True, 'AUD','USD','IDEALPRO','CASH', False)
-
-
+dps_model_pos=get_dps_model_pos(['v2_AUDUSD'])
+adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','101008882',1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','100962754',1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)

@@ -42,3 +42,4 @@ adj_size(model_pos, ib_pos,'USDCHF','100961267',1, 'USDCHF','forex',True, 10000,
 adj_size(model_pos, ib_pos,'USDJPY','100961267',1, 'USDJPY','forex',True, 20000,'USD','JPY','IDEALPRO','CASH', False)
 adj_size(model_pos, ib_pos,'AUDUSD','100961267',1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
 adj_size(model_pos, ib_pos,'USDCAD','100961267',1, 'USDCAD','forex',True, 10000,'USD','CAD','IDEALPRO','CASH', False)
+

@@ -2,7 +2,11 @@ from wrapper_v4 import IBWrapper, IBclient
 from swigibpy import Contract as IBcontract
 
 import time
- 
+import pandas as pd
+from time import gmtime, strftime, time, localtime, sleep
+import json
+from pandas.io.json import json_normalize
+
 def get_exec():
 
     """
@@ -76,9 +80,6 @@ def get_exec():
     ## Get the executions (gives you everything for last business day)
     execlist=client.get_executions()
     
-    #print "Following executed since midnight this morning:"
-    #print ""
-    #print execlist
     return execlist;
 
 def get_exec_open():
@@ -90,4 +91,15 @@ def get_exec_open():
     (account_value, portfolio_data)=client.get_IB_account_data()
     
     return (account_value, portfolio_data)
+
+def get_ibpos():
+    datestr=strftime("%Y%m%d", localtime())
+    (account_value, portfolio_data)=get_exec_open()
+    data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
+    dataSet=pd.DataFrame(data)
+    #dataSet=dataSet.sort_values(by='times')
+    dataSet=dataSet=dataSet.set_index(['sym','currency'])
+    dataSet.to_csv('./data/portfolio/ib_portfolio.csv')
+    #
+    return dataSet
 #get_exec();

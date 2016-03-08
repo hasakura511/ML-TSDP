@@ -50,8 +50,8 @@ def describeDistribution(qtC,qtP,ticker):
     number_gainers = i_gainer
     number_losers = i_loser
     print 'Issue:             ' + ticker
-    print 'Dates:             ' + str(qtC.index[0])
-    print '  to:              ' + str(qtC.index[-1])
+    #print 'Dates:             ' + str(qtC.index[0])
+    #print '  to:              ' + str(qtC.index[-1])
     print 'Rows:              ' + str(qtC.shape[0])
     #print 'Cols:              ' + str(qtC.shape[1])
     print 'Number Gainers:     %d ' % number_gainers

@@ -838,7 +838,7 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
                                     
     if equityStatsSavePath is not None:
         equityStats.to_csv(equityStatsSavePath+'eStats_'+systemName+'_'+str(endDate).replace(':','')+'.csv')
-    return topSystem, DPS_adj[topSystem]    
+    return topSystem, DPS_adj[topSystem]
     
 def createYearlyStats(eCurves, benchStatsByYear=None):
     yearlyStats = {}

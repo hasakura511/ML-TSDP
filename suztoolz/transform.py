@@ -237,6 +237,55 @@ class ratio(object):
 
 		return benchmark
         
+def roofingFilter(p,lb,bars=10.0):
+    if lb <3:
+        print 'lookback < 3. adjusting lookback minimum to 3'
+        lb =3    
+    if type(p) is pd.core.series.Series:
+        p = p.values
+        
+    rad360 = math.radians(360)
+    sqrt2div2 = math.sqrt(2)/2
+    alpha = (math.cos(sqrt2div2*rad360/bars)+\
+            math.sin(sqrt2div2*rad360/bars)-1)/\
+            math.cos(rad360*sqrt2div2/bars)
+    a1 = math.exp(-math.sqrt(2)*math.pi/10.0)
+    b1 = 2.0*a1*math.cos(math.sqrt(2)*math.radians(180)/10.0)
+    
+    c3 = -a1*a1
+    c2 = b1
+    c1 = 1-c2-c3
+    
+    nrows = p.shape[0]
+    highpass = np.zeros(nrows)
+    
+    for i in range(2,nrows):
+        highpass[i] = (1-alpha/2.0)*(1-alpha/2.0)*\
+                (p[i]-2*p[i-1]+p[i-2])+2*(1-alpha)*\
+                highpass[i-1]-(1-alpha)*(1-alpha)*highpass[i-2]
+    
+    filt=np.zeros(nrows)
+    for i in range(2,nrows):
+        filt[i] = c1*(highpass[i]+highpass[i-1])/2.0+\
+                c2*filt[i-1]+c3*filt[i-2]
+    
+    high=np.zeros(nrows)
+    low=np.zeros(nrows)
+    #soften ramp up
+    for i in range(3,lb):
+        high[i] = max(filt[2:i])
+        low[i] = min(filt[2:i])
+                
+    stoch=np.zeros(nrows)
+    rstoch=np.zeros(nrows)
+    for i in range(lb,nrows):
+        high[i] = max(filt[i-lb:i])
+        low[i] = min(filt[i-lb:i])
+        stoch[i] = (filt[i]-low[i])/(high[i]-low[i])
+        rstoch[i] = c1*(stoch[i]+stoch[i-1])/2.0+\
+                c2*rstoch[i-1]+c3*rstoch[i-2]
+    return rstoch
+    
 def perturb_data(p,mean):
     #add guassian noise of rolling std lb
     if type(p) is pd.core.series.Series:

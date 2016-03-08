@@ -1,12 +1,13 @@
 import datetime
 import pandas as pd
 
-high={}
-low={}
-close={}
-open={}
-date={}
-df=pd.read_csv('./test.csv')
-dataSet=df.sort_values(by='Date')
-dataSet.to_csv('./test2.csv')
+def sort_dates(infile, outfile):
+    high={}
+    low={}
+    close={}
+    open={}
+    date={}
+    df=pd.read_csv(infile, index='Date')
+    dataSet=df.sort_values(by='Date')
+    dataSet.to_csv(outfile)
 

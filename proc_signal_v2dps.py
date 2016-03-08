@@ -8,10 +8,7 @@ def proc_signal_dsp(system, systemid,  c2sym, c2type, c2submit, ibsym, ibcurrenc
     data = pd.read_csv('./data/signals/' + system + '.csv', index_col='dates')
     signals=data['signals'];
     safef=data['safef'];
-    if safef[-1]*signals[-1] == 0:
-        qty=safef[-2]*signals[-2]
-    else:
-        qty=safef[-1]*signals[-1]-safef[-2]*signals[-2]
+    qty=safef[-1]*signals[-1]
     #signal=signals[-1];
     qty=round(qty)
     c2quant=qty

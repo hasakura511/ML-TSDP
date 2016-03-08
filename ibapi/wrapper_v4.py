@@ -1,6 +1,7 @@
 from swigibpy import EWrapper
 import time
 import pandas as pd
+import random
 from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
 from swigibpy import Order as IBOrder
 from IButils import bs_resolve, action_ib_fill
@@ -20,7 +21,7 @@ def return_IB_connection_info():
     host=""
    
     port=7496
-    clientid=999
+    clientid=random.randint(100,9999)
     
     return (host, port, clientid)
 
@@ -261,6 +262,47 @@ class IBWrapper(EWrapper):
 
 
 
+    ## portfolio
+
+    def init_portfolio_data(self):
+        if "data_portfoliodata" not in dir(self):
+            setattr(self, "data_portfoliodata", [])
+        if "data_accountvalue" not in dir(self):
+            setattr(self, "data_accountvalue", [])
+            
+        
+        setattr(self, "flag_finished_portfolio", False)
+        
+
+    def updatePortfolio(self, contract, position, marketPrice, marketValue, averageCost, unrealizedPNL, realizedPNL, accountName):
+        """
+        Add a row to the portfolio structure
+        """
+
+        portfolio_structure=self.data_portfoliodata
+                
+        portfolio_structure.append((contract.symbol, contract.expiry, position, marketPrice, marketValue, averageCost, 
+                                    unrealizedPNL, realizedPNL, accountName, contract.currency))
+
+    ## account value
+    
+    def updateAccountValue(self, key, value, currency, accountName):
+        """
+        Populates account value dictionary
+        """
+        account_value=self.data_accountvalue
+        
+        account_value.append((key, value, currency, accountName))
+        
+
+    def accountDownloadEnd(self, accountName):
+        """
+        Finished can look at portfolio_structure and account_value
+        """
+        setattr(self, "flag_finished_portfolio", True)
+
+
+
 
 class IBclient(object):
     """
@@ -286,7 +328,7 @@ class IBclient(object):
 
         self.tws=tws
         self.cb=callback
-
+        self.accountid=''
 
     
     def get_contract_details(self, ibcontract, reqId=MEANINGLESS_NUMBER):
@@ -476,3 +518,44 @@ class IBclient(object):
         execlist=self.cb.data_fill_data.values()
         
         return execlist
+        
+        
+    def get_IB_account_data(self):
+
+        self.cb.init_portfolio_data()
+        self.cb.init_error()
+        
+        ## Turn on the streaming of accounting information
+        
+        self.tws.reqAccountUpdates(True, self.accountid)
+        
+        start_time=time.time()
+        finished=False
+        iserror=False
+
+        while not finished and not iserror:
+            finished=self.cb.flag_finished_portfolio
+            iserror=self.cb.flag_iserror
+
+            if (time.time() - start_time) > MAX_WAIT_SECONDS:
+                finished=True
+                print "Didn't get an end for account update, might be missing stuff"
+            pass
+        if iserror:
+            print self.cb.error_msg
+            print "Problem getting details"
+            return None
+
+
+        
+        ## Turn off the streaming
+        ## Note portfolio_structure will also be updated
+        #self.tws.reqAccountUpdates(False, self.accountid)
+
+        portfolio_data=self.cb.data_portfoliodata
+        account_value=self.cb.data_accountvalue
+
+        
+        
+       
+        return (account_value, portfolio_data)

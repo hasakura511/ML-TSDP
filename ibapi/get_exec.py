@@ -80,5 +80,14 @@ def get_exec():
     #print ""
     #print execlist
     return execlist;
+
+def get_exec_open():
+
+
+    callback = IBWrapper()
+    client=IBclient(callback)
     
+    (account_value, portfolio_data)=client.get_IB_account_data()
+    
+    return (account_value, portfolio_data)
 #get_exec();

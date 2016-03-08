@@ -7,7 +7,7 @@ def sort_dates(infile, outfile):
     close={}
     open={}
     date={}
-    df=pd.read_csv(infile, index_col=['Date'])
+    df=pd.read_csv(infile)
     dataSet=df.sort_values(by='Date')
-    dataSet.to_csv(outfile)
+    dataSet.to_csv(outfile, index=False)
 

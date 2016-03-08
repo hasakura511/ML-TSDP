@@ -1,2 +1,2 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-USDCAD,14,1457431525,,,1.33417,,forex,short,2016-03-08 05:05:25,1457431525,open,2016-03-08 05:02:07,1.33438,10000,,0,1,,,101072680,
+USDCAD,-29,1457431525,,,1.33417,,forex,short,2016-03-08 05:05:25,1457431525,open,2016-03-08 05:02:07,1.33438,10000,,0,1,,,101072680,

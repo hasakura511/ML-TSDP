@@ -2,18 +2,33 @@ import pandas as pd
 import sys
 from datetime import datetime
 from threading import Event
+import numpy as np
+import pandas as pd
+import time
+import json
+from time import gmtime, strftime, time, localtime
+from io import StringIO
 
 from swigibpy import EWrapper, EPosixClientSocket, Contract
-
+from btapi.get_hist_btcharts import  get_hist_btcharts
+from btapi.raw_to_ohlc import raw_to_ohlc_min
+from btapi.sort_dates import sort_dates
 
 WAIT_TIME = 30.0
 data = pd.DataFrame(columns = ['Date','Open','High','Low','Close','Volume'])
-def get_bthist_from_csv():
-    dataSet = pd.read_csv('./data/btapi/BTCUSD.csv', index_col=['Date'])
+def get_bthist(symbol):
+    datestr=strftime("%Y%m%d", localtime())
+    data=get_hist_btcharts(symbol);
+    dataSet = pd.read_csv(StringIO(data))
+    dataSet.to_csv('./data/btapi/' + symbol + '.csv', index=False)
+    raw_to_ohlc_min('./data/btapi/' + symbol + '.csv','./data/btapi/' + symbol + '.csv')
+    sort_dates('./data/btapi/' + symbol + '.csv','./data/btapi/' + symbol + '.csv')
+
+    dataSet = pd.read_csv('./data/btapi/' + symbol + '.csv', index_col=['Date'])
     return dataSet
     
 
-data=get_bthist_from_csv()
+data=get_bthist('bitstampUSD')
 
 # Simple contract for GOOG
 contract = Contract()

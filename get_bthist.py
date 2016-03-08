@@ -9,7 +9,7 @@ from pandas.io.json import json_normalize
 from btapi.get_hist_coindesk import  get_hist_coindesk
 from btapi.get_hist_blockchain import  get_hist_blockchain
 from btapi.get_hist_btcharts import  get_hist_btcharts
-from btapi.raw_to_ohlc import raw_to_ohlc, raw_to_ohlc_min
+from btapi.raw_to_ohlc import raw_to_ohlc, raw_to_ohlc_min, raw_to_ohlc_from_csv
 from btapi.sort_dates import sort_dates
 import os
 import sys
@@ -34,13 +34,13 @@ def get_btcharts_hist(symbol):
     data=get_hist_btcharts(symbol);
     dataSet = pd.read_csv(StringIO(data))
     dataSet.to_csv('./data/btapi/' + symbol + '_hist.csv', index=False)
-    raw_to_ohlc('./data/btapi/' + symbol + '_hist.csv','./data/btapi/' + symbol + '_hist.csv')
+    raw_to_ohlc_from_csv('./data/btapi/' + symbol + '_hist.csv','./data/btapi/' + symbol + '_hist.csv')
     sort_dates('./data/btapi/' + symbol + '_hist.csv','./data/btapi/' + symbol + '_hist.csv')
     
 def get_1coin_hist():
     os.system("curl http://api.bitcoincharts.com/v1/csv/bitstampUSD.csv.gz > BTCUSD.csv.gz")
     os.system("gunzip BTCUSD.csv.gz")
-    raw_to_ohlc('./BTCUSD.csv','./BTCUSD.csv')
+    raw_to_ohlc_from_csv('./BTCUSD.csv','./BTCUSD.csv')
     sort_dates('./BTCUSD.csv','./data/btapi/BTCUSD.csv')
     os.remove('./BTCUSD.csv')
   

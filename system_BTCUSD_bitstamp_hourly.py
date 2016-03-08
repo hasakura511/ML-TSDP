@@ -11,7 +11,7 @@ from io import StringIO
 
 from swigibpy import EWrapper, EPosixClientSocket, Contract
 from btapi.get_hist_btcharts import  get_hist_btcharts
-from btapi.raw_to_ohlc import raw_to_ohlc_min
+from btapi.raw_to_ohlc import raw_to_ohlc_min, raw_to_ohlc
 from btapi.sort_dates import sort_dates
 
 WAIT_TIME = 30.0
@@ -20,16 +20,26 @@ def get_bthist(symbol):
     datestr=strftime("%Y%m%d", localtime())
     data=get_hist_btcharts(symbol);
     dataSet = pd.read_csv(StringIO(data))
-    #dataSet.to_csv('./data/btapi/' + symbol + '.csv', index=False)
-    dataSet=dataSet.replace([np.inf, -np.inf], np.nan).dropna(how="all")
-  
-    dataSet=raw_to_ohlc_min(dataSet,'./data/btapi/' + symbol + '.csv')
-    #sort_dates('./data/btapi/' + symbol + '.csv','./data/btapi/' + symbol + '.csv')
-    dataSet = pd.read_csv('./data/btapi/' + symbol + '.csv', index_col='Date')
+    #dataSet.to_csv('./data/btapi/' + symbol + '_hourly.csv', index=False)
+    dataSet=raw_to_ohlc(dataSet,'./data/btapi/' + symbol + '_hourly.csv')
+    #sort_dates('./data/btapi/' + symbol + '_hourly.csv','./data/btapi/' + symbol + '_hourly.csv')
+
+    #dataSet = pd.read_csv('./data/btapi/' + symbol + '.csv', index_col='Date')
+    dataSet=dataSet.reset_index()
     return dataSet
     
+def get_bthist_from_csv():
+    dataSet = pd.read_csv('./data/btapi/BTCUSD_updated.csv', index_col='Date')
+    return dataSet
 
-data=get_bthist('bitstampUSD').iloc[100:]
+data=get_bthist_from_csv()
+data=data.loc['2016-01-01 00:00':]
+data=data.reset_index()
+data=data.append(get_bthist('bitstampUSD'))
+
+data=data.drop_duplicates(subset=['Date'],keep='last').set_index('Date')
+data.to_csv('./data/btapi/BTCUSD_updated.csv')
+data=data.iloc[100:]
 
 # Simple contract for GOOG
 contract = Contract()
@@ -130,7 +140,6 @@ cm_sum_oos = np.zeros((2,2))
 for train_index,test_index in sss:
     X_train, X_test = dX[train_index], dX[test_index]
     y_train, y_test = dy[train_index], dy[test_index] 
-
 
 #  fit the model to the in-sample data
     model.fit(X_train, y_train)

@@ -42,3 +42,6 @@ sleep 10
 
 /Users/admin/anaconda/bin/python get_ibpos.py
 
+
+/Users/admin/anaconda/bin/python system_BTCUSD_bitstamp_hourly.py 1
+/Users/admin/anaconda/bin/python system_BTCUSD_bitstamp.py 1

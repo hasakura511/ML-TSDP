@@ -14,7 +14,7 @@ def get_bthist_from_csv():
     
 
 data=get_bthist_from_csv()
-data=data.loc['2016-01-01 00:00':]
+data=data.loc['2015-12-01 00:00':]
 # Simple contract for GOOG
 contract = Contract()
 contract.exchange = "bitstampUSD"

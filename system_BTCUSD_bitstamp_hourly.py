@@ -33,7 +33,7 @@ def get_bthist_from_csv():
     return dataSet
 
 data=get_bthist_from_csv()
-data=data.loc['2016-01-01 00:00':]
+data=data.loc['2015-12-01 00:00':]
 data=data.reset_index()
 data=data.append(get_bthist('bitstampUSD'))
 

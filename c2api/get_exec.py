@@ -46,6 +46,9 @@ def get_c2pos(systemid, c2sym):
     jsondata = json.loads(data)
     if len(jsondata['response']) > 0:
         dataSet=json_normalize(jsondata['response'])
+        if c2sym not in dataSet['symbol'].values:
+            dataSet=dataSet.append(pd.DataFrame([[c2sym,0,0,'none']],
+                              columns=['symbol','quant_opened','quant_closed','long_or_short']))
         dataSet=dataSet.set_index(['symbol'])
         dataSet.to_csv('./data/portfolio/c2_' + c2sym + '_' + str(systemid)+ '_pos.csv')
         return dataSet

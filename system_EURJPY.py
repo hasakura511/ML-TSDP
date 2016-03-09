@@ -159,7 +159,7 @@ zScoreLookback = 10
 ATRLookback = 5
 beLongThreshold = 0.0
 DPOLookback = 3    
-model = SVC()
+model = GaussianNB()
 ticker = contract.symbol + contract.currency
 
 dataSet = data

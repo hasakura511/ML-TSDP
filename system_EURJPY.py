@@ -291,7 +291,7 @@ if len(sys.argv)==1:
 nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
 print 'Next Signal for',dataSet.index[-1],'is', nextSignal
 
-system="EURUSD"
+system="EURJPY"
 data=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
 #data.to_csv('./data/signals/' + system + '.csv', index=False)
 signal=pd.read_csv('./data/signals/' + system + '.csv')

@@ -88,9 +88,9 @@ if debug:
     showPDFCDF = True
     showAllCharts = True
     perturbData = True
-    scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
-    equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
-    signalPath =  'C:/Users/Hidemi/Desktop/Python/'
+    scorePath = './debug/scored_metrics_'
+    equityStatsSavePath = './debug/'
+    signalPath =  './debug/'
 else:
     showDist =  False
     showPDFCDF = False

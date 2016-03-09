@@ -27,14 +27,14 @@ adj_size(model_pos, ib_pos,'EURUSD','100961267',1, 'EURUSD','forex',False, 25000
 adj_size(model_pos, ib_pos,'GBPUSD','100961267',1, 'GBPUSD','forex',False, 25000,'GBP','USD','IDEALPRO','CASH', True)
 adj_size(model_pos, ib_pos,'USDCHF','100961267',1, 'USDCHF','forex',False, 25000,'USD','CHF','IDEALPRO','CASH', True)
 adj_size(model_pos, ib_pos,'USDJPY','100961267',2, 'USDJPY','forex',False, 25000,'USD','JPY','IDEALPRO','CASH', True)
-adj_size(model_pos, ib_pos,'AUDUSD','100961267',1, 'AUDUSD','forex',False, 25000,'AUD','USD','IDEALPRO','CASH', True)
+#adj_size(model_pos, ib_pos,'AUDUSD','100961267',1, 'AUDUSD','forex',False, 25000,'AUD','USD','IDEALPRO','CASH', True)
 adj_size(model_pos, ib_pos,'USDCAD','100961267',1, 'USDCAD','forex',False, 25000,'USD','CAD','IDEALPRO','CASH', True)
 
 adj_size(model_pos, ib_pos,'EURUSD','100984342',5, 'EURUSD','forex',True, 10000,'EUR','USD','IDEALPRO','CASH', False)
 adj_size(model_pos, ib_pos,'GBPUSD','100984342',5, 'GBPUSD','forex',True, 10000,'GBP','USD','IDEALPRO','CASH', False)
 adj_size(model_pos, ib_pos,'USDCHF','100984342',5, 'USDCHF','forex',True, 10000,'USD','CHF','IDEALPRO','CASH', False)
 adj_size(model_pos, ib_pos,'USDJPY','100984342',5, 'USDJPY','forex',True, 10000,'USD','JPY','IDEALPRO','CASH', False)
-adj_size(model_pos, ib_pos,'AUDUSD','100984342',5, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
+#adj_size(model_pos, ib_pos,'AUDUSD','100984342',5, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
 adj_size(model_pos, ib_pos,'USDCAD','100984342',5, 'USDCAD','forex',True, 10000,'USD','CAD','IDEALPRO','CASH', False)
 
 adj_size(model_pos, ib_pos,'EURUSD','100961267',1, 'EURUSD','forex',True, 10000,'EUR','USD','IDEALPRO','CASH', False)

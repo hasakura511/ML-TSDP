@@ -522,6 +522,7 @@ class IBclient(object):
         
     def get_IB_account_data(self):
 
+        time.sleep(2)
         self.cb.init_portfolio_data()
         self.cb.init_error()
         

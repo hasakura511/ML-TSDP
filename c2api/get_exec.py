@@ -7,41 +7,43 @@ import pandas as pd
 import time
 
 
-def get_exec(systemid):
+def get_exec(systemid, apikey):
     
     url = 'https://collective2.com/world/apiv3/requestTrades'
     
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
     
     data = { 
-    		"apikey":   "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
+    		"apikey":   apikey,#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
     		"systemid": systemid
     	}
     
     params={}
     
     r=requests.post(url, params=params, json=data);
+    sleep(2)
     return r.text
 
-def get_exec_open(systemid):
+def get_exec_open(systemid, apikey):
     
     url = 'https://collective2.com/world/apiv3/requestTradesOpen'
     
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
     
     data = { 
-    		"apikey":   "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
+    		"apikey":   apikey,#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
     		"systemid": systemid
     	}
     
     params={}
     
     r=requests.post(url, params=params, json=data);
+    sleep(2)
     return r.text
 
-def get_c2pos(systemid, c2sym):
+def get_c2pos(systemid, c2sym,apikey):
     datestr=strftime("%Y%m%d", localtime())
-    data=get_exec_open(systemid);
+    data=get_exec_open(systemid,apikey);
     
     jsondata = json.loads(data)
     if len(jsondata['response']) > 0:

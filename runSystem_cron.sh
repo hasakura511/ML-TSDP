@@ -20,6 +20,7 @@ export LANG=en_US.UTF-8
 
 cd /Users/admin/ML-TSDP/
 /Users/admin/anaconda/bin/python get_ibpos.py
+/Users/admin/anaconda/bin/python system_EURJPY.py 1
 /Users/admin/anaconda/bin/python system_EURUSD.py 1
 /Users/admin/anaconda/bin/python system_GBPUSD.py 1
 /Users/admin/anaconda/bin/python system_USDJPY.py 1

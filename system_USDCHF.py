@@ -5,7 +5,7 @@ from threading import Event
 
 from swigibpy import EWrapper, EPosixClientSocket, Contract
 
-
+start = '20160222  08:00:00'
 WAIT_TIME = 30.0
 data = pd.DataFrame(columns = ['Open','High','Low','Close','Volume'])
 #p_open=[];
@@ -204,7 +204,7 @@ mData = dataSet.drop(['Open','High','Low','Close',
                         axis=1).dropna()
 
 #  Select the date range to test no label for the last index
-mmData = mData[:-1]
+mmData = mData.ix[start:mData.index[-2]]
 
 datay = mmData.signal
 mmData = mmData.drop(['signal'],axis=1)

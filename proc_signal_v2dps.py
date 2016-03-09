@@ -17,7 +17,8 @@ from time import gmtime, strftime, time, localtime, sleep
 ib_pos=get_ibpos_from_csv()
 
 dps_model_pos=get_dps_model_pos(['v2_AUDUSD'])
-adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','101008882',1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
-adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','100962754',1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
-adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','100984342',5, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
-adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','100961267',1, 'AUDUSD','forex',False, 25000,'AUD','USD','IDEALPRO','CASH', True)
+adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','101008882',"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w",1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','100962754',"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w",1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','100984342',"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w",5, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','100961267',"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w",1, 'AUDUSD','forex',False, 25000,'AUD','USD','IDEALPRO','CASH', True)
+adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','101092852',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",10, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)

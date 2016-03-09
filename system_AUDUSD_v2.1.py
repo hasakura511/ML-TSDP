@@ -5,6 +5,7 @@ Created on Sun Nov 22 20:57:32 2015
 changelog
 v2.10
 added other pairs as features
+added Baysian Ridge as model option
 
 v2.01
 added roofing filter indicators
@@ -106,7 +107,7 @@ signal = 'LongGT0'
 #data Parameters
 cycles = 3
 exchange='IDEALPRO'
-symbol='EUR'
+symbol='AUD'
 secType='CASH'
 currency='USD'
 endDateTime=dt.now(timezone('US/Eastern'))

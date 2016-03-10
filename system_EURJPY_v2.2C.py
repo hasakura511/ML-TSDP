@@ -94,10 +94,10 @@ if debug:
     showPDFCDF = True
     showAllCharts = True
     perturbData = True
-    scorePath = './debug/scored_metrics_'
-    equityStatsSavePath = './debug/'
-    signalPath = './debug/'
-    dataPath = './data/from_IB/'
+    scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
+    equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
+    signalPath = 'C:/Users/Hidemi/Desktop/Python/'
+    dataPath = 'C:/Users/Hidemi/Desktop/Python/data/from_IB/'
 else:
     showDist =  False
     showPDFCDF = False
@@ -144,8 +144,8 @@ iterations=1
 input_signal = 1
 feature_selection = 'None' #RFECV OR Univariate
 wfSteps=[1]
-wf_is_periods = [100,200,300]
-#wf_is_periods = [100]
+wf_is_periods = [25,50,100]
+#wf_is_periods = [500]
 tox_adj_proportion = 0
 nfeatures = 10
 
@@ -199,7 +199,7 @@ models = [#("GA_Reg", SymbolicRegressor(population_size=5000, generations=20,
          #("PAC", PassiveAggressiveClassifier(class_weight={1:500})), \
          #("LSVC", LinearSVC()), \
          ("GNBayes",GaussianNB()),\
-         #("LDA", LinearDiscriminantAnalysis()), \
+         ("LDA", LinearDiscriminantAnalysis()), \
          #("QDA", QuadraticDiscriminantAnalysis()), \
          #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),
          #("rbf1SVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \

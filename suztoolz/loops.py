@@ -274,7 +274,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
         #model_metrics = update_report(model_metrics, filterName, cm_y_pred_oos, cm_y_test, datay_gainAhead,\
         #                       cmatrix_test_index, m, metaData,CAR25_Sn1_oos)
     return model_metrics, st_oos_filt
-    
+
 def wf_regress_validate2(unfilteredData, dataSet, models, model_metrics, wf_is_period, \
                            metaData, PRT, showPDFCDF=True, showLearningCurve=False, longMemory=False):
     close = unfilteredData.reset_index().Close
@@ -1064,9 +1064,10 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
         equityStats['sharpeRatiomm'] =minmax_scale(robust_scale(equityStats.sharpeRatio.reshape(-1, 1)))
         equityStats['k_ratiomm'] =minmax_scale(robust_scale(equityStats.k_ratio.reshape(-1, 1)))
 
-        equityStats['scoremm'] =  equityStats.avgSafefmm+equityStats.cumCARmm+equityStats.MAXDDmm+\
+        equityStats['scoremm'] =  equityStats.avgSafefmm+equityStats.cumCARmm+\
                                         equityStats.sortinoRatiomm+equityStats.k_ratiomm+\
                                        equityStats.sharpeRatiomm+equityStats.marRatiomm
+                                       #+equityStats.MAXDDmm
 
         equityStats = equityStats.sort_values(['scoremm'], ascending=False)
     topSystem = equityStats.system.iloc[0]

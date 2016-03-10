@@ -1,2 +1,2 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-EURJPY,11,1457613839,,,124.66800,,forex,short,2016-03-10 07:43:59,1457613839,open,2016-03-10 07:20:23,124.82100,10000,,0,2,,,101141931,
+EURJPY,39,1457613839,,,124.66800,,forex,short,2016-03-10 07:43:59,1457613839,open,2016-03-10 07:20:23,124.82100,10000,,0,2,,,101141931,

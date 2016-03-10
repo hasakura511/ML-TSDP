@@ -16,7 +16,21 @@ from time import gmtime, strftime, time, localtime, sleep
 #ib_pos=get_ibpos()
 ib_pos=get_ibpos_from_csv()
 
-dps_model_pos=get_dps_model_pos(['v2_AUDUSD'])
-#adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','101008882',"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w",1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
-#adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','100962754',"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w",1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
+dps_model_pos=get_dps_model_pos(['v2_EURJPY','v2_EURUSD','v2_GBPUSD','v2_USDCHF','v2_USDJPY','v2_AUDUSD','v2_USDCAD'])
+
+adj_size(dps_model_pos, ib_pos,'v2_EURUSD','101138810',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'EURUSD','forex',True, 10000,'EUR','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_EURJPY','101138810',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'EURJPY','forex',True, 10000,'EUR','JPY','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_GBPUSD','101138810',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'GBPUSD','forex',True, 10000,'GBP','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_USDCHF','101138810',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'USDCHF','forex',True, 10000,'USD','CHF','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_USDJPY','101138810',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'USDJPY','forex',True, 10000,'USD','JPY','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','101138810',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_USDCAD','101138810',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'USDCAD','forex',True, 10000,'USD','CAD','IDEALPRO','CASH', False)
+
+adj_size(dps_model_pos, ib_pos,'v2_EURUSD','101138698',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'EURUSD','forex',True, 10000,'EUR','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_EURJPY','101138480',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'EURJPY','forex',True, 10000,'EUR','JPY','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_GBPUSD','101138756',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'GBPUSD','forex',True, 10000,'GBP','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_USDCHF','101138777',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'USDCHF','forex',True, 10000,'USD','CHF','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_USDJPY','101138782',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'USDJPY','forex',True, 10000,'USD','JPY','IDEALPRO','CASH', False)
 adj_size(dps_model_pos, ib_pos,'v2_AUDUSD','101092852',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'AUDUSD','forex',True, 10000,'AUD','USD','IDEALPRO','CASH', False)
+adj_size(dps_model_pos, ib_pos,'v2_USDCAD','101138787',"bAOXHw3zGAxwXChl0YC_jv8joQBPFKR60AslojabW_lnYvTut9",1, 'USDCAD','forex',True, 10000,'USD','CAD','IDEALPRO','CASH', False)
+

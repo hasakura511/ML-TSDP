@@ -1,5 +1,6 @@
 import sys
 import random
+import time
 from threading import Event
 
 from swigibpy import (EWrapper, EPosixClientSocket, Contract, Order, TagValue,
@@ -147,5 +148,5 @@ def place_order(action, quant, sym, type, currency, exchange, submit):
     
         print("\nDisconnecting...")
         tws.eDisconnect()
-
+    time.sleep(2)
 #place_order("BUY", 1, "EUR", "CASH", "USD", "IDEALPRO");

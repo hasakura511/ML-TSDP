@@ -12,6 +12,8 @@ start /b .\start_usdchf.cmd
 start /b .\start_audusd.cmd
 start /b .\start_usdcad.cmd
 
+sleep 360
+
 \anaconda2\python system_EURJPY.py 1
 \anaconda2\python system_EURUSD.py 1
 \anaconda2\python system_GBPUSD.py 1

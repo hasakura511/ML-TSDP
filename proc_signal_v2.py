@@ -13,8 +13,8 @@ from seitoolz.order import adj_size
 from time import gmtime, strftime, time, localtime, sleep
     
 model_pos=get_model_pos(['EURJPY','EURUSD','GBPUSD','USDCHF','USDJPY','AUDUSD','USDCAD'])
-ib_pos=get_ibpos()
-#ib_pos=get_ibpos_from_csv()
+#ib_pos=get_ibpos()
+ib_pos=get_ibpos_from_csv()
 
 adj_size(model_pos, ib_pos,'EURUSD','100961267',"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w",1, 'EURUSD','forex',False, 25000,'EUR','USD','IDEALPRO','CASH', True)
 adj_size(model_pos, ib_pos,'GBPUSD','100961267',"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w",1, 'GBPUSD','forex',False, 25000,'GBP','USD','IDEALPRO','CASH', True)

@@ -1,25 +1,7 @@
 #!/bin/sh
-export PATH="/usr/local/bin:/usr/local/sbin:~/Documents/Android/sdk/platform-tools:~/Documents/Android/sdk/tools:~/Documents/Android/android-ndk-r10e:$PATH"
-
-export LDFLAGS="-L/usr/local/opt/tcl-tk/lib:$LDFLAGS"
-export CPPFLAGS="-I/usr/local/opt/tcl-tk/include:$CPPFLAGS"
-export TK_LIBRARY="/usr/local/Cellar/tcl-tk/8.6.4/lib"
-export LD_LIBRARY_PATH="/usr/local/opt/tcl-tk/lib:$LD_LIBRARY_PATH"
-
-export MONO_GAC_PREFIX="/usr/local"
-#export DYLD_LIBRARY_PATH="/usr/local/Cellar/openssl/1.0.2d/lib"
-export DYLD_FALLBACK_LIBRARY_PATH="$HOME/anaconda/lib/:$DYLD_FALLBACK_LIBRARY_PATH"
-# added by Anaconda 2.3.0 installer
-export PATH="/Users/admin/anaconda/bin:$PATH"
-
-# added by Anaconda 2.3.0 installer
-export PATH="/Users/admin/anaconda/bin:$PATH"
-
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-cd /Users/admin/ML-TSDP/
-/Users/admin/anaconda/bin/python proc_pos_adj.py	
-/Users/admin/anaconda/bin/python proc_signal_v2dps.py
+cd \media\sf_python\tsdp
+/anaconda2/bin/python get_ibpos.py
+/anaconda2/bin/python proc_signal_v2.py	
+/anaconda2/bin/python proc_signal_v2dps.py
 sleep 100
 /Users/admin/anaconda/bin/python get_ibpos.py

@@ -6,5 +6,5 @@ counter=counter +1
 data['counter']=counter
 data=data.set_index('counter')
 data.to_csv('./data/counter')
-if counter >= 7:
+if int(counter) >= 7:
 	subprocess.call(['python', 'proc_signal_v2dps.py'])	

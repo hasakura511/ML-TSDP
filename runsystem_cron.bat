@@ -23,10 +23,8 @@ start /b .\start_usdcad.cmd
 
 sleep 10
 \anaconda2\python proc_pos_adj.py	
-\anaconda2\python proc_signal_v2dps.py
 
-sleep 360
+sleep 10
 \anaconda2\python proc_signal_v2dps.py
-
 \anaconda2\python system_BTCUSD_bitstamp_hourly.py 1
 \anaconda2\python system_BTCUSD_bitstamp.py 1

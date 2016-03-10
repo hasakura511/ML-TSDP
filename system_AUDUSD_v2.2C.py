@@ -94,10 +94,10 @@ if debug:
     showPDFCDF = True
     showAllCharts = True
     perturbData = True
-    scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
-    equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
-    signalPath = 'C:/Users/Hidemi/Desktop/Python/'
-    dataPath = 'C:/Users/Hidemi/Desktop/Python/data/from_IB/'
+    scorePath = './debug/scored_metrics_'
+    equityStatsSavePath = './debug/'
+    signalPath = './debug/'
+    dataPath = './data/from_IB/'
 else:
     showDist =  False
     showPDFCDF = False
@@ -106,8 +106,7 @@ else:
     scorePath = None
     equityStatsSavePath = None
     signalPath = './data/signals/'
-    dataPath = './data/signals/from_IB/'
-
+    dataPath = './data/from_IB/'
 
 #system parameters
 version = 'v2'

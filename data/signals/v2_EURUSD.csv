@@ -1,2 +1,7 @@
 dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
-3/9/2016 18:00,-1,0,,1,,,,bothEURUSD_ALL_DF1_kNeighbors-distance_i100
+3/9/2016 18:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_kNeighbors-distance_i100
+2016-03-10 02:00:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_kNeighbors-distance_i200
+2016-03-10 02:00:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_kNeighbors-distance_i200
+2016-03-10 03:00:00,-1.0,0.0,1001.0,3.84792138359,-0.782730869893,0.0104249386446,0.0102150783691,bothEURUSD_ALL_DF1_kNeighbors-distance_i200 DPS wl24.0 maxL5 dd95_0.010 thres_-inf
+2016-03-10 04:00:00,-1.0,0.0,1003.0,2.11262634035,-2.21014986073,0.0151524453402,0.0144463023703,bothEURUSD_ALL_DF1_kNeighbors-distance_i100 DPS wl48.0 maxL5 dd95_0.014 thres_-inf
+2016-03-10 05:00:00,-1.0,0.0,1005.0,3.28366970233,-5.81554626133,0.00778158472434,0.0102150783691,bothEURUSD_ALL_DF1_kNeighbors-distance_i200 DPS wl24.0 maxL5 dd95_0.010 thres_-inf

@@ -103,6 +103,7 @@ for pair in currencyPairs:
     for date in getHistLoop:
         brokerData['client_id']=random.randint(100,1000)
         data = pd.concat([data,getDataFromIB(brokerData, date)],axis=0)
+        time.sleep(3)
     currencyPairsDict[pair] = data
     data.to_csv(dataPath+'raw_'+pair+'.csv')
 print 'Successfully Retrieved Data and saved data.'

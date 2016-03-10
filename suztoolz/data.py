@@ -81,9 +81,10 @@ def getDataFromIB(brokerData,endDateTime):
     contract.symbol = brokerData['symbol']
     contract.secType = brokerData['secType']
     contract.currency = brokerData['currency']
+    ticker = contract.symbol+contract.currency
     #today = dt.today()
 
-    print("Requesting historical data for %s" % contract.symbol)
+    print("Requesting historical data for %s" % ticker)
 
     # Request some historical data.
 

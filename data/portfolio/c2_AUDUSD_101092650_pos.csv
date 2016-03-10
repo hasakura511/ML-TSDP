@@ -1,2 +1,2 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-AUDUSD,-115,1457572172,,,0.74651,,forex,short,2016-03-09 20:09:32,1457572172,open,2016-03-09 20:02:33,0.74633,10000,,0,10,,,101131575,
+AUDUSD,-188,1457572172,,,0.74651,,forex,short,2016-03-09 20:09:32,1457572172,open,2016-03-09 20:02:33,0.74633,10000,,0,10,,,101131575,

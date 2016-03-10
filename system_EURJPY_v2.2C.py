@@ -106,7 +106,7 @@ else:
     scorePath = None
     equityStatsSavePath = None
     signalPath = './data/signals/'
-    dataPath = './data/signals/from_IB/'
+    dataPath = './data/from_IB/'
 
 
 #system parameters

@@ -9,5 +9,5 @@ def get_hist_btcharts(symbol):
     values = {'symbol' : symbol} #, 'start' : '1420121275'}
    
     response = requests.get(url, params=values, json=values);
-    print response.text;
+    #print response.text;
     return response.text;

@@ -7,5 +7,5 @@ def get_hist_blockchain():
     values = {'timespan' : '60days',
               'format' : 'json'}
     response = requests.get(url, params=values, json=values);
-    print response.text;
+    #print response.text;
     return response.text;

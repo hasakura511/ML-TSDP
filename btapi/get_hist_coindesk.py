@@ -13,5 +13,5 @@ def get_hist_coindesk():
                }
     
     response = requests.get(url, params=values, json=values);
-    print response.text;
+    #print response.text;
     return response.text;

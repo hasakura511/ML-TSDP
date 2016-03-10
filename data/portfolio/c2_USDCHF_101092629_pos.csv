@@ -1,2 +1,2 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-USDCHF,-51,1457586420,,,0.99714,,forex,short,2016-03-10 00:07:00,1457586420,open,2016-03-10 00:01:50,0.99714,10000,,0,10,,,101136909,
+USDCHF,369,1457586420,,,0.99714,,forex,short,2016-03-10 00:07:00,1457586420,open,2016-03-10 00:01:50,0.99714,10000,,0,10,,,101136909,

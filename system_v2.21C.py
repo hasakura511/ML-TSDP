@@ -90,23 +90,27 @@ from suztoolz.data import getDataFromIB
 
 start_time = time.time()
 
-Live = True
-if not Live:
-    signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv', parse_dates=['dates'])
-    offline = signalFile.iloc[-1].copy(deep=True)
-    offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
-    offline.signals = 0
-    offline.gainAhead =0
-    offline.prior_index=0
-    offline.safef=0
-    offline.CAR25=0
-    offline.dd95 = 0
-    offline.ddTol=0
-    offline.system = 'Offline'
-    signalFile=signalFile.append(offline)
-    signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
-    sys.exit("Offline Mode: "+sys.argv[0])
-    
+
+livePairs = [
+                'AUDUSD',\
+                'EURUSD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'USDJPY',\
+                'EURJPY',
+                ]
+                
+currencyPairs = [
+                'AUDUSD',\
+                'EURUSD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'USDJPY',\
+                'EURJPY'
+                ]
+                
 debug=False
 
 if len(sys.argv)==1:
@@ -116,7 +120,7 @@ if debug:
     showDist =  True
     showPDFCDF = True
     showAllCharts = True
-    perturbData = True
+    perturbData = False
     scorePath = './debug/scored_metrics_'
     equityStatsSavePath = './debug/'
     signalPath = './debug/'
@@ -140,24 +144,32 @@ else:
 version = 'v2.21C'
 filterName = 'DF1'
 data_type = 'ALL'
-
-#data Parameters
-#cycles = 3
-#exchange='IDEALPRO'
-currencyPairs = [
-                'AUDUSD',\
-                'EURUSD',\
-                'GBPUSD',\
-                'USDCAD',\
-                'USDCHF',\
-                'USDJPY',\
-                'EURJPY'
-                ]
-for ticker in currencyPairs:
+                
+for pair in currencyPairs:
+    if pair not in livePairs:
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if version+'_'+ pair + '.csv' not in files:
+            pass
+        else:
+            signalFile=pd.read_csv(signalPath+ version+'_'+ pair + '.csv', parse_dates=['dates'])
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = 'Offline'
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + version+'_'+ pair + '.csv', index=False)
+            #sys.exit("Offline Mode: "+sys.argv[0])
+    
+for ticker in livePairs:
     print 'Begin optimization run for', ticker
     symbol=ticker[0:3]
     currency=ticker[3:6]
-
 
     #Model Parameters
     zz_steps = [0.004,0.005,0.006]
@@ -167,7 +179,7 @@ for ticker in currencyPairs:
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     wfSteps=[1]
-    wf_is_periods = [25]
+    wf_is_periods = [25,50]
     #wf_is_periods = [100]
     tox_adj_proportion = 0
     nfeatures = 10
@@ -378,7 +390,6 @@ for ticker in currencyPairs:
     print '\nBest Signal Labels Found.', CAR25_MAX['C25sig']
     signal = CAR25_MAX['C25sig']
     dataSet['signal'] = zz_signals[CAR25_MAX['C25sig']].shift(-1).fillna(0)
-    
     #find max lookback
     maxlb = max(RSILookback,
                         zScoreLookback,

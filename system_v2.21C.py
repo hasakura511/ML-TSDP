@@ -172,7 +172,7 @@ for ticker in livePairs:
     currency=ticker[3:6]
 
     #Model Parameters
-    zz_steps = [0.004,0.005,0.006]
+    zz_steps = [0.002,0.003,0.004]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1

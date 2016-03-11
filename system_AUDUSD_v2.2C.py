@@ -143,7 +143,7 @@ iterations=1
 input_signal = 1
 feature_selection = 'None' #RFECV OR Univariate
 wfSteps=[1]
-wf_is_periods = [25,50,100]
+wf_is_periods = [25]
 #wf_is_periods = [100]
 tox_adj_proportion = 0
 nfeatures = 10
@@ -161,7 +161,7 @@ statsLookback = 100
 ROCLookback = 500
 
 #DPS parameters
-windowLengths = [24,48]
+windowLengths = [48]
 maxLeverage = [5]
 PRT={}
 PRT['DD95_limit'] = 0.05
@@ -197,7 +197,7 @@ models = [#("GA_Reg", SymbolicRegressor(population_size=5000, generations=20,
          #("PRCEPT", Perceptron(class_weight={1:500})), \
          #("PAC", PassiveAggressiveClassifier(class_weight={1:500})), \
          #("LSVC", LinearSVC()), \
-         ("GNBayes",GaussianNB()),\
+         #("GNBayes",GaussianNB()),\
          ("LDA", LinearDiscriminantAnalysis()), \
          #("QDA", QuadraticDiscriminantAnalysis()), \
          #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),
@@ -213,7 +213,7 @@ models = [#("GA_Reg", SymbolicRegressor(population_size=5000, generations=20,
          #("ETC", ExtraTreesClassifier(class_weight={1:500}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
          #("RF", RandomForestClassifier(class_weight={1:500}, n_estimators=10, criterion='gini',max_depth=3, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=1, random_state=None, verbose=0))\
          #("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=5, weights='uniform')),\
-         ("kNeighbors-distance", KNeighborsClassifier(n_neighbors=5, weights='distance')),\
+         #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=5, weights='distance')),\
          #("rNeighbors-uniform", RadiusNeighborsClassifier(radius=8, weights='uniform')),\
          #("rNeighbors-distance", RadiusNeighborsClassifier(radius=10, weights='distance')),\
          #("VotingHard", VotingClassifier(estimators=[\

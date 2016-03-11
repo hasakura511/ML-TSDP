@@ -204,7 +204,8 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
         #create signals 1 and -1
         #cm_y_pred_oos = np.array([-1 if x<0 else 1 for x in cm_y_pred_oos_ga])
         #cm_y_test = np.array([-1 if x<0 else 1 for x in cm_y_test_ga])
-        
+        oos_display_cmatrix(confusion_matrix(cm_y_test[:-1], cm_y_pred_oos[:-1]), m[0],\
+                ticker,validationFirstYear, validationFinalYear, iterations, signal)
         #if data is filtered so need to fill in the holes. signal = 0 for days that filtered
         st_oos_filt= pd.DataFrame()
         st_oos_filt['signals'] =  pd.Series(cm_y_pred_oos)
@@ -259,7 +260,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
         if data_type == 'ALL':
             print 'Metrics for All Validation Datapoints'
             oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cmatrix_test_index, m[1], ticker,\
-                                validationFirstYear, validationFinalYear, iterations, signal,showPDFCDF)
+                                validationFirstYear, validationFinalYear, iterations, 'Long>0',showPDFCDF)
             CAR25_oos = CAR25_df(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
                                     close, minFcst=PRT['horizon'], DD95_limit =PRT['DD95_limit'])
             #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\

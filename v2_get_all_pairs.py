@@ -63,7 +63,7 @@ else:
 
     
 #data Parameters
-cycles = 3
+cycles = 2
 exchange='IDEALPRO'
 symbol='AUD'
 currency='USD'

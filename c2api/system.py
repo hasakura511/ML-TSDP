@@ -1,8 +1,7 @@
 import requests
 from time import gmtime, strftime, time, localtime, sleep
 
-
-def create_system(ownerid,apikey):
+def create_system(system, ownerid,apikey):
 
     url = 'https://api.collective2.com/world/apiv3/createNewSystem'
     
@@ -12,7 +11,7 @@ def create_system(ownerid,apikey):
     		"site_visibility_status" : 0,
            "startingcapital" : 50000,
            "ownerpersonid" : ownerid,
-           "name" : "API System 300",
+           "name" : system,
            "creditSystemTimeInSeconds" : 86400,
            "apikey" : apikey
     	}

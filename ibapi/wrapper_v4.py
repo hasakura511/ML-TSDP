@@ -1,5 +1,6 @@
 from swigibpy import EWrapper
 import time
+import numpy as np
 import pandas as pd
 import random
 from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
@@ -302,7 +303,107 @@ class IBWrapper(EWrapper):
         setattr(self, "flag_finished_portfolio", True)
 
 
+    def init_tickdata(self, TickerId):
+        if "data_tickdata" not in dir(self):
+            tickdict=dict()
+        else:
+            tickdict=self.data_tickdata
 
+        tickdict[TickerId]=[np.nan]*4
+        setattr(self, "data_tickdata", tickdict)
+
+
+    def tickString(self, TickerId, field, value):
+        marketdata=self.data_tickdata[TickerId]
+
+        ## update string ticks
+
+        tickType=field
+
+        if int(tickType)==0:
+            ## bid size
+            marketdata[0]=int(value)
+        elif int(tickType)==3:
+            ## ask size
+            marketdata[1]=int(value)
+
+        elif int(tickType)==1:
+            ## bid
+            marketdata[0][2]=float(value)
+        elif int(tickType)==2:
+            ## ask
+            marketdata[0][3]=float(value)
+        
+
+
+    def tickGeneric(self, TickerId, tickType, value):
+        marketdata=self.data_tickdata[TickerId]
+
+        ## update generic ticks
+
+        if int(tickType)==0:
+            ## bid size
+            marketdata[0]=int(value)
+        elif int(tickType)==3:
+            ## ask size
+            marketdata[1]=int(value)
+
+        elif int(tickType)==1:
+            ## bid
+            marketdata[2]=float(value)
+        elif int(tickType)==2:
+            ## ask
+            marketdata[3]=float(value)
+        
+        print marketdata
+        
+        
+           
+    def tickSize(self, TickerId, tickType, size):
+        
+        ## update ticks of the form new size
+        
+        marketdata=self.data_tickdata[TickerId]
+
+        
+        if int(tickType)==0:
+            ## bid
+            marketdata[0]=int(size)
+        elif int(tickType)==3:
+            ## ask
+            marketdata[1]=int(size)
+        
+
+   
+    def tickPrice(self, TickerId, tickType, price, canAutoExecute):
+        ## update ticks of the form new price
+        
+        marketdata=self.data_tickdata[TickerId]
+        
+        if int(tickType)==1:
+            ## bid
+            marketdata[2]=float(price)
+        elif int(tickType)==2:
+            ## ask
+            marketdata[3]=float(price)
+        
+    
+    def updateMktDepth(self, id, position, operation, side, price, size):
+        """
+        Only here for completeness - not required. Market depth is only available if you subscribe to L2 data.
+        Since I don't I haven't managed to test this.
+        
+        Here is the client side call for interest
+        
+        tws.reqMktDepth(999, ibcontract, 9)
+        
+        """
+        pass
+
+        
+    def tickSnapshotEnd(self, tickerId):
+        
+        print "No longer want to get %d" % tickerId
 
 class IBclient(object):
     """
@@ -556,7 +657,48 @@ class IBclient(object):
         portfolio_data=self.cb.data_portfoliodata
         account_value=self.cb.data_accountvalue
 
-        
-        
-       
         return (account_value, portfolio_data)
+
+
+    def get_IB_market_data(self, ibcontract, seconds=30,  tickerid=999):         
+        """
+        Returns granular market data
+        
+        Returns a tuple (bid price, bid size, ask price, ask size)
+        
+        """
+        
+        ## initialise the tuple
+        self.cb.init_tickdata(tickerid)
+        self.cb.init_error()
+            
+        # Request a market data stream 
+        self.tws.reqMktData(
+                tickerid,
+                ibcontract,
+                "",
+                False)       
+        
+        start_time=time.time()
+
+        finished=False
+        iserror=False
+
+        while not finished and not iserror:
+            iserror=self.cb.flag_iserror
+            if (time.time() - start_time) > seconds:
+                finished=True
+            #pass
+            time.sleep(10)
+        #self.tws.cancelMktData(tickerid)
+        
+        marketdata=self.cb.data_tickdata[tickerid]
+        ## marketdata should now contain some interesting information
+        ## Note in this implementation we overwrite the contents with each tick; we could keep them
+        
+        if iserror:
+            print "Error: "+self.cb.error_msg
+            print "Failed to get any prices with marketdata"
+        
+        return marketdata
+    

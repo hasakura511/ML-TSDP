@@ -70,7 +70,7 @@ currency='USD'
 secType='CASH'
 endDateTime=dt.now(timezone('US/Eastern'))
 durationStr='1 M'
-barSizeSetting='1 hour'
+barSizeSetting='30 mins'
 whatToShow='MIDPOINT'
 ticker = symbol + currency
 

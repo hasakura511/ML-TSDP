@@ -8,4 +8,4 @@ data=data.set_index('counter')
 data.to_csv('./data/counter')
 if int(counter) >= 7:
 	subprocess.call(['python', 'get_ibpos.py'])
-	subprocess.call(['python', 'proc_signal_v2dps.py'])	
+	subprocess.call(['python', 'proc_signal.py'])	

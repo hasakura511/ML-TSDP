@@ -14,7 +14,7 @@ from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpo
 from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.order import adj_size
-from time import gmtime, strftime, time, localtime, sleep
+from time import gmtime, strftime, localtime, sleep
 
 model_pos=get_model_pos(['EURJPY','EURUSD','GBPUSD','USDCHF','USDJPY','AUDUSD','USDCAD'])
 dps_model_pos=get_dps_model_pos(['v2_EURJPY','v2_EURUSD','v2_GBPUSD','v2_USDCHF','v2_USDJPY','v2_AUDUSD','v2_USDCAD'])

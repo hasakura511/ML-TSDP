@@ -25,7 +25,6 @@ def get_exec(systemid, apikey):
     return r.text
 
 def get_exec_open(systemid, apikey):
-    
     url = 'https://collective2.com/world/apiv3/requestTradesOpen'
     
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}

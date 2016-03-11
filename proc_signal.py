@@ -33,7 +33,7 @@ for i in data.index:
                 model=model_pos
         elif system['Version'] == 'v2':
                 model=dps_model_pos
-	print system['c2id']
+        print system['c2id']
         adj_size(model, ib_pos,system['System'],system['c2id'],system['c2api'],system['c2qty'],system['c2sym'],system['c2type'],system['c2submit'], system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'])
         time.sleep(1)
 #subprocess.call(['python', 'proc_signal_v2.py'])

@@ -8,7 +8,7 @@ def create_system(system, ownerid,apikey):
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
     
     data = { 
-    		"site_visibility_status" : 0,
+    		"site_visibility_status" : 1,
            "startingcapital" : 50000,
            "ownerpersonid" : ownerid,
            "name" : system,

@@ -1,8 +1,5 @@
 cd \cygwin64\media\sf_python\tsdp
-\anaconda2\python get_ibpos.py
 
-\anaconda2\python system_v1.py 1
-\anaconda2\python proc_signal.py
 \anaconda2\python get_ibpos.py
 
 \anaconda2\python v2_get_all_pairs.py
@@ -19,5 +16,6 @@ start /b .\start_usdcad.cmd
 PING -n 600 127.0.0.1>nul
 
 \anaconda2\python get_ibpos.py
+
 \anaconda2\python system_BTCUSD_bitstamp_hourly.py 1
 \anaconda2\python system_BTCUSD_bitstamp.py 1

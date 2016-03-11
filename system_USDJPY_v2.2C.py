@@ -137,7 +137,7 @@ currencyPairs = [
                 ]
 
 #Model Parameters
-zz_steps = [0.004,0.005,0.006]
+zz_steps = [0.003,0.04,0.005]
 perturbDataPct = 0.0002
 longMemory =  False
 iterations=1

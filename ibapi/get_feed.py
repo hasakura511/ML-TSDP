@@ -20,3 +20,17 @@ def get_feed(sym, currency, exchange, type):
     
     ans=client.get_IB_market_data(contract, 1000, 111)
 
+def get_realtimebar(sym, currency, exchange, type):
+    callback = IBWrapper()
+    client=IBclient(callback)
+
+
+    # Simple contract for GOOG
+    contract = Contract()
+    contract.symbol = sym
+    contract.secType = type
+    contract.exchange = exchange
+    contract.currency = currency
+    
+    ans=client.get_realtimebar(contract, 1000, 111)
+

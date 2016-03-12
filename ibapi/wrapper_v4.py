@@ -302,6 +302,20 @@ class IBWrapper(EWrapper):
         """
         setattr(self, "flag_finished_portfolio", True)
 
+    
+    
+    def realtimeBar(self, reqId, time, open, high, low, close, volume, wap, count):
+
+        """
+        Note we don't use all the information here
+        
+        Just append close prices. 
+        """
+    
+        global pricevalue
+        global finished
+
+        pricevalue.append(close)
 
     def init_tickdata(self, TickerId):
         if "data_tickdata" not in dir(self):
@@ -701,4 +715,54 @@ class IBclient(object):
             print "Failed to get any prices with marketdata"
         
         return marketdata
+
+    def get_realtimebar(self, ibcontract,seconds=30,  tickerid=999):
+        
+        """
+        Returns a list of snapshotted prices, averaged over 'real time bars'
+        
+        tws is a result of calling IBConnector()
+        
+        """
+        
+        tws=self.tws
+        
+        global finished
+        global iserror
+        global pricevalue
     
+    
+        iserror=False
+        
+        finished=False
+        pricevalue=[]
+            
+        # Request current price in 5 second increments
+        # It turns out this is the only way to do it (can't get any other increments)
+        tws.reqRealTimeBars(
+                tickerid,                                          # tickerId,
+                ibcontract,                                   # contract,
+                5, 
+                "MIDPOINT",
+                0)
+    
+    
+        start_time=time.time()
+        ## get about 16 seconds worth of samples
+        ## could obviously just stop at N bars as well eg. while len(pricevalue)<N:
+        
+        while not finished:
+            if iserror:
+                finished=True
+            if (time.time() - start_time) > 20: ## get ~4 samples over 15 seconds
+                finished=True
+            pass
+        
+        ## Cancel the stream
+        tws.cancelRealTimeBars(MEANINGLESS_ID)
+
+        if len(pricevalue)==0 or iserror:
+            raise Exception("Failed to get price")
+
+        
+        return pricevalue

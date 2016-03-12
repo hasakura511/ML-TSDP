@@ -98,8 +98,10 @@ def get_ibpos():
     data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
     dataSet=pd.DataFrame(data)
     #dataSet=dataSet.sort_values(by='times')
-    dataSet=dataSet=dataSet.set_index(['sym','currency'])
+    dataSet=dataSet.set_index(['sym','currency'])
     dataSet.to_csv('./data/portfolio/ib_portfolio.csv')
+    accountSet=pd.DataFrame(account_value)
+    accountSet.to_csv('./data/portfolio/ib_account_value.csv', index=False)
     #
     return dataSet
 

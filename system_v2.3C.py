@@ -485,7 +485,9 @@ for ticker in livePairs:
 
     #score models
     scored_models, bestModel = directional_scoring(model_metrics,filterName)
-    bestModel['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    best=bestModel.copy(deep=True)
+    best['timestamp']=datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    bestModel=best
     
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
     if ticker + '.csv' not in files:

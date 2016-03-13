@@ -16,6 +16,7 @@ import datetime
 import sys
 import random
 import copy
+import pytz
 from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
@@ -92,7 +93,10 @@ for i in range(0,cycles):
 currencyPairsDict = {}
 for pair in currencyPairs:
     #turn this off to get progressively older dates for testing.
-    date = endDateTime.strftime("%Y%m%d %H:%M:%S %Z")
+    
+    eastern=timezone('US/Eastern')
+    date=endDateTime.astimezone(eastern)
+    date=date.strftime("%Y%m%d %H:%M:%S EST")
     symbol = pair[0:3]
     currency = pair[3:6]
     brokerData = {}
@@ -111,7 +115,10 @@ for pair in currencyPairs:
         requestedData = getDataFromIB(brokerData, date)
         #update date
         date = endDateTime.tzinfo.localize(requestedData.index.to_datetime()[0]\
-                .to_pydatetime()).strftime("%Y%m%d %H:%M:%S %Z")
+                .to_pydatetime())
+        eastern=timezone('US/Eastern')
+        date=date.astimezone(eastern)
+        date=date.strftime("%Y%m%d %H:%M:%S EST")
         if len(data)==0:
             data = pd.concat([requestedData,data],axis=0)
         else:

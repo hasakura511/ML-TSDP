@@ -209,7 +209,7 @@ for ticker in livePairs:
     ROCLookback = 500
 
     #DPS parameters
-    windowLengths = [30,60,90]
+    windowLengths = [30,60]
     maxLeverage = [5]
     PRT={}
     PRT['DD95_limit'] = 0.05

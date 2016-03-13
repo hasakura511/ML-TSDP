@@ -84,7 +84,7 @@ def getDataFromIB(brokerData,endDateTime):
     ticker = contract.symbol+contract.currency
     #today = dt.today()
 
-    print("Requesting historical data for %s" % ticker)
+    print("\nRequesting historical data for %s" % ticker)
 
     # Request some historical data.
 
@@ -101,9 +101,9 @@ def getDataFromIB(brokerData,endDateTime):
         )
 
 
-    print("\n====================================================================")
+    print("====================================================================")
     print(" %s History requested, waiting %ds for TWS responses" % (endDateTime, WAIT_TIME))
-    print("====================================================================\n")
+    print("====================================================================")
 
 
     try:
@@ -116,7 +116,7 @@ def getDataFromIB(brokerData,endDateTime):
     
     #data_cons = pd.concat([data_cons,callback.data],axis=0)
              
-    print("\nDisconnecting...")
+    print("Disconnecting...")
     tws.eDisconnect()
         
     return callback.data

@@ -30,6 +30,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor,\
                         ExtraTreesRegressor, GradientBoostingRegressor
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
+from suztoolz.transform import zigzag as zg
                         #import warnings
 #warnings.filterwarnings('error')                       
 
@@ -49,13 +50,23 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
     nfeatures = metaData['n_features']
     tox_adj_proportion = metaData['tox_adj']
     feature_selection = metaData['FS']
-    RFE_estimator = metaData['rfe_model'][1]
-    metaData['rfe_model'] = metaData['rfe_model'][0]
+
+    #CAR25 for zigzag
+    if signal[:2]=='ZZ':
+        zz_step = [float(x) for x in signal.split()[1].split(',')]
+    ddTolerance = PRT['DD95_limit']
+    forecastHorizon = PRT['horizon']
+
+    #adjust personal risk tolerance for available data
+    #assuming dd increases with sqrt of time
+    #ddTolerance = ddTolerance/math.sqrt(float(forecastHorizon)/float(wf_is_period))
+    #forecastHorizon = wf_is_period #need a bit more than 2x trades of the fcst horizon
+
     if 'filter' in metaData:
         filterName = metaData['filter']
     else:
         filterName = 'OOS_V'
-    
+
     dropCol = ['Open','High','Low','Close', 'Volume','gainAhead','signal','dates', 'prior_index']
 
     #check
@@ -64,20 +75,20 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
         print 'Walkforward insample period of', wf_is_period, 'is greater than in-sample data of ', nrows_is, '!'
         print 'Adjusting to', nrows_is, 'rows..'
         wf_is_period = nrows_is
-    
+
     mmData = dataSet.ix[:testFinalYear].dropna()[-wf_is_period:]
     mmData_adj = adjustDataProportion(mmData, tox_adj_proportion)  #drop last row for hold days =1
     mmData_v = pd.concat([mmData_adj,dataSet.ix[validationFirstYear:validationFinalYear].dropna()], axis=0).reset_index()
-    
+
     nrows_is = mmData.shape[0]
     nrows_oos = mmData_v.shape[0]-nrows_is
         
     metaData['rows'] = nrows_is
-    
+
     #nrows = mmData_adj.shape[0]
     datay_signal = mmData_v[['signal', 'prior_index']]
     datay_gainAhead = mmData_v.gainAhead
-    
+
     dataX = mmData_v.drop(dropCol, axis=1) 
     cols = dataX.columns.shape[0]
     metaData['cols']=cols
@@ -94,7 +105,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
     #  Copy from pandas dataframe to numpy arrays
     dy = np.zeros_like(datay_signal.signal)
     dX = np.zeros_like(dataX)
-    
+
     dy = datay_signal.signal.values
     dX = dataX.values
     for m in models:
@@ -141,10 +152,39 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
                 #    'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
                 #print train_index, test_index
         #c=0
+        #zz_begin = mmData_v.prior_index.iloc[0]
         for train_index,test_index in tt_index:
             #c+=1
             X_train, X_test = dX[train_index], dX[test_index]
             y_train, y_test = dy[train_index], dy[test_index]
+            
+            #create zigzag signals
+            
+            #ending at test_index so dont need to shift labels
+            if signal[:2] == 'ZZ':
+                zz_end = mmData_v.iloc[test_index].prior_index.iloc[-1]
+                y_train = zg(close.ix[:zz_end].values, zz_step[0], \
+                                zz_step[1]).pivots_to_modes()[-len(train_index):]
+            
+            #zz_signals = pd.DataFrame()
+            #print 'Creating Signal labels..',
+            #for i in zz_steps:
+            #    for j in zz_steps:
+            #        label = 'ZZ '+str(i) + ',-' + str(j)
+            #        print label,
+
+
+            #CAR25_list = []
+            #for sig in zz_signals.columns:
+            #    CAR25 = CAR25_df(sig,zz_signals[sig], close.ix[:zz_end].index,\
+            #                        close.ix[:zz_end], minFcst=forecastHorizon, DD95_limit =ddTolerance)                    
+            #    CAR25_list.append(CAR25)
+
+            #CAR25_MAX = maxCAR25(CAR25_list) 
+            #print '\nBest Signal Labels Found.', CAR25_MAX['C25sig']
+            #signal = CAR25_MAX['C25sig']
+            #y_train = zz_signals[CAR25_MAX['C25sig']].values[-len(train_index):]
+
             #print mmData_v.dates.iloc[test_index[-1]],
             #print 't_start', mmData_v.dates.iloc[train_index[0]], 't_end', mmData_v.dates.iloc[train_index[-1]],\
             #        'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
@@ -180,14 +220,14 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
                 metaData['featureRank'] = str(featureRank)
                 #print 'Top %i univariate features' % len(featureRank)
                 #print featureRank
-    
+
             #  fit the model to the in-sample data
             m[1].fit(X_train, y_train)
             #trained_models[m[0]] = pickle.dumps(m[1])
                         
             #y_pred_is = np.array(([-1 if x<0 else 1 for x in m[1].predict(X_train)]))              
             y_pred_oos = m[1].predict(X_test)
-    
+
             if m[0][:2] == 'GA':
                 print featureRank
                 print '\nProgram:', m[1]._program
@@ -220,7 +260,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
             oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cm_test_index, m[1],\
                     ticker, validationFirstYear, validationFinalYear, iterations, metaData['filter'],showPDFCDF)
             CAR25_oos = CAR25_df(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
-                                    close, minFcst=PRT['horizon'], DD95_limit =PRT['DD95_limit'])
+                                    close, minFcst=forecastHorizon, DD95_limit =ddTolerance)
             #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'LONG', 1)
             #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'SHORT', -1)
                                     
@@ -262,7 +302,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
             oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cmatrix_test_index, m[1], ticker,\
                                 validationFirstYear, validationFinalYear, iterations, 'Long>0',showPDFCDF)
             CAR25_oos = CAR25_df(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
-                                    close, minFcst=PRT['horizon'], DD95_limit =PRT['DD95_limit'])
+                                    close, minFcst=forecastHorizon, DD95_limit =ddTolerance)
             #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
              #                       close, 'LONG', 1)
             #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
@@ -1013,7 +1053,7 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
     equityStats = pd.DataFrame(columns=['system','avgSafef','cumCAR','MAXDD','sortinoRatio',\
                            'sharpeRatio','marRatio','k_ratio'], index = range(0,len(equityCurves)))
     #this calc dosent exclude non-trading days
-    years_in_forecast = (endDate-startDate).days/365.0
+    years_in_forecast = (endDate-startDate).seconds/3600.0/365.0
     i=0
     for sst in equityCurves:
         avgSafef = equityCurves[sst].safef.mean()    
@@ -1442,7 +1482,8 @@ def calcDPS2(signal_type, sst, PRT, start, end, windowLength, trade='long', thre
     multiplier = ddTolerance/math.sqrt(forecastHorizon) #assuming dd increases with sqrt of time
     forecastHorizon = windowLength/2.3 #need a bit more than 2x trades of the fcst horizon
     ddTolerance = math.sqrt(forecastHorizon)* multiplier #adjusted dd tolerance for the forecast
-    years_in_forecast = forecastHorizon / 252.0
+    years_in_forecast = (start-end).seconds/3600.0/365.0
+    #years_in_forecast = forecastHorizon / 252.0
     dpsRun = trade + signal_type + ' DPS wl%.1f maxL%i dd95_%.3f thres_%.1f' % (windowLength,maxLeverage,ddTolerance,threshold)
             
     print '\n', dpsRun, 'from', start, 'to', end
@@ -1934,6 +1975,7 @@ def CAR25_df(signal_type, signals, signal_index, Close, minFcst=1008, DD95_limit
     initial_equity = 100000
     forecast_horizon = min(minFcst,signal_index.shape[0]) #4 years because start date is 2007
     years_in_forecast = forecast_horizon/252.0
+        
     #percentOfYearInMarket = number_long_signals /(years_in_study*252.0)
     #number_signals = index.shape[0]
     number_trades = forecast_horizon / hold_days

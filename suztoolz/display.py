@@ -7,6 +7,7 @@ Created on Sun Nov 22 20:57:32 2015
 import math
 import numpy as np
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import seaborn as sns
@@ -218,7 +219,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             #    print 'Signal: ', sf1
             startDate = benchmarks[sf1].index.to_datetime()[0]
             endDate = benchmarks[sf1].index.to_datetime()[-1]
-            yearsInValidation = (endDate-startDate).days/365.0
+            yearsInValidation = (endDate-startDate).seconds/3600.0/365.0
             print 'Validation Length(years): %.2f' % yearsInValidation
             print ' Trading Days in Market: %i' % benchmarks[sf1].numDays.iloc[-1],
             shortTrades, longTrades = numberZeros(benchmarks[sf1].signals*benchmarks[sf1].safef)
@@ -443,6 +444,12 @@ def compareEquity_vf(sst, title):
     #        ],axis=1)
     
 def compareEquity(sst, title):
+    #check if there's time in the index
+    if not sst.index.to_datetime()[0].time() and not sst.index.to_datetime()[1].time():
+        barSize = '1 day'
+    else:
+        barSize = '1 min'
+        
     nrows = sst.gainAhead.shape[0]
     #signalCounts = sst.signals.shape[0]
     print '\nThere are %0.f signal counts' % nrows
@@ -486,7 +493,7 @@ def compareEquity(sst, title):
             equityBeShortSignals[i] = (1+-sst.gainAhead.iloc[i-1])*equityBeShortSignals[i-1]
         else:
             equityBeShortSignals[i] = equityBeShortSignals[i-1] 
-            
+    
     #plt.close('all')
     fig, ax = plt.subplots(1, figsize=(8,7))
     ax.plot(sst.index.to_datetime(), equityBeLongSignals,label="Long 1 Signals",color='b')
@@ -494,15 +501,36 @@ def compareEquity(sst, title):
     ax.plot(sst.index.to_datetime(), equityBeLongAndShortSignals,label="Long & Short",color='g')
     ax.plot(sst.index.to_datetime(), equityAllSignals,label="BuyHold",ls='--',color='c')
     # rotate and align the tick labels so they look better
-    fig.autofmt_xdate()
+    years = mdates.YearLocator()   # every year
+    months = mdates.MonthLocator()  # every month
+    days = mdates.DayLocator()
+    # format the ticks
+    ax.xaxis.set_major_locator(years)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    ax.xaxis.set_minor_locator(months)    
+    y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
+    ax.yaxis.set_major_formatter(y_formatter)
     
-    # use a more precise date string for the x axis locations in the
-    # toolbar
+    if barSize != '1 day' and nrows <=1440:
+        hours = mdates.HourLocator() 
+        minutes = mdates.MinuteLocator()
+        # format the ticks
+        ax.xaxis.set_major_locator(hours)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d %H"))
+        ax.xaxis.set_minor_locator(minutes)
+    else:
+        hours = mdates.HourLocator() 
+        minutes = mdates.MinuteLocator()
+        # format the ticks
+        ax.xaxis.set_major_locator(days)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+        ax.xaxis.set_minor_locator(hours)
 
-    ax.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+    #ax.fmt_xdata = mdates.DateFormatter("%Y-%m-%d %H:%M")
     plt.title(title)
     plt.ylabel("TWR")
     plt.legend(loc="best")
+    fig.autofmt_xdate()
     plt.show()
     shortTrades, longTrades = numberZeros(sst.signals.values)
     allTrades = shortTrades+ longTrades

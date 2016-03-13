@@ -29,7 +29,7 @@ def get_bthist(symbol):
     return dataSet
     
 
-data=get_bthist('bitstampUSD').iloc[100:]
+data=get_bthist('bitstampUSD').iloc[1000:]
 
 # Simple contract for GOOG
 contract = Contract()

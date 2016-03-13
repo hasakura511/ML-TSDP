@@ -490,12 +490,12 @@ for ticker in livePairs:
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
     if ticker + '.csv' not in files:
         BMdf = pd.concat([bestModel,bestModel],axis=1).transpose()
-        BMdf.index = BMdf.timestamp
-        BMdf.to_csv(bestParamsPath+ticker+'.csv')
+        #BMdf.index = BMdf.timestamp
+        BMdf.to_csv(bestParamsPath+ticker+'.csv', index=False)
     else:
         BMdf = pd.read_csv(bestParamsPath+ticker+'.csv').append(bestModel)
-        BMdf.index = BMdf.timestamp
-        BMdf.to_csv(bestParamsPath+ticker+'.csv')
+        #BMdf.index = BMdf.timestamp
+        BMdf.to_csv(bestParamsPath+ticker+'.csv', index=False)
         
     if scorePath is not None:
         scored_models.to_csv(scorePath+filterName+'.csv')

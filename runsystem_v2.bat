@@ -1,6 +1,6 @@
 cd \cygwin64\media\sf_python\tsdp
 \anaconda2\python get_ibpos.py
-\anaconda2\python v2_get_all_pairs.py
+\anaconda2\python v2_get_all_pairs_sub30m.py
 \anaconda2\python make_counter.py
 
 start /b .\start_eurjpy.cmd

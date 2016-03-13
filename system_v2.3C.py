@@ -157,12 +157,14 @@ validationStartPoint = 0
 #signal_types = ['gainAhead','ZZ']
 signal_types = ['ZZ']
 #signal_types = ['gainAhead']
+'''
 for pair in currencyPairs:
     if pair not in livePairs:
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
         if version+'_'+ pair + '.csv' not in files:
             pass
         else:
+	    print 'signal file ' + signalPath+ version+'_'+ pair + '.csv'
             signalFile=pd.read_csv(signalPath+ version+'_'+ pair + '.csv', parse_dates=['dates'])
             offline = signalFile.iloc[-1].copy(deep=True)
             offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
@@ -177,7 +179,7 @@ for pair in currencyPairs:
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + version+'_'+ pair + '.csv', index=False)
             #sys.exit("Offline Mode: "+sys.argv[0])
-    
+'''    
 for ticker in livePairs:
     print 'Begin optimization run for', ticker
     symbol=ticker[0:3]
@@ -577,10 +579,10 @@ for ticker in livePairs:
         else:        
             signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv', parse_dates=['dates'])
 
-            if bestBothDPS.reset_index().iloc[-1].dates != signalFile.iloc[-1].dates:
-                if bestBothDPS.reset_index().iloc[-2].dates == signalFile.iloc[-1].dates:
-                    signalFile.gainAhead.iloc[-1] == bestBothDPS.gainAhead.iloc[-2]
-                signalFile=signalFile.append(bestBothDPS.reset_index().iloc[-1])
-                signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
+            #if bestBothDPS.reset_index().iloc[-1].dates != signalFile.iloc[-1].dates:
+            if bestBothDPS.reset_index().iloc[-2].dates == signalFile.iloc[-1].dates:
+                signalFile.gainAhead.iloc[-1] == bestBothDPS.gainAhead.iloc[-2]
+            signalFile=signalFile.append(bestBothDPS.reset_index().iloc[-1])
+            signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
                         
         print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

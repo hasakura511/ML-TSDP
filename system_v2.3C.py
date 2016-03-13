@@ -570,6 +570,7 @@ for ticker in livePairs:
         #init file
         #bestBothDPS.tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        #
         if version+'_'+ ticker + '.csv' not in files:
             signalFile = bestBothDPS.tail()
             signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=True)

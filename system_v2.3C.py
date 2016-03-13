@@ -184,7 +184,7 @@ for ticker in livePairs:
     currency=ticker[3:6]
 
     #Model Parameters
-    zz_steps = [0.0005,0.001,0.002,0.003]
+    zz_steps = [0.001,0.002,0.003]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
@@ -209,7 +209,7 @@ for ticker in livePairs:
     ROCLookback = 500
 
     #DPS parameters
-    windowLengths = [30,60]
+    windowLengths = [60]
     maxLeverage = [5]
     PRT={}
     PRT['DD95_limit'] = 0.05
@@ -217,8 +217,8 @@ for ticker in livePairs:
     PRT['initial_equity'] = 1.0
     PRT['horizon'] = 1440
     PRT['maxLeverage'] = 5
-    CAR25_threshold=-np.inf
-    #CAR25_threshold=0
+    #CAR25_threshold=-np.inf
+    CAR25_threshold=0
 
     #model selection
     dt_stump = DecisionTreeClassifier(max_depth=1, min_samples_leaf=1)

@@ -7,7 +7,7 @@ from pandas.io.json import json_normalize
 from ibapi.place_order import place_order as place_iborder
 from c2api.place_order import place_order as place_c2order
 from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ib_sym_pos
-from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open
+from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open, reset_c2pos_cache
 from seitoolz.signal import get_model_pos
 from time import gmtime, strftime, time, localtime, sleep
     
@@ -36,13 +36,14 @@ def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant,
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 print 'BTC: ' + str(qty)
                 place_c2order('BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
-                
+                reset_c2pos_cache(systemid)
                 c2quant = c2quant - qty
                 sleep(2)
             
             if c2quant > 0:
                 print 'BTO: ' + str(c2quant)
                 place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+                reset_c2pos_cache(systemid)
         if system_c2pos_qty < c2_pos_qty:
             c2quant=c2_pos_qty - system_c2pos_qty   
             
@@ -50,12 +51,13 @@ def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant,
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 print 'STC: ' + str(qty)
                 place_c2order('STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
-                
+                reset_c2pos_cache(systemid)
                 c2quant = c2quant - qty
                 sleep(2)
             if c2quant > 0:
                 print 'STO: ' + str(c2quant)
                 place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+                reset_c2pos_cache(systemid)
     if ibsubmit:
         ib_pos=get_ib_sym_pos(ib_pos, ibsym, ibcurrency) 
         ib_pos=ib_pos.loc[ibsym,ibcurrency]

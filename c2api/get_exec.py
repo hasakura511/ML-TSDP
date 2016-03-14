@@ -72,5 +72,8 @@ def get_c2pos(systemid, c2sym, apikey, systemname):
         dataSet=dataSet.set_index(['symbol'])
         dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
         return dataSet
-        
+
+def reset_c2pos_cache(systemid):
+    global system_cache
+    system_cache.pop(systemid, None)
 #place_order('BTO','1','EURUSD','forex')

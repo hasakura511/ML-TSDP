@@ -6,39 +6,52 @@ import numpy as np
 import pandas as pd
 import time
 
+system_cache={}
 
 def get_exec(systemid, apikey):
-    
-    url = 'https://collective2.com/world/apiv3/requestTrades'
-    
-    headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
-    
-    data = { 
-    		"apikey":   apikey,#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
-    		"systemid": systemid
-    	}
-    
-    params={}
-    
-    r=requests.post(url, params=params, json=data);
-    sleep(2)
-    return r.text
+    global system_cache
+    if systemid in system_cache:
+        return system_cache[systemid]
+    else:
+        url = 'https://collective2.com/world/apiv3/requestTrades'
+        
+        headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
+        
+        data = { 
+        		"apikey":   apikey,#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
+        		"systemid": systemid
+        	}
+        
+        params={}
+        
+        r=requests.post(url, params=params, json=data);
+        
+        sleep(2)
+        system_cache[systemid]=r.text
+
+    return system_cache[systemid]
 
 def get_exec_open(systemid, apikey):
-    url = 'https://collective2.com/world/apiv3/requestTradesOpen'
+    global system_cache
+    if systemid in system_cache:
+        return system_cache[systemid]
+    else:
+        url = 'https://collective2.com/world/apiv3/requestTradesOpen'
+        
+        headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
+        
+        data = { 
+        		"apikey":   apikey,#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
+        		"systemid": systemid
+        	}
+        
+        params={}
+        
+        r=requests.post(url, params=params, json=data);
+        sleep(2)
+        system_cache[systemid]=r.text
     
-    headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
-    
-    data = { 
-    		"apikey":   apikey,#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
-    		"systemid": systemid
-    	}
-    
-    params={}
-    
-    r=requests.post(url, params=params, json=data);
-    sleep(2)
-    return r.text
+    return system_cache[systemid]
 
 def get_c2pos(systemid, c2sym, apikey, systemname):
     datestr=strftime("%Y%m%d", localtime())

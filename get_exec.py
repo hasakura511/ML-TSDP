@@ -15,22 +15,24 @@ def get_c2trades(systemid, name, c2api):
     
     datestr=strftime("%Y%m%d", localtime())
     data=get_c2exec(systemid,c2api);
-    jsondata = json.loads(data)
-    dataSet=json_normalize(jsondata['response'])
-    dataSet=dataSet.set_index('trade_id')
-     
-    if os.path.isfile(filename):
-        existData = pd.read_csv(filename, index_col='trade_id')
-        existData = existData.reset_index()
-        dataSet   =   dataSet.reset_index()
-        dataSet=existData.append(dataSet)
-        dataSet['trade_id'] = dataSet['trade_id'].astype('int')
-        dataSet=dataSet.drop_duplicates(subset=['trade_id'],keep='last')
-        dataSet=dataSet.set_index('trade_id') 
-        
-    dataSet=dataSet.sort_values(by='closedWhenUnixTimeStamp')
     
-    dataSet.to_csv(filename)
+    jsondata = json.loads(data)
+    if len(jsondata['response']) > 1:
+        dataSet=json_normalize(jsondata['response'])
+        dataSet=dataSet.set_index('trade_id')
+         
+        if os.path.isfile(filename):
+            existData = pd.read_csv(filename, index_col='trade_id')
+            existData = existData.reset_index()
+            dataSet   =   dataSet.reset_index()
+            dataSet=existData.append(dataSet)
+            dataSet['trade_id'] = dataSet['trade_id'].astype('int')
+            dataSet=dataSet.drop_duplicates(subset=['trade_id'],keep='last')
+            dataSet=dataSet.set_index('trade_id') 
+            
+        dataSet=dataSet.sort_values(by='closedWhenUnixTimeStamp')
+        
+        dataSet.to_csv(filename)
 
 def get_ibtrades():
     filename='./data/ibapi/trades' + '.csv'

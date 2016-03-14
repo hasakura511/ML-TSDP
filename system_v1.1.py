@@ -50,62 +50,6 @@ from threading import Event
 from swigibpy import EWrapper, EPosixClientSocket, Contract
 
 
-
-class HistoricalDataExample(EWrapper):
-    '''Callback object passed to TWS, these functions will be called directly
-    by TWS.
-    '''
-
-    def __init__(self):
-        super(HistoricalDataExample, self).__init__()
-        self.got_history = Event()
-
-    def orderStatus(self, id, status, filled, remaining, avgFillPrice, permId,
-                    parentId, lastFilledPrice, clientId, whyHeld):
-        pass
-
-    def openOrder(self, orderID, contract, order, orderState):
-        pass
-
-    def nextValidId(self, orderId):
-        '''Always called by TWS but not relevant for our example'''
-        pass
-
-    def openOrderEnd(self):
-        '''Always called by TWS but not relevant for our example'''
-        pass
-
-    def managedAccounts(self, openOrderEnd):
-        '''Called by TWS but not relevant for our example'''
-        pass
-
-    def historicalData(self, reqId, date, open, high,
-                       low, close, volume,
-                       barCount, WAP, hasGaps):
-
-        if date[:8] == 'finished':
-            print("History request complete")
-            self.got_history.set()
-        else:
-	    #chg=0;
-	    #chgpt=0;
-	    #if len(p_close) > 0:
-	    #	chgpt=close-p_close[-1];
-		#chg=chgpt/p_close[-1];
-           
-        #    p_open.append(open);
-        #    p_high.append(high);
-        #    p_low.append(low);
-        #    p_close.append(close);
-        #    p_volume.append(volume);
-	    #date = datetime.strptime(date, "%Y%m%d").strftime("%d %b %Y")
-            data.loc[date] = [open,high,low,close,volume]
-            #print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
-            #           % (date, open, high, low, close, volume)
-
-            #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
-            #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
-
 start_time = time.time()
 bestParamsPath = './data/params/'
 signalPath = './data/signals/'
@@ -157,64 +101,25 @@ for pair in currencyPairs:
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + pair + '.csv', index=False)
             #sys.exit("Offline Mode: "+sys.argv[0])
-            
+############################################################
+currencyPairsDict = {}
+barSizeSetting='1 min'
+dataPath = './data/from_IB/'
+files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+
+for pair in currencyPairs:    
+    if barSizeSetting+'_'+pair+'.csv' in files:
+        data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)
+        currencyPairsDict[pair] = data
+        
+print 'Successfully Retrieved Data.'
+###########################################################
 for ticker in livePairs:     
     symbol=ticker[0:3]
     currency=ticker[3:6]
     bestModel = pd.read_csv(bestParamsPath+ticker+'.csv').iloc[-1]
-    data = pd.DataFrame(columns = ['Open','High','Low','Close','Volume'])
-
-
-    # Instantiate our callback object
-    callback = HistoricalDataExample()
-
-    # Instantiate a socket object, allowing us to call TWS directly. Pass our
-    # callback object so TWS can respond.
-
-    tws = EPosixClientSocket(callback)
-    #tws = EPosixClientSocket(callback, reconnect_auto=True)
-    # Connect to tws running on localhost
-    if not tws.eConnect("", 7496, 111):
-        raise RuntimeError('Failed to connect to TWS')
-
-    # Simple contract for GOOG
-    contract = Contract()
-    contract.exchange = "IDEALPRO"
-    contract.symbol = symbol
-    contract.secType = "CASH"
-    contract.currency = currency
-    today = datetime.today()
-
-    print("Requesting historical data for %s" % contract.symbol+contract.currency)
-
-    # Request some historical data.
-    tws.reqHistoricalData(
-        1,                                         # tickerId,
-        contract,                                   # contract,
-        today.strftime("%Y%m%d %H:%M:%S %Z"),       # endDateTime,
-        "1 D",                                      # durationStr,
-        "1 min",                                    # barSizeSetting,
-        "MIDPOINT",                                   # whatToShow,
-        1,                                          # useRTH,
-        1                                          # formatDate
-    )
-
-    print("====================================================================")
-    print(" History requested, waiting %ds for TWS responses" % WAIT_TIME)
-    print("====================================================================")
-
-
-    try:
-        callback.got_history.wait(timeout=WAIT_TIME)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        if not callback.got_history.is_set():
-            print('Failed to get history within %d seconds' % WAIT_TIME)
-
-        print("Disconnecting...")
-        tws.eDisconnect()
-
+    data = currencyPairsDict[ticker]
+    
                     
     #Model Parameters
     signal = bestModel.signal    
@@ -241,7 +146,7 @@ for ticker in livePairs:
     statsLookback = bestModel.statsLookback
     ROCLookback = bestModel.ROCLookback
     model = eval(bestModel.params)
-    ticker = contract.symbol + contract.currency
+    ticker = symbol + currency
 
     dataSet = data
     #nrows = data.shape[0]

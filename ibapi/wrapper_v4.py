@@ -1,17 +1,24 @@
 from swigibpy import EWrapper
 import time
+import datetime
 import numpy as np
 import pandas as pd
 import random
 from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
 from swigibpy import Order as IBOrder
 from IButils import bs_resolve, action_ib_fill
+from pytz import timezone
+from threading import Event
 
 MAX_WAIT_SECONDS=10
 MEANINGLESS_NUMBER=1729
 
 ## This is the reqId IB API sends when a fill is received
 FILL_CODE=-1
+rtbar={}
+rtdict={}
+rthist={}
+rtfile={}
 
 def return_IB_connection_info():
     """
@@ -30,7 +37,9 @@ class IBWrapper(EWrapper):
     """
     Callback object passed to TWS, these functions will be called directly by the TWS or Gateway.
     """
-
+    global rtbar
+    global rtdict
+    
     def init_error(self):
         setattr(self, "flag_iserror", False)
         setattr(self, "error_msg", "")
@@ -303,7 +312,33 @@ class IBWrapper(EWrapper):
         setattr(self, "flag_finished_portfolio", True)
 
     
-    
+         
+    def historicalData(self, reqId, date, open, high,
+                       low, close, volume,
+                       barCount, WAP, hasGaps):
+        global rtbar
+        global rtdict
+        global rthist
+        sym=rtdict[reqId]
+        data=rtbar[reqId]
+        if date[:8] == 'finished':
+            print("History request complete")
+            rthist[reqId].set()
+            data=data.reset_index()
+            data=data.sort_values(by='Date')  
+            data=data.set_index('Date')
+        else:
+            data.loc[date] = [open,high,low,close,volume]
+            print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+                      % (date, open, high, low, close, volume)
+        rtbar[reqId]=data
+        
+
+            #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
+            #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
+
+        #return self.data
+
     def realtimeBar(self, reqId, time, open, high, low, close, volume, wap, count):
 
         """
@@ -311,11 +346,48 @@ class IBWrapper(EWrapper):
         
         Just append close prices. 
         """
-    
+       
         global pricevalue
         global finished
-
-        pricevalue.append(close)
+        global rtbar
+        global rtdict
+        global rtfile
+        sym=rtdict[reqId]
+        data=rtbar[reqId]
+        filename=rtfile[reqId]
+        
+        eastern=timezone('US/Eastern')
+        
+        time=datetime.datetime.fromtimestamp(
+                    int(time), eastern
+                ).strftime('%Y%m%d  %H:%M:00') 
+        #time=time.astimezone(eastern).strftime('%Y-%m-%d %H:%M:00') 
+        
+        if time in data.index:
+               
+            quote=data.loc[time]
+            if high > quote['High']:
+                quote['High']=high
+            if low < quote['Low']:
+                quote['Low']=low
+            quote['Close']=close
+            quote['Volume']=quote['Volume'] + volume
+            if quote['Volume'] < 0:
+                quote['Volume'] = 0 
+            data.loc[time]=quote
+            print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
+        
+        else:
+            data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume']))
+            print "New Bar:    bar: sym: " + sym + " date:" + str(time) + "open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(count)
+            data=data.sort_values(by='Date')  
+            data=data.set_index('Date')
+            data.to_csv(filename)
+            
+        rtbar[reqId]=data
+        
+        
+        #pricevalue.append(close)
 
     def init_tickdata(self, TickerId):
         if "data_tickdata" not in dir(self):
@@ -347,7 +419,7 @@ class IBWrapper(EWrapper):
         elif int(tickType)==2:
             ## ask
             marketdata[0][3]=float(value)
-        
+        print "ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
 
 
     def tickGeneric(self, TickerId, tickType, value):
@@ -368,8 +440,7 @@ class IBWrapper(EWrapper):
         elif int(tickType)==2:
             ## ask
             marketdata[3]=float(value)
-        
-        print marketdata
+        print "ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
         
         
            
@@ -387,6 +458,7 @@ class IBWrapper(EWrapper):
             ## ask
             marketdata[1]=int(size)
         
+        print "tickSize: ASKSIZE: " + str(marketdata[0]) +  " BIDSIZE: " + str(marketdata[1])
 
    
     def tickPrice(self, TickerId, tickType, price, canAutoExecute):
@@ -401,7 +473,8 @@ class IBWrapper(EWrapper):
             ## ask
             marketdata[3]=float(price)
         
-    
+        print "tickPrice: ASK: " + str(marketdata[2]) +  " BID: " + str(marketdata[3])
+
     def updateMktDepth(self, id, position, operation, side, price, size):
         """
         Only here for completeness - not required. Market depth is only available if you subscribe to L2 data.
@@ -674,7 +747,7 @@ class IBclient(object):
         return (account_value, portfolio_data)
 
 
-    def get_IB_market_data(self, ibcontract, seconds=30,  tickerid=999):         
+    def get_IB_market_data(self, ibcontract, tickerid=999):         
         """
         Returns granular market data
         
@@ -695,28 +768,28 @@ class IBclient(object):
         
         start_time=time.time()
 
-        finished=False
-        iserror=False
+        #finished=False
+        #iserror=False
 
-        while not finished and not iserror:
-            iserror=self.cb.flag_iserror
-            if (time.time() - start_time) > seconds:
-                finished=True
-            #pass
-            time.sleep(10)
+        # while not finished and not iserror:
+        #    iserror=self.cb.flag_iserror
+        #    if (time.time() - start_time) > seconds:
+        #        finished=True
+        #    #pass
+        #    time.sleep(10)
         #self.tws.cancelMktData(tickerid)
         
         marketdata=self.cb.data_tickdata[tickerid]
         ## marketdata should now contain some interesting information
         ## Note in this implementation we overwrite the contents with each tick; we could keep them
         
-        if iserror:
-            print "Error: "+self.cb.error_msg
-            print "Failed to get any prices with marketdata"
+        #if iserror:
+        #    print "Error: "+self.cb.error_msg
+        #    print "Failed to get any prices with marketdata"
         
         return marketdata
 
-    def get_realtimebar(self, ibcontract,seconds=30,  tickerid=999):
+    def get_realtimebar(self, ibcontract, ibtype, tickerid, data, filename):
         
         """
         Returns a list of snapshotted prices, averaged over 'real time bars'
@@ -730,20 +803,24 @@ class IBclient(object):
         global finished
         global iserror
         global pricevalue
-    
-    
+        global rtbar
+        global rtdict
+        global rtfile
         iserror=False
         
         finished=False
         pricevalue=[]
-            
+        rtdict[tickerid]=ibcontract.symbol + ibcontract.currency
+        rtfile[tickerid]=filename
+        rtbar[tickerid]=data
         # Request current price in 5 second increments
         # It turns out this is the only way to do it (can't get any other increments)
+        
         tws.reqRealTimeBars(
                 tickerid,                                          # tickerId,
                 ibcontract,                                   # contract,
                 5, 
-                "MIDPOINT",
+                ibtype,
                 0)
     
     
@@ -751,18 +828,77 @@ class IBclient(object):
         ## get about 16 seconds worth of samples
         ## could obviously just stop at N bars as well eg. while len(pricevalue)<N:
         
-        while not finished:
-            if iserror:
-                finished=True
-            if (time.time() - start_time) > 20: ## get ~4 samples over 15 seconds
-                finished=True
-            pass
+
         
         ## Cancel the stream
-        tws.cancelRealTimeBars(MEANINGLESS_ID)
+        #tws.cancelRealTimeBars(MEANINGLESS_ID)
 
-        if len(pricevalue)==0 or iserror:
-            raise Exception("Failed to get price")
+        #if len(pricevalue)==0 or iserror:
+        #    raise Exception("Failed to get price")
 
         
         return pricevalue
+        
+    def getDataFromIB(self, brokerData,endDateTime,data):
+        WAIT_TIME=60
+        global rtbar
+        global rtdict
+        global rthist
+        iserror=False
+        
+        pricevalue=[]
+        tickerid=brokerData['tickerId']
+        rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
+        rtbar[tickerid]=data
+        #data_cons = pd.DataFrame()
+        # Instantiate our callback object
+        
+    
+        # Instantiate a socket object, allowing us to call TWS directly. Pass our
+        # callback object so TWS can respond.
+        tws = self.tws
+        #tws = EPosixClientSocket(callback, reconnect_auto=True)
+        # Connect to tws running on localhost
+        
+        # Simple contract for GOOG
+        contract = Contract()
+        contract.exchange = brokerData['exchange']
+        contract.symbol = brokerData['symbol']
+        contract.secType = brokerData['secType']
+        contract.currency = brokerData['currency']
+        ticker = contract.symbol+contract.currency
+        #today = dt.today()
+    
+        print("\nRequesting historical data for %s" % ticker)
+    
+        # Request some historical data.
+        rthist[tickerid]=Event()
+        #for endDateTime in getHistLoop:
+        tws.reqHistoricalData(
+            brokerData['tickerId'],                                         # tickerId,
+            contract,                                   # contract,
+            endDateTime,                            #endDateTime
+            brokerData['durationStr'],                                      # durationStr,
+            brokerData['barSizeSetting'],                                    # barSizeSetting,
+            brokerData['whatToShow'],                                   # whatToShow,
+            brokerData['useRTH'],                                          # useRTH,
+            brokerData['formatDate']                                          # formatDate
+            )
+    
+    
+        print("====================================================================")
+        print(" %s History requested, waiting %ds for TWS responses" % (endDateTime, WAIT_TIME))
+        print("====================================================================")
+        
+        try:
+            rthist[tickerid].wait(timeout=WAIT_TIME)
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if not rthist[tickerid].is_set():
+                print('Failed to get history within %d seconds' % WAIT_TIME)
+        
+        #data_cons = pd.concat([data_cons,callback.data],axis=0)
+                 
+       
+        return rtbar[tickerid]

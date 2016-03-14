@@ -20,7 +20,7 @@ class HistoricalDataExample(EWrapper):
     def __init__(self):
         super(HistoricalDataExample, self).__init__()
         self.got_history = Event()
-        self.data = pd.DataFrame(columns = ['Open','High','Low','Close','Volume'])
+        self.data = pd.DataFrame(columns = ['Date','Open','High','Low','Close','Volume'])
 
     def orderStatus(self, id, status, filled, remaining, avgFillPrice, permId,
                     parentId, lastFilledPrice, clientId, whyHeld):

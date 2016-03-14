@@ -7,34 +7,61 @@ from time import gmtime, strftime, time, localtime
 from pandas.io.json import json_normalize
 from ibapi.get_exec import get_exec as get_ibexec
 from c2api.get_exec import get_exec as get_c2exec
+import os
 
 
-
-def get_c2trades(systemid, name):
+def get_c2trades(systemid, name, c2api):
+    filename='./data/c2api/' + name + '_trades.csv'
+    
     datestr=strftime("%Y%m%d", localtime())
-    data=get_c2exec(systemid);
+    data=get_c2exec(systemid,c2api);
     jsondata = json.loads(data)
     dataSet=json_normalize(jsondata['response'])
-    dataSet.to_csv('./data/c2api/' + datestr + '_' + name + '_trades_' + str(systemid) + '.csv', index=False)
+    dataSet=dataSet.set_index('trade_id')
+     
+    if os.path.isfile(filename):
+        existData = pd.read_csv(filename, index_col='trade_id')
+        existData = existData.reset_index()
+        dataSet   =   dataSet.reset_index()
+        dataSet=existData.append(dataSet)
+        dataSet['trade_id'] = dataSet['trade_id'].astype('int')
+        dataSet=dataSet.drop_duplicates(subset=['trade_id'],keep='last')
+        dataSet=dataSet.set_index('trade_id') 
+        
+    dataSet=dataSet.sort_values(by='closedWhenUnixTimeStamp')
+    
+    dataSet.to_csv(filename)
 
 def get_ibtrades():
+    filename='./data/ibapi/trades' + '.csv'
+    
     datestr=strftime("%Y%m%d", localtime())
     data=get_ibexec()
     dataSet=pd.DataFrame(data)
+    dataSet=dataSet.set_index('permid')
+    
+    if os.path.isfile(filename):
+        existData = pd.read_csv(filename, index_col='permid')
+        existData =existData.reset_index()
+        dataSet=dataSet.reset_index()
+        dataSet=existData.append(dataSet)
+        dataSet['permid'] = dataSet['permid'].astype('int')
+        dataSet=dataSet.drop_duplicates(subset=['permid'],keep='last')
+        dataSet=dataSet.set_index('permid')
     dataSet=dataSet.sort_values(by='times')
-    dataSet.to_csv('./data/ibapi/' +  datestr + '_' + 'trades' + '.csv', index=False)
-
+    dataSet.to_csv(filename)
+    
 data=pd.read_csv('./data/systems/system.csv')
 data=data.reset_index()
 
 c2dict={}
 for i in data.index:
         system=data.ix[i]
-        c2dict[system['c2id']]=system['Name']
+        c2dict[system['c2id']]=(system['Name'],system['c2api'])
 
 for c2id in c2dict:
-	stratName=c2dict[c2id]
-	get_c2trades(c2id, stratName)
+    (stratName,c2api)=c2dict[c2id]
+    get_c2trades(c2id, stratName, c2api)
 
 get_ibtrades()
 

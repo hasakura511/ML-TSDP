@@ -20,6 +20,12 @@ rtdict={}
 rthist={}
 rtfile={}
 
+fask={}
+fasksize={}
+fbid={}
+fbidsize={}
+fdict={}
+
 def return_IB_connection_info():
     """
     Returns the tuple host, port, clientID required by eConnect
@@ -406,6 +412,10 @@ class IBWrapper(EWrapper):
 
 
     def tickString(self, TickerId, field, value):
+        global fasksize
+        global fbidsize
+        global fask
+        global fbid
         marketdata=self.data_tickdata[TickerId]
 
         ## update string ticks
@@ -415,20 +425,27 @@ class IBWrapper(EWrapper):
         if int(tickType)==0:
             ## bid size
             marketdata[0]=int(value)
+            fbidsize[TickerId]=int(value)
         elif int(tickType)==3:
             ## ask size
             marketdata[1]=int(value)
-
+            fasksize[TickerId]=int(value)
         elif int(tickType)==1:
             ## bid
             marketdata[0][2]=float(value)
+            fbid[TickerId]=float(value)
         elif int(tickType)==2:
             ## ask
             marketdata[0][3]=float(value)
-        print "ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
+            fask[TickerId]=float(value)
+        #print "tickString: ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
 
 
     def tickGeneric(self, TickerId, tickType, value):
+        global fasksize
+        global fbidsize
+        global fask
+        global fbid
         marketdata=self.data_tickdata[TickerId]
 
         ## update generic ticks
@@ -436,22 +453,26 @@ class IBWrapper(EWrapper):
         if int(tickType)==0:
             ## bid size
             marketdata[0]=int(value)
+            fbidsize[TickerId]=int(value)
         elif int(tickType)==3:
             ## ask size
             marketdata[1]=int(value)
-
+            fasksize[TickerId]=int(value)
         elif int(tickType)==1:
             ## bid
             marketdata[2]=float(value)
+            fbid[TickerId]=float(value)
         elif int(tickType)==2:
             ## ask
             marketdata[3]=float(value)
-        print "ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
+            fask[TickerId]=float(value)
+        #print "ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
         
         
            
     def tickSize(self, TickerId, tickType, size):
-        
+        global fasksize
+        global fbidsize
         ## update ticks of the form new size
         
         marketdata=self.data_tickdata[TickerId]
@@ -460,26 +481,31 @@ class IBWrapper(EWrapper):
         if int(tickType)==0:
             ## bid
             marketdata[0]=int(size)
+            fbidsize[TickerId]=int(size)
         elif int(tickType)==3:
             ## ask
             marketdata[1]=int(size)
+            fasksize[TickerId]=int(size)
         
-        print "tickSize: ASKSIZE: " + str(marketdata[0]) +  " BIDSIZE: " + str(marketdata[1])
+        #print "tickSize: ASKSIZE: " + str(marketdata[0]) +  " BIDSIZE: " + str(marketdata[1])
 
    
     def tickPrice(self, TickerId, tickType, price, canAutoExecute):
         ## update ticks of the form new price
-        
+        global fask
+        global fbid
         marketdata=self.data_tickdata[TickerId]
         
         if int(tickType)==1:
             ## bid
             marketdata[2]=float(price)
+            fbid[TickerId]=float(price)
         elif int(tickType)==2:
             ## ask
             marketdata[3]=float(price)
-        
-        print "tickPrice: ASK: " + str(marketdata[2]) +  " BID: " + str(marketdata[3])
+            fask[TickerId]=float(price)
+       
+        #print "tickPrice: ASK: " + str(marketdata[3]) +  " BID: " + str(marketdata[2])
 
     def updateMktDepth(self, id, position, operation, side, price, size):
         """
@@ -752,7 +778,25 @@ class IBclient(object):
 
         return (account_value, portfolio_data)
 
-
+    def get_IBAsk(self, symbol, currency):
+        global fdict
+        global fask
+        symname=symbol + currency
+        tickerid=fdict[symname]
+        if tickerid in fask:
+            return fask[tickerid]
+        else:
+            return -1
+        
+    def get_IBBid(self, symbol, currency):
+        global fdict
+        global fbid
+        symname=symbol + currency
+        tickerid=fdict[symname]
+        if tickerid in fbid:
+            return fbid[tickerid]
+        else:
+            return -1
     def get_IB_market_data(self, ibcontract, tickerid=999):         
         """
         Returns granular market data
@@ -762,6 +806,10 @@ class IBclient(object):
         """
         
         ## initialise the tuple
+        global fdict
+        symname=ibcontract.symbol + ibcontract.currency
+        fdict[symname]=tickerid
+        
         self.cb.init_tickdata(tickerid)
         self.cb.init_error()
             
@@ -773,25 +821,8 @@ class IBclient(object):
                 False)       
         
         start_time=time.time()
-
-        #finished=False
-        #iserror=False
-
-        # while not finished and not iserror:
-        #    iserror=self.cb.flag_iserror
-        #    if (time.time() - start_time) > seconds:
-        #        finished=True
-        #    #pass
-        #    time.sleep(10)
-        #self.tws.cancelMktData(tickerid)
         
         marketdata=self.cb.data_tickdata[tickerid]
-        ## marketdata should now contain some interesting information
-        ## Note in this implementation we overwrite the contents with each tick; we could keep them
-        
-        #if iserror:
-        #    print "Error: "+self.cb.error_msg
-        #    print "Failed to get any prices with marketdata"
         
         return marketdata
 

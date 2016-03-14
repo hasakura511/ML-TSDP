@@ -11,8 +11,17 @@ from tzlocal import get_localzone
 
 callback = IBWrapper()
 client=IBclient(callback)
-tickerid=1
-def get_feed(sym, currency, exchange, type):
+
+def get_ask(symbol, currency):
+    global client
+    ask=client.get_IBAsk(str(symbol), str(currency))
+    return ask
+    
+def get_bid(symbol, currency):
+    global client
+    return client.get_IBBid(symbol, currency)
+   
+def get_feed(sym, currency, exchange, type, tickerId):
     global tickerid, client, callback
     # Simple contract for GOOG
     contract = Contract()
@@ -20,8 +29,7 @@ def get_feed(sym, currency, exchange, type):
     contract.secType = type
     contract.exchange = exchange
     contract.currency = currency
-    tickerid=tickerid + 1
-    ans=client.get_IB_market_data(contract, tickerid)
+    ans=client.get_IB_market_data(contract, tickerId)
 
 def get_realtimebar(sym, currency, exchange, type, whatToShow, data, filename, tickerId):
     global client, callback

@@ -6,12 +6,12 @@ import json
 from pandas.io.json import json_normalize
 from ibapi.place_order import place_order as place_iborder
 from c2api.place_order import place_order as place_c2order
-from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open
+from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ib_sym_pos
 from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open
 from seitoolz.signal import get_model_pos
 from time import gmtime, strftime, time, localtime, sleep
     
-def adj_size(model_pos, ib_pos, system, systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit):
+def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit):
     system_pos=model_pos.loc[system]
    
     print "system: " + system
@@ -20,7 +20,7 @@ def adj_size(model_pos, ib_pos, system, systemid, c2apikey, c2quant, c2sym, c2ty
     #print c2_pos
     
     if c2submit:
-        c2_pos=get_c2pos(systemid,c2sym,c2apikey).loc[c2sym]
+        c2_pos=get_c2pos(systemid,c2sym,c2apikey,systemname).loc[c2sym]
         c2_pos_qty=int(c2_pos['quant_opened']) - int(c2_pos['quant_closed'])
         c2_pos_side=c2_pos['long_or_short']
         if c2_pos_side == 'short':
@@ -57,6 +57,7 @@ def adj_size(model_pos, ib_pos, system, systemid, c2apikey, c2quant, c2sym, c2ty
                 print 'STO: ' + str(c2quant)
                 place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
     if ibsubmit:
+        ib_pos=get_ib_sym_pos(ib_pos, ibsym, ibcurrency) 
         ib_pos=ib_pos.loc[ibsym,ibcurrency]
         ib_pos_qty=ib_pos['qty']
         system_ibpos_qty=round(system_pos['action']) * ibquant
@@ -72,5 +73,3 @@ def adj_size(model_pos, ib_pos, system, systemid, c2apikey, c2quant, c2sym, c2ty
             place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
     #
     #place_iborder(ibaction, ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
-
-

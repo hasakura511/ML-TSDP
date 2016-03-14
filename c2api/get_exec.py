@@ -40,7 +40,7 @@ def get_exec_open(systemid, apikey):
     sleep(2)
     return r.text
 
-def get_c2pos(systemid, c2sym,apikey):
+def get_c2pos(systemid, c2sym, apikey, systemname):
     datestr=strftime("%Y%m%d", localtime())
     data=get_exec_open(systemid,apikey);
     
@@ -51,13 +51,13 @@ def get_c2pos(systemid, c2sym,apikey):
             dataSet=dataSet.append(pd.DataFrame([[c2sym,0,0,'none']],
                               columns=['symbol','quant_opened','quant_closed','long_or_short']))
         dataSet=dataSet.set_index(['symbol'])
-        dataSet.to_csv('./data/portfolio/c2_' + c2sym + '_' + str(systemid)+ '_pos.csv')
+        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
         return dataSet
     else:
         dataSet=pd.DataFrame([[c2sym,0,0,'none']],
                               columns=['symbol','quant_opened','quant_closed','long_or_short'])
         dataSet=dataSet.set_index(['symbol'])
-        dataSet.to_csv('./data/portfolio/c2_' + c2sym + '_' + str(systemid)+ '_pos.csv')
+        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
         return dataSet
         
 #place_order('BTO','1','EURUSD','forex')

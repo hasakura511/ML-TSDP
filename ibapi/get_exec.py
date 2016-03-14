@@ -110,4 +110,23 @@ def get_ibpos_from_csv():
     dataSet = pd.read_csv('./data/portfolio/ib_portfolio.csv', index_col=['sym','currency'])
    #
     return dataSet
+
+def get_ib_sym_pos(portfolio_data, symbol, currency):
+    datestr=strftime("%Y%m%d", localtime())
+  
+    portfolio_data=portfolio_data.reset_index()
+    portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
+    sym_cur=symbol + currency
+    if sym_cur not in portfolio_data['symbol'].values:
+        portfolio_data=portfolio_data.append(pd.DataFrame([[sym_cur,symbol,0,currency]], \
+                              columns=['symbol','sym','qty','currency']))
+    dataSet=portfolio_data
+    #dataSet=dataSet.sort_values(by='times')
+    dataSet=dataSet.set_index(['sym','currency'])
+    #dataSet.to_csv('./data/portfolio/ib_portfolio.csv')
+    #accountSet=pd.DataFrame(account_value)
+    #accountSet.to_csv('./data/portfolio/ib_account_value.csv', index=False)
+    #
+    return dataSet
+
 #get_exec();

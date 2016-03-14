@@ -23,16 +23,18 @@ def get_ibtrades():
     dataSet=pd.DataFrame(data)
     dataSet=dataSet.sort_values(by='times')
     dataSet.to_csv('./data/ibapi/' +  datestr + '_' + 'trades' + '.csv', index=False)
-    
-get_c2trades(100961226, 'stratEURUSD') #stratEURUSD
-get_c2trades(100962402, 'stratGBPUSD') #stratGBPUSD
-get_c2trades(100962399, 'stratUSDCHF') #stratUSDCHF
-get_c2trades(100962390, 'stratUSDJPY') #stratUSDJPY
-get_c2trades(100962756, 'stratAUDUSD') #stratAUDUSD
-get_c2trades(100962769, 'stratUSDCAD') #stratUSDCAD
 
-get_c2trades(100961267, 'testStrat') #testStrat
-get_c2trades(100984342, 'testStrat102') #testStrat102
+data=pd.read_csv('./data/systems/system.csv')
+data=data.reset_index()
+
+c2dict={}
+for i in data.index:
+        system=data.ix[i]
+        c2dict[system['c2id']]=system['Name']
+
+for c2id in c2dict:
+	stratName=c2dict[c2id]
+	get_c2trades(c2id, stratName)
 
 get_ibtrades()
 

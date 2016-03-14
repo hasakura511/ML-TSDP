@@ -121,3 +121,11 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-14 11:58:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i50_gainAhead
 2016-03-14 12:28:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i50_gainAhead
 2016-03-14 12:58:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i50_gainAhead
+2016-03-14 13:28:00,1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i50_gainAhead
+2016-03-14 13:58:00,-1.0,0.0,2031.0,0.0,-1.07154604969,0.0,0.00475866867267,bothEURUSD_ALL_DF1_LDA_i50_gainAhead DPS wl30.0 maxL5 dd95_0.005 thres_0.0
+2016-03-14 14:28:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i100_gainAhead
+2016-03-14 14:58:00,1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i100_gainAhead
+2016-03-14 15:28:00,-1.0,0.0,,1.0,,,,"bothEURUSD_ALL_DF1_LDA_i100_ZZ 0.003,-0.003"
+2016-03-14 15:58:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i25_gainAhead
+2016-03-14 16:28:00,1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i25_gainAhead
+2016-03-14 16:58:00,-1.0,0.0,,1.0,,,,bothEURUSD_ALL_DF1_LDA_i25_gainAhead

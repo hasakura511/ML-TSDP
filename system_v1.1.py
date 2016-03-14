@@ -119,8 +119,8 @@ for ticker in livePairs:
     currency=ticker[3:6]
     bestModel = pd.read_csv(bestParamsPath+ticker+'.csv').iloc[-1]
     data = currencyPairsDict[ticker]
-    
-                    
+    print 'received', data.shape[0], 'rows of data'                
+
     #Model Parameters
     signal = bestModel.signal    
     #perturbDataPct = 0.0002

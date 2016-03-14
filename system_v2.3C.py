@@ -153,9 +153,9 @@ version = 'v2'
 filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='1 min'
-validationStartPoint = 0
-#signal_types = ['gainAhead','ZZ']
-signal_types = ['ZZ']
+validationStartPoint = 200
+signal_types = ['gainAhead','ZZ']
+#signal_types = ['ZZ']
 #signal_types = ['gainAhead']
 '''
 for pair in currencyPairs:
@@ -193,7 +193,7 @@ for ticker in livePairs:
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     wfSteps=[1]
-    wf_is_periods = [25,50]
+    wf_is_periods = [25,50,100]
     #wf_is_periods = [100]
     tox_adj_proportion = 0
     nfeatures = 10
@@ -208,10 +208,10 @@ for ticker in livePairs:
     CCLookback = 60
     rStochLookback = 300
     statsLookback = 100
-    ROCLookback = 500
+    ROCLookback = 600
 
     #DPS parameters
-    windowLengths = [60]
+    windowLengths = [30]
     maxLeverage = [5]
     PRT={}
     PRT['DD95_limit'] = 0.05
@@ -458,10 +458,11 @@ for ticker in livePairs:
                     testFinalYear = dataSet.index[max(wf_is_periods)-1]
                     validationFirstYear =dataSet.index[max(wf_is_periods)]
                     validationFinalYear =dataSet.index[-1]
-                    if validationStartPoint is not None and validationStartPoint > max(wf_is_periods) and\
-                                dataSet.shape[0]>validationStartPoint:
-                        testFinalYear = dataSet.index[validationStartPoint]
-                        validationFirstYear =dataSet.index[validationStartPoint+1]
+                    
+                    if validationStartPoint is not None and\
+                                dataSet.shape[0]>dataSet.index[-validationStartPoint:].shape[0]+max(wf_is_periods):
+                        testFinalYear = dataSet.index[-validationStartPoint-1]
+                        validationFirstYear =dataSet.index[-validationStartPoint]
 
                     #check
                     nrows_is = dataSet.ix[:testFinalYear].shape[0]

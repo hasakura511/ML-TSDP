@@ -1,2 +1,2 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-USDJPY,-20,,,,113.794,,forex,short,,,open,2016-03-13 20:00:17,113.793,10000,,0,10,,,101198065,
+USDJPY,-6,1457931087,,,113.78900,,forex,short,2016-03-14 00:51:27,1457931087,open,2016-03-14 00:46:49,113.80200,10000,,0,10,,,101200659,

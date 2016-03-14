@@ -375,14 +375,20 @@ class IBWrapper(EWrapper):
             if quote['Volume'] < 0:
                 quote['Volume'] = 0 
             data.loc[time]=quote
-            print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
+            #print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
         
         else:
-            data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume']))
+            if data.count > 0:
+                quote=data.iloc[-1]
+                print "Close Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
+                data=data.reset_index()                
+                data=data.sort_values(by='Date')  
+                data=data.set_index('Date')
+                data.to_csv(filename)
             print "New Bar:    bar: sym: " + sym + " date:" + str(time) + "open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(count)
-            data=data.sort_values(by='Date')  
-            data=data.set_index('Date')
-            data.to_csv(filename)
+            
+            data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
+            
             
         rtbar[reqId]=data
         

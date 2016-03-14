@@ -72,35 +72,19 @@ barSizeSetting='1 min'
 whatToShow='MIDPOINT'
 ticker = symbol + currency
 
-currencyPairs = ['AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY']
+currencyPairs = ['EURGBP','GBPJPY','EURCHF','AUDJPY',\
+                 'NZDJPY','CADJPY','CHFJPY','EURGBP',\
+                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
+                 'USDCHF','USDJPY','EURJPY','NZDUSD']
+
 
 def get_ibfeed(sym, cur):
 	get_feed(sym, cur,'IDEALPRO','CASH')
 
-'''
-reqDuration = {
-                '1 M':30,
-                '2 W':14,
-                '1 W':7,
-                '1 D':1
-                }
-############################################################
-for i in range(0,cycles):
-    if i ==0:
-        getHistLoop = [endDateTime]
-    else:
-        getHistLoop.insert(0,(getHistLoop[0]-\
-                                datetime.timedelta(reqDuration[durationStr])))
-
-getHistLoop = []
-getHistLoop = [endDateTime.strftime("%Y%m%d %H:%M:%S %Z") for x in getHistLoop]
-'''
 currencyPairsDict = {}
 tickerId=1
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 for pair in currencyPairs:
-    #turn this off to get progressively older dates for testing.
     filename=dataPath+barSizeSetting+'_'+pair+'.csv'
     data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
    
@@ -116,19 +100,10 @@ for pair in currencyPairs:
     currencyPairsDict[pair] = data
     
     get_realtimebar(symbol, currency,   exchange, secType, whatToShow, data, filename, tickerId)
-    
-    #tickerId=tickerId+1
+
     data=get_history(date, symbol, currency, exchange, secType, whatToShow, data, filename, tickerId, minDataPoints, durationStr, barSizeSetting)
    
- 
-###########################################################
-
-
-#get_ibfeed('USD','JPY')
-#get_ibfeed('EUR','JPY')
-
 finished=False
-
 while not finished:
     #if iserror:
     #    finished=True

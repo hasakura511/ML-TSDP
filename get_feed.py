@@ -72,8 +72,8 @@ barSizeSetting='1 min'
 whatToShow='MIDPOINT'
 ticker = symbol + currency
 
-currencyPairs = ['EURGBP','GBPJPY','EURCHF','AUDJPY',\
-                 'NZDJPY','CADJPY','CHFJPY','EURGBP',\
+currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
+                 'EURGBP','GBPJPY','EURCHF','AUDJPY',\
                  'AUDUSD','EURUSD','GBPUSD','USDCAD',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
 

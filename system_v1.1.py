@@ -195,7 +195,7 @@ for ticker in livePairs:
         "1 D",                                      # durationStr,
         "1 min",                                    # barSizeSetting,
         "MIDPOINT",                                   # whatToShow,
-        1,                                          # useRTH,
+        0,                                          # useRTH,
         1                                          # formatDate
     )
 
@@ -215,7 +215,7 @@ for ticker in livePairs:
         print("Disconnecting...")
         tws.eDisconnect()
 
-                    
+    print 'received', data.shape[0], 'rows of data'                
     #Model Parameters
     signal = bestModel.signal    
     #perturbDataPct = 0.0002

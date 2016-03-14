@@ -1,2 +1,2 @@
-symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-EURUSD,45,1457936299,,,1.11623,,forex,short,2016-03-14 02:18:19,1457936299,open,2016-03-14 02:14:57,1.11615,10000,,0,1,,,101201587,
+symbol,quant_opened,quant_closed,long_or_short
+EURUSD,0,0,none

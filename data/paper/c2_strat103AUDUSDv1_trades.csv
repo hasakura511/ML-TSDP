@@ -1,4 +1,2 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,commission,expir,index,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description
-1.0,"0   -5
-dtype: float64",,,,0.0,"0    5
-dtype: float64",,,AUDUSD,long,20160314 22:34:36 EST,20160314 22:34:36 EST,open,20160314 22:34:36 EST,0.74895,10000.0,,0.0,15.0,,AUDUSD,strat103AUDUSDv1
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission
+1,-5.0,,,,0.0,,AUDUSD,short,20160315 19:12:08 EST,20160315 19:12:08 EST,open,20160315 19:12:08 EST,0.74649,10000.0,,0.0,15.0,,AUDUSD,strat103AUDUSDv1,5.0

@@ -1,1 +1,8 @@
-trade_id,index,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description
+trade_id,index,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission
+1,,-5.0,,,,0.0,,EURUSD,short,20160315 19:12:11 EST,20160315 19:12:11 EST,open,20160315 19:12:11 EST,1.1109,10000.0,,0.0,15.0,,EURUSD,strat104v1v2,5.0
+2,,-5.0,,,,0.0,,EURJPY,long,20160315 19:12:11 EST,20160315 19:12:11 EST,open,20160315 19:12:11 EST,125.736,10000.0,,0.0,15.0,,EURJPY,strat104v1v2,5.0
+3,,-5.0,,,,0.0,,GBPUSD,short,20160315 19:12:11 EST,20160315 19:12:11 EST,open,20160315 19:12:11 EST,1.41533,10000.0,,0.0,15.0,,GBPUSD,strat104v1v2,5.0
+4,,-5.0,,,,0.0,,USDCHF,short,20160315 19:12:12 EST,20160315 19:12:12 EST,open,20160315 19:12:12 EST,0.98661,10000.0,,0.0,15.0,,USDCHF,strat104v1v2,5.0
+5,,-5.0,,,,0.0,,USDJPY,short,20160315 19:12:12 EST,20160315 19:12:12 EST,open,20160315 19:12:12 EST,113.171,10000.0,,0.0,15.0,,USDJPY,strat104v1v2,5.0
+6,,-5.0,,,,0.0,,AUDUSD,short,20160315 19:12:12 EST,20160315 19:12:12 EST,open,20160315 19:12:12 EST,0.74654,10000.0,,0.0,15.0,,AUDUSD,strat104v1v2,5.0
+7,,-5.0,,,,0.0,,USDCAD,long,20160315 19:12:12 EST,20160315 19:12:12 EST,open,20160315 19:12:12 EST,1.33542,10000.0,,0.0,15.0,,USDCAD,strat104v1v2,5.0

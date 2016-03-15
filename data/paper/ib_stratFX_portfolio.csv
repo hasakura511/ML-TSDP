@@ -1,1 +1,6 @@
-,sym,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,currency
+sym,currency,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,symbol
+EUR,JPY,,10000.0,125.736,100000000.0,2002.0,0.0,-2002.0,Paper,EURJPY
+EUR,USD,,10000.0,1.11097,100000000.0,2002.0,0.0,-2002.0,Paper,EURUSD
+USD,CHF,,50000.0,0.98686,500000000.0,10002.0,0.0,-10002.0,Paper,USDCHF
+GBP,USD,,-10000.0,1.41533,141533000.0,7665.32,0.0,283060336.68,Paper,GBPUSD
+USD,CAD,,-10000.0,1.33531,133531000.0,7345.16,0.0,267052656.84,Paper,USDCAD

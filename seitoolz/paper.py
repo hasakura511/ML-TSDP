@@ -15,22 +15,27 @@ from tzlocal import get_localzone
 def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit):
     system_pos=model_pos.loc[system]
    
-    print "system: " + system
-    #print str(system_pos['action'])
+     #print str(system_pos['action'])
     #print "c2: " 
     #print c2_pos
     c2submit=True
     ibsubmit=True
     if c2submit:
-        c2_pos=get_c2_pos(system_name, c2sym).loc[c2sym]
+        c2_pos=get_c2_pos(system_name, c2sym)
+        c2_pos=c2_pos.loc[c2_pos['symbol']==c2sym].iloc[-1]
         c2_pos_qty=int(c2_pos['quant_opened']) - int(c2_pos['quant_closed'])
-        c2_pos_side=c2_pos['long_or_short']
+        c2_pos_side=str(c2_pos['long_or_short'])
         if c2_pos_side == 'short':
             c2_pos_qty=-c2_pos_qty
             
         system_c2pos_qty=round(system_pos['action']) * c2quant
-        print "system_c2_pos: " + str(system_c2pos_qty)
-        print "c2_pos: " + str(c2_pos_qty)
+        
+        if system_c2pos_qty != c2_pos_qty:
+            print "========"
+            print "system: " + system_name + " symbol: " + c2_pos['symbol']
+            print "system_c2_pos: " + str(system_c2pos_qty)
+            print "c2_pos: " + str(c2_pos_qty)
+            print "========"
         
         if system_c2pos_qty > c2_pos_qty:
             c2quant=system_c2pos_qty - c2_pos_qty
@@ -40,7 +45,6 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
                 place_order(system_name, 'BTC', qty, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed)
                                 
                 c2quant = c2quant - qty
-                sleep(2)
             
             if c2quant > 0:
                 print 'BTO: ' + str(c2quant)
@@ -55,18 +59,25 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
                 place_order(system_name, 'STC', qty, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed)
                 
                 c2quant = c2quant - qty
-                sleep(2)
+
             if c2quant > 0:
                 print 'STO: ' + str(c2quant)
                 place_order(system_name, 'STO', c2quant, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed)
                 
     if ibsubmit:
         paper_pos=get_ib_pos(system_name, ibsym,ibcurrency)
-        ib_pos=paper_pos.loc[ibsym,ibcurrency]
+        symbol=ibsym+ibcurrency
+        ib_pos=paper_pos.loc[paper_pos['symbol']==symbol].iloc[-1]
         ib_pos_qty=ib_pos['qty']
         system_ibpos_qty=round(system_pos['action']) * ibquant
-        print "system_ib_pos: " + str(system_ibpos_qty)
-        print "ib_pos: " + str(ib_pos_qty)
+        
+        if system_ibpos_qty != ib_pos_qty:
+            print "========"
+            print "system: " + system_name + " symbol: " + ib_pos['symbol']
+            print "system_ib_pos: " + str(system_ibpos_qty)
+            print "ib_pos: " + str(ib_pos_qty)
+            print "========"
+        
         if system_ibpos_qty > ib_pos_qty:
             ibquant=int(system_ibpos_qty - ib_pos_qty)
             print 'BUY: ' + str(ibquant)
@@ -77,37 +88,40 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
             place_order(system_name, 'SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, 'ib', pricefeed);
 
 def place_order(systemname, action, quant, sym, type, currency, exch, broker, pricefeed):
+    print "Place Order " + action + " " + str(quant) + " " + sym + " " + currency + " " + broker 
+    pricefeed=pricefeed.iloc[-1]
+    eastern=timezone('US/Eastern')
+    endDateTime=dt.now(get_localzone())
+    date=endDateTime.astimezone(eastern)
+    date=date.strftime("%Y%m%d %H:%M:%S EST")
     if broker == 'c2':
         (account, portfolio)=get_c2_portfolio(systemname)
-        
-        eastern=timezone('US/Eastern')
-        endDateTime=dt.now(get_localzone())
-        date=endDateTime.astimezone(eastern)
-        date=date.strftime("%Y%m%d %H:%M:%S EST")
+    
             
-        portfolio=portfolio.reset_index()
         if sym in portfolio['symbol'].values:
             #portfolio=portfolio.reset_index().set_index('symbol')
-            pos=portfolio.loc[sym]
+            pos=portfolio.loc[portfolio['symbol']==sym].reset_index().iloc[-1]
             
-            side=pos['long_or_short']
-            openVWAP=pos['opening_price_VWAP']
-            closeVWAP=pos['closing_price_VWAP']
+            side=str(pos['long_or_short'])
+            openVWAP=float(pos['opening_price_VWAP'])
+            closeVWAP=float(pos['closing_price_VWAP'])
             
-            openqty=pos['quant_opened']
-            closedqty=pos['quant_closed']
-            openVWAP_timestamp=pos['openVWAP_timestamp']
-            closeVWAP_timestamp=pos['closeVWAP_timestamp']
-            pl=pos['PL']
-            ptValue=pos['ptValue']
+            openqty=int(pos['quant_opened'])
+            closedqty=int(pos['quant_closed'])
+            openVWAP_timestamp=str(pos['openVWAP_timestamp'])
+            closeVWAP_timestamp=str(pos['closeVWAP_timestamp'])
+            pl=float(pos['PL'])
+            ptValue=float(pos['ptValue'])
             
+            print 'Symbol: ' + pos['symbol'] + ' Action: ' + action +' Side: ' + side
             if action == 'STO' and side=='short':
-                bid=pricefeed['Bid'][0]
+                bid=pricefeed['Bid']
                 openVWAP=(openVWAP * openqty + bid * quant) / (openqty + quant)
                 openqty=openqty + quant
                 pos['openVWAP_timestamp']=date
                 pos['opening_price_VWAP']=openVWAP
                 pos['quant_opened']=openqty
+               
                 commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue) + pricefeed['Commission_Cash']) 
                 pl=pl - commission
                 buy_power=pos['ptValue'] * openVWAP * quant * -1
@@ -115,7 +129,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 update_c2_portfolio(systemname, pos)
                 
             if action == 'BTO' and side=='long':
-                ask=pricefeed['Ask'][0]
+                ask=pricefeed['Ask']
                 openVWAP=(openVWAP * openqty + ask * quant) / (openqty + quant)
                 openqty=openqty + quant
                 pos['openVWAP_timestamp']=date
@@ -126,13 +140,13 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 buy_power=pos['ptValue'] * openVWAP * quant * -1
                 update_c2_trades(systemname, pos, pl, buy_power)
                 update_c2_portfolio(systemname, pos)
-                
+
             if action == 'STC' and side=='long':
-                bid=pricefeed['Bid'][0]
+                bid=pricefeed['Bid']
                 closedqty = closedqty + quant
                 closeVWAP = (closeVWAP * closedqty + bid * quant) / (closedqty + quant)
                 closeVWAP_timestamp=date
-                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue) + pricefeed['Commission_Cash']) 
+                commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue) + pricefeed['Commission_Cash']) 
                 
                 pl=(openVWAP * openqty - closedqty * closeVWAP) * pos['ptValue']
                 pl=pl - commission
@@ -145,12 +159,13 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     pos['open_or_closed']='closed'
                     
                 buy_power=pos['ptValue'] * closeVWAP * quant
+               
                 update_c2_trades(systemname, pos, pl, buy_power)
                 update_c2_portfolio(systemname, pos)
                     
                 
             if action == 'BTC' and side=='short':
-                ask=pricefeed['Ask'][0]
+                ask=pricefeed['Ask']
                 closedqty = closedqty + quant
                 closeVWAP = (closeVWAP * closedqty + ask * quant) / (closedqty + quant)
                 closeVWAP_timestamp=date
@@ -179,9 +194,10 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 #'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
         else:
             trade_id=0
-            if len(portfolio['trade_id'].index) > 0:
-                int(portfolio['trade_id'].values.max())
-            trade_id=trade_id + 1
+            if len(portfolio.index.values) > 0:
+                trade_id=int(max(portfolio.index.values))
+            trade_id=int(trade_id) + 1
+            print "Trade ID:" + str(trade_id)
             side='long'
             openVWAP=-1
             openqty=quant
@@ -192,11 +208,11 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
             
             if action == 'STO':
                 side='short'
-                openVWAP=pricefeed['Bid'][0]
+                openVWAP=pricefeed['Bid']
                 
             if action == 'BTO':
                 side='long'
-                openVWAP=pricefeed['Ask'][0]
+                openVWAP=pricefeed['Ask']
             
             pos=pd.DataFrame([[trade_id, pl, '','', \
                                 '',0,'',sym,side, \
@@ -207,74 +223,169 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
             'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
             'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
             'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description', \
-            'commission'])
+            'commission']).iloc[-1]
             update_c2_trades(systemname, pos, pl, buy_power)
             update_c2_portfolio(systemname, pos)
             
     
     if broker == 'ib':
-        data=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
-                        'exchange','execid','expiry','level_0','orderid','price','qty','realized_PnL','side',\
-                        'symbol','symbol_currency','times','yield_redemption_date'])    
-    #if action == 'BUY':
-        #
-    #if action == 'SELL':
-        #
-    #if action == 'BTO':
-    #if action == 'BTC':
-    #if action == 'STO':
-    #if action == 'STC':
-    print "Place Order"
+        (account, portfolio)=get_ib_portfolio(systemname)
+        
+        eastern=timezone('US/Eastern')
+        endDateTime=dt.now(get_localzone())
+        date=endDateTime.astimezone(eastern)
+        date=date.strftime("%Y%m%d %H:%M:%S EST")
+        symbol=sym+currency
+        portfolio=portfolio.reset_index()
+        if symbol in portfolio.loc[portfolio['symbol']==symbol].values:
+            #portfolio=portfolio.reset_index().set_index('symbol')
+            pos=portfolio.loc[portfolio['symbol']==symbol].iloc[-1]
+            
+           
+            openVWAP=float(pos['price'])
+            openqty=int(pos['qty'])
+            side='long'
+            if openqty < 0:
+                side='short'
+                
+            pl=float(pos['real_pnl'])
+            ptValue=float(pricefeed['Mult'])
+            
+            print 'Symbol: ' + pos['sym'] + pos['currency'] + ' Action: ' + action +' Side: ' + side
+            if action == 'SELL' and side=='short':
+                bid=pricefeed['Bid']
+                quant=-quant
+                openVWAP=(openVWAP * openqty + bid * quant) / (openqty + quant)
+                openqty=openqty + quant
+                buy_power=pricefeed['Mult'] * openVWAP * quant * -1
+                commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue) + pricefeed['Commission_Cash']) 
+                pl=pl - commission
+                
+                #pos['times']=date
+                pos['price']=openVWAP
+                pos['qty']=openqty
+                pos['value']=abs(pricefeed['Mult'] * openVWAP * quant)
+                pos['avg_cost']=commission + pos['avg_cost']
+                pos['real_pnl']=pl
+                pos['unr_pnl']=0
+                
+                update_ib_trades(systemname, pos, pl, buy_power, exch, date)
+                update_ib_portfolio(systemname, pos)
+                
+            if action == 'BUY' and side == 'long':
+                ask=pricefeed['Ask']
+                openVWAP=(openVWAP * openqty + ask * quant) / (openqty + quant)
+                openqty=openqty + quant
+                buy_power=pricefeed['Mult'] * openVWAP * quant * -1
+                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue) + pricefeed['Commission_Cash']) 
+                pl=pl - commission
+                
+                #pos['times']=date
+                pos['price']=openVWAP
+                pos['qty']=openqty
+                pos['value']=abs(pricefeed['Mult'] * openVWAP * quant)
+                pos['avg_cost']=commission + pos['avg_cost']
+                pos['real_pnl']=pl
+                pos['unr_pnl']=0
+                
+                update_ib_trades(systemname, pos, pl, buy_power, exch, date)
+                update_ib_portfolio(systemname, pos)
+
+            if action == 'SELL' and side=='long':
+                bid=pricefeed['Bid']
+                quant=-quant
+                newqty = openqty + quant
+                print "NQ: " + str(newqty) + " Q: " + str(quant)
+                newVWAP = (openVWAP * openqty + bid * quant) / (openqty + quant)
+                newVWAP_timestamp=date
+                commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue) + pricefeed['Commission_Cash']) 
+                buy_power=pricefeed['Mult'] * newVWAP * quant
+                
+                pl=(openVWAP * openqty -  newVWAP*newqty) * pricefeed['Mult']
+                pl=pl - commission
+                #pos['times']=newVWAP_timestamp
+                pos['price']=newVWAP
+                pos['qty']=newqty
+                pos['real_pnl']=pl
+                pos['value']=abs(pricefeed['Mult'] * newVWAP * newqty)
+                pos['avg_cost']=commission + pos['avg_cost']
+                pos['real_pnl']=pl
+                pos['unr_pnl']=0
+                
+                update_ib_trades(systemname, pos, pl, buy_power, exch, date)
+                update_ib_portfolio(systemname, pos)
+                    
+                
+            if action == 'BUY' and side=='short':
+                ask=pricefeed['Ask']
+                newqty = openqty + quant
+                newVWAP = (openVWAP * openqty + ask * quant) / (openqty + quant)
+                newVWAP_timestamp=date
+                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue) + pricefeed['Commission_Cash']) 
+                buy_power=pricefeed['Mult'] * newVWAP * quant
+                
+                pl=(openVWAP * openqty -  newVWAP*newqty) * pricefeed['Mult']
+                pl=pl - commission
+                #pos['times']=newVWAP_timestamp
+                pos['price']=newVWAP
+                pos['qty']=newqty
+                pos['real_pnl']=pl
+                pos['value']=abs(pricefeed['Mult'] * newVWAP * newqty)
+                pos['avg_cost']=commission + pos['avg_cost']
+                pos['real_pnl']=pl
+                pos['unr_pnl']=0
+
+                update_ib_trades(systemname, pos, pl, buy_power, exch, date)
+                update_ib_portfolio(systemname, pos)
+                    
+            
+        else:
+            
+            side='long'
+            openVWAP=-1
+            openqty=quant
+            ptValue=pricefeed['Mult']
+            value=abs(openVWAP * openqty * ptValue)
+            commission=(abs(pricefeed['Commission_Pct'] * openVWAP * openqty * ptValue) + pricefeed['Commission_Cash']) 
+            pl=commission * -1
+            buy_power=openVWAP * openqty * ptValue * -1
+            
+            if action == 'SELL':
+                side='short'
+                openVWAP=pricefeed['Bid']
+                
+            if action == 'BUY':
+                side='long'
+                openVWAP=pricefeed['Ask']
+            
+            pos=pd.DataFrame([[sym,'',openqty,openVWAP, value, \
+                                    commission, 0, pl, 'Paper', \
+                                    currency]], 
+                                 columns=['sym','exp','qty','price','value', \
+                                 'avg_cost','unr_pnl','real_pnl','accountid', \
+                                 'currency']).iloc[-1]
+            
+            update_ib_trades(systemname, pos, pl, buy_power, exch, date)
+            update_ib_portfolio(systemname, pos)
+
 
 def get_c2_trades(systemname):
     filename='./data/paper/c2_' + systemname + '_trades.csv'
     
     datestr=strftime("%Y%m%d", localtime())
-    #data=get_c2exec(systemid,c2api);
-    #jsondata = json.loads(data)
-    #dataSet=json_normalize(jsondata['response'])
-    #dataSet=dataSet.set_index('trade_id')
-     
+    
     if os.path.isfile(filename):
         existData = pd.read_csv(filename, index_col='trade_id')
-        #existData = existData.reset_index()
-        #dataSet   =   dataSet.reset_index()
-        #dataSet=existData.append(dataSet)
-        #dataSet['trade_id'] = dataSet['trade_id'].astype('int')
-        #dataSet=dataSet.drop_duplicates(subset=['trade_id'],keep='last')
-        #dataSet=dataSet.set_index('trade_id')
         return existData
     else:
         dataSet=pd.DataFrame({},columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
         'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
         'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
         'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
-        dataSet = dataSet.reset_index().set_index(['trade_id'])
+        dataSet = dataSet.set_index('trade_id')
         dataSet.to_csv(filename)
         return dataSet
-    #dataSet=dataSet.sort_values(by='closedWhenUnixTimeStamp')
-    
-    #dataSet.to_csv(filename)
-    #return dataSet
-
-def get_ib_trades(systemname):
-    filename='./data/paper/ib_' + systemname + '_trades.csv'
-    
-    #datestr=strftime("%Y%m%d", localtime())
-    #data=get_ibexec()
-    #dataSet=pd.DataFrame(data)
-    #dataSet=dataSet.set_index('permid')
-    
-    if os.path.isfile(filename):
-        existData = pd.read_csv(filename, index_col='permid')
-        existData =existData.reset_index()
-        dataSet=dataSet.reset_index()
-        dataSet=existData.append(dataSet)
-        dataSet['permid'] = dataSet['permid'].astype('int')
-        dataSet=dataSet.drop_duplicates(subset=['permid'],keep='last')
-        dataSet=dataSet.set_index('permid')
-    dataSet=dataSet.sort_values(by='times')
-    #dataSet.to_csv(filename)
+  
     return dataSet
 
 def get_c2_portfolio(systemname):
@@ -299,18 +410,28 @@ def update_c2_portfolio(systemname, pos):
     datestr=strftime("%Y%m%d", localtime())
    
     (account, dataSet)=get_c2_portfolio(systemname)
+
+    pos=pos.copy()
     tradeid=int(pos['trade_id'])
+    print "Update Portfolio: " + str(tradeid)
+    dataSet=dataSet.reset_index()
+    pos['trade_id'] = pos['trade_id'].astype('int')
+    dataSet['trade_id'] = dataSet['trade_id'].astype('int')
     if str(pos['open_or_closed']) == 'open':
         
-        if tradeid in dataSet.index.values:
-        
-            dataSet.update(pos, overwrite=True)
-        else:
-            dataSet = dataSet.reset_index()
+        if tradeid in dataSet['trade_id'].values:
+            dataSet = dataSet[dataSet['trade_id'] != tradeid]
             dataSet=dataSet.append(pos)
-            dataSet=dataSet.set_index(['trade_id'])
+        else:
+            dataSet=dataSet.append(pos)
+            
     else:
-        dataSet = dataSet[dataSet.index != tradeid]
+        dataSet = dataSet[dataSet['trade_id'] != tradeid]
+    print "Update Portfolio " + systemname + " " + pos['long_or_short'] + \
+                        ' symbol: ' + pos['symbol'] + ' open_or_closed ' + pos['open_or_closed'] + \
+                        ' opened: ' + str(pos['quant_opened']) + ' closed: ' + str(pos['quant_closed'])
+    dataSet=dataSet.set_index('trade_id')
+    
     dataSet.to_csv(filename)
     
     account=get_account_value(systemname, 'c2')
@@ -321,15 +442,27 @@ def update_c2_trades(systemname, pos, pl, buypower):
     datestr=strftime("%Y%m%d", localtime())
    
     dataSet = get_c2_trades(systemname)
-    print 'update tradeid ' + str(int(pos['trade_id']))
+    #pos=pos.iloc[-1]
+    pos=pos.copy()
     tradeid=int(pos['trade_id'])
-    if tradeid in dataSet.index.values:
-        dataSet.update(pos, overwrite=True)
-    else:
-        dataSet = dataSet.reset_index()
+    dataSet=dataSet.reset_index()
+    
+    dataSet['trade_id'] = dataSet['trade_id'].astype('int')
+    pos['trade_id'] = pos['trade_id'].astype('int')
+    
+    if tradeid in dataSet['trade_id'].values:
+        dataSet = dataSet[dataSet['trade_id'] != tradeid]
         dataSet=dataSet.append(pos)
-        dataSet=dataSet.set_index(['trade_id'])
+         
+    else:
+        dataSet=dataSet.append(pos)
         
+    print "Update Trade " + systemname + " " + pos['long_or_short'] + \
+                    ' symbol: ' + pos['symbol'] + ' open_or_closed ' + pos['open_or_closed'] + \
+                    ' opened: ' + str(pos['quant_opened']) + ' closed: ' + str(pos['quant_closed'])
+    #print filename
+    dataSet['trade_id'] = dataSet['trade_id'].astype('int')
+    dataSet=dataSet.set_index('trade_id')   
     dataSet.to_csv(filename)
     
     account=get_account_value(systemname, 'c2')
@@ -344,45 +477,13 @@ def get_c2_pos(systemname, c2sym):
     datestr=strftime("%Y%m%d", localtime())
    
     (account, dataSet)=get_c2_portfolio(systemname)
-    dataSet=dataSet.reset_index()
+
     if c2sym not in dataSet['symbol'].values:
-        dataSet=dataSet.append(pd.DataFrame([[c2sym,0,0,'none']], \
-                              columns=['symbol','quant_opened','quant_closed','long_or_short']))
-    dataSet=dataSet.set_index('symbol')
+        return pd.DataFrame([[c2sym,0,0,'none']], \
+                              columns=['symbol','quant_opened','quant_closed','long_or_short'])
     return dataSet    
 
-def get_ib_portfolio(systemname):
-    filename='./data/paper/ib_' + systemname + '_portfolio.csv'
-    datestr=strftime("%Y%m%d", localtime())
-   
-    if os.path.isfile(filename):
-        dataSet = pd.read_csv(filename, index_col=['sym','currency'])
-        
-    else:
-        dataSet=pd.DataFrame({}, columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
-        dataSet.to_csv(filename)
 
-    account=get_account_value(systemname, 'ib')
-    return (account, dataSet)
-
-    
-def get_ib_pos(systemname, symbol, currency):
-    datestr=strftime("%Y%m%d", localtime())
-    (account_data, portfolio_data)=get_ib_portfolio(systemname)
-    portfolio_data=portfolio_data.reset_index()
-    portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
-    sym_cur=symbol + currency
-    if sym_cur not in portfolio_data['symbol'].values:
-        portfolio_data=portfolio_data.append(pd.DataFrame([[sym_cur,symbol,0,currency]], \
-                              columns=['symbol','sym','qty','currency']))
-    dataSet=portfolio_data
-    #dataSet=dataSet.sort_values(by='times')
-    dataSet=dataSet.set_index(['sym','currency'])
-    #dataSet.to_csv('./data/portfolio/ib_portfolio.csv')
-    #accountSet=pd.DataFrame(account_value)
-    #accountSet.to_csv('./data/portfolio/ib_account_value.csv', index=False)
-    #
-    return dataSet
 
 def get_account_value(systemname, broker):
     filename='./data/paper/' + broker + '_' + systemname + '_account.csv'
@@ -393,7 +494,7 @@ def get_account_value(systemname, broker):
         
     else:
         dataSet=pd.DataFrame([['paperUSD',10000,30000,0,0,'USD']], columns=['accountid','balance','buy_power','unr_pnl','real_pnl','currency'])
-        
+        dataSet=dataSet.set_index('accountid')
         dataSet.to_csv(filename)
     return dataSet
 
@@ -403,3 +504,135 @@ def update_account_value(systemname, broker, account):
    
     account.to_csv(filename)
     return dataSet
+    
+
+def get_ib_trades(systemname):
+    filename='./data/paper/ib_' + systemname + '_trades.csv'
+    
+    if os.path.isfile(filename):
+        existData = pd.read_csv(filename, index_col='permid')
+        return existData
+    else:
+        dataSet=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
+                            'exchange','execid','expiry','level_0','orderid','price','qty','realized_PnL','side',\
+                            'symbol','symbol_currency','times','yield_redemption_date'])
+        dataSet=dataSet.set_index('permid')
+        dataSet.to_csv(filename)
+        return dataSet
+        
+        
+def get_ib_portfolio(systemname):
+    filename='./data/paper/ib_' + systemname + '_portfolio.csv'
+    datestr=strftime("%Y%m%d", localtime())
+    account=get_account_value(systemname, 'ib')
+    if os.path.isfile(filename):
+        dataSet = pd.read_csv(filename, index_col=['sym','currency'])
+        dataSet=dataSet.reset_index()
+        dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
+        dataSet=dataSet.set_index(['sym','currency'])
+        return (account, dataSet)
+    else:
+
+        dataSet=pd.DataFrame({}, columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
+        dataSet['symbol']=dataSet['sym'] + dataSet['currency']        
+        dataSet=dataSet.set_index(['sym','currency'])
+        dataSet.to_csv(filename)
+        return (account, dataSet)
+   
+    
+
+    
+def get_ib_pos(systemname, symbol, currency):
+    datestr=strftime("%Y%m%d", localtime())
+    (account_data, portfolio_data)=get_ib_portfolio(systemname)
+    portfolio_data=portfolio_data.reset_index()
+    portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
+    sym_cur=symbol + currency
+    if sym_cur not in portfolio_data['symbol'].values:
+       return pd.DataFrame([[sym_cur,symbol,0,currency]], \
+                              columns=['symbol','sym','qty','currency'])
+    
+    
+    return portfolio_data
+    
+def update_ib_portfolio(systemname, pos):
+    filename='./data/paper/ib_' + systemname + '_portfolio.csv'
+    datestr=strftime("%Y%m%d", localtime())
+   
+    (account, dataSet)=get_ib_portfolio(systemname)
+    dataSet=dataSet.reset_index()
+    
+    pos=pos.copy()
+    symbol = pos['sym'] + pos['currency']
+    dataSet['symbol']=dataSet['sym'] + dataSet['currency']
+    print "Update Portfolio: " + str(symbol)
+
+    if int(pos['qty']) != 0:
+        
+        if symbol in dataSet.loc[dataSet['symbol'] == symbol].values:
+            dataSet = dataSet[dataSet['symbol'] != symbol]
+            dataSet=dataSet.append(pos)
+        else:
+            dataSet=dataSet.append(pos)
+            
+    else:
+        dataSet = dataSet[dataSet['symbol'] != symbol]
+        
+    print "Update Portfolio " + systemname + " Qty: " + str(pos['qty']) + \
+                        ' symbol: ' + symbol
+                        
+    dataSet=dataSet.set_index(['sym','currency'])
+    
+    dataSet.to_csv(filename)
+    
+    account=get_account_value(systemname, 'ib')
+    return (account, dataSet)
+    
+def update_ib_trades(systemname, pos, pl, buypower, ibexch, date):
+    filename='./data/paper/ib_' + systemname + '_trades.csv'
+   
+    dataSet = get_ib_trades(systemname)
+    #pos=pos.iloc[-1]
+    pos=pos.copy()
+    trade_id=0
+    dataSet=dataSet.reset_index()
+    if len(dataSet['permid'].values) > 0:
+        trade_id=int(max(dataSet['permid'].values))
+    trade_id=int(trade_id) + 1
+    side='long'
+    if pos['qty'] < 0:
+        side='short'
+    print "Trade ID:" + str(trade_id)
+    
+    pos=pd.DataFrame([[trade_id, 'Paper', 'Paper', pos['avg_cost'], 'USD', \
+                               ibexch, trade_id, '','',1,pos['price'],pos['qty'],pos['real_pnl'],side, \
+                               pos['sym'], pos['currency'], date, '' \
+                            ]], columns=['permid','account','clientid','commission','commission_currency',\
+                            'exchange','execid','expiry','level_0','orderid','price','qty','realized_PnL','side',\
+                            'symbol','symbol_currency','times','yield_redemption_date']).iloc[-1]
+                            
+    tradeid=int(pos['permid'])
+    
+    dataSet['permid'] = dataSet['permid'].astype('int')
+    pos['permid'] = pos['permid'].astype('int')
+    
+    if tradeid in dataSet['permid'].values:
+        dataSet = dataSet[dataSet['permid'] != tradeid]
+        dataSet=dataSet.append(pos)
+         
+    else:
+        dataSet=dataSet.append(pos)
+        
+    print "Update Trade " + systemname + " " + pos['side'] + \
+                    ' symbol: ' + pos['symbol'] + ' qty: ' + str(pos['qty'])
+    #print filename
+    dataSet['permid'] = dataSet['permid'].astype('int')
+    dataSet=dataSet.set_index('permid')   
+    dataSet.to_csv(filename)
+    
+    account=get_account_value(systemname, 'ib')
+    account['balance']=account['balance']+pl
+    account['buy_power']=account['buy_power']+buypower
+    account['real_pnl']=account['real_pnl'] + pl
+    
+    return (account, dataSet)

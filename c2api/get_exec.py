@@ -10,6 +10,7 @@ system_cache={}
 
 def get_exec(systemid, apikey):
     global system_cache
+    systemid=str(systemid)
     if systemid in system_cache:
         return system_cache[systemid]
     else:
@@ -33,6 +34,7 @@ def get_exec(systemid, apikey):
 
 def get_exec_open(systemid, apikey):
     global system_cache
+    systemid=str(systemid)
     if systemid in system_cache:
         return system_cache[systemid]
     else:

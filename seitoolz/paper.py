@@ -72,7 +72,70 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
             print 'SELL: ' + str(ibquant)
             place_order('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, 'ib', pricefeed);
 
-def place_order(action, quant, sym, type, currency, exch, broker, pricefeed):
+def place_order(systemname, action, quant, sym, type, currency, exch, broker, pricefeed):
+    if broker == 'c2':
+        portfolio=get_c2_portfolio(systemname)
+        
+        eastern=timezone('US/Eastern')
+        endDateTime=dt.now(get_localzone())
+        date=endDateTime.astimezone(eastern)
+        date=date.strftime("%Y%m%d %H:%M:%S EST")
+            
+        trade_id=int(portfolio['trade_id'].values.max())
+        trade_id=trade_id + 1
+        if sym in portfolio['symbol'].values:
+            pos=portfolio.loc[sym]
+            
+            side='long'
+            openVWAP=-1
+            openqty=quant
+            
+            if action == 'STO':
+                side='short'
+                openVWAP=pricefeed['Bid'][0]
+                
+            if action == 'BTO':
+                side='long'
+                openVWAP=pricefeed['Ask'][0]
+            
+            if action == 'STC':
+            if action == 'BTC':
+            data=pd.DataFrame([[trade_id, 0, '','', \
+                                '','','',sym,side, \
+                                date,date,'open',date,openVWAP, \
+                                10000,'',0,openqty,'',sym,systemname]] \
+            ,columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
+            'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
+            'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
+            'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
+        else:
+            side='long'
+            openVWAP=-1
+            openqty=quant
+            
+            if action == 'STO':
+                side='short'
+                openVWAP=pricefeed['Bid'][0]
+                
+            if action == 'BTO':
+                side='long'
+                openVWAP=pricefeed['Ask'][0]
+            
+            data=pd.DataFrame([[trade_id, 0, '','', \
+                                '','','',sym,side, \
+                                date,date,'open',date,openVWAP, \
+                                10000,'',0,openqty,'',sym,systemname]] \
+            ,columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
+            'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
+            'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
+            'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
+            portfolio.append(data)
+            
+    
+    if broker == 'ib':
+        data=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
+                        'exchange','execid','expiry','level_0','orderid','price','qty','realized_PnL','side',\
+                        'symbol','symbol_currency','times','yield_redemption_date'])    
     #if action == 'BUY':
         #
     #if action == 'SELL':
@@ -83,17 +146,8 @@ def place_order(action, quant, sym, type, currency, exch, broker, pricefeed):
     #if action == 'STC':
     print "Place Order"
 
-def proc_exec(broker):
-    if broker == 'c2':
-        data=pd.DataFrame({},columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
-        'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
-        'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
-        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
+def proc_exec(broker, sym):
     
-    if broker == 'ib':
-        data=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
-                        'exchange','execid','expiry','level_0','orderid','price','qty','realized_PnL','side',\
-                        'symbol','symbol_currency','times','yield_redemption_date'])
     
 def get_c2trades(systemid, systemname, c2api):
     filename='./data/paper/c2_' + systemname + '_trades.csv'
@@ -152,6 +206,17 @@ def get_c2_portfolio(systemname):
         'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
         dataSet = dataSet.reset_index().set_index(['symbol'])
         dataSet.to_csv(filename)
+    account=get_account_value(systemname, 'c2')
+    return (account, dataSet)
+
+def update_c2_portfolio(systemname, portfolio):
+    filename='./data/paper/c2_' + systemname + '_portfolio.csv'
+    datestr=strftime("%Y%m%d", localtime())
+   
+    dataSet=portfolio
+    dataSet = dataSet.reset_index().set_index(['symbol'])
+    dataSet.to_csv(filename)
+    
     account=get_account_value(systemname, 'c2')
     return (account, dataSet)
     

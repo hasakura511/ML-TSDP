@@ -40,18 +40,19 @@ def get_ibtrades():
     datestr=strftime("%Y%m%d", localtime())
     data=get_ibexec()
     dataSet=pd.DataFrame(data)
-    dataSet=dataSet.set_index('permid')
+    if len(dataSet.index) > 0:
+	dataSet=dataSet.set_index('permid')
     
-    if os.path.isfile(filename):
-        existData = pd.read_csv(filename, index_col='permid')
-        existData =existData.reset_index()
-        dataSet=dataSet.reset_index()
-        dataSet=existData.append(dataSet)
-        dataSet['permid'] = dataSet['permid'].astype('int')
-        dataSet=dataSet.drop_duplicates(subset=['permid'],keep='last')
-        dataSet=dataSet.set_index('permid')
-    dataSet=dataSet.sort_values(by='times')
-    dataSet.to_csv(filename)
+    	if os.path.isfile(filename):
+        	existData = pd.read_csv(filename, index_col='permid')
+        	existData =existData.reset_index()
+        	dataSet=dataSet.reset_index()
+        	dataSet=existData.append(dataSet)
+        	dataSet['permid'] = dataSet['permid'].astype('int')
+        	dataSet=dataSet.drop_duplicates(subset=['permid'],keep='last')
+        	dataSet=dataSet.set_index('permid')
+    	dataSet=dataSet.sort_values(by='times')
+    	dataSet.to_csv(filename)
     
 data=pd.read_csv('./data/systems/system.csv')
 data=data.reset_index()

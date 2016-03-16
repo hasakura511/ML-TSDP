@@ -65,13 +65,13 @@ def generate_model_sig(system, date, action, qty):
     pos=pd.DataFrame([[date, action, qty]], columns=['dates','signals','safef'])
     filename='./data/signals/' + system + '.csv'
     if os.path.isfile(filename):
-        data=pd.read_csv(filename, index_col='dates')
-        pos=pos.append(data)
+        data=pd.read_csv(filename)
+        pos=data.append(pos)
+        pos=pos.set_index('dates')
         pos.to_csv('./data/signals/' + system + '.csv')
     else:
-        signal=pos
-        signal=signal.set_index('dates')
-        signal.to_csv('./data/signals/' + system + '.csv')
+        pos=pos.set_index('dates')
+        pos.to_csv('./data/signals/' + system + '.csv')
 
     return generate_model_pos(system)
     

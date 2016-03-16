@@ -169,7 +169,7 @@ def get_v1signal(data, ticker, exchange):
     print 'Next Signal for',dataSet.index[-1],'is', nextSignal
     
     system=ticker+'_'+ exchange
-    return generate_model_sig(system, dataSet.index[-1], int(nextSignal), int(nextSignal))
+    return generate_model_sig(system, str(dataSet.index[-1]), int(nextSignal), int(nextSignal))
         #pos=pd.DataFrame({}, columns=['system
     
  

@@ -1,4 +1,8 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,commission,expir,index,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description
-1.0,"0   -2.2
-dtype: float64",,,,0.0,"0    2.2
-dtype: float64",,,EURUSD,short,20160314 22:34:37 EST,20160314 22:34:37 EST,open,20160314 22:34:37 EST,1.11114,10000.0,,0.0,1.0,,EURUSD,strat103v2
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission,index
+1,-2.2,,,,0.0,,EURUSD,long,20160315 19:12:09 EST,20160315 19:12:09 EST,open,20160315 19:12:09 EST,1.11097,10000.0,,0.0,1.0,,EURUSD,strat103v2,2.2,
+2,-2.2,,,,0.0,,EURJPY,long,20160315 19:12:09 EST,20160315 19:12:09 EST,open,20160315 19:12:09 EST,125.736,10000.0,,0.0,1.0,,EURJPY,strat103v2,2.2,
+3,-2.2,,,,0.0,,GBPUSD,short,20160315 19:12:09 EST,20160315 19:12:09 EST,open,20160315 19:12:09 EST,1.41533,10000.0,,0.0,1.0,,GBPUSD,strat103v2,2.2,
+5,-2.2,,,,0.0,,USDCAD,short,20160315 19:12:09 EST,20160315 19:12:09 EST,open,20160315 19:12:09 EST,1.33527,10000.0,,0.0,1.0,,USDCAD,strat103v2,2.2,
+4,29604.410568,20160315 19:24:48 EST,,,0.493395,,USDCHF,long,20160315 19:12:09 EST,20160315 19:12:09 EST,open,20160315 19:12:09 EST,0.98686,10000.0,,4.0,5.0,,USDCHF,strat103v2,3.0,
+7,-2.2,,,,0.0,,AUDUSD,short,20160315 19:28:47 EST,20160315 19:28:47 EST,open,20160315 19:28:47 EST,0.74653,10000.0,,0.0,1.0,,AUDUSD,strat103v2,2.2,
+6,565805.3696,20160315 19:33:23 EST,,,56.576,,USDJPY,short,20160315 19:24:48 EST,20160315 19:24:48 EST,closed,20160315 19:24:48 EST,113.159,10000.0,,1.0,1.0,,USDJPY,strat103v2,26.8304,

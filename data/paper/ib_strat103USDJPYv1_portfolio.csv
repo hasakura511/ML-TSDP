@@ -1,1 +1,2 @@
-,sym,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,currency
+sym,currency,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,symbol
+USD,JPY,,10000.0,113.065,11306500000.0,3621894.0,0.0,-22609052174.0,Paper,USDJPY

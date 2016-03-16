@@ -64,7 +64,7 @@ if debug:
     perturbData = True
     scorePath = './debug/scored_metrics_'
     equityStatsSavePath = './debug/'
-    signalPath = './debug/'
+    signalPath = './data/signals/'
     dataPath = './data/from_IB/'
 else:
     showDist =  False
@@ -149,18 +149,20 @@ while not finished:
         commission_pct=float(commission['Pct'])
         commission_cash=float(commission['Cash'])
         
-        print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
-        print        " System Algo: " + str(system['System']) 
-        print        " Ask: " + str(ask)
-        print        " Bid: " + str(bid)
-        print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
-        print        " Signal: " + str(system_ibpos_qty)
-        pricefeed=pd.DataFrame([[ask, bid, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','Exchange','Type','Commission_Pct','Commission_Cash'])
-        adj_size(model, system['System'],system['Name'],pricefeed,\
+        if debug:
+            print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+            print        " System Algo: " + str(system['System']) 
+            print        " Ask: " + str(ask)
+            print        " Bid: " + str(bid)
+            print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
+            print        " Signal: " + str(system_ibpos_qty)
+        pricefeed=pd.DataFrame([[ask, bid, 10000, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','Mult','Exchange','Type','Commission_Pct','Commission_Cash'])
+        if ask > 0 and bid > 0:
+            adj_size(model, system['System'],system['Name'],pricefeed,\
             str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
                 system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'])
         #time.sleep(1)
         
-    time.sleep(10)
+    time.sleep(1)
     
 

@@ -1,4 +1,2 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,commission,expir,index,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description
-1.0,"0   -2.6
-dtype: float64",,,,0.0,"0    2.6
-dtype: float64",,,USDJPY,long,20160314 22:34:37 EST,20160314 22:34:37 EST,open,20160314 22:34:37 EST,113.652,10000.0,,0.0,3.0,,USDJPY,strat103USDJPYv2
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission,index
+1,1697420.1088,20160315 19:33:23 EST,,,56.576,,USDJPY,short,20160315 19:24:48 EST,20160315 19:24:48 EST,closed,20160315 19:24:48 EST,113.159,10000.0,,3.0,3.0,,USDJPY,strat103USDJPYv2,72.4912,

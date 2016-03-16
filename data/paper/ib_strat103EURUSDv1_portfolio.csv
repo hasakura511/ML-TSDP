@@ -1,1 +1,2 @@
-,sym,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,currency
+sym,currency,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,symbol
+EUR,USD,,10000.0,1.11058,111058000.0,10892.56,0.0,-222152444.96,Paper,EURUSD

@@ -1,1 +1,2 @@
-,sym,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,currency
+sym,currency,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,symbol
+AUD,USD,,10000.0,0.74627,74627000.0,7977.88,0.0,-149288987.72,Paper,AUDUSD

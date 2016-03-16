@@ -1,1 +1,2 @@
-,sym,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,currency
+sym,currency,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,symbol
+GBP,USD,,-10000.0,1.41539,141539000.0,7665.44,0.0,283066336.56,Paper,GBPUSD

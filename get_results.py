@@ -130,20 +130,35 @@ for systemname in systemdict:
 
  
     c2data=generate_paper_c2_plot(systemname, 10000)
-    ibdata=generate_paper_ib_plot(systemname, 10000)
+    c2data['equitycurve'].plot()  
     
-    c2data['equitycurve'].plot()   
-    ibdata['equitycurve'].plot()
-
     fig = plt.figure(1)
-    plt.title(systemname)
+    plt.title(systemname + " C2 ")
     plt.ylabel("Equity")
-    plt.savefig('./data/results/paper_' + systemname + '.png')
+    plt.savefig('./data/results/paper_c2' + systemname + '.png')
     plt.close(fig)
     if counter == 0:
         html = html + '<tr>'
     
-    html = html + '<td><img src="paper_' + systemname + '.png" width=' + str(width) + ' height=' + str(height) + '><br></td>'
+    html = html + '<td><img src="paper_c2' + systemname + '.png" width=' + str(width) + ' height=' + str(height) + '><br></td>'
+    
+    counter = counter + 1
+    if counter == 3:
+        html = html + '</tr>'
+        counter=0
+    
+    ibdata=generate_paper_ib_plot(systemname, 10000)
+    ibdata['equitycurve'].plot()
+
+    fig = plt.figure(1)
+    plt.title(systemname + " IB ")
+    plt.ylabel("Equity")
+    plt.savefig('./data/results/paper_ib' + systemname + '.png')
+    plt.close(fig)
+    if counter == 0:
+        html = html + '<tr>'
+    
+    html = html + '<td><img src="paper_ib' + systemname + '.png" width=' + str(width) + ' height=' + str(height) + '><br></td>'
     
     counter = counter + 1
     if counter == 3:

@@ -1,3 +1,4 @@
 permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date
 1,Paper,Paper,2.222052,USD,IDEALPRO,1.0,,,1.0,1.11026,10000.0,-2.222052,long,EUR,USD,20160315 22:34:34 EST,
 2,Paper,Paper,4.666156,USD,IDEALPRO,2.0,,,1.0,1.11026,-10000.0,-4.666156,short,EUR,USD,20160315 22:34:44 EST,
+3,Paper,Paper,7.110188,USD,IDEALPRO,3.0,,,1.0,1.1099,10000.0,-14.310188,long,EUR,USD,20160315 23:36:48 EST,

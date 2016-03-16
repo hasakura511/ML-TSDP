@@ -112,7 +112,7 @@ for i in systemdata.index:
     systemdict[system['Name']]=system
 
 #Paper
-html="<html><body>"
+html='<html><head><meta http-equiv="refresh" content="60"></head><body>'
 html = html + '<h1>Paper</h1><br><table>'
 counter=0
 for systemname in systemdict:

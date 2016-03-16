@@ -57,7 +57,7 @@ def generate_model_pos(system):
     
     pos=pos.append(pd.DataFrame([[system, signal, qty]], columns=['system','action','qty']))
     pos=pos.set_index(['system'])
-    pos.to_csv('./data/portfolio/gen_model_pos.csv')
+    #pos.to_csv('./data/portfolio/gen_model_pos.csv')
     return pos
 
 def generate_model_sig(system, date, action, qty):
@@ -74,4 +74,9 @@ def generate_model_sig(system, date, action, qty):
         pos.to_csv('./data/signals/' + system + '.csv')
 
     return generate_model_pos(system)
-    
+
+def generate_model_manual(system, action, qty):
+    pos=pd.DataFrame([[system, action, qty]], columns=['system','action','qty'])
+    pos=pos.set_index(['system'])
+    #pos.to_csv('./data/portfolio/gen_model_pos.csv')
+    return pos

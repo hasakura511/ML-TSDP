@@ -40,7 +40,7 @@ import json
 import os
 from pandas.io.json import json_normalize
 
-from seitoolz.signal import get_dps_model_pos, get_model_pos, generate_model_pos
+from seitoolz.signal import get_dps_model_pos, get_model_pos, generate_model_manual
 from seitoolz.paper import adj_size
 from time import gmtime, strftime, localtime, sleep
 
@@ -130,7 +130,7 @@ for i in data.index:
             symdict[sym]=symdict[sym]+qty
         else:
             symdict[sym]=qty
-        model=generate_model_pos(sym, symdict[sym], symdict[sym])
+        model=generate_model_manual(sym, symdict[sym], symdict[sym])
         systemname='IB_Live'
            
         system_pos=qty

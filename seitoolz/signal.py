@@ -44,3 +44,9 @@ def get_dps_model_pos(systems):
     pos.to_csv('./data/portfolio/dps_model_pos.csv')
     return pos;
 
+def generate_model_pos(sym, action, qty):
+    #pos=pd.DataFrame({}, columns=['system','action','qty']);
+    pos=pd.DataFrame([[sym, action, qty]], columns=['system','action','qty'])
+    pos=pos.set_index(['system'])
+    return pos
+    

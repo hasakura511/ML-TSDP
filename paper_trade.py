@@ -158,9 +158,13 @@ while not finished:
             print        " Signal: " + str(system_ibpos_qty)
         pricefeed=pd.DataFrame([[ask, bid, 10000, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
         if ask > 0 and bid > 0:
+            eastern=timezone('US/Eastern')
+            endDateTime=dt.now(get_localzone())
+            date=endDateTime.astimezone(eastern)
+            date=date.strftime("%Y%m%d %H:%M:%S EST")
             adj_size(model, system['System'],system['Name'],pricefeed,\
             str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
-                system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'])
+                system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
         #time.sleep(1)
         
     time.sleep(1)

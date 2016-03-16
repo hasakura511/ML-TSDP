@@ -82,15 +82,26 @@ def generate_paper_ib_plot(systemname, initialEquity):
     
 def generate_ib_plot(systemname, initialEquity):
     filename='./data/ibapi/trades.csv'
+    if systemname == 'IB':
+        filename='./data/ibapi/trades.csv'
+    if systemname == 'IB_Paper':
+        filename='./data/paper/ib_IB_Live_trades.csv' 
+    if systemname == 'C2_Paper':
+        filename='./data/paper/c2_IB_Live_trades.csv'
+        
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         #sums up results to starting acct capital
-        dataSet['equitycurve'] = initialEquity + dataSet['realized_PnL'].cumsum()
+        if systemname == 'C2_Paper':
+            dataSet['equitycurve'] = initialEquity + dataSet['PL'].cumsum()
+        else:
+            dataSet['equitycurve'] = initialEquity + dataSet['realized_PnL'].cumsum()
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity]], columns=['equitycurve'])
         return dataSet
-    
+
+
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
 commissiondata=pd.read_csv('./data/systems/commission.csv')
@@ -162,14 +173,24 @@ for systemname in systemdict:
         counter=0
 html = html + '</table><h1>IB</h1><br>'
 #IB
-ibdata=generate_ib_plot('IB', 10000)
+ibdata=generate_ib_plot('IB_Paper', 10000)
 ibdata['equitycurve'].plot()
 fig = plt.figure(1)
-plt.title('IB')
+plt.title('IB Live - IB Paper')
 plt.ylabel("Equity")
-plt.savefig('./data/results/ib.png')
+plt.savefig('./data/results/ib_paper.png')
 plt.close(fig)
-html = html + '<img src="ib.png"  width=' + str(width) + ' height=' + str(height) + '><br>'
+html = html + '<img src="ib_paper.png"  width=' + str(width) + ' height=' + str(height) + '><br>'
+
+ibdata=generate_ib_plot('C2_Paper', 10000)
+ibdata['equitycurve'].plot()
+fig = plt.figure(1)
+plt.title('IB Live - C2 Paper')
+plt.ylabel("Equity")
+plt.savefig('./data/results/ib_c2.png')
+plt.close(fig)
+html = html + '<img src="ib_c2.png"  width=' + str(width) + ' height=' + str(height) + '><br>'
+
 
 html = html + '</body></html>'
 f = open('./data/results/index.html', 'w')

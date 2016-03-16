@@ -12,12 +12,9 @@ from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
 
-def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit):
+def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit, date):
     system_pos=model_pos.loc[system]
    
-     #print str(system_pos['action'])
-    #print "c2: " 
-    #print c2_pos
     c2submit=True
     ibsubmit=True
     if c2submit:
@@ -42,13 +39,13 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
             if c2_pos_qty < 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 print 'BTC: ' + str(qty)
-                place_order(system_name, 'BTC', qty, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed)
+                place_order(system_name, 'BTC', qty, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed,date)
                                 
                 c2quant = c2quant - qty
             
             if c2quant > 0:
                 print 'BTO: ' + str(c2quant)
-                place_order(system_name, 'BTO', c2quant, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed)
+                place_order(system_name, 'BTO', c2quant, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed,date)
                 
         if system_c2pos_qty < c2_pos_qty:
             c2quant=c2_pos_qty - system_c2pos_qty   
@@ -56,13 +53,13 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
             if c2_pos_qty > 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 print 'STC: ' + str(qty)
-                place_order(system_name, 'STC', qty, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed)
+                place_order(system_name, 'STC', qty, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed,date)
                 
                 c2quant = c2quant - qty
 
             if c2quant > 0:
                 print 'STO: ' + str(c2quant)
-                place_order(system_name, 'STO', c2quant, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed)
+                place_order(system_name, 'STO', c2quant, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed,date)
                 
     if ibsubmit:
         paper_pos=get_ib_pos(system_name, ibsym,ibcurrency)
@@ -81,19 +78,16 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
         if system_ibpos_qty > ib_pos_qty:
             ibquant=int(system_ibpos_qty - ib_pos_qty)
             print 'BUY: ' + str(ibquant)
-            place_order(system_name, 'BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, 'ib', pricefeed);
+            place_order(system_name, 'BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, 'ib', pricefeed,date);
         if system_ibpos_qty < ib_pos_qty:
             ibquant=int(ib_pos_qty - system_ibpos_qty)
             print 'SELL: ' + str(ibquant)
-            place_order(system_name, 'SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, 'ib', pricefeed);
+            place_order(system_name, 'SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, 'ib', pricefeed,date)
 
-def place_order(systemname, action, quant, sym, type, currency, exch, broker, pricefeed):
+def place_order(systemname, action, quant, sym, type, currency, exch, broker, pricefeed, date):
     print "Place Order " + action + " " + str(quant) + " " + sym + " " + currency + " " + broker 
     pricefeed=pricefeed.iloc[-1]
-    eastern=timezone('US/Eastern')
-    endDateTime=dt.now(get_localzone())
-    date=endDateTime.astimezone(eastern)
-    date=date.strftime("%Y%m%d %H:%M:%S EST")
+    
     if broker == 'c2':
         (account, portfolio)=get_c2_portfolio(systemname)
     
@@ -126,18 +120,24 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['opening_price_VWAP']=openVWAP
                 pos['quant_opened']=openqty
                 
-               
-                commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue) + pricefeed['Commission_Cash']) 
-              
-                pl=pl - commission
+                commission=abs(pricefeed['Commission_Pct'] * bid * quant * ptValue)
+                purepl=0
+                
                 buy_power=pos['ptValue'] * openVWAP * quant * -1
                 
-                
-                print "Original PL: " + str(pos['PL']) + " New PL: " + str(pl) + " (Commission: " + str(commission) + ")"
+                print "Original PL: " + str(pos['PL']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
                 print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
                 
+                if currency != 'USD':
+                    purepl=purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+                    
+                commission = max(commission,pricefeed['Commission_Cash'])
+                pl = pl + purepl - commission 
+                
                 pos['PL']=pl
-                pos['commission']=pos['commission'] + commission
+                pos['commission']=pos['commission'] + commission 
                 
                 update_c2_trades(systemname, pos, pl, buy_power)
                 update_c2_portfolio(systemname, pos)
@@ -153,15 +153,22 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['openVWAP_timestamp']=date
                 pos['opening_price_VWAP']=openVWAP
                 pos['quant_opened']=openqty
-                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue) + pricefeed['Commission_Cash']) 
+                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue)) 
+                purepl=0
                 
-                pl=pl - commission
-
                 buy_power=pos['ptValue'] * openVWAP * quant * -1
                 
-                print "Original PL: " + str(pos['PL']) + " New PL: " + str(pl) + " (Commission: " + str(commission) + ")"
+                print "Original PL: " + str(pos['PL']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
                 print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
                 
+                if currency != 'USD':
+                    purepl = purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+                    
+                commission = max(commission,pricefeed['Commission_Cash'])
+                pl = pl + purepl - commission                     
+                    
                 pos['PL']=pl
                 pos['commission']=pos['commission'] + commission
                 
@@ -174,11 +181,9 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 closeVWAP = (closeVWAP * closedqty + bid * quant) / (closedqty + quant)
                 closedqty = closedqty + quant
                 closeVWAP_timestamp=date
-                commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue) + pricefeed['Commission_Cash']) 
+                commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue)) 
                 
                 purepl=(openVWAP - closeVWAP) * quant * pricefeed['C2Mult']
-                pl=pl + purepl
-                pl=pl - commission
                 
                 pos['closeVWAP_timestamp']=date
                 pos['closing_price_VWAP']=closeVWAP
@@ -191,12 +196,19 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                
                 print "C2 STC " + str(sym) + "@" + str(bid) + "[" + str(quant) + "] Opened @ " + \
                         str(openVWAP) + "[" + str(openqty) + "]" 
-                print "Original PL: " + str(pos['PL']) + " New PL: " + str(pl) + " (Commission: " + str(commission) + ")"
+                print "Original PL: " + str(pos['PL']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
                 print "Trade PL: " + str(purepl)
                 print "Close VWAP: " + str(closeVWAP) + " [" + str(closedqty) + "]"
-                
+
+                if currency != 'USD':
+                    purepl=purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+                commission = max(commission,pricefeed['Commission_Cash'])
+                pl = pl + purepl - commission                  
+                    
                 pos['PL']=pl
-                pos['commission']=pos['commission'] + commission
+                pos['commission']=pos['commission'] + commission 
                 
                 update_c2_trades(systemname, pos, pl, buy_power)
                 update_c2_portfolio(systemname, pos)
@@ -207,11 +219,9 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 closeVWAP = (closeVWAP * closedqty + ask * quant) / (closedqty + quant)
                 closedqty = closedqty + quant
                 closeVWAP_timestamp=date
-                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue) + pricefeed['Commission_Cash']) 
+                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue)) 
                 
                 purepl = (closeVWAP - openVWAP) * quant * pricefeed['C2Mult']
-                pl=pl + purepl
-                pl=pl - commission
                 
                 pos['closeVWAP_timestamp']=date
                 pos['closing_price_VWAP']=closeVWAP
@@ -226,7 +236,15 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 print "Original PL: " + str(pos['PL']) + " New PL: " + str(pl) + " (Commission: " + str(commission) + ")"
                 print "Trade PL: " + str(purepl)
                 print "Close VWAP: " + str(closeVWAP) + " [" + str(closedqty) + "]"
-                
+
+                if currency != 'USD':
+                    purepl = purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+                    
+                commission = max(commission,pricefeed['Commission_Cash'])
+                pl = pl + purepl - commission          
+                    
                 pos['PL']=pl
                 pos['commission']=pos['commission'] + commission
                 update_c2_trades(systemname, pos, pl, buy_power)
@@ -258,15 +276,24 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
             print "Trade ID:" + str(trade_id)
             
             openqty=quant
-            ptValue=10000
-            commission=(abs(pricefeed['Commission_Pct'] * openVWAP * openqty * 10000) + pricefeed['Commission_Cash']) 
-            pl=commission * -1
+            ptValue=pricefeed['C2Mult']
+            commission=(abs(pricefeed['Commission_Pct'] * openVWAP * openqty * ptValue) ) 
+            pl=0
             buy_power=openVWAP * openqty * ptValue * -1
+
+            if currency != 'USD':
+                    pl=pl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+            
+            commission = max(commission,pricefeed['Commission_Cash'])
+            pl = pl - commission                    
+       
             
             pos=pd.DataFrame([[trade_id, pl, '','', \
                                 '',0,'',sym,side, \
                                 date,date,'open',date,openVWAP, \
-                                10000,'',0,openqty,'',sym,systemname, \
+                                ptValue,'',0,openqty,'',sym,systemname, \
                                 commission]] \
             ,columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
             'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
@@ -279,24 +306,19 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
     if broker == 'ib':
         (account, portfolio)=get_ib_portfolio(systemname)
         
-        eastern=timezone('US/Eastern')
-        endDateTime=dt.now(get_localzone())
-        date=endDateTime.astimezone(eastern)
-        date=date.strftime("%Y%m%d %H:%M:%S EST")
         symbol=sym+currency
         portfolio=portfolio.reset_index()
         if symbol in portfolio.loc[portfolio['symbol']==symbol].values:
             #portfolio=portfolio.reset_index().set_index('symbol')
             pos=portfolio.loc[portfolio['symbol']==symbol].iloc[-1]
             
-           
             openVWAP=float(pos['price'])
             openqty=int(pos['qty'])
             side='long'
             if openqty < 0:
                 side='short'
                 
-            pl=float(pos['real_pnl'])
+            pl=0
             ptValue=float(pricefeed['IBMult'])
             
             print 'Symbol: ' + pos['sym'] + pos['currency'] + ' Action: ' + action +' Side: ' + side
@@ -307,12 +329,12 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 print "IB STO " + str(symbol) + "@" + str(bid) + "[" + str(quant) + "] Opened @ " + \
                         str(openVWAP) + "[" + str(openqty) + "]" 
                         
-                openVWAP=(openVWAP * openqty + bid * abs(quant)) / (openqty + abs(quant))
+                openVWAP=(openVWAP * abs(openqty) + bid * abs(quant)) / (abs(openqty) + abs(quant))
                 
                 openqty=openqty + quant
-                buy_power=pricefeed['IBMult'] * openVWAP * quant * -1
-                commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue) + pricefeed['Commission_Cash']) 
-                pl=pl - commission
+                buy_power=pricefeed['IBMult'] * openVWAP * abs(quant) * -1
+                commission=(abs(pricefeed['Commission_Pct'] * bid * abs(quant) * ptValue)) 
+                purepl = 0
                 
                 #pos['times']=date
                 value=pos['value']
@@ -320,12 +342,19 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['qty']=openqty
                 pos['value']=abs(pricefeed['IBMult'] * openVWAP * openqty)
                 
-                
-                print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(pl) + " (Commission: " + str(commission) + ")"
+                print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
                 print "Original Value: " + str(value) + " New Value: " + str(pos['value'])     
                 print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
+
+                if currency != 'USD':
+                    purepl=purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+                    
+                commission = max(commission,pricefeed['Commission_Cash'])
+                pl = pl +purepl - commission             
                 
-                pos['avg_cost']=commission + pos['avg_cost']
+                pos['avg_cost']=commission 
                 pos['real_pnl']=pl
                 pos['unr_pnl']=0
                 update_ib_trades(systemname, pos, pl, buy_power, exch, date)
@@ -337,12 +366,12 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 print "IB BTO " + str(symbol) + "@" + str(ask) + "[" + str(quant) + "] Opened @ " + \
                         str(openVWAP) + "[" + str(openqty) + "]" 
                         
-                openVWAP=(openVWAP * openqty + ask * quant) / (openqty + quant)
+                openVWAP=(openVWAP * abs(openqty) + ask * abs(quant)) / (abs(openqty) + abs(quant))
                 openqty=openqty + quant
                 
-                buy_power=pricefeed['IBMult'] * openVWAP * quant * -1
-                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue) + pricefeed['Commission_Cash']) 
-                pl=pl - commission
+                buy_power=pricefeed['IBMult'] * openVWAP * abs(quant) * -1
+                commission=(abs(pricefeed['Commission_Pct'] * ask * abs(quant) * ptValue)) 
+                purepl=0
                 
                 #pos['times']=date
                 value=pos['value']
@@ -350,11 +379,18 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['qty']=openqty
                 pos['value']=abs(pricefeed['IBMult'] * openVWAP * openqty)
                 
-                print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(pl) + " (Commission: " + str(commission) + ")"
+                print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
                 print "Original Value: " + str(value) + " New Value: " + str(pos['value'])     
                 print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
+
+                if currency != 'USD':
+                    purepl=purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+                commission = max(commission,pricefeed['Commission_Cash'])
+                pl = pl +purepl - commission         
                 
-                pos['avg_cost']=commission + pos['avg_cost']
+                pos['avg_cost']=commission
                 pos['real_pnl']=pl
                 pos['unr_pnl']=0
                 
@@ -366,17 +402,15 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 bid=pricefeed['Bid']
                 quant=-quant
                 
-                newVWAP = (openVWAP * openqty + bid * abs(quant)) / (openqty + abs(quant))
+                newVWAP = (openVWAP * abs(openqty) + bid * abs(quant)) / (abs(openqty) + abs(quant))
                 newqty = openqty + quant
                 newVWAP_timestamp=date
-                commission=(abs(pricefeed['Commission_Pct'] * bid * quant * ptValue) + pricefeed['Commission_Cash']) 
+                commission=(abs(pricefeed['Commission_Pct'] * bid * abs(quant) * ptValue)) 
                 buy_power=pricefeed['IBMult'] * newVWAP * quant
                 
                 print "NQ: " + str(newqty) + " Q: " + str(quant)
                 
                 purepl=(openVWAP - newVWAP) * abs(quant) * pricefeed['IBMult']
-                pl=purepl + pl
-                pl=pl - commission
                 
                 #pos['times']=newVWAP_timestamp
                 value=pos['value']
@@ -386,13 +420,20 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 
                 print "IB SELL " + str(symbol) + "@" + str(bid) + "[" + str(quant) + "] Opened @ " + \
                         str(openVWAP) + "[" + str(openqty) + "]" 
-                print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(pl) + " (Commission: " + str(commission) + ")"
+                print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
                 print "Trade PL: " + str(purepl)
                 print "Original Value: " + str(value) + " New Value: " + str(pos['value'])            
                 print "New VWAP: " + str(newVWAP) + " [" + str(newqty) + "]"
+
+                if currency != 'USD':
+                    purepl=purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+                commission = max(commission,pricefeed['Commission_Cash'])
+                pl = pl +purepl - commission         
                 
                 pos['real_pnl']=pl
-                pos['avg_cost']=commission + pos['avg_cost']
+                pos['avg_cost']=commission 
                 pos['unr_pnl']=0
                 
                 update_ib_trades(systemname, pos, pl, buy_power, exch, date)
@@ -401,17 +442,15 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 
             if action == 'BUY' and side=='short':
                 ask=pricefeed['Ask']
-                newVWAP = (openVWAP * openqty + ask * quant) / (openqty + quant)
+                newVWAP = (openVWAP * abs(openqty) + ask * abs(quant)) / (abs(openqty) + abs(quant))
                 newqty = openqty + quant
                 
                 newVWAP_timestamp=date
-                commission=(abs(pricefeed['Commission_Pct'] * ask * quant * ptValue) + pricefeed['Commission_Cash']) 
+                commission=(abs(pricefeed['Commission_Pct'] * ask * abs(quant) * ptValue)) 
                 buy_power=pricefeed['IBMult'] * newVWAP * quant
                 
                 purepl=(newVWAP - openVWAP) * abs(quant) * pricefeed['IBMult']
-                pl=pl + purepl
-                pl=pl - commission
-                #pos['times']=newVWAP_timestamp
+
                 value=pos['value']
                 pos['price']=newVWAP
                 pos['qty']=newqty
@@ -419,13 +458,20 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 
                 print "IB BUY " + str(symbol) + "@" + str(ask) + "[" + str(quant) + "] Opened @ " + \
                         str(openVWAP) + "[" + str(openqty) + "]" 
-                print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(pl) + " (Commission: " + str(commission) + ")"
+                print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
                 print "Trade PL: " + str(purepl)
                 print "Original Value: " + str(value) + " New Value: " + str(pos['value'])     
                 print "New VWAP: " + str(newVWAP) + " [" + str(newqty) + "]"
+
+                if currency != 'USD':
+                    purepl=purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency) 
+                commission = max(commission,pricefeed['Commission_Cash'])
+                pl = pl +purepl - commission         
                 
                 pos['real_pnl']=pl
-                pos['avg_cost']=commission + pos['avg_cost']
+                pos['avg_cost']=commission
                 pos['unr_pnl']=0
                
                 update_ib_trades(systemname, pos, pl, buy_power, exch, date)
@@ -446,12 +492,17 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
             openqty=quant
             ptValue=pricefeed['IBMult']
             value=abs(openVWAP * openqty * ptValue)
-            commission=(abs(pricefeed['Commission_Pct'] * openVWAP * openqty * ptValue) + pricefeed['Commission_Cash']) 
-            pl=commission * -1
+            commission=(abs(pricefeed['Commission_Pct'] * openVWAP * abs(openqty) * ptValue))
+            purepl=0
             buy_power=openVWAP * openqty * ptValue * -1
             
-          
-            
+            if currency != 'USD':
+                    purepl=purepl * get_USD(currency)
+                    commission=commission * get_USD(currency)
+                    buy_power=buy_power * get_USD(currency)
+            commission = max(commission,pricefeed['Commission_Cash'])
+            pl =  - commission                     
+             
             pos=pd.DataFrame([[sym,'',openqty,openVWAP, value, \
                                     commission, 0, pl, 'Paper', \
                                     currency]], 
@@ -460,11 +511,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                                  'currency']).iloc[-1]
             
             update_ib_trades(systemname, pos, pl, buy_power, exch, date)
-            update_ib_portfolio(systemname, pos)
-
-
-    
-    
+            update_ib_portfolio(systemname, pos)   
 
 def get_c2_trades(systemname):
     filename='./data/paper/c2_' + systemname + '_trades.csv'
@@ -734,3 +781,8 @@ def update_ib_trades(systemname, pos, pl, buypower, ibexch, date):
     
     account=update_account_value(systemname, 'ib',account)
     return (account, dataSet)
+
+def get_USD(currency):
+    data=pd.read_csv('./data/systems/currency.csv')
+    conversion=float(data.loc[data['Symbol']==currency].iloc[-1]['Ask'])
+    return float(conversion)

@@ -1,0 +1,2 @@
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date
+1,Paper,Paper,4.0925,USD,BITSTAMP,1.0,,,1.0,1637.0,1.0,1.0,-4.0925,BOT,BTC,USD,20160316 18:29:59 EST,

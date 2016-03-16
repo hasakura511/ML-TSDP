@@ -167,6 +167,6 @@ while not finished:
                 system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
         #time.sleep(1)
         
-    time.sleep(1)
+    time.sleep(10)
     
 

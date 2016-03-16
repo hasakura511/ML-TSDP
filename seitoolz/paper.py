@@ -313,7 +313,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
             pos=portfolio.loc[portfolio['symbol']==symbol].iloc[-1]
             
             openVWAP=float(pos['price'])
-            openqty=int(pos['qty'])
+            openqty=int(pos['openqty'])
             side='long'
             if openqty < 0:
                 side='short'
@@ -339,7 +339,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 #pos['times']=date
                 value=pos['value']
                 pos['price']=openVWAP
-                pos['qty']=openqty
+                pos['qty']=quant
                 pos['value']=abs(pricefeed['IBMult'] * openVWAP * openqty)
                 
                 print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
@@ -357,6 +357,8 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['avg_cost']=commission 
                 pos['real_pnl']=pl
                 pos['unr_pnl']=0
+                pos['openqty']=openqty
+                
                 update_ib_trades(systemname, pos, pl, buy_power, exch, date)
                 update_ib_portfolio(systemname, pos)
                 
@@ -376,7 +378,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 #pos['times']=date
                 value=pos['value']
                 pos['price']=openVWAP
-                pos['qty']=openqty
+                pos['qty']=quant
                 pos['value']=abs(pricefeed['IBMult'] * openVWAP * openqty)
                 
                 print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"
@@ -393,6 +395,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['avg_cost']=commission
                 pos['real_pnl']=pl
                 pos['unr_pnl']=0
+                pos['openqty']=openqty
                 
                 update_ib_trades(systemname, pos, pl, buy_power, exch, date)
                 update_ib_portfolio(systemname, pos)
@@ -415,7 +418,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 #pos['times']=newVWAP_timestamp
                 value=pos['value']
                 pos['price']=newVWAP
-                pos['qty']=newqty
+                pos['qty']=quant
                 pos['value']=abs(pricefeed['IBMult'] * newVWAP * newqty)
                 
                 print "IB SELL " + str(symbol) + "@" + str(bid) + "[" + str(quant) + "] Opened @ " + \
@@ -435,6 +438,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['real_pnl']=pl
                 pos['avg_cost']=commission 
                 pos['unr_pnl']=0
+                pos['openqty']=newqty
                 
                 update_ib_trades(systemname, pos, pl, buy_power, exch, date)
                 update_ib_portfolio(systemname, pos)
@@ -453,7 +457,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
 
                 value=pos['value']
                 pos['price']=newVWAP
-                pos['qty']=newqty
+                pos['qty']=quant
                 pos['value']=abs(pricefeed['IBMult'] * newVWAP * newqty)
                 
                 print "IB BUY " + str(symbol) + "@" + str(ask) + "[" + str(quant) + "] Opened @ " + \
@@ -473,6 +477,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['real_pnl']=pl
                 pos['avg_cost']=commission
                 pos['unr_pnl']=0
+                pos['openqty']=newqty
                
                 update_ib_trades(systemname, pos, pl, buy_power, exch, date)
                 update_ib_portfolio(systemname, pos)
@@ -484,6 +489,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
             if action == 'SELL':
                 side='short'
                 openVWAP=pricefeed['Bid']
+                quant=-quant
                 
             if action == 'BUY':
                 side='long'
@@ -505,10 +511,10 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
              
             pos=pd.DataFrame([[sym,'',openqty,openVWAP, value, \
                                     commission, 0, pl, 'Paper', \
-                                    currency]], 
+                                    currency,openqty]], 
                                  columns=['sym','exp','qty','price','value', \
                                  'avg_cost','unr_pnl','real_pnl','accountid', \
-                                 'currency']).iloc[-1]
+                                 'currency', 'openqty']).iloc[-1]
             
             update_ib_trades(systemname, pos, pl, buy_power, exch, date)
             update_ib_portfolio(systemname, pos)   
@@ -658,7 +664,8 @@ def get_ib_trades(systemname):
         return existData
     else:
         dataSet=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
-                            'exchange','execid','expiry','level_0','orderid','price','qty','realized_PnL','side',\
+                            'exchange','execid','expiry','level_0','orderid','price','qty','openqty', \
+                            'realized_PnL','side',\
                             'symbol','symbol_currency','times','yield_redemption_date'])
         dataSet=dataSet.set_index('permid')
         dataSet.to_csv(filename)
@@ -677,15 +684,12 @@ def get_ib_portfolio(systemname):
         return (account, dataSet)
     else:
 
-        dataSet=pd.DataFrame({}, columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
+        dataSet=pd.DataFrame({}, columns=['sym','exp','qty','openqty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
         dataSet['symbol']=dataSet['sym'] + dataSet['currency']        
         dataSet=dataSet.set_index(['sym','currency'])
         dataSet.to_csv(filename)
         return (account, dataSet)
    
-    
-
-    
 def get_ib_pos(systemname, symbol, currency):
     datestr=strftime("%Y%m%d", localtime())
     (account_data, portfolio_data)=get_ib_portfolio(systemname)
@@ -693,8 +697,8 @@ def get_ib_pos(systemname, symbol, currency):
     portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
     sym_cur=symbol + currency
     if sym_cur not in portfolio_data['symbol'].values:
-       return pd.DataFrame([[sym_cur,symbol,0,currency]], \
-                              columns=['symbol','sym','qty','currency'])
+       return pd.DataFrame([[sym_cur,symbol,0,0,currency]], \
+                              columns=['symbol','sym','qty','openqty','currency'])
     
     
     return portfolio_data
@@ -708,6 +712,7 @@ def update_ib_portfolio(systemname, pos):
     
     pos=pos.copy()
     symbol = pos['sym'] + pos['currency']
+    pos['qty']=pos['openqty']
     dataSet['symbol']=dataSet['sym'] + dataSet['currency']
     print "Update Portfolio: " + str(symbol)
 
@@ -743,16 +748,18 @@ def update_ib_trades(systemname, pos, pl, buypower, ibexch, date):
     if len(dataSet['permid'].values) > 0:
         trade_id=int(max(dataSet['permid'].values))
     trade_id=int(trade_id) + 1
-    side='long'
+    side='BOT'
     if pos['qty'] < 0:
-        side='short'
+        side='SLD'
     print "Trade ID:" + str(trade_id)
     
     pos=pd.DataFrame([[trade_id, 'Paper', 'Paper', pos['avg_cost'], 'USD', \
-                               ibexch, trade_id, '','',1,pos['price'],pos['qty'],pos['real_pnl'],side, \
+                               ibexch, trade_id, '','',1,pos['price'],abs(pos['qty']),pos['openqty'], \
+                               pos['real_pnl'],side, \
                                pos['sym'], pos['currency'], date, '' \
                             ]], columns=['permid','account','clientid','commission','commission_currency',\
-                            'exchange','execid','expiry','level_0','orderid','price','qty','realized_PnL','side',\
+                            'exchange','execid','expiry','level_0','orderid','price','qty','openqty', \
+                            'realized_PnL','side',\
                             'symbol','symbol_currency','times','yield_redemption_date']).iloc[-1]
                             
     tradeid=int(pos['permid'])
@@ -768,7 +775,8 @@ def update_ib_trades(systemname, pos, pl, buypower, ibexch, date):
         dataSet=dataSet.append(pos)
         
     print "Update Trade " + systemname + " " + pos['side'] + \
-                    ' symbol: ' + pos['symbol'] + ' qty: ' + str(pos['qty'])
+                    ' symbol: ' + pos['symbol'] + ' qty: ' + str(pos['qty']) + \
+                    ' openqty: ' + str(pos['openqty'])
     #print filename
     dataSet['permid'] = dataSet['permid'].astype('int')
     dataSet=dataSet.set_index('permid')   

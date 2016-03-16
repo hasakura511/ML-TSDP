@@ -105,7 +105,19 @@ def getibtrades():
         #sums up results to starting acct capital
         #dataSet['equitycurve'] = initialEquity + dataSet['realized_PnL'].cumsum()
         return dataSet
-   
+
+def refresh_paper_iblive():
+    files=['./data/paper/c2_IB_Live_account.csv','./data/paper/c2_IB_Live_trades.csv', \
+    './data/paper/ib_IB_Live_portfolio.csv','./data/paper/c2_IB_Live_portfolio.csv',  \
+    './data/paper/ib_IB_Live_account.csv','./data/paper/ib_IB_Live_trades.csv']
+    for i in files:
+        filename=i
+        if os.path.isfile(filename):
+            os.remove(filename)
+            print 'Deleting ' + filename
+
+refresh_paper_iblive()
+
 data=getibtrades()
 symdict={}
 for i in data.index:

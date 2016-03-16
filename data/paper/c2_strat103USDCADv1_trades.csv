@@ -1,2 +1,2 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission
-1,-6.00947,,,,0.0,,USDCAD,long,20160315 22:32:27 EST,20160315 22:32:27 EST,open,20160315 22:32:27 EST,1.33649,10000.0,,0.0,15.0,,USDCAD,strat103USDCADv1,6.00947
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission,index
+1,-6.00974,,,,0.0,,USDCAD,short,20160315 23:05:54 EST,20160315 23:05:54 EST,open,20160315 23:05:54 EST,1.33658,10000.0,,0.0,15.0,,USDCAD,strat103USDCADv1,6.00974,

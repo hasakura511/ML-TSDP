@@ -156,7 +156,7 @@ while not finished:
             print        " Bid: " + str(bid)
             print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
             print        " Signal: " + str(system_ibpos_qty)
-        pricefeed=pd.DataFrame([[ask, bid, 10000, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','Mult','Exchange','Type','Commission_Pct','Commission_Cash'])
+        pricefeed=pd.DataFrame([[ask, bid, 10000, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
         if ask > 0 and bid > 0:
             adj_size(model, system['System'],system['Name'],pricefeed,\
             str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \

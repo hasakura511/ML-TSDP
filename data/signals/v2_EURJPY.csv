@@ -209,3 +209,5 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-15 16:58:00,1.0,0.0,,1.0,,,,"bothEURJPY_ALL_DF1_LDA_i50_ZZ 0.003,-0.003"
 2016-03-15 17:58:00,-1.0,0.0,,1.0,,,,bothEURJPY_ALL_DF1_LDA_i50_gainAhead
 2016-03-15 18:58:00,1.0,0.0,,1.0,,,,bothEURJPY_ALL_DF1_LDA_i50_gainAhead
+2016-03-15 19:58:00,1.0,0.0,,1.0,,,,bothEURJPY_ALL_DF1_LDA_i50_gainAhead
+2016-03-15 20:58:00,1.0,0.0,,1.0,,,,"bothEURJPY_ALL_DF1_LDA_i100_ZZ 0.003,-0.003"

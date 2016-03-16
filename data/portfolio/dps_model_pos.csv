@@ -1,8 +1,8 @@
 system,action,qty
 v2_EURJPY,1.0,1.0
-v2_EURUSD,1.0,1.0
+v2_EURUSD,-1.0,-1.0
 v2_GBPUSD,-1.0,-1.0
-v2_USDCHF,1.0,1.0
-v2_USDJPY,0.0,0.0
-v2_AUDUSD,-1.0,-1.0
+v2_USDCHF,-0.0,-0.0
+v2_USDJPY,-0.0,-0.0
+v2_AUDUSD,1.0,1.0
 v2_USDCAD,-1.0,-1.0

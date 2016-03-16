@@ -54,7 +54,7 @@ start_time = time.time()
 
 debug=False
 
-if len(sys.argv)==1:
+if len(sys.argv) > 1 and sys.argv[1] == 'debug':
     debug=True
 
 if debug:

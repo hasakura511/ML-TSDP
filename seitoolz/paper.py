@@ -241,7 +241,8 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 #'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
                 #'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
         elif action == 'STO' or action == 'BTO':
-            
+            side='long'
+            openVWAP=-1
             if action == 'STO':
                 side='short'
                 openVWAP=pricefeed['Bid']
@@ -255,7 +256,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 trade_id=int(max(portfolio.index.values))
             trade_id=int(trade_id) + 1
             print "Trade ID:" + str(trade_id)
-            side='long'
+            
             openqty=quant
             ptValue=10000
             commission=(abs(pricefeed['Commission_Pct'] * openVWAP * openqty * 10000) + pricefeed['Commission_Cash']) 
@@ -432,6 +433,8 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     
             
         else:
+            side='long'
+            openVWAP=-1
             if action == 'SELL':
                 side='short'
                 openVWAP=pricefeed['Bid']
@@ -440,7 +443,6 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 side='long'
                 openVWAP=pricefeed['Ask']
                 
-            side='long'
             openqty=quant
             ptValue=pricefeed['IBMult']
             value=abs(openVWAP * openqty * ptValue)

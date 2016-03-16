@@ -1,2 +1,2 @@
 trade_id,index,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission
-1,,-6.0071,,,,0.0,,USDCAD,short,20160316 01:35:19 EST,20160316 01:35:19 EST,open,20160316 01:35:19 EST,1.3357,10000.0,,0.0,15.0,,USDCAD,strat103USDCADv1,6.0071
+1,,-2.994256302,,,,0.0,,USDCAD,short,20160316 11:55:26 EST,20160316 11:55:26 EST,open,20160316 11:55:26 EST,1.33541,10000.0,,0.0,15.0,,USDCAD,strat103USDCADv1,2.994256302

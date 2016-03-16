@@ -149,11 +149,11 @@ if len(sys.argv)==1:
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
     #dataPath = './data/from_IB/'
-    scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
-    equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
-    signalPath = 'C:/Users/Hidemi/Desktop/Python/'
-    dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
-    bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
+    scorePath = './debug/scored_metrics_'
+    equityStatsSavePath = './debug/'
+    signalPath = './debug/'
+    dataPath = './data/from_IB/'
+    bestParamsPath = './data/params/' 
     
 else:
     print 'Live Mode', sys.argv[1], sys.argv[2]

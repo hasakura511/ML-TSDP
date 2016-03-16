@@ -1,4 +1,0 @@
-permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date
-1,Paper,Paper,2002.0,USD,IDEALPRO,1.0,,,1.0,0.74649,10000.0,-2002.0,long,AUD,USD,20160315 19:12:08 EST,
-2,Paper,Paper,4990.16,USD,IDEALPRO,2.0,,,1.0,0.74659,-10000.0,149305011.84,short,AUD,USD,20160315 19:12:14 EST,
-3,Paper,Paper,7977.88,USD,IDEALPRO,3.0,,,1.0,0.74627,10000.0,-149288987.72,long,AUD,USD,20160315 19:24:47 EST,

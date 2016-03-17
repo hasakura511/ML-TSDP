@@ -25,7 +25,6 @@ def get_bthist(ticker, exchange):
     #dataSet=dataSet.replace([np.inf, -np.inf], np.nan).dropna(how="all")
     for i in dataSet.index:
         row=dataSet.ix[i]
-        
         feed_to_ohlc(ticker, exchange, row[1], row[0], row[2])
     return feed_ohlc_to_csv(ticker, exchange)
     

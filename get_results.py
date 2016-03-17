@@ -52,7 +52,9 @@ def generate_paper_c2_plot(systemname, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         #sums up results to starting acct capital
+        dataSet.sort_index(inplace=True)
         dataSet['equitycurve'] = initialEquity + dataSet['PL'].cumsum()
+
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity]], columns=['equitycurve'])
@@ -63,6 +65,7 @@ def generate_c2_plot(systemname, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         #sums up results to starting acct capital
+        dataSet.sort_index(inplace=True)
         dataSet['equitycurve'] = initialEquity + dataSet['PL'].cumsum()
         return dataSet
     else:
@@ -96,6 +99,7 @@ def generate_ib_plot(systemname, initialEquity):
         dataSet=pd.read_csv(filename)
         #sums up results to starting acct capital
         if systemname == 'C2_Paper':
+            dataSet.sort_index(inplace=True)
             dataSet['equitycurve'] = initialEquity + dataSet['PL'].cumsum()
         else:
             dataSet['equitycurve'] = initialEquity + dataSet['realized_PnL'].cumsum()

@@ -172,7 +172,4 @@ def get_v1signal(data, ticker, exchange, debug=False):
     if debug:
         return
     else:
-        return generate_model_sig(system, str(dataSet.index[-1]), int(nextSignal), int(nextSignal))
-        #pos=pd.DataFrame({}, columns=['system
-    
- 
+        return generate_model_sig(system, str(dataSet.index[-1]), int(nextSignal), abs(int(nextSignal)))

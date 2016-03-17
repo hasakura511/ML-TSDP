@@ -135,11 +135,6 @@ while not finished:
         
         filename='./data/paper/' + system['Name'] + '_portfolio.csv'
            
-        system_pos=model.loc[system['System']]
-        system_c2pos_qty=round(system_pos['action']) * system['c2qty']
-        system_ibpos_qty=round(system_pos['action']) * system['ibqty']
-        
-        
         ask=float(get_ib_ask(str(system['ibsym']),str(system['ibcur'])))
         bid=float(get_ib_bid(str(system['ibsym']),str(system['ibcur'])))
         exchange=system['ibexch']
@@ -151,6 +146,9 @@ while not finished:
         commission_cash=float(commission['Cash'])
         
         if debug:
+            system_pos=model.loc[system['System']]
+            system_c2pos_qty=round(system_pos['action']) * system['c2qty']
+            system_ibpos_qty=round(system_pos['action']) * system['ibqty']
             print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
             print        " System Algo: " + str(system['System']) 
             print        " Ask: " + str(ask)

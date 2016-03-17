@@ -84,6 +84,13 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
             print 'SELL: ' + str(ibquant)
             place_order(system_name, 'SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, 'ib', pricefeed,date)
 
+def test(sym, systemname):
+    (account, portfolio)=get_c2_portfolio(systemname)
+    if sym in portfolio['symbol'].values:
+            #portfolio=portfolio.reset_index().set_index('symbol')
+            pos=portfolio.loc[portfolio['symbol']==sym].reset_index().iloc[-1]
+            print pos['trade_id']
+
 def place_order(systemname, action, quant, sym, type, currency, exch, broker, pricefeed, date):
     print "Place Order " + action + " " + str(quant) + " " + sym + " " + currency + " " + broker 
     pricefeed=pricefeed.iloc[-1]
@@ -186,6 +193,8 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 purepl=(openVWAP - closeVWAP) * quant * pricefeed['C2Mult']
                 
                 pos['closeVWAP_timestamp']=date
+                pos['closedWhen']=date
+                pos['closedWhenUnixTimeStamp']=date
                 pos['closing_price_VWAP']=closeVWAP
                 pos['quant_closed']=closedqty
 
@@ -224,6 +233,8 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 purepl = (closeVWAP - openVWAP) * quant * pricefeed['C2Mult']
                 
                 pos['closeVWAP_timestamp']=date
+                pos['closedWhen']=date
+                pos['closedWhenUnixTimeStamp']=date
                 pos['closing_price_VWAP']=closeVWAP
                 pos['quant_closed']=closedqty
                     
@@ -270,8 +281,9 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 openVWAP=pricefeed['Ask']
                 
             trade_id=0
-            if len(portfolio.index.values) > 0:
-                trade_id=int(max(portfolio.index.values))
+            trades=get_c2_trades(systemname)
+            if len(trades.index.values) > 0:
+                trade_id=int(max(trades.index.values))
             trade_id=int(trade_id) + 1
             print "Trade ID:" + str(trade_id)
             

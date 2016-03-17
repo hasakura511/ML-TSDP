@@ -93,9 +93,6 @@ def get_signal():
                 if system['System'] == 'BTCUSD':
                     system['Name']=system['Name'] + '_' + exchange
                     system['System'] = ticker + '_' + exchange
-                    system_pos=model.loc[system['System']]
-                    system_c2pos_qty=round(system_pos['action']) * system['c2qty']
-                    system_ibpos_qty=round(system_pos['action']) * system['ibqty']
                 
                     ask=float(get_btc_ask(ticker, exchange))
                     bid=float(get_btc_bid(ticker, exchange))
@@ -107,6 +104,9 @@ def get_signal():
                     commission_cash=float(commission['Cash'])
                     
                     if debug:
+                        system_pos=model.loc[system['System']]
+                        system_c2pos_qty=round(system_pos['action']) * system['c2qty']
+                        system_ibpos_qty=round(system_pos['action']) * system['ibqty']
                         print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
                         print        " System Algo: " + str(system['System']) 
                         print        " Ask: " + str(ask)

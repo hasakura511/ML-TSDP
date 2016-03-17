@@ -1,2 +1,2 @@
-sym,currency,exp,qty,price,value,avg_cost,unr_pnl,real_pnl,accountid,symbol
-USD,CAD,,-10000.0,1.33547,13354.7,2.0,0.0,-0.206240000002,Paper,USDCAD
+sym,currency,exp,qty,openqty,price,value,avg_cost,unr_pnl,real_pnl,accountid,symbol
+USD,CAD,,10000.0,10000.0,1.31248008517,13124.8008517,2.0,0.0,4.57457375768,Paper,USDCAD

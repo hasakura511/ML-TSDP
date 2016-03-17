@@ -125,7 +125,8 @@ while not finished:
     #ib_pos=get_ibpos_from_csv()
     for i in systemdata.index:
         
-        system=systemdata.ix[i]
+      system=systemdata.ix[i]
+      if system['ibsym'] + system['ibcur'] in currencyPairsDict:
         model=model_pos
         if system['Version'] == 'v1':
                 model=model_pos

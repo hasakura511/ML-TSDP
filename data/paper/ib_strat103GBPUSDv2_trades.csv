@@ -1,2 +1,5 @@
-permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date
-1,Paper,Paper,2.0,USD,IDEALPRO,1.0,,,1.0,1.40956,10000.0,-2.0,long,GBP,USD,20160316 11:54:06 EST,
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date
+1,Paper,Paper,2.0,USD,IDEALPRO,1.0,,,1.0,1.40935,10000.0,10000.0,-2.0,BOT,GBP,USD,20160316 12:49:08 EST,
+2,Paper,Paper,2.0,USD,IDEALPRO,2.0,,,1.0,1.42069,20000.0,-10000.0,-228.8,SLD,GBP,USD,20160316 15:40:19 EST,
+3,Paper,Paper,2.0,USD,IDEALPRO,3.0,,,1.0,1.42487666667,20000.0,10000.0,81.7333333333,BOT,GBP,USD,20160316 16:49:40 EST,
+4,Paper,Paper,2.0,USD,IDEALPRO,4.0,,,1.0,1.42495888889,20000.0,-10000.0,-3.6444444,SLD,GBP,USD,20160316 19:37:15 EST,

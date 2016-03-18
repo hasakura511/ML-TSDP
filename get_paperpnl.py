@@ -131,9 +131,14 @@ for system_name in sysdict:
         symdict={}
         if len(data.index.values) > 2:
             for i in data.index:
-                    order=data.ix[i]
-                    sym=order['symbol'] + order['symbol_currency']
-                    qty=order['qty']
+                 order=data.ix[i]
+                 sym=order['symbol'] + order['symbol_currency']
+                 qty=order['qty']
+                 exchange=order['exchange']
+                 commissionkey=str(sym + exchange)
+                    
+                 if len(commissionkey) > 3:
+                    
                     if order['side'] == 'SLD':
                         qty=-qty
                     if sym in symdict:
@@ -148,10 +153,10 @@ for system_name in sysdict:
                     
                     ask=float(order['price'])
                     bid=float(order['price'])
-                    exchange=order['exchange']
+                    
                     secType='CASH'
                     
-                    commissionkey=sym + exchange
+                    
                     commission=commissiondata.loc[commissionkey]
                     commission_pct=float(commission['Pct'])
                     commission_cash=float(commission['Cash'])

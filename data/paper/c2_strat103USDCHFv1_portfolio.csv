@@ -1,2 +1,2 @@
 symbol,trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,commission
-USDCHF,26,-2.937394278,,,,0.0,,USDCHF,long,20160318 09:29:51 EST,20160318 09:29:51 EST,open,20160318 09:29:51 EST,0.96733,10000.0,,0.0,15.0,,strat103USDCHFv1,2.937394278
+USDCHF,78,-31.696668486,20160318 16:45:27 EST,20160318 16:45:27 EST,20160318 16:45:27 EST,0.96902,,USDCHF,long,20160318 16:41:36 EST,20160318 16:45:27 EST,open,20160318 16:41:36 EST,0.96919,10000.0,,15.0,0.0,,strat103USDCHFv1,5.885568486

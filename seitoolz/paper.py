@@ -153,7 +153,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['commission']=pos['commission'] + commission
                 pos['long_or_short']=side
                 
-                if True:
+                if debug:
                     print "++++++++++++++++++++"
                     print "Trade ID: " + str(pos['trade_id'])
                     print "C2 " + action + ' ' + str(sym) + "@" + str(price) + "[" + str(quant) + "]"
@@ -194,7 +194,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 if abs(closedqty) == abs(openqty):
                     pos['open_or_closed']='closed'
                 
-                if True:
+                if debug:
                     print "--------------------"
                     print "Trade ID: " + str(pos['trade_id'])
                     print "C2 " + action + ' ' + str(sym) + "@" + str(price) + "[" + str(quant) + "]"

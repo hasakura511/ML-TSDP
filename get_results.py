@@ -129,6 +129,35 @@ def generate_ib_plot_from_trades(systemname, initialEquity):
         dataSet=pd.DataFrame([[initialEquity]], columns=['equitycurve'])
         return dataSet
 
+def get_data(systemname, api, broker, dataType, initialData):
+    filename='./data/' + api + '/' + broker + '_' + systemname + '_' + dataType + '.csv'
+    if api == 'c2api' or api=='ibapi':
+        filename='./data/' + api + '/' + systemname + '_' + dataType + '.csv'
+    dataSet=pd.DataFrame([[initialData]], columns=[dataType])
+    if os.path.isfile(filename):
+        dataSet=pd.read_csv(filename)
+        return dataSet
+    else:
+        return dataSet
+        
+def generate_plot(data, systemname, title, ylabel, counter, html, cols=4):
+    height=300
+    width=300
+    data.plot()   
+    fig = plt.figure(1)
+    plt.title(title)
+    plt.ylabel(ylabel)
+    plt.savefig('./data/results/' + systemname + ylabel + '.png')
+    plt.close(fig)
+    if counter == 0:
+            html = html + '<tr>'
+    html = html + '<td><img src="' + systemname + ylabel + '.png"  width=' + str(width) + ' height=' + str(height) + '></td>'
+    counter = counter + 1
+    if counter == cols:
+        html = html + '</tr>'
+        counter=0
+    return (counter, html)
+            
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
 commissiondata=pd.read_csv('./data/systems/commission.csv')
@@ -139,8 +168,6 @@ commissiondata=commissiondata.set_index('key')
 start_time = time.time()
 
 systemdict={}
-width=300
-height=300
 for i in systemdata.index:
     
     system=systemdata.ix[i]
@@ -157,100 +184,48 @@ counter=0
 for systemname in systemdict:
     if systemdict[systemname]['c2submit']:
         c2data=generate_c2_plot(systemname, 10000)
+        (counter, html)=generate_plot(c2data['equitycurve'], 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html)
+        data=get_data(systemname, 'c2api', 'c2', 'trades', 0)
+        (counter, html)=generate_plot(data['PL'], 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html)
         
-        c2data['equitycurve'].plot()   
-        
-        fig = plt.figure(1)
-        plt.title(systemname)
-        plt.ylabel("Equity")
-        plt.savefig('./data/results/c2_' + systemname + '.png')
-        plt.close(fig)
-        if counter == 0:
-            html = html + '<tr>'
-        html = html + '<td><img src="c2_' + systemname + '.png"  width=' + str(width) + ' height=' + str(height) + '></td>'
-        counter = counter + 1
-        if counter == 3:
-            html = html + '</tr>'
-            counter=0
 html = html + '</table><h1>IB</h1><br><table>'
 #IB
+cols=3
 ibdata=generate_ib_plot('IB_Paper', 10000)
-ibdata['equitycurve'].plot()
-fig = plt.figure(1)
-plt.title('IB Live - IB Paper')
-plt.ylabel("Equity")
-plt.savefig('./data/results/ib_paper.png')
-plt.close(fig)
-html = html + '<tr><td><img src="ib_paper.png"  width=' + str(width) + ' height=' + str(height) + '><br></td>'
+(counter, html)=generate_plot(ibdata['equitycurve'], 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
 
 ibdata=generate_ib_plot_from_trades('IB_Paper', 10000)
-ibdata['equitycurve'].plot()
-fig = plt.figure(1)
-plt.title('IB Live - IB Paper From Trades')
-plt.ylabel("Equity")
-plt.savefig('./data/results/ib_paper2.png')
-plt.close(fig)
-html = html + '<td><img src="ib_paper2.png"  width=' + str(width) + ' height=' + str(height) + '><br></td></tr>'
+(counter, html)=generate_plot(ibdata['equitycurve'], 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
 
-
+data=get_data('IB_Live', 'paper', 'ib', 'trades', 0)
+(counter, html)=generate_plot(data['realized_PnL'], 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+        
 ibdata=generate_ib_plot('C2_Paper', 10000)
-ibdata['equitycurve'].plot()
-fig = plt.figure(1)
-plt.title('IB Live - C2 Paper')
-plt.ylabel("Equity")
-plt.savefig('./data/results/ib_c2.png')
-plt.close(fig)
-html = html + '<tr><td><img src="ib_c2.png"  width=' + str(width) + ' height=' + str(height) + '><br></td>'
+(counter, html)=generate_plot(ibdata['equitycurve'], 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
 
 ibdata=generate_ib_plot_from_trades('C2_Paper', 10000)
-ibdata['equitycurve'].plot()
-fig = plt.figure(1)
-plt.title('IB Live - C2 Paper From Trades')
-plt.ylabel("Equity")
-plt.savefig('./data/results/ib_c2_2.png')
-plt.close(fig)
-html = html + '<td><img src="ib_c2_2.png"  width=' + str(width) + ' height=' + str(height) + '><br></td></tr>'
+(counter, html)=generate_plot(ibdata['equitycurve'], 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
 
+data=get_data('IB_Live', 'paper', 'c2', 'trades', 0)
+(counter, html)=generate_plot(data['PL'], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+cols=4
+       
 html = html + '</table><h1>Paper</h1><br><table>'
 counter=0
 for systemname in systemdict:
 
   if systemname != 'stratBTC':
     c2data=generate_paper_c2_plot(systemname, 10000)
-    c2data['equitycurve'].plot()  
-    
-    fig = plt.figure(1)
-    plt.title(systemname + " C2 ")
-    plt.ylabel("Equity")
-    plt.savefig('./data/results/paper_c2' + systemname + '.png')
-    plt.close(fig)
-    if counter == 0:
-        html = html + '<tr>'
-    
-    html = html + '<td><img src="paper_c2' + systemname + '.png" width=' + str(width) + ' height=' + str(height) + '><br></td>'
-    
-    counter = counter + 1
-    if counter == 3:
-        html = html + '</tr>'
-        counter=0
-    
-    ibdata=generate_paper_ib_plot(systemname, 10000)
-    ibdata['equitycurve'].plot()
+    (counter, html)=generate_plot(c2data['equitycurve'], 'paper_c2', systemname + " C2 ", 'Equity', counter, html)
 
-    fig = plt.figure(1)
-    plt.title(systemname + " IB ")
-    plt.ylabel("Equity")
-    plt.savefig('./data/results/paper_ib' + systemname + '.png')
-    plt.close(fig)
-    if counter == 0:
-        html = html + '<tr>'
-    
-    html = html + '<td><img src="paper_ib' + systemname + '.png" width=' + str(width) + ' height=' + str(height) + '><br></td>'
-    
-    counter = counter + 1
-    if counter == 3:
-        html = html + '</tr>'
-        counter=0
+    data=get_data(systemname, 'paper', 'c2', 'trades', 0)
+    (counter, html)=generate_plot(data['PL'], 'paper_c2' + systemname+'PL', 'paper_c2' + systemname + ' PL', 'PL', counter, html)
+
+    ibdata=generate_paper_ib_plot(systemname, 10000)
+    (counter, html)=generate_plot(ibdata['equitycurve'], 'paper_ib', systemname + " IB ", 'Equity', counter, html)
+
+    data=get_data(systemname, 'paper', 'ib', 'trades', 0)
+    (counter, html)=generate_plot(data['realized_PnL'], 'paper_ib' + systemname+'PL', 'paper_ib' + systemname + ' PL', 'PL', counter, html)
 
 html = html + '</table><h1>BTC Paper</h1><br><table>'
 counter = 0
@@ -267,44 +242,22 @@ for file in files:
                                 systemname=file
                                 systemname = re.sub('c2_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
-				print systemname
-                                c2data=generate_paper_c2_plot(systemname, 10000)
-                                c2data['equitycurve'].plot()  
-                                fig = plt.figure(1)
-                                
-                                
-                                plt.title(systemname + " C2 ")
-                                    
-                                plt.ylabel("Equity")
-                                plt.savefig('./data/results/paper_c2' + systemname + '.png')
-                                plt.close(fig)
-                                
-                                html = html + '<td><img src="paper_c2' + systemname + '.png" width=' + str(width) + ' height=' + str(height) + '><br></td>'
-                        
+                                print systemname
+                                c2data=generate_paper_c2_plot(systemname, 10000)                                   
+                                (counter, html)=generate_plot(c2data['equitycurve'], 'paper_c2', systemname + " C2 ", 'Equity', counter, html)
+
+                                data=get_data(systemname, 'paper', 'c2', 'trades', 0)
+                                (counter, html)=generate_plot(data['PL'], 'paper_c2' + systemname+'PL', 'paper_c2' + systemname + ' PL', 'PL', counter, html)
+
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
                                 ibdata=generate_paper_ib_plot(systemname, 10000)
-                                ibdata['equitycurve'].plot()
-                            
-                                fig = plt.figure(1)
-                                plt.title(systemname + " IB ")
-                                plt.ylabel("Equity")
-                                plt.savefig('./data/results/paper_ib' + systemname + '.png')
-                                plt.close(fig)
-                                
-                                html = html + '<td><img src="paper_ib' + systemname + '.png" width=' + str(width) + ' height=' + str(height) + '><br></td>'
-                                
-                        counter = counter + 1
-                        if counter == 3:
-                            html = html + '</tr>'
-                            counter=0
-    
-                        if counter == 0:
-                            html = html + '<tr>'
-    
-    
+                                (counter, html)=generate_plot(ibdata['equitycurve'], 'paper_ib', systemname + " IB ", 'Equity', counter, html)
+
+                                data=get_data(systemname, 'paper', 'ib', 'trades', 0)
+                                (counter, html)=generate_plot(data['realized_PnL'], 'paper_ib' + systemname+'PL', 'paper_ib' + systemname + ' PL', 'PL', counter, html)
 
 html = html + '</body></html>'
 f = open('./data/results/index.html', 'w')

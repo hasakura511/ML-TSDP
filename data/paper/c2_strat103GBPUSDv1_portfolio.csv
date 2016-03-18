@@ -1,0 +1,2 @@
+symbol,trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,commission
+GBPUSD,1,-4.33545,,,,0.0,,GBPUSD,short,20160318 04:15:37 EST,20160318 04:15:37 EST,open,20160318 04:15:37 EST,1.44515,10000.0,,0.0,15.0,,strat103GBPUSDv1,4.33545

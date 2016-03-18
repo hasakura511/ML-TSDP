@@ -1,0 +1,6 @@
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,accountid,currency
+EURJPY,EUR,,10000.0,10000.0,125.608,125.608,-11053.504,2.0,0.0,-2.0,Paper,JPY
+EURUSD,EUR,,-10000.0,-10000.0,1.12945,1.12945,-11294.5,2.0,0.0,-2.0,Paper,USD
+GBPUSD,GBP,,-10000.0,-10000.0,1.44515,1.44515,-14451.5,2.0,0.0,-2.0,Paper,USD
+USDJPY,USD,,-10000.0,-10000.0,111.201,111.201,-9785.688,2.0,0.0,-2.0,Paper,JPY
+AUDUSD,AUD,,10000.0,10000.0,0.76346,0.76346,7628.5,2.0,0.0,4.1,Paper,USD

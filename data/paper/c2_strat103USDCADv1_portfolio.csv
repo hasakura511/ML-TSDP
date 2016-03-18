@@ -1,0 +1,2 @@
+symbol,trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,commission
+USDCAD,1,-2.91743853,,,,0.0,,USDCAD,long,20160318 04:15:37 EST,20160318 04:15:37 EST,open,20160318 04:15:37 EST,1.30115,10000.0,,0.0,15.0,,strat103USDCADv1,2.91743853

@@ -1,0 +1,6 @@
+symbol,trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,commission
+EURUSD,1,-2.0,,,,0.0,,EURUSD,short,20160318 04:15:38 EST,20160318 04:15:38 EST,open,20160318 04:15:38 EST,1.12945,10000.0,,0.0,1.0,,strat103v2,2.0
+EURJPY,2,-2.0,,,,0.0,,EURJPY,long,20160318 04:15:39 EST,20160318 04:15:39 EST,open,20160318 04:15:39 EST,125.611,10000.0,,0.0,1.0,,strat103v2,2.0
+GBPUSD,3,-2.0,,,,0.0,,GBPUSD,short,20160318 04:15:39 EST,20160318 04:15:39 EST,open,20160318 04:15:39 EST,1.44515,10000.0,,0.0,1.0,,strat103v2,2.0
+USDJPY,4,-2.0,,,,0.0,,USDJPY,short,20160318 04:15:39 EST,20160318 04:15:39 EST,open,20160318 04:15:39 EST,111.204,10000.0,,0.0,1.0,,strat103v2,2.0
+AUDUSD,6,-2.0,,,,0.0,,AUDUSD,long,20160318 04:21:03 EST,20160318 04:21:03 EST,open,20160318 04:21:03 EST,0.76267,10000.0,,0.0,1.0,,strat103v2,2.0

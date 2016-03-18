@@ -1,0 +1,2 @@
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,accountid,currency
+USDCAD,USD,,10000.0,10000.0,1.30115,1.30115,-9724.7951,2.0,0.0,-2.0,Paper,CAD

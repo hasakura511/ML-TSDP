@@ -1,0 +1,2 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,balance,commission,margin_available
+1,-1.946275,20160318 04:24:13 EST,20160318 04:24:13 EST,20160318 04:24:13 EST,415.32,,BTCUSD,long,20160318 04:21:02 EST,20160318 04:24:13 EST,open,20160318 04:21:02 EST,415.19,1.0,,1.0,0.0,,BTCUSD,stratBTC_bitstampUSD,9998.053725,2.076275,30000.13

@@ -1,0 +1,2 @@
+symbol,trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,commission
+BTCUSD,1,-0.928,,,,0.0,,BTCUSD,short,20160318 04:23:46 EST,20160318 04:23:46 EST,open,20160318 04:23:46 EST,371.2,1.0,,0.0,1.0,,stratBTC_rockEUR,0.928

@@ -1,2 +1,2 @@
 trade_id,index,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission
-10,,-3.39501,,,,0.0,,EURUSD,short,20160317 17:21:35 EST,20160317 17:21:35 EST,open,20160317 17:21:35 EST,1.13167,10000.0,,0.0,15.0,,EURUSD,strat103EURUSDv1,3.39501
+86,,-3.39513,,,,0.0,,EURUSD,short,20160317 20:59:15 EST,20160317 20:59:15 EST,open,20160317 20:59:15 EST,1.13171,10000.0,,0.0,15.0,,EURUSD,strat103EURUSDv1,3.39513

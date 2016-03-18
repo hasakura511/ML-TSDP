@@ -215,7 +215,7 @@ html = html + '</table><h1>Paper</h1><br><table>'
 counter=0
 for systemname in systemdict:
 
- 
+  if systemname != 'stratBTC':
     c2data=generate_paper_c2_plot(systemname, 10000)
     c2data['equitycurve'].plot()  
     
@@ -265,8 +265,9 @@ for file in files:
                 if re.search(tradesearch, file):
                         if re.search(c2search, file):
                                 systemname=file
-                                systemname = re.sub(dataPath + 'c2_','', systemname.rstrip())
-                                systemname = re.sub('.csv','', systemname.rstrip())
+                                systemname = re.sub('c2_','', systemname.rstrip())
+                                systemname = re.sub('_trades.csv','', systemname.rstrip())
+				print systemname
                                 c2data=generate_paper_c2_plot(systemname, 10000)
                                 c2data['equitycurve'].plot()  
                                 fig = plt.figure(1)
@@ -282,8 +283,8 @@ for file in files:
                         
                         else:
                                 systemname=file
-                                systemname = re.sub(dataPath + 'ib_','', systemname.rstrip())
-                                systemname = re.sub('.csv','', systemname.rstrip())
+                                systemname = re.sub('ib_','', systemname.rstrip())
+                                systemname = re.sub('_trades.csv','', systemname.rstrip())
                                 ibdata=generate_paper_ib_plot(systemname, 10000)
                                 ibdata['equitycurve'].plot()
                             

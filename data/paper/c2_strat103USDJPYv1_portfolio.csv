@@ -1,2 +1,2 @@
 symbol,trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,commission
-USDJPY,9,-33.6040584,20160318 07:36:33 EST,20160318 07:36:33 EST,20160318 07:36:33 EST,111.43,,USDJPY,long,20160318 07:34:42 EST,20160318 07:36:33 EST,open,20160318 07:34:42 EST,111.451,10000.0,,15.0,0.0,,strat103USDJPYv1,5.8840584
+USDJPY,31,-2.9446032,,,,0.0,,USDJPY,long,20160318 09:28:54 EST,20160318 09:28:54 EST,open,20160318 09:28:54 EST,111.538,10000.0,,0.0,15.0,,strat103USDJPYv1,2.9446032

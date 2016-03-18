@@ -216,16 +216,16 @@ for systemname in systemdict:
 
   if systemname != 'stratBTC':
     c2data=generate_paper_c2_plot(systemname, 10000)
-    (counter, html)=generate_plot(c2data['equitycurve'], 'paper_c2', systemname + " C2 ", 'Equity', counter, html)
+    (counter, html)=generate_plot(c2data['equitycurve'], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html)
 
     data=get_data(systemname, 'paper', 'c2', 'trades', 0)
-    (counter, html)=generate_plot(data['PL'], 'paper_c2' + systemname+'PL', 'paper_c2' + systemname + ' PL', 'PL', counter, html)
+    (counter, html)=generate_plot(data['PL'], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
 
     ibdata=generate_paper_ib_plot(systemname, 10000)
-    (counter, html)=generate_plot(ibdata['equitycurve'], 'paper_ib', systemname + " IB ", 'Equity', counter, html)
+    (counter, html)=generate_plot(ibdata['equitycurve'], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html)
 
     data=get_data(systemname, 'paper', 'ib', 'trades', 0)
-    (counter, html)=generate_plot(data['realized_PnL'], 'paper_ib' + systemname+'PL', 'paper_ib' + systemname + ' PL', 'PL', counter, html)
+    (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
 
 html = html + '</table><h1>BTC Paper</h1><br><table>'
 counter = 0
@@ -244,20 +244,20 @@ for file in files:
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
                                 print systemname
                                 c2data=generate_paper_c2_plot(systemname, 10000)                                   
-                                (counter, html)=generate_plot(c2data['equitycurve'], 'paper_c2', systemname + " C2 ", 'Equity', counter, html)
+                                (counter, html)=generate_plot(c2data['equitycurve'], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html)
 
                                 data=get_data(systemname, 'paper', 'c2', 'trades', 0)
-                                (counter, html)=generate_plot(data['PL'], 'paper_c2' + systemname+'PL', 'paper_c2' + systemname + ' PL', 'PL', counter, html)
+                                (counter, html)=generate_plot(data['PL'], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
 
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
                                 ibdata=generate_paper_ib_plot(systemname, 10000)
-                                (counter, html)=generate_plot(ibdata['equitycurve'], 'paper_ib', systemname + " IB ", 'Equity', counter, html)
+                                (counter, html)=generate_plot(ibdata['equitycurve'], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html)
 
                                 data=get_data(systemname, 'paper', 'ib', 'trades', 0)
-                                (counter, html)=generate_plot(data['realized_PnL'], 'paper_ib' + systemname+'PL', 'paper_ib' + systemname + ' PL', 'PL', counter, html)
+                                (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
 
 html = html + '</body></html>'
 f = open('./data/results/index.html', 'w')

@@ -48,12 +48,12 @@ from time import gmtime, strftime, localtime, sleep
 import os
 
 def generate_paper_c2_plot(systemname, initialEquity):
-    filename='./data/paper/c2_' + systemname + '_trades.csv'
+    filename='./data/paper/c2_' + systemname + '_account.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         #sums up results to starting acct capital
         dataSet.sort_index(inplace=True)
-        dataSet['equitycurve'] = initialEquity + dataSet['PL'].cumsum()
+        dataSet['equitycurve'] = dataSet['balance']
 
         return dataSet
     else:
@@ -76,11 +76,11 @@ def generate_c2_plot(systemname, initialEquity):
     return dataSet
         
 def generate_paper_ib_plot(systemname, initialEquity):
-    filename='./data/paper/ib_' + systemname + '_trades.csv'
+    filename='./data/paper/ib_' + systemname + '_account.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         #sums up results to starting acct capital
-        dataSet['equitycurve'] = initialEquity + dataSet['realized_PnL'].cumsum()
+        dataSet['equitycurve'] = dataSet['balance']
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity]], columns=['equitycurve'])

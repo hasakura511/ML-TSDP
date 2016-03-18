@@ -118,7 +118,6 @@ def refresh_paper_iblive(system_name):
             os.remove(filename)
             print 'Deleting ' + filename
 sysdata=pd.read_csv('./data/systems/system.csv')
-sysdata=sysdata.reset_index()
 sysdict={}
 for i in sysdata.index:
         system=sysdata.ix[i]

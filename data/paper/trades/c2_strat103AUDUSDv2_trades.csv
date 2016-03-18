@@ -1,0 +1,8 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission,index
+<<<<<<< HEAD:data/paper/trades/c2_strat103AUDUSDv2_trades.csv
+1,-2.0,,,,0.0,,AUDUSD,short,20160317 14:43:52 EST,20160317 14:43:52 EST,open,20160317 14:43:52 EST,0.7648,10000.0,,0.0,3.0,,AUDUSD,strat103AUDUSDv2,2.0,
+=======
+1,-7.3,20160317 17:48:47 EST,20160317 17:48:47 EST,20160317 17:48:47 EST,0.76396,,AUDUSD,short,20160317 16:41:50 EST,20160317 16:41:50 EST,closed,20160317 16:41:50 EST,0.76407,10000.0,,3.0,3.0,,AUDUSD,strat103AUDUSDv2,4.0,
+2,-34.9,20160317 20:59:04 EST,20160317 20:59:04 EST,20160317 20:59:04 EST,0.76499,,AUDUSD,long,20160317 17:48:47 EST,20160317 17:48:47 EST,closed,20160317 17:48:47 EST,0.76396,10000.0,,3.0,3.0,,AUDUSD,strat103AUDUSDv2,4.0,
+3,-2.0,,,,0.0,,AUDUSD,short,20160317 20:59:04 EST,20160317 20:59:04 EST,open,20160317 20:59:04 EST,0.76499,10000.0,,0.0,3.0,,AUDUSD,strat103AUDUSDv2,2.0,
+>>>>>>> 45a5abfefbb190afc2de4e02a4dd90342770ebd0:data/paper/c2_strat103AUDUSDv2_trades.csv

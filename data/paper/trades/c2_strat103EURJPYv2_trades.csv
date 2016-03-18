@@ -1,0 +1,7 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,commission,index
+<<<<<<< HEAD:data/paper/trades/c2_strat103EURJPYv2_trades.csv
+1,-65.776,20160317 13:54:16 EST,,,126.047,,EURJPY,long,20160317 12:59:44 EST,20160317 12:59:44 EST,closed,20160317 12:59:44 EST,125.813,10000.0,,3.0,3.0,,EURJPY,strat103EURJPYv2,4.0,
+=======
+1,70.24939,20160317 17:48:46 EST,20160317 17:48:46 EST,20160317 17:48:46 EST,1.131762,,EURUSD,short,20160317 16:41:49 EST,20160317 16:41:49 EST,closed,20160317 16:41:49 EST,1.13135,10000.0,,15.0,15.0,,EURUSD,strat103EURUSDv2,8.11061,
+2,-2.0,,,,0.0,,EURUSD,short,20160317 19:26:00 EST,20160317 19:26:00 EST,open,20160317 19:26:00 EST,1.13193,10000.0,,0.0,3.0,,EURUSD,strat103EURUSDv2,2.0,
+>>>>>>> 45a5abfefbb190afc2de4e02a4dd90342770ebd0:data/paper/c2_strat103EURUSDv2_trades.csv

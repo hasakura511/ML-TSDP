@@ -28,8 +28,8 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros, runs
                         volumeSpike, softmax_score, create_indicators, ratio, getToxCutoff2,\
                         percentUpDays
 from suztoolz.display import compareEquity                        
-
-def get_v1signal(data, ticker, exchange, debug=False):
+from seitoolz.display import compareEquity as compareEquitySave   
+def get_v1signal(data, ticker, exchange, debug=False, saveEquity=False, equityFile=''):
     iterations=10
     RSILookback = 1.5
     zScoreLookback = 10
@@ -162,8 +162,11 @@ def get_v1signal(data, ticker, exchange, debug=False):
     sst= pd.concat([dataSet['gainAhead'].ix[datay.index], \
                 pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)
     sst.index=sst.index.astype(str).to_datetime()
-    if debug:
+    if debug and not saveEquity:
         compareEquity(sst, ticker)
+        
+    if debug and saveEquity:
+        compareEquitySave(sst, ticker, equityFile)
     
     nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
     print 'Next Signal for',dataSet.index[-1],'is', nextSignal

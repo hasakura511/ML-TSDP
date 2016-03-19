@@ -132,7 +132,7 @@ def generate_ib_plot_from_trades(systemname, initialEquity):
 
 def get_data(systemname, api, broker, dataType, initialData):
     filename='./data/' + api + '/' + broker + '_' + systemname + '_' + dataType + '.csv'
-    if api == 'c2api' or api=='ibapi':
+    if api == 'c2api' or api=='ibapi' or api=='btapi':
         filename='./data/' + api + '/' + systemname + '_' + dataType + '.csv'
     dataSet=pd.DataFrame([[initialData]], columns=[dataType])
     if os.path.isfile(filename):

@@ -498,7 +498,7 @@ for ticker in livePairs:
     bestModel = bestModel.append(pd.Series(data=datetime.datetime.fromtimestamp(time.time())\
                                     .strftime('%Y-%m-%d %H:%M:%S'), index=['timestamp']))
     
-    print 'Saving Params..'                                
+    print version, 'Saving Params..'                                
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
     if version+'_'+ticker + '.csv' not in files:
         BMdf = pd.concat([bestModel,bestModel],axis=1).transpose()
@@ -572,7 +572,7 @@ for ticker in livePairs:
         bestBothDPS.index.name = 'dates'
         bestBothDPS = pd.concat([bestBothDPS, pd.Series(data = dpsRunName,index=bestBothDPS.index, name='system')], \
                                                         axis=1)
-        print 'Next Signal:'
+        print '\n'+version, 'Next Signal:'
         print bestBothDPS.iloc[-1].system
         print bestBothDPS.drop(['system'],axis=1).iloc[-1]
          

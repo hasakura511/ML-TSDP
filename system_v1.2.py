@@ -75,7 +75,7 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
 WAIT_TIME = 30.0
 
 #system parameters
-#version = 'v2.21C'
+version = 'v1'
 filterName = 'DF1'
 data_type = 'ALL'
 
@@ -102,7 +102,7 @@ for pair in currencyPairs:
             #sys.exit("Offline Mode: "+sys.argv[0])
             
 for ticker in livePairs:
-    print '\n\nStarting v1 live run for',ticker,' Loading Params from v2..'
+    print '\n\nStarting',version,'live run for',ticker,' Loading Params from v2..'
     symbol=ticker[0:3]
     currency=ticker[3:6]
     bestModel = pd.read_csv(bestParamsPath+'v2_'+ticker+'.csv').iloc[-1]
@@ -403,7 +403,7 @@ for ticker in livePairs:
         compareEquity(sst, ticker)
 
     nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
-    print 'Next Signal for',dataSet.index[-1],'is', nextSignal
+    print version+'Next Signal for',dataSet.index[-1],'is', nextSignal
 
     signal_df=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
     #signal.to_csv('./signal/signalss/' + ticker + '.csv', index=False)

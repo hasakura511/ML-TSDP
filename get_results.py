@@ -134,6 +134,7 @@ def get_data(systemname, api, broker, dataType, initialData):
     filename='./data/' + api + '/' + broker + '_' + systemname + '_' + dataType + '.csv'
     if api == 'c2api' or api=='ibapi' or api=='btapi':
         filename='./data/' + api + '/' + systemname + '_' + dataType + '.csv'
+    print filename
     dataSet=pd.DataFrame([[initialData]], columns=[dataType])
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)

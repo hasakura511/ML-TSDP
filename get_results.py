@@ -260,9 +260,6 @@ for file in files:
 
                                 data=get_data(systemname, 'paper', 'c2', 'trades', 0)
                                 (counter, html)=generate_plot(data['PL'], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
-                                
-                                data=get_data(btcname, 'btapi', 'BTCUSD', exchangename, 0)
-                                (counter, html)=generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
@@ -272,13 +269,9 @@ for file in files:
 
                                 data=get_data(systemname, 'paper', 'ib', 'trades', 0)
                                 (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
-                                
-                                data=get_data(btcname, 'btapi', 'BTCUSD', exchangename, 0)
-                                (counter, html)=generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
-                                
 
-                                
                         (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
+                        (counter, html)=generate_html('OHLC_paper_' + btcname+'Close', counter, html, cols)
 dataPath='./data/btapi/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 btcsearch=re.compile('BTCUSD')
@@ -290,6 +283,8 @@ for file in files:
                 systemname = re.sub('.csv','', systemname.rstrip())
                 data = pd.read_csv(dataPath + file, index_col='Date')
                 if data.shape[0] > 2000:
+                    generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
+                            
                     get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
                     
 html = html + '</body></html>'

@@ -132,8 +132,9 @@ def generate_ib_plot_from_trades(systemname, initialEquity):
 
 def get_data(systemname, api, broker, dataType, initialData):
     filename='./data/' + api + '/' + broker + '_' + systemname + '_' + dataType + '.csv'
-    if api == 'c2api' or api=='ibapi':
+    if api == 'c2api' or api=='ibapi' or api=='btapi':
         filename='./data/' + api + '/' + systemname + '_' + dataType + '.csv'
+    print filename
     dataSet=pd.DataFrame([[initialData]], columns=[dataType])
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
@@ -237,7 +238,7 @@ for systemname in systemdict:
 
 html = html + '</table><h1>BTC Paper</h1><br><table>'
 counter = 0
-cols=3
+cols=4
 
 dataPath='./data/paper/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -247,6 +248,8 @@ c2search=re.compile('c2')
 for file in files:
         if re.search(btcsearch, file):
                 if re.search(tradesearch, file):
+                        btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
+                        exchangename=re.sub('BTCUSD_','',btcname.rstrip())
                         if re.search(c2search, file):
                                 systemname=file
                                 systemname = re.sub('c2_','', systemname.rstrip())
@@ -257,8 +260,6 @@ for file in files:
 
                                 data=get_data(systemname, 'paper', 'c2', 'trades', 0)
                                 (counter, html)=generate_plot(data['PL'], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
-
-                                
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
@@ -268,8 +269,9 @@ for file in files:
 
                                 data=get_data(systemname, 'paper', 'ib', 'trades', 0)
                                 (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
-                        btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
+
                         (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
+                        (counter, html)=generate_html('OHLC_paper_' + btcname+'Close', counter, html, cols)
 dataPath='./data/btapi/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 btcsearch=re.compile('BTCUSD')
@@ -281,6 +283,8 @@ for file in files:
                 systemname = re.sub('.csv','', systemname.rstrip())
                 data = pd.read_csv(dataPath + file, index_col='Date')
                 if data.shape[0] > 2000:
+                    generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
+                            
                     get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
                     
 html = html + '</body></html>'

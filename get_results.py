@@ -237,7 +237,7 @@ for systemname in systemdict:
 
 html = html + '</table><h1>BTC Paper</h1><br><table>'
 counter = 0
-cols=3
+cols=4
 
 dataPath='./data/paper/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -247,6 +247,8 @@ c2search=re.compile('c2')
 for file in files:
         if re.search(btcsearch, file):
                 if re.search(tradesearch, file):
+                        btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
+                        exchangename=re.sub('BTCUSD_','',btcname.rstrip())
                         if re.search(c2search, file):
                                 systemname=file
                                 systemname = re.sub('c2_','', systemname.rstrip())
@@ -257,8 +259,9 @@ for file in files:
 
                                 data=get_data(systemname, 'paper', 'c2', 'trades', 0)
                                 (counter, html)=generate_plot(data['PL'], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
-
                                 
+                                data=get_data(btcname, 'btapi', 'BTCUSD', exchangename, 0)
+                                (counter, html)=generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
@@ -268,7 +271,12 @@ for file in files:
 
                                 data=get_data(systemname, 'paper', 'ib', 'trades', 0)
                                 (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
-                        btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
+                                
+                                data=get_data(btcname, 'btapi', 'BTCUSD', exchangename, 0)
+                                (counter, html)=generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
+                                
+
+                                
                         (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
 dataPath='./data/btapi/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]

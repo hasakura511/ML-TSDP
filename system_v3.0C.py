@@ -216,9 +216,10 @@ for ticker in livePairs:
 
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 500
-    validationPeriods = [50,250]
-    #validationPeriods = [250,1400] # min is 2
+    validationSetLength = 7000
+    #validationSetLength = 500
+    #validationPeriods = [50,250]
+    validationPeriods = [250,1400] # min is 2
     #validationStartPoint = None
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']

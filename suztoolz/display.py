@@ -243,7 +243,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             #    print 'Signal: ', sf1
             startDate = benchmarks[sf1].index.to_datetime()[0]
             endDate = benchmarks[sf1].index.to_datetime()[-1]
-            yearsInValidation = (endDate-startDate).seconds/3600.0/365.0
+            yearsInValidation = (endDate-startDate).total_seconds()/3600.0/365.0
             print 'Validation Length(years): %.2f' % yearsInValidation
             print ' Trading Days in Market: %i' % benchmarks[sf1].numDays.iloc[-1],
             shortTrades, longTrades = numberZeros(benchmarks[sf1].signals*benchmarks[sf1].safef)

@@ -126,9 +126,9 @@ if len(sys.argv)==1:
                     #'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
-                    #'GBPUSD',\
+                    'GBPUSD',\
                     #'USDCAD',\
-                    'USDCHF',\
+                    #'USDCHF',\
                     #'NZDUSD',
                     #'EURCHF',\
                     #'EURGBP'\
@@ -218,20 +218,20 @@ for ticker in livePairs:
     #dataSet length needs to be divisiable by each validation period! 
     validationSetLength = 7000
     #validationPeriods = [50,100,250,500,1000,2500]
-    validationPeriods = [100,500,1400] # min is 2
+    validationPeriods = [250,1400] # min is 2
     #validationStartPoint = None
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
     #signal_types = ['gainAhead']
     #zz_steps = [0.001,0.003,0.006]
-    zz_steps = [0.003,0.006]
+    zz_steps = [0.009]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     wfSteps=[1]
-    wf_is_periods = [25,250]
+    wf_is_periods = [25,500]
     #wf_is_periods = [2150]
     tox_adj_proportion = 0
     nfeatures = 10
@@ -772,51 +772,59 @@ for ticker in livePairs:
                     else:
                         validationDict[validationPeriod] =validationDict[validationPeriod].append(sstDictDF1_[nextRunName])
           
-    print '\n\nScoring Validation Curves...'               
+    print '\n\nScoring Validation Curves...'
+    #set validation curves equal length
+    vStartDate = dataSet.index[0]
+    for validationPeriod in validationDict:
+        if validationDict[validationPeriod].index[0]>vStartDate:
+            vStartDate =  validationDict[validationPeriod].index[0]
+    
     if runDPS:
         vCurve_metrics = init_report()
         for validationPeriod in validationDict:
             vCurve = ticker+' Validation Period '+str(validationPeriod)
             #compareEquity(validationDict[validationPeriod],vCurve)
             if showAllCharts:
-                DPSequity = calcEquity_df(validationDict[validationPeriod][['signals','gainAhead']], vCurve,\
-                                                    leverage = validationDict[validationPeriod].safef.values)
+                DPSequity = calcEquity_df(validationDict[validationPeriod].ix[vStartDate:][['signals','gainAhead']], vCurve,\
+                                                    leverage = validationDict[validationPeriod].ix[vStartDate:].safef.values)
             if scorePath is not None:
                 validationDict[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
                                                                 str(validationDict[validationPeriod].index[0]).replace(':','')+'_to_'+\
                                                                 str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
-            CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].signals,\
-                                                validationDict[validationPeriod].prior_index.values.astype(int),\
+            CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
+                                                validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
                                                 unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
             model = ['validationPeriod', validationPeriod]
-            #metaData['validationPeriod'] = validationPeriod
+            metaData['validationPeriod'] = validationPeriod
             #metaData['params'] =model[1]
-            vCurve_metrics = update_report(vCurve_metrics, filterName, validationDict[validationPeriod].signals.values.astype(int), \
-                                                dataSet.ix[validationDict[validationPeriod].index].signal.values.astype(int),\
+            vCurve_metrics = update_report(vCurve_metrics, filterName,\
+                                                validationDict[validationPeriod].ix[vStartDate:].signals.values.astype(int), \
+                                                dataSet.ix[validationDict[validationPeriod].ix[vStartDate:].index].signal.values.astype(int),\
                                                 unFilteredData.gainAhead,\
-                                                validationDict[validationPeriod].prior_index.values.astype(int), model,\
+                                                validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int), model,\
                                                 metaData,CAR25_oos)
     else:
         vCurve_metrics = init_report()
         for validationPeriod in validationDict:
             vCurve = ticker+' Validation Period '+str(validationPeriod)
             if showAllCharts:
-                compareEquity(validationDict[validationPeriod],vCurve)
+                compareEquity(validationDict[validationPeriod].ix[vStartDate:],vCurve)
             if scorePath is not None:
                 validationDict[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
                                                                 str(validationDict[validationPeriod].index[0]).replace(':','')+'_to_'+\
                                                                 str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
-            CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].signals,\
-                                                validationDict[validationPeriod].prior_index.values.astype(int),\
+            CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
+                                                validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
                                                 unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
             model = ['validationPeriod', validationPeriod]
             #metaData['model'] = model[0]
             #metaData['params'] =model[1]
-            #metaData['validationPeriod'] = validationPeriod
-            vCurve_metrics = update_report(vCurve_metrics, filterName, validationDict[validationPeriod].signals.values.astype(int), \
-                                                dataSet.ix[validationDict[validationPeriod].index].signal.values.astype(int),\
+            metaData['validationPeriod'] = validationPeriod
+            vCurve_metrics = update_report(vCurve_metrics, filterName,\
+                                                validationDict[validationPeriod].ix[vStartDate:].signals.values.astype(int), \
+                                                dataSet.ix[validationDict[validationPeriod].ix[vStartDate:].index].signal.values.astype(int),\
                                                 unFilteredData.gainAhead,\
-                                                validationDict[validationPeriod].prior_index.values.astype(int), model,\
+                                                validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int), model,\
                                                 metaData,CAR25_oos)
             
     #score models
@@ -844,7 +852,7 @@ for ticker in livePairs:
         BMdf.to_csv(bestParamsPath+version+'_'+ticker+'.csv', index=False)
     
     if scorePath is not None:
-        scored_models.to_csv(scorePath+filterName+'.csv')
+        scored_models.to_csv(scorePath+version+'_'+ticker+'.csv')
         
     if runDPS:    
         print '\nNext Signal:'

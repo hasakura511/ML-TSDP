@@ -1058,7 +1058,7 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
     equityStats = pd.DataFrame(columns=['system','avgSafef','cumCAR','MAXDD','sortinoRatio',\
                            'sharpeRatio','marRatio','k_ratio'], index = range(0,len(equityCurves)))
     #this calc dosent exclude non-trading days
-    years_in_forecast = (endDate-startDate).seconds/3600.0/365.0
+    years_in_forecast = (endDate-startDate).total_seconds()/3600.0/365.0
     i=0
     for sst in equityCurves:
         avgSafef = equityCurves[sst].safef.mean()    
@@ -1509,7 +1509,7 @@ def calcDPS2(signal_type, sst, PRT, start, end, windowLength, trade='long', thre
     multiplier = ddTolerance/math.sqrt(forecastHorizon) #assuming dd increases with sqrt of time
     forecastHorizon = windowLength/2.3 #need a bit more than 2x trades of the fcst horizon
     ddTolerance = math.sqrt(forecastHorizon)* multiplier #adjusted dd tolerance for the forecast
-    years_in_forecast = (start-end).seconds/3600.0/365.0
+    years_in_forecast = (start-end).total_seconds()/3600.0/365.0
     #years_in_forecast = forecastHorizon / 252.0
     dpsRun = trade + signal_type + ' DPS wl%.1f maxL%i dd95_%.3f thres_%.1f' % (windowLength,maxLeverage,ddTolerance,threshold)
             

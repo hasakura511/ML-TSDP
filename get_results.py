@@ -46,6 +46,7 @@ from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.paper import adj_size
 from time import gmtime, strftime, localtime, sleep
 import os
+from btapi.get_signal import get_v1signal
 
 def generate_paper_c2_plot(systemname, initialEquity):
     filename='./data/paper/c2_' + systemname + '_account.csv'
@@ -141,22 +142,29 @@ def get_data(systemname, api, broker, dataType, initialData):
         return dataSet
         
 def generate_plot(data, systemname, title, ylabel, counter, html, cols=4):
-    height=300
-    width=300
+    
     data.plot()   
     fig = plt.figure(1)
     plt.title(title)
     plt.ylabel(ylabel)
     plt.savefig('./data/results/' + systemname + ylabel + '.png')
     plt.close(fig)
+    (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
+    
+    return (counter, html)
+
+def generate_html(filename, counter, html, cols):
+    height=300
+    width=300
     if counter == 0:
             html = html + '<tr>'
-    html = html + '<td><img src="' + systemname + ylabel + '.png"  width=' + str(width) + ' height=' + str(height) + '></td>'
+    html = html + '<td><img src="' + filename + '.png"  width=' + str(width) + ' height=' + str(height) + '></td>'
     counter = counter + 1
     if counter == cols:
         html = html + '</tr>'
         counter=0
     return (counter, html)
+    
             
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
@@ -229,6 +237,7 @@ for systemname in systemdict:
 
 html = html + '</table><h1>BTC Paper</h1><br><table>'
 counter = 0
+cols=3
 
 dataPath='./data/paper/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -249,6 +258,7 @@ for file in files:
                                 data=get_data(systemname, 'paper', 'c2', 'trades', 0)
                                 (counter, html)=generate_plot(data['PL'], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
 
+                                
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
@@ -258,7 +268,21 @@ for file in files:
 
                                 data=get_data(systemname, 'paper', 'ib', 'trades', 0)
                                 (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
+                        btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
+                        (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
+dataPath='./data/btapi/'
+files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+btcsearch=re.compile('BTCUSD')
 
+for file in files:
+        if re.search(btcsearch, file):
+                systemname=file
+                systemname = re.sub(dataPath + 'BTCUSD_','', systemname.rstrip())
+                systemname = re.sub('.csv','', systemname.rstrip())
+                data = pd.read_csv(dataPath + file, index_col='Date')
+                if data.shape[0] > 2000:
+                    get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
+                    
 html = html + '</body></html>'
 f = open('./data/results/index.html', 'w')
 f.write(html)

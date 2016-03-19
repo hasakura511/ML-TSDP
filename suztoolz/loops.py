@@ -23,6 +23,7 @@ from display import sss_display_cmatrix, is_display_cmatrix, oos_display_cmatrix
 from transform import ratio, numberZeros
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.ticker as tick
 from sklearn.metrics import accuracy_score
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
@@ -50,7 +51,8 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
     nfeatures = metaData['n_features']
     tox_adj_proportion = metaData['tox_adj']
     feature_selection = metaData['FS']
-
+    longMemory = metaData['longMemory']
+    
     #CAR25 for zigzag
     if signal[:2]=='ZZ':
         zz_step = [float(x) for x in signal.split()[1].split(',')]
@@ -244,8 +246,9 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
         #create signals 1 and -1
         #cm_y_pred_oos = np.array([-1 if x<0 else 1 for x in cm_y_pred_oos_ga])
         #cm_y_test = np.array([-1 if x<0 else 1 for x in cm_y_test_ga])
-        oos_display_cmatrix(confusion_matrix(cm_y_test[:-1], cm_y_pred_oos[:-1]), m[0],\
-                ticker,validationFirstYear, validationFinalYear, iterations, signal)
+        #gives errors when 100% accuracy for binary classification
+        oos_display_cmatrix(cm_y_test[:-1], cm_y_pred_oos[:-1], m[0],\
+            ticker,validationFirstYear, validationFinalYear, iterations, signal)
         #if data is filtered so need to fill in the holes. signal = 0 for days that filtered
         st_oos_filt= pd.DataFrame()
         st_oos_filt['signals'] =  pd.Series(cm_y_pred_oos)
@@ -1029,7 +1032,7 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
         #DPS_adj[sst] = DPS_adj[sst].drop('index', axis=1)
         
     #create equity curves for safef1
-    print 'creating equity curve for ', direction, sst
+    print 'creating equity curve for ', direction+systemName
     
     if direction == 'long':
         signals = pd.Series(data=np.where(system.signals == -1,0,1), name='signals',\
@@ -1041,9 +1044,11 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
         signals = system.signals.ix[startDate:]
 
     system_sst = pd.concat([signals, system.gainAhead.ix[startDate:],\
+                        pd.Series(data=system.prior_index.ix[startDate:], name = 'prior_index'),
                         pd.Series(data=1.0, name = 'safef', index = signals.index),
                         pd.Series(data=np.nan, name = 'CAR25', index = signals.index),
                         pd.Series(data=np.nan, name = 'dd95', index = signals.index),
+                        pd.Series(data=np.nan, name = 'ddTol', index = signals.index),
                         ],axis=1)
     DPS_adj[direction+systemName] = system_sst
     equityCurves[direction+systemName] = calcEquity2(system_sst, PRT['initial_equity'],'b')
@@ -1101,13 +1106,14 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
         equityStats['cumCARmm'] =minmax_scale(robust_scale(equityStats.cumCAR.reshape(-1, 1)))
         equityStats['MAXDDmm'] =minmax_scale(robust_scale(equityStats.MAXDD.reshape(-1, 1)))
         equityStats['sortinoRatiomm'] = minmax_scale(robust_scale(equityStats.sortinoRatio.reshape(-1, 1)))
-        equityStats['marRatiomm'] =minmax_scale(robust_scale(equityStats.marRatio.reshape(-1, 1)))
+        #equityStats['marRatiomm'] =minmax_scale(robust_scale(equityStats.marRatio.reshape(-1, 1)))
         equityStats['sharpeRatiomm'] =minmax_scale(robust_scale(equityStats.sharpeRatio.reshape(-1, 1)))
         equityStats['k_ratiomm'] =minmax_scale(robust_scale(equityStats.k_ratio.reshape(-1, 1)))
 
         equityStats['scoremm'] =  equityStats.avgSafefmm+equityStats.cumCARmm+\
                                         equityStats.sortinoRatiomm+equityStats.k_ratiomm+\
-                                       equityStats.sharpeRatiomm+equityStats.marRatiomm
+                                       equityStats.sharpeRatiomm
+                                       #+equityStats.marRatiomm
                                        #+equityStats.MAXDDmm
 
         equityStats = equityStats.sort_values(['scoremm'], ascending=False)
@@ -1265,13 +1271,13 @@ def calcEquity_df(SST, title, leverage=1.0):
         SSTcopy = SST.copy(deep=True)
         if trade =='l':
             #changeIndex = SSTcopy.signals[SST.signals==-1].index
-            SSTcopy.signals[SST.signals==-1]=0
+            SSTcopy.loc[SST.signals==-1,'signals']=0
         elif trade =='s':
             #changeIndex = SSTcopy.signals[SST.signals==1].index
-            SSTcopy.signals[SST.signals==1]=0
+            SSTcopy.loc[SST.signals==1,'signals']=0
             
         equityCurves[trade] = pd.concat([SSTcopy.reset_index(), safef, trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
-    
+
     #  Compute cumulative equity for all days (buy and hold)   
     trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')
     num_days = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numDays')
@@ -1279,7 +1285,7 @@ def calcEquity_df(SST, title, leverage=1.0):
     maxEquity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='maxEquity')
     drawdown = pd.Series(data=0.0,index=range(0,len(SST.index)), name='drawdown')
     maxDD = pd.Series(data=0.0,index=range(0,len(SST.index)),name='maxDD')
-    safef = pd.Series(data=leverage,index=range(0,len(SST.index)),name='safef')
+    safef = pd.Series(data=1.0,index=range(0,len(SST.index)),name='safef')
     for i in range(0,len(SST.index)):
         if i == 0:
             equity[i] = initialEquity
@@ -1295,27 +1301,48 @@ def calcEquity_df(SST, title, leverage=1.0):
             maxEquity[i] = max(equity[i],maxEquity[i-1])
             drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
             maxDD[i] = max(drawdown[i],maxDD[i-1])          
-    SSTcopy.signals[SSTcopy.signals==-1]=1
-    SSTcopy.signals[SSTcopy.signals==0]=1       
+    SSTcopy.loc[SST.signals==-1,'signals']=1
+    SSTcopy.loc[SST.signals==0,'signals']=1
+
     equityCurves['buyHold'] = pd.concat([SSTcopy.reset_index(), safef, trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
-    
+
+    if not SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
+        barSize = '1 day'
+    else:
+        barSize = '1 min'
         
     #plt.close('all')
     fig, (ax1,ax2) = plt.subplots(2,1, figsize=(8,7))
     #plt.subplot(2,1,1)
-    ax1.plot(SST.index.to_datetime(), equityCurves['l'].equity,label="Long 1 Signals",color='b')
-    ax1.plot(SST.index.to_datetime(), equityCurves['s'].equity,label="Short -1 Signals",color='r')
-    ax1.plot(SST.index.to_datetime(), equityCurves['b'].equity,label="Long & Short",color='g')
-    ax1.plot(SST.index.to_datetime(), equityCurves['buyHold'].equity,label="BuyHold",ls='--',color='c')
+    ind = np.arange(SST.shape[0])
+    ax1.plot(ind, equityCurves['l'].equity,label="Long 1 Signals",color='b')
+    ax1.plot(ind, equityCurves['s'].equity,label="Short -1 Signals",color='r')
+    ax1.plot(ind, equityCurves['b'].equity,label="Long & Short",color='g')
+    ax1.plot(ind, equityCurves['buyHold'].equity,label="BuyHold",ls='--',color='c')
     #fig, ax = plt.subplots(2)
     #plt.subplot(2,1,2)
-    ax2.plot(SST.index.to_datetime(), -equityCurves['l'].drawdown,label="Long 1 Signals",color='b')
-    ax2.plot(SST.index.to_datetime(), -equityCurves['s'].drawdown,label="Short -1 Signals",color='r')
-    ax2.plot(SST.index.to_datetime(), -equityCurves['b'].drawdown,label="Long & Short",color='g')
-    ax2.plot(SST.index.to_datetime(), -equityCurves['buyHold'].drawdown,label="BuyHold",ls='--',color='c')
+    ax2.plot(ind, -equityCurves['l'].drawdown,label="Long 1 Signals",color='b')
+    ax2.plot(ind, -equityCurves['s'].drawdown,label="Short -1 Signals",color='r')
+    ax2.plot(ind, -equityCurves['b'].drawdown,label="Long & Short",color='g')
+    ax2.plot(ind, -equityCurves['buyHold'].drawdown,label="BuyHold",ls='--',color='c')
+
+    if barSize != '1 day' :
+        def format_date(x, pos=None):
+            thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
+            return SST.index[thisind].strftime("%Y-%m-%d %H:%M")
+        ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        
+    else:
+        def format_date(x, pos=None):
+            thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
+            return SST.index[thisind].strftime("%Y-%m-%d")
+        ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        
     # rotate and align the tick labels so they look better
     fig.autofmt_xdate()
-    
+
     # use a more precise date string for the x axis locations in the
     # toolbar
 
@@ -1336,8 +1363,8 @@ def calcEquity_df(SST, title, leverage=1.0):
                 (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
     print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
                 (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
-    print 'SAFEf:', leverage
-    
+    print 'SAFEf:', equityCurves['b'].safef.mean()
+
     SST_equity = equityCurves['b']
     if 'dates' in SST_equity:
         return SST_equity.set_index(pd.DatetimeIndex(SST_equity['dates'])).drop(['dates'], axis=1)

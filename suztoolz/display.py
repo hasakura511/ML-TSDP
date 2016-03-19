@@ -10,6 +10,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.ticker as tick
 import seaborn as sns
 import datetime
 from datetime import datetime as dt
@@ -169,26 +170,49 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             
         #plot top systems
         for i,sst in enumerate(topSystems): 
+            nrows = equityCurves[sst].shape[0]
             #  Plot the equitycurve and drawdown
+            if not equityCurves[sst].index.to_datetime()[0].time() and not equityCurves[sst].index.to_datetime()[-1].time():
+                barSize = '1 day'
+                
+                def format_date(x, pos=None):
+                    thisind = np.clip(int(x + 0.5), 0, nrows - 1)
+                    return equityCurves[sst].index[thisind].strftime("%Y-%m-%d")
+            
+                ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+                ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+                
+            else:
+                barSize = '1 min'
+                
+                def format_date(x, pos=None):
+                    thisind = np.clip(int(x + 0.5), 0, nrows - 1)
+                    return equityCurves[sst].index[thisind].strftime("%Y-%m-%d %H:%M")
+                    
+                ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+                ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+
             #fig = plt.figure(figsize=(7, 5)) 
             #plt.subplot(2,1,1)
+            ind_ec = np.arange(nrows)
             plt.figure(1)
             if vsDPS:
-                ax.plot(equityCurves[sst].index.to_datetime(), equityCurves[sst].equity, label=str(dpsChartRank)+'_'+sst)
+                ax.plot(ind_ec, equityCurves[sst].equity, label=str(dpsChartRank)+'_'+sst)
             else:
-                ax.plot(equityCurves[sst].index.to_datetime(), equityCurves[sst].equity, label=str(chartRank[i])+'_'+sst)
+                ax.plot(ind_ec, equityCurves[sst].equity, label=str(chartRank[i])+'_'+sst)
             #plt.subplot(2,1,2)
             plt.figure(2)
             if vsDPS:
-                ax2.plot(equityCurves[sst].index.to_datetime(), -equityCurves[sst].drawdown, label=str(dpsChartRank)+'_'+sst)
+                ax2.plot(ind_ec, -equityCurves[sst].drawdown, label=str(dpsChartRank)+'_'+sst)
             else:
-                ax2.plot(equityCurves[sst].index.to_datetime(), -equityCurves[sst].drawdown, label=str(chartRank[i])+'_'+sst)
+                ax2.plot(ind_ec, -equityCurves[sst].drawdown, label=str(chartRank[i])+'_'+sst)
 
         #plot benchmarks
         for sf1 in benchmarks: 
             #plt.subplot(2,1,1)
             plt.figure(1)
-            ax.plot(benchmarks[sf1].index.to_datetime(), benchmarks[sf1].equity,'--', label=sf1)
+            ind_bm = np.arange(benchmarks[sf1].shape[0])
+            ax.plot(ind_bm, benchmarks[sf1].equity,'--', label=sf1)
             if vsDPS:
                 plt.title('Rank '+str(dpsChartRank)+' SAFEF1 vs DPS')
             else:
@@ -197,18 +221,18 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             ax.grid('on')
             ax.set_yscale(yscale)
             handles, labels = ax.get_legend_handles_labels()
-            lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.1),prop={'size':10})
+            lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.2),prop={'size':10})
             #lgd=ax.legend(loc="upper left",prop={'size':10})
             fig.autofmt_xdate()
             fig.savefig('samplefigure', bbox_extra_artists=(lgd,), bbox_inches='tight')
             #plt.subplot(2,1,2)
             plt.figure(2)
-            ax2.plot(benchmarks[sf1].index.to_datetime(), -benchmarks[sf1].drawdown,'--', label=sf1)
+            ax2.plot(ind_bm, -benchmarks[sf1].drawdown,'--', label=sf1)
             plt.ylabel('Drawdown')
             ax2.grid('on')
             handles, labels = ax2.get_legend_handles_labels()
             #lgd2=plt.legend(loc="upper left",prop={'size':10})
-            lgd2 = ax2.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.1),prop={'size':10})
+            lgd2 = ax2.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.2),prop={'size':10})
             fig2.savefig('samplefigure', bbox_extra_artists=(lgd2,), bbox_inches='tight')
             fig2.autofmt_xdate()
             
@@ -283,7 +307,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             #    maxCAR = CAR
             #    maxCARsst = sst
             
-        plt.show()
+        plt.show()    
     
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5), scoring=None):
@@ -496,37 +520,44 @@ def compareEquity(sst, title):
     
     #plt.close('all')
     fig, ax = plt.subplots(1, figsize=(8,7))
-    ax.plot(sst.index.to_datetime(), equityBeLongSignals,label="Long 1 Signals",color='b')
-    ax.plot(sst.index.to_datetime(), equityBeShortSignals,label="Short -1 Signals",color='r')
-    ax.plot(sst.index.to_datetime(), equityBeLongAndShortSignals,label="Long & Short",color='g')
-    ax.plot(sst.index.to_datetime(), equityAllSignals,label="BuyHold",ls='--',color='c')
+    ind = np.arange(sst.shape[0])
+    ax.plot(ind, equityBeLongSignals,label="Long 1 Signals",color='b')
+    ax.plot(ind, equityBeShortSignals,label="Short -1 Signals",color='r')
+    ax.plot(ind, equityBeLongAndShortSignals,label="Long & Short",color='g')
+    ax.plot(ind, equityAllSignals,label="BuyHold",ls='--',color='c')
     # rotate and align the tick labels so they look better
-    years = mdates.YearLocator()   # every year
-    months = mdates.MonthLocator()  # every month
-    days = mdates.DayLocator()
-    # format the ticks
-    ax.xaxis.set_major_locator(years)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    ax.xaxis.set_minor_locator(months)    
+    #years = mdates.YearLocator()   # every year
+    #months = mdates.MonthLocator()  # every month
+    #days = mdates.DayLocator()
     y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
-    
-    if barSize != '1 day' and nrows <=1440:
-        hours = mdates.HourLocator() 
-        minutes = mdates.MinuteLocator()
-        # format the ticks
-        ax.xaxis.set_major_locator(hours)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d %H"))
-        ax.xaxis.set_minor_locator(minutes)
-    else:
-        hours = mdates.HourLocator() 
-        minutes = mdates.MinuteLocator()
-        # format the ticks
-        ax.xaxis.set_major_locator(days)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-        ax.xaxis.set_minor_locator(hours)
 
-    #ax.fmt_xdata = mdates.DateFormatter("%Y-%m-%d %H:%M")
+    if barSize != '1 day' :
+        def format_date(x, pos=None):
+            thisind = np.clip(int(x + 0.5), 0, sst.shape[0] - 1)
+            return sst.index[thisind].strftime("%Y-%m-%d %H:%M")
+            
+        #hours = mdates.HourLocator() 
+        #minutes = mdates.MinuteLocator()
+        # format the ticks
+        #ax.xaxis.set_minor_locator(minutes)
+        #ax.xaxis.set_major_locator(hours)
+        ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        
+    else:
+        def format_date(x, pos=None):
+            thisind = np.clip(int(x + 0.5), 0, sst.shape[0] - 1)
+            return sst.index[thisind].strftime("%Y-%m-%d")
+            
+        # format the ticks
+        #ax.xaxis.set_major_locator(years)
+        #ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        #ax.xaxis.set_minor_locator(months)        
+        # format the ticks
+        #ax.xaxis.set_major_locator(months)
+        ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        #ax.xaxis.set_minor_locator(years)
+        
     plt.title(title)
     plt.ylabel("TWR")
     plt.legend(loc="best")
@@ -664,6 +695,7 @@ def directional_scoring(model_metrics, sample1, sample2=None):
     #removed f1, rec, rows, to focus more on profitability (magnitude)
     #removed sortino - equity curve scoring is not factored in here
     #Only Minmax score of the separated samples 1 and 2 are used to rank between apples and apples.
+    #removed accuracy and drawdown to focus more on monte carlo distribution, added TPY to minimize trades
     #sample1
     model_score_s1 = model_metrics.loc[model_metrics['sample'] == sample1].reset_index()
     model_score_s1['f1mm'] =minmax_scale(robust_scale(model_score_s1.f1.reshape(-1, 1)))
@@ -675,14 +707,17 @@ def directional_scoring(model_metrics, sample1, sample2=None):
     model_score_s1['CAR25mm'] =minmax_scale(robust_scale(model_score_s1.CAR25.reshape(-1, 1)))
     model_score_s1['CAR50mm'] =minmax_scale(robust_scale(model_score_s1.CAR50.reshape(-1, 1)))
     model_score_s1['CAR75mm'] =minmax_scale(robust_scale(model_score_s1.CAR75.reshape(-1, 1)))
-    model_score_s1['DD100mm'] =-minmax_scale(robust_scale(model_score_s1.DD100.reshape(-1, 1)))
+    #model_score_s1['DD100mm'] =-minmax_scale(robust_scale(model_score_s1.DD100.reshape(-1, 1)))
     #model_score_s1['SOR25mm'] =minmax_scale(robust_scale(model_score_s1.SOR25.reshape(-1, 1)))
-    #model_score_s1['TPYmm'] =minmax_scale(robust_scale(model_score_s1.TPY.reshape(-1, 1)))
+    model_score_s1['TPYmm'] =-minmax_scale(robust_scale(model_score_s1.TPY.reshape(-1, 1)))
     #model_score_s1['rowsmm'] = minmax_scale(robust_scale(model_score_s1.rows.reshape(-1, 1)))   
-    model_score_s1['scoremm'] =  model_score_s1.accmm+model_score_s1.CAR25mm+\
-                                    model_score_s1.CAR50mm+model_score_s1.CAR75mm+\
-                                   model_score_s1.fn_magmm+model_score_s1.fp_magmm+\
-                                    model_score_s1.DD100mm#+model_score_s1.SOR25mm+model_score_s1.TPYmm
+    model_score_s1['scoremm'] =    model_score_s1.CAR25mm+\
+                                                    model_score_s1.CAR50mm+model_score_s1.CAR75mm+\
+                                                    model_score_s1.fn_magmm+model_score_s1.fp_magmm+\
+                                                    model_score_s1.TPYmm
+                                                    #model_score_s1.DD100mm
+                                                    #model_score_s1.accmm+
+                                                    #+model_score_s1.SOR25mm+
     if sample2 is not None:
         #sample2                        
         model_score_s2 = model_metrics.loc[model_metrics['sample'] == sample2].reset_index()
@@ -752,10 +787,21 @@ def update_report(original_report, sample, ypred, ytrue, gainAhead, index, m, me
     for item in CAR25:
         report[item] = pd.Series(CAR25[item])
     cm = confusion_matrix(ytrue, ypred)
-    tp = cm[1,1]
-    fn = cm[1,0]
-    fp = cm[0,1]
-    tn = cm[0,0]
+    if cm.shape != (1,1):
+        cm_sum_oos = confusion_matrix(ytrue,ypred).astype(float)
+        tp = cm[1,1]
+        fn = cm[1,0]
+        fp = cm[0,1]
+        tn = cm[0,0]
+    else:
+        if ytrue[0]>0:
+            tp = float(len(ytrue))
+            tn = 0.0
+        else:
+            tp = 0.0
+            tn = float(len(ytrue))
+        fn = 0.0
+        fp = 0.0
     fn_index = index[np.intersect1d(np.where(ypred == -1), np.where(ytrue == 1))]
     fp_index = index[np.intersect1d(np.where(ypred == 1), np.where(ytrue == -1))]
     #report['ticker'] = pd.Series(ticker)
@@ -830,21 +876,44 @@ def oos_display_cmatrix2(ytrue, ypred, gainAhead, index, m, ticker,testFirstYear
         showPDF(ytrue, ypred, gainAhead, index)
         showCDF(ytrue, ypred, gainAhead, index)
     else:
-        cm_sum_oos = confusion_matrix(ytrue,ypred).astype(float)
-        tpOOS = cm_sum_oos[1,1]
-        fnOOS = cm_sum_oos[1,0]
-        fpOOS = cm_sum_oos[0,1]
-        tnOOS = cm_sum_oos[0,0]
+        if confusion_matrix(ytrue,ypred).shape != (1,1):
+            cm_sum_oos = confusion_matrix(ytrue,ypred).astype(float)
+            tpOOS = cm_sum_oos[1,1]
+            fnOOS = cm_sum_oos[1,0]
+            fpOOS = cm_sum_oos[0,1]
+            tnOOS = cm_sum_oos[0,0]
+        else:
+            if ytrue[0]>0:
+                tpOOS = float(len(ytrue))
+                tnOOS = 0.0
+            else:
+                tpOOS = 0.0
+                tnOOS = float(len(ytrue))
+            fnOOS = 0.0
+            fpOOS = 0.0
+            
+    if (tpOOS+fpOOS) == 0:
+        precisionOOS =  np.nan
+    else:
         precisionOOS = tpOOS/(tpOOS+fpOOS)
+    if (tpOOS+fnOOS) == 0:
+        recallOOS =  np.nan
+    else:
         recallOOS = tpOOS/(tpOOS+fnOOS)
+    if (tpOOS+fnOOS+fpOOS+tnOOS) ==0:
+        accuracyOOS =  np.nan
+    else:
         accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
+    if precisionOOS ==  np.nan or recallOOS ==  np.nan:
+        f1OOS =  np.nan
+    else:
         f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
 
-        print "      pos neg"
-        print "pos:  %i  %i  %.2f" % (tpOOS, fnOOS, recallOOS)
-        print "neg:  %i  %i" % (fpOOS, tnOOS)
-        print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
-        print "f1:   %.2f" % f1OOS
+    print "      pos neg"
+    print "pos:  %i  %i  %.2f" % (tpOOS, fnOOS, recallOOS)
+    print "neg:  %i  %i" % (fpOOS, tnOOS)
+    print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
+    print "f1:   %.2f" % f1OOS
     
 def is_display_cmatrix(cm_sum_is, m, ticker, testFirstYear, testFinalYear, iterations, signal):
     cm_sum_is = cm_sum_is.astype(float)
@@ -871,17 +940,40 @@ def is_display_cmatrix(cm_sum_is, m, ticker, testFirstYear, testFinalYear, itera
     print "      %.2f          %.2f " % (precisionIS, accuracyIS)
     print "f1:   %.2f" % f1IS
 
-def oos_display_cmatrix(cm_sum_oos, m, ticker,testFirstYear, testFinalYear, iterations, signal):
-    cm_sum_oos = cm_sum_oos.astype(float)       
-    tpOOS = cm_sum_oos[1,1]
-    fnOOS = cm_sum_oos[1,0]
-    fpOOS = cm_sum_oos[0,1]
-    tnOOS = cm_sum_oos[0,0]
-    precisionOOS = tpOOS/(tpOOS+fpOOS)
-    recallOOS = tpOOS/(tpOOS+fnOOS)
-    accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
-    f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
-    
+def oos_display_cmatrix(ytrue, ypred, m, ticker,testFirstYear, testFinalYear, iterations, signal):
+    if confusion_matrix(ytrue,ypred).shape != (1,1):
+        cm_sum_oos = confusion_matrix(ytrue,ypred).astype(float)
+        tpOOS = cm_sum_oos[1,1]
+        fnOOS = cm_sum_oos[1,0]
+        fpOOS = cm_sum_oos[0,1]
+        tnOOS = cm_sum_oos[0,0]
+    else:
+        if ytrue[0]>0:
+            tpOOS = float(len(ytrue))
+            tnOOS = 0.0
+        else:
+            tpOOS = 0.0
+            tnOOS = float(len(ytrue))
+        fnOOS = 0.0
+        fpOOS = 0.0
+        
+    if (tpOOS+fpOOS) == 0:
+        precisionOOS =  np.nan
+    else:
+        precisionOOS = tpOOS/(tpOOS+fpOOS)
+    if (tpOOS+fnOOS) == 0:
+        recallOOS =  np.nan
+    else:
+        recallOOS = tpOOS/(tpOOS+fnOOS)
+    if (tpOOS+fnOOS+fpOOS+tnOOS) ==0:
+        accuracyOOS =  np.nan
+    else:
+        accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
+    if precisionOOS ==  np.nan or recallOOS ==  np.nan:
+        f1OOS =  np.nan
+    else:
+        f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
+        
     print "\nSymbol is ", ticker
     print "Learning algorithm is ", m
     print "Signal is ", signal

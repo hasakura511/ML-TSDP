@@ -216,22 +216,22 @@ for ticker in livePairs:
 
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 5000
+    validationSetLength = 7000
     #validationPeriods = [50,100,250,500,1000,2500]
-    validationPeriods = [250,500,1000] # min is 2
+    validationPeriods = [100,500,1400] # min is 2
     #validationStartPoint = None
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
     #signal_types = ['gainAhead']
     #zz_steps = [0.001,0.003,0.006]
-    zz_steps = [0.006,0.009]
+    zz_steps = [0.003,0.006]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     wfSteps=[1]
-    wf_is_periods = [25,50,100,250,500]
+    wf_is_periods = [25,250]
     #wf_is_periods = [2150]
     tox_adj_proportion = 0
     nfeatures = 10
@@ -736,11 +736,11 @@ for ticker in livePairs:
                         if validationPeriod not in validationDict:
                             validationDict[validationPeriod] =bestBothDPS
                             if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
-                                    offlineMode(ticker, "Error: NaN in bestBothDPS].prior_index:1 ") 
+                                    offlineMode(ticker, "Error: NaN in bestBothDPS.prior_index:1 ") 
                         else:              
                             validationDict[validationPeriod] =validationDict[validationPeriod].append(bestBothDPS)
                             if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
-                                    offlineMode(ticker, "Error: NaN in bestBothDPS].prior_index:2 ")    
+                                    offlineMode(ticker, "Error: NaN in bestBothDPS.prior_index:2 ")    
                     else:
                         #if No DPS was chosen as the best model to use going forward
                         if validationPeriod not in validationDict:
@@ -788,8 +788,8 @@ for ticker in livePairs:
             CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].signals,\
                                                 validationDict[validationPeriod].prior_index.values.astype(int),\
                                                 unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
-            model = [' ValidationPeriod ', validationPeriod]
-            metaData['ValidationPeriod'] = validationPeriod
+            model = ['validationPeriod', validationPeriod]
+            #metaData['validationPeriod'] = validationPeriod
             #metaData['params'] =model[1]
             vCurve_metrics = update_report(vCurve_metrics, filterName, validationDict[validationPeriod].signals.values.astype(int), \
                                                 dataSet.ix[validationDict[validationPeriod].index].signal.values.astype(int),\
@@ -809,10 +809,10 @@ for ticker in livePairs:
             CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].signals,\
                                                 validationDict[validationPeriod].prior_index.values.astype(int),\
                                                 unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
-            model = [' Validation Period ', validationPeriod]
+            model = ['validationPeriod', validationPeriod]
             #metaData['model'] = model[0]
             #metaData['params'] =model[1]
-            metaData['ValidationPeriod'] = validationPeriod
+            #metaData['validationPeriod'] = validationPeriod
             vCurve_metrics = update_report(vCurve_metrics, filterName, validationDict[validationPeriod].signals.values.astype(int), \
                                                 dataSet.ix[validationDict[validationPeriod].index].signal.values.astype(int),\
                                                 unFilteredData.gainAhead,\
@@ -823,14 +823,14 @@ for ticker in livePairs:
     scored_models, bestModel = directional_scoring(vCurve_metrics,filterName)
     #bestModel['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     
-    print '\n\nBest Validation Period Found:', bestModel.ValidationPeriod
+    print '\n\nBest Validation Period Found:', bestModel.validationPeriod
     if showAllCharts:
-        BestEquity = calcEquity_df(validationDict[bestModel.ValidationPeriod][['signals','gainAhead']],\
-                                            bestModel.C25sig, leverage = validationDict[bestModel.ValidationPeriod].safef.values)
+        BestEquity = calcEquity_df(validationDict[bestModel.validationPeriod][['signals','gainAhead']],\
+                                            bestModel.C25sig, leverage = validationDict[bestModel.validationPeriod].safef.values)
     
     bestModel = bestModel.append(pd.Series(data=datetime.datetime.fromtimestamp(time.time())\
                                     .strftime('%Y-%m-%d %H:%M:%S'), index=['timestamp']))
-    bestModel = bestModel.append(pd.Series(data=bestModel.ValidationPeriod, index=['validationPeriod']))
+    bestModel = bestModel.append(pd.Series(data=bestModel.validationPeriod, index=['validationPeriod']))
     
     print 'Saving Params..'
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
@@ -848,23 +848,23 @@ for ticker in livePairs:
         
     if runDPS:    
         print '\nNext Signal:'
-        print BMdict[bestModel.ValidationPeriod].iloc[-1].system
-        print BMdict[bestModel.ValidationPeriod].drop(['system'],axis=1).iloc[-1]
+        print BMdict[bestModel.validationPeriod].iloc[-1].system
+        print BMdict[bestModel.validationPeriod].drop(['system'],axis=1).iloc[-1]
          
         print 'Saving Signals..'      
         #init file
-        #BMdict[bestModel.ValidationPeriod].tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
+        #BMdict[bestModel.validationPeriod].tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
         if version+'_'+ ticker + '.csv' not in files:
-            signalFile = BMdict[bestModel.ValidationPeriod].tail()
+            signalFile = BMdict[bestModel.validationPeriod].tail()
             signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=True)
         else:        
             signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv', parse_dates=['dates'])
 
-            #if BMdict[bestModel.ValidationPeriod].reset_index().iloc[-1].dates != signalFile.iloc[-1].dates:
-            if BMdict[bestModel.ValidationPeriod].reset_index().iloc[-2].dates == signalFile.iloc[-1].dates:
-                signalFile.gainAhead.iloc[-1] == BMdict[bestModel.ValidationPeriod].gainAhead.iloc[-2]
-            signalFile=signalFile.append(BMdict[bestModel.ValidationPeriod].reset_index().iloc[-1])
+            #if BMdict[bestModel.validationPeriod].reset_index().iloc[-1].dates != signalFile.iloc[-1].dates:
+            if BMdict[bestModel.validationPeriod].reset_index().iloc[-2].dates == signalFile.iloc[-1].dates:
+                signalFile.gainAhead.iloc[-1] == BMdict[bestModel.validationPeriod].gainAhead.iloc[-2]
+            signalFile=signalFile.append(BMdict[bestModel.validationPeriod].reset_index().iloc[-1])
             signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
         
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

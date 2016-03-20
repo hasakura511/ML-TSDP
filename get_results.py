@@ -141,10 +141,52 @@ def get_data(systemname, api, broker, dataType, initialData):
         return dataSet
     else:
         return dataSet
+
+def get_USD(currency):
+    data=pd.read_csv('./data/systems/currency.csv')
+    conversion=float(data.loc[data['Symbol']==currency].iloc[-1]['Ask'])
+    return float(conversion)
+    
+def get_datas(systems, api, dataType, initialData):
+    dataPath='./data/' + api + '/'
+    files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+    dataSet=pd.DataFrame({}, columns=['Date'])
+    dataSet=dataSet.set_index('Date')
+    newfiles=list()
+    for symbol in systems:   
+        search=re.compile(symbol)      
+        for file in files:
+            if re.search(search, file):        
+                filename=dataPath+file
+                if os.path.isfile(filename):
+                    print ' Price Feed: ' + filename + ' data '+ dataType
+    
+                    newfiles.append([filename,symbol])
+                    
+    return newfiles
+                
         
 def generate_plot(data, systemname, title, ylabel, counter, html, cols=4):
     
     data.plot()   
+    fig = plt.figure(1)
+    plt.title(title)
+    plt.ylabel(ylabel)
+    plt.savefig('./data/results/' + systemname + ylabel + '.png')
+    plt.close(fig)
+    (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
+    
+    return (counter, html)
+
+def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
+    for (filename, ticker) in datas:
+        dta=pd.read_csv(filename)
+        symbol=ticker[0:3]
+        currency=ticker[3:6]
+        #print 'plot for ticker: ' + currency
+        if currency != 'USD':
+            dta[ylabel]=dta[ylabel] * get_USD(currency)
+        dta[ylabel].tail(2000).plot()   
     fig = plt.figure(1)
     plt.title(title)
     plt.ylabel(ylabel)
@@ -183,20 +225,29 @@ for i in systemdata.index:
     print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
     print        " System Algo: " + str(system['System']) 
     
-    systemdict[system['Name']]=system
+    if not systemdict.has_key(system['Name']):
+        systemdict[system['Name']]=list()
+        systemdict[system['Name']].append(system['ibsym']+ system['ibcur'])
+    else:
+        systemdict[system['Name']].append(system['ibsym']+ system['ibcur'])
 
 #Paper
-html='<html><head><meta http-equiv="refresh" content="60"></head><body>'
+html='<html><head><meta http-equiv="refresh" content="300"></head><body>'
 html = html + '<h1>C2</h1><br><table>'
 counter=0
+cols=3
 #C2
 for systemname in systemdict:
-    if systemdict[systemname]['c2submit']:
+    #if systemdict[systemname]['c2submit']:
         c2data=generate_c2_plot(systemname, 10000)
-        (counter, html)=generate_plot(c2data['equitycurve'], 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html)
-        data=get_data(systemname, 'c2api', 'c2', 'trades', 0)
-        (counter, html)=generate_plot(data['PL'], 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html)
+        (counter, html)=generate_plot(c2data['equitycurve'], 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols)
         
+        data=get_data(systemname, 'c2api', 'c2', 'trades', 0)
+        (counter, html)=generate_plot(data['PL'], 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols)
+        
+        data=get_datas(systemdict[systemname], 'from_IB', 'Close', 0)
+        (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
+
 html = html + '</table><h1>IB</h1><br><table>'
 #IB
 cols=3
@@ -217,7 +268,7 @@ ibdata=generate_ib_plot_from_trades('C2_Paper', 10000)
 
 data=get_data('IB_Live', 'paper', 'c2', 'trades', 0)
 (counter, html)=generate_plot(data['PL'], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
-cols=4
+cols=3
        
 html = html + '</table><h1>Paper</h1><br><table>'
 counter=0
@@ -225,16 +276,22 @@ for systemname in systemdict:
 
   if systemname != 'stratBTC':
     c2data=generate_paper_c2_plot(systemname, 10000)
-    (counter, html)=generate_plot(c2data['equitycurve'], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html)
+    (counter, html)=generate_plot(c2data['equitycurve'], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
 
     data=get_data(systemname, 'paper', 'c2', 'trades', 0)
-    (counter, html)=generate_plot(data['PL'], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
+    (counter, html)=generate_plot(data['PL'], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
+
+    data=get_datas(systemdict[systemname], 'from_IB', 'Close', 0)
+    (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
     ibdata=generate_paper_ib_plot(systemname, 10000)
-    (counter, html)=generate_plot(ibdata['equitycurve'], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html)
+    (counter, html)=generate_plot(ibdata['equitycurve'], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
 
     data=get_data(systemname, 'paper', 'ib', 'trades', 0)
-    (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
+    (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
+    
+    data=get_datas(systemdict[systemname], 'from_IB', 'Close', 0)
+    (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
 html = html + '</table><h1>BTC Paper</h1><br><table>'
 counter = 0
@@ -248,8 +305,6 @@ c2search=re.compile('c2')
 for file in files:
         if re.search(btcsearch, file):
                 if re.search(tradesearch, file):
-                        btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
-                        exchangename=re.sub('BTCUSD_','',btcname.rstrip())
                         if re.search(c2search, file):
                                 systemname=file
                                 systemname = re.sub('c2_','', systemname.rstrip())
@@ -269,6 +324,10 @@ for file in files:
 
                                 data=get_data(systemname, 'paper', 'ib', 'trades', 0)
                                 (counter, html)=generate_plot(data['realized_PnL'], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
+                        btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
+                            
+                        #data=get_datas(btcname, 'btapi', 'Close', 0)
+                        #(counter, html)=generate_plots(data, 'paper_' +btcname + 'Close', btcname + " Close Price", 'Close', counter, html, cols)
 
                         (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
                         (counter, html)=generate_html('OHLC_paper_' + btcname+'Close', counter, html, cols)
@@ -283,10 +342,10 @@ for file in files:
                 systemname = re.sub('.csv','', systemname.rstrip())
                 data = pd.read_csv(dataPath + file, index_col='Date')
                 if data.shape[0] > 2000:
-                    generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
-                            
+                    generate_plot(data['Close'].tail(2000), 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
+                    plt.close()
                     get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
-                    
+                    plt.close()
 html = html + '</body></html>'
 f = open('./data/results/index.html', 'w')
 f.write(html)

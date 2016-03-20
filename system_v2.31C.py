@@ -199,7 +199,7 @@ for ticker in livePairs:
     feature_selection = 'None' #RFECV OR Univariate
     #feature_selection = 'Univariate' #RFECV OR Univariate
     wfSteps=[1]
-    wf_is_periods = [25,100,250,500]
+    wf_is_periods = [25,250,500]
     #wf_is_periods = [100]
     tox_adj_proportion = 0
     nfeatures = 10

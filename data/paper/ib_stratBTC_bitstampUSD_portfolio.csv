@@ -1,2 +1,6 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,accountid,currency
+<<<<<<< HEAD
 BTCUSD,BTC,,-1.0,-1.0,414.66,414.66,4095000.0,20475.0,0.0,-72075.0,Paper,USD
+=======
+BTCUSD,BTC,,-1.0,-1.0,414.66,414.66,4084600.0,20423.0,0.0,-82423.0,Paper,USD
+>>>>>>> b402c770dcf3b48481f69c1d58d1d4b399c1b450

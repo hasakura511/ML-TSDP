@@ -92,7 +92,6 @@ def get_btcfeed():
     return
 
 def bitstamp_order_book_callback(data):
-    #print "book", data
     jsondata = json.loads(data)
     dataSet=json_normalize(jsondata).iloc[-1]
     if not feed.has_key('bitstampUSD'):
@@ -112,15 +111,16 @@ def bitstamp_order_book_callback(data):
         for ask in asks:
             data.append(ask[0])
         feed['bitstampUSD']['ask']=float(min(data))    
+    #print "book", data
     
 def bitstamp_trade_callback(data):
     #trade {"price": 408.80000000000001, "amount": 0.076399999999999996, "id": 10832011}
     jsondata = json.loads(data)
     dataSet=json_normalize(jsondata).iloc[-1]
     eastern=timezone('US/Eastern')
-    endDateTime=dt.now(get_localzone())
-    date=endDateTime.astimezone(eastern)
-    timestamp=int(date.strftime("%s"))
+    localendDateTime=dt.now(get_localzone())
+    localdate=localendDateTime.astimezone(eastern)
+    timestamp=int(localdate.strftime("%s"))
     vol=float(dataSet['amount'])
     price=float(dataSet['price'])
     exchange='bitstampUSD'
@@ -182,10 +182,10 @@ def get_signal():
                     commission_pct=float(commission['Pct'])
                     commission_cash=float(commission['Cash'])
                     
+                    system_pos=model.loc[system['System']]
+                    system_c2pos_qty=round(system_pos['action']) * system['c2qty']
+                    system_ibpos_qty=round(system_pos['action']) * system['ibqty']
                     if debug:
-                        system_pos=model.loc[system['System']]
-                        system_c2pos_qty=round(system_pos['action']) * system['c2qty']
-                        system_ibpos_qty=round(system_pos['action']) * system['ibqty']
                         print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
                         print        " System Algo: " + str(system['System']) 
                         print        " Ask: " + str(ask)
@@ -198,9 +198,11 @@ def get_signal():
                         endDateTime=dt.now(get_localzone())
                         date=endDateTime.astimezone(eastern)
                         date=date.strftime("%Y%m%d %H:%M:%S EST")
+
+			#print ' Qty: ' + str(system['ibqty']) + ' c2 ' + str(system['c2qty'])
                         adj_size(model, system['System'],system['Name'],pricefeed,\
-                        str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
-                            system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
+                        str(system['c2id']),system['c2api'],float(system['c2qty']),system['c2sym'],system['c2type'], system['c2submit'], \
+                            float(system['ibqty']),system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
                     time.sleep(1)
 
 def get_ohlc(ticker, exchange):

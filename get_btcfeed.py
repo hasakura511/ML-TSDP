@@ -122,7 +122,7 @@ def get_signal():
                         adj_size(model, system['System'],system['Name'],pricefeed,\
                         str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
                             system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
-                    time.sleep(1)
+                    time.sleep(120)
 
 def get_ohlc(ticker, exchange):
     global feed

@@ -295,17 +295,19 @@ for ticker in livePairs:
                            'Volume','prior_index','gainAhead'],
                             axis=1).dropna()
                             
-    print '\nIn-Sample Period: %i ' % wf_is_period
-    print 'Total %i features: ' % mData.shape[1]
-    for i,x in enumerate(mData.columns):
-        print i,x+',',
-        #feature_names = feature_names+[x]
+
         
     #  Select the date range to test no label for the last index
     mmData = mData.iloc[-wf_is_period:-1]
 
     datay = mmData.signal
     mmData = mmData.drop(['signal'],axis=1)
+    
+    print '\nIn-Sample Period: %i ' % wf_is_period
+    print 'Total %i features: ' % mmData.shape[1]
+    for i,x in enumerate(mmData.columns):
+        print i,x+',',
+        #feature_names = feature_names+[x]    
     dataX = mmData
 
     #  Copy from pandas dataframe to numpy arrays

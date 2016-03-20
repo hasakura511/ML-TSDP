@@ -24,13 +24,13 @@ def connect_handler(data): #this gets called when the Pusher connection is estab
     trades_channel = pusher.subscribe("live_trades")
     trades_channel.bind('trade', trade_callback)
 
-    #order_book_channel = pusher.subscribe('order_book');
-    #order_book_channel.bind('data', order_book_callback)
+    order_book_channel = pusher.subscribe('order_book');
+    order_book_channel.bind('data', order_book_callback)
 
-    #orders_channel = pusher.subscribe("live_orders")
-    #orders_channel.bind('order_deleted', order_deleted_callback)
-    #orders_channel.bind('order_created', order_created_callback)
-    #orders_channel.bind('order_changed', order_changed_callback)
+    orders_channel = pusher.subscribe("live_orders")
+    orders_channel.bind('order_deleted', order_deleted_callback)
+    orders_channel.bind('order_created', order_created_callback)
+    orders_channel.bind('order_changed', order_changed_callback)
 
 
 if __name__ == '__main__': #this is the main() function

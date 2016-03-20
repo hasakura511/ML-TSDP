@@ -87,7 +87,8 @@ def get_signal():
          ticker='BTCUSD'
          data=get_ohlc(ticker, exchange)
          if data.shape[0] > 2000:
-            model=get_v1signal(data.tail(2000), ticker, exchange)
+            #model=get_v1signal(data.tail(2000), ticker, exchange)
+            model=get_v1signal(data, ticker, exchange)
             for i in systemdata.index:
                 system=systemdata.ix[i].copy()
                 if system['System'] == 'BTCUSD':

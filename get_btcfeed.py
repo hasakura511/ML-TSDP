@@ -23,7 +23,7 @@ import websocket
 
 logging.basicConfig()
 
-debug=True
+debug=False
 
 feed={}
 ohlc={}
@@ -92,7 +92,7 @@ def get_btcfeed():
     return
 
 def bitstamp_order_book_callback(data):
-    print "book", data
+    #print "book", data
     jsondata = json.loads(data)
     dataSet=json_normalize(jsondata).iloc[-1]
     if not feed.has_key('bitstampUSD'):
@@ -115,7 +115,7 @@ def bitstamp_order_book_callback(data):
     #print "book", data
     
 def bitstamp_trade_callback(data):
-    print "trade", data
+    #print "trade", data
     #trade {"price": 408.80000000000001, "amount": 0.076399999999999996, "id": 10832011}
     jsondata = json.loads(data)
     dataSet=json_normalize(jsondata).iloc[-1]

@@ -75,7 +75,7 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
 WAIT_TIME = 30.0
 
 #system parameters
-#version = 'v2.21C'
+version = 'v1'
 filterName = 'DF1'
 data_type = 'ALL'
 
@@ -102,7 +102,7 @@ for pair in currencyPairs:
             #sys.exit("Offline Mode: "+sys.argv[0])
             
 for ticker in livePairs:
-    print '\n\nStarting v1 live run for',ticker,' Loading Params from v2..'
+    print '\n\nStarting',version,'live run for',ticker,' Loading Params from v2..'
     symbol=ticker[0:3]
     currency=ticker[3:6]
     bestModel = pd.read_csv(bestParamsPath+'v2_'+ticker+'.csv').iloc[-1]
@@ -295,17 +295,19 @@ for ticker in livePairs:
                            'Volume','prior_index','gainAhead'],
                             axis=1).dropna()
                             
-    print '\nIn-Sample Period: %i ' % wf_is_period
-    print 'Total %i features: ' % mData.shape[1]
-    for i,x in enumerate(mData.columns):
-        print i,x+',',
-        #feature_names = feature_names+[x]
+
         
     #  Select the date range to test no label for the last index
     mmData = mData.iloc[-wf_is_period:-1]
 
     datay = mmData.signal
     mmData = mmData.drop(['signal'],axis=1)
+    
+    print '\nIn-Sample Period: %i ' % wf_is_period
+    print 'Total %i features: ' % mmData.shape[1]
+    for i,x in enumerate(mmData.columns):
+        print i,x+',',
+        #feature_names = feature_names+[x]    
     dataX = mmData
 
     #  Copy from pandas dataframe to numpy arrays
@@ -403,7 +405,7 @@ for ticker in livePairs:
         compareEquity(sst, ticker)
 
     nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
-    print 'Next Signal for',dataSet.index[-1],'is', nextSignal
+    print version+'Next Signal for',dataSet.index[-1],'is', nextSignal
 
     signal_df=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
     #signal.to_csv('./signal/signalss/' + ticker + '.csv', index=False)

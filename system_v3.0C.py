@@ -217,7 +217,8 @@ for ticker in livePairs:
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
     validationSetLength = 7000
-    #validationPeriods = [50,100,250,500,1000,2500]
+    #validationSetLength = 500
+    #validationPeriods = [50,250]
     validationPeriods = [250,1400] # min is 2
     #validationStartPoint = None
     signal_types = ['gainAhead','ZZ']
@@ -232,7 +233,7 @@ for ticker in livePairs:
     feature_selection = 'None' #RFECV OR Univariate
     wfSteps=[1]
     wf_is_periods = [25,500]
-    #wf_is_periods = [2150]
+    #wf_is_periods = [10]
     tox_adj_proportion = 0
     nfeatures = 10
 
@@ -794,7 +795,8 @@ for ticker in livePairs:
             CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
                                                 validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
                                                 unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
-            model = ['validationPeriod', validationPeriod]
+            model = [validationDict[validationPeriod].iloc[-1].system.split('_')[4],\
+                            [m[1] for m in models if m[0] ==validationDict[validationPeriod].iloc[-1].system.split('_')[4]][0]]
             metaData['validationPeriod'] = validationPeriod
             #metaData['params'] =model[1]
             vCurve_metrics = update_report(vCurve_metrics, filterName,\
@@ -816,7 +818,8 @@ for ticker in livePairs:
             CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
                                                 validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
                                                 unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
-            model = ['validationPeriod', validationPeriod]
+            model = [validationDict[validationPeriod].iloc[-1].system.split('_')[4],\
+                            [m[1] for m in models if m[0] ==validationDict[validationPeriod].iloc[-1].system.split('_')[4]][0]]
             #metaData['model'] = model[0]
             #metaData['params'] =model[1]
             metaData['validationPeriod'] = validationPeriod
@@ -838,9 +841,8 @@ for ticker in livePairs:
     
     bestModel = bestModel.append(pd.Series(data=datetime.datetime.fromtimestamp(time.time())\
                                     .strftime('%Y-%m-%d %H:%M:%S'), index=['timestamp']))
-    bestModel = bestModel.append(pd.Series(data=bestModel.validationPeriod, index=['validationPeriod']))
     
-    print 'Saving Params..'
+    print version, 'Saving Params..'
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
     if version+'_'+ticker + '.csv' not in files:
         BMdf = pd.concat([bestModel,bestModel],axis=1).transpose()
@@ -855,7 +857,7 @@ for ticker in livePairs:
         scored_models.to_csv(scorePath+version+'_'+ticker+'.csv')
         
     if runDPS:    
-        print '\nNext Signal:'
+        print '\n'+version, 'Next Signal:'
         print BMdict[bestModel.validationPeriod].iloc[-1].system
         print BMdict[bestModel.validationPeriod].drop(['system'],axis=1).iloc[-1]
          

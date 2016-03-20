@@ -10,13 +10,13 @@ start /b .\start_usdchf_v3.cmd
 start /b .\start_audusd_v3.cmd
 start /b .\start_usdcad_v3.cmd
 
-rem start /b .\start_eurjpy_v2.cmd
-rem start /b .\start_eurusd_v2.cmd
-rem start /b .\start_gbpusd_v2.cmd
-rem start /b .\start_usdjpy_v2.cmd
-rem start /b .\start_usdchf_v2.cmd
-rem start /b .\start_audusd_v2.cmd
-rem start /b .\start_usdcad_v2.cmd
+start /b .\start_eurjpy_v2.cmd
+start /b .\start_eurusd_v2.cmd
+start /b .\start_gbpusd_v2.cmd
+start /b .\start_usdjpy_v2.cmd
+start /b .\start_usdchf_v2.cmd
+start /b .\start_audusd_v2.cmd
+start /b .\start_usdcad_v2.cmd
 
 PING -n 600 127.0.0.1>nul
 

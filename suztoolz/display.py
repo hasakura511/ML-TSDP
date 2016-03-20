@@ -697,7 +697,7 @@ def directional_scoring(model_metrics, sample1, sample2=None):
     #Only Minmax score of the separated samples 1 and 2 are used to rank between apples and apples.
     #removed accuracy and drawdown to focus more on monte carlo distribution, added TPY to minimize trades
     #sample1
-    model_score_s1 = model_metrics.loc[model_metrics['sample'] == sample1].reset_index()
+    model_score_s1 = model_metrics.loc[model_metrics['sample'] == sample1].reset_index().copy(deep=True)
     model_score_s1['f1mm'] =minmax_scale(robust_scale(model_score_s1.f1.reshape(-1, 1)))
     model_score_s1['accmm'] =minmax_scale(robust_scale(model_score_s1.acc.reshape(-1, 1)))
     model_score_s1['precmm'] =minmax_scale(robust_scale(model_score_s1.prec.reshape(-1, 1)))

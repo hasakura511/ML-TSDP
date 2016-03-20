@@ -112,7 +112,7 @@ def bitstamp_order_book_callback(data):
         for ask in asks:
             data.append(ask[0])
         feed['bitstampUSD']['ask']=float(min(data))    
-    print "book", data
+    #print "book", data
     
 def bitstamp_trade_callback(data):
     print "trade", data
@@ -131,7 +131,7 @@ def bitstamp_trade_callback(data):
     #print "Price: " + str(price)
     #feed[exchange]=dataSet
     feed_to_ohlc('BTCUSD',exchange, float(price), int(timestamp), float(vol))
-    print "trade", data
+    #print "trade", data
     
     
 def bitstamp_connect_handler(data): #this gets called when the Pusher connection is established

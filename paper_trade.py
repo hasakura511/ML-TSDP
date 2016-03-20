@@ -134,7 +134,7 @@ while not finished:
         model=model_pos
         if system['Version'] == 'v1':
                 model=model_pos
-        elif system['Version'] == 'v2':
+        elif system['Version'] == 'v2' or system['Version'] == 'v3':
                 model=dps_model_pos
         
         filename='./data/paper/' + system['Name'] + '_portfolio.csv'

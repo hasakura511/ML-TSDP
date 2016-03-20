@@ -118,8 +118,12 @@ finished=False
 while not finished:
     
     model_pos=get_model_pos(['EURJPY','EURUSD','GBPUSD','USDCHF','USDJPY','AUDUSD','USDCAD'])
-    dps_model_pos=get_dps_model_pos(['v2_EURJPY','v2_EURUSD','v2_GBPUSD','v2_USDCHF','v2_USDJPY','v2_AUDUSD','v2_USDCAD'])
-    
+    dps_model_pos=get_dps_model_pos(['v2_EURJPY','v2_EURUSD','v2_GBPUSD','v2_USDCHF',
+                                 'v2_USDJPY','v2_AUDUSD','v2_USDCAD',
+                                 'v3_EURJPY','v3_EURUSD','v3_GBPUSD','v3_USDCHF',
+                                 'v3_USDJPY','v3_AUDUSD','v3_USDCAD',
+                                 ])
+                                 
     #subprocess.call(['python', 'get_ibpos.py'])
     #ib_pos=get_ibpos()
     #ib_pos=get_ibpos_from_csv()

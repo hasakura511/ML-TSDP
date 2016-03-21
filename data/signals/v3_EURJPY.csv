@@ -1778,3 +1778,12 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-21 11:36:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 5874 is less than required validation set + training set of 7500
 2016-03-21 11:37:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 5874 is less than required validation set + training set of 7500
 2016-03-21 11:37:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 5875 is less than required validation set + training set of 7500
+2016-03-21 07:26:00,-1.0,0.0,5924.0,2.76861605905,0.0489822641199,0.000486147131432,0.00134595475515,"bothEURJPY_ALL_DF1_LDA_i500_ZZ 0.009,-0.009 DPS wl30.0 maxL5 dd95_0.001 thres_0.0"
+2016-03-21 16:25:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6063 is less than required validation set + training set of 7500
+2016-03-21 16:26:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6064 is less than required validation set + training set of 7500
+2016-03-21 16:27:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6065 is less than required validation set + training set of 7500
+2016-03-21 16:28:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6066 is less than required validation set + training set of 7500
+2016-03-21 16:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6067 is less than required validation set + training set of 7500
+2016-03-21 16:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6068 is less than required validation set + training set of 7500
+2016-03-21 16:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6069 is less than required validation set + training set of 7500
+2016-03-21 16:34:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6071 is less than required validation set + training set of 7500

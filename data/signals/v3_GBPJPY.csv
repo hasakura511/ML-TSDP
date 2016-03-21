@@ -1,0 +1,17 @@
+dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
+2016-03-21 07:22:00,1.0,-0.000326967331293,7340.0,1.0,,,,bothGBPJPY_ALL_DF1_LDA_i25_gainAhead
+2016-03-21 07:23:00,1.0,0.000196244564337,7341.0,1.0,,,,bothGBPJPY_ALL_DF1_LDA_i25_gainAhead
+2016-03-21 07:24:00,1.0,-0.000364382682791,7342.0,1.0,,,,bothGBPJPY_ALL_DF1_LDA_i25_gainAhead
+2016-03-21 07:25:00,1.0,-7.16568943278e-05,7343.0,1.0,,,,bothGBPJPY_ALL_DF1_LDA_i25_gainAhead
+2016-03-21 07:26:00,-1.0,0.0,7344.0,1.0,,,,bothGBPJPY_ALL_DF1_LDA_i25_gainAhead
+2016-03-21 16:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7487 is less than required validation set + training set of 7500
+2016-03-21 16:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7488 is less than required validation set + training set of 7500
+2016-03-21 16:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7489 is less than required validation set + training set of 7500
+2016-03-21 16:34:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7491 is less than required validation set + training set of 7500
+2016-03-21 16:35:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7492 is less than required validation set + training set of 7500
+2016-03-21 16:36:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7493 is less than required validation set + training set of 7500
+2016-03-21 16:37:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7494 is less than required validation set + training set of 7500
+2016-03-21 16:38:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7495 is less than required validation set + training set of 7500
+2016-03-21 16:39:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7497 is less than required validation set + training set of 7500
+2016-03-21 16:40:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7498 is less than required validation set + training set of 7500
+2016-03-21 16:41:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7499 is less than required validation set + training set of 7500

@@ -1,0 +1,13 @@
+dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
+2016-03-21 07:22:00,-1.0,-2.92714340075e-05,7326.0,0.761992059352,0.583066424,0.00176636322994,0.00134595475515,bothCADJPY_ALL_DF1_LDA_i25_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-21 07:23:00,1.0,0.000181488203267,7327.0,0.878360871894,0.482182450382,0.00153234826165,0.00134595475515,bothCADJPY_ALL_DF1_LDA_i25_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-21 07:24:00,-1.0,-0.0001229213128,7328.0,1.03150394695,0.404109801332,0.00130484692678,0.00134595475515,bothCADJPY_ALL_DF1_LDA_i25_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-21 07:25:00,-1.0,9.36658470905e-05,7329.0,1.20604799976,0.216997340642,0.00111600430116,0.00134595475515,bothCADJPY_ALL_DF1_LDA_i25_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-21 07:26:00,-1.0,0.0,7330.0,1.1513477109,0.297403405096,0.00116902543203,0.00134595475515,bothCADJPY_ALL_DF1_LDA_i25_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-21 15:58:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7441 is less than required validation set + training set of 7500
+2016-03-21 15:59:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7442 is less than required validation set + training set of 7500
+2016-03-21 16:00:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7444 is less than required validation set + training set of 7500
+2016-03-21 16:01:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7444 is less than required validation set + training set of 7500
+2016-03-21 16:02:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7445 is less than required validation set + training set of 7500
+2016-03-21 16:03:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7446 is less than required validation set + training set of 7500
+2016-03-21 16:03:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7447 is less than required validation set + training set of 7500

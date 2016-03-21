@@ -159,8 +159,9 @@ def get_signal():
     global systemdata
     global commissiondata
     while True:
-      myfeed=feed.copy()
-      for exchange in myfeed:
+      try:
+       myfeed=feed.copy()
+       for exchange in myfeed:
             
         ticker='BTCUSD'
         if get_btc_ask(ticker, exchange) > 0 and get_btc_bid(ticker, exchange) > 0:
@@ -206,7 +207,12 @@ def get_signal():
                         str(system['c2id']),system['c2api'],float(system['c2qty']),system['c2sym'],system['c2type'], system['c2submit'], \
                             float(system['ibqty']),system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
                     time.sleep(1)
-
+      except Exception as e:
+        f=open ('./debug/btcerrors.log','a')
+        f.write(e)
+        f.close()
+        
+        
 def get_ohlc(ticker, exchange):
     global feed
     global ohlc

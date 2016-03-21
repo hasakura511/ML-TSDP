@@ -65,3 +65,106 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=localbtcUSD HTTP/1.1" 200 96136
 ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
 ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=rockUSD HTTP/1.1" 200 2037
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=coinfloorGBP HTTP/1.1" 200 5477
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=coinbaseGBP HTTP/1.1" 200 20247
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=itbitSGD HTTP/1.1" 200 3800
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=itbitUSD HTTP/1.1" 200 12184
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string

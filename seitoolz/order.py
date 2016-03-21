@@ -17,12 +17,12 @@ def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant,
     print "system: " + system
     if c2submit == 'TRUE':
         c2submit=True
-    else:
+    elif c2submit == 'FALSE':
         c2submit=False
         
     if ibsubmit == 'TRUE':
         ibsubmit=True
-    else:
+    elif ibsubmit == 'FALSE':
         ibsubmit=False
     #print str(system_pos['action'])
     #print "c2: " 

@@ -15,6 +15,15 @@ def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant,
     system_pos=model_pos.loc[system]
    
     print "system: " + system
+    if c2submit == 'TRUE':
+        c2submit=True
+    else:
+        c2submit=False
+        
+    if ibsubmit == 'TRUE':
+        ibsubmit=True
+    else:
+        ibsubmit=False
     #print str(system_pos['action'])
     #print "c2: " 
     #print c2_pos

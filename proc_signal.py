@@ -25,8 +25,10 @@ dps_model_pos=get_dps_model_pos(['v2_NZDJPY','v2_CADJPY','v2_CHFJPY','v2_EURGBP'
                                  'v2_GBPJPY','v2_EURCHF','v2_AUDJPY',
                                  'v2_AUDUSD','v2_EURUSD','v2_GBPUSD','v2_USDCAD',
                                  'v2_USDCHF','v2_USDJPY','v2_EURJPY','v2_NZDUSD',
-                                 'v3_EURJPY','v3_EURUSD','v3_GBPUSD','v3_USDCHF',
-                                 'v3_USDJPY','v3_AUDUSD','v3_USDCAD',
+                                 'v3_NZDJPY','v3_CADJPY','v3_CHFJPY','v3_EURGBP',
+                                 'v3_GBPJPY','v3_EURCHF','v3_AUDJPY',
+                                 'v3_AUDUSD','v3_EURUSD','v3_GBPUSD','v3_USDCAD',
+                                 'v3_USDCHF','v3_USDJPY','v3_EURJPY','v3_NZDUSD',
                                  ])
 
 subprocess.call(['python', 'get_ibpos.py'])

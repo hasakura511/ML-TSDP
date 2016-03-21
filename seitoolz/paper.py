@@ -172,7 +172,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     quant=-abs(quant)
                     
                 (closeVWAP, closedqty)=calc_closeVWAP(closeVWAP, closedqty, price, quant)
-                (openVWAP, openqty, commission, buy_power, purepl, ptValue,side) =           \
+                (openVWAP, openqty, commission, buy_power, purepl, ptValue,side, tradepurepl) =           \
                     calc_close_pos(openVWAP,openqty, price, quant,                      \
                     pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], currency, \
                     pricefeed['C2Mult'])
@@ -188,6 +188,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['closing_price_VWAP']=closeVWAP
                 pos['quant_closed']=abs(closedqty)
                 pos['PL']=pl
+                pos['PurePL']=float(pos['PurePL']) + tradepurepl
                 pos['commission']=pos['commission'] + commission
                 pos['long_or_short']=side
                 
@@ -239,12 +240,12 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                                 '',0,'',sym,side, \
                                 date,date,'open',date,openVWAP, \
                                 ptValue,'',0,abs(openqty),'',sym,systemname, \
-                                commission]] \
+                                commission,0]] \
             ,columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
             'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
             'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
             'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description', \
-            'commission']).iloc[-1]
+            'commission','PurePL']).iloc[-1]
             update_c2_trades(systemname, pos, tradepl, pl, buy_power, date)
             update_c2_portfolio(systemname, pos, date)
         else:
@@ -293,6 +294,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['real_pnl']=pl
                 pos['unr_pnl']=0
                 
+                
                 if debug:
                     print "IB " + action + ' ' + str(symbol) + "@" + str(price) + "[" + str(quant) + "] Opened @ " + \
                         str(openVWAP) + "[" + str(openqty) + "]" 
@@ -309,7 +311,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     price=pricefeed['Bid']
                     quant=-abs(quant)
  
-                (openVWAP, openqty, commission, buy_power, purepl, ptValue,side) =           \
+                (openVWAP, openqty, commission, buy_power, purepl, ptValue,side,tradepurepl) =           \
                     calc_close_pos(openVWAP,openqty, price, quant,                      \
                     pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], currency, \
                     pricefeed['IBMult'])
@@ -323,6 +325,8 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['real_pnl']=pl
                 pos['avg_cost']=commission
                 pos['unr_pnl']=0
+                pos['PurePL']=float(pos['PurePL']) + tradepurepl
+                
                 
                 if debug:
                     print "IB " + action + " " + str(symbol) + "@" + str(price) + "[" + str(quant) + "] Opened @ " + \
@@ -354,10 +358,10 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
              
             pos=pd.DataFrame([[sym,'',openqty,openVWAP,openVWAP, buy_power, \
                                     commission, 0, pl, 'Paper', \
-                                    currency,openqty]], 
+                                    currency,openqty,0]], 
                                  columns=['sym','exp','qty','price','openprice','value', \
                                  'avg_cost','unr_pnl','real_pnl','accountid', \
-                                 'currency', 'openqty']).iloc[-1]
+                                 'currency', 'openqty','PurePL']).iloc[-1]
             
             update_ib_trades(systemname, pos, pl, buy_power, exch, date)
             update_ib_portfolio(systemname, pos, date)   
@@ -394,7 +398,7 @@ def calc_close_pos(openAt, openqty, closeAt, closeqty, comPct, comCash, currency
     if qty < 0:
         side='short'
     
-    return (openAt, qty, commission, value, pl, mult, side)
+    return (openAt, qty, commission, value, pl, mult, side, purepl)
 
 def calc_closeVWAP(closeVWAP, closedqty, addVWAP, addqty):
     newVWAP = (abs(closeVWAP * closedqty) + abs(addVWAP*addqty)) / (abs(closedqty) + abs(addqty))

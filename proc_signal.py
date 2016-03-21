@@ -16,30 +16,30 @@ from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.order import adj_size
 from time import gmtime, strftime, localtime, sleep
 
-model_pos=get_model_pos(['NZDJPY','CADJPY','CHFJPY','EURGBP',\
-                 'GBPJPY','EURCHF','AUDJPY',\
-                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY','NZDUSD'])
- 
-dps_model_pos=get_dps_model_pos(['v2_NZDJPY','v2_CADJPY','v2_CHFJPY','v2_EURGBP',
-                                 'v2_GBPJPY','v2_EURCHF','v2_AUDJPY',
-                                 'v2_AUDUSD','v2_EURUSD','v2_GBPUSD','v2_USDCAD',
-                                 'v2_USDCHF','v2_USDJPY','v2_EURJPY','v2_NZDUSD',
-                                 'v3_NZDJPY','v3_CADJPY','v3_CHFJPY','v3_EURGBP',
-                                 'v3_GBPJPY','v3_EURCHF','v3_AUDJPY',
-                                 'v3_AUDUSD','v3_EURUSD','v3_GBPUSD','v3_USDCAD',
-                                 'v3_USDCHF','v3_USDJPY','v3_EURJPY','v3_NZDUSD',
-                                 ])
+currencyList=dict()
+v1sList=dict()
+dpsList=dict()
+systemdata=pd.read_csv('./data/systems/system.csv')
+systemdata=systemdata.reset_index()
+for i in systemdata.index:
+    system=systemdata.ix[i]
+    if system['ibsym'] != 'BTC':
+      currencyList[system['ibsym']+system['ibcur']]=1
+      if system['Version'] == 'v1':
+          v1sList[system['System']]=1
+      else:
+          dpsList[system['System']]=1
+
+currencyPairs = currencyList.keys()
+model_pos=get_model_pos(v1sList.keys())
+dps_model_pos=get_dps_model_pos(dpsList.keys())
 
 subprocess.call(['python', 'get_ibpos.py'])
 #ib_pos=get_ibpos()
 ib_pos=get_ibpos_from_csv()
 
-data=pd.read_csv('./data/systems/system.csv')
-data=data.reset_index()
-
-for i in data.index:
-   system=data.ix[i]
+for i in systemdata.index:
+   system=systemdata.ix[i]
    model=model_pos
    if system['c2sym'] != 'BTCUSD':
         if system['Version'] == 'v1':

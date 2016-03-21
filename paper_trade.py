@@ -43,8 +43,25 @@ from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.paper import adj_size
 from time import gmtime, strftime, localtime, sleep
 
+currencyList=dict()
+v1sList=dict()
+dpsList=dict()
+
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
+for i in systemdata.index:
+    system=systemdata.ix[i]
+    if system['ibsym'] != 'BTC':
+     
+      currencyList[system['ibsym']+system['ibcur']]=1
+      if system['Version'] == 'v1':
+          v1sList[system['System']]=1
+      else:
+          dpsList[system['System']]=1
+
+
+currencyPairs = currencyList.keys()
+
 commissiondata=pd.read_csv('./data/systems/commission.csv')
 commissiondata=commissiondata.reset_index()
 commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + commissiondata['Exchange']
@@ -89,11 +106,6 @@ barSizeSetting='1 min'
 whatToShow='MIDPOINT'
 ticker = symbol + currency
 
-currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
-                 'EURGBP','GBPJPY','EURCHF','AUDJPY',\
-                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY','NZDUSD']
-
 currencyPairsDict = {}
 tickerId=1
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -117,13 +129,8 @@ for pair in currencyPairs:
 finished=False
 while not finished:
     
-    model_pos=get_model_pos(['EURJPY','EURUSD','GBPUSD','USDCHF','USDJPY','AUDUSD','USDCAD'])
-    dps_model_pos=get_dps_model_pos(['v2_EURJPY','v2_EURUSD','v2_GBPUSD','v2_USDCHF',
-                                 'v2_USDJPY','v2_AUDUSD','v2_USDCAD',
-                                 'v3_EURJPY','v3_EURUSD','v3_GBPUSD','v3_USDCHF',
-                                 'v3_USDJPY','v3_AUDUSD','v3_USDCAD',
-                                 ])
-                                 
+    model_pos=get_model_pos(v1sList.keys())
+    dps_model_pos=get_dps_model_pos(dpsList.keys())                                 
     #subprocess.call(['python', 'get_ibpos.py'])
     #ib_pos=get_ibpos()
     #ib_pos=get_ibpos_from_csv()

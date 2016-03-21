@@ -28,9 +28,27 @@ import pytz
 from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
-
-#other
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
+import os
+
+currencyList=dict()
+v1sList=dict()
+dpsList=dict()
+
+systemdata=pd.read_csv('./data/systems/system.csv')
+systemdata=systemdata.reset_index()
+for i in systemdata.index:
+    system=systemdata.ix[i]
+    if system['ibsym'] != 'BTC':
+     
+      currencyList[system['ibsym']+system['ibcur']]=1
+      if system['Version'] == 'v1':
+          v1sList[system['System']]=1
+      else:
+          dpsList[system['System']]=1
+
+
+currencyPairs = currencyList.keys()
 
 start_time = time.time()
 
@@ -72,12 +90,6 @@ barSizeSetting='1 min'
 whatToShow='MIDPOINT'
 ticker = symbol + currency
 
-currencyPairs = ['NZDJPY','CADJPY','CHFJPY', \
-                 'EURGBP','GBPJPY','EURCHF','AUDJPY',\
-                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY','NZDUSD']
-
-
 def get_ibfeed(sym, cur):
 	get_feed(sym, cur,'IDEALPRO','CASH')
 
@@ -87,7 +99,9 @@ files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 for pair in currencyPairs:
     filename=dataPath+barSizeSetting+'_'+pair+'.csv'
     data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
-   
+    if os.path.isfile(filename):
+        data=pd.read_csv(filename, index_col='Date')
+        
     eastern=timezone('US/Eastern')
     endDateTime=dt.now(get_localzone())
     date=endDateTime.astimezone(eastern)

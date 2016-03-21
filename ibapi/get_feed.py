@@ -47,14 +47,6 @@ def getDataFromIB( brokerData,endDateTime,data):
 
 def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename,tickerId, minDataPoints, durationStr, barSizeSetting):
         print "Requesting history for: " + symbol + currency + " ending: " + date
-        #for pair in currencyPairs:
-        #turn this off to get progressively older dates for testing.
-        #filename=dataPath+barSizeSetting+'_'+pair+'.csv'
-        #data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
-       
-        #eastern=timezone('US/Eastern')
-        #date=endDateTime.astimezone(eastern)
-        #date=date.strftime("%Y%m%d %H:%M:%S EST")
         
         brokerData = {}
         brokerData =  {'port':7496, 'client_id':101,\

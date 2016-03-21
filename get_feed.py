@@ -80,7 +80,7 @@ else:
     
 #data Parameters
 #cycles = 2
-minDataPoints = 2000
+minDataPoints = 10000
 exchange='IDEALPRO'
 symbol='AUD'
 currency='USD'

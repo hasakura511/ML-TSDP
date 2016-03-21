@@ -60,7 +60,9 @@ data=data.reset_index()
 c2dict={}
 for i in data.index:
         system=data.ix[i]
-        c2dict[system['c2id']]=(system['Name'],system['c2api'])
+	print system['Name'] + ' ' + str(system['c2submit'])
+	if system['c2submit']:
+	        c2dict[system['c2id']]=(system['Name'],system['c2api'])
 
 for c2id in c2dict:
     (stratName,c2api)=c2dict[c2id]

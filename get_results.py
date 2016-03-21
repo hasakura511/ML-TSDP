@@ -231,12 +231,14 @@ commissiondata=commissiondata.set_index('key')
 start_time = time.time()
 
 systemdict={}
+c2dict={}
 for i in systemdata.index:
     
     system=systemdata.ix[i]
     print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
     print        " System Algo: " + str(system['System']) 
-    
+    if system['c2submit']:
+	c2dict[system['Name']]=1  
     if not systemdict.has_key(system['Name']):
         systemdict[system['Name']]=list()
         systemdict[system['Name']].append(system['ibsym']+ system['ibcur'])
@@ -250,8 +252,8 @@ counter=0
 cols=3
 #C2
 for systemname in systemdict:
-    #if systemdict[systemname]['c2submit']:
-        c2data=generate_c2_plot(systemname, 10000)
+    if c2dict.has_key(systemname):
+        c2data=generate_c2_plot(systemname, 0)
         (counter, html)=generate_plot(c2data['equitycurve'], 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols)
         
         data=get_data(systemname, 'c2api', 'c2', 'trades', 0)
@@ -263,19 +265,19 @@ for systemname in systemdict:
 html = html + '</table><h1>IB</h1><br><table>'
 #IB
 cols=3
-ibdata=generate_ib_plot('IB_Paper', 10000)
+ibdata=generate_ib_plot('IB_Paper', 0)
 (counter, html)=generate_plot(ibdata['equitycurve'], 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
 
-ibdata=generate_ib_plot_from_trades('IB_Paper', 10000)
+ibdata=generate_ib_plot_from_trades('IB_Paper', 0)
 (counter, html)=generate_plot(ibdata['equitycurve'], 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
 
 data=get_data('IB_Live', 'paper', 'ib', 'trades', 0)
 (counter, html)=generate_plot(data['realized_PnL'], 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
         
-ibdata=generate_ib_plot('C2_Paper', 10000)
+ibdata=generate_ib_plot('C2_Paper', 0)
 (counter, html)=generate_plot(ibdata['equitycurve'], 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
 
-ibdata=generate_ib_plot_from_trades('C2_Paper', 10000)
+ibdata=generate_ib_plot_from_trades('C2_Paper', 0)
 (counter, html)=generate_plot(ibdata['equitycurve'], 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
 
 data=get_data('IB_Live', 'paper', 'c2', 'trades', 0)
@@ -287,7 +289,7 @@ counter=0
 for systemname in systemdict:
 
   if systemname != 'stratBTC':
-    c2data=generate_paper_c2_plot(systemname, 10000)
+    c2data=generate_paper_c2_plot(systemname, 0)
     (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePL']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
 
     data=get_data(systemname, 'paper', 'c2', 'trades', 0)
@@ -296,7 +298,7 @@ for systemname in systemdict:
     data=get_datas(systemdict[systemname], 'from_IB', 'Close', 0)
     (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
-    ibdata=generate_paper_ib_plot(systemname, 10000)
+    ibdata=generate_paper_ib_plot(systemname, 0)
     (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePL']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
 
     data=get_data(systemname, 'paper', 'ib', 'trades', 0)
@@ -322,7 +324,7 @@ for file in files:
                                 systemname = re.sub('c2_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
                                 print systemname
-                                c2data=generate_paper_c2_plot(systemname, 10000)                                   
+                                c2data=generate_paper_c2_plot(systemname, 0)                                   
                                 (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePL']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html)
 
                                 data=get_data(systemname, 'paper', 'c2', 'trades', 0)
@@ -331,7 +333,7 @@ for file in files:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
-                                ibdata=generate_paper_ib_plot(systemname, 10000)
+                                ibdata=generate_paper_ib_plot(systemname, 0)
                                 (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePL']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html)
 
                                 data=get_data(systemname, 'paper', 'ib', 'trades', 0)

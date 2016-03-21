@@ -88,13 +88,15 @@ def get_v1signal(data, ticker, exchange, debug=False, saveEquity=False, equityFi
     #  Initialize the confusion matrix
     cm_sum_is = np.zeros((2,2))
     cm_sum_oos = np.zeros((2,2))
-        
+    
+    dX=np.nan_to_num(dX)
+    dy=np.nan_to_num(dy)
     #  For each entry in the set of splits, fit and predict
     for train_index,test_index in sss:
         X_train, X_test = dX[train_index], dX[test_index]
         y_train, y_test = dy[train_index], dy[test_index] 
     
-    
+        
     #  fit the model to the in-sample data
         model.fit(X_train, y_train)
     

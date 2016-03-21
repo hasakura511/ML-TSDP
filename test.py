@@ -35,4 +35,5 @@ for file in files:
 		if systemname == 'BTCUSD_rockEUR':
                  data = pd.read_csv(dataPath + file, index_col='Date')
                  if data.shape[0] > 2000:
-                    get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, debug)
+                    get_v1signal(data, 'BTCUSD_' + systemname, systemname, debug)
+                    #get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, debug)

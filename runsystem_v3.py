@@ -25,7 +25,11 @@ logging.basicConfig()
 
 debug=False
 
-pairs=['EURJPY','EURUSD','GBPUSD','USDJPY','USDCHF','AUDUSD','USDCAD','AUDJPY']
+pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
+                 'GBPJPY','EURCHF','AUDJPY',\
+                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
+                 'USDCHF','USDJPY','EURJPY','NZDUSD']
+                
 
 def runv3(pair):
     while 1:

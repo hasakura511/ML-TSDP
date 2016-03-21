@@ -7,6 +7,7 @@ v3.0 "KOBE"
 added validation period optimization
 added more pairs
 fixed offline mode
+added minute version of CAR25
 
 v2.3C "MJ"
 added params folder
@@ -89,7 +90,7 @@ from suztoolz.display import sss_display_cmatrix, is_display_cmatrix2,\
                          oos_display_cmatrix2, init_report, update_report,\
                          showPDF, showCDF, getToxCDF, plot_learning_curve,\
                          directional_scoring, compareEquity, describeDistribution
-from suztoolz.loops import sss_iterate_train, adjustDataProportion, CAR25_df,\
+from suztoolz.loops import sss_iterate_train, adjustDataProportion, CAR25_df_min,\
                             maxCAR25, wf_classify_validate, sss_regress_train, calcDPS2,\
                             calcEquity2, createBenchmark, createYearlyStats, findBestDPS,\
                             calcEquity_df
@@ -120,13 +121,13 @@ if len(sys.argv)==1:
                     #'NZDJPY',\
                     #'CADJPY',\
                     #'CHFJPY',\
-                    #'EURJPY',\
+                    'EURJPY',\
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
-                    'GBPUSD',\
+                    #'GBPUSD',\
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
@@ -148,7 +149,7 @@ if len(sys.argv)==1:
     equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
-    dataPath = 'D:/Dropbox/SharedTSDP/data/from_IB/'
+    dataPath = 'D:/ML-TSDP/data/from_IB/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     
 else:
@@ -216,10 +217,10 @@ for ticker in livePairs:
 
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 7000
-    #validationSetLength = 500
+    #validationSetLength = 7000
+    validationSetLength = 5000
     #validationPeriods = [50,250]
-    validationPeriods = [250,1400] # min is 2
+    validationPeriods = [250,1000] # min is 2
     #validationStartPoint = None
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
@@ -254,7 +255,7 @@ for ticker in livePairs:
     windowLengths = [30]
     maxLeverage = [5]
     PRT={}
-    PRT['DD95_limit'] = 0.05
+    PRT['DD95_limit'] = 0.01
     PRT['tailRiskPct'] = 95
     PRT['initial_equity'] = 1.0
     PRT['horizon'] = 720
@@ -792,7 +793,7 @@ for ticker in livePairs:
                 validationDict[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
                                                                 str(validationDict[validationPeriod].index[0]).replace(':','')+'_to_'+\
                                                                 str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
-            CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
+            CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
                                                 validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
                                                 unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
             model = [validationDict[validationPeriod].iloc[-1].system.split('_')[4],\
@@ -815,7 +816,7 @@ for ticker in livePairs:
                 validationDict[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
                                                                 str(validationDict[validationPeriod].index[0]).replace(':','')+'_to_'+\
                                                                 str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
-            CAR25_oos = CAR25_df(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
+            CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
                                                 validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
                                                 unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
             model = [validationDict[validationPeriod].iloc[-1].system.split('_')[4],\

@@ -123,7 +123,7 @@ def get_v1signal(data, ticker, exchange, debug=False, saveEquity=False, equityFi
     accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
     f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
     
-    print "\n\nSymbol is ", ticker
+    print "\n\nSymbol is ", ticker + ' ' + exchange
     print "Learning algorithm is", model
     print "Confusion matrix for %i randomized tests" % iterations
     print "for years ", dataSet.index[0] , " through ", dataSet.index[-2]  

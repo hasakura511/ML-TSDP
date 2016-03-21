@@ -16,9 +16,15 @@ from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.order import adj_size
 from time import gmtime, strftime, localtime, sleep
 
-model_pos=get_model_pos(['EURJPY','EURUSD','GBPUSD','USDCHF','USDJPY','AUDUSD','USDCAD'])
-dps_model_pos=get_dps_model_pos(['v2_EURJPY','v2_EURUSD','v2_GBPUSD','v2_USDCHF',
-                                 'v2_USDJPY','v2_AUDUSD','v2_USDCAD',
+model_pos=get_model_pos(['NZDJPY','CADJPY','CHFJPY','EURGBP',\
+                 'GBPJPY','EURCHF','AUDJPY',\
+                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
+                 'USDCHF','USDJPY','EURJPY','NZDUSD'])
+ 
+dps_model_pos=get_dps_model_pos(['v2_NZDJPY','v2_CADJPY','v2_CHFJPY','v2_EURGBP',
+                                 'v2_GBPJPY','v2_EURCHF','v2_AUDJPY',
+                                 'v2_AUDUSD','v2_EURUSD','v2_GBPUSD','v2_USDCAD',
+                                 'v2_USDCHF','v2_USDJPY','v2_EURJPY','v2_NZDUSD',
                                  'v3_EURJPY','v3_EURUSD','v3_GBPUSD','v3_USDCHF',
                                  'v3_USDJPY','v3_AUDUSD','v3_USDCAD',
                                  ])

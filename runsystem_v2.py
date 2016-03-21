@@ -21,7 +21,7 @@ import logging
 import time
 import websocket
 
-logging.basicConfig()
+logging.basicConfig(filename='/logs/runsystem_v2.log',level=logging.DEBUG)
 
 debug=False
 
@@ -43,6 +43,7 @@ def runv2(pair):
 	 f=open ('./debug/v2run' + pair + '.log','a')
 	 f.write(e)
 	 f.close()
+	 logging.error("something bad happened", exc_info=True)
     return
 
 threads = []

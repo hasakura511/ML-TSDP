@@ -21,7 +21,7 @@ import logging
 import time
 import websocket
 
-logging.basicConfig()
+logging.basicConfig(filename='./debug/get_btcfeed.log',level=logging.DEBUG)
 
 debug=False
 
@@ -208,9 +208,10 @@ def get_signal():
                             float(system['ibqty']),system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
                     time.sleep(1)
       except Exception as e:
-        f=open ('./debug/btcerrors.log','a')
+        f=open ('./debug/get_btcfeed_cerrors.log','a')
         f.write(e)
         f.close()
+        logging.error("something bad happened", exc_info=True)
         
         
 def get_ohlc(ticker, exchange):

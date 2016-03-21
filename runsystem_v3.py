@@ -21,7 +21,7 @@ import logging
 import time
 import websocket
 
-logging.basicConfig()
+logging.basicConfig(filename='/logs/runsystem_v3.log',level=logging.DEBUG)
 
 debug=False
 
@@ -31,13 +31,22 @@ pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
                 
 
+
 def runv3(pair):
     while 1:
-	print 'Starting V3: ' + pair
-	f=open ('/logs/' + pair + 'v3.log','a')
-    	subprocess.call(['python','system_v3.0C.py',pair,'1'], stdout=f)
+     try:
+         f=open ('/logs/' + pair + 'v3.log','a')
+	 print 'Starting v3: ' + pair
+	 f.write('Starting v3: ' + pair)
+         subprocess.call(['python','system_v3.0C.py',pair,'1'], stdout=f)
+         f.close()
+     except Exception as e:
+	 f=open ('./debug/v3run' + pair + '.log','a')
+	 f.write(e)
+	 f.close()
+	 logging.error("something bad happened", exc_info=True)
     return
-
+    
 threads = []
 for pair in pairs:
 	sig_thread = threading.Thread(target=runv3, args=[pair])

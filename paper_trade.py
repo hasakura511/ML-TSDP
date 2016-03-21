@@ -42,6 +42,9 @@ from pandas.io.json import json_normalize
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.paper import adj_size
 from time import gmtime, strftime, localtime, sleep
+import logging
+
+logging.basicConfig(filename='./debug/paper_trade.log',level=logging.DEBUG)
 
 currencyList=dict()
 v1sList=dict()
@@ -185,6 +188,7 @@ while not finished:
         f=open ('./debug/papererrors.log','a')
         f.write(e)
         f.close()
+        logging.error("something bad happened", exc_info=True)
         
     
 

@@ -14,7 +14,9 @@ from time import gmtime, strftime, time, localtime, sleep
 def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit):
     system_pos=model_pos.loc[system]
    
-    print "system: " + system
+    print '=============='
+    print 'Strategy:' + systemname
+    print "  Signal Name: " + system
     if c2submit == 'TRUE':
         c2submit=True
     elif c2submit == 'FALSE':
@@ -27,7 +29,7 @@ def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant,
     #print str(system_pos['action'])
     #print "c2: " 
     #print c2_pos
-    
+   
     if c2submit:
         c2_pos=get_c2pos(systemid,c2sym,c2apikey,systemname).loc[c2sym]
         c2_pos_qty=int(c2_pos['quant_opened']) - int(c2_pos['quant_closed'])

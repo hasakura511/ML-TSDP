@@ -44,7 +44,7 @@ for i in systemdata.index:
    if system['c2sym'] != 'BTCUSD':
         if system['Version'] == 'v1':
                 model=model_pos
-        elif system['Version'] == 'v2' or system['Version'] == 'v3':
+        else:
                 model=dps_model_pos
         
         adj_size(model, ib_pos,system['System'], system['Name'], str(system['c2id']),system['c2api'],system['c2qty'],

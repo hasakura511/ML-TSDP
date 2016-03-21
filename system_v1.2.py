@@ -58,12 +58,12 @@ start_time = time.time()
 bestParamsPath = './data/params/'
 signalPath = './data/signals/'
 livePairs =  [
-                'NZDJPY',\
-                'CADJPY',\
-                'CHFJPY',\
+                #'NZDJPY',\
+                #'CADJPY',\
+                #'CHFJPY',\
                 'EURJPY',\
-                'GBPJPY',\
-                'AUDJPY',\
+                #'GBPJPY',\
+                #'AUDJPY',\
                 'USDJPY',\
                 'AUDUSD',\
                 'EURUSD',\
@@ -71,8 +71,8 @@ livePairs =  [
                 'USDCAD',\
                 'USDCHF',\
                 'NZDUSD',
-                'EURCHF',\
-                'EURGBP'\
+                #'EURCHF',\
+                #'EURGBP'\
                 ]
                 
 currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\

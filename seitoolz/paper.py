@@ -124,7 +124,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 openqty = -abs(openqty)
             elif side == 'long':
                 closedqty = -abs(closedqty)
-            
+                
             openVWAP_timestamp=str(pos['openVWAP_timestamp'])
             closeVWAP_timestamp=str(pos['closeVWAP_timestamp'])
             pl=float(pos['PL'])
@@ -138,6 +138,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 price=pricefeed['Ask']
                 if action == 'STO':
                     price=pricefeed['Bid']
+                    quant = -abs(quant)
                     
                 (openVWAP, openqty, commission, buy_power, purepl, ptValue, side)=calc_add_pos(openVWAP,openqty,
                     price, quant, 
@@ -165,23 +166,23 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 update_c2_portfolio(systemname, pos, date)
 
                 
-            if (action == 'BTC' and side=='short') or (action == 'STC' and side=='long'):
+            elif (action == 'BTC' and side=='short') or (action == 'STC' and side=='long'):
                 price=pricefeed['Ask']
                 if action == 'STC':
                     price=pricefeed['Bid']
                     quant=-abs(quant)
                     
                 (closeVWAP, closedqty)=calc_closeVWAP(closeVWAP, closedqty, price, quant)
-                (openVWAP, openqty, commission, buy_power, purepl, ptValue,side, tradepurepl) =           \
-                    calc_close_pos(openVWAP,openqty, price, quant,                      \
+                (newVWAP, remqty, commission, buy_power, purepl, ptValue, newside, tradepurepl) =           \
+                    calc_close_pos(openVWAP,(abs(openqty)-abs(closedqty)), price, quant,                      \
                     pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], currency, \
                     pricefeed['C2Mult'])
                 pl = pl + purepl
                 tradepl=purepl
                 
                 pos['openVWAP_timestamp']=date
-                pos['opening_price_VWAP']=openVWAP
-                pos['quant_opened']=abs(openqty)
+                #pos['opening_price_VWAP']=openVWAP
+                #pos['quant_opened']=abs(openqty)
                 pos['closeVWAP_timestamp']=date
                 pos['closedWhen']=date
                 pos['closedWhenUnixTimeStamp']=date
@@ -195,7 +196,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['commission']=pos['commission'] + commission
                 pos['long_or_short']=side
                 
-                if abs(closedqty) == abs(openqty):
+                if abs(closedqty) >= abs(openqty):
                     pos['open_or_closed']='closed'
                 
                 if debug:
@@ -209,7 +210,8 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     
                 update_c2_trades(systemname, pos, tradepl, pl, tradepurepl, buy_power, date)
                 update_c2_portfolio(systemname, pos, date)
-                
+            else:
+                print action + ' ' + side + ' ILLEGAL OP '
         elif action == 'STO' or action == 'BTO':
             side='long'
             price=-1
@@ -307,7 +309,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 update_ib_trades(systemname, pos, pl, 0, buy_power, exch, date)
                 update_ib_portfolio(systemname, pos, date)
                 
-            if (action == 'BUY' and side=='short') or (action == 'SELL' and side=='long'):
+            elif (action == 'BUY' and side=='short') or (action == 'SELL' and side=='long'):
                 price=pricefeed['Ask']
                 
                 if (action == 'SELL'):
@@ -344,7 +346,8 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 update_ib_trades(systemname, pos, pl, tradepurepl, buy_power, exch, date)
                 update_ib_portfolio(systemname, pos, date)
                     
-            
+            else:
+                print action + ' ' + side + ' ILLEGAL OP '
         else:
             side='long'
             price=-1
@@ -491,7 +494,7 @@ def update_c2_portfolio(systemname, pos, date):
     symbol=pos['symbol']
     dataSet['trade_id'] = dataSet['trade_id'].astype('int')
     
-    if pos['quant_opened'] != pos['quant_closed']:
+    if abs(pos['quant_opened']) > abs(pos['quant_closed']):
         if symbol in dataSet['symbol'].values:
         #if tradeid in dataSet['trade_id'].values:
             dataSet = dataSet[dataSet['trade_id'] != tradeid]

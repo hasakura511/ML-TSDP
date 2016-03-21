@@ -78,7 +78,7 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
         if system_ibpos_qty != ib_pos_qty:
             if debug:
                 print "========"
-                print "system: " + system_name + " symbol: " + ib_pos['symbol']
+                print "system: " + system_name + " symbol: " +symbol
                 print "system_ib_pos: " + str(system_ibpos_qty)
                 print "ib_pos: " + str(ib_pos_qty)
                 print "========"

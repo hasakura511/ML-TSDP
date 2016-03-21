@@ -1,5 +1,11 @@
-/data/results/
-/data/btapi/
-/data/from_IB/
-/data/signals/
-/data/paper/
+data/results/
+data/btapi/
+data/from_IB/
+data/signals/
+data/paper/
+results/
+from_IB/
+signals/
+paper/
+*.pyc
+*.swp

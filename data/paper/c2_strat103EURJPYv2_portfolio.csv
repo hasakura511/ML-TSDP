@@ -1,2 +1,0 @@
-symbol,trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,commission
-EURJPY,2,-30.136,20160318 11:50:37 EST,20160318 11:50:37 EST,20160318 11:50:37 EST,125.821,,EURJPY,long,20160318 10:45:29 EST,20160318 11:50:37 EST,open,20160318 10:45:29 EST,125.92,10000.0,,3.0,0.0,,strat103EURJPYv2,4.0

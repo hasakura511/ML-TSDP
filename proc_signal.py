@@ -31,8 +31,9 @@ data=pd.read_csv('./data/systems/system.csv')
 data=data.reset_index()
 
 for i in data.index:
-        system=data.ix[i]
-        model=model_pos
+   system=data.ix[i]
+   model=model_pos
+   if system['c2sym'] != 'BTCUSD':
         if system['Version'] == 'v1':
                 model=model_pos
         elif system['Version'] == 'v2' or system['Version'] == 'v3':

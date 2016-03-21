@@ -112,14 +112,22 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
 if len(sys.argv)==1:
     debug=True
     
-    livePairs = [
+    livePairs =  [
+                    #'NZDJPY',\
+                    #'CADJPY',\
+                    #'CHFJPY',\
+                    #'EURJPY',\
+                    #'GBPJPY',\
+                    #'AUDJPY',\
+                    #'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
-                    #GBPUSD',\
+                    #'GBPUSD',\
                     #'USDCAD',\
                     #'USDCHF',\
-                    #'USDJPY',\
-                    'EURJPY',
+                    #'NZDUSD',
+                    #'EURCHF',\
+                    'EURGBP'\
                     ]
                     
     showDist =  True
@@ -134,7 +142,7 @@ if len(sys.argv)==1:
     scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
     equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/'
-    dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
+    dataPath = 'D:/ML-TSDP/data/from_IB/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     
 else:
@@ -220,7 +228,7 @@ for ticker in livePairs:
     windowLengths = [30]
     maxLeverage = [5]
     PRT={}
-    PRT['DD95_limit'] = 0.05
+    PRT['DD95_limit'] = 0.01
     PRT['tailRiskPct'] = 95
     PRT['initial_equity'] = 1.0
     PRT['horizon'] = 1440

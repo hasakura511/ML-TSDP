@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import random
 import pickle
+import matplotlib
 from datetime import datetime as dt
 from scipy import stats
 from sklearn.linear_model import Ridge
@@ -178,7 +179,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
 
             #CAR25_list = []
             #for sig in zz_signals.columns:
-            #    CAR25 = CAR25_df(sig,zz_signals[sig], close.ix[:zz_end].index,\
+            #    CAR25 = CAR25_df_min(sig,zz_signals[sig], close.ix[:zz_end].index,\
             #                        close.ix[:zz_end], minFcst=forecastHorizon, DD95_limit =ddTolerance)                    
             #    CAR25_list.append(CAR25)
 
@@ -262,7 +263,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
             #datay_gainAhead and cm_test_index have the same index. dont need to have same shape because iloc is used in display
             oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cm_test_index, m[1],\
                     ticker, validationFirstYear, validationFinalYear, iterations, metaData['filter'],showPDFCDF)
-            CAR25_oos = CAR25_df(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+            CAR25_oos = CAR25_df_min(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
                                     close, minFcst=forecastHorizon, DD95_limit =ddTolerance)
             #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'LONG', 1)
             #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'SHORT', -1)
@@ -304,7 +305,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
             print 'Metrics for All Validation Datapoints'
             oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cmatrix_test_index, m[1], ticker,\
                                 validationFirstYear, validationFinalYear, iterations, 'Long>0',showPDFCDF)
-            CAR25_oos = CAR25_df(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+            CAR25_oos = CAR25_df_min(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
                                     close, minFcst=forecastHorizon, DD95_limit =ddTolerance)
             #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
              #                       close, 'LONG', 1)
@@ -1134,7 +1135,7 @@ def createYearlyStats(eCurves, benchStatsByYear=None):
     yearlyStats = {}
     for df in eCurves:
         #print '\n'+df
-        days = pd.Series(name='tradingDays')
+        days = pd.Series(name='dataPoints')
         iEquity = pd.Series(name='iEquity')
         eEquity = pd.Series(name='eEquity')
         returns = pd.Series(name='return')
@@ -1196,7 +1197,7 @@ def calcEquity_df(SST, title, leverage=1.0):
     equityCurves = {}
     for trade in ['l','s','b']:       
         trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')
-        num_days = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numDays')
+        numBars = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numBars')
         equity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='equity')
         maxEquity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='maxEquity')
         drawdown = pd.Series(data=0.0,index=range(0,len(SST.index)), name='drawdown')
@@ -1207,7 +1208,7 @@ def calcEquity_df(SST, title, leverage=1.0):
             if i == 0:
                 equity[i] = initialEquity
                 trades[i] = 0.0
-                num_days[i] = 0.0
+                numBars[i] = 0.0
                 maxEquity[i] = initialEquity
                 drawdown[i] = 0.0
                 maxDD[i] = 0.0
@@ -1216,7 +1217,7 @@ def calcEquity_df(SST, title, leverage=1.0):
                 if trade=='l':
                     if (SST.signals[i-1] > 0):
                         trades[i] = safef[i-1] * equity[i-1] * SST.gainAhead[i-1]
-                        num_days[i] = num_days[i-1] + 1 
+                        numBars[i] = numBars[i-1] + 1 
                         equity[i] = equity[i-1] + trades[i]
                         maxEquity[i] = max(equity[i],maxEquity[i-1])
                         drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
@@ -1225,7 +1226,7 @@ def calcEquity_df(SST, title, leverage=1.0):
                         #print i, SST.signals[i], trades[i], equity[i], maxEquity[i], drawdown[i], maxDD[i]
                     else:
                         trades[i] = 0.0
-                        num_days[i] = num_days[i-1]
+                        numBars[i] = numBars[i-1]
                         equity[i] = equity[i-1]
                         maxEquity[i] = maxEquity[i-1]
                         drawdown[i] = drawdown[i-1]
@@ -1233,14 +1234,14 @@ def calcEquity_df(SST, title, leverage=1.0):
                 elif trade=='s':
                     if (SST.signals[i-1] < 0):
                         trades[i] = safef[i-1] * equity[i-1] * -SST.gainAhead[i-1]
-                        num_days[i] = num_days[i-1] + 1                
+                        numBars[i] = numBars[i-1] + 1                
                         equity[i] = equity[i-1] + trades[i]
                         maxEquity[i] = max(equity[i],maxEquity[i-1])
                         drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
                     else:
                         trades[i] = 0.0
-                        num_days[i] = num_days[i-1]
+                        numBars[i] = numBars[i-1]
                         equity[i] = equity[i-1]
                         maxEquity[i] = maxEquity[i-1]
                         drawdown[i] = drawdown[i-1]
@@ -1248,21 +1249,21 @@ def calcEquity_df(SST, title, leverage=1.0):
                 else:
                     if (SST.signals[i-1] > 0):
                         trades[i] = safef[i-1] * equity[i-1] * SST.gainAhead[i-1]
-                        num_days[i] = num_days[i-1] + 1                
+                        numBars[i] = numBars[i-1] + 1                
                         equity[i] = equity[i-1] + trades[i]
                         maxEquity[i] = max(equity[i],maxEquity[i-1])
                         drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
                     elif (SST.signals[i-1] < 0):
                         trades[i] = safef[i-1] * equity[i-1] * -SST.gainAhead[i-1]
-                        num_days[i] = num_days[i-1] + 1                
+                        numBars[i] = numBars[i-1] + 1                
                         equity[i] = equity[i-1] + trades[i]
                         maxEquity[i] = max(equity[i],maxEquity[i-1])
                         drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
                     else:
                         trades[i] = 0.0
-                        num_days[i] = num_days[i-1]
+                        numBars[i] = numBars[i-1]
                         equity[i] = equity[i-1]
                         maxEquity[i] = maxEquity[i-1]
                         drawdown[i] = drawdown[i-1]
@@ -1276,11 +1277,11 @@ def calcEquity_df(SST, title, leverage=1.0):
             #changeIndex = SSTcopy.signals[SST.signals==1].index
             SSTcopy.loc[SST.signals==1,'signals']=0
             
-        equityCurves[trade] = pd.concat([SSTcopy.reset_index(), safef, trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
+        equityCurves[trade] = pd.concat([SSTcopy.reset_index(), safef, trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
 
     #  Compute cumulative equity for all days (buy and hold)   
     trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')
-    num_days = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numDays')
+    numBars = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numBars')
     equity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='equity')
     maxEquity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='maxEquity')
     drawdown = pd.Series(data=0.0,index=range(0,len(SST.index)), name='drawdown')
@@ -1290,13 +1291,13 @@ def calcEquity_df(SST, title, leverage=1.0):
         if i == 0:
             equity[i] = initialEquity
             trades[i] = 0.0
-            num_days[i] = 0.0
+            numBars[i] = 0.0
             maxEquity[i] = initialEquity
             drawdown[i] = 0.0
             maxDD[i] = 0.0
         else:
             trades[i] = safef[i-1] * equity[i-1] * SST.gainAhead[i-1]
-            num_days[i] = num_days[i-1] + 1 
+            numBars[i] = numBars[i-1] + 1 
             equity[i] = equity[i-1] + trades[i]
             maxEquity[i] = max(equity[i],maxEquity[i-1])
             drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
@@ -1304,7 +1305,7 @@ def calcEquity_df(SST, title, leverage=1.0):
     SSTcopy.loc[SST.signals==-1,'signals']=1
     SSTcopy.loc[SST.signals==0,'signals']=1
 
-    equityCurves['buyHold'] = pd.concat([SSTcopy.reset_index(), safef, trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
+    equityCurves['buyHold'] = pd.concat([SSTcopy.reset_index(), safef, trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
 
     if not SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
         barSize = '1 day'
@@ -1325,6 +1326,9 @@ def calcEquity_df(SST, title, leverage=1.0):
     ax2.plot(ind, -equityCurves['s'].drawdown,label="Short -1 Signals",color='r')
     ax2.plot(ind, -equityCurves['b'].drawdown,label="Long & Short",color='g')
     ax2.plot(ind, -equityCurves['buyHold'].drawdown,label="BuyHold",ls='--',color='c')
+    
+    y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
+    ax1.yaxis.set_major_formatter(y_formatter)
 
     if barSize != '1 day' :
         def format_date(x, pos=None):
@@ -1355,7 +1359,7 @@ def calcEquity_df(SST, title, leverage=1.0):
     shortTrades, longTrades = numberZeros(SST.signals)
     allTrades = shortTrades+ longTrades
     print '\nValidation Period from', SST.index[0],'to',SST.index[-1]
-    print 'TWR for Buy & Hold is %0.3f, %i days, maxDD %0.3f' %\
+    print 'TWR for Buy & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
                 (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
     print 'TWR for %i beLong trades is %0.3f, maxDD %0.3f' %\
                 (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
@@ -1374,7 +1378,7 @@ def calcEquity_df(SST, title, leverage=1.0):
         
 def calcEquity2(SST, initialEquity, trade):
     trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')
-    num_days = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numDays')
+    numBars = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numBars')
     equity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='equity')
     maxEquity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='maxEquity')
     drawdown = pd.Series(data=0.0,index=range(0,len(SST.index)), name='drawdown')
@@ -1384,7 +1388,7 @@ def calcEquity2(SST, initialEquity, trade):
         if i == 0:
             equity[i] = initialEquity
             trades[i] = 0.0
-            num_days[i] = 0.0
+            numBars[i] = 0.0
             maxEquity[i] = initialEquity
             drawdown[i] = 0.0
             maxDD[i] = 0.0
@@ -1393,7 +1397,7 @@ def calcEquity2(SST, initialEquity, trade):
             if trade=='l':
                 if (SST.signals[i-1]*SST.safef[i-1] > 0):
                     trades[i] = SST.safef[i-1] * equity[i-1] * SST.gainAhead[i-1]
-                    num_days[i] = num_days[i-1] + 1                
+                    numBars[i] = numBars[i-1] + 1                
                     equity[i] = equity[i-1] + trades[i]
                     maxEquity[i] = max(equity[i],maxEquity[i-1])
                     drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
@@ -1402,7 +1406,7 @@ def calcEquity2(SST, initialEquity, trade):
                     #print i, SST.signals[i], trades[i], equity[i], maxEquity[i], drawdown[i], maxDD[i]
                 else:
                     trades[i] = 0.0
-                    num_days[i] = num_days[i-1]
+                    numBars[i] = numBars[i-1]
                     equity[i] = equity[i-1]
                     maxEquity[i] = maxEquity[i-1]
                     drawdown[i] = drawdown[i-1]
@@ -1410,14 +1414,14 @@ def calcEquity2(SST, initialEquity, trade):
             elif trade=='s':
                 if (SST.signals[i-1]*SST.safef[i-1] < 0):
                     trades[i] = SST.safef[i-1] * equity[i-1] * -SST.gainAhead[i-1]
-                    num_days[i] = num_days[i-1] + 1                
+                    numBars[i] = numBars[i-1] + 1                
                     equity[i] = equity[i-1] + trades[i]
                     maxEquity[i] = max(equity[i],maxEquity[i-1])
                     drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                     maxDD[i] = max(drawdown[i],maxDD[i-1])
                 else:
                     trades[i] = 0.0
-                    num_days[i] = num_days[i-1]
+                    numBars[i] = numBars[i-1]
                     equity[i] = equity[i-1]
                     maxEquity[i] = maxEquity[i-1]
                     drawdown[i] = drawdown[i-1]
@@ -1425,27 +1429,27 @@ def calcEquity2(SST, initialEquity, trade):
             else:
                 if (SST.signals[i-1]*SST.safef[i-1] > 0):
                     trades[i] = SST.safef[i-1] * equity[i-1] * SST.gainAhead[i-1]
-                    num_days[i] = num_days[i-1] + 1                
+                    numBars[i] = numBars[i-1] + 1                
                     equity[i] = equity[i-1] + trades[i]
                     maxEquity[i] = max(equity[i],maxEquity[i-1])
                     drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                     maxDD[i] = max(drawdown[i],maxDD[i-1])
                 elif (SST.signals[i-1]*SST.safef[i-1] < 0):
                     trades[i] = SST.safef[i-1] * equity[i-1] * -SST.gainAhead[i-1]
-                    num_days[i] = num_days[i-1] + 1                
+                    numBars[i] = numBars[i-1] + 1                
                     equity[i] = equity[i-1] + trades[i]
                     maxEquity[i] = max(equity[i],maxEquity[i-1])
                     drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                     maxDD[i] = max(drawdown[i],maxDD[i-1])
                 else:
                     trades[i] = 0.0
-                    num_days[i] = num_days[i-1]
+                    numBars[i] = numBars[i-1]
                     equity[i] = equity[i-1]
                     maxEquity[i] = maxEquity[i-1]
                     drawdown[i] = drawdown[i-1]
                     maxDD[i] = max(drawdown[i],maxDD[i-1])
                     
-    SST_equity = pd.concat([SST.reset_index(), trades, num_days, equity,maxEquity,drawdown,maxDD], axis =1)
+    SST_equity = pd.concat([SST.reset_index(), trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
     
     if 'dates' in SST_equity:
         return SST_equity.set_index(pd.DatetimeIndex(SST_equity['dates'])).drop(['dates'], axis=1)
@@ -1991,6 +1995,211 @@ def maxCAR25(*args):
                 global_max = loc_max
     return outer_d
 
+
+def CAR25_df_min(signal_type, signals, signal_index, Close, minFcst=1440, DD95_limit = .005):
+    #edited to compute all trades.
+    #forecast horizon minimum 1 year, or safef becomes very large
+    hold_mins = 1
+    number_forecasts = 50
+    fraction = 1.00
+    accuracy_tolerance = 0.001
+    #DD95_limit = .20
+    initial_equity = 100000
+    forecast_horizon = min(minFcst,signal_index.shape[0]) #4 years because start date is 2007
+    years_in_forecast = forecast_horizon/1440.0
+        
+    #percentOfYearInMarket = number_long_signals /(years_in_study*252.0)
+    #number_signals = index.shape[0]
+    number_trades = forecast_horizon / hold_mins
+    number_mins = number_trades*hold_mins
+    account_balance = np.zeros(number_mins+1, dtype=float) 
+    max_IT_DD = np.zeros(number_mins+1, dtype=float)     # Maximum Intra-Trade drawdown
+    max_IT_Eq = np.zeros(number_mins+1, dtype=float)     # Maximum Intra-Trade equity
+    FC_max_IT_DD = np.zeros(number_forecasts, dtype=float) # Max intra-trade drawdown
+    FC_tr_eq = np.zeros(number_forecasts, dtype=float)     # Trade equity (TWR)
+    FC_trades = np.zeros(number_forecasts, dtype=float)     
+    FC_sortino = np.zeros(number_forecasts, dtype=float)     
+    FC_sharpe = np.zeros(number_forecasts, dtype=float)
+
+    # start loop
+
+    done = False    
+    while not done:
+        done = True
+        #print 'Using fraction: %.3f ' % fraction,
+        # -----------------------------
+        #   Beginning a new forecast run
+        for i_forecast in range(number_forecasts):
+            #print "forecast ",i_forecast, " of ", number_forecasts
+            
+            #wait = raw_input("PRESS ENTER TO CONTINUE.")
+            #   Initialize for trade sequence
+            i_day = 0    # i_day counts to end of forecast
+            #  Daily arrays, so running history can be plotted
+            # Starting account balance
+            account_balance[0] = initial_equity
+            # Maximum intra-trade equity
+            max_IT_Eq[0] = account_balance[0]    
+            max_IT_DD[0] = 0
+            trades = 0
+            lastSignal = 0
+            #  for each trade
+            #for i_trade in range(0,number_trades):
+            for i_trade in range(0,number_trades):
+                #print 'day', i_trade, 'of',number_trades
+                #  Select the trade and retrieve its index 
+                #  into the price array
+                #  gainer or loser?
+                #  Uniform for win/loss
+                index = random.choice(range(0,len(signal_index)-1))
+                TRADE = signals[index]
+                
+                
+                if TRADE > 0:
+                    direction = 'LONG'
+                else:
+                    direction = 'SHORT'
+                    
+                if TRADE: #<0 not toxic
+                    entry_index = signal_index[index]
+                    #rint entry_index, TRADE
+                    #  Process the trade, day by day
+                    for i_day_in_trade in range(0,hold_mins+1):
+                        if i_day_in_trade==0: #day 0
+                            #  Things that happen immediately 
+                            #  after the close of the signal day
+                            #  Initialize for the trade
+                            entry_price = Close.ix[entry_index]
+                            #print entry_price
+
+                            #print account_balance[i_day], fraction, buy_price
+                            number_shares = account_balance[i_day] * \
+                                            fraction / entry_price
+                            share_dollars = number_shares * entry_price
+                            cash = account_balance[i_day] - \
+                                   share_dollars
+                            #print '155', "buy price", number_shares, "num_shares", share_dollars, "share $", cash, "cash"
+
+                        else: # day n
+                            #print 'iday in trade', i_day_in_trade, 'iday', i_day, 'num trades', number_trades
+                            #  Things that change during a 
+                            #  day the trade is held
+                            i_day = i_day + 1
+                            j = entry_index + i_day_in_trade
+                            #print Close.ix[j], entry_price
+                            #  Drawdown for the trade
+
+                            if direction == 'LONG':
+                                profit = number_shares * (Close.ix[j] - entry_price)
+                            else:                            
+                                profit = number_shares * (entry_price - Close.ix[j])
+
+                            MTM_equity = cash + share_dollars + profit
+                            IT_DD = (max_IT_Eq[i_day-1] - MTM_equity) \
+                                    / max_IT_Eq[i_day-1]
+                            max_IT_DD[i_day] = max(max_IT_DD[i_day-1], \
+                                    IT_DD)
+                            max_IT_Eq[i_day] = max(max_IT_Eq[i_day-1], \
+                                    MTM_equity)
+                            account_balance[i_day] = MTM_equity
+                            #print '175accountbal', account_balance[i_day],'profit', profit, 'itdd', IT_DD,'max_IT_DD[i_day]',max_IT_DD[i_day], 'max_ITEq', max_IT_Eq[i_day]
+
+                            if i_day_in_trade==hold_mins: # last day of forecast
+                                #  Exit at the close
+                                exit_price = Close.ix[j]
+                                if lastSignal == 0 or TRADE != lastSignal:
+                                    trades += 1
+                                    #print trades, lastSignal, TRADE
+                                    lastSignal = TRADE
+                                
+                                #  Check for end of forecast
+                                if i_day >= number_mins:
+                                    #print '182##############ENDSAVE i_day', i_day, 'number_mins', number_mins
+                                    FC_max_IT_DD[i_forecast] = max_IT_DD[i_day]
+                                    FC_tr_eq[i_forecast] = MTM_equity
+                                    FC_trades[i_forecast] = trades
+                                    #print '186maxitdd', max_IT_DD[i_day]
+                                    
+
+                else: # no trade
+                    #print '189iday', i_day, 'num days', number_mins, 'num trades', number_trades
+                    MTM_equity = account_balance[i_day]
+                    i_day = i_day + 1
+                    IT_DD = (max_IT_Eq[i_day-1] - MTM_equity) \
+                            / max_IT_Eq[i_day-1]
+                    max_IT_DD[i_day] = max(max_IT_DD[i_day-1], \
+                            IT_DD)
+                    max_IT_Eq[i_day] = max(max_IT_Eq[i_day-1], \
+                            MTM_equity)
+                    account_balance[i_day] = MTM_equity
+                    #print '199no_trade ', 'mtm', MTM_equity, 'itdd', IT_DD, 'max_IT_DD', max_IT_DD[i_day], 'max_IT_Eq', max_IT_Eq[i_day]
+                    if i_day >= number_mins:
+                        #print '##############ENDSAVE i_day', i_day, 'number_mins', number_mins
+                        FC_max_IT_DD[i_forecast] = max_IT_DD[i_day]
+                        FC_tr_eq[i_forecast] = MTM_equity
+                        FC_trades[i_forecast] = trades
+                        FC_sortino[i_forecast] = ratio(account_balance).sortino()
+                        FC_sharpe[i_forecast] = ratio(account_balance).sharpe()
+                        #print '207maxitdd', max_IT_DD[i_day]
+
+        #  All the forecasts have been run
+        #  Find the drawdown at the 95th percentile 
+        #print '211maxdd ', FC_max_IT_DD       
+        DD_95 = stats.scoreatpercentile(FC_max_IT_DD,95)    
+        if (abs(DD95_limit - DD_95) < accuracy_tolerance):
+            #print '  214 DD95: %.3f ' % DD_95, "Close enough" 
+            done = True
+        elif DD_95 == 0: #no drawdown
+            fraction =  float('inf')
+            done == True
+        elif DD_95 == 1: #max loss
+            fraction = 0
+            done == True 
+        else:
+            #print '  223DD95: %.3f ' % DD_95, "Adjust fraction from " , fraction,
+            fraction = fraction * DD95_limit / DD_95
+            #print 'to ', fraction
+            done = False
+            
+    #  Report
+    SIG = signal_type
+    YIF =  forecast_horizon/60.0
+    TPY = FC_trades.mean()/(forecast_horizon/60.0)
+    print '\nSignal: ', SIG
+    print 'Fcst Horizon (Hours): %.1f ' % YIF, 
+    #print ' TotalTrades: %.0f ' % FC_trades.mean(), 
+    print ' Avg. Trades/Hour: %.1f' % TPY
+
+    IT_DD_95 = stats.scoreatpercentile(FC_max_IT_DD,95)
+    IT_DD_100 = max(FC_max_IT_DD)
+    print 'DD95:  %.3f ' % IT_DD_95,
+    print 'DD100: %.3f ' %  IT_DD_100,
+
+    SOR25 = stats.scoreatpercentile(FC_sortino,25)
+    SHA25 = stats.scoreatpercentile(FC_sharpe,25)
+    print 'SORTINO25: %.3f ' %  SOR25,
+    print 'SHARPE25: %.3f ' % SHA25
+
+    print 'SAFEf: %.3f ' % fraction,
+    #IT_DD_25 = stats.scoreatpercentile(FC_max_IT_DD,25)        
+    #IT_DD_50 = stats.scoreatpercentile(FC_max_IT_DD,50)        
+
+
+    TWR_25 = stats.scoreatpercentile(FC_tr_eq,25)        
+    CAR_25 = 100*(((TWR_25/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
+    TWR_50 = stats.scoreatpercentile(FC_tr_eq,50)
+    CAR_50 = 100*(((TWR_50/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
+    TWR_75 = stats.scoreatpercentile(FC_tr_eq,75)        
+    CAR_75 = 100*(((TWR_75/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
+
+    print 'CAR25: %.3f ' % CAR_25,
+    print 'CAR50: %.3f ' % CAR_50,
+    print 'CAR75: %.3f ' % CAR_75
+    metrics = {'C25sig':SIG, 'safef':fraction, 'CAR25':CAR_25, 'CAR50':CAR_50, 'CAR75':CAR_75,\
+                'DD95':IT_DD_95, 'DD100':IT_DD_100, 'SOR25':SOR25, 'SHA25':SHA25, 'YIF':YIF, 'TPY':TPY}
+    return metrics
+
+
 def CAR25_df(signal_type, signals, signal_index, Close, minFcst=1008, DD95_limit = .20):
     #edited to compute all trades.
     #forecast horizon minimum 1 year, or safef becomes very large
@@ -2037,6 +2246,7 @@ def CAR25_df(signal_type, signals, signal_index, Close, minFcst=1008, DD95_limit
             max_IT_Eq[0] = account_balance[0]    
             max_IT_DD[0] = 0
             trades = 0
+            lastSignal = 0
             #  for each trade
             for i_trade in range(0,number_trades):
                 #print 'day', i_trade, 'of',number_trades
@@ -2091,7 +2301,10 @@ def CAR25_df(signal_type, signals, signal_index, Close, minFcst=1008, DD95_limit
                         if i_day_in_trade==hold_days: # last day of forecast
                             #  Exit at the close
                             exit_price = Close.ix[j]
-                            trades += 1
+                            if lastSignal == 0 or TRADE != lastSignal:
+                                trades += 1
+                                #print trades, lastSignal, TRADE
+                                lastSignal = TRADE
                             #  Check for end of forecast
                             if i_day >= number_days:
                                 #print '##############ENDSAVE i_day', i_day, 'number_days', number_days

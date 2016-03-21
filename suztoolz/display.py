@@ -194,6 +194,8 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
 
             #fig = plt.figure(figsize=(7, 5)) 
             #plt.subplot(2,1,1)
+
+            
             ind_ec = np.arange(nrows)
             plt.figure(1)
             if vsDPS:
@@ -218,6 +220,8 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             else:
                 plt.title('Top '+str(chartRank).strip('[]')+' Systems')
             plt.ylabel('Equity')
+            y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
+            ax.yaxis.set_major_formatter(y_formatter)
             ax.grid('on')
             ax.set_yscale(yscale)
             handles, labels = ax.get_legend_handles_labels()
@@ -228,6 +232,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             #plt.subplot(2,1,2)
             plt.figure(2)
             ax2.plot(ind_bm, -benchmarks[sf1].drawdown,'--', label=sf1)
+            ax2.yaxis.set_major_formatter(y_formatter)
             plt.ylabel('Drawdown')
             ax2.grid('on')
             handles, labels = ax2.get_legend_handles_labels()
@@ -244,8 +249,8 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             startDate = benchmarks[sf1].index.to_datetime()[0]
             endDate = benchmarks[sf1].index.to_datetime()[-1]
             yearsInValidation = (endDate-startDate).total_seconds()/3600.0/365.0
-            print 'Validation Length(years): %.2f' % yearsInValidation
-            print ' Trading Days in Market: %i' % benchmarks[sf1].numDays.iloc[-1],
+            print 'Validation Length (years): %.2f' % yearsInValidation
+            print 'In the market (Bars): %i' % benchmarks[sf1].numBars.iloc[-1],
             shortTrades, longTrades = numberZeros(benchmarks[sf1].signals*benchmarks[sf1].safef)
             allTrades = shortTrades+ longTrades
             TPY = allTrades/yearsInValidation
@@ -278,7 +283,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
                 dd95Ahead = equityCurves[sst].dd95.iloc[-1]
             
             print '\n',str(chartRank[i]),sst
-            print 'Trading Days in Market: %i' % equityCurves[sst].numDays.iloc[-1],
+            print 'In the Market (Bars): %i' % equityCurves[sst].numBars.iloc[-1],
             shortTrades, longTrades = numberZeros(equityCurves[sst].signals*equityCurves[sst].safef)
             allTrades = shortTrades+ longTrades
             TPY = allTrades/yearsInValidation
@@ -566,7 +571,7 @@ def compareEquity(sst, title):
     shortTrades, longTrades = numberZeros(sst.signals.values)
     allTrades = shortTrades+ longTrades
     print '\nValidation Period from', sst.index[0],'to',sst.index[-1]
-    print 'TWR for Buy & Hold is %0.3f, %i days' % (equityAllSignals[nrows-1], nrows)
+    print 'TWR for Buy & Hold is %0.3f, %i Bars' % (equityAllSignals[nrows-1], nrows)
     print 'TWR for %i beLong trades is %0.3f' % (longTrades, equityBeLongSignals[nrows-1])
     print 'TWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])
     print 'TWR for %i beLong and beShort trades is %0.3f' % (allTrades,equityBeLongAndShortSignals[nrows-1])
@@ -892,28 +897,28 @@ def oos_display_cmatrix2(ytrue, ypred, gainAhead, index, m, ticker,testFirstYear
             fnOOS = 0.0
             fpOOS = 0.0
             
-    if (tpOOS+fpOOS) == 0:
-        precisionOOS =  np.nan
-    else:
-        precisionOOS = tpOOS/(tpOOS+fpOOS)
-    if (tpOOS+fnOOS) == 0:
-        recallOOS =  np.nan
-    else:
-        recallOOS = tpOOS/(tpOOS+fnOOS)
-    if (tpOOS+fnOOS+fpOOS+tnOOS) ==0:
-        accuracyOOS =  np.nan
-    else:
-        accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
-    if precisionOOS ==  np.nan or recallOOS ==  np.nan:
-        f1OOS =  np.nan
-    else:
-        f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
+        if (tpOOS+fpOOS) == 0:
+            precisionOOS =  np.nan
+        else:
+            precisionOOS = tpOOS/(tpOOS+fpOOS)
+        if (tpOOS+fnOOS) == 0:
+            recallOOS =  np.nan
+        else:
+            recallOOS = tpOOS/(tpOOS+fnOOS)
+        if (tpOOS+fnOOS+fpOOS+tnOOS) ==0:
+            accuracyOOS =  np.nan
+        else:
+            accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
+        if precisionOOS ==  np.nan or recallOOS ==  np.nan:
+            f1OOS =  np.nan
+        else:
+            f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
 
-    print "      pos neg"
-    print "pos:  %i  %i  %.2f" % (tpOOS, fnOOS, recallOOS)
-    print "neg:  %i  %i" % (fpOOS, tnOOS)
-    print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
-    print "f1:   %.2f" % f1OOS
+        print "      pos neg"
+        print "pos:  %i  %i  %.2f" % (tpOOS, fnOOS, recallOOS)
+        print "neg:  %i  %i" % (fpOOS, tnOOS)
+        print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
+        print "f1:   %.2f" % f1OOS
     
 def is_display_cmatrix(cm_sum_is, m, ticker, testFirstYear, testFinalYear, iterations, signal):
     cm_sum_is = cm_sum_is.astype(float)

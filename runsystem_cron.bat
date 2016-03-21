@@ -34,10 +34,3 @@ start /b .\start_gbpjpy_v2.cmd
 start /b .\start_nzdjpy_v2.cmd
 start /b .\start_nzdusd_v2.cmd
 
-
-
-PING -n 600 127.0.0.1>nul
-
-\anaconda2\python get_ibpnl.py
-\anaconda2\python system_BTCUSD_bitstamp_hourly.py 1
-\anaconda2\python system_BTCUSD_bitstamp.py 1

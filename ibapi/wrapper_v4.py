@@ -849,7 +849,8 @@ class IBclient(object):
         pricevalue=[]
         rtdict[tickerid]=ibcontract.symbol + ibcontract.currency
         rtfile[tickerid]=filename
-        rtbar[tickerid]=data
+        if tickerid not in rtbar:
+            rtbar[tickerid]=data
         # Request current price in 5 second increments
         # It turns out this is the only way to do it (can't get any other increments)
         
@@ -886,7 +887,8 @@ class IBclient(object):
         pricevalue=[]
         tickerid=brokerData['tickerId']
         rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
-        rtbar[tickerid]=data
+        if tickerid not in rtbar:
+            rtbar[tickerid]=data
         #data_cons = pd.DataFrame()
         # Instantiate our callback object
         
@@ -936,6 +938,28 @@ class IBclient(object):
                 print('Failed to get history within %d seconds' % WAIT_TIME)
         
         #data_cons = pd.concat([data_cons,callback.data],axis=0)
+                 
+       
+        return rtbar[tickerid]
+        
+    def proc_history(self, tickerid, sym, currency,data):
+        WAIT_TIME=60
+        global rtbar
+        global rtdict
+        global rthist
+        iserror=False
+        
+       
+        rtdict[tickerid]=sym + currency
+        if tickerid not in rtbar:
+            rtbar[tickerid]=data
+        data=data.reset_index()
+        for i in data.index:
+            tick=data.ix[i]
+            
+            self.cb.historicalData(tickerid, tick['Date'],tick['Open'],tick['High'],
+                                    tick['Low'],tick['Close'],tick['Volume'],-1,-1,-1)
+       
                  
        
         return rtbar[tickerid]

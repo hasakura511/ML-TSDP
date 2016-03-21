@@ -218,9 +218,9 @@ for ticker in livePairs:
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
     #validationSetLength = 7000
-    validationSetLength = 5000
+    validationSetLength = 7000
     #validationPeriods = [50,250]
-    validationPeriods = [250,1000] # min is 2
+    validationPeriods = [250,1400] # min is 2
     #validationStartPoint = None
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
@@ -248,14 +248,14 @@ for ticker in livePairs:
     CCLookback = 60
     rStochLookback = 300
     statsLookback = 100
-    ROCLookback = 500
+    ROCLookback = 600
 
     #DPS parameters
     #windowLengths = [2] 
     windowLengths = [30]
     maxLeverage = [5]
     PRT={}
-    PRT['DD95_limit'] = 0.01
+    PRT['DD95_limit'] = 0.05
     PRT['tailRiskPct'] = 95
     PRT['initial_equity'] = 1.0
     PRT['horizon'] = 720

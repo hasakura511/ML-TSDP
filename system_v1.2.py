@@ -57,14 +57,22 @@ from swigibpy import EWrapper, EPosixClientSocket, Contract
 start_time = time.time()
 bestParamsPath = './data/params/'
 signalPath = './data/signals/'
-livePairs = [
+livePairs =  [
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
                 'AUDUSD',\
                 'EURUSD',\
                 'GBPUSD',\
                 'USDCAD',\
                 'USDCHF',\
-                'USDJPY',\
-                'EURJPY',
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP'\
                 ]
                 
 currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
@@ -409,10 +417,14 @@ for ticker in livePairs:
 
     signal_df=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
     #signal.to_csv('./signal/signalss/' + ticker + '.csv', index=False)
-    signalFile=pd.read_csv(signalPath + ticker + '.csv')
-    signalFile=signalFile.append(signal_df)
     if len(sys.argv) > 1:
-        signalFile.to_csv(signalPath + ticker + '.csv', index=False)
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if ticker + '.csv' not in files:
+            signal_df.to_csv(signalPath + ticker + '.csv', index=True)
+        else:        
+            signalFile=pd.read_csv(signalPath + ticker + '.csv')
+            signalFile=signalFile.append(signal_df)
+            signalFile.to_csv(signalPath + ticker + '.csv', index=False)
      
      
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

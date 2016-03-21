@@ -12,7 +12,7 @@ from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
 
-debug=False
+debug=True
 
 def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit, date):
     system_pos=model_pos.loc[system]

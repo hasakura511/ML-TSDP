@@ -30,6 +30,9 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros, runs
 from suztoolz.display import compareEquity                        
 from seitoolz.display import compareEquity as compareEquitySave   
 def get_v1signal(data, ticker, exchange, debug=False, saveEquity=False, equityFile=''):
+    
+    print "\n\nSymbol is ", ticker + ' ' + exchange
+    
     iterations=10
     RSILookback = 1.5
     zScoreLookback = 10

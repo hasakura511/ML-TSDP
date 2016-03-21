@@ -188,7 +188,10 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['closing_price_VWAP']=closeVWAP
                 pos['quant_closed']=abs(closedqty)
                 pos['PL']=pl
-                pos['PurePL']=float(pos['PurePL']) + tradepurepl
+                if 'PurePL' in pos:
+                    pos['PurePL']=float(pos['PurePL']) + tradepurepl
+                else:
+                    pos['PurePL']=tradepurepl
                 pos['commission']=pos['commission'] + commission
                 pos['long_or_short']=side
                 
@@ -325,7 +328,10 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                 pos['real_pnl']=pl
                 pos['avg_cost']=commission
                 pos['unr_pnl']=0
-                pos['PurePL']=float(pos['PurePL']) + tradepurepl
+                if 'PurePL' in pos:
+                    pos['PurePL']=float(pos['PurePL']) + tradepurepl
+                else:
+                    pos['PurePL']=tradepurepl
                 
                 
                 if debug:

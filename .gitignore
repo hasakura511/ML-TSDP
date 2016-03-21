@@ -3,4 +3,4 @@ data/paper/
 results/
 paper/
 *.pyc
-*.swp
+*.sw[op]

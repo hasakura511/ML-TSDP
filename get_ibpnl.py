@@ -123,6 +123,7 @@ for i in data.index:
         qty=order['qty']
         if order['side'] == 'SLD':
             qty=-qty
+            
         if sym in symdict:
             symdict[sym]=symdict[sym]+qty
         else:
@@ -139,9 +140,13 @@ for i in data.index:
         secType='CASH'
         
         commissionkey=sym + exchange
-        commission=commissiondata.loc[commissionkey]
-        commission_pct=float(commission['Pct'])
-        commission_cash=float(commission['Cash'])
+        commission_pct=0.00002
+        commission_cash=2
+        if commissionkey in commissiondata.index:
+            commission=commissiondata.loc[commissionkey]
+            commission_pct=float(commission['Pct'])
+            commission_cash=float(commission['Cash'])
+        
         
         pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
         if ask > 0 and bid > 0:

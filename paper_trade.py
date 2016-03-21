@@ -154,7 +154,7 @@ while not finished:
         commissionkey=system['ibsym']+system['ibcur']+system['ibexch']
         commission_pct=0.00002
         commission_cash=2
-        if commissionkey in commissiondata.index.values():
+        if commissionkey in commissiondata.index:
             commission=commissiondata.loc[commissionkey]
             commission_pct=float(commission['Pct'])
             commission_cash=float(commission['Cash'])

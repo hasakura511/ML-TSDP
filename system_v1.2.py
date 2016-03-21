@@ -96,8 +96,8 @@ for pair in currencyPairs:
         else:
             signalFile=pd.read_csv(signalPath+ pair + '.csv', parse_dates=['Date'])
             offline = signalFile.iloc[-1].copy(deep=True)
-            offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
-            offline.signals = 0
+            offline.Date = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
+            offline.Signal = 0
             #offline.gainAhead =0
             #offline.prior_index=0
             #offline.safef=0

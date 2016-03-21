@@ -228,7 +228,7 @@ for ticker in livePairs:
     windowLengths = [30]
     maxLeverage = [5]
     PRT={}
-    PRT['DD95_limit'] = 0.01
+    PRT['DD95_limit'] = 0.05
     PRT['tailRiskPct'] = 95
     PRT['initial_equity'] = 1.0
     PRT['horizon'] = 1440

@@ -444,8 +444,10 @@ def get_c2_trades(systemname, date):
     filename='./data/paper/c2_' + systemname + '_trades.csv'
     
     if os.path.isfile(filename):
-        existData = pd.read_csv(filename, index_col='trade_id')
-        return existData
+        dataSet = pd.read_csv(filename, index_col='trade_id')
+        if 'PurePL' not in dataSet:
+            dataSet['PurePL']=0
+        return dataSet
     else:
         dataSet=pd.DataFrame({},columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
         'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
@@ -463,6 +465,8 @@ def get_c2_portfolio(systemname, date):
     account=get_account_value(systemname, 'c2', date)
     if os.path.isfile(filename):
         dataSet = pd.read_csv(filename, index_col='symbol')
+        if 'PurePL' not in dataSet:
+            dataSet['PurePL']=0
         return (account, dataSet)
         
     else:
@@ -567,7 +571,8 @@ def get_account_value(systemname, broker, date):
     
     if os.path.isfile(filename):
         dataSet = pd.read_csv(filename, index_col=['Date'])
-        
+        if 'PurePL' not in dataSet:
+            dataSet['PurePL']=0
     else:
         dataSet=pd.DataFrame([[date, 'paperUSD',10000,30000,0,0,0,'USD']], columns=['Date','accountid','balance','buy_power','unr_pnl','real_pnl','PurePL','currency'])
         dataSet=dataSet.set_index('Date')
@@ -602,8 +607,10 @@ def get_ib_trades(systemname, date):
     filename='./data/paper/ib_' + systemname + '_trades.csv'
     
     if os.path.isfile(filename):
-        existData = pd.read_csv(filename, index_col='permid')
-        return existData
+        dataSet = pd.read_csv(filename, index_col='permid')
+        if 'PurePL' not in dataSet:
+            dataSet['PurePL']=0
+        return dataSet
     else:
         dataSet=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
                             'exchange','execid','expiry','level_0','orderid','price','qty','openqty', \
@@ -620,6 +627,8 @@ def get_ib_portfolio(systemname, date):
     account=get_account_value(systemname, 'ib', date)
     if os.path.isfile(filename):
         dataSet = pd.read_csv(filename, index_col='symbol')
+        if 'PurePL' not in dataSet:
+            dataSet['PurePL']=0
         dataSet=dataSet.reset_index()
         dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
         dataSet=dataSet.set_index('symbol')

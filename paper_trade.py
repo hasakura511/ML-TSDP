@@ -141,7 +141,7 @@ while not finished:
         model=model_pos
         if system['Version'] == 'v1':
                 model=model_pos
-        elif system['Version'] == 'v2' or system['Version'] == 'v3':
+        else:
                 model=dps_model_pos
         
         filename='./data/paper/' + system['Name'] + '_portfolio.csv'
@@ -152,9 +152,12 @@ while not finished:
         secType=system['ibtype']
         
         commissionkey=system['ibsym']+system['ibcur']+system['ibexch']
-        commission=commissiondata.loc[commissionkey]
-        commission_pct=float(commission['Pct'])
-        commission_cash=float(commission['Cash'])
+        commission_pct=0.00002
+        commission_cash=2
+        if commissionkey in commissiondata.index.values():
+            commission=commissiondata.loc[commissionkey]
+            commission_pct=float(commission['Pct'])
+            commission_cash=float(commission['Cash'])
         
         if debug:
             system_pos=model.loc[system['System']]

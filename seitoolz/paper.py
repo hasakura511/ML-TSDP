@@ -161,7 +161,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     print " Total Closed: " + str(closeVWAP) + "[" + str(closedqty) + "]" 
                     print "Trade PL: " + str(purepl) + " Total PL: " + str(pl) + " (Commission: " + str(commission) + ")"
                     print "++++++++++++++++++++"
-                update_c2_trades(systemname, pos, tradepl, pl, buy_power, date)
+                update_c2_trades(systemname, pos, tradepl, pl, 0, buy_power, date)
                 update_c2_portfolio(systemname, pos, date)
 
                 
@@ -207,7 +207,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     print "Trade PL: " + str(purepl) + " Total PL: " + str(pl) + " (Commission: " + str(commission) + ")"
                     print "--------------------"
                     
-                update_c2_trades(systemname, pos, tradepl, pl, buy_power, date)
+                update_c2_trades(systemname, pos, tradepl, pl, tradepurepl, buy_power, date)
                 update_c2_portfolio(systemname, pos, date)
                 
         elif action == 'STO' or action == 'BTO':
@@ -249,7 +249,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
             'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
             'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description', \
             'commission','PurePL']).iloc[-1]
-            update_c2_trades(systemname, pos, tradepl, pl, buy_power, date)
+            update_c2_trades(systemname, pos, tradepl, pl, 0, buy_power, date)
             update_c2_portfolio(systemname, pos, date)
         else:
             print action + ' ' + side + ' ILLEGAL OP '
@@ -304,7 +304,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     print "Original PL: " + str(pos['real_pnl']) + " New PL: " + str(purepl) + " (Commission: " + str(commission) + ")"   
                     print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
                 
-                update_ib_trades(systemname, pos, pl, buy_power, exch, date)
+                update_ib_trades(systemname, pos, pl, 0, buy_power, exch, date)
                 update_ib_portfolio(systemname, pos, date)
                 
             if (action == 'BUY' and side=='short') or (action == 'SELL' and side=='long'):
@@ -341,7 +341,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                     print "Trade PL: " + str(purepl)
                     print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
 
-                update_ib_trades(systemname, pos, pl, buy_power, exch, date)
+                update_ib_trades(systemname, pos, pl, tradepurepl, buy_power, exch, date)
                 update_ib_portfolio(systemname, pos, date)
                     
             
@@ -369,7 +369,7 @@ def place_order(systemname, action, quant, sym, type, currency, exch, broker, pr
                                  'avg_cost','unr_pnl','real_pnl','accountid', \
                                  'currency', 'openqty','PurePL']).iloc[-1]
             
-            update_ib_trades(systemname, pos, pl, buy_power, exch, date)
+            update_ib_trades(systemname, pos, pl, 0, buy_power, exch, date)
             update_ib_portfolio(systemname, pos, date)   
 
 
@@ -450,7 +450,7 @@ def get_c2_trades(systemname, date):
         dataSet=pd.DataFrame({},columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
         'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
         'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
-        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
+        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description','PurePL'])
         dataSet = dataSet.set_index('trade_id')
         dataSet.to_csv(filename)
         return dataSet
@@ -469,7 +469,7 @@ def get_c2_portfolio(systemname, date):
         dataSet=pd.DataFrame({},columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
         'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
         'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
-        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description'])
+        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description','PurePL'])
         dataSet = dataSet.set_index('symbol')
         dataSet.to_csv(filename)
         return (account, dataSet)
@@ -507,12 +507,13 @@ def update_c2_portfolio(systemname, pos, date):
     account=get_account_value(systemname, 'c2', date)
     return (account, dataSet)
     
-def update_c2_trades(systemname, pos, tradepl, pl, buypower, date):
+def update_c2_trades(systemname, pos, tradepl, pl, purepl, buypower, date):
     
     account=get_account_value(systemname, 'c2', date)
     account['balance']=account['balance']+tradepl
     account['buy_power']=account['buy_power']+buypower
     account['real_pnl']=account['real_pnl'] + tradepl
+    account['PurePL']=account['PurePL'] + purepl
     account['Date']=date
     account=update_account_value(systemname, 'c2', account)
     
@@ -568,15 +569,16 @@ def get_account_value(systemname, broker, date):
         dataSet = pd.read_csv(filename, index_col=['Date'])
         
     else:
-        dataSet=pd.DataFrame([[date, 'paperUSD',10000,30000,0,0,'USD']], columns=['Date','accountid','balance','buy_power','unr_pnl','real_pnl','currency'])
+        dataSet=pd.DataFrame([[date, 'paperUSD',10000,30000,0,0,0,'USD']], columns=['Date','accountid','balance','buy_power','unr_pnl','real_pnl','PurePL','currency'])
         dataSet=dataSet.set_index('Date')
         dataSet.to_csv(filename)
         
     account=pd.DataFrame([[date, dataSet.iloc[-1]['accountid'],
                             dataSet.iloc[-1]['balance'],dataSet.iloc[-1]['buy_power'],
                             dataSet.iloc[-1]['unr_pnl'], dataSet.iloc[-1]['real_pnl'], 
+                            dataSet.iloc[-1]['PurePL'],
                             dataSet.iloc[-1]['currency']]], 
-        columns=['Date','accountid','balance','buy_power','unr_pnl','real_pnl','currency']).iloc[-1]
+        columns=['Date','accountid','balance','buy_power','unr_pnl','real_pnl','PurePL','currency']).iloc[-1]
         
     return account
 
@@ -606,7 +608,7 @@ def get_ib_trades(systemname, date):
         dataSet=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
                             'exchange','execid','expiry','level_0','orderid','price','qty','openqty', \
                             'realized_PnL','side',\
-                            'symbol','symbol_currency','times','yield_redemption_date'])
+                            'symbol','symbol_currency','times','yield_redemption_date','PurePL'])
         dataSet=dataSet.set_index('permid')
         dataSet.to_csv(filename)
         return dataSet
@@ -624,7 +626,7 @@ def get_ib_portfolio(systemname, date):
         return (account, dataSet)
     else:
 
-        dataSet=pd.DataFrame({}, columns=['sym','exp','qty','openqty','price','openprice','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
+        dataSet=pd.DataFrame({}, columns=['sym','exp','qty','openqty','price','openprice','value','avg_cost','unr_pnl','real_pnl','PurePL','accountid','currency'])
         dataSet['symbol']=dataSet['sym'] + dataSet['currency']        
         dataSet=dataSet.set_index('symbol')
         dataSet.to_csv(filename)
@@ -682,7 +684,7 @@ def update_ib_portfolio(systemname, pos, date):
     account=get_account_value(systemname, 'ib', date)
     return (account, dataSet)
     
-def update_ib_trades(systemname, pos, pl, buypower, ibexch, date):
+def update_ib_trades(systemname, pos, pl, purepl, buypower, ibexch, date):
     filename='./data/paper/ib_' + systemname + '_trades.csv'
    
     dataSet = get_ib_trades(systemname, date)
@@ -701,11 +703,11 @@ def update_ib_trades(systemname, pos, pl, buypower, ibexch, date):
     
     pos=pd.DataFrame([[trade_id, 'Paper', 'Paper', pos['avg_cost'], 'USD', \
                                ibexch, trade_id, '','',1,pos['price'],abs(pos['qty']),pos['openqty'],pos['openprice'], \
-                               pos['real_pnl'],side, \
+                               pos['real_pnl'],pos['PurePL'],side, \
                                pos['sym'], pos['currency'], date, '' \
                             ]], columns=['permid','account','clientid','commission','commission_currency',\
                             'exchange','execid','expiry','level_0','orderid','price','qty','openqty','openprice', \
-                            'realized_PnL','side',\
+                            'realized_PnL','PurePL','side',\
                             'symbol','symbol_currency','times','yield_redemption_date']).iloc[-1]
                             
     tradeid=int(pos['permid'])
@@ -717,6 +719,7 @@ def update_ib_trades(systemname, pos, pl, buypower, ibexch, date):
     account['balance']=account['balance']+pl
     account['buy_power']=account['buy_power']+buypower
     account['real_pnl']=account['real_pnl'] + pl
+    account['PurePL']=account['PurePL'] + purepl
     account['Date']=date
     account=update_account_value(systemname, 'ib',account)
     

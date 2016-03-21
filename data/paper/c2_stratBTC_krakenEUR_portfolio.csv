@@ -1,2 +1,2 @@
 symbol,trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,commission
-BTCUSD,31,-9149.9,,,,0.0,,BTCUSD,short,20160320 17:17:11 EST,20160320 17:17:11 EST,open,20160320 17:17:11 EST,365.996,10000.0,,0.0,1.0,,stratBTC_krakenEUR,9149.9
+BTCUSD,34,-10583.075,20160320 20:36:04 EST,20160320 20:36:04 EST,20160320 20:36:04 EST,365.044,,BTCUSD,long,20160320 20:30:36 EST,20160320 20:36:04 EST,open,20160320 20:30:36 EST,364.279,10000.0,,1.0,0.0,,stratBTC_krakenEUR,18233.075

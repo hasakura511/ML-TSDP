@@ -33,10 +33,16 @@ pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
 
 def runv2(pair):
     while 1:
-        print 'Starting V2: ' + pair
-        f=open ('/logs/' + pair + 'v2.log','a')
-        subprocess.call(['python','system_v2.31C.py',pair,'1'], stdout=f)
-        f.close()
+        try:
+         f=open ('/logs/' + pair + 'v2.log','a')
+	 print 'Starting V2: ' + pair
+	 f.write('Starting V2: ' + pair)
+         subprocess.call(['python','system_v2.31C.py',pair,'1'], stdout=f)
+         f.close()
+	except Exception as e:
+	 f=open ('./debug/v2run' + pair + '.log','a')
+	 f.write(e)
+	 f.close()
     return
 
 threads = []

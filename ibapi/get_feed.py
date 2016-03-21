@@ -41,6 +41,11 @@ def get_realtimebar(sym, currency, exchange, type, whatToShow, data, filename, t
     contract.currency = currency
     client.get_realtimebar(contract, whatToShow, tickerId, data, filename)
 
+def proc_history(sym, currency, exchange, type, whatToShow, data, filename, tickerId):
+    global client, callback
+    return client.proc_history(tickerId, sym, currency, data)
+   
+
 def getDataFromIB( brokerData,endDateTime,data):
     data=client.getDataFromIB(brokerData,endDateTime,data)
     return data
@@ -58,7 +63,22 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
                               }
                               
          #for date in getHistLoop:
-        while data.shape[0] < minDataPoints:      
+        if data.shape[0] < minDataPoints:
+            while data.shape[0] < minDataPoints:      
+                requestedData = getDataFromIB(brokerData, date, data)
+                #update date
+                date = requestedData.index.to_datetime()[0]
+                #eastern=timezone('US/Eastern')
+                #date=date.astimezone(eastern)
+                date=date.strftime("%Y%m%d %H:%M:%S EST")
+                brokerData['endDateTime']=date
+                if len(data)==0:
+                    data = pd.concat([requestedData,data],axis=0)
+                else:
+                    if sum(pd.concat([requestedData,data],axis=0).duplicated())<100:
+                        data = pd.concat([requestedData,data],axis=0)
+                time.sleep(30)
+        else:
             requestedData = getDataFromIB(brokerData, date, data)
             #update date
             date = requestedData.index.to_datetime()[0]
@@ -71,7 +91,8 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
             else:
                 if sum(pd.concat([requestedData,data],axis=0).duplicated())<100:
                     data = pd.concat([requestedData,data],axis=0)
+            time.sleep(30)
         #set date as last index for next request
     
-            time.sleep(30)
+            
         return data

@@ -1661,3 +1661,6 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-21 21:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6052 is less than required validation set + training set of 7500
 2016-03-21 21:35:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6053 is less than required validation set + training set of 7500
 2016-03-21 21:35:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6054 is less than required validation set + training set of 7500
+2016-03-21 23:47:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6165 is less than required validation set + training set of 7500
+2016-03-21 23:49:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6167 is less than required validation set + training set of 7500
+2016-03-21 23:51:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6169 is less than required validation set + training set of 7500

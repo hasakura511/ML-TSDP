@@ -1643,3 +1643,17 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-21 17:22:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6140 is less than required validation set + training set of 7500
 2016-03-21 17:23:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6141 is less than required validation set + training set of 7500
 2016-03-21 12:22:00,1.0,0.0,7623.0,5.0,2.99291239529,0.00107995243345,0.00672977377573,"bothAUDJPY_ALL_DF1_GNBayes_i500_ZZ 0.009,-0.009 DPS wl30.0 maxL5 dd95_0.007 thres_0.0"
+2016-03-21 23:46:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6494 is less than required validation set + training set of 7500
+2016-03-21 23:48:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6495 is less than required validation set + training set of 7500
+2016-03-21 23:49:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6496 is less than required validation set + training set of 7500
+2016-03-21 23:51:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6498 is less than required validation set + training set of 7500
+2016-03-21 23:52:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6499 is less than required validation set + training set of 7500
+2016-03-21 23:54:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6510 is less than required validation set + training set of 7500
+2016-03-21 23:55:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6502 is less than required validation set + training set of 7500
+2016-03-21 23:56:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6503 is less than required validation set + training set of 7500
+2016-03-21 23:57:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6504 is less than required validation set + training set of 7500
+2016-03-21 23:58:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6506 is less than required validation set + training set of 7500
+2016-03-21 23:59:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6516 is less than required validation set + training set of 7500
+2016-03-22 00:00:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6508 is less than required validation set + training set of 7500
+2016-03-22 00:02:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6509 is less than required validation set + training set of 7500
+2016-03-22 00:03:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 6510 is less than required validation set + training set of 7500

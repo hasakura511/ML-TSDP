@@ -1,0 +1,66 @@
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=btcnCNY HTTP/1.1" 200 108438
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=bitstampUSD HTTP/1.1" 200 130700
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=coinbaseUSD HTTP/1.1" 200 118985
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=btceUSD HTTP/1.1" 200 120795
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=rockEUR HTTP/1.1" 200 37714
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=mrcdBRL HTTP/1.1" 200 16269
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=krakenEUR HTTP/1.1" 200 159263
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=bitcurexEUR HTTP/1.1" 200 6025
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=bitbayPLN HTTP/1.1" 200 49658
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=btcmarketsAUD HTTP/1.1" 200 14616
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=btcoidIDR HTTP/1.1" 200 61910
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=bitfinexUSD HTTP/1.1" 200 156377
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=krakenUSD HTTP/1.1" 200 59234
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=virwoxSLL HTTP/1.1" 200 43274
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=coinbaseEUR HTTP/1.1" 200 84004
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=krakenCAD HTTP/1.1" 200 7757
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=btceEUR HTTP/1.1" 200 8513
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=bitmarketplPLN HTTP/1.1" 200 23120
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=btceRUR HTTP/1.1" 200 24134
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=coinbaseCAD HTTP/1.1" 200 19945
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=btcdeEUR HTTP/1.1" 200 17434
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=krakenLTC HTTP/1.1" 200 4710
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=itbitEUR HTTP/1.1" 200 17930
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=localbtcRUB HTTP/1.1" 200 104819
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): api.bitcoincharts.com
+DEBUG:requests.packages.urllib3.connectionpool:"GET /v1/trades.csv?symbol=localbtcUSD HTTP/1.1" 200 96136
+ERROR:root:error from callback <bound method Connection._on_message of <Connection(Thread-3, started daemon 8036)>>: Invalid format string

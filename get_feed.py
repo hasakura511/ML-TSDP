@@ -4,7 +4,7 @@ import pandas as pd
 import time
 from os import listdir
 from os.path import isfile, join
-from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history
+from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, proc_history
 from c2api.place_order import place_order as place_c2order
 # -*- coding: utf-8 -*-
 """
@@ -99,8 +99,7 @@ files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 for pair in currencyPairs:
     filename=dataPath+barSizeSetting+'_'+pair+'.csv'
     data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
-    if os.path.isfile(filename):
-        data=pd.read_csv(filename, index_col='Date')
+    
         
     eastern=timezone('US/Eastern')
     endDateTime=dt.now(get_localzone())
@@ -113,6 +112,9 @@ for pair in currencyPairs:
         
     currencyPairsDict[pair] = data
     
+    if os.path.isfile(filename):
+        data=pd.read_csv(filename, index_col='Date')
+        data=proc_history(symbol, currency,   exchange, secType, whatToShow, data, filename, tickerId)
     get_realtimebar(symbol, currency,   exchange, secType, whatToShow, data, filename, tickerId)
 
     data=get_history(date, symbol, currency, exchange, secType, whatToShow, data, filename, tickerId, minDataPoints, durationStr, barSizeSetting)

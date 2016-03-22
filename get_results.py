@@ -277,7 +277,7 @@ ibdata=generate_ib_plot_from_trades('IB_Paper', 20000)
 (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
 
 data=get_data('IB_Live', 'paper', 'ib', 'trades', 20000)
-(counter, html)=generate_plot(data['realized_PnL'], 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+(counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
         
 ibdata=generate_ib_plot('C2_Paper', 20000)
 (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
@@ -286,7 +286,7 @@ ibdata=generate_ib_plot_from_trades('C2_Paper', 20000)
 (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
 
 data=get_data('IB_Live', 'paper', 'c2', 'trades', 20000)
-(counter, html)=generate_plot(data['PL'], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+(counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
 cols=3
        
 html = html + '</table><h1>Paper</h1><br><table>'

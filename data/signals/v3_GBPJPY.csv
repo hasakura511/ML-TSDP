@@ -16,3 +16,7 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-21 16:40:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7498 is less than required validation set + training set of 7500
 2016-03-21 16:41:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7499 is less than required validation set + training set of 7500
 2016-03-21 18:45:00,-1.0,0.0,7891.0,0.0,-2.5136174798,0.0,0.00672977377573,bothGBPJPY_ALL_DF1_GNBayes_i25_gainAhead DPS wl30.0 maxL5 dd95_0.007 thres_0.0
+2016-03-22 01:32:00,-1.0,0.0,8294.0,5.0,1.14160272867,0.000724074833379,0.00672977377573,"bothGBPJPY_ALL_DF1_LDA_i25_ZZ 0.009,-0.009 DPS wl30.0 maxL5 dd95_0.007 thres_0.0"
+2016-03-22 07:47:00,1.0,0.0,8668.0,1.0,,,,bothGBPJPY_ALL_DF1_LDA_i500_gainAhead
+2016-03-22 10:38:00,-1.0,0.0,8839.0,3.17599174488,11.0507093862,0.00211895191055,0.00672977377573,"bothGBPJPY_ALL_DF1_LDA_i500_ZZ 0.009,-0.009 DPS wl30.0 maxL5 dd95_0.007 thres_0.0"
+2016-03-22 15:27:00,1.0,0.0,9113.0,1.0,,,,bothGBPJPY_ALL_DF1_LDA_i500_gainAhead

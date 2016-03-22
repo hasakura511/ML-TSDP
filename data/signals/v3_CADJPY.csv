@@ -11,3 +11,5 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-21 16:02:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7445 is less than required validation set + training set of 7500
 2016-03-21 16:03:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7446 is less than required validation set + training set of 7500
 2016-03-21 16:03:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7447 is less than required validation set + training set of 7500
+2016-03-21 18:45:00,-1.0,0.0,7877.0,1.0,,,,"bothCADJPY_ALL_DF1_LDA_i500_ZZ 0.009,-0.009"
+2016-03-22 01:18:00,-1.0,0.0,8270.0,3.22488874258,13.0551265754,0.00208682355049,0.00672977377573,bothCADJPY_ALL_DF1_GNBayes_i25_gainAhead DPS wl30.0 maxL5 dd95_0.007 thres_0.0

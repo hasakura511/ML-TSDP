@@ -1,3 +1,3 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-AUDUSD,91,1458611750,,,0.75764,,forex,long,2016-03-21 21:55:50,1458611750,open,2016-03-21 21:55:41,0.75765,10000,,0,5,,,101392461,
-USDCAD,-13,1458593017,,,1.30767,,forex,long,2016-03-21 16:43:37,1458593017,open,2016-03-21 16:37:57,1.30844,10000,,0,1,,,101388970,
+AUDUSD,6,1458633965,,,0.75955,,forex,short,2016-03-22 04:06:05,1458633965,open,2016-03-22 04:06:01,0.75960,10000,,0,5,,,101399039,
+USDCAD,-1,1458593017,,,1.30767,,forex,long,2016-03-21 16:43:37,1458643791,open,2016-03-21 16:37:57,1.30706,10000,,0,5,,,101388970,

@@ -363,7 +363,7 @@ for file in files:
                 if data.shape[0] > 2000:
                     generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
                     plt.close()
-                    get_v1signal(data, 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
+                    get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
                     plt.close()
 html = html + '</body></html>'
 f = open('./data/results/index.html', 'w')

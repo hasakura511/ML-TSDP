@@ -185,9 +185,9 @@ while not finished:
             
         time.sleep(10)
     except Exception as e:
-        f=open ('./debug/papererrors.log','a')
-        f.write(e)
-        f.close()
+        #f=open ('./debug/papererrors.log','a')
+        #f.write(e)
+        #f.close()
         logging.error("something bad happened", exc_info=True)
         
     

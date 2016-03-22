@@ -208,9 +208,9 @@ def get_signal():
                             float(system['ibqty']),system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
                     time.sleep(1)
       except Exception as e:
-        f=open ('./debug/get_btcfeed_cerrors.log','a')
-        f.write(e)
-        f.close()
+        #f=open ('./debug/get_btcfeed_cerrors.log','a')
+        #f.write(e)
+        #f.close()
         logging.error("something bad happened", exc_info=True)
         
         

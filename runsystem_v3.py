@@ -41,9 +41,9 @@ def runv3(pair):
          subprocess.call(['python','system_v3.0C.py',pair,'1'], stdout=f)
          f.close()
      except Exception as e:
-	 f=open ('./debug/v3run' + pair + '.log','a')
-	 f.write(e)
-	 f.close()
+	 #f=open ('./debug/v3run' + pair + '.log','a')
+	 #f.write(e)
+	 #f.close()
 	 logging.error("something bad happened", exc_info=True)
     return
     

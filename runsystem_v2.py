@@ -40,9 +40,9 @@ def runv2(pair):
          subprocess.call(['python','system_v2.31C.py',pair,'1'], stdout=f)
          f.close()
 	except Exception as e:
-	 f=open ('./debug/v2run' + pair + '.log','a')
-	 f.write(e)
-	 f.close()
+	 #f=open ('./debug/v2run' + pair + '.log','a')
+	 #f.write(e)
+	 #f.close()
 	 logging.error("something bad happened", exc_info=True)
     return
 

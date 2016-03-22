@@ -1,4 +1,7 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
+USDCHF,19,1458606266,,,0.97056,,forex,short,2016-03-21 20:24:26,1458606266,open,2016-03-21 20:24:23,0.97063,10000,,0,5,,,101391249,
 EURJPY,7,1458604207,,,126.03100,,forex,short,2016-03-21 19:50:07,1458604207,open,2016-03-21 19:50:03,126.02800,10000,,0,1,,,101390888,
-USDCAD,2,1458603657,,,1.30885,,forex,short,2016-03-21 19:40:57,1458603657,open,2016-03-21 19:34:04,1.30911,10000,,0,5,,,101390717,
-GBPUSD,10,1458602318,,,1.43715,,forex,short,2016-03-21 19:18:38,1458602318,open,2016-03-21 19:18:33,1.43714,10000,,0,5,,,101390561,
+AUDUSD,0,,,,0.75714,,forex,short,,,open,2016-03-21 20:45:01,0.75711,10000,,0,4,,,101391496,
+EURUSD,-3,1458606860,,,1.12368,,forex,short,2016-03-21 20:34:20,1458606860,open,2016-03-21 20:34:16,1.12367,10000,,0,5,,,101391355,
+GBPUSD,-16,1458602318,,,1.43715,,forex,short,2016-03-21 19:18:38,1458602318,open,2016-03-21 19:18:33,1.43714,10000,,0,5,,,101390561,
+USDCAD,,,,,,,,none,,,,,,,,0,0,,,,

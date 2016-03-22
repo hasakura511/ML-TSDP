@@ -4,6 +4,7 @@ Created on Sun Nov 22 20:57:32 2015
 v1.12
 added features of other pairs
 fixed offline mode
+added timestamp
 
 v1.10
 added param load
@@ -22,6 +23,7 @@ from os import listdir
 from os.path import isfile, join
 from datetime import datetime as dt
 import datetime 
+from pytz import timezone
 
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.linear_model import Perceptron, PassiveAggressiveClassifier, LogisticRegression
@@ -96,6 +98,7 @@ for pair in currencyPairs:
             pass
         else:
             signalFile=pd.read_csv(signalPath+ pair + '.csv', parse_dates=['Date'])
+            signalFile2 = signalFile.copy(deep=True)
             offline = signalFile.iloc[-1].copy(deep=True)
             offline.Date = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
             offline.Signal = 0
@@ -108,6 +111,10 @@ for pair in currencyPairs:
             #offline.system = 'Offline'
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + pair + '.csv', index=False)
+            
+            offline['timestamp'] = dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST")
+            signalFile2 = signalFile2.append(offline)
+            signalFile2.to_csv(signalPath + version + '_' + pair + '.csv', index=False)
             #sys.exit("Offline Mode: "+sys.argv[0])
             
 for ticker in livePairs:
@@ -421,11 +428,15 @@ for ticker in livePairs:
     if len(sys.argv) > 1:
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
         if ticker + '.csv' not in files:
-            signal_df.to_csv(signalPath + ticker + '.csv', index=True)
+            signal_df.to_csv(signalPath + version + '_' + pair + '.csv', index=True)
         else:        
             signalFile=pd.read_csv(signalPath + ticker + '.csv')
+            signalFile2 = signalFile.copy(deep=True)
             signalFile=signalFile.append(signal_df)
             signalFile.to_csv(signalPath + ticker + '.csv', index=False)
-     
-     
+            
+            signal_df['timestamp'] = dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST")
+            signalFile2=signalFile2.append(signal_df)   
+            signalFile2.to_csv(signalPath + version + '_' + pair + '.csv', index=False)    
+
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

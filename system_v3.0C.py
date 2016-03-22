@@ -8,6 +8,7 @@ added validation period optimization
 added more pairs
 fixed offline mode
 added minute version of CAR25
+fixed timestamp
 
 v2.3C "MJ"
 added params folder
@@ -217,8 +218,8 @@ for ticker in livePairs:
 
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
-    #validationSetLength = 7000
     validationSetLength = 7000
+    #validationSetLength = 500
     #validationPeriods = [50,250]
     validationPeriods = [250,1400] # min is 2
     #validationStartPoint = None
@@ -840,8 +841,7 @@ for ticker in livePairs:
         BestEquity = calcEquity_df(validationDict[bestModel.validationPeriod][['signals','gainAhead']],\
                                             bestModel.C25sig, leverage = validationDict[bestModel.validationPeriod].safef.values)
     
-    bestModel = bestModel.append(pd.Series(data=datetime.datetime.fromtimestamp(time.time())\
-                                    .strftime('%Y-%m-%d %H:%M:%S'), index=['timestamp']))
+    bestModel = bestModel.append(pd.Series(data=dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST"), index=['timestamp']))
     
     print version, 'Saving Params..'
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]

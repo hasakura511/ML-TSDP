@@ -5,6 +5,7 @@ Created on Sun Nov 22 20:57:32 2015
 changelog
 v2.31C " MJ"
 added compatibility with v3
+fixed timestamp
 
 v2.3C " MJ"
 fixed offline mode
@@ -503,8 +504,7 @@ for ticker in livePairs:
     #score models
     scored_models, bestModel = directional_scoring(model_metrics,filterName)
     #bestModel['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    bestModel = bestModel.append(pd.Series(data=datetime.datetime.fromtimestamp(time.time())\
-                                    .strftime('%Y-%m-%d %H:%M:%S'), index=['timestamp']))
+    bestModel = bestModel.append(pd.Series(data=dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST"), index=['timestamp']))
     
     print version, 'Saving Params..'                                
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]

@@ -58,8 +58,17 @@ from swigibpy import EWrapper, EPosixClientSocket, Contract
 
 
 start_time = time.time()
-bestParamsPath = './data/params/'
-signalPath = './data/signals/'
+
+if len(sys.argv) > 1:
+    bestParamsPath = './data/params/'
+    signalPath = './data/signals/'
+    dataPath = './data/from_IB/'
+else:
+    signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
+    dataPath = 'D:/ML-TSDP/data/from_IB/'
+    bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
+    
 livePairs =  [
                 'NZDJPY',\
                 'CADJPY',\
@@ -97,7 +106,7 @@ for pair in currencyPairs:
         if pair + '.csv' not in files:
             pass
         else:
-            print pair
+            print pair, 'OFFLINE'
             signalFile=pd.read_csv(signalPath+ pair + '.csv', parse_dates=['Date'])
             offline = signalFile.iloc[-1].copy(deep=True)
             offline.Date = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
@@ -122,6 +131,7 @@ for pair in currencyPairs:
             offline.ddTol=0
             offline.system = 'Offline'
             offline.timestamp = dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")
+            offline.cycleTime = 0
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + version + '_' + pair + '.csv', index=False)
             #sys.exit("Offline Mode: "+sys.argv[0])
@@ -434,19 +444,23 @@ for ticker in livePairs:
     print version+' Next Signal for',dataSet.index[-1],'is', nextSignal
 
     signal_df=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
+    timenow = dt.now(timezone('US/Eastern'))
+    lastBartime = timezone('US/Eastern').localize(dataSet.index[-1].to_datetime())
+    cycleTime = (timenow-lastBartime).total_seconds()/60
     signal_df_new=pd.DataFrame({'dates':dataSet.index[-1],
-                                                        'signals':nextSignal,
-                                                        'gainAhead':0,
-                                                        'prior_index':0,
-                                                        'safef':1,
-                                                        'CAR25':np.nan,
-                                                        'dd95':np.nan,
-                                                        'system':runName, 
-                                                        'timestamp': dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")
-                                                        },
-                                                        columns=['dates','signals','gainAhead','prior_index','safef','CAR25',\
-                                                                            'dd95','system','timestamp'])
-    
+                                'signals':nextSignal,
+                                'gainAhead':0,
+                                'prior_index':0,
+                                'safef':1,
+                                'CAR25':np.nan,
+                                'dd95':np.nan,
+                                'system':runName, 
+                                'timestamp': timenow.strftime("%Y%m%d %H:%M:%S %Z"),
+                                'cycleTime': cycleTime
+                                },
+                                columns=['dates','signals','gainAhead','prior_index','safef','CAR25',\
+                                                    'dd95','system','timestamp','cycleTime'])
+
     
     if len(sys.argv) > 1:
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]

@@ -503,9 +503,12 @@ for ticker in livePairs:
 
     #score models
     scored_models, bestModel = directional_scoring(model_metrics,filterName)
-    #bestModel['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    bestModel = bestModel.append(pd.Series(data=dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"),\
-                                                            index=['timestamp']))
+    timenow = dt.now(timezone('US/Eastern'))
+    lastBartime = timezone('US/Eastern').localize(dataSet.index[-1].to_datetime())
+    cycleTime = (timenow-lastBartime).total_seconds()/60
+    bestModel = bestModel.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+    bestModel = bestModel.append(pd.Series(data=lastBartime.strftime("%Y%m%d %H:%M:%S %Z"), index=['lastBarTime']))
+    bestModel = bestModel.append(pd.Series(data=cycleTime, index=['cycleTime']))
     
     print version, 'Saving Params..'                                
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]

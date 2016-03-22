@@ -3,6 +3,7 @@
 Created on Sun Nov 22 20:57:32 2015
 v1.12
 added features of other pairs
+fixed offline mode
 
 v1.10
 added param load
@@ -58,12 +59,12 @@ start_time = time.time()
 bestParamsPath = './data/params/'
 signalPath = './data/signals/'
 livePairs =  [
-                #'NZDJPY',\
-                #'CADJPY',\
-                #'CHFJPY',\
-                'EURJPY',\
-                #'GBPJPY',\
-                #'AUDJPY',\
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                #'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
                 'USDJPY',\
                 'AUDUSD',\
                 'EURUSD',\
@@ -71,7 +72,7 @@ livePairs =  [
                 'USDCAD',\
                 'USDCHF',\
                 'NZDUSD',
-                #'EURCHF',\
+                'EURCHF',\
                 #'EURGBP'\
                 ]
                 

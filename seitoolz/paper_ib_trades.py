@@ -1,0 +1,115 @@
+import numpy as np
+import pandas as pd
+import time
+import os.path
+
+import json
+from pandas.io.json import json_normalize
+from seitoolz.signal import get_model_pos
+from time import gmtime, strftime, localtime, sleep
+import pytz
+from pytz import timezone
+from datetime import datetime as dt
+from tzlocal import get_localzone
+
+from paper_account import get_account_value, update_account_value
+from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
+
+debug=True
+
+def get_ib_trades(systemname, date):
+    filename='./data/paper/ib_' + systemname + '_trades.csv'
+    
+    if os.path.isfile(filename):
+        dataSet = pd.read_csv(filename, index_col='permid')
+        if 'PurePL' not in dataSet:
+            dataSet['PurePL']=0
+        return dataSet
+    else:
+        dataSet=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
+                            'exchange','execid','expiry','level_0','orderid','price','qty','openqty', \
+                            'realized_PnL','side',\
+                            'symbol','symbol_currency','times','yield_redemption_date','PurePL'])
+        dataSet=dataSet.set_index('permid')
+        dataSet.to_csv(filename)
+        return dataSet
+    
+    
+def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
+    account=get_account_value(systemname, 'ib', date)
+    account['balance']=account['balance']+tradepl
+    account['purebalance']=account['purebalance']+purepl
+    account['buy_power']=account['buy_power']+buypower
+    account['real_pnl']=account['real_pnl'] + tradepl
+    account['PurePL']=account['PurePL'] + purepl
+    account['Date']=date
+    account=update_account_value(systemname, 'ib',account)
+    
+    filename='./data/paper/ib_' + systemname + '_trades.csv'
+   
+    dataSet = get_ib_trades(systemname, date)
+    #pos=pos.iloc[-1]
+    pos=pos.copy()
+    trade_id=0
+    dataSet=dataSet.reset_index()
+    if len(dataSet['permid'].values) > 0:
+        trade_id=int(max(dataSet['permid'].values))
+    trade_id=int(trade_id) + 1
+    side='BOT'
+    if pos['qty'] < 0:
+        side='SLD'
+    
+    pos=pd.DataFrame([[trade_id, 'Paper', 'Paper', pos['avg_cost'], 'USD', \
+                               ibexch, trade_id, '','',1,pos['price'],abs(pos['qty']),pos['openqty'],pos['openprice'], \
+                               pos['real_pnl'],pos['PurePL'],side, \
+                               pos['sym'], pos['currency'], date, '' \
+                            ]], columns=['permid','account','clientid','commission','commission_currency',\
+                            'exchange','execid','expiry','level_0','orderid','price','qty','openqty','openprice', \
+                            'realized_PnL','PurePL','side',\
+                            'symbol','symbol_currency','times','yield_redemption_date']).iloc[-1]
+                            
+    tradeid=int(pos['permid'])
+    
+    dataSet['permid'] = dataSet['permid'].astype('int')
+    pos['permid'] = pos['permid'].astype('int')
+    pos['balance']=account['balance'] 
+    pos['margin_available']=account['buy_power']
+    
+    if tradeid in dataSet['permid'].values:
+        dataSet = dataSet[dataSet['permid'] != tradeid]
+        dataSet=dataSet.append(pos)
+         
+    else:
+        dataSet=dataSet.append(pos)
+    
+    if debug:
+        longshort='long'
+        qty=abs(pos['qty'])
+        if pos['openqty'] < 0:
+            longshort='short'
+        if pos['openqty'] == 0:
+            if side=='SLD':
+                longshort='long'
+            else:
+                longshort='short'
+        if side == 'SLD':
+            qty=-abs(qty)
+        openorclosed='open'
+        if pos['openqty'] == 0:
+            openorclosed='closed'
+        print "Update IB Balance: " + str(account['balance'])  + " PB: " +  str(account['purebalance']) + " PurePL: " + str(account['PurePL']) + ' ' + \
+                    systemname + " " + longshort + \
+                    ' symbol: ' + (pos['symbol']+pos['symbol_currency']) + ' qty: ' + str(qty) + \
+                    ' openqty: ' + str(pos['openqty']) + ' open_or_closed ' + openorclosed + ' Buy_Power: ' + str(account['buy_power'])
+    #print filename
+    dataSet['permid'] = dataSet['permid'].astype('int')
+    dataSet=dataSet.set_index('permid')   
+    dataSet.to_csv(filename)
+    
+
+    return (account, dataSet)
+
+
+
+# -*- coding: utf-8 -*-
+

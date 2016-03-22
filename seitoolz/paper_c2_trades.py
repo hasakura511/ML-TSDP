@@ -1,0 +1,81 @@
+import numpy as np
+import pandas as pd
+import time
+import os.path
+
+import json
+from pandas.io.json import json_normalize
+from seitoolz.signal import get_model_pos
+from time import gmtime, strftime, localtime, sleep
+import pytz
+from pytz import timezone
+from datetime import datetime as dt
+from tzlocal import get_localzone
+
+from paper_account import get_account_value, update_account_value
+from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
+
+debug=True
+
+def get_c2_trades(systemname, date):
+    filename='./data/paper/c2_' + systemname + '_trades.csv'
+    
+    if os.path.isfile(filename):
+        dataSet = pd.read_csv(filename, index_col='trade_id')
+        if 'PurePL' not in dataSet:
+            dataSet['PurePL']=0
+        return dataSet
+    else:
+        dataSet=pd.DataFrame({},columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
+        'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
+        'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
+        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description','PurePL','qty'])
+        dataSet = dataSet.set_index('trade_id')
+        dataSet.to_csv(filename)
+        return dataSet
+  
+    return dataSet
+
+def update_c2_trades(systemname, pos, tradepl, purepl, buypower, date):
+    account=get_account_value(systemname, 'c2', date)
+    account['balance']=account['balance']+tradepl
+    account['purebalance']=account['purebalance']+purepl
+    account['buy_power']=account['buy_power']+buypower
+    account['real_pnl']=account['real_pnl'] + tradepl
+    account['PurePL']=account['PurePL'] + purepl
+    account['Date']=date
+    account=update_account_value(systemname, 'c2', account)
+    
+    filename='./data/paper/c2_' + systemname + '_trades.csv'
+    dataSet = get_c2_trades(systemname, date)
+    
+    pos=pos.copy()
+    tradeid=int(pos['trade_id'])
+    pos['balance']=account['balance'] 
+    pos['margin_available']=account['buy_power']
+    
+    if tradeid in dataSet.index.values:
+        dataSet = dataSet[dataSet.index != tradeid]
+        dataSet=dataSet.reset_index()
+        dataSet=dataSet.append(pos)
+        dataSet=dataSet.set_index('trade_id')   
+    
+    else:
+        dataSet=dataSet.reset_index()
+        dataSet=dataSet.append(pos)
+        dataSet=dataSet.set_index('trade_id')   
+        
+    if debug:
+        openqty=pos['quant_opened']-pos['quant_closed']
+        if pos['long_or_short'] == 'short':
+            openqty=-abs(openqty)
+        print "Update C2 Trade Balance: " + str(account['balance'])  + " PB: " +  str(account['purebalance']) + " PurePL: " + str(account['PurePL']) + ' ' + \
+                    systemname + " " + pos['long_or_short'] + \
+                    ' symbol: ' + pos['symbol'] + ' qty: ' + str(pos['qty']) + \
+                    ' openqty: ' + str(openqty) + \
+                    ' open_or_closed ' + pos['open_or_closed'] + ' Buy_Power: ' + str(account['buy_power'])
+             
+    dataSet.to_csv(filename)
+    
+    return (account, dataSet)
+    

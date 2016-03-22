@@ -1868,3 +1868,4 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-21 18:58:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7336 is less than required validation set + training set of 7500
 2016-03-21 18:59:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7337 is less than required validation set + training set of 7500
 2016-03-21 19:00:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7338 is less than required validation set + training set of 7500
+2016-03-21 18:45:00,1.0,0.0,7588.0,5.0,0.471046310222,0.000889481534475,0.00672977377573,bothAUDUSD_ALL_DF1_GNBayes_i25_gainAhead DPS wl30.0 maxL5 dd95_0.007 thres_0.0

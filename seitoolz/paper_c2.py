@@ -87,7 +87,6 @@ def exec_pos_open(pos, systemname, quant, sym, type, currency, exch, price, pric
             pos['opening_price_VWAP']=openVWAP
             pos['quant_opened']=abs(openqty)
             pos['qty']=quant
-            pos['PL']=float(pos['PL']) + float(tradepl)
             pos['commission']=pos['commission'] + commission
             pos['long_or_short']=side
             
@@ -101,7 +100,7 @@ def exec_pos_open(pos, systemname, quant, sym, type, currency, exch, price, pric
                 print "++++++++++++++++++++"
                 
             update_c2_trades(systemname, pos, tradepl, 0, buy_power, date)
-            update_c2_portfolio(systemname, pos, date)
+            update_c2_portfolio(systemname, pos, tradepl, 0, buy_power, date)
         else:
             side='long'
             if quant < 0:
@@ -114,7 +113,7 @@ def exec_pos_open(pos, systemname, quant, sym, type, currency, exch, price, pric
             
             pos=get_new_c2_pos(systemname, sym, side, price, quant, tradepl, commission, ptValue, date)
             update_c2_trades(systemname, pos, tradepl, 0, buy_power, date)
-            update_c2_portfolio(systemname, pos, date)
+            update_c2_portfolio(systemname, pos, tradepl, 0, buy_power, date)
        
 
 def exec_pos_close(pos, systemname, quant, sym, type, currency, exch, price, pricefeed, date):
@@ -151,14 +150,8 @@ def exec_pos_close(pos, systemname, quant, sym, type, currency, exch, price, pri
                 pos['closing_price_VWAP']=closeVWAP
                 pos['quant_closed']=abs(closedqty)
                 pos['commission']=pos['commission'] + commission
-                pos['PL']=pos['PL'] + tradepl
                 pos['long_or_short']=side
                 pos['qty']=quant
-                
-                if 'PurePL' in pos:
-                    pos['PurePL']=float(pos['PurePL']) + purepl
-                else:
-                    pos['PurePL']=purepl
                 
                 if abs(closedqty) >= abs(openqty):
                     pos['open_or_closed']='closed'
@@ -175,6 +168,6 @@ def exec_pos_close(pos, systemname, quant, sym, type, currency, exch, price, pri
                 pos['open_or_closed']='closed'
                 
             update_c2_trades(systemname, pos, tradepl, purepl, buy_power, date)
-            update_c2_portfolio(systemname, pos, date)
+            update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date)
             
 

@@ -16,6 +16,8 @@ from paper_account import get_account_value, update_account_value
 from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
 
 debug=True
+debug2=False
+cumpl=dict()
 
 def get_c2_trades(systemname, date):
     filename='./data/paper/c2_' + systemname + '_trades.csv'
@@ -36,6 +38,7 @@ def get_c2_trades(systemname, date):
   
     return dataSet
 
+
 def update_c2_trades(systemname, pos, tradepl, purepl, buypower, date):
     account=get_account_value(systemname, 'c2', date)
     account['balance']=account['balance']+tradepl
@@ -52,8 +55,21 @@ def update_c2_trades(systemname, pos, tradepl, purepl, buypower, date):
     pos=pos.copy()
     tradeid=int(pos['trade_id'])
     pos['balance']=account['balance'] 
+    pos['purebalance']=account['purebalance']
     pos['margin_available']=account['buy_power']
+    pos['PurePL']=float(pos['PurePL']) + purepl
+    pos['PL']=float(pos['PL']) + float(tradepl)
     
+    if debug2:
+        if cumpl.has_key(pos['symbol']):
+            cumpl[pos['symbol']]=cumpl[pos['symbol']] +float(tradepl)
+        else:
+            cumpl[pos['symbol']]=float(tradepl)
+        print 'C2 Symbol: ' + pos['symbol'] + ' PL: ' + str(pos['PL']) + ' Comp:' + str(cumpl[pos['symbol']])
+        print 'C2 Symbol: ' + pos['symbol'] + ' Co: ' + str(pos['commission']) + ' Comp:' + str(pos['PL']-pos['PurePL'])
+        if pos['quant_opened']-pos['quant_closed']==0:
+            cumpl[pos['symbol']]=0
+            
     if tradeid in dataSet.index.values:
         dataSet = dataSet[dataSet.index != tradeid]
         dataSet=dataSet.reset_index()

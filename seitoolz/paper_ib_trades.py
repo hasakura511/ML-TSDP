@@ -16,6 +16,7 @@ from paper_account import get_account_value, update_account_value
 from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
 
 debug=True
+debug2=False
 
 def get_ib_trades(systemname, date):
     filename='./data/paper/ib_' + systemname + '_trades.csv'
@@ -59,9 +60,10 @@ def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
     if pos['qty'] < 0:
         side='SLD'
     
+    
     pos=pd.DataFrame([[trade_id, 'Paper', 'Paper', pos['avg_cost'], 'USD', \
                                ibexch, trade_id, '','',1,pos['price'],abs(pos['qty']),pos['openqty'],pos['openprice'], \
-                               pos['real_pnl'],pos['PurePL'],side, \
+                               tradepl,purepl,side, \
                                pos['sym'], pos['currency'], date, '' \
                             ]], columns=['permid','account','clientid','commission','commission_currency',\
                             'exchange','execid','expiry','level_0','orderid','price','qty','openqty','openprice', \
@@ -73,7 +75,13 @@ def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
     dataSet['permid'] = dataSet['permid'].astype('int')
     pos['permid'] = pos['permid'].astype('int')
     pos['balance']=account['balance'] 
+    pos['purebalance']=account['purebalance']
     pos['margin_available']=account['buy_power']
+    pos['PurePL']=purepl
+    pos['real_pnl']=tradepl
+    
+    if debug2:
+        print 'IB Symbol: ' + pos['symbol'] + pos['symbol_currency'] + ' PL: ' + str(pos['real_pnl']) + ' Pure PL:' + str(pos['PurePL'])
     
     if tradeid in dataSet['permid'].values:
         dataSet = dataSet[dataSet['permid'] != tradeid]
@@ -97,7 +105,8 @@ def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
         openorclosed='open'
         if pos['openqty'] == 0:
             openorclosed='closed'
-        print "Update IB Balance: " + str(account['balance'])  + " PB: " +  str(account['purebalance']) + " PurePL: " + str(account['PurePL']) + ' ' + \
+        if debug:
+            print "Update IB Balance: " + str(account['balance'])  + " PB: " +  str(account['purebalance']) + " PurePL: " + str(account['PurePL']) + ' ' + \
                     systemname + " " + longshort + \
                     ' symbol: ' + (pos['symbol']+pos['symbol_currency']) + ' qty: ' + str(qty) + \
                     ' openqty: ' + str(pos['openqty']) + ' open_or_closed ' + openorclosed + ' Buy_Power: ' + str(account['buy_power'])

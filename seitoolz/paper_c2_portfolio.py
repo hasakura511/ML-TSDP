@@ -17,6 +17,7 @@ from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
 from paper_c2_trades import get_c2_trades
 
 debug=False
+debug2=False
 
 def get_c2_portfolio(systemname, date):
     filename='./data/paper/c2_' + systemname + '_portfolio.csv'
@@ -39,13 +40,22 @@ def get_c2_portfolio(systemname, date):
         dataSet.to_csv(filename)
         return (account, dataSet)
 
-def update_c2_portfolio(systemname, pos, date):
+def update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date):
     filename='./data/paper/c2_' + systemname + '_portfolio.csv'
     (account, dataSet)=get_c2_portfolio(systemname, date)
 
     pos=pos.copy()
     symbol=pos['symbol']
     
+    pos['balance']=account['balance'] + tradepl
+    pos['purebalance']=account['purebalance'] + purepl
+    pos['margin_available']=account['buy_power'] + buy_power
+    pos['PurePL']=float(pos['PurePL']) + purepl
+    pos['PL']=float(pos['PL']) + float(tradepl)
+    
+    if debug2:
+         print 'C2 Symbol: ' + pos['symbol'] + ' PurePL: ' + str(pos['PurePL']) + ' From Portfolio'
+         
     if debug:
         print "Update Portfolio: " + str(symbol)
         
@@ -96,7 +106,7 @@ def get_new_c2_pos(systemname, sym, side, openVWAP, openqty, pl, commission, ptV
         print "Trade ID:" + str(trade_id)
             
     pos=pd.DataFrame([[sym, 'open',side, abs(openqty), 0, \
-                        openVWAP, 0, pl, 0, commission, \
+                        openVWAP, 0, 0, 0, commission, \
                         trade_id, '','','', \
                         '',sym, \
                         '',date,date,openqty]]

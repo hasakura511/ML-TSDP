@@ -55,7 +55,7 @@ def generate_paper_c2_plot(systemname, initialEquity):
         #sums up results to starting acct capital
         dataSet.sort_index(inplace=True)
         dataSet['equitycurve'] = dataSet['balance']
-        dataSet['PurePLcurve'] = initialEquity + dataSet['PurePL']
+        dataSet['PurePLcurve'] = dataSet['purebalance']
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity]], columns=['equitycurve','PurePLcurve'])
@@ -82,7 +82,7 @@ def generate_paper_ib_plot(systemname, initialEquity):
         dataSet=pd.read_csv(filename)
         #sums up results to starting acct capital
         dataSet['equitycurve'] = dataSet['balance']
-        dataSet['PurePLcurve'] = initialEquity + dataSet['PurePL']
+        dataSet['PurePLcurve'] = dataSet['purebalance']
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity, initialEquity]], columns=['equitycurve','PurePLcurve'])
@@ -103,8 +103,10 @@ def generate_ib_plot(systemname, initialEquity):
         if systemname == 'C2_Paper':
             dataSet.sort_index(inplace=True)
             dataSet['equitycurve'] = dataSet['balance']
+            dataSet['PurePLcurve'] = dataSet['purebalance']
         else:
             dataSet['equitycurve'] = dataSet['balance']
+            dataSet['PurePLcurve'] = dataSet['purebalance']
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity]], columns=['equitycurve'])
@@ -256,34 +258,34 @@ cols=3
 #C2
 for systemname in systemdict:
     if c2dict.has_key(systemname):
-        c2data=generate_c2_plot(systemname, 10000)
+        c2data=generate_c2_plot(systemname, 20000)
         (counter, html)=generate_plot(c2data['equitycurve'], 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols)
         
-        data=get_data(systemname, 'c2api', 'c2', 'trades', 10000)
+        data=get_data(systemname, 'c2api', 'c2', 'trades', 20000)
         (counter, html)=generate_plot(data['PL'], 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols)
         
-        data=get_datas(systemdict[systemname], 'from_IB', 'Close', 10000)
+        data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
         (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
 html = html + '</table><h1>IB</h1><br><table>'
 #IB
 cols=3
-ibdata=generate_ib_plot('IB_Paper', 10000)
+ibdata=generate_ib_plot('IB_Paper', 20000)
 (counter, html)=generate_plot(ibdata['equitycurve'], 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
 
-ibdata=generate_ib_plot_from_trades('IB_Paper', 10000)
+ibdata=generate_ib_plot_from_trades('IB_Paper', 20000)
 (counter, html)=generate_plot(ibdata['equitycurve'], 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
 
-data=get_data('IB_Live', 'paper', 'ib', 'trades', 10000)
+data=get_data('IB_Live', 'paper', 'ib', 'trades', 20000)
 (counter, html)=generate_plot(data['realized_PnL'], 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
         
-ibdata=generate_ib_plot('C2_Paper', 10000)
+ibdata=generate_ib_plot('C2_Paper', 20000)
 (counter, html)=generate_plot(ibdata['equitycurve'], 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
 
-ibdata=generate_ib_plot_from_trades('C2_Paper', 10000)
+ibdata=generate_ib_plot_from_trades('C2_Paper', 20000)
 (counter, html)=generate_plot(ibdata['equitycurve'], 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
 
-data=get_data('IB_Live', 'paper', 'c2', 'trades', 10000)
+data=get_data('IB_Live', 'paper', 'c2', 'trades', 20000)
 (counter, html)=generate_plot(data['PL'], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
 cols=3
        
@@ -292,22 +294,22 @@ counter=0
 for systemname in systemdict:
 
   if systemname != 'stratBTC':
-    c2data=generate_paper_c2_plot(systemname, 10000)
+    c2data=generate_paper_c2_plot(systemname, 20000)
     (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePLcurve']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
 
-    data=get_data(systemname, 'paper', 'c2', 'trades', 10000)
+    data=get_data(systemname, 'paper', 'c2', 'trades', 20000)
     (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
 
-    data=get_datas(systemdict[systemname], 'from_IB', 'Close', 10000)
+    data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
     (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
-    ibdata=generate_paper_ib_plot(systemname, 10000)
+    ibdata=generate_paper_ib_plot(systemname, 20000)
     (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
 
-    data=get_data(systemname, 'paper', 'ib', 'trades', 10000)
+    data=get_data(systemname, 'paper', 'ib', 'trades', 20000)
     (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
     
-    data=get_datas(systemdict[systemname], 'from_IB', 'Close', 10000)
+    data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
     (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
 html = html + '</table><h1>BTC Paper</h1><br><table>'
@@ -327,23 +329,23 @@ for file in files:
                                 systemname = re.sub('c2_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
                                 print systemname
-                                c2data=generate_paper_c2_plot(systemname, 10000)                                   
+                                c2data=generate_paper_c2_plot(systemname, 20000)                                   
                                 (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePLcurve']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html)
 
-                                data=get_data(systemname, 'paper', 'c2', 'trades', 10000)
+                                data=get_data(systemname, 'paper', 'c2', 'trades', 20000)
                                 (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
-                                ibdata=generate_paper_ib_plot(systemname, 10000)
+                                ibdata=generate_paper_ib_plot(systemname, 20000)
                                 (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html)
 
-                                data=get_data(systemname, 'paper', 'ib', 'trades', 10000)
+                                data=get_data(systemname, 'paper', 'ib', 'trades', 20000)
                                 (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
                         btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
                             
-                        #data=get_datas(btcname, 'btapi', 'Close', 10000)
+                        #data=get_datas(btcname, 'btapi', 'Close', 20000)
                         #(counter, html)=generate_plots(data, 'paper_' +btcname + 'Close', btcname + " Close Price", 'Close', counter, html, cols)
 
                         (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
@@ -361,7 +363,7 @@ for file in files:
                 if data.shape[0] > 2000:
                     generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
                     plt.close()
-                    get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
+                    get_v1signal(data, 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
                     plt.close()
 html = html + '</body></html>'
 f = open('./data/results/index.html', 'w')

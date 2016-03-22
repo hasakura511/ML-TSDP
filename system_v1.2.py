@@ -64,7 +64,7 @@ livePairs =  [
                 'NZDJPY',\
                 'CADJPY',\
                 'CHFJPY',\
-                #'EURJPY',\
+                'EURJPY',\
                 'GBPJPY',\
                 'AUDJPY',\
                 'USDJPY',\
@@ -75,7 +75,7 @@ livePairs =  [
                 'USDCHF',\
                 'NZDUSD',
                 'EURCHF',\
-                #'EURGBP'\
+                'EURGBP'\
                 ]
                 
 currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
@@ -97,24 +97,33 @@ for pair in currencyPairs:
         if pair + '.csv' not in files:
             pass
         else:
+            print pair
             signalFile=pd.read_csv(signalPath+ pair + '.csv', parse_dates=['Date'])
-            signalFile2 = signalFile.copy(deep=True)
             offline = signalFile.iloc[-1].copy(deep=True)
             offline.Date = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
             offline.Signal = 0
-            #offline.gainAhead =0
-            #offline.prior_index=0
-            #offline.safef=0
-            #offline.CAR25=0
-            #offline.dd95 = 0
-            #offline.ddTol=0
-            #offline.system = 'Offline'
+
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + pair + '.csv', index=False)
-            
-            offline['timestamp'] = dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST")
-            signalFile2 = signalFile2.append(offline)
-            signalFile2.to_csv(signalPath + version + '_' + pair + '.csv', index=False)
+        
+        if version + '_' + pair + '.csv' not in files:
+            pass
+        else:
+            signalFile=pd.read_csv(signalPath+ version + '_' + pair + '.csv', parse_dates=['dates'])
+           
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = 'Offline'
+            offline.timestamp = dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST")
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + version + '_' + pair + '.csv', index=False)
             #sys.exit("Offline Mode: "+sys.argv[0])
             
 for ticker in livePairs:
@@ -417,26 +426,42 @@ for ticker in livePairs:
                 pd.Series(data=ypred,index=datay.index, name='signals')],axis=1)
     sst.index=sst.index.astype(str).to_datetime()
     
+    runName = ticker+'_'+data_type+'_'+filterName+'_' + bestModel.model +'_i'+str(bestModel.rows)+'_'+bestModel.signal
     if len(sys.argv)==1:
-        compareEquity(sst, ticker)
+        compareEquity(sst, runName)
 
     nextSignal = model.predict([mData.drop(['signal'],axis=1).values[-1]])
-    print version+'Next Signal for',dataSet.index[-1],'is', nextSignal
+    print version+' Next Signal for',dataSet.index[-1],'is', nextSignal
 
     signal_df=pd.DataFrame({'Date':dataSet.index[-1], 'Signal':nextSignal}, columns=['Date','Signal'])
-    #signal.to_csv('./signal/signalss/' + ticker + '.csv', index=False)
+    signal_df_new=pd.DataFrame({'dates':dataSet.index[-1],
+                                                        'signals':nextSignal,
+                                                        'gainAhead':0,
+                                                        'prior_index':0,
+                                                        'safef':1,
+                                                        'CAR25':np.nan,
+                                                        'dd95':np.nan,
+                                                        'system':runName, 
+                                                        'timestamp': dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST")
+                                                        },
+                                                        columns=['dates','signals','gainAhead','prior_index','safef','CAR25',\
+                                                                            'dd95','system','timestamp'])
+    
+    
     if len(sys.argv) > 1:
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
         if ticker + '.csv' not in files:
-            signal_df.to_csv(signalPath + version + '_' + pair + '.csv', index=True)
+            signal_df_new.to_csv(signalPath + version + '_' + ticker + '.csv', index=False)
         else:        
             signalFile=pd.read_csv(signalPath + ticker + '.csv')
-            signalFile2 = signalFile.copy(deep=True)
             signalFile=signalFile.append(signal_df)
             signalFile.to_csv(signalPath + ticker + '.csv', index=False)
             
-            signal_df['timestamp'] = dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST")
-            signalFile2=signalFile2.append(signal_df)   
-            signalFile2.to_csv(signalPath + version + '_' + pair + '.csv', index=False)    
-
+        if version + '_'  + ticker + '.csv' not in files:
+            signal_df_new.to_csv(signalPath + version + '_' + ticker + '.csv', index=False)
+        else:        
+            signalFile=pd.read_csv(signalPath + version + '_' + ticker + '.csv')
+            signalFile=signalFile.append(signal_df_new)
+            signalFile.to_csv(signalPath + version + '_'  + ticker + '.csv', index=False)
+            
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

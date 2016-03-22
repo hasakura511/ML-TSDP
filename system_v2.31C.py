@@ -135,7 +135,7 @@ if len(sys.argv)==1:
     showPDFCDF = True
     showAllCharts = True
     perturbData = False
-    runDPS = True
+    runDPS = False
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -169,7 +169,7 @@ else:
         if version+'_'+ pair + '.csv' in files:
             signalFile=pd.read_csv(signalPath+ version+'_'+ pair + '.csv', parse_dates=['dates'])
             offline = signalFile.iloc[-1].copy(deep=True)
-            offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
             offline.signals = 0
             offline.gainAhead =0
             offline.prior_index=0
@@ -504,7 +504,8 @@ for ticker in livePairs:
     #score models
     scored_models, bestModel = directional_scoring(model_metrics,filterName)
     #bestModel['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    bestModel = bestModel.append(pd.Series(data=dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST"), index=['timestamp']))
+    bestModel = bestModel.append(pd.Series(data=dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"),\
+                                                            index=['timestamp']))
     
     print version, 'Saving Params..'                                
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]

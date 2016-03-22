@@ -100,7 +100,7 @@ for pair in currencyPairs:
             print pair
             signalFile=pd.read_csv(signalPath+ pair + '.csv', parse_dates=['Date'])
             offline = signalFile.iloc[-1].copy(deep=True)
-            offline.Date = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
+            offline.Date = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
             offline.Signal = 0
 
             signalFile=signalFile.append(offline)
@@ -112,7 +112,7 @@ for pair in currencyPairs:
             signalFile=pd.read_csv(signalPath+ version + '_' + pair + '.csv', parse_dates=['dates'])
            
             offline = signalFile.iloc[-1].copy(deep=True)
-            offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
             offline.signals = 0
             offline.gainAhead =0
             offline.prior_index=0
@@ -121,7 +121,7 @@ for pair in currencyPairs:
             offline.dd95 = 0
             offline.ddTol=0
             offline.system = 'Offline'
-            offline.timestamp = dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST")
+            offline.timestamp = dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + version + '_' + pair + '.csv', index=False)
             #sys.exit("Offline Mode: "+sys.argv[0])
@@ -442,7 +442,7 @@ for ticker in livePairs:
                                                         'CAR25':np.nan,
                                                         'dd95':np.nan,
                                                         'system':runName, 
-                                                        'timestamp': dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST")
+                                                        'timestamp': dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")
                                                         },
                                                         columns=['dates','signals','gainAhead','prior_index','safef','CAR25',\
                                                                             'dd95','system','timestamp'])

@@ -176,7 +176,7 @@ else:
         if version+'_'+ pair + '.csv' in files:
             signalFile=pd.read_csv(signalPath+ version+'_'+ pair + '.csv', parse_dates=['dates'])
             offline = signalFile.iloc[-1].copy(deep=True)
-            offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
             offline.signals = 0
             offline.gainAhead =0
             offline.prior_index=0
@@ -197,7 +197,7 @@ def offlineMode(ticker, errorText):
         if version+'_'+ ticker + '.csv' in files:
             signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv', parse_dates=['dates'])
             offline = signalFile.iloc[-1].copy(deep=True)
-            offline.dates = pd.to_datetime(dt.now().replace(second=0, microsecond=0))
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
             offline.signals = 0
             offline.gainAhead =0
             offline.prior_index=0
@@ -841,7 +841,8 @@ for ticker in livePairs:
         BestEquity = calcEquity_df(validationDict[bestModel.validationPeriod][['signals','gainAhead']],\
                                             bestModel.C25sig, leverage = validationDict[bestModel.validationPeriod].safef.values)
     
-    bestModel = bestModel.append(pd.Series(data=dt.now(timezone('EST')).strftime("%Y%m%d %H:%M:%S EST"), index=['timestamp']))
+    bestModel = bestModel.append(pd.Series(data=dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"),\
+                                                    index=['timestamp']))
     
     print version, 'Saving Params..'
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]

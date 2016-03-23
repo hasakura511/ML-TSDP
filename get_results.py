@@ -59,7 +59,7 @@ def generate_sigplots(counter, html, cols):
         if system['ibsym'] != 'BTC':
           if not systems.has_key(system['System']):
             filename=system['System']
-	    if os.path.isfile('./data/results/' + filename + '.png'):
+            if os.path.isfile('./data/results/' + filename + '.png'):
               systems[system['System']]=1
               if system['Version']=='v1':
                   filename = 'v1_' + filename
@@ -172,6 +172,7 @@ def get_USD(currency):
 def get_datas(systems, api, dataType, initialData):
     dataPath='./data/' + api + '/'
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+    
     dataSet=pd.DataFrame({}, columns=['Date'])
     dataSet=dataSet.set_index('Date')
     newfiles=list()
@@ -181,10 +182,9 @@ def get_datas(systems, api, dataType, initialData):
             if re.search(search, file):        
                 filename=dataPath+file
                 if os.path.isfile(filename):
-                    print ' Price Feed: ' + filename + ' data '+ dataType
+                    print filename + ' data '+ dataType
     
-                    newfiles.append([filename,symbol])
-                    
+                    newfiles.append([filename,symbol])      
     return newfiles
                 
         
@@ -218,7 +218,7 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
         symbol=ticker[0:3]
         currency=ticker[3:6]
         #print 'plot for ticker: ' + currency
-        if currency != 'USD':
+        if ylabel == 'Close' and currency != 'USD':
             dta[ylabel]=dta[ylabel] * get_USD(currency)
         dta[ylabel].tail(2000).plot()   
     fig = plt.figure(1)
@@ -253,6 +253,7 @@ commissiondata=commissiondata.set_index('key')
 start_time = time.time()
 
 systemdict={}
+sigdict={}
 c2dict={}
 for i in systemdata.index:
     
@@ -266,15 +267,28 @@ for i in systemdata.index:
         systemdict[system['Name']].append(system['ibsym']+ system['ibcur'])
     else:
         systemdict[system['Name']].append(system['ibsym']+ system['ibcur'])
+    signal=system['System']
+    if system['Version'] == 'v1':
+        signal='v1_' + signal
+    if not sigdict.has_key(system['Name']):
+        sigdict[system['Name']]=list()
+        sigdict[system['Name']].append(signal)
+    else:
+        sigdict[system['Name']].append(signal)
 
 #Paper
 html='<html><head><meta http-equiv="refresh" content="300"></head><body>'
-html = html + '<h1>C2</h1><br><table>'
+
 counter=0
-cols=3
+cols=4
 #Signals
+html = html + '<h1>Signals</h1><br><table>'
 (counter, html)=generate_sigplots(counter, html, cols)
+
 #C2
+counter=0
+cols=4
+html = html + '</table><h1>C2</h1><br><table>'
 for systemname in systemdict:
     if c2dict.has_key(systemname):
         c2data=generate_c2_plot(systemname, 20000)
@@ -283,6 +297,9 @@ for systemname in systemdict:
         data=get_data(systemname, 'c2api', 'c2', 'trades', 20000)
         (counter, html)=generate_plot(data['PL'], 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols)
         
+        data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+        (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
+
         data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
         (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
@@ -306,28 +323,36 @@ ibdata=generate_ib_plot_from_trades('C2_Paper', 20000)
 
 data=get_data('IB_Live', 'paper', 'c2', 'trades', 20000)
 (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
-cols=3
+cols=4
        
 html = html + '</table><h1>Paper</h1><br><table>'
 counter=0
 for systemname in systemdict:
 
   if systemname != 'stratBTC':
+    #C2
     c2data=generate_paper_c2_plot(systemname, 20000)
     (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePLcurve']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
 
     data=get_data(systemname, 'paper', 'c2', 'trades', 20000)
     (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
 
+    data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+    (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
+
     data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
     (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
+    #IB
     ibdata=generate_paper_ib_plot(systemname, 20000)
     (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
 
     data=get_data(systemname, 'paper', 'ib', 'trades', 20000)
     (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
     
+    data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+    (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols)
+
     data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
     (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 

@@ -1,7 +1,5 @@
 data/results/
-data/paper/
 results/
-paper/
 *.pyc
 *.sw[op]
 .DS_Store

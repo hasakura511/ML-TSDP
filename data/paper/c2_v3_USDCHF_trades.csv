@@ -1,0 +1,2 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
+1.0,-2.0,,,,0.0,,USDCHF,short,,20160323 05:41:15 EST,open,20160323 05:41:15 EST,0.97562,,,0.0,5.0,,USDCHF,,0.0,-5.0,19998.0,2.0,350623.8718,20000.0

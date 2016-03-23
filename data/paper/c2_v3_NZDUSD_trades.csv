@@ -1,0 +1,2 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
+1.0,-4.0,,,,,,NZDUSD,long,,20160323 06:48:21 EST,open,20160323 05:41:04 EST,0.67042,,,0.0,5.0,,NZDUSD,,0.0,4.0,19996.0,4.0,366479.0,20000.0

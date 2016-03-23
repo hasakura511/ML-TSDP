@@ -1,0 +1,5 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
+1.0,-35.328,20160323 08:43:28 EST,20160323 08:43:28 EST,20160323 08:43:28 EST,85.42,,AUDJPY,long,,20160323 05:41:10 EST,closed,20160323 05:41:10 EST,85.598,,,2.0,2.0,,AUDJPY,,-31.328,-2.0,19964.672,4.0,399968.672,19968.672
+2.0,30.76,20160323 09:15:57 EST,20160323 09:15:57 EST,20160323 09:15:57 EST,85.303,,AUDJPY,short,,20160323 08:56:20 EST,closed,20160323 08:56:20 EST,85.382,,,5.0,5.0,,AUDJPY,,34.76,5.0,19995.432,4.0,399933.912,20003.432
+3.0,-16.056,20160323 09:52:02 EST,20160323 09:52:02 EST,20160323 09:52:02 EST,85.166,,AUDJPY,long,,20160323 09:15:57 EST,closed,20160323 09:15:57 EST,85.303,,,1.0,1.0,,AUDJPY,,-12.056,-1.0,19979.376,4.0,399921.856,19991.376
+4.0,-2.0,,,,0.0,,AUDJPY,long,,20160323 10:10:00 EST,open,20160323 10:10:00 EST,85.12,,,0.0,1.0,,AUDJPY,,0.0,1.0,19977.376,2.0,392431.296,19991.376

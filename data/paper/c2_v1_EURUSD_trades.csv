@@ -1,0 +1,4 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
+1.0,-7.7,20160323 09:39:43 EST,20160323 09:39:43 EST,20160323 09:39:43 EST,1.11939,,EURUSD,short,,20160323 05:41:16 EST,closed,20160323 05:41:16 EST,1.11902,,,1.0,1.0,,EURUSD,,-3.7,1.0,19992.3,4.0,400003.7,19996.3
+2.0,-17.4,20160323 10:03:37 EST,20160323 10:03:37 EST,20160323 10:03:37 EST,1.11805,,EURUSD,long,,20160323 09:39:43 EST,closed,20160323 09:39:43 EST,1.11939,,,1.0,1.0,,EURUSD,,-13.4,-1.0,19974.9,4.0,399990.3,19982.9
+3.0,-2.0,,,,0.0,,EURUSD,short,,20160323 10:03:37 EST,open,20160323 10:03:37 EST,1.11805,,,0.0,1.0,,EURUSD,,0.0,-1.0,19972.9,2.0,388809.8,19982.9

@@ -1,0 +1,4 @@
+Date,accountid,balance,purebalance,buy_power,unr_pnl,real_pnl,PurePL,currency
+20160322 07:04:30 EST,paperUSD,20000.0,20000.0,400000.0,0,0.0,0.0,USD
+20160322 07:04:30 EST,paperUSD,19998.0,20000.0,388978.88,0,-2.0,0.0,USD
+20160322 13:32:23 EST,paperUSD,19933.344,19937.344,388978.88,0,-66.656,-62.656,USD

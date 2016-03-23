@@ -1,0 +1,2 @@
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
+CADJPY,CAD,,-10000.0,-10000.0,86.253,86.253,-7590.264,2.0,0.0,-2.0,0.0,Paper,JPY

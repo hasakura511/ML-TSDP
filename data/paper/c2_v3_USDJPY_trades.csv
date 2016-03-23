@@ -1,0 +1,2 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
+1.0,-2.0,,,,0.0,,USDJPY,long,,20160323 05:41:08 EST,open,20160323 05:41:08 EST,112.745,,,0.0,5.0,,USDJPY,,0.0,5.0,19998.0,2.0,350392.2,20000.0

@@ -58,8 +58,9 @@ def generate_sigplots(counter, html, cols):
         system=systemdata.ix[i]
         if system['ibsym'] != 'BTC':
           if not systems.has_key(system['System']):
+            filename=system['System']
+	    if os.path.isfile('./data/results/' + filename + '.png'):
               systems[system['System']]=1
-              filename=system['System']
               if system['Version']=='v1':
                   filename = 'v1_' + filename
               (counter, html)=generate_html(filename, counter, html, cols)

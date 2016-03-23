@@ -87,3 +87,4 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-22 21:11:00,-1.0,0.0,7987,1.0,,,,"bothCHFJPY_ALL_DF1_GNBayes_i500_ZZ 0.003,-0.003"
 2016-03-22 22:36:00,-1.0,0.0,8072,1.0,,,,bothCHFJPY_ALL_DF1_LDA_i250_gainAhead
 2016-03-22 23:55:00,-1.0,0.0,8150,1.0,,,,"bothCHFJPY_ALL_DF1_GNBayes_i500_ZZ 0.003,-0.003"
+2016-03-23 01:26:00,-1.0,0.0,8240,1.0,,,,bothCHFJPY_ALL_DF1_LDA_i250_gainAhead

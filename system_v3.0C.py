@@ -980,7 +980,7 @@ for ticker in livePairs:
         addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
         addLine.name = BMdict[bestModel.validationPeriod].iloc[-1].name
         signalFile = signalFile.append(addLine)
-        signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=False)
+        signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=True)
     
             
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

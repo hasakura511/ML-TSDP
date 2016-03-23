@@ -310,7 +310,7 @@ for i in systemdata.index:
         sigdict[system['Name']].append(signal)
 
 #Paper
-html='<html><head><meta http-equiv="refresh" content="300"></head><body>'
+html='<html><head><meta http-equiv="refresh" content="600"></head><body>'
 
 counter=0
 cols=3

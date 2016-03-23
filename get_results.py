@@ -218,6 +218,7 @@ def generate_mult_plot(datas, systemname, title, ylabel, counter, html, cols=4):
     
 def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
     fig, ax = plt.subplots()
+    SST=pd.DataFrame()
     
     for (filename, ticker) in datas:
         dta=pd.read_csv(filename)
@@ -227,9 +228,32 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
         if ylabel == 'Close' and currency != 'USD':
             dta[ylabel]=dta[ylabel] * get_USD(currency)
         #dta[ylabel].plot(label=ticker)   
+        
         ax.plot( dta[ylabel], label=ticker)
-    
-
+        
+       
+        if len(SST.index.values) < 2:
+            dta['key']=pd.to_datetime(dta[dta.columns[0]])
+            dta=dta.set_index('key') 
+            SST=dta
+            barSize='1 day'
+            if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
+                barSize = '1 day'
+            else:
+                barSize = '1 min'
+            if barSize != '1 day' :
+                def format_date(x, pos=None):
+                    thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
+                    return SST.index[thisind].strftime("%Y-%m-%d %H:%M")
+                ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+                 
+            else:
+                def format_date(x, pos=None):
+                    thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
+                    return SST.index[thisind].strftime("%Y-%m-%d")
+                ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        #ax.plot( dta[ylabel], label=ticker) 
+           
     # Now add the legend with some customizations.
     legend = ax.legend(loc='best', shadow=True)
     

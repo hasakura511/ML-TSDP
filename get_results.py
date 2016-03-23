@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import time
+import matplotlib.ticker as tick
+import matplotlib.dates as mdates
 from os import listdir
 from os.path import isfile, join
 import re
@@ -66,6 +68,7 @@ def generate_sigplots(counter, html, cols):
                   filename = 'v1_' + filename
               (counter, html)=generate_html(filename, counter, html, cols)
     return (counter, html)     
+    
 def generate_paper_c2_plot(systemname, initialEquity):
     filename='./data/paper/c2_' + systemname + '_account.csv'
     if os.path.isfile(filename):
@@ -214,6 +217,8 @@ def generate_mult_plot(datas, systemname, title, ylabel, counter, html, cols=4):
     return (counter, html)
     
 def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
+    fig, ax = plt.subplots()
+    
     for (filename, ticker) in datas:
         dta=pd.read_csv(filename)
         symbol=ticker[0:3]
@@ -221,12 +226,39 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
         #print 'plot for ticker: ' + currency
         if ylabel == 'Close' and currency != 'USD':
             dta[ylabel]=dta[ylabel] * get_USD(currency)
-        dta[ylabel].tail(2000).plot()   
-    fig = plt.figure(1)
+        #dta[ylabel].plot(label=ticker)   
+        ax.plot( dta[ylabel], label=ticker)
+    
+
+    # Now add the legend with some customizations.
+    legend = ax.legend(loc='best', shadow=True)
+    
+    # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
+    frame = legend.get_frame()
+    frame.set_facecolor('0.90')
+    
+    # Set the fontsize
+    for label in legend.get_texts():
+        label.set_fontsize(8)
+        label.set_fontweight('bold')
+    
+   
+    
+        
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    # use a more precise date string for the x axis locations in the
+    # toolbar
+
+    fig.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+    #for label in legend.get_lines():
+    #    label.set_linewidth(0.5)  # the legend line width
     plt.title(title)
     plt.ylabel(ylabel)
     plt.savefig('./data/results/' + systemname + ylabel + '.png')
     plt.close(fig)
+    plt.close()
     (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
     
     return (counter, html)

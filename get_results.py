@@ -50,7 +50,7 @@ import subprocess
 from btapi.get_signal import get_v1signal
 
 def generate_sigplots(counter, html, cols):
-    subprocess.call(['python','create_signalPlots.py','1'])
+    #subprocess.call(['python','create_signalPlots.py','1'])
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
     systems=dict()
@@ -306,55 +306,61 @@ for systemname in systemdict:
 html = html + '</table><h1>IB</h1><br><table>'
 #IB
 cols=3
-ibdata=generate_ib_plot('IB_Paper', 20000)
-(counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
+if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
+    ibdata=generate_ib_plot('IB_Paper', 20000)
+    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
+    
+    ibdata=generate_ib_plot_from_trades('IB_Paper', 20000)
+    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
+    
+    data=get_data('IB_Live', 'paper', 'ib', 'trades', 20000)
+    (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
 
-ibdata=generate_ib_plot_from_trades('IB_Paper', 20000)
-(counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
+if os.path.isfile('./data/paper/c2_' + 'IB_Live' + '_trades.csv'):
+    ibdata=generate_ib_plot('C2_Paper', 20000)
+    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
+    
+    ibdata=generate_ib_plot_from_trades('C2_Paper', 20000)
+    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
+    
+    data=get_data('IB_Live', 'paper', 'c2', 'trades', 20000)
+    (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
 
-data=get_data('IB_Live', 'paper', 'ib', 'trades', 20000)
-(counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
-        
-ibdata=generate_ib_plot('C2_Paper', 20000)
-(counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
-
-ibdata=generate_ib_plot_from_trades('C2_Paper', 20000)
-(counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
-
-data=get_data('IB_Live', 'paper', 'c2', 'trades', 20000)
-(counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
 cols=4
-       
+
+#Paper    
 html = html + '</table><h1>Paper</h1><br><table>'
 counter=0
 for systemname in systemdict:
 
   if systemname != 'stratBTC':
-    #C2
-    c2data=generate_paper_c2_plot(systemname, 20000)
-    (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePLcurve']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
-
-    data=get_data(systemname, 'paper', 'c2', 'trades', 20000)
-    (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
-
-    data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-    (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
-
-    data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
-    (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
-
-    #IB
-    ibdata=generate_paper_ib_plot(systemname, 20000)
-    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
-
-    data=get_data(systemname, 'paper', 'ib', 'trades', 20000)
-    (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
+    #C2 Paper
+    if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
+        c2data=generate_paper_c2_plot(systemname, 20000)
+        (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePLcurve']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
     
-    data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-    (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols)
+        data=get_data(systemname, 'paper', 'c2', 'trades', 20000)
+        (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
+    
+        data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+        (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
+    
+        data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
+        (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
-    data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
-    (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
+    #IB Paper
+    if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
+        ibdata=generate_paper_ib_plot(systemname, 20000)
+        (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
+    
+        data=get_data(systemname, 'paper', 'ib', 'trades', 20000)
+        (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
+        
+        data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+        (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols)
+    
+        data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
+        (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
 html = html + '</table><h1>BTC Paper</h1><br><table>'
 counter = 0

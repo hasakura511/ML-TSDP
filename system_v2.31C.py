@@ -198,11 +198,12 @@ for ticker in livePairs:
     #load best params
     bestParams = pd.read_csv(bestParamsPath+'v3_'+ticker+'.csv')
     validationStartPoint = bestParams.iloc[-1].validationPeriod
-
+    #validationStartPoint = 250
+    
     #Model Parameters
-    signal_types = ['gainAhead','ZZ']
+    #signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
-    #signal_types = ['gainAhead']    
+    signal_types = ['gainAhead']    
     zz_steps = [0.001,0.002,0.003]
     perturbDataPct = 0.0002
     longMemory =  False
@@ -211,7 +212,7 @@ for ticker in livePairs:
     feature_selection = 'None' #RFECV OR Univariate
     #feature_selection = 'Univariate' #RFECV OR Univariate
     wfSteps=[5,10]
-    wf_is_periods = [25,100,250,500]
+    wf_is_periods = [500,1000]
     #wf_is_periods = [100]
     tox_adj_proportion = 0
     nfeatures = 10
@@ -235,7 +236,7 @@ for ticker in livePairs:
     PRT['DD95_limit'] = 0.05
     PRT['tailRiskPct'] = 95
     PRT['initial_equity'] = 1.0
-    PRT['horizon'] = 1440
+    PRT['horizon'] = 250
     PRT['maxLeverage'] = 5
     #CAR25_threshold=-np.inf
     CAR25_threshold=0

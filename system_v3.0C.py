@@ -264,10 +264,10 @@ for ticker in livePairs:
     #validationPeriods = [50,250]
     validationPeriods = [50,250] # min is 2
     #validationStartPoint = None
-    signal_types = ['gainAhead','ZZ']
+    #signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
-    #signal_types = ['gainAhead']
-    zz_steps = [0.001,0.002,0.003]
+    signal_types = ['gainAhead']
+    #zz_steps = [0.001,0.002,0.003]
     #zz_steps = [0.009]
     perturbDataPct = 0.0002
     longMemory =  False
@@ -275,7 +275,7 @@ for ticker in livePairs:
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     wfSteps=[5,10]
-    wf_is_periods = [25,500]
+    wf_is_periods = [500,1000]
     #wf_is_periods = [10]
     tox_adj_proportion = 0
     nfeatures = 10

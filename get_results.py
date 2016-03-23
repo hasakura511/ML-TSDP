@@ -46,8 +46,24 @@ from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.paper import adj_size
 from time import gmtime, strftime, localtime, sleep
 import os
+import subprocess
 from btapi.get_signal import get_v1signal
 
+def generate_sigplots(counter, html, cols):
+    subprocess.call(['python','create_signalPlots.py','1'])
+    systemdata=pd.read_csv('./data/systems/system.csv')
+    systemdata=systemdata.reset_index()
+    systems=dict()
+    for i in systemdata.index:
+        system=systemdata.ix[i]
+        if system['ibsym'] != 'BTC':
+          if not systems.has_key(systems[system['System']]):
+              systems[system['System']]=1
+              filename=system['System']
+              if system['Version']=='v1':
+                  filename = 'v1_' + filename
+              (counter, html)=generate_html(filename, counter, html, cols)
+    return (counter, html)     
 def generate_paper_c2_plot(systemname, initialEquity):
     filename='./data/paper/c2_' + systemname + '_account.csv'
     if os.path.isfile(filename):
@@ -255,6 +271,8 @@ html='<html><head><meta http-equiv="refresh" content="300"></head><body>'
 html = html + '<h1>C2</h1><br><table>'
 counter=0
 cols=3
+#Signals
+(counter, html)=generate_sigplots(counter, html, cols)
 #C2
 for systemname in systemdict:
     if c2dict.has_key(systemname):

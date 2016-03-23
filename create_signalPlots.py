@@ -39,6 +39,7 @@ if len(sys.argv) > 1:
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
     savePath = './data/signalPlots/'
+    pngPath = './data/results/
     showPlot = False
 else:
     signalPath = 'D:/ML-TSDP/data/signals/' 
@@ -60,7 +61,7 @@ def fixnans(dataSet):
         #print fixed[i]
     return fixed
     
-def calcEquity_signals(SST, title, leverage=1.0, savePath=None, figsize=(8,7), showPlot=True):
+def calcEquity_signals(SST, title, leverage=1.0, savePath=None, pngPath=None, figsize=(8,7), showPlot=True):
     initialEquity = 1.0
     nrows = SST.gainAhead.shape[0]
     #signalCounts = SST.signals.shape[0]
@@ -233,8 +234,8 @@ def calcEquity_signals(SST, title, leverage=1.0, savePath=None, figsize=(8,7), s
     ax1.set_ylabel("TWR")
     ax1.legend(loc="best")
     ax2.set_ylabel("Drawdown")   
-    if savePath != None:
-        plt.savefig(savePath+title+'.png', bbox_inches='tight')
+    if pngPath != None:
+        plt.savefig(pngPath+title+'.png', bbox_inches='tight')
         
     if showPlot:
         plt.show()
@@ -308,6 +309,7 @@ for pair in pairs:
                     
                     equityCurve = calcEquity_signals(dataSet, f[:-4],\
                                         leverage = dataSet.safef.values, savePath=savePath,\
+                                        pngPath=pngPath, \
                                         figsize=size, showPlot=showPlot)
                     equityCurve.to_csv(savePath+f[:-4]+'_curve.csv')
         else:

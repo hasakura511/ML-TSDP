@@ -21,7 +21,7 @@ import logging
 import time
 import websocket
 
-logging.basicConfig(filename='./debug/get_btcfeed.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/get_btcfeed.log',level=logging.DEBUG)
 
 debug=False
 

@@ -155,6 +155,7 @@ def start_trade(systems, commissiondata, currencyPairsDict):
     global debug
     if debug:
        print "Starting " + str(systems.iloc[0]['Name'])
+       logging.info("Starting " + str(systems.iloc[0]['Name']))
     finished=False
     while not finished:
         try:

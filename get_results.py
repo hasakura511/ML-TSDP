@@ -281,7 +281,7 @@ for i in systemdata.index:
 html='<html><head><meta http-equiv="refresh" content="300"></head><body>'
 
 counter=0
-cols=4
+cols=3
 #Signals
 html = html + '<h1>Signals</h1><br><table>'
 (counter, html)=generate_sigplots(counter, html, cols)

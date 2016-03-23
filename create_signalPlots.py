@@ -4,7 +4,7 @@ Created on Wed Mar 23 08:56:25 2016
 
 @author: Hidemi
 """
-
+import os
 import math
 import string
 import numpy as np
@@ -239,7 +239,7 @@ def calcEquity_signals(SST, title, leverage=1.0, savePath=None, pngPath=None, fi
         
     if showPlot:
         plt.show()
-
+    plt.close()
     
     shortTrades, longTrades = numberZeros(SST.signals)
     allTrades = shortTrades+ longTrades
@@ -268,7 +268,7 @@ pairs = [x[6:12] for x in dataFiles]
 
 for pair in pairs:
     dataFilename = [pairs for pairs in dataFiles if pair in pairs][0]
-    dataFile = pd.read_csv(dataPath + dataFilename, index_col='Date').drop_duplicates()
+    dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
     print 'Loaded data from', dataFilename
     
     validSignalFiles = {}
@@ -278,7 +278,10 @@ for pair in pairs:
     for system in validSignalFiles:
         if system != 'v1':
             for f in [sfile for sfile in validSignalFiles[system] if pair in sfile]:
-                signalFile = pd.read_csv(signalPath+f, index_col='dates').drop_duplicates()
+	      filename=str(signalPath)+str(f)
+	      print filename
+	      if os.path.isfile(filename):
+                signalFile = pd.read_csv(filename, index_col='dates').drop_duplicates()
                 print 'Loaded signals from', f
                 #if there is no prior index in the row, then it's a legacy file
                 if 'prior_index' in signalFile:
@@ -314,7 +317,7 @@ for pair in pairs:
                     equityCurve.to_csv(savePath+f[:-4]+'_curve.csv')
         else:
             for f in [sfile for sfile in validSignalFiles[system] if pair in sfile]:
-                signalFile = pd.read_csv(signalPath+f, index_col='dates').drop_duplicates()
+                signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()
                 print 'Loaded signals from', f
                 #if there is no prior index in the row, then it's a legacy file
                 if 'prior_index' in signalFile:

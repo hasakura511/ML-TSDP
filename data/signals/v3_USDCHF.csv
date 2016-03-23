@@ -2160,3 +2160,4 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-22 17:18:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7496 is less than required validation set + training set of 7500
 2016-03-22 17:19:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 7496 is less than required validation set + training set of 7500
 2016-03-22 17:18:00,-1.0,0.0,7507.0,5.0,1.01878384349,0.000234694848328,0.00672977377573,"bothUSDCHF_ALL_DF1_GNBayes_i500_ZZ 0.009,-0.009 DPS wl30.0 maxL5 dd95_0.007 thres_0.0"
+2016-03-22 23:10:00,-1.0,0.0,7833.0,5.0,2.45468806154,0.000501631218628,0.00672977377573,bothUSDCHF_ALL_DF1_GNBayes_i500_gainAhead DPS wl30.0 maxL5 dd95_0.007 thres_0.0

@@ -13,6 +13,7 @@ import matplotlib.dates as mdates
 import matplotlib.ticker as tick
 import seaborn as sns
 import datetime
+from pytz import timezone
 from datetime import datetime as dt
 from scipy import stats
 from scipy.stats import kurtosis, skew
@@ -29,6 +30,42 @@ from transform import softmax_score, numberZeros, ratio, hurst
 sns.set_style("darkgrid", {"axes.facecolor": ".9"})
 sns.color_palette("Set1", n_colors=8, desat=.5)
 
+def offlineMode(ticker, errorText, signalPath, ver1, ver2):
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if ver1+'_'+ ticker + '.csv' in files:
+            signalFile=pd.read_csv(signalPath+ ver1+'_'+ ticker + '.csv', parse_dates=['dates'])
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = errorText
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + ver1+'_'+ ticker + '.csv', index=False)
+            
+        if ver2+'_'+ ticker + '.csv' in files:
+            signalFile=pd.read_csv(signalPath+ ver2+'_'+ ticker + '.csv', parse_dates=['dates'])
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = errorText
+            offline.timestamp = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.cycleTime = 0
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + ver2+'_'+ ticker + '.csv', index=False)
+            
+        sys.exit(errorText)
+        
 def describeDistribution(qtC,qtP,ticker):
     hold_days = 1
     #qtC = dataSet.reset_index()['Close']

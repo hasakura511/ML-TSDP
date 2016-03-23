@@ -101,6 +101,7 @@ from suztoolz.data import getDataFromIB
 start_time = time.time()
 #system parameters
 version = 'v2'
+version_ = 'v2.32'
 filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='1 min'
@@ -109,7 +110,9 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'GBPJPY','EURCHF','AUDJPY',\
                  'AUDUSD','EURUSD','GBPUSD','USDCAD',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
-                
+                 
+
+        
 if len(sys.argv)==1:
     debug=True
     
@@ -134,8 +137,8 @@ if len(sys.argv)==1:
     showDist =  True
     showPDFCDF = True
     showAllCharts = True
-    perturbData = False
-    runDPS = False
+    perturbData = True
+    runDPS = True
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -200,15 +203,15 @@ for ticker in livePairs:
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
     #signal_types = ['gainAhead']    
-    zz_steps = [0.003,0.009]
+    zz_steps = [0.001,0.002,0.003]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     #feature_selection = 'Univariate' #RFECV OR Univariate
-    wfSteps=[1]
-    wf_is_periods = [25,250,500]
+    wfSteps=[5,10]
+    wf_is_periods = [25,100,250,500]
     #wf_is_periods = [100]
     tox_adj_proportion = 0
     nfeatures = 10
@@ -262,8 +265,8 @@ for ticker in livePairs:
              #("PRCEPT", Perceptron(class_weight={1:500})), \
              #("PAC", PassiveAggressiveClassifier(class_weight={1:500})), \
              #("LSVC", LinearSVC()), \
-             ("GNBayes",GaussianNB()),\
-             ("LDA", LinearDiscriminantAnalysis()), \
+             #("GNBayes",GaussianNB()),\
+             #("LDA", LinearDiscriminantAnalysis()), \
              #("QDA", QuadraticDiscriminantAnalysis()), \
              #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),
              #("rbf1SVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
@@ -281,18 +284,20 @@ for ticker in livePairs:
              #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=15, weights='distance')),\
              #("rNeighbors-uniform", RadiusNeighborsClassifier(radius=8, weights='uniform')),\
              #("rNeighbors-distance", RadiusNeighborsClassifier(radius=10, weights='distance')),\
-             #("VotingHard", VotingClassifier(estimators=[\
+             ("VotingHard", VotingClassifier(estimators=[\
              #    ("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
              #    ("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
              #    ("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
              #    ("QDA", QuadraticDiscriminantAnalysis()),\
-             #    ("GNBayes",GaussianNB()),\
+                 ("GNBayes",GaussianNB()),\
+                 ("LDA", LinearDiscriminantAnalysis()), \
+                 ("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=5, weights='uniform')),\
                  #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
                  #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:500}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
                  #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=8, weights='distance')),\
                  #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
              #    ("ETC", ExtraTreesClassifier(class_weight={1:500}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
-             #       ], voting='hard', weights=None)),
+                    ], voting='hard', weights=None)),
              #("VotingSoft", VotingClassifier(estimators=[\
                  #("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
                  #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
@@ -497,7 +502,7 @@ for ticker in livePairs:
                             'CCLookback': CCLookback,'rStochLookback': rStochLookback,'statsLookback': statsLookback,\
                             'ROCLookback': ROCLookback,
                              }
-                    runName = ticker+'_'+data_type+'_'+filterName+'_' + m[0]+'_i'+str(wf_is_period)+'_'+signal
+                    runName = ticker+'_'+data_type+'_'+filterName+'_' + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
                     model_metrics, sstDictDF1_[runName] = wf_classify_validate(dataSet, dataSet, [m], model_metrics,\
                                                         wf_is_period, metaData, PRT, showPDFCDF=showPDFCDF,longMemory=longMemory)
 
@@ -540,7 +545,8 @@ for ticker in livePairs:
     print 'WF Out-of-Sample Period:', bestModel.wf_step
     print 'Long Memory: ', longMemory
     DF1_BMrunName = ticker+'_'+bestModel.data_type+'_'+filterName+'_'  +\
-                        bestModel.model + '_i'+str(bestModel.rows)+'_'+bestModel.signal
+                        bestModel.model + '_i'+str(bestModel.rows)\
+                        +'_fcst'+str(bestModel.wf_step)+'_'+bestModel.signal    
     if showAllCharts:
         compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName)
         
@@ -603,5 +609,24 @@ for ticker in livePairs:
                 signalFile.gainAhead.iloc[-1] == bestBothDPS.gainAhead.iloc[-2]
             signalFile=signalFile.append(bestBothDPS.reset_index().iloc[-1])
             signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
-                        
+            
+        #new version file
+        if version_+'_'+ ticker + '.csv' not in files:
+            #signalFile = bestBothDPS.iloc[-2:]
+            addLine = bestBothDPS.iloc[-1]
+            addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+            addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+            addLine.name = bestBothDPS.iloc[-1].name
+            signalFile = bestBothDPS.iloc[-2:-1].append(addLine)
+            signalFile.index.name = 'dates'
+            signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=True)
+        else:        
+            signalFile=pd.read_csv(signalPath+ version_+'_'+ ticker + '.csv', index_col=['dates'])
+            addLine = bestBothDPS.iloc[-1]
+            addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+            addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+            addLine.name = bestBothDPS.iloc[-1].name
+            signalFile = signalFile.append(addLine)
+            signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=True)
+                    
         print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

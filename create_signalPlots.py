@@ -155,7 +155,7 @@ def calcEquity_signals(SST, title, leverage=1.0, savePath=None, figsize=(8,7), s
             #changeIndex = SSTcopy.signals[SST.signals==1].index
             SSTcopy.loc[SST.signals==1,'signals']=0
             
-        equityCurves[trade] = pd.concat([SSTcopy.reset_index(), safef, trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
+        equityCurves[trade] = pd.concat([SSTcopy.reset_index(), trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
 
     #  Compute cumulative equity for all days (buy and hold)   
     trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')

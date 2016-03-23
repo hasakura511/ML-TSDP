@@ -39,7 +39,7 @@ if len(sys.argv) > 1:
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
     savePath = './data/signalPlots/'
-    pngPath = './data/results/
+    pngPath = './data/results/'
     showPlot = False
 else:
     signalPath = 'D:/ML-TSDP/data/signals/' 

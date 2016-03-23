@@ -57,7 +57,7 @@ def generate_sigplots(counter, html, cols):
     for i in systemdata.index:
         system=systemdata.ix[i]
         if system['ibsym'] != 'BTC':
-          if not systems.has_key(systems[system['System']]):
+          if not systems.has_key(system['System']):
               systems[system['System']]=1
               filename=system['System']
               if system['Version']=='v1':

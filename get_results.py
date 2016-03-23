@@ -54,6 +54,7 @@ def generate_sigplots(counter, html, cols):
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
     systems=dict()
+    systemdata=systemdata.sort_values(by=['c2sym','Version'])
     for i in systemdata.index:
         system=systemdata.ix[i]
         if system['ibsym'] != 'BTC':

@@ -3,15 +3,42 @@
 """
 Created on Sun Nov 22 20:57:32 2015
 changelog
-v3.1
-model drop for v1
-
 v3.0 "KOBE"
 added validation period optimization
 added more pairs
 fixed offline mode
 added minute version of CAR25
-added timestamp, cycletime
+fixed timestamp
+
+v2.3C "MJ"
+added params folder
+added sysargv
+added signal types
+fixed future leak in zz signals
+added ValidationDataPoints
+fixed signal file timestamp duplication
+fixed gainAhead appending to previous timestamp
+creates new signal file if one dosent exist for current version
+added online/offline mode
+one script to cycle through all currency pairs
+
+v2.20C
+moved getData from IB to another script
+added zigzag signals
+added walkforward classifier
+
+v2.10
+added other pairs as features
+added Baysian Ridge as model option
+
+v2.01
+added roofing filter indicators
+
+v2.0
+added in-sample period walk forward optemization
+added dps optimization
+added perturb data for robustness
+
 
 @author: hidemi
 """
@@ -57,15 +84,13 @@ from sklearn.svm import LinearSVR, SVR
 
 #other
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
-from sklearn.externals import joblib
 import arch
 
 #suztoolz
 from suztoolz.display import sss_display_cmatrix, is_display_cmatrix2,\
                          oos_display_cmatrix2, init_report, update_report,\
                          showPDF, showCDF, getToxCDF, plot_learning_curve,\
-                         directional_scoring, compareEquity, describeDistribution,\
-                         offlineMode
+                         directional_scoring, compareEquity, describeDistribution
 from suztoolz.loops import sss_iterate_train, adjustDataProportion, CAR25_df_min,\
                             maxCAR25, wf_classify_validate, sss_regress_train, calcDPS2,\
                             calcEquity2, createBenchmark, createYearlyStats, findBestDPS,\
@@ -81,8 +106,6 @@ start_time = time.time()
 
 #system parameters
 version = 'v3'
-version_ = 'v3.1'
-
 filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='1 min'
@@ -90,103 +113,7 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'GBPJPY','EURCHF','AUDJPY',\
                  'AUDUSD','EURUSD','GBPUSD','USDCAD',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
-
-                            
-
-def saveModel(dataSet):    
-    mData = dataSet.drop(['Open','High','Low','Close',
-                           'Volume','prior_index','gainAhead'],
-                            axis=1).dropna()    
-    #  Select the date range to test no label for the last index
-    mmData = mData.iloc[-wf_is_period:-1]
-
-    datay = mmData.signal
-    mmData = mmData.drop(['signal'],axis=1)
-
-    print '\nIn-Sample Period: %i ' % wf_is_period
-    print 'Total %i features: ' % mmData.shape[1]
-    for i,x in enumerate(mmData.columns):
-        print i,x+',',
-        #feature_names = feature_names+[x]    
-    dataX = mmData
-
-    #  Copy from pandas dataframe to numpy arrays
-    dy = np.zeros_like(datay)
-    dX = np.zeros_like(dataX)
-
-    dy = datay.values
-    dX = dataX.values
-
-    #  Make 'iterations' index vectors for the train-test split
-    sss = StratifiedShuffleSplit(dy,iterations,test_size=0.33,
-                                 random_state=None)
-
-    #  Initialize the confusion matrix
-    cm_sum_is = np.zeros((2,2))
-    cm_sum_oos = np.zeros((2,2))
-        
-    #  For each entry in the set of splits, fit and predict
-    for train_index,test_index in sss:
-        X_train, X_test = dX[train_index], dX[test_index]
-        y_train, y_test = dy[train_index], dy[test_index] 
-
-    #  fit the model to the in-sample data
-        model.fit(X_train, y_train)
-
-    #  test the in-sample fit    
-        y_pred_is = model.predict(X_train)
-        cm_is = confusion_matrix(y_train, y_pred_is)
-        cm_sum_is = cm_sum_is + cm_is
-
-    #  test the out-of-sample data
-        y_pred_oos = model.predict(X_test)
-        cm_oos = confusion_matrix(y_test, y_pred_oos)
-        cm_sum_oos = cm_sum_oos + cm_oos
-
-    tpIS = cm_sum_is[1,1]
-    fnIS = cm_sum_is[1,0]
-    fpIS = cm_sum_is[0,1]
-    tnIS = cm_sum_is[0,0]
-    precisionIS = tpIS/(tpIS+fpIS)
-    recallIS = tpIS/(tpIS+fnIS)
-    accuracyIS = (tpIS+tnIS)/(tpIS+fnIS+fpIS+tnIS)
-    f1IS = (2.0 * precisionIS * recallIS) / (precisionIS+recallIS) 
-
-    tpOOS = cm_sum_oos[1,1]
-    fnOOS = cm_sum_oos[1,0]
-    fpOOS = cm_sum_oos[0,1]
-    tnOOS = cm_sum_oos[0,0]
-    precisionOOS = tpOOS/(tpOOS+fpOOS)
-    recallOOS = tpOOS/(tpOOS+fnOOS)
-    accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
-    f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
-
-    print "\n\nSymbol is ", ticker
-    print "Learning algorithm is", model
-    print "Confusion matrix for %i randomized tests" % iterations
-    print "for years ", dataSet.index[0] , " through ", dataSet.index[-2]  
-
-    print "\nIn sample"
-    print "     predicted"
-    print "      pos neg"
-    print "pos:  %i  %i  %.2f" % (tpIS, fnIS, recallIS)
-    print "neg:  %i  %i" % (fpIS, tnIS)
-    print "      %.2f          %.2f " % (precisionIS, accuracyIS)
-    print "f1:   %.2f" % f1IS
-
-    print "\nOut of sample"
-    print "     predicted"
-    print "      pos neg"
-    print "pos:  %i  %i  %.2f" % (tpOOS, fnOOS, recallOOS)
-    print "neg:  %i  %i" % (fpOOS, tnOOS)
-    print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
-    print "f1:   %.2f" % f1OOS
-
-    print "\nend of run"
-
-    model.fit(dX, dy)
-    
-        
+                
 #no args -> debug.  else live mode arg 1 = pair, arg 2 = "0" to turn off
 if len(sys.argv)==1:
     debug=True
@@ -195,7 +122,7 @@ if len(sys.argv)==1:
                     #'NZDJPY',\
                     #'CADJPY',\
                     #'CHFJPY',\
-                    #'EURJPY',\
+                    'EURJPY',\
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
@@ -205,7 +132,7 @@ if len(sys.argv)==1:
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
-                    'EURCHF',\
+                    #'EURCHF',\
                     #'EURGBP'\
                     ]
                     
@@ -213,8 +140,8 @@ if len(sys.argv)==1:
     showDist =  False
     showPDFCDF = False
     showAllCharts = True
-    perturbData = True
-    runDPS = False
+    perturbData = False
+    runDPS = True
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -223,7 +150,6 @@ if len(sys.argv)==1:
     equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
-    modelPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/pickle/' 
     dataPath = 'D:/ML-TSDP/data/from_IB/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     
@@ -245,12 +171,45 @@ else:
     
     if sys.argv[2] == "0":
         livePairs=[]
-        ticker = sys.argv[1]
-        offlineMode(ticker, "Offline Mode: "+sys.argv[0]+' '+sys.argv[1], signalPath, version, version_)
+        pair = sys.argv[1]
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if version+'_'+ pair + '.csv' in files:
+            signalFile=pd.read_csv(signalPath+ version+'_'+ pair + '.csv', parse_dates=['dates'])
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = 'Offline'
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + version+'_'+ pair + '.csv', index=False)
+            
+        sys.exit("Offline Mode: "+sys.argv[0]+' '+sys.argv[1])
     else:
         livePairs=[sys.argv[1]]
            
-
+def offlineMode(ticker, errorText):
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if version+'_'+ ticker + '.csv' in files:
+            signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv', parse_dates=['dates'])
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = errorText
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
+            
+        sys.exit(errorText)
         
 for ticker in livePairs:
     print 'Begin optimization run for', ticker
@@ -259,22 +218,22 @@ for ticker in livePairs:
 
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 1000
+    validationSetLength = 7000
     #validationSetLength = 500
     #validationPeriods = [50,250]
-    validationPeriods = [50,250] # min is 2
+    validationPeriods = [250,1400] # min is 2
     #validationStartPoint = None
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
     #signal_types = ['gainAhead']
-    zz_steps = [0.001,0.002,0.003]
-    #zz_steps = [0.009]
+    #zz_steps = [0.001,0.003,0.006]
+    zz_steps = [0.009]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
-    wfSteps=[5,10]
+    wfSteps=[1]
     wf_is_periods = [25,500]
     #wf_is_periods = [10]
     tox_adj_proportion = 0
@@ -297,7 +256,7 @@ for ticker in livePairs:
     windowLengths = [30]
     maxLeverage = [5]
     PRT={}
-    PRT['DD95_limit'] = 0.01
+    PRT['DD95_limit'] = 0.05
     PRT['tailRiskPct'] = 95
     PRT['initial_equity'] = 1.0
     PRT['horizon'] = 720
@@ -326,12 +285,12 @@ for ticker in livePairs:
               #                             p_point_replace=0.05, max_samples=1.0, 
               #                             n_jobs=1, verbose=0, random_state=None)),
              #("GA_Reg2", SymbolicRegressor(population_size=5000, generations=20, stopping_criteria=0.01, comparison=True, transformer=False, p_crossover=0.7, p_subtree_mutation=0.1, p_hoist_mutation=0.05, p_point_mutation=0.1, max_samples=1, verbose=0, parsimony_coefficient=0.01, random_state=0)),
-             #("LR", LogisticRegression(class_weight={1:1})), \
-             #("PRCEPT", Perceptron(class_weight={1:1})), \
-             #("PAC", PassiveAggressiveClassifier(class_weight={1:1})), \
+             #("LR", LogisticRegression(class_weight={1:500})), \
+             #("PRCEPT", Perceptron(class_weight={1:500})), \
+             #("PAC", PassiveAggressiveClassifier(class_weight={1:500})), \
              #("LSVC", LinearSVC()), \
-             #("GNBayes",GaussianNB()),\
-             #("LDA", LinearDiscriminantAnalysis()), \
+             ("GNBayes",GaussianNB()),\
+             ("LDA", LinearDiscriminantAnalysis()), \
              #("QDA", QuadraticDiscriminantAnalysis()), \
              #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),
              #("rbf1SVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
@@ -343,26 +302,24 @@ for ticker in livePairs:
              #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
              #("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
              #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
-             #("ETC", ExtraTreesClassifier(class_weight={1:1}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
-             #("RF", RandomForestClassifier(class_weight={1:1}, n_estimators=10, criterion='gini',max_depth=3, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=1, random_state=None, verbose=0))\
+             #("ETC", ExtraTreesClassifier(class_weight={1:500}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
+             #("RF", RandomForestClassifier(class_weight={1:500}, n_estimators=10, criterion='gini',max_depth=3, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=1, random_state=None, verbose=0))\
              #("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=5, weights='uniform')),\
              #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=15, weights='distance')),\
              #("rNeighbors-uniform", RadiusNeighborsClassifier(radius=8, weights='uniform')),\
              #("rNeighbors-distance", RadiusNeighborsClassifier(radius=10, weights='distance')),\
-             ("VotingHard", VotingClassifier(estimators=[\
-                 #("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
-                 #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
-                 #("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
-                 #("QDA", QuadraticDiscriminantAnalysis()),\
-                 ("GNBayes",GaussianNB()),\
-                 ("LDA", LinearDiscriminantAnalysis()), \
-                 ("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=5, weights='uniform')),\
+             #("VotingHard", VotingClassifier(estimators=[\
+             #    ("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
+             #    ("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
+             #    ("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
+             #    ("QDA", QuadraticDiscriminantAnalysis()),\
+             #    ("GNBayes",GaussianNB()),\
                  #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
                  #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:500}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
                  #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=8, weights='distance')),\
                  #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
-                 #("ETC", ExtraTreesClassifier(class_weight={1:1}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
-                    ], voting='hard', weights=None)),
+             #    ("ETC", ExtraTreesClassifier(class_weight={1:500}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
+             #       ], voting='hard', weights=None)),
              #("VotingSoft", VotingClassifier(estimators=[\
                  #("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
                  #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
@@ -370,10 +327,10 @@ for ticker in livePairs:
                  #("QDA", QuadraticDiscriminantAnalysis()),\
                  #("GNBayes",GaussianNB()),\
                  #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
-                 #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=True, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
+                 #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:500}, kernel='rbf', max_iter=-1, probability=True, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
                  #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=8, weights='distance')),\
                  #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
-                 #("ETC", ExtraTreesClassifier(class_weight={1:1}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
+                 #("ETC", ExtraTreesClassifier(class_weight={1:500}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
              #        ], voting='soft', weights=None)),
              ]    
 
@@ -525,20 +482,14 @@ for ticker in livePairs:
     unFilteredData = dataSet.copy(deep=True)
     
     if dataSet.shape[0] <validationSetLength+max(wf_is_periods):
-        message = 'Add more data: dataSet rows '+str(dataSet.shape[0])+\
-                    ' is less than required validation set + training set of '\
-                    + str(validationSetLength+max(wf_is_periods))
-        offlineMode(ticker, message, signalPath, version, version_)
+        offlineMode(ticker, 'Add more data: dataSet rows '+str(dataSet.shape[0])+\
+                                            ' is less than required validation set + training set of '+ str(validationSetLength+max(wf_is_periods)))
     else:
         for i in validationPeriods:
             if dataSet.iloc[-validationSetLength:].shape[0]%i != 0:
-                message='validationSetLength '+str(validationSetLength)+\
-                        ' needs to be divisible by validation period '+ str(i)
-                offlineMode(ticker, message, signalPath, version, version_)
+                offlineMode(ticker, 'validationSetLength '+str(validationSetLength)+' needs to be divisible by validation period '+ str(i))
             if validationSetLength == i:
-                message='validationSetLength '+str(validationSetLength)+\
-                        ' needs to be less than validation period '+ str(i)
-                offlineMode(ticker, message, signalPath, version, version_)
+                offlineMode(ticker, 'validationSetLength '+str(validationSetLength)+' needs to be less than validation period '+ str(i))
                 
         dataSet = dataSet.iloc[-validationSetLength-max(wf_is_periods):]
         print 'dataSet rows', dataSet.shape[0], 'from', dataSet.index[0], 'to', dataSet.index[-1]
@@ -608,7 +559,7 @@ for ticker in livePairs:
                                     'CCLookback': CCLookback,'rStochLookback': rStochLookback,'statsLookback': statsLookback,\
                                     'ROCLookback': ROCLookback,
                                      }
-                            runName = ticker+'_'+data_type+'_'+filterName+'_' + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
+                            runName = ticker+'_'+data_type+'_'+filterName+'_' + m[0]+'_i'+str(wf_is_period)+'_'+signal
                             model_metrics, sstDictDF1_[runName] = wf_classify_validate(unFilteredData, dataSet, [m], model_metrics,\
                                                                 wf_is_period, metaData, PRT, showPDFCDF=showPDFCDF)
 
@@ -634,8 +585,7 @@ for ticker in livePairs:
             print 'WF Out-of-Sample Period:', bestModel.wf_step
             print 'Long Memory: ', longMemory
             DF1_BMrunName = ticker+'_'+bestModel.data_type+'_'+filterName+'_'  +\
-                                bestModel.model + '_i'+str(bestModel.rows)\
-                                +'_fcst'+str(bestModel.wf_step)+'_'+bestModel.signal
+                                bestModel.model + '_i'+str(bestModel.rows)+'_'+bestModel.signal
                 
             if showAllCharts:
                 compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName)
@@ -693,20 +643,10 @@ for ticker in livePairs:
                 if endOfData ==1:
                     #save sst's for save file         
                     BMdict[validationPeriod] = bestBothDPS
-                    #save model
-                    
                     
                 if showAllCharts:
                     DPSequity = calcEquity_df(bestBothDPS[['signals','gainAhead']], dpsRunName, leverage = bestBothDPS.safef.values)
-            else:
-                BMdict[validationPeriod] = pd.concat([sstDictDF1_[DF1_BMrunName],\
-                                    pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[DF1_BMrunName].index),
-                                    pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[DF1_BMrunName].index),
-                                    pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[DF1_BMrunName].index),
-                                    pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[DF1_BMrunName].index),
-                                    pd.Series(data=DF1_BMrunName, name = 'system', index = sstDictDF1_[DF1_BMrunName].index)
-                                    ],axis=1)
-                
+                                                                
             #use best params for next step
             for i in range(0,bestModel.shape[0]):
                 metaData[bestModel.index[i]]=bestModel[bestModel.index[i]]
@@ -799,13 +739,11 @@ for ticker in livePairs:
                         if validationPeriod not in validationDict:
                             validationDict[validationPeriod] =bestBothDPS
                             if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
-                                    message = "Error: NaN in bestBothDPS.prior_index:1 "
-                                    offlineMode(ticker, message, signalPath, version, version_)
+                                    offlineMode(ticker, "Error: NaN in bestBothDPS.prior_index:1 ") 
                         else:              
                             validationDict[validationPeriod] =validationDict[validationPeriod].append(bestBothDPS)
                             if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
-                                    message="Error: NaN in bestBothDPS.prior_index:2 "
-                                    offlineMode(ticker, message, signalPath, version, version_)
+                                    offlineMode(ticker, "Error: NaN in bestBothDPS.prior_index:2 ")    
                     else:
                         #if No DPS was chosen as the best model to use going forward
                         if validationPeriod not in validationDict:
@@ -817,8 +755,7 @@ for ticker in livePairs:
                                                                             pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
                                                                             ],axis=1)
                             if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
-                                message="Error: NaN in bestBothDPS.prior_index:3 "
-                                offlineMode(ticker, message, signalPath, version, version_)    
+                                offlineMode(ticker, "Error:NaN in validationDict[validationPeriod].prior_index:3 ")    
                         else:                      
                             validationDict[validationPeriod] =validationDict[validationPeriod].append(                                                                         
                                                                               pd.concat([sstDictDF1_[nextRunName],\
@@ -830,29 +767,13 @@ for ticker in livePairs:
                                                                             ],axis=1)                                                               
                                                                              )
                             if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
-                                message="Error: NaN in bestBothDPS.prior_index:4"
-                                offlineMode(ticker, message, signalPath, version, version_)    
-                               
+                                offlineMode(ticker, "Error:NaN in validationDict[validationPeriod].prior_index:4 ")                                
                 else:   
                     #DPSrun == False
                     if validationPeriod not in validationDict:
-                        validationDict[validationPeriod] =pd.concat([sstDictDF1_[nextRunName],\
-                                                                            pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
-                                                                            ],axis=1)
+                        validationDict[validationPeriod] =sstDictDF1_[nextRunName]
                     else:
-                        validationDict[validationPeriod] =validationDict[validationPeriod].append(                                                                         
-                                                                              pd.concat([sstDictDF1_[nextRunName],\
-                                                                            pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
-                                                                            ],axis=1)                                                               
-                                                                             )
+                        validationDict[validationPeriod] =validationDict[validationPeriod].append(sstDictDF1_[nextRunName])
           
     print '\n\nScoring Validation Curves...'
     #set validation curves equal length
@@ -919,6 +840,7 @@ for ticker in livePairs:
     if showAllCharts:
         BestEquity = calcEquity_df(validationDict[bestModel.validationPeriod][['signals','gainAhead']],\
                                             bestModel.C25sig, leverage = validationDict[bestModel.validationPeriod].safef.values)
+    
     timenow = dt.now(timezone('US/Eastern'))
     lastBartime = timezone('US/Eastern').localize(dataSet.index[-1].to_datetime())
     cycleTime = (timenow-lastBartime).total_seconds()/60
@@ -940,49 +862,27 @@ for ticker in livePairs:
     if scorePath is not None:
         scored_models.to_csv(scorePath+version+'_'+ticker+'.csv')
         
-    #if runDPS:    
-    print '\n'+version, 'Next Signal:'
-    print BMdict[bestModel.validationPeriod].iloc[-1].system
-    print BMdict[bestModel.validationPeriod].drop(['system'],axis=1).iloc[-1]
-     
-    print 'Saving Signals..'      
-    #init file
-    #BMdict[bestModel.validationPeriod].tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
-    files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
-    
-    #old version file
-    if version+'_'+ ticker + '.csv' not in files:
-        signalFile = BMdict[bestModel.validationPeriod].tail()
-        signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=True)
-    else:        
-        signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv', parse_dates=['dates'])
+    if runDPS:    
+        print '\n'+version, 'Next Signal:'
+        print BMdict[bestModel.validationPeriod].iloc[-1].system
+        print BMdict[bestModel.validationPeriod].drop(['system'],axis=1).iloc[-1]
+         
+        print 'Saving Signals..'      
+        #init file
+        #BMdict[bestModel.validationPeriod].tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if version+'_'+ ticker + '.csv' not in files:
+            signalFile = BMdict[bestModel.validationPeriod].tail()
+            signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=True)
+        else:        
+            signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv', parse_dates=['dates'])
 
-        #if BMdict[bestModel.validationPeriod].reset_index().iloc[-1].dates != signalFile.iloc[-1].dates:
-        if BMdict[bestModel.validationPeriod].reset_index().iloc[-2].dates == signalFile.iloc[-1].dates:
-            signalFile.gainAhead.iloc[-1] == BMdict[bestModel.validationPeriod].gainAhead.iloc[-2]
-        signalFile=signalFile.append(BMdict[bestModel.validationPeriod].reset_index().iloc[-1])
-        signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
+            #if BMdict[bestModel.validationPeriod].reset_index().iloc[-1].dates != signalFile.iloc[-1].dates:
+            if BMdict[bestModel.validationPeriod].reset_index().iloc[-2].dates == signalFile.iloc[-1].dates:
+                signalFile.gainAhead.iloc[-1] == BMdict[bestModel.validationPeriod].gainAhead.iloc[-2]
+            signalFile=signalFile.append(BMdict[bestModel.validationPeriod].reset_index().iloc[-1])
+            signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
         
-    #new version file
-    if version_+'_'+ ticker + '.csv' not in files:
-        #signalFile = BMdict[bestModel.validationPeriod].iloc[-2:]
-        addLine = BMdict[bestModel.validationPeriod].iloc[-1]
-        addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
-        addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
-        addLine.name = BMdict[bestModel.validationPeriod].iloc[-1].name
-        signalFile = BMdict[bestModel.validationPeriod].iloc[-2:-1].append(addLine)
-        signalFile.index.name = 'dates'
-        signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=True)
-    else:        
-        signalFile=pd.read_csv(signalPath+ version_+'_'+ ticker + '.csv', index_col=['dates'])
-        addLine = BMdict[bestModel.validationPeriod].iloc[-1]
-        addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
-        addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
-        addLine.name = BMdict[bestModel.validationPeriod].iloc[-1].name
-        signalFile = signalFile.append(addLine)
-        signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=False)
-    
-            
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
     print 'Finished Validation Period Parameter Search!'
     

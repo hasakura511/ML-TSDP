@@ -5,6 +5,7 @@ from os import listdir
 from os.path import isfile, join
 from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, get_ask as get_ib_ask, get_bid as get_ib_bid
 from c2api.place_order import place_order as place_c2order
+import threading
 # -*- coding: utf-8 -*-
 """
 Created on Tue Mar 08 20:10:29 2016
@@ -44,11 +45,10 @@ from seitoolz.paper import adj_size
 from time import gmtime, strftime, localtime, sleep
 import logging
 
-logging.basicConfig(filename='./debug/paper_trade.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/paper_trade.log',level=logging.DEBUG)
 
 currencyList=dict()
-v1sList=dict()
-dpsList=dict()
+systemList=dict()
 
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
@@ -57,11 +57,13 @@ for i in systemdata.index:
     if system['ibsym'] != 'BTC':
      
       currencyList[system['ibsym']+system['ibcur']]=1
-      if system['Version'] == 'v1':
-          v1sList[system['System']]=1
+      
+      if systemList.has_key(system['Name']):
+          systemList[system['Name']]=systemList[system['Name']].append(system)
       else:
-          dpsList[system['System']]=1
-
+          systemList[system['Name']]=pd.DataFrame()
+          systemList[system['Name']]=systemList[system['Name']].append(system)
+          
 
 currencyPairs = currencyList.keys()
 
@@ -128,67 +130,111 @@ for pair in currencyPairs:
         
     currencyPairsDict[pair] = data 
     get_feed(symbol, currency,'IDEALPRO','CASH', tickerId)
-     
-finished=False
-while not finished:
-    try:
-        model_pos=get_model_pos(v1sList.keys())
-        dps_model_pos=get_dps_model_pos(dpsList.keys())                                 
-        #subprocess.call(['python', 'get_ibpos.py'])
-        #ib_pos=get_ibpos()
-        #ib_pos=get_ibpos_from_csv()
-        for i in systemdata.index:
-            
-          system=systemdata.ix[i]
-          if system['ibsym'] + system['ibcur'] in currencyPairsDict:
-            model=model_pos
-            if system['Version'] == 'v1':
-                    model=model_pos
-            else:
-                    model=dps_model_pos
-            
-            filename='./data/paper/' + system['Name'] + '_portfolio.csv'
-               
-            ask=float(get_ib_ask(str(system['ibsym']),str(system['ibcur'])))
-            bid=float(get_ib_bid(str(system['ibsym']),str(system['ibcur'])))
-            exchange=system['ibexch']
-            secType=system['ibtype']
-            
-            commissionkey=system['ibsym']+system['ibcur']+system['ibexch']
-            commission_pct=0.00002
-            commission_cash=2
-            if commissionkey in commissiondata.index:
-                commission=commissiondata.loc[commissionkey]
-                commission_pct=float(commission['Pct'])
-                commission_cash=float(commission['Cash'])
-            
-            if debug:
-                system_pos=model.loc[system['System']]
-                system_c2pos_qty=round(system_pos['action']) * system['c2qty']
-                system_ibpos_qty=round(system_pos['action']) * system['ibqty']
-                print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
-                print        " System Algo: " + str(system['System']) 
-                print        " Ask: " + str(ask)
-                print        " Bid: " + str(bid)
-                print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
-                print        " Signal: " + str(system_ibpos_qty)
-            pricefeed=pd.DataFrame([[ask, bid, 10000, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
-            if ask > 0 and bid > 0:
-                eastern=timezone('US/Eastern')
-                endDateTime=dt.now(get_localzone())
-                date=endDateTime.astimezone(eastern)
-                date=date.strftime("%Y%m%d %H:%M:%S EST")
-                adj_size(model, system['System'],system['Name'],pricefeed,\
-                str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
-                    system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
-            #time.sleep(1)
-            
-        time.sleep(10)
-    except Exception as e:
-        #f=open ('./debug/papererrors.log','a')
-        #f.write(e)
-        #f.close()
-        logging.error("something bad happened", exc_info=True)
-        
+
+def get_timestamp():
+	timestamp = int(time.time())
+	return timestamp
+    
+def get_models(systems):
+    v1sList=dict()
+    dpsList=dict()
+    for i in systems.index:
+        system=systems.ix[i]
+        if system['ibsym'] != 'BTC':
+         
+          if system['Version'] == 'v1':
+              v1sList[system['System']]=1
+          else:
+              dpsList[system['System']]=1
+          
+    model_pos=get_model_pos(v1sList.keys())
+    dps_model_pos=get_dps_model_pos(dpsList.keys())    
+    return (model_pos, dps_model_pos)    
+    
+def start_trade(systems, commissiondata, currencyPairsDict): 
+    global debug
+    if debug:
+       print "Starting " + str(systems.iloc[0]['Name'])
+       logging.info("Starting " + str(systems.iloc[0]['Name']))
+    finished=False
+    while not finished:
+        try:
+            (model_pos, dps_model_pos)=get_models(systems)
+            symbols=systems['c2sym'].values
+            for symbol in symbols:
+              system=systems.loc[symbol].copy()
+              if system['ibsym'] + system['ibcur'] in currencyPairsDict \
+                 and \
+                 get_timestamp() - int(system['last_trade']) > int(system['trade_freq']):
+                     
+                model=model_pos
+                if system['Version'] == 'v1':
+                        model=model_pos
+                else:
+                        model=dps_model_pos
+                
+                ask=float(get_ib_ask(str(system['ibsym']),str(system['ibcur'])))
+                bid=float(get_ib_bid(str(system['ibsym']),str(system['ibcur'])))
+                exchange=system['ibexch']
+                secType=system['ibtype']
+                
+                commissionkey=system['ibsym']+system['ibcur']+system['ibexch']
+                commission_pct=0.00002
+                commission_cash=2
+                if commissionkey in commissiondata.index:
+                    commission=commissiondata.loc[commissionkey]
+                    commission_pct=float(commission['Pct'])
+                    commission_cash=float(commission['Cash'])
+                if debug:
+                    system_pos=model.loc[system['System']]
+                    system_c2pos_qty=round(system_pos['action']) * system['c2qty']
+                    system_ibpos_qty=round(system_pos['action']) * system['ibqty']
+
+                    print "Processing " + system['Name'] + " Symbol: " + system['ibsym'] + system['ibcur'] + \
+                    " Timestamp: " + str(get_timestamp()) + " Last Trade: " + str(system['last_trade']) + " Freq: " +  str(system['trade_freq'])
+                    #print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+                    #print        " System Algo: " + str(system['System']) 
+                    #print        " Ask: " + str(ask)
+                    #print        " Bid: " + str(bid)
+                    #print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
+                    #print        " Signal: " + str(system_ibpos_qty)
+                pricefeed=pd.DataFrame([[ask, bid, 10000, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
+                if ask > 0 and bid > 0:
+                    eastern=timezone('US/Eastern')
+                    endDateTime=dt.now(get_localzone())
+                    date=endDateTime.astimezone(eastern)
+                    date=date.strftime("%Y%m%d %H:%M:%S EST")
+                    adj_size(model, system['System'],system['Name'],pricefeed,\
+                    str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
+                        system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
+                #time.sleep(1)
+                system['last_trade']=get_timestamp()
+                systems.loc[symbol]=system
+                            
+            time.sleep(1)
+        except Exception as e:
+            #f=open ('./debug/papererrors.log','a')
+            #f.write(e)
+            #f.close()
+            logging.error("something bad happened", exc_info=True)
+
+threads = []
+def start_systems(systemList):
+      global commissiondata
+      global currencyPairsDict
+      global threads         
+      for systemname in systemList.keys():
+           systems=systemList[systemname]
+           systems['last_trade']=0
+           systems['key']=systems['c2sym']
+           systems=systems.set_index('key')
+           sig_thread = threading.Thread(target=start_trade, args=[systems,commissiondata,currencyPairsDict])
+           sig_thread.daemon=True
+           threads.append(sig_thread)
+           sig_thread.start()
+      while 1:
+          time.sleep(100)
+         
+start_systems(systemList)
     
 

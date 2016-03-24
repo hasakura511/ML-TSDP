@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
-EURGBP,EUR,,10000.0,10000.0,0.79234,0.79234,0.0,2.0,0.0,-47.24415,-3.24415,Paper,GBP
+EURGBP,EUR,,10000.0,10000.0,0.79224,0.79224,0.0,2.0,0.0,-41.42125,10.57875,Paper,GBP

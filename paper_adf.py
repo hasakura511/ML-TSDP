@@ -136,7 +136,7 @@ def get_history(datas, systemname, ylabel):
         logging.error("something bad happened", exc_info=True)
     return SST
 
-pairs=[['./data/from_IB/1 min_NZDJPY.csv', 'NZDJPY'],['./data/from_IB/1 min_CADJPY.csv', 'CADJPY']]
+pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY'],['./data/from_IB/1 min_USDJPY.csv', 'USDJPY']]
 sysname='ADF'
 refresh_paper(sysname)
 data=gettrades(sysname)
@@ -201,8 +201,20 @@ def proc_backtest(systemname, SST):
                                 100000, sym,currency,exchange, secType, True, date)
                 #time.sleep(1)
 proc_backtest(sysname, SST)
-data=seigraph.generate_paper_ib_plot(sysname, 'Date')
-seigraph.view_plot(['equitycurve','PurePLcurve'], 'Backtest Result', 'Equity', data)
+
+#results
+systemname=sysname
+
+ibdata=seigraph.generate_paper_ib_plot(systemname, 'Date', 20000)
+seigraph.generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity')
+
+data=seigraph.get_data(sysname, 'paper', 'ib', 'trades', 'times', 20000)
+seigraph.generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL')
+
+data=seigraph.get_datas([pairs[0][1],pairs[1][1]], 'from_IB', 'Close', 20000)
+seigraph.generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close')
+
+
 #threads = []
 #for pair in pairs:
 #	sig_thread = threading.Thread(target=runv2, args=[pair])

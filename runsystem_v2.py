@@ -37,8 +37,13 @@ def runv2(pair):
             f=open ('/logs/' + pair + 'v2.log','a')
             print 'Starting V2: ' + pair
             f.write('Starting V2: ' + pair)
-            subprocess.call(['python','system_v2.31C.py',pair,'1'], stdout=f)
+            
+            ferr=open ('/logs/' + pair + 'v2_err.log','a')
+            ferr.write('Starting V2: ' + pair)
+            
+            subprocess.call(['python','system_v2.31C.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
+            ferr.close()
       except Exception as e:
         	 #f=open ('./debug/v2run' + pair + '.log','a')
         	 #f.write(e)

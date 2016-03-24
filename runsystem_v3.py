@@ -38,8 +38,13 @@ def runv3(pair):
          f=open ('/logs/' + pair + 'v3.log','a')
          print 'Starting v3: ' + pair
          f.write('Starting v3: ' + pair)
-         subprocess.call(['python','system_v3.0C.py',pair,'1'], stdout=f)
+         
+         ferr=open ('/logs/' + pair + 'v3_err.log','a')
+         ferr.write('Starting V3: ' + pair)
+            
+         subprocess.call(['python','system_v3.0C.py',pair,'1'], stdout=f, stderr=ferr)
          f.close()
+         ferr.close()
      except Exception as e:
 	 #f=open ('./debug/v3run' + pair + '.log','a')
 	 #f.write(e)

@@ -50,9 +50,13 @@ from time import gmtime, strftime, localtime, sleep
 import os
 import subprocess
 from btapi.get_signal import get_v1signal
+import logging
+
+logging.basicConfig(filename='/logs/get_results.log',level=logging.DEBUG)
+
 
 def generate_sigplots(counter, html, cols):
-    subprocess.call(['python','create_signalPlots.py','1'])
+    #subprocess.call(['python','create_signalPlots.py','1'])
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
     systems=dict()
@@ -69,47 +73,45 @@ def generate_sigplots(counter, html, cols):
               (counter, html)=generate_html(filename, counter, html, cols)
     return (counter, html)     
     
-def generate_paper_c2_plot(systemname, initialEquity):
+def generate_paper_c2_plot(systemname, dateCol, initialEquity):
     filename='./data/paper/c2_' + systemname + '_account.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
-        #sums up results to starting acct capital
-        dataSet.sort_index(inplace=True)
+        dataSet=dataSet.sort_values(by=[dateCol])
         dataSet['equitycurve'] = dataSet['balance']
         dataSet['PurePLcurve'] = dataSet['purebalance']
         return dataSet
     else:
-        dataSet=pd.DataFrame([[initialEquity,initialEquity]], columns=['equitycurve','PurePLcurve'])
+        dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
         return dataSet
     
-def generate_c2_plot(systemname, initialEquity):
+def generate_c2_plot(systemname, dateCol, initialEquity):
     filename='./data/c2api/' + systemname + '_trades.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
-        #sums up results to starting acct capital
-        dataSet.sort_index(inplace=True)
+        dataSet=dataSet.sort_values(by=[dateCol])
         dataSet['equitycurve'] = initialEquity + dataSet['PL'].cumsum()
         return dataSet
     else:
-        dataSet=pd.DataFrame([[initialEquity]], columns=['equitycurve'])
+        dataSet=pd.DataFrame([[initialEquity,'2016-01-01']], columns=['equitycurve',dateCol])
         return dataSet
      
 
     return dataSet
         
-def generate_paper_ib_plot(systemname, initialEquity):
+def generate_paper_ib_plot(systemname, dateCol, initialEquity):
     filename='./data/paper/ib_' + systemname + '_account.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
-        #sums up results to starting acct capital
+        dataSet=dataSet.sort_values(by=[dateCol])
         dataSet['equitycurve'] = dataSet['balance']
         dataSet['PurePLcurve'] = dataSet['purebalance']
         return dataSet
     else:
-        dataSet=pd.DataFrame([[initialEquity, initialEquity]], columns=['equitycurve','PurePLcurve'])
+        dataSet=pd.DataFrame([[initialEquity, initialEquity, '2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
         return dataSet
     
-def generate_ib_plot(systemname, initialEquity):
+def generate_ib_plot(systemname, dateCol, initialEquity):
     filename='./data/ibapi/trades.csv'
     if systemname == 'IB':
         filename='./data/ibapi/trades.csv'
@@ -121,8 +123,8 @@ def generate_ib_plot(systemname, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         #sums up results to starting acct capital
+        dataSet=dataSet.sort_values(by=[dateCol])
         if systemname == 'C2_Paper':
-            dataSet.sort_index(inplace=True)
             dataSet['equitycurve'] = dataSet['balance']
             dataSet['PurePLcurve'] = dataSet['purebalance']
         else:
@@ -130,10 +132,10 @@ def generate_ib_plot(systemname, initialEquity):
             dataSet['PurePLcurve'] = dataSet['purebalance']
         return dataSet
     else:
-        dataSet=pd.DataFrame([[initialEquity]], columns=['equitycurve'])
+        dataSet=pd.DataFrame([[initialEquity, dateCol]], columns=['equitycurve', dateCol])
         return dataSet
 
-def generate_ib_plot_from_trades(systemname, initialEquity):
+def generate_ib_plot_from_trades(systemname, dateCol, initialEquity):
     filename='./data/ibapi/trades.csv'
     if systemname == 'IB':
         filename='./data/ibapi/trades.csv'
@@ -144,6 +146,7 @@ def generate_ib_plot_from_trades(systemname, initialEquity):
         
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
+        dataSet=dataSet.sort_values(by=[dateCol])
         #sums up results to starting acct capital
         if systemname == 'C2_Paper':
             dataSet['equitycurve'] = initialEquity + dataSet['PL'].cumsum()
@@ -153,17 +156,18 @@ def generate_ib_plot_from_trades(systemname, initialEquity):
             dataSet['PurePLcurve'] = initialEquity + dataSet['PurePL'].cumsum()
         return dataSet
     else:
-        dataSet=pd.DataFrame([[initialEquity]], columns=['equitycurve'])
+        dataSet=pd.DataFrame([[initialEquity,'2016-01-01']], columns=['equitycurve',dateCol])
         return dataSet
 
-def get_data(systemname, api, broker, dataType, initialData):
+def get_data(systemname, api, broker, dataType, dateCol, initialData):
     filename='./data/' + api + '/' + broker + '_' + systemname + '_' + dataType + '.csv'
     if api == 'c2api' or api=='ibapi' or api=='btapi':
         filename='./data/' + api + '/' + systemname + '_' + dataType + '.csv'
     print filename
-    dataSet=pd.DataFrame([[initialData]], columns=[dataType])
+    dataSet=pd.DataFrame([[initialData,'2016-01-01']], columns=[dataType,dateCol])
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
+        dataSet=dataSet.sort_values(by=[dateCol])
         return dataSet
     else:
         return dataSet
@@ -191,68 +195,27 @@ def get_datas(systems, api, dataType, initialData):
                     newfiles.append([filename,symbol])      
     return newfiles
                 
-        
-def generate_plot(data, systemname, title, ylabel, counter, html, cols=4):
-    
-    data.plot()   
-    fig = plt.figure(1)
-    plt.title(title)
-    plt.ylabel(ylabel)
-    plt.savefig('./data/results/' + systemname + ylabel + '.png')
-    plt.close(fig)
-    (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
-    
-    return (counter, html)
-
-def generate_mult_plot(datas, systemname, title, ylabel, counter, html, cols=4):
-    for data in datas:
-        data.plot()   
-    fig = plt.figure(1)
-    plt.title(title)
-    plt.ylabel(ylabel)
-    plt.savefig('./data/results/' + systemname + ylabel + '.png')
-    plt.close(fig)
-    (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
-    
-    return (counter, html)
-    
-def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
+def save_plot(colnames, filename, title, ylabel, SST):
     fig, ax = plt.subplots()
-    SST=pd.DataFrame()
-    
-    for (filename, ticker) in datas:
-        dta=pd.read_csv(filename)
-        symbol=ticker[0:3]
-        currency=ticker[3:6]
-        #print 'plot for ticker: ' + currency
-        if ylabel == 'Close' and currency != 'USD':
-            dta[ylabel]=dta[ylabel] * get_USD(currency)
-        #dta[ylabel].plot(label=ticker)   
+    for col in colnames:
+        ax.plot( SST[col], label=col)      
+    barSize='1 day'
+    if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
+        barSize = '1 day'
+    else:
+        barSize = '1 min'
         
-        ax.plot( dta[ylabel], label=ticker)
-        
-       
-        if len(SST.index.values) < 2:
-            dta['key']=pd.to_datetime(dta[dta.columns[0]])
-            dta=dta.set_index('key') 
-            SST=dta
-            barSize='1 day'
-            if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
-                barSize = '1 day'
-            else:
-                barSize = '1 min'
-            if barSize != '1 day' :
-                def format_date(x, pos=None):
-                    thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
-                    return SST.index[thisind].strftime("%Y-%m-%d %H:%M")
-                ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-                 
-            else:
-                def format_date(x, pos=None):
-                    thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
-                    return SST.index[thisind].strftime("%Y-%m-%d")
-                ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-        #ax.plot( dta[ylabel], label=ticker) 
+    if barSize != '1 day':
+        def format_date(x, pos=None):
+            thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
+            return SST.index[thisind].strftime("%Y-%m-%d %H:%M")
+        #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+         
+    else:
+        def format_date(x, pos=None):
+            thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
+            return SST.index[thisind].strftime("%Y-%m-%d")
+        #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
            
     # Now add the legend with some customizations.
     legend = ax.legend(loc='best', shadow=True)
@@ -265,9 +228,6 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
     for label in legend.get_texts():
         label.set_fontsize(8)
         label.set_fontweight('bold')
-    
-   
-    
         
     # rotate and align the tick labels so they look better
     fig.autofmt_xdate()
@@ -276,15 +236,61 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
     # toolbar
 
     fig.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
-    #for label in legend.get_lines():
-    #    label.set_linewidth(0.5)  # the legend line width
     plt.title(title)
     plt.ylabel(ylabel)
-    plt.savefig('./data/results/' + systemname + ylabel + '.png')
+    #plt.show()
+    plt.savefig(filename)
     plt.close(fig)
     plt.close()
-    (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
     
+def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, counter, html, cols=4):
+    try:
+        SST=data
+        SST[dateCol]=pd.to_datetime(SST[dateCol])
+        SST=SST.sort_values(by=[dateCol])
+        SST=SST.set_index(dateCol)
+        
+        filename='./data/results/' + systemname + ylabel + '.png'
+        save_plot(colnames, filename, title, ylabel, SST)
+        (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
+    except Exception as e:
+        logging.error("something bad happened", exc_info=True)
+    
+    return (counter, html)
+    
+def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
+    try:
+        SST=pd.DataFrame()
+        
+        for (filename, ticker) in datas:
+            dta=pd.read_csv(filename)
+            symbol=ticker[0:3]
+            currency=ticker[3:6]
+            #print 'plot for ticker: ' + currency
+            if ylabel == 'Close':
+                diviser=dta.iloc[0][ylabel]
+                dta[ylabel]=dta[ylabel] /diviser
+                
+            #dta[ylabel].plot(label=ticker)   
+            data=pd.DataFrame()
+            data['Date']=pd.to_datetime(dta[dta.columns[0]])
+            data[ticker]=dta[ylabel]
+            data=data.set_index('Date') 
+            if len(SST.index.values) < 2:
+                SST=data
+            else:
+                SST=SST.join(data)
+        colnames=list()
+        for col in SST.columns:
+            if col != 'Date' and col != 0:
+                colnames.append(col)
+                
+        filename='./data/results/' + systemname + ylabel + '.png'
+        save_plot(colnames, filename, title, ylabel, SST)
+        
+        (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
+    except Exception as e:
+        logging.error("something bad happened", exc_info=True)
     return (counter, html)
 
 def generate_html(filename, counter, html, cols):
@@ -348,11 +354,11 @@ cols=4
 html = html + '</table><h1>C2</h1><br><table>'
 for systemname in systemdict:
     if c2dict.has_key(systemname):
-        c2data=generate_c2_plot(systemname, 20000)
-        (counter, html)=generate_plot(c2data['equitycurve'], 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols)
+        c2data=generate_c2_plot(systemname, 'openedWhen',  20000)
+        (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'openedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols)
         
-        data=get_data(systemname, 'c2api', 'c2', 'trades', 20000)
-        (counter, html)=generate_plot(data['PL'], 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols)
+        data=get_data(systemname, 'c2api', 'c2', 'trades','openedWhen', 20000)
+        (counter, html)=generate_mult_plot(data, ['PL'], 'openedWhen', 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols)
         
         data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
         (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
@@ -364,24 +370,24 @@ html = html + '</table><h1>IB</h1><br><table>'
 #IB
 cols=3
 if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
-    ibdata=generate_ib_plot('IB_Paper', 20000)
-    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
+    ibdata=generate_ib_plot('IB_Paper','Date', 20000)
+    (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
     
-    ibdata=generate_ib_plot_from_trades('IB_Paper', 20000)
-    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
+    ibdata=generate_ib_plot_from_trades('IB_Paper','times', 20000)
+    (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'times', 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
     
-    data=get_data('IB_Live', 'paper', 'ib', 'trades', 20000)
-    (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+    data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',20000)
+    (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
 
 if os.path.isfile('./data/paper/c2_' + 'IB_Live' + '_trades.csv'):
-    ibdata=generate_ib_plot('C2_Paper', 20000)
-    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
+    ibdata=generate_ib_plot('C2_Paper', 'Date', 20000)
+    (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
     
-    ibdata=generate_ib_plot_from_trades('C2_Paper', 20000)
-    (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
+    ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', 20000)
+    (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'openedWhen', 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
     
-    data=get_data('IB_Live', 'paper', 'c2', 'trades', 20000)
-    (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+    data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', 20000)
+    (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
 
 cols=4
 
@@ -393,11 +399,11 @@ for systemname in systemdict:
   if systemname != 'stratBTC':
     #C2 Paper
     if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
-        c2data=generate_paper_c2_plot(systemname, 20000)
-        (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePLcurve']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
+        c2data=generate_paper_c2_plot(systemname, 'Date', 20000)
+        (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
     
-        data=get_data(systemname, 'paper', 'c2', 'trades', 20000)
-        (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
+        data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', 20000)
+        (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
     
         data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
         (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
@@ -407,11 +413,11 @@ for systemname in systemdict:
 
     #IB Paper
     if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
-        ibdata=generate_paper_ib_plot(systemname, 20000)
-        (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
+        ibdata=generate_paper_ib_plot(systemname, 'Date', 20000)
+        (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
     
-        data=get_data(systemname, 'paper', 'ib', 'trades', 20000)
-        (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
+        data=get_data(systemname, 'paper', 'ib', 'trades', 'times', 20000)
+        (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
         
         data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
         (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols)
@@ -437,24 +443,21 @@ for file in files:
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
                                 print systemname
                                 c2data=generate_paper_c2_plot(systemname, 20000)                                   
-                                (counter, html)=generate_mult_plot([c2data['equitycurve'],c2data['PurePLcurve']], 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html)
+                                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html)
 
                                 data=get_data(systemname, 'paper', 'c2', 'trades', 20000)
-                                (counter, html)=generate_mult_plot([data['PL'],data['PurePL']], 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
+                                (counter, html)=generate_mult_plot(data, ['PL','PurePL'], 'Date', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
                                 ibdata=generate_paper_ib_plot(systemname, 20000)
-                                (counter, html)=generate_mult_plot([ibdata['equitycurve'],ibdata['PurePLcurve']], 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html)
+                                (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html)
 
                                 data=get_data(systemname, 'paper', 'ib', 'trades', 20000)
-                                (counter, html)=generate_mult_plot([data['realized_PnL'],data['PurePL']], 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
+                                (counter, html)=generate_mult_plot(data, ['realized_PnL','PurePL'], 'Date', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
                         btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
                             
-                        #data=get_datas(btcname, 'btapi', 'Close', 20000)
-                        #(counter, html)=generate_plots(data, 'paper_' +btcname + 'Close', btcname + " Close Price", 'Close', counter, html, cols)
-
                         (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
                         (counter, html)=generate_html('OHLC_paper_' + btcname+'Close', counter, html, cols)
 dataPath='./data/btapi/'
@@ -468,9 +471,10 @@ for file in files:
                 systemname = re.sub('.csv','', systemname.rstrip())
                 data = pd.read_csv(dataPath + file, index_col='Date')
                 if data.shape[0] > 2000:
-                    generate_plot(data['Close'], 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
-                    plt.close()
                     get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
+                    plt.close()
+                    data=data.reset_index()
+                    generate_mult_plot(data, ['Close'], 'Date', 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
                     plt.close()
 html = html + '</body></html>'
 f = open('./data/results/index.html', 'w')

@@ -1,0 +1,4 @@
+signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,timestamp
+-1.0,-3.45648501398e-05,8711.0,0.0,-15.7210985586,0.0,0.00134595475515,bothCHFJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0,,
+-1.0,0.0,8712.0,0.0,-12.3504144123,0.0,0.00134595475515,bothCHFJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0,13.7080666667,20160323 09:34:42 EDT
+-1.0,0.0,8724.0,1.0,,,,bothCHFJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead,17.9084833333,20160323 09:50:54 EDT

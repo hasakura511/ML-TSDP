@@ -527,3 +527,29 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 22:18:00,-1.0,0.0,10711.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
 2016-03-23 22:36:00,-1.0,0.0,10729.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
 2016-03-23 22:52:00,-1.0,0.0,10745.0,0.0,-27.7388657364,0.0,0.00134595475515,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-23 23:08:00,-1.0,0.0,10761.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 23:28:00,-1.0,0.0,10781.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 23:42:00,1.0,0.0,10795.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 23:58:00,-1.0,0.0,10811.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:17:00,1.0,0.0,10830.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:33:00,1.0,0.0,10846.0,0.914661970727,29.0736053038,0.00147153243299,0.00134595475515,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-24 00:49:00,1.0,0.0,10862.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-24 00:57:00,1.0,0.0,10870.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 01:13:00,1.0,0.0,10886.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 01:31:00,1.0,0.0,10904.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-24 01:47:00,-1.0,0.0,10920.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 02:04:00,1.0,0.0,10937.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 02:21:00,1.0,0.0,10954.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 02:41:00,1.0,0.0,10974.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 03:01:00,-1.0,0.0,10994.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 03:17:00,-1.0,0.0,11010.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:35:00,1.0,0.0,11028.0,0.787590533187,36.9503383801,0.00170895242951,0.00134595475515,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-24 03:54:00,1.0,0.0,11047.0,0.0,-3.78780818615,0.0,0.00134595475515,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-24 04:11:00,1.0,0.0,11064.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:24:00,-1.0,0.0,11077.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:40:00,1.0,0.0,11093.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:54:00,-1.0,0.0,11107.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:09:00,-1.0,0.0,11358.0,0.917498343999,45.9391489841,0.00146698330733,0.00134595475515,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0
+2016-03-24 05:29:00,-1.0,0.0,11142.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 05:45:00,1.0,0.0,11158.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 06:03:00,1.0,0.0,11176.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead

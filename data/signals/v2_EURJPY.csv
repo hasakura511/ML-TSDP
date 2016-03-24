@@ -319,3 +319,138 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 23:04:00,1.0,0.0,9532.0,0.0,-27.3209674913,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 23:06:00,1.0,0.0,9534.0,0.0,-11.8338892078,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 23:08:00,1.0,0.0,9536.0,0.0,-14.9697536188,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:09:00,1.0,0.0,9537.0,1.0,,,,bothEURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 23:10:00,-1.0,0.0,9538.0,0.0,-18.2868557766,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:12:00,-1.0,0.0,9540.0,5.0,8.93250123266,0.000468865988373,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:13:00,-1.0,0.0,9541.0,0.0,-20.4734030999,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:15:00,1.0,0.0,9543.0,0.0,-15.3313638692,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:16:00,-1.0,0.0,9544.0,0.0,-9.56065641057,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:18:00,-1.0,0.0,9546.0,0.0,-0.142418845913,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:24:00,1.0,0.0,9552.0,5.0,0.444647865109,0.000358475645475,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:29:00,-1.0,0.0,9557.0,5.0,1.86185913295,0.000379153634163,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:33:00,-1.0,0.0,9561.0,5.0,1.76154290302,0.000539185636803,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:38:00,1.0,0.0,9566.0,0.0,-2.40215467159,0.0,0.0114208048144,bothEURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:42:00,1.0,0.0,9570.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 23:46:00,1.0,0.0,9574.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 23:51:00,1.0,0.0,9579.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 23:57:00,1.0,0.0,9585.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 00:04:00,-1.0,0.0,9592.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst10_gainAhead
+2016-03-24 00:11:00,1.0,0.0,9599.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 00:14:00,1.0,0.0,9602.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 00:16:00,-1.0,0.0,9604.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 00:18:00,-1.0,0.0,9606.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:20:00,-1.0,0.0,9608.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 00:22:00,1.0,0.0,9610.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:24:00,-1.0,0.0,9612.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 00:25:00,1.0,0.0,9613.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:27:00,1.0,0.0,9615.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:28:00,1.0,0.0,9616.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:30:00,1.0,0.0,9618.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 00:31:00,1.0,0.0,9619.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 00:37:00,-1.0,0.0,9625.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:42:00,1.0,0.0,9630.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:47:00,1.0,0.0,9635.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:53:00,1.0,0.0,9641.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 00:55:00,1.0,0.0,9643.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 00:56:00,-1.0,0.0,9644.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 00:57:00,1.0,0.0,9645.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 00:59:00,1.0,0.0,9647.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 01:00:00,-1.0,0.0,9648.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 01:02:00,-1.0,0.0,9650.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 01:03:00,-1.0,0.0,9651.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 01:05:00,-1.0,0.0,9653.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 01:06:00,-1.0,0.0,9654.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 01:08:00,-1.0,0.0,9656.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 01:13:00,-1.0,0.0,9661.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 01:16:00,-1.0,0.0,9664.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 01:21:00,-1.0,0.0,9669.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 01:27:00,-1.0,0.0,9675.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 01:31:00,-1.0,0.0,9679.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 01:37:00,1.0,0.0,9685.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 01:44:00,-1.0,0.0,9692.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 01:50:00,1.0,0.0,9698.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 01:54:00,1.0,0.0,9702.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 02:00:00,1.0,0.0,9708.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 02:06:00,-1.0,0.0,9714.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 02:11:00,1.0,0.0,9719.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 02:16:00,-1.0,0.0,9724.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 02:18:00,-1.0,0.0,9726.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 02:19:00,-1.0,0.0,9727.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 02:20:00,-1.0,0.0,9728.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-24 02:21:00,-1.0,0.0,9729.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 02:23:00,-1.0,0.0,9731.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 02:24:00,-1.0,0.0,9732.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 02:25:00,1.0,0.0,9733.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 02:27:00,1.0,0.0,9735.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 02:29:00,-1.0,0.0,9737.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 02:34:00,-1.0,0.0,9742.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 02:40:00,-1.0,0.0,9747.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 02:45:00,1.0,0.0,9752.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 02:51:00,-1.0,0.0,9758.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 02:56:00,-1.0,0.0,9762.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 03:01:00,-1.0,0.0,9767.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:06:00,-1.0,0.0,9772.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 03:12:00,1.0,0.0,9778.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:19:00,1.0,0.0,9785.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst10_gainAhead
+2016-03-24 03:20:00,1.0,0.0,9786.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:22:00,1.0,0.0,9788.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:23:00,-1.0,0.0,9789.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:25:00,-1.0,0.0,9791.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 03:26:00,-1.0,0.0,9792.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 03:28:00,1.0,0.0,9794.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-24 03:30:00,1.0,0.0,9796.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:31:00,1.0,0.0,9797.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:33:00,1.0,0.0,9799.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:36:00,-1.0,0.0,9802.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 03:41:00,1.0,0.0,9807.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 03:46:00,1.0,0.0,9812.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 03:54:00,-1.0,0.0,9820.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 03:59:00,1.0,0.0,9825.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:04:00,-1.0,0.0,9830.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:10:00,-1.0,0.0,9836.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 04:15:00,-1.0,0.0,9841.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:22:00,-1.0,0.0,9848.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 04:27:00,1.0,0.0,9853.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 04:33:00,-1.0,0.0,9859.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 04:35:00,-1.0,0.0,9861.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst10_gainAhead
+2016-03-24 04:41:00,-1.0,0.0,9867.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 04:47:00,-1.0,0.0,9873.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst10_gainAhead
+2016-03-24 04:49:00,-1.0,0.0,9875.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:50:00,-1.0,0.0,9876.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:52:00,-1.0,0.0,9878.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 04:53:00,-1.0,0.0,9879.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 04:55:00,-1.0,0.0,9881.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst10_gainAhead
+2016-03-24 04:56:00,-1.0,0.0,9882.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 04:57:00,-1.0,0.0,9883.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst10_gainAhead
+2016-03-24 04:59:00,-1.0,0.0,9885.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:00:00,-1.0,0.0,9886.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:01:00,1.0,0.0,9887.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:03:00,-1.0,0.0,9889.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 05:09:00,-1.0,0.0,9895.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:12:00,-1.0,0.0,9898.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 05:17:00,-1.0,0.0,9903.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 05:23:00,-1.0,0.0,9909.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:24:00,-1.0,0.0,9910.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:26:00,-1.0,0.0,9912.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:28:00,-1.0,0.0,9914.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:29:00,-1.0,0.0,9915.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:31:00,1.0,0.0,9917.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst5_gainAhead
+2016-03-24 05:33:00,-1.0,0.0,9919.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 05:34:00,-1.0,0.0,9920.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst10_gainAhead
+2016-03-24 05:36:00,-1.0,0.0,9922.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst5_gainAhead
+2016-03-24 05:37:00,-1.0,0.0,9923.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst5_gainAhead
+2016-03-24 05:39:00,-1.0,0.0,9925.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:45:00,-1.0,0.0,9931.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 05:51:00,-1.0,0.0,9937.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 05:57:00,-1.0,0.0,9943.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-24 05:58:00,-1.0,0.0,9944.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 06:00:00,-1.0,0.0,9946.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 06:01:00,1.0,0.0,9947.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst10_gainAhead
+2016-03-24 06:03:00,-1.0,0.0,9949.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 06:05:00,-1.0,0.0,9951.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-24 06:06:00,-1.0,0.0,9952.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 06:08:00,-1.0,0.0,9954.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 06:10:00,-1.0,0.0,9956.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-24 06:12:00,-1.0,0.0,9958.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-24 06:14:00,-1.0,0.0,9960.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-24 06:16:00,-1.0,0.0,9962.0,1.0,,,,EURJPY_ALL_DF1_VotingHard_i250_fcst5_gainAhead

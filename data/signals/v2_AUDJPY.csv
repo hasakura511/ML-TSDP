@@ -546,3 +546,8 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 22:39:00,-1.0,0.0,9546,0.0,-74.6093472874,0.0,0.0114208048144,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 22:41:00,-1.0,0.0,9548,5.0,11.7106869683,0.00153698805633,0.0114208048144,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 22:42:00,-1.0,0.0,9549,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 22:45:00,-1.0,0.0,9552,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 22:51:00,-1.0,0.0,9558,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 22:54:00,-1.0,0.0,9561,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 22:58:00,-1.0,0.0,9565,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 23:04:00,-1.0,0.0,9571,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead

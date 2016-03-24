@@ -37,3 +37,8 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 22:43:00,1.0,0.0,12454,1.0,,,,bothEURGBP_ALL_DF1_VotingHard_i500_fcst10_gainAhead
 2016-03-23 22:45:00,1.0,0.0,12456,1.0,,,,bothEURGBP_ALL_DF1_VotingHard_i500_fcst10_gainAhead
 2016-03-23 22:46:00,1.0,0.0,12457,1.0,,,,bothEURGBP_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 22:47:00,1.0,0.0,12458,1.0,,,,bothEURGBP_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-23 22:48:00,1.0,0.0,12459,1.0,,,,bothEURGBP_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-23 22:49:00,1.0,0.0,12460,5.0,1.69166616291,0.000533310222028,0.0114208048144,bothEURGBP_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 22:56:00,1.0,0.0,12467,5.0,0.0857254275742,0.000334197061483,0.0114208048144,bothEURGBP_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:01:00,-1.0,0.0,12472,0.0,-0.623496173676,0.0,0.0114208048144,bothEURGBP_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0

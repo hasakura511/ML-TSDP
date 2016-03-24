@@ -1,3 +1,4 @@
 dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,timestamp
 2016-03-23 22:28:00,1.0,4.32492280012e-05,9456.0,1.0,,,,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead,,
 2016-03-23 22:29:00,-1.0,0.0,9457.0,1.0,,,,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead,17.4237666667,20160323 22:46:25 EDT
+2016-03-23 22:45:00,1.0,0.0,9473.0,1.0,,,,bothCHFJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead,18.7381166667,20160323 23:03:44 EDT

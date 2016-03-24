@@ -43,6 +43,7 @@ from time import gmtime, strftime, localtime, sleep
 import logging
 import threading
 import adfapi.s103 as s103
+import seitoolz.graph as seigraph
 
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
@@ -159,11 +160,18 @@ def proc_backtest(systemname, SST):
             if signals and len(signals) >= 1:
                 for signal in signals:
                     (barSym, barSig, barCmt)=signal
-                    model=generate_model_manual(barSym, barSig, 1)
                     
-                    pos[barSym]=barSig
+                    if pos.has_key(barSym):
+                        pos[barSym]=pos[barSym] + barSig
+                    else:
+                        pos[barSym]=barSig
+                    model=generate_model_manual(barSym, pos[barSym], 1)
+                    
                     if pos[barSym] == 0:
                         pos.pop(barSym, None)
+                    
+                    
+                    
                     commissionkey=barSym
                     commission_pct=0.00002
                     commission_cash=2
@@ -185,11 +193,13 @@ def proc_backtest(systemname, SST):
                             int(timestamp)
                         ).strftime("%Y%m%d %H:%M:%S EST")
                         print 'Signal: ' + barSym + '[' + str(barSig) + ']@' + str(ask)
-                        #adj_size(model, barSym, systemname, pricefeed,   \
-                        #systemname,systemname,1,barSym,secType, True, \
-                        #    1, sym,currency,exchange, secType, True, date)
+                        adj_size(model, barSym, systemname, pricefeed,   \
+                            systemname,systemname,100000,barSym, secType, True, \
+                                100000, sym,currency,exchange, secType, True, date)
                 #time.sleep(1)
 proc_backtest(sysname, SST)
+data=seigraph.generate_paper_ib_plot(sysname, 'Date')
+seigraph.view_plot(['equitycurve','PurePLcurve'], 'Backtest Result', 'Equity', data)
 #threads = []
 #for pair in pairs:
 #	sig_thread = threading.Thread(target=runv2, args=[pair])

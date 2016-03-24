@@ -101,7 +101,7 @@ def procBar(bar1, bar2, pos, trade):
         if trade:
                 strOrderComment = "zScore: " + str(round(dblZscoreData, 2)) + " zSMA: " + str(round(signals.iloc[-1]['indSmaZscore'], 2));
                 strOrderComment2 = "zScore: " + str(round(dblZscoreData2, 2)) + " zSMA: " + str(round(signals.iloc[-1]['indSmaZscore2'], 2));
-                print strOrderComment            
+                #print strOrderComment            
                 
                 crossAbove = 1 in np.where(
                         (
@@ -118,7 +118,7 @@ def procBar(bar1, bar2, pos, trade):
                         signals['tsZscore'].iloc[-1] >= signals['indSmaZscore'].iloc[-1] 
                         ), 1.0, 0.0) 
                 
-                print ' crossAbove: ' + str(crossAbove) + ' crossBelow: ' + str(crossBelow)
+                #print ' crossAbove: ' + str(crossAbove) + ' crossBelow: ' + str(crossBelow)
 
                 if not sentEntryOrder and not pos.has_key(bar1['Symbol']) and not pos.has_key(bar2['Symbol']):
 

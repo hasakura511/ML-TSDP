@@ -48,7 +48,7 @@ def calculate_adf(spread):
         
         return (confidence, cadf[1], -1)
     except:
-        print sys.exc_info()[0]
+         print 'calculate_adf Error'
         
 def calculate_johansen(y, p):
         """
@@ -137,7 +137,7 @@ def create_pairs_dataframe(datadir, symbols):
     pairs = pairs.dropna()
     return pairs
 
-def calculate_spread_zscore(pairs, symbols, lookback=100):
+def calculate_spread_zscore(pairs, symbols, lookback=2000):
     try:
         """Creates a hedge ratio between the two symbols by calculating
         a rolling linear regression with a defined lookback period. This

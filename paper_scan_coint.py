@@ -97,7 +97,7 @@ for file in files:
                 systemname=file
                 systemname = re.sub('BTCUSD_','', systemname.rstrip())
                 systemname = re.sub('.csv','', systemname.rstrip())
-                #pairs.append([dataPath+file, systemname])
+                pairs.append([dataPath+file, systemname])
 dataPath='./data/from_IB/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 btcsearch=re.compile('1 min')

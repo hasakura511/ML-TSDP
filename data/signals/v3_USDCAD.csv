@@ -1551,3 +1551,4 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 19:15:00,-1.0,0.0,10398.0,1.0,,,,bothUSDCAD_ALL_DF1_VotingHard_i500_fcst5_gainAhead
 2016-03-23 19:30:00,1.0,0.0,10411.0,1.0,,,,bothUSDCAD_ALL_DF1_VotingHard_i500_fcst10_gainAhead
 2016-03-23 19:52:00,-1.0,0.0,10433.0,1.0,,,,bothUSDCAD_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-23 20:09:00,-1.0,0.0,10449.0,5.0,0.0841799564934,0.000245653749189,0.00134595475515,bothUSDCAD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0

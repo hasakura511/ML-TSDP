@@ -423,3 +423,5 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 20:19:00,-1.0,0.0,10784,1.0,,,,bothCADJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
 2016-03-23 20:20:00,-1.0,0.0,10785,0.0,-6.56586767493,0.0,0.0114208048144,bothCADJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:21:00,-1.0,0.0,10786,0.0,-55.799102919,0.0,0.0114208048144,bothCADJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:22:00,-1.0,0.0,10787,0.0,-20.5412800205,0.0,0.0114208048144,bothCADJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:23:00,1.0,0.0,10788,0.0,-12.6223137082,0.0,0.0114208048144,bothCADJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0

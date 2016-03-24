@@ -1,2 +1,1 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
-EURUSD,EUR,,-50000.0,-50000.0,1.11798,1.11798,-44718.8,2.0,0.0,-4.0,0.0,Paper,USD

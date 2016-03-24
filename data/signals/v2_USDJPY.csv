@@ -623,3 +623,6 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 20:18:00,1.0,0.0,9038.0,5.0,33.3027276693,0.000613940151511,0.0114208048144,bothUSDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:19:00,1.0,0.0,9039.0,0.0,-2.81905253275,0.0,0.0114208048144,bothUSDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:20:00,1.0,0.0,9040.0,5.0,37.9617541829,0.000794807871468,0.0114208048144,bothUSDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:21:00,-1.0,0.0,9041.0,1.0,,,,bothUSDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 20:23:00,-1.0,0.0,9043.0,1.0,,,,bothUSDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 20:23:00,-1.0,0.0,9043.0,1.0,,,,bothUSDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead

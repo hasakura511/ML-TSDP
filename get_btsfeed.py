@@ -63,6 +63,7 @@ def bitstamp_order_book_callback(data):
         for bid in bids:
             data.append(bid[0])
         feed['bitstampUSD']['bid']=float(max(data))
+        print "Bid: " + str(feed['bitstampUSD']['bid']) + " Bid: " + str(float(bids[0][0])) + " Vol: " + str(float(bids[0][1]))
     if 'asks' in dataSet:
         asks=dataSet['asks']
         data=list()

@@ -138,7 +138,7 @@ if len(sys.argv)==1:
     showPDFCDF = True
     showAllCharts = True
     perturbData = True
-    runDPS = True
+    runDPS = False
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -157,7 +157,7 @@ else:
     showPDFCDF = False
     showAllCharts = False
     perturbData = False
-    runDPS = True
+    runDPS = False
     
     scorePath = None
     equityStatsSavePath = None
@@ -212,7 +212,7 @@ for ticker in livePairs:
     feature_selection = 'None' #RFECV OR Univariate
     #feature_selection = 'Univariate' #RFECV OR Univariate
     wfSteps=[5,10]
-    wf_is_periods = [500,1000]
+    wf_is_periods = [250,500,1000]
     #wf_is_periods = [100]
     tox_adj_proportion = 0
     nfeatures = 10
@@ -551,6 +551,13 @@ for ticker in livePairs:
     if showAllCharts:
         compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName)
         
+    bestSSTnoDPS = pd.concat([sstDictDF1_[DF1_BMrunName],\
+                    pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[DF1_BMrunName].index),
+                    pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[DF1_BMrunName].index),
+                    pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[DF1_BMrunName].index),
+                    pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[DF1_BMrunName].index),
+                    pd.Series(data=DF1_BMrunName, name = 'system', index = sstDictDF1_[DF1_BMrunName].index)
+                    ],axis=1)    
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
     print 'Finished Model Training... Beginning Dynamic Position Sizing..'
     ##############################################################
@@ -629,5 +636,40 @@ for ticker in livePairs:
             addLine.name = bestBothDPS.iloc[-1].name
             signalFile = signalFile.append(addLine)
             signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=True)
-                    
-        print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+    else:
+        print 'Saving Signals..'      
+        #init file
+        #bestSSTnoDPS.tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if version+'_'+ ticker + '.csv' not in files:
+            signalFile = bestSSTnoDPS.tail()
+            signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=True)
+        else:        
+            signalFile=pd.read_csv(signalPath+ version+'_'+ ticker + '.csv', parse_dates=['dates'])
+
+            #if bestSSTnoDPS.reset_index().iloc[-1].dates != signalFile.iloc[-1].dates:
+            if bestSSTnoDPS.reset_index().iloc[-2].dates == signalFile.iloc[-1].dates:
+                signalFile.gainAhead.iloc[-1] == bestSSTnoDPS.gainAhead.iloc[-2]
+            signalFile=signalFile.append(bestSSTnoDPS.reset_index().iloc[-1])
+            signalFile.to_csv(signalPath + version+'_'+ ticker + '.csv', index=False)
+            
+        #new version file
+        if version_+'_'+ ticker + '.csv' not in files:
+            #signalFile = bestSSTnoDPS.iloc[-2:]
+            addLine = bestSSTnoDPS.iloc[-1]
+            addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+            addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+            addLine.name = bestSSTnoDPS.iloc[-1].name
+            signalFile = bestSSTnoDPS.iloc[-2:-1].append(addLine)
+            signalFile.index.name = 'dates'
+            signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=True)
+        else:        
+            signalFile=pd.read_csv(signalPath+ version_+'_'+ ticker + '.csv', index_col=['dates'])
+            addLine = bestSSTnoDPS.iloc[-1]
+            addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+            addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+            addLine.name = bestSSTnoDPS.iloc[-1].name
+            signalFile = signalFile.append(addLine)
+            signalFile.to_csv(signalPath + version_+'_'+ ticker + '.csv', index=True)
+            
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

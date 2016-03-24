@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
-CHFJPY,CHF,,-10000.0,-10000.0,115.45,115.45,0.0,2.0,0.0,21.392,51.392,Paper,JPY
+CHFJPY,CHF,,-10000.0,-10000.0,115.566,115.566,0.0,2.0,0.0,10.448,52.448,Paper,JPY

@@ -501,3 +501,16 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 20:21:00,1.0,0.0,9071,5.0,8.55083309924,0.000686047150843,0.0114208048144,bothNZDUSD_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:22:00,1.0,0.0,9072,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i500_fcst5_gainAhead
 2016-03-23 20:23:00,1.0,0.0,9073,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-23 20:24:00,-1.0,0.0,9074,0.0,-35.3873611181,0.0,0.0114208048144,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:25:00,-1.0,0.0,9075,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:26:00,-1.0,0.0,9076,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:27:00,-1.0,0.0,9077,0.0,-66.362845734,0.0,0.0114208048144,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:27:00,-1.0,0.0,9077,0.0,-52.7239959443,0.0,0.0114208048144,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:28:00,-1.0,0.0,9078,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:29:00,-1.0,0.0,9079,0.0,-39.8858727265,0.0,0.0114208048144,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:30:00,-1.0,0.0,9080,0.0,-56.8147225558,0.0,0.0114208048144,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:32:00,-1.0,0.0,9082,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:33:00,-1.0,0.0,9083,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:34:00,-1.0,0.0,9084,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:36:00,-1.0,0.0,9086,1.0,,,,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:37:00,-1.0,0.0,9087,0.0,-4.48891285023,0.0,0.0114208048144,bothNZDUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0

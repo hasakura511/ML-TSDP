@@ -1,2 +1,1 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-AUDUSD,open,long,5.0,0.0,0.7562516,,-27.52,-19.52,8.0,3.0,,,,,AUDUSD,,20160323 09:56:36 EST,20160323 09:19:22 EST,4.0,19996.38,331931.4,20014.38

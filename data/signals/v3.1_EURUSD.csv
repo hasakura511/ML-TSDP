@@ -1,4 +1,3 @@
-signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,timestamp
--1.0,-0.000156575032993,8419.0,1.0,,,,bothEURUSD_ALL_DF1_VotingHard_i500_fcst10_gainAhead,,
-1.0,0.0,8420.0,1.0,,,,bothEURUSD_ALL_DF1_VotingHard_i500_fcst10_gainAhead,14.9799166667,20160323 09:31:58 EDT
-1.0,0.0,8434.0,1.0,,,,bothEURUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead,13.8034,20160323 09:44:48 EDT
+dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,timestamp
+2016-03-23 22:25:00,1.0,3.58037952023e-05,9159.0,1.0,,,,bothEURUSD_ALL_DF1_VotingHard_i500_fcst10_gainAhead,,
+2016-03-23 22:26:00,1.0,0.0,9160.0,1.0,,,,bothEURUSD_ALL_DF1_VotingHard_i500_fcst10_gainAhead,19.4515333333,20160323 22:45:27 EDT

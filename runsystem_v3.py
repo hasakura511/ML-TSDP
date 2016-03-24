@@ -36,8 +36,8 @@ def runv3(pair):
     while 1:
      try:
          f=open ('/logs/' + pair + 'v3.log','a')
-	 print 'Starting v3: ' + pair
-	 f.write('Starting v3: ' + pair)
+         print 'Starting v3: ' + pair
+         f.write('Starting v3: ' + pair)
          subprocess.call(['python','system_v3.0C.py',pair,'1'], stdout=f)
          f.close()
      except Exception as e:

@@ -450,7 +450,7 @@ for ticker in livePairs:
     signal_df_new=pd.DataFrame({'dates':dataSet.index[-1],
                                 'signals':nextSignal,
                                 'gainAhead':0,
-                                'prior_index':0,
+                                'prior_index':-1,
                                 'safef':1,
                                 'CAR25':np.nan,
                                 'dd95':np.nan,

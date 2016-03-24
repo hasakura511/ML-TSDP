@@ -1,0 +1,2 @@
+symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
+CHFJPY,open,short,1.0,0.0,115.225,0.0,-2.0,0.0,2.0,137.0,,,,,CHFJPY,,20160323 20:48:17 EST,20160323 20:48:17 EST,-1.0,18673.6079997,379789.656,19365.6079997

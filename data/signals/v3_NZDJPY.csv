@@ -516,3 +516,4 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 19:39:00,-1.0,0.0,10552.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
 2016-03-23 19:53:00,1.0,0.0,10566.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
 2016-03-23 20:10:00,1.0,0.0,10583.0,1.0,,,,bothNZDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 20:25:00,1.0,0.0,10598.0,1.05587003798,18.3143646984,0.0012747352484,0.00134595475515,bothNZDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.001 thres_0.0

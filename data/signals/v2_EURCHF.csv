@@ -449,3 +449,18 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 20:19:00,-1.0,0.0,12249,0.0,-1.18598569362,0.0,0.0114208048144,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:23:00,-1.0,0.0,12252,0.0,-8.08653612469,0.0,0.0114208048144,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:24:00,-1.0,0.0,12253,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:25:00,-1.0,0.0,12254,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:26:00,-1.0,0.0,12255,0.0,-15.3763792238,0.0,0.0114208048144,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:27:00,-1.0,0.0,12256,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:28:00,-1.0,0.0,12257,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:29:00,-1.0,0.0,12258,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:31:00,-1.0,0.0,12260,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:32:00,-1.0,0.0,12261,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:33:00,-1.0,0.0,12262,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:34:00,-1.0,0.0,12263,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:35:00,-1.0,0.0,12264,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:36:00,-1.0,0.0,12265,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:37:00,-1.0,0.0,12266,5.0,20.5651650824,0.000306853711252,0.0114208048144,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:38:00,-1.0,0.0,12281,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i500_fcst5_gainAhead
+2016-03-23 20:39:00,-1.0,0.0,12268,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 20:39:00,-1.0,0.0,12268,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead

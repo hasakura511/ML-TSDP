@@ -56,7 +56,9 @@ logging.basicConfig(filename='/logs/get_results.log',level=logging.DEBUG)
 
 
 def generate_sigplots(counter, html, cols):
-    subprocess.call(['python','create_signalPlots.py','1'])
+    logfile = open('/logs/create_signalPlots.log', 'a')
+    subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
+    logfile.close()
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
     systems=dict()

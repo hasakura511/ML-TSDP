@@ -464,3 +464,9 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 20:38:00,-1.0,0.0,12281,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i500_fcst5_gainAhead
 2016-03-23 20:39:00,-1.0,0.0,12268,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
 2016-03-23 20:39:00,-1.0,0.0,12268,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:41:00,-1.0,0.0,12347,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 20:43:00,1.0,0.0,12364,5.0,2.86961770965,0.000220341898477,0.0114208048144,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:43:00,-1.0,0.0,12271,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:44:00,-1.0,0.0,12272,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 20:45:00,-1.0,0.0,12273,5.0,12.2554038351,0.000256098913395,0.0114208048144,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:47:00,-1.0,0.0,12275,1.0,,,,bothEURCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead

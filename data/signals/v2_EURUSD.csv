@@ -677,3 +677,5 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 20:07:00,-1.0,0.0,9024.0,0.0,-9.41318415683,0.0,0.0114208048144,bothEURUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:08:00,-1.0,0.0,9025.0,1.0,,,,bothEURUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
 2016-03-23 20:09:00,-1.0,0.0,9026.0,0.0,-33.9677169702,0.0,0.0114208048144,bothEURUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:10:00,-1.0,0.0,9027.0,0.0,-2.48344478413,0.0,0.0114208048144,bothEURUSD_ALL_DF1_VotingHard_i1000_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:16:00,-1.0,0.0,9033.0,1.0,,,,bothEURUSD_ALL_DF1_VotingHard_i1000_fcst10_gainAhead

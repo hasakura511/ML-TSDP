@@ -503,3 +503,9 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 19:57:00,1.0,0.0,9309,0.0,-0.805152022994,0.0,0.0114208048144,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:02:00,1.0,0.0,9314,0.0,-1.27381932629,0.0,0.0114208048144,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 20:06:00,1.0,0.0,9317,0.0,-1.50144580885,0.0,0.0114208048144,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:10:00,1.0,0.0,9321,0.0,-5.17855725575,0.0,0.0114208048144,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:15:00,1.0,0.0,9326,0.0,-0.957466990601,0.0,0.0114208048144,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 20:18:00,-1.0,0.0,9329,1.0,,,,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 20:19:00,-1.0,0.0,9330,1.0,,,,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 20:20:00,1.0,0.0,10761,1.0,,,,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead
+2016-03-23 20:21:00,1.0,0.0,9331,1.0,,,,bothCHFJPY_ALL_DF1_VotingHard_i500_fcst5_gainAhead

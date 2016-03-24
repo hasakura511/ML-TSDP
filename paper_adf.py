@@ -44,6 +44,7 @@ import logging
 import threading
 import adfapi.s103 as s103
 import seitoolz.graph as seigraph
+import adfapi.adf_helper as adf
 
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
@@ -145,10 +146,13 @@ pos=dict()
 asks=dict()
 bids=dict()
 def proc_backtest(systemname, SST):
+    sym1=pairs[0][1]
+    sym2=pairs[1][1]
+    confidence=adf.getCoint(SST[sym1], sym1, SST[sym2], sym2)
+    print "Coint Confidence: " + str(confidence) + "%"
     for i in SST.index:
             priceHist=SST.ix[i]
-            sym1=pairs[0][1]
-            sym2=pairs[1][1]
+            
             asks[sym1]=priceHist[sym1]
             bids[sym1]=priceHist[sym1]
             asks[sym2]=priceHist[sym2]
@@ -161,16 +165,15 @@ def proc_backtest(systemname, SST):
                 for signal in signals:
                     (barSym, barSig, barCmt)=signal
                     
+                    
+                    model=generate_model_manual(barSym, barSig, 1)
                     if pos.has_key(barSym):
                         pos[barSym]=pos[barSym] + barSig
                     else:
                         pos[barSym]=barSig
-                    model=generate_model_manual(barSym, pos[barSym], 1)
-                    
+                        
                     if pos[barSym] == 0:
                         pos.pop(barSym, None)
-                    
-                    
                     
                     commissionkey=barSym
                     commission_pct=0.00002

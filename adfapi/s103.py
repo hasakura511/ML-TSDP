@@ -7,6 +7,8 @@ import statsmodels.tsa.stattools as ts
 import sys
 from numpy import zeros, ones, flipud, log
 from numpy.linalg import inv, eig, cholesky as chol
+import talib as ta
+
 from statsmodels.regression.linear_model import OLS
 
 ##### Do not change this function definition ####
@@ -14,8 +16,9 @@ pair1Series=list()
 pair2Series=list()
 tsPairratio=list()
 tsPairratio2=list()
-tsZscore=dict()
-tsZscore2=dict()
+tsZscore=list()
+tsZscore2=list()
+tsDates=list()
 indSmaZscore=list()
 indSmaZscore2=list()
 intDatapoints=1000
@@ -28,6 +31,8 @@ instPair1Factor=1
 instPair2Factor=1
 dblQty=1
 dblQty2=1
+crossAbove=False
+crossBelow=False
 
 def procBar(bar1, bar2, pos, trade):
     global pair1Series
@@ -48,6 +53,8 @@ def procBar(bar1, bar2, pos, trade):
     global instPair2Factor
     global dblQty
     global dblQty2 
+    global crossAbove
+    global crossBelow
     
     if bar1['Close'] > 0 and bar2['Close'] > 0:
         xd = bar1['Close'] * instPair1Factor
@@ -69,7 +76,8 @@ def procBar(bar1, bar2, pos, trade):
         dblRatioStdDev = np.std(tsPairratio[iStart:iEnd]);
         dblResidualsData = (dblRatioData - dblAverage);
         dblZscoreData = (dblRatioData - dblAverage) / dblRatioStdDev;
-        tsZscore[bar1['Date']]=dblZscoreData
+        tsZscore.append(dblZscoreData)
+        tsDates.append(bar1['Date'])
 
         iStart2 = len(tsPairratio2) - intDatapoints;
         iEnd2 = len(tsPairratio2) - 1;
@@ -77,14 +85,17 @@ def procBar(bar1, bar2, pos, trade):
         dblRatioStdDev2 = np.std(tsPairratio[iStart2:iEnd2]);
         dblResidualsData2 = (dblRatioData2 - dblAverage2);
         dblZscoreData2 = (dblRatioData2 - dblAverage2) / dblRatioStdDev2;
-        tsZscore2[bar1['Date']]=dblZscoreData2
+        tsZscore2.append(dblZscoreData2)
         
         signals=pd.DataFrame()
-        signals['Date']=tsZscore.keys()
-        signals['tsZscore']=tsZscore.values()
-        signals['tsZscore2']=tsZscore2.values()
-        signals['indSmaZscore']=pd.rolling_mean(signals['tsZscore'], intSMALength, min_periods=1)
-        signals['indSmaZscore2']=pd.rolling_mean(signals['tsZscore2'], intSMALength, min_periods=1)            
+        signals['Date']=tsDates
+        signals['tsZscore']=tsZscore
+        signals['tsZscore2']=tsZscore2
+        #signals['indSmaZscore']=pd.rolling_mean(signals['tsZscore'], intSMALength, min_periods=1)
+        #signals['indSmaZscore2']=pd.rolling_mean(signals['tsZscore2'], intSMALength, min_periods=1)    
+        
+        signals['indSmaZscore']=ta.SMA(np.array(signals['tsZscore']), intSMALength)      
+        signals['indSmaZscore2']=ta.SMA(np.array(signals['tsZscore2']), intSMALength)        
         signals=signals.set_index('Date')
         
         #				tsPricePair1.Add(bar1['Date']Time, bar1['Close']);
@@ -93,7 +104,7 @@ def procBar(bar1, bar2, pos, trade):
 
         #print 'ZScore:' + str(dblZscoreData) + ' Upper: ' +  str(dblUpperThreshold) +  + ' Lower: ' +  str(dblLowerThreshold)
        
-        if len(signals['tsZscore']) == 0 or len(signals['indSmaZscore']) == 0 or len(signals['indSmaZscore2']) == 0:
+        if len(signals['tsZscore']) < 5 or len(signals['indSmaZscore']) < 5 or len(signals['indSmaZscore2']) < 5:
             return [];
 
         #updateCointData();
@@ -101,25 +112,24 @@ def procBar(bar1, bar2, pos, trade):
         if trade:
                 strOrderComment = "zScore: " + str(round(dblZscoreData, 2)) + " zSMA: " + str(round(signals.iloc[-1]['indSmaZscore'], 2));
                 strOrderComment2 = "zScore: " + str(round(dblZscoreData2, 2)) + " zSMA: " + str(round(signals.iloc[-1]['indSmaZscore2'], 2));
-                #print strOrderComment            
-                
-                crossAbove = 1 in np.where(
-                        (
-                        signals['tsZscore'].iloc[-intSMALength-1:-2] > signals['indSmaZscore'].iloc[-intSMALength-1:-2]  
-                        ) & (                                            
-                        signals['tsZscore'].iloc[-1] <= signals['indSmaZscore'].iloc[-1]
-                        ),
-                        1.0, 0.0) 
+                #print strOrderComment
+                                
+                if signals.iloc[-2]['tsZscore'] > signals.iloc[-2]['indSmaZscore']  \
+                        and                                                         \
+                   signals.iloc[-1]['tsZscore'] <= signals.iloc[-1]['indSmaZscore']:
+                        crossBelow=False
+                        crossAbove=True
 
-                crossBelow = 1 in np.where(
-                        ( 
-                        signals['tsZscore'].iloc[-intSMALength-1:-2] < signals['indSmaZscore'].iloc[-intSMALength-1:-2] 
-                        ) & (
-                        signals['tsZscore'].iloc[-1] >= signals['indSmaZscore'].iloc[-1] 
-                        ), 1.0, 0.0) 
-                
+                if signals.iloc[-2]['tsZscore'] < signals.iloc[-2]['indSmaZscore'] \
+                       and                                                         \
+                   signals.iloc[-1]['tsZscore'] >= signals.iloc[-1]['indSmaZscore']:
+                        crossBelow=True
+                        crossAbove=False
+                       
                 #print ' crossAbove: ' + str(crossAbove) + ' crossBelow: ' + str(crossBelow)
-
+                #crossBelow = signals['tsZscore'].iloc[-1] >= signals['indSmaZscore'].iloc[-1] and crossBelow.any()
+                #crossAbove = signals['tsZscore'].iloc[-1] <= signals['indSmaZscore'].iloc[-1] and crossAbove.any()
+                #print ' crossAbove: ' + str(crossAbove) + ' crossBelow: ' + str(crossBelow)
                 if not sentEntryOrder and not pos.has_key(bar1['Symbol']) and not pos.has_key(bar2['Symbol']):
 
                     #dblQty = Math.Ceiling(1/dblBeta);
@@ -199,4 +209,4 @@ def getBar(price, symbol, date):
     bar['Symbol']=symbol
     bar['Date']=date
     return bar
-    
+

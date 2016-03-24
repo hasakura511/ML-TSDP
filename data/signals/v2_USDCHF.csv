@@ -830,3 +830,8 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 22:35:00,1.0,0.0,9184.0,0.0,-0.905086229958,0.0,0.0114208048144,bothUSDCHF_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 22:36:00,-1.0,0.0,9185.0,1.0,,,,bothUSDCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
 2016-03-23 22:42:00,1.0,0.0,9191.0,5.0,1.04906407884,0.000210015939249,0.0114208048144,bothUSDCHF_ALL_DF1_VotingHard_i500_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 22:45:00,1.0,0.0,9194.0,1.0,,,,bothUSDCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 22:50:00,1.0,0.0,9199.0,1.0,,,,bothUSDCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 22:56:00,-1.0,0.0,9205.0,1.0,,,,bothUSDCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 23:01:00,1.0,0.0,9210.0,1.0,,,,bothUSDCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
+2016-03-23 23:04:00,-1.0,0.0,9213.0,1.0,,,,bothUSDCHF_ALL_DF1_VotingHard_i1000_fcst5_gainAhead

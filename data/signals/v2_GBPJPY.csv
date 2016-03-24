@@ -393,3 +393,8 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
 2016-03-23 22:31:00,-1.0,0.0,10926,1.0,,,,bothGBPJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead
 2016-03-23 22:34:00,-1.0,0.0,10929,0.0,-5.92292897004,0.0,0.0114208048144,bothGBPJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
 2016-03-23 22:38:00,1.0,0.0,10933,1.0,,,,bothGBPJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 22:44:00,-1.0,0.0,10939,1.0,,,,bothGBPJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 22:50:00,1.0,0.0,10945,1.0,,,,bothGBPJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead
+2016-03-23 22:54:00,-1.0,0.0,10949,0.0,-0.536821069796,0.0,0.0114208048144,bothGBPJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 22:58:00,-1.0,0.0,10953,5.0,0.901491475305,0.0005685150482,0.0114208048144,bothGBPJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead DPS wl30.0 maxL5 dd95_0.011 thres_0.0
+2016-03-23 23:03:00,-1.0,0.0,10958,1.0,,,,bothGBPJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead

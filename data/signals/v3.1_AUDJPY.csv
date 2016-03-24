@@ -49,3 +49,4 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-03-23 22:04:00,-1.0,0.0,9511.0,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i500_fcst10_gainAhead,11.01705,20160323 22:15:01 EDT
 2016-03-23 22:14:00,-1.0,0.0,9521.0,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead,19.34635,20160323 22:33:20 EDT
 2016-03-23 22:32:00,-1.0,0.0,9539.0,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst5_gainAhead,10.8244333333,20160323 22:42:49 EDT
+2016-03-23 22:42:00,-1.0,0.0,9549.0,1.0,,,,bothAUDJPY_ALL_DF1_VotingHard_i1000_fcst10_gainAhead,18.3841,20160323 23:00:23 EDT

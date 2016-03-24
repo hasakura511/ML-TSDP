@@ -25,18 +25,20 @@ logging.basicConfig(filename='/logs/runproc_v3.log',level=logging.DEBUG)
 
 debug=False
 
-files=[['get_results.py',[1],300]]
+files=[['get_results.py',[1],600]]
 
 def runfile(file,runargs,sleeptime):
     while 1:
      try:
          f=open ('/logs/' + file + '.log','a')
          print 'Starting ' + file
-         f.write('Starting v3: ' + file)
+         f.write('Starting : ' + file)
          
          ferr=open ('/logs/' + file + '_err.log','a')
-         ferr.write('Starting V3: ' + file)
+         ferr.write('Starting : ' + file)
 	 runproc=['python',file] + runargs
+	 for proc in runproc:
+		print ' Arg: ' + proc
          subprocess.call(runproc, stdout=f, stderr=ferr)
 
          f.close()

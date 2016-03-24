@@ -32,7 +32,10 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (12,13)
-systems = ['v1','v2','v3']
+systems = ['v1','v2.32','v3.1']
+
+#regime switching params
+lookback = 1440
 
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
@@ -308,9 +311,10 @@ for pair in pairs:
                     dataSet['gainAhead'] = gainAhead(dataSet.Close)
                     dataSet['signals'] = fixnans(dataSet.signals)
                     dataSet['safef'] = fixnans(dataSet.safef)
-                    dataSet = dataSet[['signals','gainAhead','safef']].dropna()
-                    
-                    equityCurve = calcEquity_signals(dataSet, f[:-4],\
+                    dataSet = dataSet[['signals','gainAhead','safef']][-lookback:].dropna()
+                    title = f[:-4] +' ct_'+str(reindexed_sst.iloc[-1].cycleTime.round())+\
+                                ' '+ reindexed_sst.iloc[-1].system       
+                    equityCurve = calcEquity_signals(dataSet,title,\
                                         leverage = dataSet.safef.values, savePath=savePath,\
                                         pngPath=pngPath, \
                                         figsize=size, showPlot=showPlot)
@@ -344,9 +348,10 @@ for pair in pairs:
                     dataSet['gainAhead'] = gainAhead(dataSet.Close)
                     dataSet['signals'] = fixnans(dataSet.signals)
                     dataSet['safef'] = fixnans(dataSet.safef)
-                    dataSet = dataSet[['signals','gainAhead','safef']].dropna()
-                    
-                    equityCurve = calcEquity_signals(dataSet, f[:-4],\
+                    dataSet = dataSet[['signals','gainAhead','safef']][-lookback:].dropna()
+                    title = f[:-4] +' ct_'+str(reindexed_sst.iloc[-1].cycleTime.round())+\
+                                ' '+ reindexed_sst.iloc[-1].system       
+                    equityCurve = calcEquity_signals(dataSet, title,\
                                         leverage = dataSet.safef.values, savePath=savePath,\
                                         figsize=size, showPlot=showPlot)
                     equityCurve.to_csv(savePath+f[:-4]+'_curve.csv')

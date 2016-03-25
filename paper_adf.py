@@ -121,7 +121,7 @@ pairs=[['./data/btapi/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfi
 sysname='ADF2'
 refresh_paper(sysname)
 data=gettrades(sysname)
-SST=seigraph.get_history(pairs, sysname, 'Close')
+SST=seigraph.get_history(pairs, 'Close')
 threads = []
 
 pos=dict()

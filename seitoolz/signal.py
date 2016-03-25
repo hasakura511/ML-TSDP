@@ -61,9 +61,9 @@ def generate_model_pos(system):
     #pos.to_csv('./data/portfolio/gen_model_pos.csv')
     return pos
 
-def generate_model_sig(system, date, action, qty):
+def generate_model_sig(system, date, action, qty, comment=''):
     #pos=pd.DataFrame({}, columns=['system','action','qty']);
-    pos=pd.DataFrame([[date, action, qty]], columns=['dates','signals','safef'])
+    pos=pd.DataFrame([[date, action, qty, comment]], columns=['dates','signals','safef','comment'])
     filename='./data/signals/' + system + '.csv'
     if os.path.isfile(filename):
         data=pd.read_csv(filename)
@@ -73,9 +73,27 @@ def generate_model_sig(system, date, action, qty):
     else:
         pos=pos.set_index('dates')
         pos.to_csv('./data/signals/' + system + '.csv')
+    
+    qty=action * qty
+    qty=round(qty)
+    signal=qty
+    ###################
+    pos=pd.DataFrame([[system, signal, qty]], columns=['system','action','qty'])
+    pos=pos.set_index(['system'])
+    return pos
 
-    return generate_model_pos(system)
-
+def get_model_sig(system):
+    filename='./data/signals/' + system + '.csv'
+    if os.path.isfile(filename):
+        data=pd.read_csv(filename, index_col='dates')
+        return data
+    else:
+        pos=pd.DataFrame({}, columns=['dates','signals','safef','comment'])
+        pos=pos.set_index('dates')
+        return pos
+        
+    
+    
 def generate_model_manual(system, action, qty):
     pos=pd.DataFrame([[system, action, qty]], columns=['system','action','qty'])
     pos=pos.set_index(['system'])

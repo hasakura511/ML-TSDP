@@ -21,6 +21,7 @@ import logging
 import time
 import websocket
 from seitoolz.signal import get_dps_model_pos, get_model_pos
+
 logging.basicConfig(filename='/logs/get_btcfeed.log',level=logging.DEBUG)
 
 debug=False

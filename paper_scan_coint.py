@@ -120,7 +120,7 @@ def proc_pair(sym1):
         print "Error getting coint" + str(e) + ' , ' +  str(sys.exc_info()[0])
         
 sysname='ADFScan'
-SST=seigraph.get_history(pairs, sysname, 'Close')
+SST=seigraph.get_history(pairs, 'Close')
 
 threads=[]
 result=pd.DataFrame({}, columns=['Date','Symbol1','Symbol2','Confidence','Pv','Hurst'])

@@ -37,9 +37,8 @@ import time
 import json
 import os
 from pandas.io.json import json_normalize
-from seitoolz.signal import get_dps_model_pos, get_model_pos, generate_model_manual
+from seitoolz.signal import get_dps_model_pos, get_model_pos, generate_model_manual, generate_model_sig, get_model_sig
 from seitoolz.paper import adj_size
-import seitoolz.portfolio as portfolio
 from time import gmtime, strftime, localtime, sleep
 import logging
 import threading
@@ -47,137 +46,192 @@ import adfapi.s105 as astrat
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
 
-systemdata=pd.read_csv('./data/systems/system.csv')
-systemdata=systemdata.reset_index()
-commissiondata=pd.read_csv('./data/systems/commission.csv')
-commissiondata=commissiondata.reset_index()
-commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + commissiondata['Exchange']
-commissiondata=commissiondata.set_index('key')
-     
-start_time = time.time()
 
-debug=False
-
-if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-    debug=True
-
-if debug:
-    showDist =  True
-    showPDFCDF = True
-    showAllCharts = True
-    perturbData = True
-    scorePath = './debug/scored_metrics_'
-    equityStatsSavePath = './debug/'
-    signalPath = './data/signals/'
-    dataPath = './data/from_IB/'
-else:
-    showDist =  False
-    showPDFCDF = False
-    showAllCharts = False
-    perturbData = False
-    scorePath = None
-    equityStatsSavePath = None
-    signalPath = './data/signals/'
-    dataPath = './data/from_IB/'
+logging.basicConfig(filename='/logs/system_adf.log',level=logging.DEBUG)
 
 
-SST=seigraph.get_history(pairs, sysname, 'Close')
-threads = []
+#pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO'],
+#       ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO'],
+#       ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO'],
+#       ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO'],
+#       ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [100000,'JPY','IDEALPRO']]
+pairs=[['./data/btapi/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
+       ['./data/btapi/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
 
-pos=dict()
-totalpos=dict()
-asks=dict()
-bids=dict()
-
-def proc_pair(sym1, sym2, param1, param2):
+def prep_pair(sym1, sym2, param1, param2):
+        global pos
         symPair=sym1+sym2
         if not pos.has_key(symPair):
             pos[symPair]=dict()
+
         params=dict()
-       
+        
         params[sym1]=param1
         params[sym2]=param2
+        
         confidence=adf.getCoint(SST[sym1], sym1, SST[sym2], sym2)
         print "Coint Confidence: " + str(confidence) + "%"
         for i in SST.index:
             try:
                 priceHist=SST.ix[i]
                 
-                asks[sym1]=priceHist[sym1]
-                bids[sym1]=priceHist[sym1]
-                asks[sym2]=priceHist[sym2]
-                bids[sym2]=priceHist[sym2]
                 timestamp=time.mktime(priceHist['timestamp'].timetuple())
                 bar1=astrat.getBar(priceHist[sym1], sym1, int(timestamp))
                 bar2=astrat.getBar(priceHist[sym2], sym2, int(timestamp))
-                signals=astrat.procBar(bar1, bar2, pos[symPair], True)
-                if signals and len(signals) >= 1:
-                    for signal in signals:
-                        (barSym, barSig, barCmt)=signal
-                        
-                        if pos[symPair].has_key(barSym):
-                            pos[symPair][barSym]=pos[symPair][barSym] + barSig
-                        else:
-                            pos[symPair][barSym]=barSig
-                            
-                        if totalpos.has_key(barSym):
-                            totalpos[barSym]=totalpos[barSym] + barSig
-                        else:
-                            totalpos[barSym]=barSig
-                        
-                        model=generate_model_manual(barSym, totalpos[barSym], 1)
-                        
-                        if totalpos[barSym] == 0:
-                            totalpos.pop(barSym, None)
-                            
-                        if pos[symPair][barSym] == 0:
-                            pos[symPair].pop(barSym, None)
-                            
-                        (mult, currency, exchange)=params[barSym]
-                        commissionkey=barSym + currency + exchange
-                        commission_pct=0.00002
-                        commission_cash=2
-                        if commissionkey in commissiondata.index:
-                            commission=commissiondata.loc[commissionkey]
-                            commission_pct=float(commission['Pct'])
-                            commission_cash=float(commission['Cash'])
-                            
-                        ask=float(asks[barSym])
-                        bid=float(bids[barSym])
-                        secType='CASH'
-                        sym=barSym
-                        currency=barSym[3:6]
-                        pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
-                        if ask > 0 and bid > 0:
-                           
-                            date=datetime.datetime.fromtimestamp(
-                                int(timestamp)
-                            ).strftime("%Y%m%d %H:%M:%S EST")
-                            print 'Signal: ' + barSym + '[' + str(barSig) + ']@' + str(ask)
-                            adj_size(model, barSym, sysname, pricefeed,   \
-                                sysname,sysname,mult,barSym, secType, True, \
-                                    mult, sym,currency,exchange, secType, True, date)
+                signals=astrat.procBar(bar1, bar2, pos[symPair], False)
+                #proc_signals(signals, params, symPair, timestamp)
+                
+                
             except Exception as e:
-                print "proc_pair: error" + str(sys.exc_info()[0])
-seen=dict()
-def proc_backtest(sysname, SST):
-    for [file1,sym1, mult1] in pairs:
+                 logging.error('prep_pair', exc_info=True)
+                
+
+def proc_pair(sym1, sym2, param1, param2):
+
+        params=dict()
+       
+        symPair=sym1+sym2
+        
+        params[sym1]=param1
+        params[sym2]=param2
+        
+        while 1:
+            try:
+               
+                bars[sym1]=get_bar(sym1)
+                bars[sym2]=get_bar(sym2)
+                timestamp=int(time.time())
+                date=datetime.datetime.fromtimestamp(
+                    timestamp
+                ).strftime('%Y-%m-%d %H:%M:00') 
+                bardate=time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:00").timetuple())
+                if not lastDate.has_key(sym1):
+                    lastDate[sym1]=bardate
+                if not lastDate.has_key(sym2):
+                    lastDate[sym2]=bardate    
+                if lastDate[sym1] < timestamp and lastDate[sym2] < timestamp:
+                    lastDate[sym1]=bardate
+                    lastDate[sym2]=bardate
+                    timestamp=bardate
+                    
+                    bar1=astrat.getBar(bars[sym1], sym1, int(timestamp))
+                    bar2=astrat.getBar(bars[sym2], sym2, int(timestamp))
+                    signals=astrat.procBar(bar1, bar2, pos[symPair], True)
+                    proc_signals(signals, params, symPair, timestamp)
+                    
+                time.sleep(20)
+            except Exception as e:
+                logging.error("proc_pair", exc_info=True)
+
+def get_entryState():
+    global pairs
+    
+    for [file, sym, param] in pairs:
+        try:
+            (sysqty, syscur, sysexch, system)=param
+            
+            signal=get_model_sig(system).iloc[-1]
+            print signal['comment']
+            jsondata = json.loads(signal['comment'])
+            entryState=jsondata['Entry']
+            exitState=jsondata['Exit']
+            symPair=jsondata['symPair']
+            print  'SymPair: ' + symPair + ' System: ' + system + ' Entry: ' + str(entryState) + ' Exit: ' + str(exitState)
+            astrat.updateEntry(symPair, entryState, exitState)
+        except Exception as e:
+            logging.error("get_entryState", exc_info=True)
+
+def proc_signals(signals, params, symPair, timestamp):
+    global pos
+    global totalpos
+    
+    if not pos.has_key(symPair):
+            pos[symPair]=dict()
+            
+    if signals and len(signals) >= 1:
+        for signal in signals:
+            (barSym, barSig, barCmt)=signal
+            
+            if pos[symPair].has_key(barSym):
+                pos[symPair][barSym]=pos[symPair][barSym] + barSig
+            else:
+                pos[symPair][barSym]=barSig
+                
+            if totalpos.has_key(barSym):
+                totalpos[barSym]=totalpos[barSym] + barSig
+            else:
+                totalpos[barSym]=barSig
+            
+            (sysqty, syscur, sysexch, sysfile)=params[barSym]
+            generate_model_sig(sysfile, str(timestamp), totalpos[barSym], 1, barCmt)
+           
+            if totalpos[barSym] == 0:
+                totalpos.pop(barSym, None)
+                
+            if pos[symPair][barSym] == 0:
+                pos[symPair].pop(barSym, None)
+
+
+def proc_history():
+    
+    global SST
+    global pairs
+    while 1:
+        try:
+            SST=seigraph.get_history(pairs, 'Close')
+            time.sleep(20)
+        except Exception as e:
+            logging.error("proc_history", exc_info=True)
+            
+def get_bar(sym):
+    global SST
+    return SST.iloc[-1][sym]
+    
+def start_signal():
+    global pairs
+    global SST
+    seen=dict()
+    #Prep
+    threads = []
+    for [file1, sym1, mult1] in pairs:
         #print "sym: " + sym1
-        for [file2,sym2, mult2] in pairs:
+        for [file2, sym2, mult2] in pairs:
             if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
                 seen[sym1+sym2]=1
                 seen[sym2+sym1]=1
-                sig_thread = threading.Thread(target=proc_pair, args=[sym1, sym2, mult1, mult2])
+                sig_thread = threading.Thread(target=prep_pair, args=[sym1, sym2, mult1, mult2])
                 sig_thread.daemon=True
                 threads.append(sig_thread)
     [t.start() for t in threads]
     [t.join() for t in threads]
+    threads=[]
+    seen=dict()
+    #sig_thread = threading.Thread(target=proc_history)
+    #sig_thread.daemon=True
+    #threads.append(sig_thread)
+    #Proc
+    for [file1, sym1, param1] in pairs:
+        #print "sym: " + sym1
+        for [file2, sym2, param2] in pairs:
+            if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+                seen[sym1+sym2]=1
+                seen[sym2+sym1]=1
+                sig_thread = threading.Thread(target=proc_pair, args=[sym1, sym2, param1, param2])
+                sig_thread.daemon=True
+                threads.append(sig_thread)
+    [t.start() for t in threads]
+    
+    
 
-proc_backtest(sysname, SST)
+pos=dict()
+totalpos=dict()
+bars=dict()
+lastDate=dict()
+SST=seigraph.get_history(pairs, 'Close')
+get_entryState()
+start_signal()
+proc_history()
 
-#results
-sysname=sysname
-get_results(sysname, pairs)
 
 
 

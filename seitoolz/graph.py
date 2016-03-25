@@ -52,8 +52,6 @@ import subprocess
 from btapi.get_signal import get_v1signal
 import logging
 
-logging.basicConfig(filename='/logs/seitoolz_graph.log',level=logging.DEBUG)
-
 def get_data(systemname, api, broker, dataType, dateCol, initialData):
     filename='./data/' + api + '/' + broker + '_' + systemname + '_' + dataType + '.csv'
     if api == 'c2api' or api=='ibapi' or api=='btapi':
@@ -273,7 +271,7 @@ def save_plot(colnames, filename, title, ylabel, SST):
     plt.close(fig)
     plt.close()
 
-def get_history(datas, sysname, ylabel):
+def get_history(datas, ylabel):
     try:
         SST=pd.DataFrame()
         

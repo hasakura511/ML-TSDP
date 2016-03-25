@@ -143,8 +143,6 @@ def procBar(bar1, bar2, pos, trade):
         #updateCointData();
 
         if trade:
-                strOrderComment = "zScore: " + str(round(dblZscoreData, 2)) + " zSMA: " + str(round(signals.iloc[-1]['indSmaZscore'], 2));
-                strOrderComment2 = "zScore: " + str(round(dblZscoreData2, 2)) + " zSMA: " + str(round(signals.iloc[-1]['indSmaZscore2'], 2));
                 #print strOrderComment
                                 
                 if signals.iloc[-2]['tsZscore'] > signals.iloc[-2]['indSmaZscore']  \
@@ -189,6 +187,9 @@ def procBar(bar1, bar2, pos, trade):
                         #}
                         sentEntryOrder[sym1+sym2] = True
                         sentExitOrder[sym1+sym2] = False
+                        strOrderComment = '{"Entry": 1, "Exit": 0, "symPair": "' + sym1+sym2 + '", "zScore": ' + str(round(dblZscoreData, 2)) + ', "zSMA": ' + str(round(signals.iloc[-1]['indSmaZscore'], 2)) + '}';
+                        strOrderComment2 = '{"Entry": 1, "Exit": 0, "symPair": "' + sym1+sym2 + '", "zScore": '+ str(round(dblZscoreData2, 2)) + ', "zSMA": ' + str(round(signals.iloc[-1]['indSmaZscore2'], 2))+ '}';
+                
                         return ([bar1['Symbol'], -abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], abs(dblQty2), strOrderComment2])
                     elif dblZscoreData <= -1 * dblUpperThreshold and crossBelow==1:
@@ -201,6 +202,9 @@ def procBar(bar1, bar2, pos, trade):
                         #}
                         sentEntryOrder[sym1+sym2] = True
                         sentExitOrder[sym1+sym2] = False
+                        strOrderComment = '{"Entry": 1, "Exit": 0, "symPair": "' + sym1+sym2 + '", "zScore": ' + str(round(dblZscoreData, 2)) + ', "zSMA": ' + str(round(signals.iloc[-1]['indSmaZscore'], 2)) + '}';
+                        strOrderComment2 = '{"Entry": 1, "Exit": 0, "symPair": "' + sym1+sym2 + '", "zScore": '+ str(round(dblZscoreData2, 2)) + ', "zSMA": ' + str(round(signals.iloc[-1]['indSmaZscore2'], 2))+ '}';
+                
                         return ([bar1['Symbol'], abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], -abs(dblQty2), strOrderComment2])
     
@@ -218,6 +222,9 @@ def procBar(bar1, bar2, pos, trade):
                         #}
                         sentEntryOrder[sym1+sym2] = False;
                         sentExitOrder[sym1+sym2] = True;
+                        strOrderComment = '{"Entry": 0, "Exit": 1, "symPair": "' + sym1+sym2 + '", "zScore": ' + str(round(dblZscoreData, 2)) + ', "zSMA": ' + str(round(signals.iloc[-1]['indSmaZscore'], 2)) + '}';
+                        strOrderComment2 = '{"Entry": 0, "Exit": 1, "symPair": "' + sym1+sym2 + '", "zScore": '+ str(round(dblZscoreData2, 2)) + ', "zSMA": ' + str(round(signals.iloc[-1]['indSmaZscore2'], 2))+ '}';
+                
                         return ([bar1['Symbol'], abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], -abs(dblQty2), strOrderComment2])
     
@@ -233,6 +240,9 @@ def procBar(bar1, bar2, pos, trade):
                         #}
                         sentEntryOrder[sym1+sym2] = False;
                         sentExitOrder[sym1+sym2] = True;
+                        strOrderComment = '{"Entry": 0, "Exit": 1, "symPair": "' + sym1+sym2 + '", "zScore": ' + str(round(dblZscoreData, 2)) + ', "zSMA": ' + str(round(signals.iloc[-1]['indSmaZscore'], 2)) + '}';
+                        strOrderComment2 = '{"Entry": 0, "Exit": 1, "symPair": "' + sym1+sym2 + '", "zScore": '+ str(round(dblZscoreData2, 2)) + ', "zSMA": ' + str(round(signals.iloc[-1]['indSmaZscore2'], 2))+ '}';
+                
                         return ([bar1['Symbol'], -abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], abs(dblQty2), strOrderComment2])
                
@@ -243,6 +253,9 @@ def getBar(price, symbol, date):
     bar['Date']=date
     return bar
 
+def updateEntry(symPair, entryOrder, exitOrder):
+    sentEntryOrder[symPair] = entryOrder
+    sentExitOrder[symPair] = exitOrder
 #def updateEntry(systemname, broker, sym1, sym2, currency, date, isLive):
 #    data=portfolio.get_portfolio(systemname, broker, date, isLive)
 #    qty1=portfolio.get_pos(data, broker, sym1, currency, date)

@@ -187,7 +187,7 @@ for ticker in livePairs:
     #signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
     signal_types = ['gainAhead']
-    ga_steps = [30]
+    ga_steps = [10]
     zz_steps = [0.003]
     perturbDataPct = 0.0002
     longMemory =  False
@@ -195,7 +195,7 @@ for ticker in livePairs:
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     #feature_selection = 'Univariate' #RFECV OR Univariate
-    wfSteps=[1]
+    wfSteps=[10]
     wf_is_periods = [250,500,1000]
     #wf_is_periods = [100]
     tox_adj_proportion = 0

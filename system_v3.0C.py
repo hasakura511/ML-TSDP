@@ -196,7 +196,7 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    #'GBPJPY',\
+                    'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
                     #'AUDUSD',\
@@ -205,7 +205,7 @@ if len(sys.argv)==1:
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
-                    'EURCHF',\
+                    #'EURCHF',\
                     #'EURGBP'\
                     ]
                     
@@ -214,7 +214,7 @@ if len(sys.argv)==1:
     showPDFCDF = False
     showAllCharts = True
     perturbData = True
-    runDPS = False
+    runDPS = True
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -262,19 +262,20 @@ for ticker in livePairs:
     validationSetLength = 1000
     #validationSetLength = 500
     #validationPeriods = [50,250]
-    validationPeriods = [50,250] # min is 2
+    validationPeriods = [100,250] # min is 2
     #validationStartPoint = None
     #signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
     signal_types = ['gainAhead']
-    #zz_steps = [0.001,0.002,0.003]
+    ga_steps = [30]
+    zz_steps = [0.001,0.002,0.003]
     #zz_steps = [0.009]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
-    wfSteps=[5,10]
+    wfSteps=[1]
     wf_is_periods = [500,1000]
     #wf_is_periods = [10]
     tox_adj_proportion = 0
@@ -483,16 +484,23 @@ for ticker in livePairs:
     dataSet['gainAhead'] = gainAhead(dataSet.Close)
     dataSet['signal'] =  np.where(dataSet.gainAhead>0,1,-1)
     
+    print 'Creating Signal labels..'
     if 'ZZ' in signal_types:
         signal_types.remove('ZZ')
-        print 'Creating Signal labels..',
         for i in zz_steps:
             #for j in zz_steps:
             label = 'ZZ '+str(i) + ',-' + str(i)
-            print label,
+            print label+',',
             signal_types.append(label)
             #zz_signals[label] = zg(dataSet.Close, i, -j).pivots_to_modes()
-
+            
+    if 'gainAhead' in signal_types:
+        signal_types.remove('gainAhead')
+        for i in ga_steps:
+            label = 'GA'+str(i)
+            print label+',',
+            signal_types.append(label)
+            
     #find max lookback
     maxlb = max(RSILookback,
                         zScoreLookback,
@@ -522,7 +530,7 @@ for ticker in livePairs:
     dataSet.index = dataSet.index.values.astype(str)
     dataSet.index = dataSet.index.to_datetime()
     dataSet.index.name ='dates'
-    unFilteredData = dataSet.copy(deep=True)
+    unfilteredData = dataSet.copy(deep=True)
     
     if dataSet.shape[0] <validationSetLength+max(wf_is_periods):
         message = 'Add more data: dataSet rows '+str(dataSet.shape[0])+\
@@ -609,7 +617,7 @@ for ticker in livePairs:
                                     'ROCLookback': ROCLookback,
                                      }
                             runName = ticker+'_'+data_type+'_'+filterName+'_' + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
-                            model_metrics, sstDictDF1_[runName] = wf_classify_validate(unFilteredData, dataSet, [m], model_metrics,\
+                            model_metrics, sstDictDF1_[runName] = wf_classify_validate(unfilteredData, dataSet, [m], model_metrics,\
                                                                 wf_is_period, metaData, PRT, showPDFCDF=showPDFCDF)
 
             #score models
@@ -738,7 +746,7 @@ for ticker in livePairs:
                 metaData['v_start']=validationFirstYear
                 metaData['v_end']=validationFinalYear
                 nextRunName = 'Next'+str(validationPeriod)+'_'+DF1_BMrunName
-                model_metrics, sstDictDF1_[nextRunName] = wf_classify_validate(unFilteredData, dataSet, [m], model_metrics,\
+                model_metrics, sstDictDF1_[nextRunName] = wf_classify_validate(unfilteredData, dataSet, [m], model_metrics,\
                                                     wf_is_period, metaData, PRT, showPDFCDF=showPDFCDF)
                 if showAllCharts:
                     compareEquity(sstDictDF1_[nextRunName],nextRunName)
@@ -875,7 +883,7 @@ for ticker in livePairs:
                                                                 str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
             CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
                                                 validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
-                                                unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
+                                                unfilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
             model = [validationDict[validationPeriod].iloc[-1].system.split('_')[4],\
                             [m[1] for m in models if m[0] ==validationDict[validationPeriod].iloc[-1].system.split('_')[4]][0]]
             metaData['validationPeriod'] = validationPeriod
@@ -883,7 +891,7 @@ for ticker in livePairs:
             vCurve_metrics = update_report(vCurve_metrics, filterName,\
                                                 validationDict[validationPeriod].ix[vStartDate:].signals.values.astype(int), \
                                                 dataSet.ix[validationDict[validationPeriod].ix[vStartDate:].index].signal.values.astype(int),\
-                                                unFilteredData.gainAhead,\
+                                                unfilteredData.gainAhead,\
                                                 validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int), model,\
                                                 metaData,CAR25_oos)
     else:
@@ -898,7 +906,7 @@ for ticker in livePairs:
                                                                 str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
             CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
                                                 validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
-                                                unFilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
+                                                unfilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
             model = [validationDict[validationPeriod].iloc[-1].system.split('_')[4],\
                             [m[1] for m in models if m[0] ==validationDict[validationPeriod].iloc[-1].system.split('_')[4]][0]]
             #metaData['model'] = model[0]
@@ -907,7 +915,7 @@ for ticker in livePairs:
             vCurve_metrics = update_report(vCurve_metrics, filterName,\
                                                 validationDict[validationPeriod].ix[vStartDate:].signals.values.astype(int), \
                                                 dataSet.ix[validationDict[validationPeriod].ix[vStartDate:].index].signal.values.astype(int),\
-                                                unFilteredData.gainAhead,\
+                                                unfilteredData.gainAhead,\
                                                 validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int), model,\
                                                 metaData,CAR25_oos)
             

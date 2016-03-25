@@ -514,7 +514,9 @@ def numberZeros(p):
             lt = lt+1
     return(st,lt)
     
-def gainAhead(p):
+def gainAhead(p,lookforward=1):
+    if type(p) is pd.core.series.Series:
+        p = p.values
     # Computes change in the next 1 bar.
     # p, the base series.
     # Return is a numpy array of changes.
@@ -522,8 +524,8 @@ def gainAhead(p):
     # The final value is unknown.  Its value is 0.0.
     nrows = p.shape[0]
     g = np.zeros(nrows)
-    for i in range(0,nrows-1):
-        g[i] = (p[i+1]-p[i])/p[i]
+    for i in range(0,nrows-lookforward):
+        g[i] = (p[i+lookforward]-p[i])/p[i]
     return(g)
     
 def ATR(ph,pl,pc,lb):

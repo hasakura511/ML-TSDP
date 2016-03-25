@@ -21,7 +21,7 @@ from IPython.core.display import display_png
 from display import sss_display_cmatrix, is_display_cmatrix, oos_display_cmatrix,\
                 plot_learning_curve, is_display_cmatrix2, oos_display_cmatrix2,\
                 update_report, displayRankedCharts
-from transform import ratio, numberZeros
+from transform import ratio, numberZeros, gainAhead
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as tick
@@ -48,15 +48,32 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
     validationFirstYear=metaData['v_start']
     validationFinalYear=metaData['v_end']
     wfStep=metaData['wf_step']
+    #wfStep=1
     signal =  metaData['signal']
     nfeatures = metaData['n_features']
     tox_adj_proportion = metaData['tox_adj']
     feature_selection = metaData['FS']
-    longMemory = metaData['longMemory']
-    
+
     #CAR25 for zigzag
     if signal[:2]=='ZZ':
         zz_step = [float(x) for x in signal.split()[1].split(',')]
+
+    #create signals
+    lookforward=1
+    if signal[:3] != 'GA1' or signal[:3] != 'gainAhead':
+        if signal[:2] == 'GA':
+            lookforward = int(signal[2:])
+            #ga_start = mmData_v.iloc[train_index].prior_index.iloc[0]
+            ga_start = dataSet.iloc[0].prior_index
+            ga = gainAhead(close.ix[ga_start:],lookforward)
+            dataSet.signal = np.array([-1 if x<0 else 1 for x in ga])
+            
+        if signal[:2] == 'ZZ':
+            zz_end = dataSet.iloc[-1].prior_index
+            dataSet.signal = pd.Series(zg(close.ix[:zz_end].values, zz_step[0], \
+                            zz_step[1]).pivots_to_modes()[-dataSet.shape[0]:]).shift(-1).fillna(0).values
+                            
+
     ddTolerance = PRT['DD95_limit']
     forecastHorizon = PRT['horizon']
 
@@ -164,11 +181,19 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
             #create zigzag signals
             
             #ending at test_index so dont need to shift labels
+            #if signal[:3] != 'GA1':
+            #    if signal[:2] == 'GA':
+            #        lookforward = int(signal_types[2][2:])
+            #        ga_start = mmData_v.iloc[train_index].prior_index.iloc[0]
+            #        #ga_start = dataSet.iloc[0].prior_index
+            #        ga = gainAhead(close.ix[ga_start:],lookforward)
+            #        y_train = np.array([-1 if x<0 else 1 for x in ga])[:len(train_index)]
+                    
             if signal[:2] == 'ZZ':
-                zz_end = mmData_v.iloc[test_index].prior_index.iloc[-1]
+                zz_end = mmData_v.iloc[test_index].prior_index.iloc[0]
                 y_train = zg(close.ix[:zz_end].values, zz_step[0], \
                                 zz_step[1]).pivots_to_modes()[-len(train_index):]
-            
+                
             #zz_signals = pd.DataFrame()
             #print 'Creating Signal labels..',
             #for i in zz_steps:
@@ -197,59 +222,72 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
                         datay_signal.reset_index().iloc[train_index]['index'].values)
             if intersect.size != 0:
                 print "\nDuplicate indexes found in test/training set: Possible Future Leak!"
-            if feature_selection == 'RFECV':
-                #Recursive feature elimination with cross-validation: 
-                #A recursive feature elimination example with automatic tuning of the
-                #number of features selected with cross-validation.
-                rfe = RFECV(estimator=RFE_estimator, step=1)
-                rfe.fit(X_train, y_train)
-                #featureRank = [ feature_names[i] for i in rfe.ranking_-1]
-                featureRank = [ feature_names[i] for i,b in enumerate(rfe.support_) if b==True]
-                print 'Top %i RFECV features' % len(featureRank)
-                print featureRank    
-                metaData['featureRank'] = str(featureRank)
-                X_train = rfe.transform(X_train)
-                X_test = rfe.transform(X_test)
-            else:
-                #Univariate feature selection
-                skb = SelectKBest(f_regression, k=nfeatures)
-                skb.fit(X_train, y_train)
-                #dX_all = np.vstack((X_train.values, X_test.values))
-                #dX_t_rfe = X_new[range(0,dX_t.shape[0])]
-                #dX_v_rfe = X_new[dX_t.shape[0]:]
-                X_train = skb.transform(X_train)
-                X_test = skb.transform(X_test)
-                featureRank = [ feature_names[i] for i in skb.get_support(feature_names)]
-                metaData['featureRank'] = str(featureRank)
-                #print 'Top %i univariate features' % len(featureRank)
-                #print featureRank
+            if len(mmData_v.index[-lookforward:].intersection(train_index)) == 0:
+                #print 'training', X_train.shape
+                if feature_selection == 'RFECV':
+                    #Recursive feature elimination with cross-validation: 
+                    #A recursive feature elimination example with automatic tuning of the
+                    #number of features selected with cross-validation.
+                    rfe = RFECV(estimator=RFE_estimator, step=1)
+                    rfe.fit(X_train, y_train)
+                    #featureRank = [ feature_names[i] for i in rfe.ranking_-1]
+                    featureRank = [ feature_names[i] for i,b in enumerate(rfe.support_) if b==True]
+                    print 'Top %i RFECV features' % len(featureRank)
+                    print featureRank    
+                    metaData['featureRank'] = str(featureRank)
+                    X_train = rfe.transform(X_train)
+                    X_test = rfe.transform(X_test)
+                else:
+                    #Univariate feature selection
+                    skb = SelectKBest(f_regression, k=nfeatures)
+                    skb.fit(X_train, y_train)
+                    #dX_all = np.vstack((X_train.values, X_test.values))
+                    #dX_t_rfe = X_new[range(0,dX_t.shape[0])]
+                    #dX_v_rfe = X_new[dX_t.shape[0]:]
+                    X_train = skb.transform(X_train)
+                    X_test = skb.transform(X_test)
+                    featureRank = [ feature_names[i] for i in skb.get_support(feature_names)]
+                    metaData['featureRank'] = str(featureRank)
+                    #print 'Top %i univariate features' % len(featureRank)
+                    #print featureRank
 
-            #  fit the model to the in-sample data
-            m[1].fit(X_train, y_train)
-            #trained_models[m[0]] = pickle.dumps(m[1])
-                        
-            #y_pred_is = np.array(([-1 if x<0 else 1 for x in m[1].predict(X_train)]))              
-            y_pred_oos = m[1].predict(X_test)
+                #  fit the model to the in-sample data
+                m[1].fit(X_train, y_train)
 
-            if m[0][:2] == 'GA':
-                print featureRank
-                print '\nProgram:', m[1]._program
-                #print 'R^2:    ', m[1].score(X_test_all,y_test_all) 
-            
-            #cm_y_train = np.concatenate([cm_y_train,y_train])
-            cm_y_test = np.concatenate([cm_y_test,y_test])
-            #cm_y_pred_is = np.concatenate([cm_y_pred_is,y_pred_is])
-            cm_y_pred_oos = np.concatenate([cm_y_pred_oos,y_pred_oos])
-            #cm_train_index = np.concatenate([cm_train_index,train_index])
-            cm_test_index = np.concatenate([cm_test_index,test_index])
+
+                #trained_models[m[0]] = pickle.dumps(m[1])
+                            
+                #y_pred_is = np.array(([-1 if x<0 else 1 for x in m[1].predict(X_train)]))              
+                y_pred_oos = m[1].predict(X_test)
+
+                if m[0][:2] == 'GA':
+                    print featureRank
+                    print '\nProgram:', m[1]._program
+                    #print 'R^2:    ', m[1].score(X_test_all,y_test_all) 
+                
+                #cm_y_train = np.concatenate([cm_y_train,y_train])
+                cm_y_test = np.concatenate([cm_y_test,y_test])
+                #cm_y_pred_is = np.concatenate([cm_y_pred_is,y_pred_is])
+                cm_y_pred_oos = np.concatenate([cm_y_pred_oos,y_pred_oos])
+                #cm_train_index = np.concatenate([cm_train_index,train_index])
+                cm_test_index = np.concatenate([cm_test_index,test_index])
             
 
         #create signals 1 and -1
         #cm_y_pred_oos = np.array([-1 if x<0 else 1 for x in cm_y_pred_oos_ga])
         #cm_y_test = np.array([-1 if x<0 else 1 for x in cm_y_test_ga])
+        
         #gives errors when 100% accuracy for binary classification
-        oos_display_cmatrix(cm_y_test[:-1], cm_y_pred_oos[:-1], m[0],\
-            ticker,validationFirstYear, validationFinalYear, iterations, signal)
+        #if confusion_matrix(cm_y_test[:-1], cm_y_pred_oos[:-1]).shape == (1,1):
+        #    print  m[0], ticker,validationFirstYear, validationFinalYear, iterations, signal
+        #    print 'Accuracy 100% for', cm_y_test[:-1].shape[0], 'rows'
+        #else:
+        if lookforward>1:
+            oos_display_cmatrix(cm_y_test[:-lookforward], cm_y_pred_oos[:-lookforward], m[0],\
+                ticker,validationFirstYear, dataSet.index[-lookforward], iterations, signal)
+        else:
+            oos_display_cmatrix(cm_y_test[:-1], cm_y_pred_oos[:-1], m[0],\
+                    ticker,validationFirstYear, validationFinalYear, iterations, signal)
         #if data is filtered so need to fill in the holes. signal = 0 for days that filtered
         st_oos_filt= pd.DataFrame()
         st_oos_filt['signals'] =  pd.Series(cm_y_pred_oos)

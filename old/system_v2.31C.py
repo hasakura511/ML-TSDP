@@ -87,8 +87,7 @@ import arch
 from suztoolz.display import sss_display_cmatrix, is_display_cmatrix2,\
                          oos_display_cmatrix2, init_report, update_report,\
                          showPDF, showCDF, getToxCDF, plot_learning_curve,\
-                         directional_scoring, compareEquity, describeDistribution,\
-                         offlineMode
+                         directional_scoring, compareEquity, describeDistribution
 from suztoolz.loops import sss_iterate_train, adjustDataProportion, CAR25_df,\
                             maxCAR25, wf_classify_validate, sss_regress_train, calcDPS2,\
                             calcEquity2, createBenchmark, createYearlyStats, findBestDPS
@@ -103,7 +102,6 @@ start_time = time.time()
 #system parameters
 version = 'v2'
 version_ = 'v2.32'
-
 filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='1 min'
@@ -112,7 +110,9 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'GBPJPY','EURCHF','AUDJPY',\
                  'AUDUSD','EURUSD','GBPUSD','USDCAD',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
-                
+                 
+
+        
 if len(sys.argv)==1:
     debug=True
     
@@ -137,8 +137,8 @@ if len(sys.argv)==1:
     showDist =  True
     showPDFCDF = True
     showAllCharts = True
-    perturbData = False
-    runDPS = False
+    perturbData = True
+    runDPS = True
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -167,8 +167,24 @@ else:
     
     if sys.argv[2] == "0":
         livePairs=[]
-        ticker = sys.argv[1]
-        offlineMode(ticker, "Offline Mode: "+sys.argv[0]+' '+sys.argv[1], signalPath, version, version_)
+        pair = sys.argv[1]
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if version+'_'+ pair + '.csv' in files:
+            signalFile=pd.read_csv(signalPath+ version+'_'+ pair + '.csv', parse_dates=['dates'])
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = 'Offline'
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + version+'_'+ pair + '.csv', index=False)
+            
+        sys.exit("Offline Mode: "+sys.argv[0]+' '+sys.argv[1])
     else:
         livePairs=[sys.argv[1]]
 
@@ -180,22 +196,22 @@ for ticker in livePairs:
     currency=ticker[3:6]
     
     #load best params
-    #bestParams = pd.read_csv(bestParamsPath+'v3_'+ticker+'.csv')
-    validationStartPoint = 1000
-
+    bestParams = pd.read_csv(bestParamsPath+'v3_'+ticker+'.csv')
+    validationStartPoint = bestParams.iloc[-1].validationPeriod
+    #validationStartPoint = 250
+    
     #Model Parameters
-    #signal_types = ['gainAhead','ZZ']
+    signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
-    signal_types = ['gainAhead']
-    ga_steps = [30]
-    zz_steps = [0.003]
+    #signal_types = ['gainAhead']    
+    zz_steps = [0.001,0.002,0.003]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     #feature_selection = 'Univariate' #RFECV OR Univariate
-    wfSteps=[1]
+    wfSteps=[20]
     wf_is_periods = [250,500,1000]
     #wf_is_periods = [100]
     tox_adj_proportion = 0
@@ -215,7 +231,7 @@ for ticker in livePairs:
 
     #DPS parameters
     windowLengths = [30]
-    maxLeverage = [5]
+    maxLeverage = [2]
     PRT={}
     PRT['DD95_limit'] = 0.05
     PRT['tailRiskPct'] = 95
@@ -246,8 +262,8 @@ for ticker in livePairs:
               #                             p_point_replace=0.05, max_samples=1.0, 
               #                             n_jobs=1, verbose=0, random_state=None)),
              #("GA_Reg2", SymbolicRegressor(population_size=5000, generations=20, stopping_criteria=0.01, comparison=True, transformer=False, p_crossover=0.7, p_subtree_mutation=0.1, p_hoist_mutation=0.05, p_point_mutation=0.1, max_samples=1, verbose=0, parsimony_coefficient=0.01, random_state=0)),
-             #("LR", LogisticRegression()), \
-             #("PRCEPT", Perceptron(class_weight={1:1})), \
+             #("LR", LogisticRegression(class_weight={1:500})), \
+             #("PRCEPT", Perceptron(class_weight={1:500})), \
              #("PAC", PassiveAggressiveClassifier(class_weight={1:500})), \
              #("LSVC", LinearSVC()), \
              #("GNBayes",GaussianNB()),\
@@ -403,23 +419,15 @@ for ticker in livePairs:
     dataSet['gainAhead'] = gainAhead(dataSet.Close)
     dataSet['signal'] =  np.where(dataSet.gainAhead>0,1,-1)
     
-    print 'Creating Signal labels..'
     if 'ZZ' in signal_types:
         signal_types.remove('ZZ')
+        print 'Creating Signal labels..',
         for i in zz_steps:
             #for j in zz_steps:
             label = 'ZZ '+str(i) + ',-' + str(i)
-            print label+',',
+            print label,
             signal_types.append(label)
             #zz_signals[label] = zg(dataSet.Close, i, -j).pivots_to_modes()
-            
-    if 'gainAhead' in signal_types:
-        signal_types.remove('gainAhead')
-        for i in ga_steps:
-            label = 'GA'+str(i)
-            print label+',',
-            signal_types.append(label)
-
 
     #find max lookback
     maxlb = max(RSILookback,
@@ -539,17 +547,17 @@ for ticker in livePairs:
     print 'Long Memory: ', longMemory
     DF1_BMrunName = ticker+'_'+bestModel.data_type+'_'+filterName+'_'  +\
                         bestModel.model + '_i'+str(bestModel.rows)\
-                        +'_fcst'+str(bestModel.wf_step)+'_'+bestModel.signal  
+                        +'_fcst'+str(bestModel.wf_step)+'_'+bestModel.signal    
     if showAllCharts:
         compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName)
         
     bestSSTnoDPS = pd.concat([sstDictDF1_[DF1_BMrunName],\
-                pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[DF1_BMrunName].index),
-                pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[DF1_BMrunName].index),
-                pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[DF1_BMrunName].index),
-                pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[DF1_BMrunName].index),
-                pd.Series(data=DF1_BMrunName, name = 'system', index = sstDictDF1_[DF1_BMrunName].index)
-                ],axis=1)      
+                    pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[DF1_BMrunName].index),
+                    pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[DF1_BMrunName].index),
+                    pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[DF1_BMrunName].index),
+                    pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[DF1_BMrunName].index),
+                    pd.Series(data=DF1_BMrunName, name = 'system', index = sstDictDF1_[DF1_BMrunName].index)
+                    ],axis=1)    
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
     print 'Finished Model Training... Beginning Dynamic Position Sizing..'
     ##############################################################

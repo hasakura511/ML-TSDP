@@ -8,7 +8,7 @@ from os.path import isfile, join
 import re
 from os import listdir
 from os.path import isfile, join
-from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, get_ask as get_ib_ask, get_bid as get_ib_bid
+from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_ask as get_ib_ask, get_bid as get_ib_bid
 from c2api.place_order import place_order as place_c2order
 # -*- coding: utf-8 -*-
 """
@@ -87,6 +87,20 @@ def get_datas(systems, api, dataType, initialData):
                 if os.path.isfile(filename):
                     print filename + ' data '+ dataType
     
+                    newfiles.append([filename,symbol])      
+    return newfiles
+
+def get_data_files(files, systems, dataType, initialData):
+    dataSet=pd.DataFrame({}, columns=['Date'])
+    dataSet=dataSet.set_index('Date')
+    newfiles=list()
+    for symbol in systems:   
+        search=re.compile(symbol)      
+        for file in files:
+            if re.search(search, file):        
+                filename=file
+                if os.path.isfile(filename):
+                    print filename + ' data '+ dataType
                     newfiles.append([filename,symbol])      
     return newfiles
     
@@ -258,4 +272,42 @@ def save_plot(colnames, filename, title, ylabel, SST):
     plt.savefig(filename)
     plt.close(fig)
     plt.close()
-    
+
+def get_history(datas, sysname, ylabel):
+    try:
+        SST=pd.DataFrame()
+        
+        for (filename, ticker, qty) in datas:
+            dta=pd.read_csv(filename)
+            #symbol=ticker[0:3]
+            #currency=ticker[3:6]
+            #print 'plot for ticker: ' + currency
+            #if ylabel == 'Close':
+            #    diviser=dta.iloc[0][ylabel]
+            #    dta[ylabel]=dta[ylabel] /diviser
+                
+            #dta[ylabel].plot(label=ticker)   
+            data=pd.DataFrame()
+            
+            data['Date']=pd.to_datetime(dta[dta.columns[0]])
+            
+            data[ticker]=dta[ylabel]
+            data=data.set_index('Date') 
+            if len(SST.index.values) < 2:
+                SST=data
+            else:
+                SST=SST.join(data)
+        colnames=list()
+        for col in SST.columns:
+            if col != 'Date' and col != 0:
+                colnames.append(col)
+        data=SST
+        data=data.reset_index()        
+        data['timestamp']= data['Date']
+        
+        data=data.set_index('Date')
+        data=data.fillna(method='pad')
+        return data
+    except Exception as e:
+        logging.error("something bad happened", exc_info=True)
+    return SST

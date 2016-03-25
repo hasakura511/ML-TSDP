@@ -46,44 +46,8 @@ import adfapi.s103 as s103
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
 import re
+import csv
 
-def get_history(datas, ylabel):
-    try:
-        SST=pd.DataFrame()
-        
-        for (filename, ticker) in datas:
-            dta=pd.read_csv(filename)
-            symbol=ticker[0:3]
-            currency=ticker[3:6]
-            #print 'plot for ticker: ' + currency
-            if ylabel == 'Close':
-                diviser=dta.iloc[0][ylabel]
-                dta[ylabel]=dta[ylabel] /diviser
-                
-            #dta[ylabel].plot(label=ticker)   
-            data=pd.DataFrame()
-            
-            data['Date']=pd.to_datetime(dta[dta.columns[0]])
-            
-            data[ticker]=dta[ylabel]
-            data=data.set_index('Date') 
-            if len(SST.index.values) < 2:
-                SST=data
-            else:
-                SST=SST.join(data)
-        colnames=list()
-        for col in SST.columns:
-            if col != 'Date' and col != 0:
-                colnames.append(col)
-        data=SST
-        data=data.reset_index()        
-        data['timestamp']= data['Date']
-        
-        data=data.set_index('Date')
-        return data
-    except Exception as e:
-        logging.error("something bad happened", exc_info=True)
-    return SST
 #pairs=[['./data/from_IB/1 min_NZDJPY.csv', 'NZDJPY'],['./data/from_IB/1 min_CADJPY.csv', 'CADJPY']]
 pairs=list()
 
@@ -95,9 +59,14 @@ btcsearch=re.compile('BTCUSD')
 for file in files:
         if re.search(btcsearch, file):
                 systemname=file
-                systemname = re.sub('BTCUSD_','', systemname.rstrip())
+                #systemname = re.sub('BTCUSD_','', systemname.rstrip())
                 systemname = re.sub('.csv','', systemname.rstrip())
-                pairs.append([dataPath+file, systemname])
+                reader = pd.read_csv(dataPath+file)
+                row_count = reader.shape[0]
+                if row_count > 3000:
+                    pairs.append([dataPath+file, systemname, 1])
+                else:
+                    print "Skipping " + dataPath+file + " with " + str(row_count)
 dataPath='./data/from_IB/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 btcsearch=re.compile('1 min')
@@ -107,25 +76,53 @@ for file in files:
                 systemname=file
                 systemname = re.sub('1 min_','', systemname.rstrip())
                 systemname = re.sub('.csv','', systemname.rstrip())
-                pairs.append([dataPath+file, systemname])
+                reader = pd.read_csv(dataPath+file)
+                row_count = reader.shape[0]
+                if row_count > 3000:
+                    pairs.append([dataPath+file, systemname, 1])
+                else:
+                    print "Skipping " + dataPath+file + " with " + str(row_count)
+                    
 
-def scan_coint():
+def scan_coint(sysname, SST):
+    global result
+    global seen
     global pairs
-    result=pd.DataFrame({}, columns=['Date','Symbol1','Symbol2','Confidence','Pv','Hurst'])
     for [file1,sym1] in pairs:
         #print "sym: " + sym1
+        #if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+        #    seen[sym1+sym2]=1
+        #    seen[sym2+sym1]=1
+        sig_thread = threading.Thread(target=proc_pair, args=[sym1])
+        sig_thread.daemon=True
+        threads.append(sig_thread)
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+    
+    result.to_csv('./data/adf/coint.csv',index=False)
+    
+def proc_pair(sym1):
+    try:
+        global result
+        global SST
+        global seen
         for [file2,sym2] in pairs:
-            if sym1 != sym2:
-                try:
-                    print "Sym1: " + sym1 + " Sym2: " + sym2
-                    SST=get_history([[file1, sym1],[file2,sym2]], 'Close')
-                    (confidence,pv, hurst)=adf.getCoint(SST[sym1], sym1, SST[sym2], sym2)
-                    print "Coint Confidence: " + str(confidence) + "%"
+            if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+                seen[sym1+sym2]=1
+                seen[sym2+sym1]=1
+                print "Sym1: " + sym1 + '(' + str(len(SST[sym1])) + ") Sym2: " + sym2 + '(' + str(len(SST[sym2])) + ')'
+                (confidence,pv, hurst)=adf.getCoint(SST[sym1], sym1, SST[sym2], sym2)
+                print "Coint Confidence: " + str(confidence) + "%"
+                if confidence >= 95:
                     rec=pd.DataFrame([[int(time.time()), sym1, sym2, confidence, pv, hurst]], columns=['Date','Symbol1','Symbol2','Confidence','Pv','Hurst']).iloc[-1]
                     result=result.append(rec)
-                        
-                    result.to_csv('./data/adf/coint.csv',index=False)
-                except Exception as e:
-                    print "Error getting coint"
-    
-scan_coint()
+    except Exception as e:
+        print "Error getting coint" + str(e) + ' , ' +  str(sys.exc_info()[0])
+        
+sysname='ADFScan'
+SST=seigraph.get_history(pairs, sysname, 'Close')
+
+threads=[]
+result=pd.DataFrame({}, columns=['Date','Symbol1','Symbol2','Confidence','Pv','Hurst'])
+seen=dict()   
+scan_coint(sysname, SST)

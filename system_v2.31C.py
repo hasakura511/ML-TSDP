@@ -138,7 +138,7 @@ if len(sys.argv)==1:
     showPDFCDF = True
     showAllCharts = True
     perturbData = True
-    runDPS = False
+    runDPS = True
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -201,9 +201,9 @@ for ticker in livePairs:
     #validationStartPoint = 250
     
     #Model Parameters
-    #signal_types = ['gainAhead','ZZ']
+    signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
-    signal_types = ['gainAhead']    
+    #signal_types = ['gainAhead']    
     zz_steps = [0.001,0.002,0.003]
     perturbDataPct = 0.0002
     longMemory =  False
@@ -211,7 +211,7 @@ for ticker in livePairs:
     input_signal = 1
     feature_selection = 'None' #RFECV OR Univariate
     #feature_selection = 'Univariate' #RFECV OR Univariate
-    wfSteps=[5,10]
+    wfSteps=[20]
     wf_is_periods = [250,500,1000]
     #wf_is_periods = [100]
     tox_adj_proportion = 0
@@ -231,7 +231,7 @@ for ticker in livePairs:
 
     #DPS parameters
     windowLengths = [30]
-    maxLeverage = [5]
+    maxLeverage = [2]
     PRT={}
     PRT['DD95_limit'] = 0.05
     PRT['tailRiskPct'] = 95

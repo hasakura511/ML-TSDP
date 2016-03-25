@@ -48,10 +48,10 @@ def get_dps_model_pos(systems):
     return pos;
 
 def generate_model_pos(system):
-    data = pd.read_csv('./data/signals/' + system + '.csv', index_col='dates')
+    data = pd.read_csv('./data/signals/' + system + '.csv', index_col='dates').iloc[-1]
     signals=data['signals'];
     safef=data['safef'];
-    qty=safef[-1]*signals[-1]
+    qty=safef*signals
     #signal=signals[-1];
     qty=round(qty)
     signal=qty

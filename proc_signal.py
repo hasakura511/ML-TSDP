@@ -41,7 +41,7 @@ ib_pos=get_ibpos_from_csv()
 for i in systemdata.index:
    system=systemdata.ix[i]
    model=model_pos
-   if system['c2sym'] != 'BTCUSD':
+   if system['ibsym'] != 'BTC':
         if system['Version'] == 'v1':
                 model=model_pos
         else:

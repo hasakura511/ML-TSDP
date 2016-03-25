@@ -145,10 +145,8 @@ def bitstamp_trade_callback(data):
         #trade {"price": 408.80000000000001, "amount": 0.076399999999999996, "id": 10832011}
         jsondata = json.loads(data)
         dataSet=json_normalize(jsondata).iloc[-1]
-        eastern=timezone('US/Eastern')
-        localendDateTime=dt.now(get_localzone())
-        localdate=localendDateTime.astimezone(eastern)
-        timestamp=int(localdate.strftime("%s"))
+        
+        timestamp=int(time.time())
         vol=float(dataSet['amount'])
         price=float(dataSet['price'])
         exchange='bitstampUSD'

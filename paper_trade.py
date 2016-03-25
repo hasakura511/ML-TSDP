@@ -56,7 +56,7 @@ for i in systemdata.index:
     system=systemdata.ix[i]
     if system['ibsym'] != 'BTC':
      
-      currencyList[system['ibsym']+system['ibcur']]=1
+      currencyList[system['c2sym']]=1
       
       if systemList.has_key(system['Name']):
           systemList[system['Name']]=systemList[system['Name']].append(system)

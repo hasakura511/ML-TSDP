@@ -8,6 +8,7 @@ import sys
 from numpy import zeros, ones, flipud, log
 from numpy.linalg import inv, eig, cholesky as chol
 import talib as ta
+import seitoolz.portfolio as portfolio
 
 from statsmodels.regression.linear_model import OLS
 
@@ -242,3 +243,8 @@ def getBar(price, symbol, date):
     bar['Date']=date
     return bar
 
+#def updateEntry(systemname, broker, sym1, sym2, currency, date, isLive):
+#    data=portfolio.get_portfolio(systemname, broker, date, isLive)
+#    qty1=portfolio.get_pos(data, broker, sym1, currency, date)
+#    qty2=portfolio.get_pos(data, broker, sym1, currency, date)
+    

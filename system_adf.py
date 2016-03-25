@@ -39,6 +39,7 @@ import os
 from pandas.io.json import json_normalize
 from seitoolz.signal import get_dps_model_pos, get_model_pos, generate_model_manual
 from seitoolz.paper import adj_size
+import seitoolz.portfolio as portfolio
 from time import gmtime, strftime, localtime, sleep
 import logging
 import threading
@@ -79,48 +80,7 @@ else:
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
 
-    
-def gettrades(sysname):
-    filename='./data/paper/ib_' + sysname + '_trades.csv'
-    if os.path.isfile(filename):
-        dataSet=pd.read_csv(filename)
-        #sums up results to starting acct capital
-        #dataSet['equitycurve'] = initialEquity + dataSet['realized_PnL'].cumsum()
-        return dataSet
 
-def refresh_paper(sysname):
-    files=['./data/paper/c2_' + sysname + '_account.csv','./data/paper/c2_' + sysname + '_trades.csv', \
-    './data/paper/ib_'+ sysname + '_portfolio.csv','./data/paper/c2_' + sysname + '_portfolio.csv',  \
-    './data/paper/ib_' + sysname + '_account.csv','./data/paper/ib_' + sysname + '_trades.csv']
-    for i in files:
-        filename=i
-        if os.path.isfile(filename):
-            os.remove(filename)
-            print 'Deleting ' + filename
-
-def get_results(sysname, pairs):
-    
-    ibdata=seigraph.generate_paper_ib_plot(sysname, 'Date', 20000)
-    seigraph.generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + sysname + 'ib', sysname + " IB ", 'Equity')
-    
-    data=seigraph.get_data(sysname, 'paper', 'ib', 'trades', 'times', 20000)
-    seigraph.generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + sysname + 'ib' + sysname+'PL', 'paper_' + sysname + 'ib' + sysname + ' PL', 'PL')
-    
-    data=seigraph.get_data_files(np.array(pairs,dtype=object)[:,0], np.array(pairs,dtype=object)[:,1], 'Close', 20000)
-    seigraph.generate_plots(data, 'paper_' + sysname + 'Close', sysname + " Close Price", 'Close')
-    
-
-#pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO'],
-#       ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO'],
-#       ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO'],
-#       ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO'],
-#       ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [100000,'JPY','IDEALPRO']]
-pairs=[['./data/btapi/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD']],
-       ['./data/btapi/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD']]]
-       
-sysname='ADF2'
-refresh_paper(sysname)
-data=gettrades(sysname)
 SST=seigraph.get_history(pairs, sysname, 'Close')
 threads = []
 
@@ -186,6 +146,7 @@ def proc_pair(sym1, sym2, param1, param2):
                         bid=float(bids[barSym])
                         secType='CASH'
                         sym=barSym
+                        currency=barSym[3:6]
                         pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
                         if ask > 0 and bid > 0:
                            

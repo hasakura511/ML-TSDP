@@ -75,7 +75,23 @@ def get_c2pos(systemid, c2sym, apikey, systemname):
         dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
         return dataSet
 
+
+def get_c2livepos(systemid, apikey, systemname):
+    data=get_exec_open(systemid,apikey);
+    
+    jsondata = json.loads(data)
+    if len(jsondata['response']) > 0:
+        dataSet=json_normalize(jsondata['response'])
+        dataSet=dataSet.set_index(['symbol'])
+        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
+        return dataSet
+        
+def get_c2pos_from_csv(systemname):
+    dataSet = pd.read_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv', index_col='symbol')
+    return dataSet
+    
 def reset_c2pos_cache(systemid):
     global system_cache
     system_cache.pop(systemid, None)
+
 #place_order('BTO','1','EURUSD','forex')

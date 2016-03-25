@@ -105,6 +105,9 @@ def get_ibpos():
     #
     return dataSet
 
+def get_iblivepos():
+    return get_ibpos()
+
 def get_ibpos_from_csv():
     datestr=strftime("%Y%m%d", localtime())
     dataSet = pd.read_csv('./data/portfolio/ib_portfolio.csv', index_col=['sym','currency'])

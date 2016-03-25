@@ -20,7 +20,7 @@ import pusherclient #live stream client: https://github.com/ekulyk/PythonPusherC
 import logging
 import time
 import websocket
-
+from seitoolz.signal import get_dps_model_pos, get_model_pos
 logging.basicConfig(filename='/logs/get_btcfeed.log',level=logging.DEBUG)
 
 debug=False
@@ -86,13 +86,29 @@ def get_btcfeed():
                     exchange=dataSet['symbol']
                     feedid=dataSet['id']
                     #print "Price: " + str(price)
-                    feed[exchange]=dataSet
+                    if exchange != 'bitstampUSD':
+                        feed[exchange]=dataSet
                     feed_to_ohlc('BTCUSD',exchange, price, timestamp, vol)
         except Exception as e:
             logging.error("get_btcfeed", exc_info=True)
                 
     return
 
+
+def get_ohlc(ticker, exchange):
+    global feed
+    global ohlc
+    global systemdata
+    global commissiondata
+    if exchange not in hashist:
+        get_bthist(ticker, exchange)
+        hashist[exchange]=True
+        
+    ohlc[exchange]=feed_ohlc_to_csv(ticker, exchange)
+    return ohlc[exchange]
+    
+#################################
+### Bitstamp Feed             ###
 def bitstamp_order_book_callback(data):
     #print "book", data
     try:
@@ -163,6 +179,8 @@ def get_bitstampfeed():
     pusher.connection.logger.setLevel(logging.WARNING) #no need for this line if you want everything printed out by the logger
     pusher.connection.bind('pusher:connection_established', bitstamp_connect_handler)
     pusher.connect()
+### Bitstamp Feed             ###
+#################################
     
 def get_signal():
     global feed
@@ -191,11 +209,15 @@ def get_signal():
                     bid=float(get_btc_bid(ticker, exchange))
                     secType=system['ibtype']
                     
-                    commissionkey=system['ibsym']+system['ibcur']+system['ibexch']
-                    commission=commissiondata.loc[commissionkey]
-                    commission_pct=float(commission['Pct'])
-                    commission_cash=float(commission['Cash'])
                     
+                    commissionkey=system['ibsym']+system['ibcur']+system['ibexch']
+                    commission_pct=0.0025
+                    commission_cash=0
+                    if commissionkey in commissiondata.index:
+                        commission=commissiondata.loc[commissionkey]
+                        commission_pct=float(commission['Pct'])
+                        commission_cash=float(commission['Cash'])
+                   
                     system_pos=model.loc[system['System']]
                     system_c2pos_qty=round(system_pos['action']) * system['c2qty']
                     system_ibpos_qty=round(system_pos['action']) * system['ibqty']
@@ -223,19 +245,138 @@ def get_signal():
         #f.write(e)
         #f.close()
         logging.error("get_signal", exc_info=True)
+
+#########################
+### Paper System Trade###
+def get_models(systems):
+    v1sList=dict()
+    dpsList=dict()
+    for i in systems.index:
+        system=systems.ix[i]
+        if system['ibsym'] == 'BTC':
+         
+          if system['Version'] == 'v1':
+              v1sList[system['System']]=1
+          else:
+              dpsList[system['System']]=1
+          
+    model_pos=get_model_pos(v1sList.keys())
+    dps_model_pos=get_dps_model_pos(dpsList.keys())    
+    return (model_pos, dps_model_pos)
+    
+def get_timestamp():
+	timestamp = int(time.time())
+	return timestamp
         
-        
-def get_ohlc(ticker, exchange):
-    global feed
-    global ohlc
-    global systemdata
-    global commissiondata
-    if exchange not in hashist:
-        get_bthist(ticker, exchange)
-        hashist[exchange]=True
-        
-    ohlc[exchange]=feed_ohlc_to_csv(ticker, exchange)
-    return ohlc[exchange]
+def start_trade(systems, commissiondata): 
+    global debug
+    if debug:
+       print "Starting " + str(systems.iloc[0]['Name'])
+       logging.info("Starting " + str(systems.iloc[0]['Name']))
+    finished=False
+    while not finished:
+        try:
+            (model_pos, dps_model_pos)=get_models(systems)
+            symbols=systems['c2sym'].values
+            for symbol in symbols:
+              system=systems.loc[symbol].copy()
+              ticker='BTCUSD'
+              exchange=system['ibexch']
+              secType=system['ibtype']
+                
+              if feed.has_key(symbol) \
+                  and \
+                  get_btc_ask(ticker, exchange) > 0 and get_btc_bid(ticker, exchange) > 0 and \
+                  get_timestamp() - int(system['last_trade']) > int(system['trade_freq']):
+                     
+                model=model_pos
+                if system['Version'] == 'v1':
+                        model=model_pos
+                else:
+                        model=dps_model_pos
+                
+                ask=float(get_btc_ask(ticker, exchange))
+                bid=float(get_btc_bid(ticker, exchange))
+                
+                commissionkey=system['c2sym']+system['ibcur']+system['ibexch']
+                commission_pct=0.00002
+                commission_cash=2
+                if commissionkey in commissiondata.index:
+                    commission=commissiondata.loc[commissionkey]
+                    commission_pct=float(commission['Pct'])
+                    commission_cash=float(commission['Cash'])
+                    
+                if debug:
+                    system_pos=model.loc[system['System']]
+                    system_c2pos_qty=round(system_pos['action']) * system['c2qty']
+                    system_ibpos_qty=round(system_pos['action']) * system['ibqty']
+
+                    print "Processing " + system['Name'] + " Symbol: " + system['ibsym'] + system['ibcur'] + \
+                    " Timestamp: " + str(get_timestamp()) + " Last Trade: " + str(system['last_trade']) + " Freq: " +  str(system['trade_freq'])
+                    #print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+                    #print        " System Algo: " + str(system['System']) 
+                    #print        " Ask: " + str(ask)
+                    #print        " Bid: " + str(bid)
+                    #print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
+                    #print        " Signal: " + str(system_ibpos_qty)
+                pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
+                if ask > 0 and bid > 0:
+                    eastern=timezone('US/Eastern')
+                    endDateTime=dt.now(get_localzone())
+                    date=endDateTime.astimezone(eastern)
+                    date=date.strftime("%Y%m%d %H:%M:%S EST")
+                    adj_size(model, system['System'],system['Name'],pricefeed,\
+                    str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
+                        system['ibqty'],system['c2sym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
+                #time.sleep(1)
+                system['last_trade']=get_timestamp()
+                systems.loc[symbol]=system
+                            
+            time.sleep(10)
+        except Exception as e:
+            #f=open ('./debug/papererrors.log','a')
+            #f.write(e)
+            #f.close()
+            logging.error("something bad happened", exc_info=True)
+            
+def start_systems():
+      global commissiondata
+      global threads         
+      systemList=getSystemList()
+      
+      for systemname in systemList.keys():
+           systems=systemList[systemname]
+           systems['last_trade']=0
+           systems['key']=systems['c2sym']
+           systems=systems.set_index('key')
+           sig_thread = threading.Thread(target=start_trade, args=[systems,commissiondata])
+           sig_thread.daemon=True
+           threads.append(sig_thread)
+           sig_thread.start()
+
+
+def getSystemList():
+    systemdata=pd.read_csv('./data/systems/system.csv')
+    systemdata=systemdata.reset_index()
+    currencyList=dict()
+    systemList=dict()
+
+    for i in systemdata.index:
+        system=systemdata.ix[i]
+        if system['ibsym'] == 'BTC' and system['System'] != 'BTCUSD':
+         
+          currencyList[system['c2sym']]=1
+          
+          if systemList.has_key(system['Name']):
+              systemList[system['Name']]=systemList[system['Name']].append(system)
+          else:
+              systemList[system['Name']]=pd.DataFrame()
+              systemList[system['Name']]=systemList[system['Name']].append(system)
+          
+    return systemList            
+### Paper System Trade###
+#########################       
+
 
 threads = []
 feed_thread = threading.Thread(target=get_btcfeed)
@@ -247,6 +388,7 @@ threads.append(signal_thread)
 
 get_bitstampfeed()
 feed_thread.start()
+start_systems()
 get_signal()
  
 

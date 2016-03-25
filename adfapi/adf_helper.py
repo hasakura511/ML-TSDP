@@ -162,7 +162,7 @@ def calculate_spread_zscore(pairs, symbols, lookback=2000):
         pairs['spread'] = pairs['%s' % symbols[0]] - pairs['hedge_ratio']*pairs['%s' % symbols[1]]
         pairs['zscore'] = (pairs['spread'] - np.mean(pairs['spread']))/np.std(pairs['spread'])
     except Exception as e:
-        print 'calculate_spread_zscore Error'
+        print 'calculate_spread_zscore Error: ' + str(e)
         
     return pairs
 

@@ -109,43 +109,6 @@ def get_results(sysname, pairs):
     data=seigraph.get_datas(np.array(pairs)[:,1], 'from_IB', 'Close', 20000)
     seigraph.generate_plots(data, 'paper_' + sysname + 'Close', sysname + " Close Price", 'Close')
     
-def get_history(datas, sysname, ylabel):
-    try:
-        SST=pd.DataFrame()
-        
-        for (filename, ticker) in datas:
-            dta=pd.read_csv(filename)
-            symbol=ticker[0:3]
-            currency=ticker[3:6]
-            #print 'plot for ticker: ' + currency
-            if ylabel == 'Close':
-                diviser=dta.iloc[0][ylabel]
-                dta[ylabel]=dta[ylabel] /diviser
-                
-            #dta[ylabel].plot(label=ticker)   
-            data=pd.DataFrame()
-            
-            data['Date']=pd.to_datetime(dta[dta.columns[0]])
-            
-            data[ticker]=dta[ylabel]
-            data=data.set_index('Date') 
-            if len(SST.index.values) < 2:
-                SST=data
-            else:
-                SST=SST.join(data)
-        colnames=list()
-        for col in SST.columns:
-            if col != 'Date' and col != 0:
-                colnames.append(col)
-        data=SST
-        data=data.reset_index()        
-        data['timestamp']= data['Date']
-        
-        data=data.set_index('Date')
-        return data
-    except Exception as e:
-        logging.error("something bad happened", exc_info=True)
-    return SST
 
 pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY'],
        ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY'],
@@ -155,8 +118,7 @@ pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY'],
 sysname='ADF2'
 refresh_paper(sysname)
 data=gettrades(sysname)
-SST=get_history(pairs, sysname, 'Close')
-
+SST=seigraph.get_history(pairs, sysname, 'Close')
 threads = []
 
 pos=dict()
@@ -229,13 +191,13 @@ def proc_pair(sym1, sym2):
                                 sysname,sysname,100000,barSym, secType, True, \
                                     100000, sym,currency,exchange, secType, True, date)
             except Exception as e:
-                print "proc_pair: error" + sys.exc_info()[0]
+                print "proc_pair: error" + str(sys.exc_info()[0])
 seen=dict()
 def proc_backtest(sysname, SST):
     for [file1,sym1] in pairs:
         #print "sym: " + sym1
         for [file2,sym2] in pairs:
-            if not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+            if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
                 seen[sym1+sym2]=1
                 seen[sym2+sym1]=1
                 sig_thread = threading.Thread(target=proc_pair, args=[sym1, sym2])

@@ -106,17 +106,21 @@ def get_results(sysname, pairs):
     data=seigraph.get_data(sysname, 'paper', 'ib', 'trades', 'times', 20000)
     seigraph.generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + sysname + 'ib' + sysname+'PL', 'paper_' + sysname + 'ib' + sysname + ' PL', 'PL')
     
-    data=seigraph.get_datas(np.array(pairs)[:,1], 'from_IB', 'Close', 20000)
+    data=seigraph.get_data_files(np.array(pairs)[:,0], np.array(pairs)[:,1], 'Close', 20000)
     seigraph.generate_plots(data, 'paper_' + sysname + 'Close', sysname + " Close Price", 'Close')
     
 
-pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY'],
-       ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY'],
-       ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY'],
-       ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY'],
-       ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY']]
+#pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', 100000],
+#       ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', 100000],
+#       ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', 100000],
+#       ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', 100000],
+#       ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', 100000]]
+pairs=[['./data/btapi/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', 10],
+       ['./data/btapi/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', 10]]
+       
 sysname='ADF2'
-refresh_paper(sysname)
+get_results(sysname, pairs)
+#refresh_paper(sysname)
 data=gettrades(sysname)
 SST=seigraph.get_history(pairs, sysname, 'Close')
 threads = []
@@ -126,10 +130,13 @@ totalpos=dict()
 asks=dict()
 bids=dict()
 
-def proc_pair(sym1, sym2):
+def proc_pair(sym1, sym2, mult1, mult2):
         symPair=sym1+sym2
         if not pos.has_key(symPair):
             pos[symPair]=dict()
+        mults=dict()
+        mults[sym1]=mult1
+        mults[sym2]=mult2
         confidence=adf.getCoint(SST[sym1], sym1, SST[sym2], sym2)
         print "Coint Confidence: " + str(confidence) + "%"
         for i in SST.index:
@@ -188,19 +195,19 @@ def proc_pair(sym1, sym2):
                             ).strftime("%Y%m%d %H:%M:%S EST")
                             print 'Signal: ' + barSym + '[' + str(barSig) + ']@' + str(ask)
                             adj_size(model, barSym, sysname, pricefeed,   \
-                                sysname,sysname,100000,barSym, secType, True, \
-                                    100000, sym,currency,exchange, secType, True, date)
+                                sysname,sysname,mults[barSym],barSym, secType, True, \
+                                    mults[barSym], sym,currency,exchange, secType, True, date)
             except Exception as e:
                 print "proc_pair: error" + str(sys.exc_info()[0])
 seen=dict()
 def proc_backtest(sysname, SST):
-    for [file1,sym1] in pairs:
+    for [file1,sym1, mult1] in pairs:
         #print "sym: " + sym1
-        for [file2,sym2] in pairs:
+        for [file2,sym2, mult2] in pairs:
             if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
                 seen[sym1+sym2]=1
                 seen[sym2+sym1]=1
-                sig_thread = threading.Thread(target=proc_pair, args=[sym1, sym2])
+                sig_thread = threading.Thread(target=proc_pair, args=[sym1, sym2, mult1, mult2])
                 sig_thread.daemon=True
                 threads.append(sig_thread)
     [t.start() for t in threads]

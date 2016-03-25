@@ -64,7 +64,7 @@ for file in files:
                 reader = pd.read_csv(dataPath+file)
                 row_count = reader.shape[0]
                 if row_count > 3000:
-                    pairs.append([dataPath+file, systemname])
+                    pairs.append([dataPath+file, systemname, 1])
                 else:
                     print "Skipping " + dataPath+file + " with " + str(row_count)
 dataPath='./data/from_IB/'
@@ -79,7 +79,7 @@ for file in files:
                 reader = pd.read_csv(dataPath+file)
                 row_count = reader.shape[0]
                 if row_count > 3000:
-                    pairs.append([dataPath+file, systemname])
+                    pairs.append([dataPath+file, systemname, 1])
                 else:
                     print "Skipping " + dataPath+file + " with " + str(row_count)
                     

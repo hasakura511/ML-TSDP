@@ -89,6 +89,20 @@ def get_datas(systems, api, dataType, initialData):
     
                     newfiles.append([filename,symbol])      
     return newfiles
+
+def get_data_files(files, systems, dataType, initialData):
+    dataSet=pd.DataFrame({}, columns=['Date'])
+    dataSet=dataSet.set_index('Date')
+    newfiles=list()
+    for symbol in systems:   
+        search=re.compile(symbol)      
+        for file in files:
+            if re.search(search, file):        
+                filename=file
+                if os.path.isfile(filename):
+                    print filename + ' data '+ dataType
+                    newfiles.append([filename,symbol])      
+    return newfiles
     
 def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel):
     try:
@@ -263,7 +277,7 @@ def get_history(datas, sysname, ylabel):
     try:
         SST=pd.DataFrame()
         
-        for (filename, ticker) in datas:
+        for (filename, ticker, qty) in datas:
             dta=pd.read_csv(filename)
             #symbol=ticker[0:3]
             #currency=ticker[3:6]

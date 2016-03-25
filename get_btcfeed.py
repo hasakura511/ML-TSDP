@@ -72,66 +72,77 @@ def get_btcfeed():
      
     # Receive data in an infinite loop
     while 1:
-        line = fs.readline()
-        # If data was received, print it
-        if (len(line)):
-            #print line
-            jsondata = json.loads(line)
-            if len(jsondata) > 1:
-                dataSet=json_normalize(jsondata).iloc[-1]
-                vol=dataSet['volume']
-                timestamp=dataSet['timestamp']
-                price=dataSet['price']
-                exchange=dataSet['symbol']
-                feedid=dataSet['id']
-                #print "Price: " + str(price)
-                if exchange != 'bitstampUSD':
+        try:
+            line = fs.readline()
+            # If data was received, print it
+            if (len(line)):
+                #print line
+                jsondata = json.loads(line)
+                if len(jsondata) > 1:
+                    dataSet=json_normalize(jsondata).iloc[-1]
+                    vol=dataSet['volume']
+                    timestamp=dataSet['timestamp']
+                    price=dataSet['price']
+                    exchange=dataSet['symbol']
+                    feedid=dataSet['id']
+                    #print "Price: " + str(price)
                     feed[exchange]=dataSet
                     feed_to_ohlc('BTCUSD',exchange, price, timestamp, vol)
+        except Exception as e:
+            logging.error("get_btcfeed", exc_info=True)
                 
     return
 
 def bitstamp_order_book_callback(data):
     #print "book", data
-    jsondata = json.loads(data)
-    dataSet=json_normalize(jsondata).iloc[-1]
-    if not feed.has_key('bitstampUSD'):
-        feed['bitstampUSD']=dict()
-        feed['bitstampUSD']['bid']=-1
-        feed['bitstampUSD']['ask']=-1
-        
-    if 'bids' in dataSet:
-        bids=dataSet['bids']
-        data=list()
-        for bid in bids:
-            data.append(bid[0])
-        feed['bitstampUSD']['bid']=float(max(data))
-    if 'asks' in dataSet:
-        asks=dataSet['asks']
-        data=list()
-        for ask in asks:
-            data.append(ask[0])
-        feed['bitstampUSD']['ask']=float(min(data))    
-    #print "book", data
+    try:
+        jsondata = json.loads(data)
+        dataSet=json_normalize(jsondata).iloc[-1]
+        if not feed.has_key('bitstampUSD'):
+            feed['bitstampUSD']=dict()
+            feed['bitstampUSD']['bid']=-1
+            feed['bitstampUSD']['ask']=-1
+            
+        if 'bids' in dataSet:
+            bids=dataSet['bids']
+            data=list()
+            for bid in bids:
+                data.append(bid[0])
+            feed['bitstampUSD']['bid']=float(bids[0][0])
+            feed_to_ohlc('BTCUSD','bitstampUSD', float(bids[0][0]), str(int(time.time())), 0)
+           
+        if 'asks' in dataSet:
+            asks=dataSet['asks']
+            #data=list()
+            #for ask in asks:
+            #    data.append(ask[0])
+            feed['bitstampUSD']['ask']=float(asks[0][0])
+            feed_to_ohlc('BTCUSD','bitstampUSD', float(asks[0][0]), str(int(time.time())), 0)
+        #print "book", data
+    except Except as e:
+        logging.error("bitstamp_order_book_callback", exc_info=True)
     
 def bitstamp_trade_callback(data):
-    #print "trade", data
-    #trade {"price": 408.80000000000001, "amount": 0.076399999999999996, "id": 10832011}
-    jsondata = json.loads(data)
-    dataSet=json_normalize(jsondata).iloc[-1]
-    eastern=timezone('US/Eastern')
-    localendDateTime=dt.now(get_localzone())
-    localdate=localendDateTime.astimezone(eastern)
-    timestamp=int(localdate.strftime("%s"))
-    vol=float(dataSet['amount'])
-    price=float(dataSet['price'])
-    exchange='bitstampUSD'
-    feedid=dataSet['id']
-    #print exchange + str(price) + ' ' + str(timestamp) + ' ' + str(vol)
-    #print "Price: " + str(price)
-    #feed[exchange]=dataSet
-    feed_to_ohlc('BTCUSD',exchange, float(price), int(timestamp), float(vol))
-    #print "trade", data
+    try:
+        #print "trade", data
+        #trade {"price": 408.80000000000001, "amount": 0.076399999999999996, "id": 10832011}
+        jsondata = json.loads(data)
+        dataSet=json_normalize(jsondata).iloc[-1]
+        eastern=timezone('US/Eastern')
+        localendDateTime=dt.now(get_localzone())
+        localdate=localendDateTime.astimezone(eastern)
+        timestamp=int(localdate.strftime("%s"))
+        vol=float(dataSet['amount'])
+        price=float(dataSet['price'])
+        exchange='bitstampUSD'
+        feedid=dataSet['id']
+        #print exchange + str(price) + ' ' + str(timestamp) + ' ' + str(vol)
+        #print "Price: " + str(price)
+        #feed[exchange]=dataSet
+        feed_to_ohlc('BTCUSD',exchange, float(price), int(timestamp), float(vol))
+        #print "trade", data
+    except Exception as e:
+        logging.error("bitstamp_trade_callback", exc_info=True)
     
     
 def bitstamp_connect_handler(data): #this gets called when the Pusher connection is established
@@ -211,7 +222,7 @@ def get_signal():
         #f=open ('./debug/get_btcfeed_cerrors.log','a')
         #f.write(e)
         #f.close()
-        logging.error("something bad happened", exc_info=True)
+        logging.error("get_signal", exc_info=True)
         
         
 def get_ohlc(ticker, exchange):

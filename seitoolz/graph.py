@@ -52,8 +52,93 @@ import subprocess
 from btapi.get_signal import get_v1signal
 import logging
 
-logging.basicConfig(filename='/logs/get_results.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/seitoolz_graph.log',level=logging.DEBUG)
 
+def get_data(systemname, api, broker, dataType, dateCol, initialData):
+    filename='./data/' + api + '/' + broker + '_' + systemname + '_' + dataType + '.csv'
+    if api == 'c2api' or api=='ibapi' or api=='btapi':
+        filename='./data/' + api + '/' + systemname + '_' + dataType + '.csv'
+    print filename
+    dataSet=pd.DataFrame([[initialData,'2016-01-01']], columns=[dataType,dateCol])
+    if os.path.isfile(filename):
+        dataSet=pd.read_csv(filename)
+        dataSet=dataSet.sort_values(by=[dateCol])
+        return dataSet
+    else:
+        return dataSet
+
+def get_USD(currency):
+    data=pd.read_csv('./data/systems/currency.csv')
+    conversion=float(data.loc[data['Symbol']==currency].iloc[-1]['Ask'])
+    return float(conversion)
+    
+def get_datas(systems, api, dataType, initialData):
+    dataPath='./data/' + api + '/'
+    files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+    
+    dataSet=pd.DataFrame({}, columns=['Date'])
+    dataSet=dataSet.set_index('Date')
+    newfiles=list()
+    for symbol in systems:   
+        search=re.compile(symbol)      
+        for file in files:
+            if re.search(search, file):        
+                filename=dataPath+file
+                if os.path.isfile(filename):
+                    print filename + ' data '+ dataType
+    
+                    newfiles.append([filename,symbol])      
+    return newfiles
+    
+def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel):
+    try:
+        SST=data
+        SST[dateCol]=pd.to_datetime(SST[dateCol])
+        SST=SST.sort_values(by=[dateCol])
+        SST=SST.set_index(dateCol)
+        
+        filename='./data/results/' + systemname + ylabel + '.png'
+        view_plot(colnames, title, ylabel, SST)
+
+    except Exception as e:
+        logging.error("something bad happened", exc_info=True)
+    
+   
+def generate_plots(datas, systemname, title, ylabel):
+    try:
+        SST=pd.DataFrame()
+        
+        for (filename, ticker) in datas:
+            dta=pd.read_csv(filename)
+            symbol=ticker[0:3]
+            currency=ticker[3:6]
+            #print 'plot for ticker: ' + currency
+            if ylabel == 'Close':
+                diviser=dta.iloc[0][ylabel]
+                dta[ylabel]=dta[ylabel] /diviser
+                
+            #dta[ylabel].plot(label=ticker)   
+            data=pd.DataFrame()
+            data['Date']=pd.to_datetime(dta[dta.columns[0]])
+            data[ticker]=dta[ylabel]
+            data=data.set_index('Date') 
+            if len(SST.index.values) < 2:
+                SST=data
+            else:
+                SST=SST.join(data)
+        colnames=list()
+        for col in SST.columns:
+            if col != 'Date' and col != 0:
+                colnames.append(col)
+                
+        filename='./data/results/' + systemname + ylabel + '.png'
+        view_plot(colnames, title, ylabel, SST)
+        
+    except Exception as e:
+        logging.error("something bad happened", exc_info=True)
+   
+    
+    
 def generate_paper_c2_plot(systemname, dateCol, initialEquity):
     filename='./data/paper/c2_' + systemname + '_account.csv'
     if os.path.isfile(filename):
@@ -66,21 +151,17 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
         return dataSet
         
-def generate_paper_ib_plot(systemname, dateCol):
+def generate_paper_ib_plot(systemname, dateCol, initialEquity):
     filename='./data/paper/ib_' + systemname + '_account.csv'
-    dataSet=pd.DataFrame([[20000,20000, '2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
-
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
         dataSet['equitycurve'] = dataSet['balance']
         dataSet['PurePLcurve'] = dataSet['purebalance']
-        
-    SST=dataSet
-    SST[dateCol]=pd.to_datetime(SST[dateCol])
-    SST=SST.sort_values(by=[dateCol])
-    SST=SST.set_index(dateCol)
-    return SST
+        return dataSet
+    else:
+        dataSet=pd.DataFrame([[initialEquity, initialEquity, '2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
+        return dataSet
     
 def view_plot(colnames, title, ylabel, SST):
     fig, ax = plt.subplots()

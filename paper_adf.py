@@ -3,7 +3,7 @@ import pandas as pd
 import time
 from os import listdir
 from os.path import isfile, join
-from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, get_ask as get_ib_ask, get_bid as get_ib_bid
+from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_ask as get_ib_ask, get_bid as get_ib_bid
 from c2api.place_order import place_order as place_c2order
 # -*- coding: utf-8 -*-
 """
@@ -42,8 +42,9 @@ from seitoolz.paper import adj_size
 from time import gmtime, strftime, localtime, sleep
 import logging
 import threading
-import adfapi.s103 as s103
+import adfapi.s105 as astrat
 import seitoolz.graph as seigraph
+import adfapi.adf_helper as adf
 
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
@@ -97,6 +98,17 @@ def refresh_paper(sysname):
             os.remove(filename)
             print 'Deleting ' + filename
 
+def get_results(systemname, pairs):
+    
+    ibdata=seigraph.generate_paper_ib_plot(systemname, 'Date', 20000)
+    seigraph.generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity')
+    
+    data=seigraph.get_data(sysname, 'paper', 'ib', 'trades', 'times', 20000)
+    seigraph.generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL')
+    
+    data=seigraph.get_datas(np.array(pairs)[:,1], 'from_IB', 'Close', 20000)
+    seigraph.generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close')
+    
 def get_history(datas, systemname, ylabel):
     try:
         SST=pd.DataFrame()
@@ -135,71 +147,96 @@ def get_history(datas, systemname, ylabel):
         logging.error("something bad happened", exc_info=True)
     return SST
 
-pairs=[['./data/from_IB/1 min_NZDJPY.csv', 'NZDJPY'],['./data/from_IB/1 min_CADJPY.csv', 'CADJPY']]
+pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY'],
+       ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY'],
+       ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY'],
+       ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY'],
+       ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY']]
 sysname='ADF'
 refresh_paper(sysname)
 data=gettrades(sysname)
 SST=get_history(pairs, sysname, 'Close')
 
 pos=dict()
+totalpos=dict()
 asks=dict()
 bids=dict()
 def proc_backtest(systemname, SST):
-    for i in SST.index:
-            priceHist=SST.ix[i]
-            sym1=pairs[0][1]
-            sym2=pairs[1][1]
-            asks[sym1]=priceHist[sym1]
-            bids[sym1]=priceHist[sym1]
-            asks[sym2]=priceHist[sym2]
-            bids[sym2]=priceHist[sym2]
-            timestamp=time.mktime(priceHist['timestamp'].timetuple())
-            bar1=s103.getBar(priceHist[sym1], sym1, int(timestamp))
-            bar2=s103.getBar(priceHist[sym2], sym2, int(timestamp))
-            signals=s103.procBar(bar1, bar2, pos, True)
-            if signals and len(signals) >= 1:
-                for signal in signals:
-                    (barSym, barSig, barCmt)=signal
-                    
-                    if pos.has_key(barSym):
-                        pos[barSym]=pos[barSym] + barSig
-                    else:
-                        pos[barSym]=barSig
-                    model=generate_model_manual(barSym, pos[barSym], 1)
-                    
-                    if pos[barSym] == 0:
-                        pos.pop(barSym, None)
-                    
-                    
-                    
-                    commissionkey=barSym
-                    commission_pct=0.00002
-                    commission_cash=2
-                    if commissionkey in commissiondata.index:
-                        commission=commissiondata.loc[commissionkey]
-                        commission_pct=float(commission['Pct'])
-                        commission_cash=float(commission['Cash'])
+    for [file1,sym1] in pairs:
+        #print "sym: " + sym1
+        for [file2,sym2] in pairs:
+            if sym1 != sym2:
+                symPair=sym1+sym2
+                if not pos.has_key(symPair):
+                    pos[symPair]=dict()
+                confidence=adf.getCoint(SST[sym1], sym1, SST[sym2], sym2)
+                print "Coint Confidence: " + str(confidence) + "%"
+                for i in SST.index:
+                        priceHist=SST.ix[i]
                         
-                    ask=float(asks[barSym])
-                    bid=float(bids[barSym])
-                    exchange=barSym
-                    secType='CASH'
-                    sym=barSym[0:3]
-                    currency=barSym[3:6]
-                    pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
-                    if ask > 0 and bid > 0:
-                       
-                        date=datetime.datetime.fromtimestamp(
-                            int(timestamp)
-                        ).strftime("%Y%m%d %H:%M:%S EST")
-                        print 'Signal: ' + barSym + '[' + str(barSig) + ']@' + str(ask)
-                        adj_size(model, barSym, systemname, pricefeed,   \
-                            systemname,systemname,100000,barSym, secType, True, \
-                                100000, sym,currency,exchange, secType, True, date)
+                        asks[sym1]=priceHist[sym1]
+                        bids[sym1]=priceHist[sym1]
+                        asks[sym2]=priceHist[sym2]
+                        bids[sym2]=priceHist[sym2]
+                        timestamp=time.mktime(priceHist['timestamp'].timetuple())
+                        bar1=astrat.getBar(priceHist[sym1], sym1, int(timestamp))
+                        bar2=astrat.getBar(priceHist[sym2], sym2, int(timestamp))
+                        signals=astrat.procBar(bar1, bar2, pos[symPair], True)
+                        if signals and len(signals) >= 1:
+                            for signal in signals:
+                                (barSym, barSig, barCmt)=signal
+                                
+                                if pos[symPair].has_key(barSym):
+                                    pos[symPair][barSym]=pos[symPair][barSym] + barSig
+                                else:
+                                    pos[symPair][barSym]=barSig
+                                    
+                                if totalpos.has_key(barSym):
+                                    totalpos[barSym]=totalpos[barSym] + barSig
+                                else:
+                                    totalpos[barSym]=barSig
+                                
+                                model=generate_model_manual(barSym, totalpos[barSym], 1)
+                                
+                                if totalpos[barSym] == 0:
+                                    totalpos.pop(barSym, None)
+                                    
+                                if pos[symPair][barSym] == 0:
+                                    pos[symPair].pop(barSym, None)
+                                
+                                commissionkey=barSym
+                                commission_pct=0.00002
+                                commission_cash=2
+                                if commissionkey in commissiondata.index:
+                                    commission=commissiondata.loc[commissionkey]
+                                    commission_pct=float(commission['Pct'])
+                                    commission_cash=float(commission['Cash'])
+                                    
+                                ask=float(asks[barSym])
+                                bid=float(bids[barSym])
+                                exchange=barSym
+                                secType='CASH'
+                                sym=barSym[0:3]
+                                currency=barSym[3:6]
+                                pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
+                                if ask > 0 and bid > 0:
+                                   
+                                    date=datetime.datetime.fromtimestamp(
+                                        int(timestamp)
+                                    ).strftime("%Y%m%d %H:%M:%S EST")
+                                    print 'Signal: ' + barSym + '[' + str(barSig) + ']@' + str(ask)
+                                    adj_size(model, barSym, systemname, pricefeed,   \
+                                        systemname,systemname,100000,barSym, secType, True, \
+                                            100000, sym,currency,exchange, secType, True, date)
                 #time.sleep(1)
 proc_backtest(sysname, SST)
-data=seigraph.generate_paper_ib_plot(sysname, 'Date')
-seigraph.view_plot(['equitycurve','PurePLcurve'], 'Backtest Result', 'Equity', data)
+
+#results
+systemname=sysname
+get_results(systemname, pairs)
+
+
+
 #threads = []
 #for pair in pairs:
 #	sig_thread = threading.Thread(target=runv2, args=[pair])

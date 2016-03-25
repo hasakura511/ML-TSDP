@@ -443,21 +443,23 @@ for file in files:
                                 systemname=file
                                 systemname = re.sub('c2_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
-                                print systemname
-                                c2data=generate_paper_c2_plot(systemname, 20000)                                   
-                                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html)
-
-                                data=get_data(systemname, 'paper', 'c2', 'trades', 20000)
-                                (counter, html)=generate_mult_plot(data, ['PL','PurePL'], 'Date', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html)
+                                
+                                c2data=generate_paper_c2_plot(systemname, 'Date', 20000)
+                                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
+                            
+                                data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', 20000)
+                                (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
                         else:
                                 systemname=file
                                 systemname = re.sub('ib_','', systemname.rstrip())
                                 systemname = re.sub('_trades.csv','', systemname.rstrip())
-                                ibdata=generate_paper_ib_plot(systemname, 20000)
-                                (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html)
-
-                                data=get_data(systemname, 'paper', 'ib', 'trades', 20000)
-                                (counter, html)=generate_mult_plot(data, ['realized_PnL','PurePL'], 'Date', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html)
+                                
+                                ibdata=generate_paper_ib_plot(systemname, 'Date', 20000)
+                                (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
+                            
+                                data=get_data(systemname, 'paper', 'ib', 'trades', 'times', 20000)
+                                (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
+                        
                         btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
                             
                         (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)

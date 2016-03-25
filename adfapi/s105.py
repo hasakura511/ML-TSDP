@@ -12,37 +12,31 @@ import talib as ta
 from statsmodels.regression.linear_model import OLS
 
 ##### Do not change this function definition ####
-pair1Series=list()
-pair2Series=list()
-tsPairratio=list()
-tsPairratio2=list()
-tsZscore=list()
-tsZscore2=list()
-tsDates=list()
-indSmaZscore=list()
-indSmaZscore2=list()
+pairSeries=dict()
+tsPairratio=dict()
+tsZscore=dict()
+tsDates=dict()
+indSmaZscore=dict()
 intDatapoints=1000
-sentEntryOrder = False
-sentExitOrder = False
+sentEntryOrder = dict()
+sentExitOrder = dict()
+crossAbove=dict()
+crossBelow=dict()
 intSMALength = 30
 dblUpperThreshold = 1
-dblLowerThreshold = -1
+dblLowerThreshold = 1
 instPair1Factor=1
 instPair2Factor=1
 dblQty=1
 dblQty2=1
-crossAbove=False
-crossBelow=False
+
 
 def procBar(bar1, bar2, pos, trade):
-    global pair1Series
-    global pair2Series
+    global pairSeries
     global tsPairratio
-    global tsPairratio2
     global tsZscore
-    global tsZscore2
+    global tsDates
     global indSmaZscore
-    global indSmaZscore2
     global intDatapoints
     global sentEntryOrder 
     global sentExitOrder 
@@ -59,38 +53,76 @@ def procBar(bar1, bar2, pos, trade):
     if bar1['Close'] > 0 and bar2['Close'] > 0:
         xd = bar1['Close'] * instPair1Factor
         yd = bar2['Close'] * instPair2Factor
-        pair1Series.append(bar1['Close'])
-        pair2Series.append(bar2['Close'])
+        sym1=bar1['Symbol']
+        sym2=bar2['Symbol']
+        if not pairSeries.has_key(sym1):
+            pairSeries[sym1]=list()
+        if not pairSeries.has_key(sym2):
+            pairSeries[sym2]=list()
+        if not tsPairratio.has_key(sym1+sym2):
+            tsPairratio[sym1+sym2]=list()
+        if not tsPairratio.has_key(sym2+sym1):
+            tsPairratio[sym2+sym1]=list()
+        if not tsZscore.has_key(sym1+sym2):
+            tsZscore[sym1+sym2]=list()
+        if not tsZscore.has_key(sym2+sym1):
+            tsZscore[sym2+sym1]=list()
+        if not tsDates.has_key(sym1):
+            tsDates[sym1]=list()
+        if not tsDates.has_key(sym2):
+            tsDates[sym2]=list()
+        if not tsDates.has_key(sym1+sym2):
+            tsDates[sym1+sym2]=list()
+        if not tsDates.has_key(sym2+sym1):
+            tsDates[sym2+sym1]=list()
+        if not crossAbove.has_key(sym1+sym2):
+            crossAbove[sym1+sym2]=False
+        if not crossBelow.has_key(sym1+sym2):
+            crossBelow[sym1+sym2]=False
+        if not sentEntryOrder.has_key(sym1+sym2):
+            sentEntryOrder[sym1+sym2]=False
+        if not sentExitOrder.has_key(sym1+sym2):
+            sentExitOrder[sym1+sym2]=False
+        
+        if bar1['Date'] not in tsDates[sym1]:
+            pairSeries[sym1].append(bar1['Close'])
+            tsDates[sym1].append(bar1['Date'])
+        
+        if bar2['Date'] not in tsDates[sym2]:
+            pairSeries[sym2].append(bar2['Close'])
+            tsDates[sym2].append(bar2['Date'])
 
         dblRatioData = bar1['Close'] / bar2['Close'];
-        tsPairratio.append( dblRatioData);
+        tsPairratio[sym1+sym2].append( dblRatioData );
+        
         dblRatioData2 = bar2['Close'] / bar1['Close'];
-        tsPairratio2.append( dblRatioData2);
+        tsPairratio[sym2+sym1].append( dblRatioData2 );
 
-        if len(tsPairratio)< intDatapoints or len(tsPairratio2) < intDatapoints:
+        if len(tsPairratio[sym1+sym2])< intDatapoints or len(tsPairratio[sym2+sym1]) < intDatapoints:
             return []
 
-        iStart = len(tsPairratio) - intDatapoints;
-        iEnd = len(tsPairratio) - 1;
-        dblAverage = np.mean(tsPairratio[iStart:iEnd]);
-        dblRatioStdDev = np.std(tsPairratio[iStart:iEnd]);
+        iStart = len(tsPairratio[sym1+sym2]) - intDatapoints;
+        iEnd = len(tsPairratio[sym1+sym2]) - 1;
+        dblAverage = np.mean(tsPairratio[sym1+sym2][iStart:iEnd]);
+        dblRatioStdDev = np.std(tsPairratio[sym1+sym2][iStart:iEnd]);
         dblResidualsData = (dblRatioData - dblAverage);
         dblZscoreData = (dblRatioData - dblAverage) / dblRatioStdDev;
-        tsZscore.append(dblZscoreData)
-        tsDates.append(bar1['Date'])
-
-        iStart2 = len(tsPairratio2) - intDatapoints;
-        iEnd2 = len(tsPairratio2) - 1;
-        dblAverage2 = np.mean(tsPairratio[iStart2:iEnd2]);
-        dblRatioStdDev2 = np.std(tsPairratio[iStart2:iEnd2]);
+        tsZscore[sym1+sym2].append(dblZscoreData)
+        tsDates[sym1+sym2].append(bar1['Date'])
+        
+        iStart2 = len(tsPairratio[sym2+sym1]) - intDatapoints;
+        iEnd2 = len(tsPairratio[sym2+sym1]) - 1;
+        dblAverage2 = np.mean(tsPairratio[sym2+sym1][iStart2:iEnd2]);
+        dblRatioStdDev2 = np.std(tsPairratio[sym2+sym1][iStart2:iEnd2]);
         dblResidualsData2 = (dblRatioData2 - dblAverage2);
         dblZscoreData2 = (dblRatioData2 - dblAverage2) / dblRatioStdDev2;
-        tsZscore2.append(dblZscoreData2)
-        
+        tsZscore[sym2+sym1].append(dblZscoreData2)
+        tsDates[sym2+sym1].append(bar2['Date'])
+         
         signals=pd.DataFrame()
-        signals['Date']=tsDates
-        signals['tsZscore']=tsZscore
-        signals['tsZscore2']=tsZscore2
+        signals['Date']=tsDates[sym1+sym2]
+        signals['tsZscore']=tsZscore[sym1+sym2]
+        signals['tsZscore2']=tsZscore[sym2+sym1]
         #signals['indSmaZscore']=pd.rolling_mean(signals['tsZscore'], intSMALength, min_periods=1)
         #signals['indSmaZscore2']=pd.rolling_mean(signals['tsZscore2'], intSMALength, min_periods=1)    
         
@@ -117,20 +149,20 @@ def procBar(bar1, bar2, pos, trade):
                 if signals.iloc[-2]['tsZscore'] > signals.iloc[-2]['indSmaZscore']  \
                         and                                                         \
                    signals.iloc[-1]['tsZscore'] <= signals.iloc[-1]['indSmaZscore']:
-                        crossBelow=False
-                        crossAbove=True
+                        crossBelow[sym1+sym2]=False
+                        crossAbove[sym1+sym2]=True
 
                 if signals.iloc[-2]['tsZscore'] < signals.iloc[-2]['indSmaZscore'] \
                        and                                                         \
                    signals.iloc[-1]['tsZscore'] >= signals.iloc[-1]['indSmaZscore']:
-                        crossBelow=True
-                        crossAbove=False
+                        crossBelow[sym1+sym2]=True
+                        crossAbove[sym1+sym2]=False
                        
                 #print ' crossAbove: ' + str(crossAbove) + ' crossBelow: ' + str(crossBelow)
                 #crossBelow = signals['tsZscore'].iloc[-1] >= signals['indSmaZscore'].iloc[-1] and crossBelow.any()
                 #crossAbove = signals['tsZscore'].iloc[-1] <= signals['indSmaZscore'].iloc[-1] and crossAbove.any()
                 #print ' crossAbove: ' + str(crossAbove) + ' crossBelow: ' + str(crossBelow)
-                if not sentEntryOrder and not pos.has_key(bar1['Symbol']) and not pos.has_key(bar2['Symbol']):
+                if not sentEntryOrder[sym1+sym2] and not pos.has_key(bar1['Symbol']) and not pos.has_key(bar2['Symbol']):
 
                     #dblQty = Math.Ceiling(1/dblBeta);
                     #dblQty2 = Math.Ceiling(dblBeta);
@@ -144,7 +176,7 @@ def procBar(bar1, bar2, pos, trade):
     
                     
                 
-                    if dblZscoreData >= dblUpperThreshold and crossAbove == 1:
+                    if dblZscoreData >= dblUpperThreshold and crossAbove[sym1+sym2] == 1:
                         
                         #Sell(instPair1, dblQty, strOrderComment);
                         #Buy(instPair2, dblQty2, strOrderComment2);
@@ -154,8 +186,8 @@ def procBar(bar1, bar2, pos, trade):
                         #    Sell(myParam.getSym1OptInst(PutCall.Put, bar1['Close'], this), myParam.sym1OptQty, strOrderComment);
                         #    Sell(myParam.getSym2OptInst(PutCall.Call, bar2['Close'], this), myParam.sym2OptQty, strOrderComment2);
                         #}
-                        sentEntryOrder = True
-                        sentExitOrder = False
+                        sentEntryOrder[sym1+sym2] = True
+                        sentExitOrder[sym1+sym2] = False
                         return ([bar1['Symbol'], -abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], abs(dblQty2), strOrderComment2])
                     elif dblZscoreData <= -1 * dblUpperThreshold and crossBelow==1:
@@ -166,15 +198,15 @@ def procBar(bar1, bar2, pos, trade):
                         #    Sell(myParam.getSym1OptInst(PutCall.Call, bar1['Close'], this), myParam.sym1OptQty, strOrderComment);
                         #    Sell(myParam.getSym2OptInst(PutCall.Put, bar2['Close'], this), myParam.sym2OptQty, strOrderComment2);
                         #}
-                        sentEntryOrder = True
-                        sentExitOrder = False
+                        sentEntryOrder[sym1+sym2] = True
+                        sentExitOrder[sym1+sym2] = False
                         return ([bar1['Symbol'], abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], -abs(dblQty2), strOrderComment2])
     
-                elif not sentExitOrder and pos.has_key(bar1['Symbol']) and pos.has_key(bar2['Symbol']):
+                elif not sentExitOrder[sym1+sym2] and pos.has_key(bar1['Symbol']) and pos.has_key(bar2['Symbol']):
                     
                     if pos[bar1['Symbol']] < 0 and pos[bar2['Symbol']] > 0 and \
-                        dblZscoreData <= dblLowerThreshold and crossAbove==1:
+                        dblZscoreData <= dblLowerThreshold and crossAbove[sym1+sym2]==1:
                         #Buy(instPair1, dblQty, strOrderComment);
                         #Sell(instPair2, dblQty2, strOrderComment2);
     
@@ -183,13 +215,13 @@ def procBar(bar1, bar2, pos, trade):
                         #   Buy(myParam.instPair1opt, myParam.sym1OptQty, strOrderComment);
                         #   Buy(myParam.instPair2opt, myParam.sym2OptQty, strOrderComment);
                         #}
-                        sentEntryOrder = False;
-                        sentExitOrder = True;
+                        sentEntryOrder[sym1+sym2] = False;
+                        sentExitOrder[sym1+sym2] = True;
                         return ([bar1['Symbol'], abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], -abs(dblQty2), strOrderComment2])
     
                     elif pos[bar1['Symbol']] > 0 and pos[bar2['Symbol']] < 0 and \
-                        dblZscoreData >= -1 * dblLowerThreshold and crossBelow == 1:
+                        dblZscoreData >= -1 * dblLowerThreshold and crossBelow[sym1+sym2] == 1:
                         #Sell(instPair1, dblQty, strOrderComment);
                         #Buy(instPair2, dblQty2, strOrderComment2);
     
@@ -198,8 +230,8 @@ def procBar(bar1, bar2, pos, trade):
                         #    Buy(myParam.instPair1opt, myParam.sym1OptQty, strOrderComment);
                         #    Buy(myParam.instPair2opt, myParam.sym2OptQty, strOrderComment);
                         #}
-                        sentEntryOrder = False;
-                        sentExitOrder = True;
+                        sentEntryOrder[sym1+sym2] = False;
+                        sentExitOrder[sym1+sym2] = True;
                         return ([bar1['Symbol'], -abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], abs(dblQty2), strOrderComment2])
                

@@ -11,11 +11,11 @@ def get_model_pos(systems):
     for system in systems:
         filename='./data/signals/' + system + '.csv'
         if os.path.isfile(filename):
-            data = pd.read_csv(filename, index_col='Date')
+            data = pd.read_csv(filename, index_col='Date').iloc[-1]
             signals=data['Signal'];
             #safef=data['safef'];
            
-            signal=signals[-1];
+            signal=signals
             qty=1
             pos=pos.append(pd.DataFrame([[system, signal, qty]], columns=['system','action','qty']))
         else:
@@ -30,10 +30,10 @@ def get_dps_model_pos(systems):
     for system in systems:
         filename='./data/signals/' + system + '.csv'
         if os.path.isfile(filename):
-            data = pd.read_csv(filename, index_col='dates')
+            data = pd.read_csv(filename, index_col='dates').iloc[-1]
             signals=data['signals'];
             safef=data['safef'];
-            qty=safef[-1]*signals[-1]
+            qty=safef*signals
             #signal=signals[-1];
             qty=round(qty)
             signal=qty

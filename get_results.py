@@ -301,7 +301,8 @@ def generate_html(filename, counter, html, cols):
     width=300
     if counter == 0:
             html = html + '<tr>'
-    html = html + '<td><img src="' + filename + '.png"  width=' + str(width) + ' height=' + str(height) + '></td>'
+    html = html + '<td><a href="' + filename + '.png">'
+    html = html + '<img src="' + filename + '.png"  width=' + str(width) + ' height=' + str(height) + '></a></td>'
     counter = counter + 1
     if counter == cols:
         html = html + '</tr>'
@@ -346,10 +347,11 @@ for i in systemdata.index:
 def gen_sig(html, counter, cols):
     html = html + '<h1>Signals</h1><br><table>'
     (counter, html)=generate_sigplots(counter, html, cols)
+    html = html + '</table>'
     return (html, counter, cols)
 
 def gen_c2(html, counter, cols):
-    html = html + '</table><h1>C2</h1><br><table>'
+    html = html + '<h1>C2</h1><br><table>'
     for systemname in systemdict:
         try:
             if c2dict.has_key(systemname):
@@ -366,13 +368,13 @@ def gen_c2(html, counter, cols):
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
         except Exception as e:
             logging.error("get_c2", exc_info=True)
-        html = html + '</table>'
+    html = html + '</table>'
     return (html, counter, cols)
  
 
 def gen_ib(html, counter, cols):
     try:
-        html = html + '</table><h1>IB</h1><br><table>'
+        html = html + '<h1>IB</h1><br><table>'
         if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
             ibdata=generate_ib_plot('IB_Paper','Date', 20000)
             (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
@@ -394,6 +396,7 @@ def gen_ib(html, counter, cols):
             (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
     except Exception as e:
         logging.error("gen_ib", exc_info=True)
+    html = html + '</table>'
     return (html, counter, cols)
 
 #Paper    
@@ -436,7 +439,7 @@ def gen_paper(html, counter, cols):
     return (html, counter, cols)
     
 def gen_btc(html, counter, cols):
-    html = html + '</table><h1>BTC Paper</h1><br><table>'
+    html = html + '<h1>BTC Paper</h1><br><table>'
     counter = 0
     cols=4
     
@@ -495,6 +498,7 @@ def gen_btc(html, counter, cols):
                             plt.close()
                         except Exception as e:
                             logging.error("get_btc", exc_info=True)
+    html = html + '</table>'
     return (html, counter, cols)      
 
 def gen_file(filetype):

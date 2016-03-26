@@ -38,6 +38,9 @@ systems = ['v1','v2.32','v3.1']
 #regime switching params
 lookback = 720
 
+pngPath2 = './data/results/'
+equityCurveSavePath2 = './data/signalPlots/'
+
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
     signalPath = './data/signals/'
@@ -73,7 +76,7 @@ def calcEquity_signals(SST, title, **kwargs):
     leverage = kwargs.get('leverage',0)
     equityCurveSavePath = kwargs.get('equityCurveSavePath',None)
     pngPath = kwargs.get('pngPath',None)
-    pngFilename = kwargs.get('pngPath',None)
+    pngFilename = kwargs.get('pngFilename',None)
     figsize = kwargs.get('figsize',(8,7))
     showPlot =kwargs.get('showPlot',True)
     verbose = kwargs.get('verbose',True)
@@ -265,8 +268,9 @@ def calcEquity_signals(SST, title, **kwargs):
     xticks[1].label1.set_visible(False)
     
     fig.autofmt_xdate()
-    if pngPath != None:
-        plt.savefig(pngPath+title+'.png', bbox_inches='tight')
+    if pngPath2 != None:
+	print 'Saving: ' + pngPath2+pngFilename+'.png'
+        plt.savefig(pngPath2+pngFilename+'.png', bbox_inches='tight')
     
     if showPlot:
         plt.show()
@@ -350,7 +354,8 @@ for pair in pairs:
                                         leverage = dataSet.safef.values, equityCurveSavePath=equityCurveSavePath,\
                                         pngPath=pngPath,verbose=verbose, pngFilename=f[:-4],\
                                         figsize=size, showPlot=showPlot)
-                    equityCurve.to_csv(equityCurveSavePath+f[:-4]+'_curve.csv')
+		    print "Saving: " + equityCurveSavePath2+f[:-4]+'.csv'
+                    equityCurve.to_csv(equityCurveSavePath2+f[:-4]+'.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
                     numTrades[title] = numberZeros(dataSet.signals)
@@ -391,7 +396,8 @@ for pair in pairs:
                                         leverage = dataSet.safef.values, equityCurveSavePath=equityCurveSavePath,\
                                         figsize=size, showPlot=showPlot,pngPath=pngPath, pngFilename=f[:-4],\
                                         verbose=verbose)
-                    equityCurve.to_csv(equityCurveSavePath+f[:-4]+'_curve.csv')
+		    print 'Saving: ' + equityCurveSavePath2+f[:-4]+'.csv'
+                    equityCurve.to_csv(equityCurveSavePath2+f[:-4]+'.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
                     numTrades[title] = numberZeros(dataSet.signals)
@@ -496,7 +502,8 @@ for title in eCurves_bySystem:
     print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
                 (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
                     eCurves[title2].maxDD.iloc[-1])
-    eCurves[title2].to_csv(equityCurveSavePath+dI_title+'_curve.csv')
+    print 'Saving: ' + equityCurveSavePath2+dI_title+'.csv'
+    eCurves[title2].to_csv(equityCurveSavePath2+dI_title+'.csv')
 
 
 #check

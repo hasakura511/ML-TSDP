@@ -71,6 +71,7 @@ def generate_sigplots(counter, html, cols):
               systems[system['System']]=1
               if system['Version']=='v1':
                   filename = 'v1_' + filename
+	      print filename
               (counter, html)=generate_html(filename, counter, html, cols)
     return (counter, html)     
     
@@ -336,9 +337,9 @@ for i in systemdata.index:
         signal='v1_' + signal
     if not sigdict.has_key(system['Name']):
         sigdict[system['Name']]=list()
-        sigdict[system['Name']].append(signal)
+        sigdict[system['Name']].append(signal+'')
     else:
-        sigdict[system['Name']].append(signal)
+        sigdict[system['Name']].append(signal+'')
 
 
 def gen_sig(html, counter, cols):
@@ -618,7 +619,7 @@ def gen_file(filetype):
     f.close()    
     if filetype == 'sig':
     	logfile = open('/logs/create_signalPlots.log', 'a')
-    	subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
+    	#subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
     	logfile.close()
          
 types=['index','sig','c2','ib','paper','btc']

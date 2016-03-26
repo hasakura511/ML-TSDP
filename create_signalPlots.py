@@ -268,7 +268,7 @@ def calcEquity_signals(SST, title, **kwargs):
     xticks[1].label1.set_visible(False)
     
     fig.autofmt_xdate()
-    if pngPath2 != None:
+    if pngPath2 != None and pngFilename != None:
 	print 'Saving: ' + pngPath2+pngFilename+'.png'
         plt.savefig(pngPath2+pngFilename+'.png', bbox_inches='tight')
     
@@ -307,6 +307,8 @@ numTrades = {}
 for pair in pairs:
     dataFilename = [pairs for pairs in dataFiles if pair in pairs][0]
     dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
+    if not 'cycleTime' in dataFile:
+                        dataFile['cycleTime']=0
     print 'Loaded data from', str(dataPath) + str(dataFilename)
     
     validSignalFiles = {}
@@ -320,6 +322,8 @@ for pair in pairs:
 	      #print filename
 	      if os.path.isfile(filename):
                 signalFile = pd.read_csv(filename, index_col='dates').drop_duplicates()
+		if not 'cycleTime' in signalFile:
+			signalFile['cycleTime']=0
                 print 'Loaded signals from', filename
                 #if there is no prior index in the row, then it's a legacy file
                 if 'prior_index' in signalFile:
@@ -362,6 +366,8 @@ for pair in pairs:
         else:
             for f in [sfile for sfile in validSignalFiles[system] if pair in sfile]:
                 signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()
+		if not 'cycleTime' in signalFile: 
+                        signalFile['cycleTime']=0
                 print 'Loaded signals from', f
                 #if there is no prior index in the row, then it's a legacy file
                 if 'prior_index' in signalFile:

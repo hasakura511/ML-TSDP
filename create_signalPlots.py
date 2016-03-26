@@ -496,6 +496,7 @@ for title in eCurves_bySystem:
     print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
                 (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
                     eCurves[title2].maxDD.iloc[-1])
+    eCurves[title2].to_csv(equityCurveSavePath+dI_title+'_curve.csv')
 
 
 #check

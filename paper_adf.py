@@ -46,6 +46,8 @@ import adfapi.s105 as astrat
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
 
+logging.basicConfig(filename='/logs/paper_adf.log',level=logging.DEBUG)
+
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
 commissiondata=pd.read_csv('./data/systems/commission.csv')
@@ -110,15 +112,13 @@ def get_results(sysname, pairs):
     seigraph.generate_plots(data, 'paper_' + sysname + 'Close', sysname + " Close Price", 'Close')
     
 
-#pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO'],
-#       ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO'],
-#       ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO'],
-#       ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO'],
-#       ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [100000,'JPY','IDEALPRO']]
-pairs=[['./data/btapi/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD']],
-       ['./data/btapi/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD']]]
+pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO']],
+       ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO']],
+       ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO']]]
+#pairs=[['./data/btapi/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD']],
+#       ['./data/btapi/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD']]]
        
-sysname='ADF2'
+sysname='ADF'
 refresh_paper(sysname)
 data=gettrades(sysname)
 SST=seigraph.get_history(pairs, 'Close')
@@ -193,11 +193,12 @@ def proc_pair(sym1, sym2, param1, param2):
                                 int(timestamp)
                             ).strftime("%Y%m%d %H:%M:%S EST")
                             print 'Signal: ' + barSym + '[' + str(barSig) + ']@' + str(ask)
+                            ibsym=sym[0:3]
                             adj_size(model, barSym, sysname, pricefeed,   \
                                 sysname,sysname,mult,barSym, secType, True, \
-                                    mult, sym,currency,exchange, secType, True, date)
+                                    mult, ibsym,currency,exchange, secType, True, date)
             except Exception as e:
-                print "proc_pair: error" + str(sys.exc_info()[0])
+                logging.error('proc_pair', exc_info=True)
 seen=dict()
 def proc_backtest(sysname, SST):
     for [file1,sym1, mult1] in pairs:

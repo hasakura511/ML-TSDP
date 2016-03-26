@@ -36,26 +36,26 @@ size = (8,7)
 systems = ['v1','v2.32','v3.1']
 
 #regime switching params
-lookback = 1440
-showPlots=False
-pngResPath = './data/results/'
+lookback = 720
 
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
-    savePath = './data/signalPlots/'
+    equityCurveSavePath = './data/signalPlots/'
     pngPath = './data/results/'
-    showPlots = False
+    showPlot = False
+    verbose = False
 else:
     signalPath = 'D:/ML-TSDP/data/signals/' 
     #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
     dataPath = 'D:/ML-TSDP/data/from_IB/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
-    savePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
+    equityCurveSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
     pngPath = None
-    showPlots = True
+    showPlot = True
+    verbose = True
     
 def fixnans(dataSet):
     fixed = np.zeros(dataSet.shape[0])
@@ -69,12 +69,13 @@ def fixnans(dataSet):
     return fixed
     
 def calcEquity_signals(SST, title, **kwargs):
-    #leverage=1.0, savePath=None, pngPath=None, figsize=(8,7), showPlot=True
+    #leverage=1.0, equityCurveSavePath=None, pngPath=None, figsize=(8,7), showPlot=True
     leverage = kwargs.get('leverage',0)
-    savePath = kwargs.get('savePath',None)
+    equityCurveSavePath = kwargs.get('equityCurveSavePath',None)
     pngPath = kwargs.get('pngPath',None)
+    pngFilename = kwargs.get('pngPath',None)
     figsize = kwargs.get('figsize',(8,7))
-    showPlot =kwargs.get('showPlot',showPlots)
+    showPlot =kwargs.get('showPlot',True)
     verbose = kwargs.get('verbose',True)
     
     initialEquity = 1.0
@@ -264,8 +265,8 @@ def calcEquity_signals(SST, title, **kwargs):
     xticks[1].label1.set_visible(False)
     
     fig.autofmt_xdate()
-    if pngResPath != None:
-        plt.savefig(pngResPath+title+'.png', bbox_inches='tight')
+    if pngPath != None:
+        plt.savefig(pngPath+title+'.png', bbox_inches='tight')
     
     if showPlot:
         plt.show()
@@ -298,6 +299,7 @@ dataFiles = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 pairs = [x[6:12] for x in dataFiles]
 dataSets = {}
 maxCTs = {}
+numTrades = {}
 for pair in pairs:
     dataFilename = [pairs for pairs in dataFiles if pair in pairs][0]
     dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
@@ -345,12 +347,13 @@ for pair in pairs:
                     title = system +'_maxLag_'+str(maxCT)+\
                                 ' '+ reindexed_sst.iloc[-1].system          
                     equityCurve = calcEquity_signals(dataSet,title,\
-                                        leverage = dataSet.safef.values, savePath=savePath,\
-                                        pngPath=pngPath, \
-                                        figsize=size, showPlot=showPlots)
-                    equityCurve.to_csv(savePath+f[:-4]+'_curve.csv')
+                                        leverage = dataSet.safef.values, equityCurveSavePath=equityCurveSavePath,\
+                                        pngPath=pngPath,verbose=verbose, pngFilename=f[:-4],\
+                                        figsize=size, showPlot=showPlot)
+                    equityCurve.to_csv(equityCurveSavePath+f[:-4]+'_curve.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
+                    numTrades[title] = numberZeros(dataSet.signals)
         else:
             for f in [sfile for sfile in validSignalFiles[system] if pair in sfile]:
                 signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()
@@ -385,11 +388,13 @@ for pair in pairs:
                     title = system +'_maxLag_'+str(maxCT)+\
                                 ' '+ reindexed_sst.iloc[-1].system       
                     equityCurve = calcEquity_signals(dataSet, title,\
-                                        leverage = dataSet.safef.values, savePath=savePath,\
-                                        figsize=size, showPlot=showPlots)
-                    equityCurve.to_csv(savePath+f[:-4]+'_curve.csv')
+                                        leverage = dataSet.safef.values, equityCurveSavePath=equityCurveSavePath,\
+                                        figsize=size, showPlot=showPlot,pngPath=pngPath, pngFilename=f[:-4],\
+                                        verbose=verbose)
+                    equityCurve.to_csv(equityCurveSavePath+f[:-4]+'_curve.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
+                    numTrades[title] = numberZeros(dataSet.signals)
 
 #set arbitrary start/enddates that exist
 startDate = dataSet.index[0]
@@ -413,25 +418,29 @@ eCurves = {}
 for title in dataSets:
     eCurves[title] = calcEquity_signals(dataSets[title][startDate:endDate],title,\
                                         leverage = dataSets[title][startDate:endDate].safef.values,\
-                                        savePath=None,\
+                                        equityCurveSavePath=None,\
                                         pngPath=None, verbose=False,\
-                                        figsize=size, showPlot=showPlots)
+                                        figsize=size, showPlot=False)
                                         
 #find max cycletime and date index by version
 eCurves_bySystem = {}
 dateIndexes = {}
 maxCT_bySystem = {}
+totalTrades_bySystem = {}
 for ver in titleDict:
     for i,title in enumerate(titleDict[ver]):
         if i == 0:
             dateIndex = eCurves[title].index
             maxCT = maxCTs[title]
+            trades = sum(numTrades[title])
         else:
             dateIndex = dateIndex.intersection(eCurves[title].index)
+            trades += sum(numTrades[title])
             if maxCTs[title] > maxCT:
                 maxCT = maxCTs[title]
     dateIndexes[ver] = dateIndex
     maxCT_bySystem[ver] = maxCT
+    totalTrades_bySystem[ver] = trades
     
 #find max cycletime and date index of all systems
 all = str(systems).replace('[','').replace('\'','').replace(']','')
@@ -439,40 +448,57 @@ for i,title in enumerate(eCurves):
     if i == 0:
         dateIndex = eCurves[title].index
         maxCT = maxCTs[title]
+        trades = sum(numTrades[title])
     else:
         dateIndex = dateIndex.intersection(eCurves[title].index)
+        trades += sum(numTrades[title])
         if maxCTs[title] > maxCT:
             maxCT = maxCTs[title]
     dateIndexes[all] = dateIndex
     maxCT_bySystem[all] = maxCT
+    totalTrades_bySystem[all] = trades
     
 #add by version
 for ver in titleDict:
     equityBySystem = np.zeros(dateIndexes[ver].shape[0])
     for title in titleDict[ver]:
         equityBySystem += eCurves[title].ix[dateIndexes[ver]].equity.values
-    eCurves_bySystem[ver] = equityBySystem
+    eCurves_bySystem[str(len(titleDict[ver]))+' '+ver+' Systems'] = equityBySystem
     
 # add everything together
 equityCons = np.zeros(dateIndexes[all].shape[0])
 for title in dataSets:
     equityCons += eCurves[title].ix[dateIndexes[all]].equity.values
-eCurves_bySystem[all] = equityCons
+eCurves_bySystem[str(len(dataSets))+' '+all+' Systems'] = equityCons
 
 #create price change
 for title in eCurves_bySystem:
+    dI_title = title[len(title.split()[0])+1:-8]
     equityCons = pd.concat([pd.Series(data=priceChange(eCurves_bySystem[title]),\
-                                        name = 'gainAhead', index = dateIndexes[title]),\
-                            pd.Series(data=1, name='safef', index = dateIndexes[title]),\
-                            pd.Series(data=1, name='signals', index = dateIndexes[title])],\
+                                        name = 'gainAhead', index = dateIndexes[dI_title]),\
+                            pd.Series(data=1, name='safef', index = dateIndexes[dI_title]),\
+                            pd.Series(data=1, name='signals', index = dateIndexes[dI_title])],\
                             axis=1)
     #add cycletime
-    title2 = title+'_maxLag'+str(maxCT_bySystem[title])
+    
+    avgTrades = float(totalTrades_bySystem[dI_title])/float(title.split()[0])/60.0
+    title2 = title+' maxLag'+str(maxCT_bySystem[dI_title])
+    print '\n\n'
     eCurves[title2] = calcEquity_signals(equityCons,title2,\
                                     leverage = equityCons.safef.values,\
-                                    savePath=savePath,\
-                                    pngPath=None,\
-                                    figsize=size, showPlot=showPlots)
+                                    equityCurveSavePath=equityCurveSavePath,\
+                                    pngPath=pngPath, verbose=False, pngFilename=dI_title,\
+                                    figsize=size, showPlot=showPlot)
+                                    
+    print 'Validation Period from', equityCons.index[0],'to',equityCons.index[-1]
+    print 'There are %0.f bars. Average trades per hour per system: %0.2f' \
+                            % (equityCons.shape[0], avgTrades)
+    print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
+                (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
+                    eCurves[title2].maxDD.iloc[-1])
+    eCurves[title2].to_csv(equityCurveSavePath+dI_title+'_curve.csv')
+
+
 #check
 #for x in eCurves_bySystem:
 #    print x

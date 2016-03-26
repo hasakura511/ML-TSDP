@@ -71,7 +71,6 @@ def generate_sigplots(counter, html, cols):
               systems[system['System']]=1
               if system['Version']=='v1':
                   filename = 'v1_' + filename
-	      print filename
               (counter, html)=generate_html(filename, counter, html, cols)
     return (counter, html)     
     
@@ -235,6 +234,7 @@ def save_plot(colnames, filename, title, ylabel, SST):
     plt.clf()
     plt.cla()
     plt.close() 
+
 def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, counter, html, cols=4, recent=-1):
     try:
 	logging.info(' ' + systemname + ', ' + title + ', ' + ylabel)
@@ -344,7 +344,7 @@ for i in systemdata.index:
 
 def gen_sig(html, counter, cols):
     counter = 0
-    cols=5
+    cols=4
     html = html + '<h1>Signals</h1><br><table>'
     (counter, html)=generate_sigplots(counter, html, cols)
     html = html + '</table>'
@@ -581,7 +581,7 @@ def gen_file(filetype):
         html = html + '<li><a href=btc.html>BTC</a></li>'
     elif filetype == 'sig':
         counter=0
-        cols=3
+        cols=5
         filename='./data/results/sig.html'
         (html, counter, cols)=gen_sig(html, counter, cols)
     elif filetype == 'c2':
@@ -619,7 +619,7 @@ def gen_file(filetype):
     f.close()    
     if filetype == 'sig':
     	logfile = open('/logs/create_signalPlots.log', 'a')
-    	#subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
+    	subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
     	logfile.close()
          
 types=['index','sig','c2','ib','paper','btc']

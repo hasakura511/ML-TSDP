@@ -21,3 +21,4 @@ dates,signals,safef,comment
 1458960600.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""bitfinexUSDbitstampUSD"", ""zScore"": -0.4, ""zSMA"": -2.09}"
 1458968400.0,1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""bitfinexUSDbitstampUSD"", ""zScore"": -1.23, ""zSMA"": -1.24}"
 1458968700.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""bitfinexUSDbitstampUSD"", ""zScore"": -0.49, ""zSMA"": -1.23}"
+1458985200.0,1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""bitfinexUSDbitstampUSD"", ""zScore"": -1.69, ""zSMA"": -1.98}"

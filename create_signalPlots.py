@@ -38,6 +38,7 @@ systems = ['v1','v2.32','v3.1']
 #regime switching params
 lookback = 1440
 showPlots=False
+pngResPath = './data/results/'
 
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
@@ -263,8 +264,8 @@ def calcEquity_signals(SST, title, **kwargs):
     xticks[1].label1.set_visible(False)
     
     fig.autofmt_xdate()
-    if pngPath != None:
-        plt.savefig(pngPath+title+'.png', bbox_inches='tight')
+    if pngResPath != None:
+        plt.savefig(pngResPath+title+'.png', bbox_inches='tight')
     
     if showPlot:
         plt.show()

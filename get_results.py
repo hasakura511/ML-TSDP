@@ -58,9 +58,6 @@ logging.basicConfig(filename='/logs/get_results.log',level=logging.DEBUG)
 
 
 def generate_sigplots(counter, html, cols):
-    logfile = open('/logs/create_signalPlots.log', 'a')
-    subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
-    logfile.close()
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
     systems=dict()
@@ -209,11 +206,8 @@ def save_plot(colnames, filename, title, ylabel, SST):
     #else:
     #    barSize = '1 min'
         
-    def format_date(x, pos=None):
-        thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
-        return SST.index[thisind].strftime("%Y-%m-%d %H:%M")
-    #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-
+    myFmt = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
+    ax.xaxis.set_major_formatter(myFmt)
     legend = ax.legend(loc='best', shadow=True)
     
     # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
@@ -231,7 +225,7 @@ def save_plot(colnames, filename, title, ylabel, SST):
     # use a more precise date string for the x axis locations in the
     # toolbar
 
-    fig.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+    fig.fmt_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
     plt.title(title)
     plt.ylabel(ylabel)
     #plt.show()
@@ -243,7 +237,7 @@ def save_plot(colnames, filename, title, ylabel, SST):
 def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, counter, html, cols=4):
     try:
 	logging.info(' ' + systemname + ', ' + title + ', ' + ylabel)
-        SST=data
+        SST=data.copy()
         SST[dateCol]=pd.to_datetime(SST[dateCol])
         SST=SST.sort_values(by=[dateCol])
         SST=SST.set_index(dateCol)
@@ -256,7 +250,7 @@ def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, count
     
     return (counter, html)
     
-def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
+def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4, recent=-1):
     try:
         SST=pd.DataFrame()
         
@@ -282,7 +276,9 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4):
         for col in SST.columns:
             if col != 'Date' and col != 0:
                 colnames.append(col)
-                
+               
+	if recent > 0:
+		SST=SST.tail(recent) 
         filename='./data/results/' + systemname + ylabel + '.png'
         save_plot(colnames, filename, title, ylabel, SST)
         
@@ -317,6 +313,7 @@ start_time = time.time()
 systemdict={}
 sigdict={}
 c2dict={}
+ibdict={}
 for i in systemdata.index:
     
     system=systemdata.ix[i]
@@ -324,6 +321,8 @@ for i in systemdata.index:
     #print        " System Algo: " + str(system['System']) 
     if system['c2submit']:
 	c2dict[system['Name']]=1  
+    if system['ibsubmit']: 
+        ibdict[system['Name']]=1 
     if not systemdict.has_key(system['Name']):
         systemdict[system['Name']]=list()
         systemdict[system['Name']].append(system['ibsym']+ system['ibcur'])
@@ -340,6 +339,8 @@ for i in systemdata.index:
 
 
 def gen_sig(html, counter, cols):
+    counter = 0
+    cols=5
     html = html + '<h1>Signals</h1><br><table>'
     (counter, html)=generate_sigplots(counter, html, cols)
     html = html + '</table>'
@@ -371,6 +372,20 @@ def gen_c2(html, counter, cols):
 def gen_ib(html, counter, cols):
     try:
         html = html + '<h1>IB</h1><br><table>'
+        cols=4
+	counter=0
+	dhtml=''
+	for systemname in systemdict:
+         try:
+            if ibdict.has_key(systemname):
+
+                data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+                (dcounter, dhtml)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', 1, dhtml, cols)
+
+         except Exception as e:
+            logging.error("get_iblive", exc_info=True)
+            counter = 0
+
         if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
             ibdata=generate_ib_plot('IB_Paper','Date', 20000)
             (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
@@ -378,6 +393,9 @@ def gen_ib(html, counter, cols):
             ibdata=generate_ib_plot_from_trades('IB_Paper','times', 20000)
             (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'times', 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
             
+	    html = html + dhtml
+	    counter = counter + 1
+
             data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',20000)
             (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
         
@@ -388,8 +406,53 @@ def gen_ib(html, counter, cols):
             ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', 20000)
             (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'openedWhen', 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
             
+	    html = html + dhtml
+	    counter = counter + 1
+
             data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', 20000)
             (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+    
+	html = html + '</table><h1>Recent Trades</h1><br><table>'
+	
+	dhtml=''
+	recent=300
+	counter=0
+        for systemname in systemdict:
+         try:
+            if ibdict.has_key(systemname):
+
+                data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+                (dcounter, dhtml)=generate_plots(data, 'recent_ib_' + systemname + 'Signals', 'Recent IB ' + systemname + 'Signals', 'equity', 1, dhtml, cols, recent*2)
+
+         except Exception as e:
+            logging.error("get_iblive", exc_info=True)
+            counter = 0
+
+        if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
+            ibdata=generate_ib_plot('IB_Paper','Date', 20000)
+            (counter, html)=generate_mult_plot(ibdata.tail(recent), ['equitycurve','PurePLcurve'], 'Date', 'recent_ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
+
+            ibdata=generate_ib_plot_from_trades('IB_Paper','times', 20000)
+            (counter, html)=generate_mult_plot(ibdata.tail(recent),['equitycurve','PurePLcurve'], 'times', 'recent_ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
+
+            html = html + dhtml
+            counter = counter + 1
+
+            data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',20000)
+            (counter, html)=generate_mult_plot(data.tail(recent),['realized_PnL','PurePL'], 'times', 'recent_ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+
+        if os.path.isfile('./data/paper/c2_' + 'IB_Live' + '_trades.csv'):
+            ibdata=generate_ib_plot('C2_Paper', 'Date', 20000)
+            (counter, html)=generate_mult_plot(ibdata.tail(recent),['equitycurve','PurePLcurve'], 'Date', 'recent_ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
+
+            ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', 20000)
+            (counter, html)=generate_mult_plot(ibdata.tail(recent),['equitycurve','PurePLcurve'], 'openedWhen', 'recent_ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
+
+            html = html + dhtml
+            counter = counter + 1
+
+            data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', 20000)
+            (counter, html)=generate_mult_plot(data.tail(recent),['PL','PurePL'], 'openedWhen', 'recent_c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
     except Exception as e:
         logging.error("gen_ib", exc_info=True)
 	counter = 0
@@ -550,7 +613,11 @@ def gen_file(filetype):
     f.write(html)
     f.write(footerhtml)
     f.close()    
-
+    if filetype == 'sig':
+    	logfile = open('/logs/create_signalPlots.log', 'a')
+    	subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
+    	logfile.close()
+         
 types=['index','sig','c2','ib','paper','btc']
 def start_resgen():
     #Prep

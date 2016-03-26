@@ -72,7 +72,7 @@ def calcEquity_signals(SST, title, **kwargs):
     savePath = kwargs.get('savePath',None)
     pngPath = kwargs.get('pngPath',None)
     figsize = kwargs.get('figsize',(8,7))
-    showPlot =kwargs.get('showPlot',True)
+    showPlot =kwargs.get('showPlot',False)
     verbose = kwargs.get('verbose',True)
     
     initialEquity = 1.0

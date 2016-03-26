@@ -216,7 +216,7 @@ def save_plot(colnames, filename, title, ylabel, SST):
         
     myFmt = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
     ax.xaxis.set_major_formatter(myFmt)
-    legend = ax.legend(loc='best', shadow=True)
+    legend = ax.legend(loc='upper left', shadow=True)
     
     # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
     frame = legend.get_frame()
@@ -534,7 +534,8 @@ def gen_paper(html, counter, cols):
           if systemname != 'stratBTC':
             #C2 Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
-		(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+		if verdict.has_key(systemname):
+			(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
 
                 c2data=generate_paper_c2_plot(systemname, 'Date', 20000)
                 (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
@@ -551,7 +552,8 @@ def gen_paper(html, counter, cols):
         
             #IB Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
-		(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+		if verdict.has_key(systemname):
+			(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
 
                 ibdata=generate_paper_ib_plot(systemname, 'Date', 20000)
                 (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)

@@ -504,13 +504,11 @@ def gen_file(filetype):
     cols=3
     if filetype == 'index':
         filename='./data/results/index.html'
-        html='<html><head><meta http-equiv="refresh" content="600"></head><body>'
-        html = html + '<a href=sig.html>Signals</a><br>'
-        html = html + '<a href=c2.html>C2</a><br>'
-        html = html + '<a href=ib.html>IB</a><br>'
-        html = html + '<a href=paper.html>Paper</a><br>'
-        html = html + '<a href=btc.html>BTC</a><br>'
-        html = html + '</body></html>'
+        html = html + '<li><a href=sig.html>Signals</a></li>'
+        html = html + '<li><a href=c2.html>C2</a></li>'
+        html = html + '<li><a href=ib.html>IB</a></li>'
+        html = html + '<li><a href=paper.html>Paper</a></li>'
+        html = html + '<li><a href=btc.html>BTC</a></li>'
     elif filetype == 'sig':
         counter=0
         cols=3
@@ -538,8 +536,16 @@ def gen_file(filetype):
         cols=4
         filename='./data/results/btc.html'
         (html, counter, cols)=gen_btc(html, counter, cols)  
+    header=open('./data/results/header.html', 'r')
+    headerhtml=header.read()
+    header.close
+    footer=open('./data/results/footer.html', 'r') 
+    footerhtml=footer.read() 
+    footer.close   
     f = open(filename, 'w')
+    f.write(headerhtml)
     f.write(html)
+    f.write(footerhtml)
     f.close()    
 
 types=['index','sig','c2','ib','paper','btc']

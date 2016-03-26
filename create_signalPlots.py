@@ -37,6 +37,7 @@ systems = ['v1','v2.32','v3.1']
 
 #regime switching params
 lookback = 1440
+showPlots=False
 
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
@@ -44,7 +45,7 @@ if len(sys.argv) > 1:
     dataPath = './data/from_IB/'
     savePath = './data/signalPlots/'
     pngPath = './data/results/'
-    showPlot = False
+    showPlots = False
 else:
     signalPath = 'D:/ML-TSDP/data/signals/' 
     #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
@@ -53,7 +54,7 @@ else:
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     savePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
     pngPath = None
-    showPlot = True
+    showPlots = True
     
 def fixnans(dataSet):
     fixed = np.zeros(dataSet.shape[0])
@@ -72,7 +73,7 @@ def calcEquity_signals(SST, title, **kwargs):
     savePath = kwargs.get('savePath',None)
     pngPath = kwargs.get('pngPath',None)
     figsize = kwargs.get('figsize',(8,7))
-    showPlot =kwargs.get('showPlot',False)
+    showPlot =kwargs.get('showPlot',showPlots)
     verbose = kwargs.get('verbose',True)
     
     initialEquity = 1.0
@@ -345,7 +346,7 @@ for pair in pairs:
                     equityCurve = calcEquity_signals(dataSet,title,\
                                         leverage = dataSet.safef.values, savePath=savePath,\
                                         pngPath=pngPath, \
-                                        figsize=size, showPlot=showPlot)
+                                        figsize=size, showPlot=showPlots)
                     equityCurve.to_csv(savePath+f[:-4]+'_curve.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
@@ -384,7 +385,7 @@ for pair in pairs:
                                 ' '+ reindexed_sst.iloc[-1].system       
                     equityCurve = calcEquity_signals(dataSet, title,\
                                         leverage = dataSet.safef.values, savePath=savePath,\
-                                        figsize=size, showPlot=showPlot)
+                                        figsize=size, showPlot=showPlots)
                     equityCurve.to_csv(savePath+f[:-4]+'_curve.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
@@ -413,7 +414,7 @@ for title in dataSets:
                                         leverage = dataSets[title][startDate:endDate].safef.values,\
                                         savePath=None,\
                                         pngPath=None, verbose=False,\
-                                        figsize=size, showPlot=False)
+                                        figsize=size, showPlot=showPlots)
                                         
 #find max cycletime and date index by version
 eCurves_bySystem = {}
@@ -470,7 +471,7 @@ for title in eCurves_bySystem:
                                     leverage = equityCons.safef.values,\
                                     savePath=savePath,\
                                     pngPath=None,\
-                                    figsize=size, showPlot=True)
+                                    figsize=size, showPlot=showPlots)
 #check
 #for x in eCurves_bySystem:
 #    print x

@@ -234,13 +234,16 @@ def save_plot(colnames, filename, title, ylabel, SST):
     plt.clf()
     plt.cla()
     plt.close() 
-def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, counter, html, cols=4):
+def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, counter, html, cols=4, recent=-1):
     try:
 	logging.info(' ' + systemname + ', ' + title + ', ' + ylabel)
         SST=data.copy()
         SST[dateCol]=pd.to_datetime(SST[dateCol])
         SST=SST.sort_values(by=[dateCol])
         SST=SST.set_index(dateCol)
+	if recent > 0: 
+                SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
+
         
         filename='./data/results/' + systemname + ylabel + '.png'
         save_plot(colnames, filename, title, ylabel, SST)
@@ -278,7 +281,7 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4, rece
                 colnames.append(col)
                
 	if recent > 0:
-		SST=SST.tail(recent) 
+		SST=SST.ix[SST.index[-1] + pd.DateOffset(-recent):]
         filename='./data/results/' + systemname + ylabel + '.png'
         save_plot(colnames, filename, title, ylabel, SST)
         
@@ -415,14 +418,14 @@ def gen_ib(html, counter, cols):
 	html = html + '</table><h1>Recent Trades</h1><br><table>'
 	
 	dhtml=''
-	recent=300
+	recent=2
 	counter=0
         for systemname in systemdict:
          try:
             if ibdict.has_key(systemname):
 
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                (dcounter, dhtml)=generate_plots(data, 'recent_ib_' + systemname + 'Signals', 'Recent IB ' + systemname + 'Signals', 'equity', 1, dhtml, cols, recent*2)
+                (dcounter, dhtml)=generate_plots(data, 'recent_ib_' + systemname + 'Signals', 'Recent IB ' + systemname + 'Signals', 'equity', 1, dhtml, cols, recent)
 
          except Exception as e:
             logging.error("get_iblive", exc_info=True)
@@ -430,29 +433,29 @@ def gen_ib(html, counter, cols):
 
         if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
             ibdata=generate_ib_plot('IB_Paper','Date', 20000)
-            (counter, html)=generate_mult_plot(ibdata.tail(recent), ['equitycurve','PurePLcurve'], 'Date', 'recent_ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
+            (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'recent_ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols, recent)
 
             ibdata=generate_ib_plot_from_trades('IB_Paper','times', 20000)
-            (counter, html)=generate_mult_plot(ibdata.tail(recent),['equitycurve','PurePLcurve'], 'times', 'recent_ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'times', 'recent_ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols, recent)
 
             html = html + dhtml
             counter = counter + 1
 
             data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',20000)
-            (counter, html)=generate_mult_plot(data.tail(recent),['realized_PnL','PurePL'], 'times', 'recent_ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+            (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'recent_ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols, recent)
 
         if os.path.isfile('./data/paper/c2_' + 'IB_Live' + '_trades.csv'):
             ibdata=generate_ib_plot('C2_Paper', 'Date', 20000)
-            (counter, html)=generate_mult_plot(ibdata.tail(recent),['equitycurve','PurePLcurve'], 'Date', 'recent_ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'recent_ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols, recent)
 
             ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', 20000)
-            (counter, html)=generate_mult_plot(ibdata.tail(recent),['equitycurve','PurePLcurve'], 'openedWhen', 'recent_ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'openedWhen', 'recent_ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols, recent)
 
             html = html + dhtml
             counter = counter + 1
 
             data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', 20000)
-            (counter, html)=generate_mult_plot(data.tail(recent),['PL','PurePL'], 'openedWhen', 'recent_c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
+            (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'recent_c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols, recent)
     except Exception as e:
         logging.error("gen_ib", exc_info=True)
 	counter = 0

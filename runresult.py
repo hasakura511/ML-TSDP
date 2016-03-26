@@ -25,7 +25,11 @@ logging.basicConfig(filename='/logs/runproc_v3.log',level=logging.DEBUG)
 
 debug=False
 
-files=[['get_results.py',['1'],600]]
+files=[['get_results.py',['sig'],1200],
+       ['get_results.py',['c2'],43200],
+       ['get_results.py',['ib'],43200],
+       ['get_results.py',['paper'],1200],
+       ['get_results.py',['btc'], 7500]]
 
 def runfile(file,runargs,sleeptime):
     while 1:

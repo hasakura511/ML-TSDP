@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import time
+import matplotlib
 import matplotlib.ticker as tick
 import matplotlib.dates as mdates
 from os import listdir
@@ -203,24 +204,16 @@ def save_plot(colnames, filename, title, ylabel, SST):
     for col in colnames:
         ax.plot( SST[col], label=col)      
     barSize='1 day'
-    if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
-        barSize = '1 day'
-    else:
-        barSize = '1 min'
+    #if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
+    #    barSize = '1 day'
+    #else:
+    #    barSize = '1 min'
         
-    if barSize != '1 day':
-        def format_date(x, pos=None):
-            thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
-            return SST.index[thisind].strftime("%Y-%m-%d %H:%M")
-        #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-         
-    else:
-        def format_date(x, pos=None):
-            thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
-            return SST.index[thisind].strftime("%Y-%m-%d")
-        #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-           
-    # Now add the legend with some customizations.
+    def format_date(x, pos=None):
+        thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
+        return SST.index[thisind].strftime("%Y-%m-%d %H:%M")
+    #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+
     legend = ax.legend(loc='best', shadow=True)
     
     # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
@@ -244,10 +237,12 @@ def save_plot(colnames, filename, title, ylabel, SST):
     #plt.show()
     plt.savefig(filename)
     plt.close(fig)
-    plt.close()
-    
+    plt.clf()
+    plt.cla()
+    plt.close() 
 def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, counter, html, cols=4):
     try:
+	logging.info(' ' + systemname + ', ' + title + ', ' + ylabel)
         SST=data
         SST[dateCol]=pd.to_datetime(SST[dateCol])
         SST=SST.sort_values(by=[dateCol])
@@ -325,8 +320,8 @@ c2dict={}
 for i in systemdata.index:
     
     system=systemdata.ix[i]
-    print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
-    print        " System Algo: " + str(system['System']) 
+    #print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+    #print        " System Algo: " + str(system['System']) 
     if system['c2submit']:
 	c2dict[system['Name']]=1  
     if not systemdict.has_key(system['Name']):
@@ -368,6 +363,7 @@ def gen_c2(html, counter, cols):
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
         except Exception as e:
             logging.error("get_c2", exc_info=True)
+	    counter = 0
     html = html + '</table>'
     return (html, counter, cols)
  
@@ -396,6 +392,7 @@ def gen_ib(html, counter, cols):
             (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
     except Exception as e:
         logging.error("gen_ib", exc_info=True)
+	counter = 0
     html = html + '</table>'
     return (html, counter, cols)
 
@@ -434,7 +431,8 @@ def gen_paper(html, counter, cols):
                 data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
       except Exception as e:
-          logging.error("get_btcfeed", exc_info=True)
+          logging.error("get_paper", exc_info=True)
+	  counter = 0
     html = html + '</table>'
     return (html, counter, cols)
     
@@ -478,6 +476,7 @@ def gen_btc(html, counter, cols):
                             (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
                             (counter, html)=generate_html('OHLC_paper_' + btcname+'Close', counter, html, cols)
                         except Exception as e: 
+	  		    counter = 0
                             logging.error("get_btc", exc_info=True)
     dataPath='./data/btapi/'
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -557,10 +556,15 @@ def start_resgen():
     #Prep
     threads = []
     for ft in types:
-        gen_file(ft)
-        sig_thread = threading.Thread(target=gen_file, args=[ft])
-        sig_thread.daemon=True
-        threads.append(sig_thread)
+	if len(sys.argv)>1:
+	   if sys.argv[1]==ft:
+		gen_file(ft)
+	else:
+		runtype=sys.argv[1]
+        	gen_file(ft)
+        	sig_thread = threading.Thread(target=gen_file, args=[ft])
+        	sig_thread.daemon=True
+        	threads.append(sig_thread)
     [t.start() for t in threads]
     [t.join() for t in threads]
     threads=[]

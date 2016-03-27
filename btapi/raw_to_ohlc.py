@@ -45,12 +45,12 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
     volume=btcvolume[exchange]
     row=[timestamp, price, vol]
     
+    writeBar=False
     if len(str(timestamp)) > 0 and price > 0 and vol > 0:
         hour=datetime.datetime.fromtimestamp(
             timestamp
         ).strftime('%Y-%m-%d %H:%M') 
         
-        writeBar=False
         if len(open) > 0 and open.has_key(hour):
             
         	if row[1] > high[hour]:

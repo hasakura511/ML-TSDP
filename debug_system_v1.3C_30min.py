@@ -519,6 +519,11 @@ for ticker in livePairs:
     scored_models, bestModel = directional_scoring(model_metrics,filterName)
     timenow = dt.now(timezone('US/Eastern'))
     lastBartime = timezone('US/Eastern').localize(dataSet.index[-1].to_datetime())
+    weekday = dt.now(timezone('US/Eastern')).weekday()
+    if weekday == 5 or weekday ==6:
+        cycleTime = round(((time.time() - start_time)/60),2)
+    else:
+        cycleTime = (timenow-lastBartime).total_seconds()/60
     cycleTime = (timenow-lastBartime).total_seconds()/60
     bestModel = bestModel.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
     bestModel = bestModel.append(pd.Series(data=lastBartime.strftime("%Y%m%d %H:%M:%S %Z"), index=['lastBarTime']))

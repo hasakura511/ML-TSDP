@@ -8,6 +8,8 @@ btcclose=dict()
 btcopen=dict()
 btcdate=dict()
 btcvolume=dict()
+btcbar=dict()
+                
 hasdata=dict()
 
 def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
@@ -17,6 +19,7 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
     global btcopen
     global btcdate
     global btcvolume
+    global btcbar
     global hasdata
     
     #exchange=ticker + exchange
@@ -38,6 +41,10 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
     
     if exchange not in btcdate:
         btcdate[exchange]=dict()
+        
+    if exchange not in btcbar:
+        btcbar[exchange]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
+
     date=btcdate[exchange]
     
     if exchange not in btcvolume:
@@ -45,7 +52,8 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
     volume=btcvolume[exchange]
     row=[timestamp, price, vol]
     
-    writeBar=False
+
+    data=btcbar[exchange]
     if len(str(timestamp)) > 0 and price > 0 and vol > 0:
         hour=datetime.datetime.fromtimestamp(
             timestamp
@@ -66,14 +74,39 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
         	close[hour]=row[1]	
         	date[hour]=str(hour) + ":00"
         	volume[hour]=row[2]
-        	writeBar=True
+        
+        if hour in data.index:
+            quote=data.loc[hour]
+            if high[hour] > quote['High']:
+                quote['High']=high[hour]
+            if low[hour] < quote['Low']:
+                quote['Low']=low[hour]
+            quote['Close']=close[hour]
+            quote['Volume']=quote['Volume'] + volume[hour]
+            if quote['Volume'] < 0:
+                quote['Volume'] = 0 
+            data.loc[hour]=quote
+            #print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
+        
+        else:
+            if len(data.index) > 1:
+                data=data.reset_index()                
+                data=data.sort_values(by='Date')  
+                quote=data.iloc[-1]
+                print "Close Bar: " + exchange + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume'])
+                data=data.set_index('Date')
+                data.to_csv(filename)
+                
+                gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
+                gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
+            print "New Bar:   " + exchange + " date:" + str(hour) + " open: " + str(open[hour]) + " high:"  + str(high[hour]) + ' low:' + str(low[hour]) + ' close: ' + str(close[hour]) + ' volume:' + str(volume[hour]) 
+                        
+            data=data.reset_index().append(pd.DataFrame([[hour, open[hour], high[hour], low[hour], close[hour], volume[hour]]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
+        btcbar[exchange] = data   
         #print exchange + ' ' + str(hour) + ' ' + str(open[hour]) + ' ' + \
         #                str(high[hour]) + ' ' + str(low[hour]) + ' ' + \
         #                str(close[hour]) + ' ' + str(volume[hour])
-    if writeBar and len(btcdate[exchange]) > 0:
-           gotbar=pd.DataFrame([[btcdate[exchange], btcopen[exchange], btchigh[exchange], btclow[exchange], btcclose[exchange], btcvolume[exchange], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-           gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
-           
+             
     btcdate[exchange]=date
     btcopen[exchange]=open
     btchigh[exchange]=high
@@ -97,18 +130,16 @@ def get_feed_ohlc(ticker, exchange):
     global btcopen
     global btcdate
     global btcvolume
+    global btcbar
     global hasdata
     
     
-    if exchange in hasdata:
+    if exchange in btcbar:
         #print exchange + " Found "
-        dataSet=pd.DataFrame({'Date':btcdate[exchange].values(), 'Open':btcopen[exchange].values(), 'High':btchigh[exchange].values(),
-    		      'Low':btclow[exchange].values(), 'Close':btcclose[exchange].values(), 'Volume':btcvolume[exchange].values()}, 
-                columns=['Date','Open','High','Low','Close','Volume'])	
-                
-        dataSet=dataSet.sort_values(by='Date')
-        dataSet=dataSet.set_index('Date')
-        return dataSet
+        #dataSet=pd.DataFrame({'Date':btcdate[exchange].values(), 'Open':btcopen[exchange].values(), 'High':btchigh[exchange].values(),
+        #		      'Low':btclow[exchange].values(), 'Close':btcclose[exchange].values(), 'Volume':btcvolume[exchange].values()}, 
+        #        columns=['Date','Open','High','Low','Close','Volume'])	
+        return btcbar[exchange]
     else:
         #print exchange + " NOT Found "
         dataSet=pd.DataFrame({},columns=['Date','Open','High','Low','Close','Volume'])

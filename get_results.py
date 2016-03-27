@@ -615,7 +615,7 @@ def gen_btc(html, counter, cols):
                         except Exception as e: 
 	  		    counter = 0
                             logging.error("get_btc", exc_info=True)
-    dataPath='./data/btapi/'
+    dataPath='./data/from_IB/'
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
     btcsearch=re.compile('BTCUSD')
     

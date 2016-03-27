@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-BTCUSD,open,short,1.0,0.0,374.87,0.0,-9371.75,0.0,9371.75,243.0,,,,,BTCUSD,,20160327 06:29:49 EST,20160327 06:29:49 EST,-1.0,-4060661.05,-7077400.0,472620.0
+BTCUSD,open,short,1.0,0.0,374.73,0.0,-9368.25,0.0,9368.25,249.0,,,,,BTCUSD,,20160327 10:47:14 EST,20160327 10:47:14 EST,-1.0,-4152898.15,-7076000.0,492700.0

@@ -205,6 +205,7 @@ def start_signal():
         #print "sym: " + sym1
         for [file2, sym2, mult2] in pairs:
             if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+		logging.info("Prepping " + sym1 + sym2)
                 seen[sym1+sym2]=1
                 seen[sym2+sym1]=1
                 sig_thread = threading.Thread(target=prep_pair, args=[sym1, sym2, mult1, mult2])
@@ -222,6 +223,7 @@ def start_signal():
         #print "sym: " + sym1
         for [file2, sym2, param2] in pairs:
             if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+		logging.info("Prepping " + sym1 + sym2)
                 seen[sym1+sym2]=1
                 seen[sym2+sym1]=1
                 sig_thread = threading.Thread(target=proc_pair, args=[sym1, sym2, param1, param2])

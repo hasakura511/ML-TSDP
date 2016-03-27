@@ -71,7 +71,7 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
         #                str(high[hour]) + ' ' + str(low[hour]) + ' ' + \
         #                str(close[hour]) + ' ' + str(volume[hour])
     if writeBar and len(btcdate[exchange]) > 0:
-           gotbar=pd.DataFrame([[btcdate[hour], btcopen[hour], btchigh[hour], btclow[hour], btcclose[hour], btcvolume[hour], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
+           gotbar=pd.DataFrame([[btcdate[exchange], btcopen[exchange], btchigh[exchange], btclow[exchange], btcclose[exchange], btcvolume[exchange], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
            gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
            
     btcdate[exchange]=date

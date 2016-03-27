@@ -80,7 +80,7 @@ else:
 #cycles = 2
 minDataPoints = 10000
 durationStr='1 D'
-barSizeSetting='1 hour'
+barSizeSetting='30m'
 exchange='IDEALPRO'
 symbol='AUD'
 currency='USD'
@@ -126,10 +126,18 @@ def proc_history(sym, currency, exchange, type, whatToShow, histData, filename, 
     #timestamp
     date=parse(date).replace(tzinfo=eastern)
     timestamp = time.mktime(date.timetuple())
-    #time
-    date=datetime.datetime.fromtimestamp(
+    mins=int(datetime.datetime.fromtimestamp(
                 int(timestamp), eastern
-            ).strftime('%Y%m%d  %H:00:00') 
+            ).strftime('%M'))
+    if mins < 30:
+        #time
+        date=datetime.datetime.fromtimestamp(
+                    int(timestamp), eastern
+                ).strftime('%Y%m%d  %H:00:00') 
+    else:
+         date=datetime.datetime.fromtimestamp(
+                    int(timestamp), eastern
+                ).strftime('%Y%m%d  %H:30:00') 
     #time=time.astimezone(eastern).strftime('%Y-%m-%d %H:%M:00') 
     wap=0
     
@@ -157,7 +165,7 @@ def proc_history(sym, currency, exchange, type, whatToShow, histData, filename, 
             data.to_csv(filename)
             
             gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], sym]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-            gotbar.to_csv('./data/bars/1h_' + sym + '.csv')
+            gotbar.to_csv('./data/bars/' + barSizeSetting + '_' + sym + '.csv')
         
         print "New Bar:   " + sym + " date:" + str(date) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) 
         data=data.reset_index().append(pd.DataFrame([[date, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
@@ -169,7 +177,7 @@ currencyPairsDict = {}
 tickerId=1
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 for pair in currencyPairs:
-    filename=dataPath+'1h'+'_'+pair+'.csv'
+    filename=dataPath+barSizeSetting+'_'+pair+'.csv'
     minFile=dataPath+'1 min'+'_'+pair+'.csv'
     
     data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
@@ -182,7 +190,7 @@ for pair in currencyPairs:
     symbol = pair
     currency = pair[3:6]
     tickerId=tickerId+1
-        
+    
     currencyPairsDict[pair] = data
     
     if os.path.isfile(minFile):

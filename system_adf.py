@@ -185,7 +185,7 @@ def proc_history():
     #        time.sleep(20)
     #    except Exception as e:
     #        logging.error("proc_history", exc_info=True)
-    bars.get_last_bars(pairs, 'Close', self)
+    bars.get_last_bars(pairs, 'Close', onBar)
 
 def onBar(bar):
     global SST

@@ -311,7 +311,7 @@ def get_last_bars(currencyPairs, ylabel, callback):
                 data=SST
                 data=data.set_index('Date')
                 data=data.fillna(method='pad')
-                callback.onBar(data)
+                callback(data)
             time.sleep(20)
         except Exception as e:
             logging.error("get_last_bar", exc_info=True)

@@ -4,6 +4,7 @@ import time
 import pandas as pd
 from time import gmtime, strftime, localtime, sleep
 import json
+import datetime
 from pandas.io.json import json_normalize
 from pytz import timezone
 from datetime import datetime as dt
@@ -96,3 +97,4 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
     
             
         return data
+        

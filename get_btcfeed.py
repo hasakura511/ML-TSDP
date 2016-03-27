@@ -136,7 +136,7 @@ def bitstamp_order_book_callback(data):
             feed['bitstampUSD']['ask']=float(asks[0][0])
             feed_to_ohlc('BTCUSD','bitstampUSD', float(asks[0][0]), str(int(time.time())), 0)
         #print "book", data
-    except Except as e:
+    except Exception as e:
         logging.error("bitstamp_order_book_callback", exc_info=True)
     
 def bitstamp_trade_callback(data):

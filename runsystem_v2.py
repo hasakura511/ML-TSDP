@@ -41,7 +41,7 @@ def runv2(pair):
             ferr=open ('/logs/' + pair + 'v2_err.log','a')
             ferr.write('Starting V2: ' + pair)
             
-            subprocess.call(['python','system_v2.31C.py',pair,'1'], stdout=f, stderr=ferr)
+            subprocess.call(['python','debug_system_v2.4C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
       except Exception as e:

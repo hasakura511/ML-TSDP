@@ -297,7 +297,7 @@ def wf_classify_validate2(unfilteredData, dataSet, models, model_metrics, \
 
                 #  fit the model to the in-sample data
                 m[1].fit(X_train, y_train)
-                print X_train.shape,
+                #print X_train.shape,
 
                 #trained_models[m[0]] = pickle.dumps(m[1])
                             
@@ -423,7 +423,7 @@ if len(sys.argv)==1:
     showPDFCDF = False
     showAllCharts = True
     perturbData = True
-    runDPS = True
+    runDPS = False
     verbose= True
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
@@ -445,7 +445,7 @@ else:
     showPDFCDF = False
     showAllCharts = False
     perturbData = True
-    runDPS = True
+    runDPS = False
     verbose= False
     
     scorePath = None
@@ -479,10 +479,10 @@ for ticker in livePairs:
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
     #signal_types = ['gainAhead']
-    zz_steps = [0.006,0.009]
+    zz_steps = [0.009]
     #zz_steps = [0.009]
-    wfSteps=[2]
-    wf_is_periods = [250,500,1000]
+    wfSteps=[1]
+    wf_is_periods = [250,500]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
     longMemory =  False
@@ -509,7 +509,7 @@ for ticker in livePairs:
 
     #DPS parameters
     #windowLengths = [2] 
-    windowLengths = [2,10]
+    windowLengths = [10]
     maxLeverage = [5]
     PRT={}
     PRT['DD95_limit'] = 0.01

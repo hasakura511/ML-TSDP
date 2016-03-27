@@ -45,6 +45,7 @@ import threading
 import adfapi.s105 as astrat
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
+import seitoolz.bars as bars
 
 logging.basicConfig(filename='/logs/paper_adf.log',level=logging.DEBUG)
 
@@ -121,7 +122,7 @@ pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO']],
 sysname='ADF'
 refresh_paper(sysname)
 data=gettrades(sysname)
-SST=seigraph.get_history(pairs, 'Close')
+SST=bars.get_bar_history(pairs, 'Close')
 threads = []
 
 pos=dict()

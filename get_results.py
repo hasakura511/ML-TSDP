@@ -33,7 +33,7 @@ import random
 import copy
 import pytz
 from pytz import timezone
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 from tzlocal import get_localzone
 
 #other
@@ -207,7 +207,10 @@ def save_plot(colnames, filename, title, ylabel, SST):
     SST=SST.fillna(method='pad')
     fig, ax = plt.subplots()
     for col in colnames:
-        ax.plot( SST[col], label=str(col) + ' [' + str(len(SST[col].values)) + ']')
+        tdiff=SST.index[-1] - SST.index[0]
+        tdiff=tdiff.total_seconds()/3600
+        perhour=len(SST[col].values)/tdiff
+        ax.plot( SST[col], label=str(col) + ' [' + str(len(SST[col].values)) + ']' + ' ' + str(perhour) + '/hour')
     barSize='1 day'
     #if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
     #    barSize = '1 day'

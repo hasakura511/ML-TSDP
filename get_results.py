@@ -185,7 +185,7 @@ def get_USD(currency):
     conversion=float(data.loc[data['Symbol']==currency].iloc[-1]['Ask'])
     return float(conversion)
     
-def get_datas(systems, api, dataType, initialData):
+def get_datas(systems, api, dataType, initialData, interval=''):
     dataPath='./data/' + api + '/'
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
     
@@ -193,7 +193,7 @@ def get_datas(systems, api, dataType, initialData):
     dataSet=dataSet.set_index('Date')
     newfiles=list()
     for symbol in systems:   
-        search=re.compile(symbol)      
+        search=re.compile(interval + symbol)      
         for file in files:
             if re.search(search, file):        
                 filename=dataPath+file
@@ -401,7 +401,7 @@ def gen_c2(html, counter, cols):
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
         
-                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
+                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000, '1 min_')
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
         except Exception as e:
@@ -549,7 +549,7 @@ def gen_paper(html, counter, cols):
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
             
-                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
+                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000, '1 min_')
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 		
         
@@ -567,7 +567,7 @@ def gen_paper(html, counter, cols):
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols)
             
-                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000)
+                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000, '1 min_')
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 		
       except Exception as e:

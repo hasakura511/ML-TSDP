@@ -277,16 +277,20 @@ def calcEquity_signals(SST, title, **kwargs):
     plt.close()
     
     shortTrades, longTrades = numberZeros(SST.signals)
-    allTrades = shortTrades+ longTrades
+    allTrades = sum((SST.signals * SST.safef).round().diff().fillna(0).values !=0)
+    
     if verbose:
+        hoursTraded = (SST.index[-1]-SST.index[0]).total_seconds()/60.0/60.0
+        avgTrades = float(allTrades)/hoursTraded
         print '\nValidation Period from', SST.index[0],'to',SST.index[-1]
+        print 'Average trades per hour: %0.2f' % (avgTrades)
         print 'TWR for Buy & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
                     (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
         print 'TWR for %i beLong trades is %0.3f, maxDD %0.3f' %\
                     (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
         print 'TWR for %i beShort trades is %0.3f, maxDD %0.3f' %\
                     (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
-        print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
+        print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
                     (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
         print 'SAFEf:', equityCurves['b'].safef.mean()
 
@@ -362,7 +366,7 @@ for pair in pairs:
                     equityCurve.to_csv(equityCurveSavePath2+f[:-4]+'.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
-                    numTrades[title] = numberZeros(dataSet.signals)
+                    numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
         else:
             for f in [sfile for sfile in validSignalFiles[system] if pair in sfile]:
                 signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()
@@ -406,7 +410,7 @@ for pair in pairs:
                     equityCurve.to_csv(equityCurveSavePath2+f[:-4]+'.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
-                    numTrades[title] = numberZeros(dataSet.signals)
+                    numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
 
 #set arbitrary start/enddates that exist
 startDate = dataSet.index[0]
@@ -505,7 +509,7 @@ for title in eCurves_bySystem:
     print 'Validation Period from', equityCons.index[0],'to',equityCons.index[-1]
     print 'There are %0.f bars. Average trades per hour per system: %0.2f' \
                             % (equityCons.shape[0], avgTrades)
-    print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
+    print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
                 (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
                     eCurves[title2].maxDD.iloc[-1])
     print 'Saving: ' + equityCurveSavePath2+dI_title+'.csv'

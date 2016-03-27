@@ -607,7 +607,10 @@ def compareEquity(sst, title):
     plt.show()
     shortTrades, longTrades = numberZeros(sst.signals.values)
     allTrades = shortTrades+ longTrades
+    hoursTraded = (sst.index[-1]-sst.index[0]).total_seconds()/60.0/60.0
+    avgTrades = float(allTrades)/hoursTraded
     print '\nValidation Period from', sst.index[0],'to',sst.index[-1]
+    print 'Average trades per hour: %0.2f' % (avgTrades)
     print 'TWR for Buy & Hold is %0.3f, %i Bars' % (equityAllSignals[nrows-1], nrows)
     print 'TWR for %i beLong trades is %0.3f' % (longTrades, equityBeLongSignals[nrows-1])
     print 'TWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])

@@ -265,10 +265,10 @@ for ticker in livePairs:
     validationPeriods = [100,250] # min is 2
     #validationStartPoint = None
     #signal_types = ['gainAhead','ZZ']
-    #signal_types = ['ZZ']
-    signal_types = ['gainAhead']
+    signal_types = ['ZZ']
+    #signal_types = ['gainAhead']
     ga_steps = [30]
-    zz_steps = [0.001,0.002,0.003]
+    zz_steps = [0.006,0.009]
     #zz_steps = [0.009]
     perturbDataPct = 0.0002
     longMemory =  False

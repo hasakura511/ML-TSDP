@@ -115,8 +115,8 @@ def get_results(sysname, pairs):
 pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO']],
        ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO']],
        ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO']]]
-#pairs=[['./data/btapi/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD']],
-#       ['./data/btapi/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD']]]
+#pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD']],
+#       ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD']]]
        
 sysname='ADF'
 refresh_paper(sysname)

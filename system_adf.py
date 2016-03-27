@@ -45,6 +45,7 @@ import threading
 import adfapi.s105 as astrat
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
+import seitoolz.bars as bars
 
 
 logging.basicConfig(filename='/logs/system_adf.log',level=logging.DEBUG)
@@ -56,8 +57,8 @@ logging.basicConfig(filename='/logs/system_adf.log',level=logging.DEBUG)
 #       ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO', 's105_CHFJPY']],
 #       ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [100000,'JPY','IDEALPRO', 's105_AUDJPY']]]
 
-pairs=[['./data/btapi/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
-       ['./data/btapi/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
+pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
+       ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
 
 def prep_pair(sym1, sym2, param1, param2):
         global pos
@@ -177,13 +178,18 @@ def proc_history():
     
     global SST
     global pairs
-    while 1:
-        try:
-            SST=seigraph.get_history(pairs, 'Close')
-            time.sleep(20)
-        except Exception as e:
-            logging.error("proc_history", exc_info=True)
-            
+    #while 1:
+    #    try:
+    #        SST=seigraph.get_history(pairs, 'Close')
+    #        time.sleep(20)
+    #    except Exception as e:
+    #        logging.error("proc_history", exc_info=True)
+    bars.get_last_bars(pairs, 'Close', self)
+
+def onBar(bar):
+    global SST
+    SST = SST.combine_first(bar).sort_index()
+    
 def get_bar(sym):
     global SST
     return SST.iloc[-1][sym]
@@ -228,7 +234,7 @@ pos=dict()
 totalpos=dict()
 bars=dict()
 lastDate=dict()
-SST=seigraph.get_history(pairs, 'Close')
+SST=bars.get_bar_history(pairs, 'Close')
 get_entryState()
 start_signal()
 proc_history()

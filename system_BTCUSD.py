@@ -19,7 +19,7 @@ import re
 from os import listdir
 from os.path import isfile, join
 
-dataPath='./data/btapi/'
+dataPath='./data/from_IB/'
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 btcsearch=re.compile('BTCUSD')
 debug=False

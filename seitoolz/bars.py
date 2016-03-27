@@ -29,6 +29,7 @@ from tzlocal import get_localzone
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
 import os
 from dateutil.parser import parse
+import logging
 
 rtbar={}
 rtdict={}
@@ -247,24 +248,110 @@ def update_bars(currencyPairs, interval='30m'):
     global lastDate
     dataPath='./data/from_IB/'
     while 1:
-        for pair in currencyPairs:
-            filename=dataPath+interval+'_'+pair+'.csv'
-            minFile='./data/bars/'+pair+'.csv'
-            symbol = pair
-            if os.path.isfile(minFile):
-                data=pd.read_csv(minFile)
-                 
-                eastern=timezone('US/Eastern')
+        try:
+            for pair in currencyPairs:
+                filename=dataPath+interval+'_'+pair+'.csv'
+                minFile='./data/bars/'+pair+'.csv'
+                symbol = pair
+                if os.path.isfile(minFile):
+                    data=pd.read_csv(minFile)
+                     
+                    eastern=timezone('US/Eastern')
+                    
+                    date=data.iloc[-1]['Date']
+                    date=parse(date).replace(tzinfo=eastern)
+                    timestamp = time.mktime(date.timetuple())
+                    
+                    if not lastDate.has_key(symbol):
+                        lastDate[symbol]=timestamp
+                                       
+                    if lastDate[symbol] < timestamp:
+                        lastDate[symbol]=timestamp
+                        quote=data.iloc[-1]
+                        compress_min_bar(symbol, quote, filename, interval) 
+            time.sleep(20)
+        except Exception as e:
+            logging.error("update_bars", exc_info=True)
+        
+def get_last_bars(currencyPairs, ylabel, callback):
+    global tickerId
+    global lastDate
+    while 1:
+        try:
+            SST=pd.DataFrame()
+            returnData=False
+            for pair in currencyPairs:
+                minFile='./data/bars/'+pair+'.csv'
+                symbol = pair
+                if os.path.isfile(minFile):
+                    dta=pd.read_csv(minFile).iloc[-1]
+                    date=dta['Date']
+                    
+                    eastern=timezone('US/Eastern')
+                    date=parse(date).replace(tzinfo=eastern)
+                    timestamp = time.mktime(date.timetuple())
+                    
+                    data=pd.DataFrame()
+                    data['Date']=date
+                    data[symbol]=dta[ylabel]
+                    data=data.set_index('Date') 
+                    
+                    if len(SST.index.values) < 1:
+                        SST=data
+                    else:
+                        SST=SST.join(data)
+                        
+                    if not lastDate.has_key(symbol):
+                        lastDate[symbol]=timestamp
+                                               
+                    if lastDate[symbol] < timestamp:
+                        returnData=True
+                        
+            if returnData:
+                data=SST
+                data=data.set_index('Date')
+                data=data.fillna(method='pad')
+                callback.onBar(data)
+            time.sleep(20)
+        except Exception as e:
+            logging.error("get_last_bar", exc_info=True)
+            
+def get_bar_history(datas, ylabel):
+    try:
+        SST=pd.DataFrame()
+        
+        for (filename, ticker, qty) in datas:
+            dta=pd.read_csv(filename)
+            #symbol=ticker[0:3]
+            #currency=ticker[3:6]
+            #print 'plot for ticker: ' + currency
+            #if ylabel == 'Close':
+            #    diviser=dta.iloc[0][ylabel]
+            #    dta[ylabel]=dta[ylabel] /diviser
                 
-                date=data.iloc[-1]['Date']
-                date=parse(date).replace(tzinfo=eastern)
-                timestamp = time.mktime(date.timetuple())
-                
-                if not lastDate.has_key(symbol):
-                    lastDate[symbol]=timestamp
-                                   
-                if lastDate[symbol] < timestamp:
-                    lastDate[symbol]=timestamp
-                    quote=data.iloc[-1]
-                    compress_min_bar(symbol, quote, filename, interval) 
-        time.sleep(20)
+            #dta[ylabel].plot(label=ticker)   
+            data=pd.DataFrame()
+            
+            data['Date']=pd.to_datetime(dta[dta.columns[0]])
+            
+            data[ticker]=dta[ylabel]
+            data=data.set_index('Date') 
+            if len(SST.index.values) < 2:
+                SST=data
+            else:
+                SST=SST.join(data)
+        colnames=list()
+        for col in SST.columns:
+            if col != 'Date' and col != 0:
+                colnames.append(col)
+        data=SST
+        data=data.reset_index()        
+        data['timestamp']= data['Date']
+        
+        data=data.set_index('Date')
+        data=data.fillna(method='pad')
+        return data
+        
+    except Exception as e:
+        logging.error("something bad happened", exc_info=True)
+    return SST

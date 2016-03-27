@@ -20,6 +20,3 @@ cd \cygwin64\media\sf_python\tsdp
 \anaconda2\python system_USDCAD.py 1
 \anaconda2\python proc_signal_v2.py
 
-sleep 10
-\anaconda2\python system_BTCUSD_bitstamp_hourly.py 1
-\anaconda2\python system_BTCUSD_bitstamp.py 1

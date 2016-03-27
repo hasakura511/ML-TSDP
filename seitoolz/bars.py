@@ -35,6 +35,7 @@ rtdict={}
 rthist={}
 rtfile={}
 rtreqid={}
+lastDate={}
 tickerId=1
     
 def get_currencies():
@@ -239,4 +240,31 @@ def get_hist_bars(currencyPairs, interval='30m', minDataPoints = 10000, exchange
             #gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], pair]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
             #gotbar.to_csv('./data/bars/' + interval + '_' + pair + '.csv')
             #time.sleep(30)
-        
+
+
+def update_bars(currencyPairs, interval='30m'):
+    global tickerId
+    global lastDate
+    dataPath='./data/from_IB/'
+    while 1:
+        for pair in currencyPairs:
+            filename=dataPath+interval+'_'+pair+'.csv'
+            minFile='./data/bars/'+pair+'.csv'
+            symbol = pair
+            if os.path.isfile(minFile):
+                data=pd.read_csv(minFile)
+                 
+                eastern=timezone('US/Eastern')
+                
+                date=data.iloc[-1]['Date']
+                date=parse(date).replace(tzinfo=eastern)
+                timestamp = time.mktime(date.timetuple())
+                
+                if not lastDate.has_key(symbol):
+                    lastDate[symbol]=timestamp
+                                   
+                if lastDate[symbol] < timestamp:
+                    lastDate[symbol]=timestamp
+                    quote=data.iloc[-1]
+                    compress_min_bar(symbol, quote, filename, interval) 
+        time.sleep(20)

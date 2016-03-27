@@ -12,7 +12,7 @@ def start_proc():
     threads = []
     bars.get_hist_bars(pairs, interval, minDataPoints, exchange, secType)
     #bars.create_bars(pairs, interval)
-    
+      
     #t1 = threading.Thread(target=bars.get_hist_bars, args=[pairs, interval, minDataPoints, exchange, secType])
     #t1.daemon=True
     #threads.append(t1)
@@ -21,13 +21,12 @@ def start_proc():
     t2.daemon=True
     threads.append(t2)
     
+    
     [t.start() for t in threads]
-    [t.join() for t in threads]
+    #[t.join() for t in threads]
+    bars.update_bars(pairs, interval)
     
 
 start_proc()
-#finished=False
-#while not finished:
-#    time.sleep(30)
-    
+
 

@@ -50,15 +50,16 @@ import seitoolz.bars as bars
 
 logging.basicConfig(filename='/logs/system_adf.log',level=logging.DEBUG)
 
+pairs=[]
 
-#pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO', 's105_EURJPY']],
-#       ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO', 's105_USDJPY']],
-#       ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO', 's105_CADJPY']],
-#       ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO', 's105_CHFJPY']],
-#       ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [100000,'JPY','IDEALPRO', 's105_AUDJPY']]]
+if len(sys.argv) > 1 and sys.argv[1] == 's105JPY':
+    pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO', 's105_EURJPY']],
+           ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO', 's105_USDJPY']],
+           ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO', 's105_CADJPY']]]
 
-pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
-       ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
+else:
+    pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
+           ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
 
 def prep_pair(sym1, sym2, param1, param2):
         global pos

@@ -80,18 +80,13 @@ def calcEquity_signals(SST, title, **kwargs):
     figsize = kwargs.get('figsize',(8,7))
     showPlot =kwargs.get('showPlot',True)
     verbose = kwargs.get('verbose',True)
+    totalTrades= kwargs.get('totalTrades',None)
+    totalAvgTrades=kwargs.get('totalAvgTrades',None)
     
     initialEquity = 1.0
     nrows = SST.gainAhead.shape[0]
     #signalCounts = SST.signals.shape[0]
-    if verbose:
-        print '\nThere are %0.f signal counts' % nrows
-        if 1 in SST.signals.value_counts():
-            print SST.signals.value_counts()[1], 'beLong Signals',
-        if -1 in SST.signals.value_counts():
-            print SST.signals.value_counts()[-1], 'beShort Signals',
-        if 0 in SST.signals.value_counts():
-            print SST.signals.value_counts()[0], 'beFlat Signals',
+
         
     equityCurves = {}
     for trade in ['l','s','b']:       
@@ -267,18 +262,58 @@ def calcEquity_signals(SST, title, **kwargs):
     xticks = ax2.xaxis.get_minor_ticks()
     xticks[1].label1.set_visible(False)
     
+    if totalTrades != None and totalAvgTrades != None:
+        text=  '\n%0.f signal counts: ' % nrows
+        text+='\nAverage trades per hour per system: %0.2f' \
+                                % (totalAvgTrades)
+        text+='\nTWR for %i beLong and beShort trades with DPS is %0.4f, maxDD %0.4f' %\
+                    (totalTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
+        plt.figtext(0.05,-0.05,text, fontsize=15)
+    else:
+        text=  '\n%0.f signal counts: ' % nrows
+        if 1 in SST.signals.value_counts():
+            text+= '%i beLong,  ' % SST.signals.value_counts()[1]
+        if -1 in SST.signals.value_counts():
+            text+= '%i beShort,  ' % SST.signals.value_counts()[-1]
+        if 0 in SST.signals.value_counts():
+            text+= '%i beFlat  ' % SST.signals.value_counts()[0]
+        shortTrades, longTrades = numberZeros(SST.signals)
+        allTrades = sum((SST.signals * SST.safef).round().diff().fillna(0).values !=0)
+        hoursTraded = (SST.index[-1]-SST.index[0]).total_seconds()/60.0/60.0
+        avgTrades = float(allTrades)/hoursTraded
+        #text+='\nValidation Period from %s to %s' % (str(SST.index[0]), str(SST.index[-1]))
+        text+='\nAverage trades per hour: %0.2f' % (avgTrades)
+        text+=  '\nTWR for Buy & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
+                    (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
+        text+='\nTWR for %i beLong trades is %0.3f, maxDD %0.3f' %\
+                    (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
+        text+='\nTWR for %i beShort trades is %0.3f, maxDD %0.3f' %\
+                    (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
+        text+='\nTWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
+                    (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
+        text+='\nAverage SAFEf: %0.3f' % (equityCurves['b'].safef.mean())
+        plt.figtext(0.05,-0.15,text, fontsize=15)
+        
     fig.autofmt_xdate()
+    
     if pngPath2 != None and pngFilename != None:
-	print 'Saving: ' + pngPath2+pngFilename+'.png'
+        print 'Saving: ' + pngPath2+pngFilename+'.png'
         plt.savefig(pngPath2+pngFilename+'.png', bbox_inches='tight')
     
     if showPlot:
         plt.show()
     plt.close()
     
-    shortTrades, longTrades = numberZeros(SST.signals)
-    allTrades = sum((SST.signals * SST.safef).round().diff().fillna(0).values !=0)
-    
+
+    '''
+    if verbose:
+        print '\nThere are %0.f signal counts' % nrows
+        if 1 in SST.signals.value_counts():
+            print SST.signals.value_counts()[1], 'beLong Signals',
+        if -1 in SST.signals.value_counts():
+            print SST.signals.value_counts()[-1], 'beShort Signals',
+        if 0 in SST.signals.value_counts():
+            print SST.signals.value_counts()[0], 'beFlat Signals',
     if verbose:
         hoursTraded = (SST.index[-1]-SST.index[0]).total_seconds()/60.0/60.0
         avgTrades = float(allTrades)/hoursTraded
@@ -293,7 +328,7 @@ def calcEquity_signals(SST, title, **kwargs):
         print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
                     (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
         print 'SAFEf:', equityCurves['b'].safef.mean()
-
+    '''
     SST_equity = equityCurves['b']
     if 'dates' in SST_equity:
         return SST_equity.set_index(pd.DatetimeIndex(SST_equity['dates'])).drop(['dates'], axis=1)
@@ -448,10 +483,10 @@ for ver in titleDict:
         if i == 0:
             dateIndex = eCurves[title].index
             maxCT = maxCTs[title]
-            trades = sum(numTrades[title])
+            trades = numTrades[title]
         else:
             dateIndex = dateIndex.intersection(eCurves[title].index)
-            trades += sum(numTrades[title])
+            trades += numTrades[title]
             if maxCTs[title] > maxCT:
                 maxCT = maxCTs[title]
     dateIndexes[ver] = dateIndex
@@ -464,10 +499,10 @@ for i,title in enumerate(eCurves):
     if i == 0:
         dateIndex = eCurves[title].index
         maxCT = maxCTs[title]
-        trades = sum(numTrades[title])
+        trades = numTrades[title]
     else:
         dateIndex = dateIndex.intersection(eCurves[title].index)
-        trades += sum(numTrades[title])
+        trades += numTrades[title]
         if maxCTs[title] > maxCT:
             maxCT = maxCTs[title]
     dateIndexes[all] = dateIndex
@@ -499,19 +534,21 @@ for title in eCurves_bySystem:
     
     avgTrades = float(totalTrades_bySystem[dI_title])/float(title.split()[0])/60.0
     title2 = title+' maxLag'+str(maxCT_bySystem[dI_title])
-    print '\n\n'
+    #print '\n\n'
     eCurves[title2] = calcEquity_signals(equityCons,title2,\
                                     leverage = equityCons.safef.values,\
                                     equityCurveSavePath=equityCurveSavePath,\
                                     pngPath=pngPath, verbose=False, pngFilename=dI_title,\
-                                    figsize=size, showPlot=showPlot)
+                                    figsize=size, showPlot=showPlot, 
+                                    totalTrades= totalTrades_bySystem[dI_title],
+                                    totalAvgTrades=avgTrades)
                                     
-    print 'Validation Period from', equityCons.index[0],'to',equityCons.index[-1]
-    print 'There are %0.f bars. Average trades per hour per system: %0.2f' \
-                            % (equityCons.shape[0], avgTrades)
-    print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
-                (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
-                    eCurves[title2].maxDD.iloc[-1])
+    #print 'Validation Period from %s to %s' % (str(equityCons.index[0]), str(equityCons.index[-1]))
+    #print 'There are %0.f bars. Average trades per hour per system: %0.2f' \
+    #                       % (equityCons.shape[0], avgTrades)
+    #print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
+    #            (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
+    #               eCurves[title2].maxDD.iloc[-1])
     print 'Saving: ' + equityCurveSavePath2+dI_title+'.csv'
     eCurves[title2].to_csv(equityCurveSavePath2+dI_title+'.csv')
 

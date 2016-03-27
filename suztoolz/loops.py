@@ -25,6 +25,7 @@ from transform import ratio, numberZeros, gainAhead
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as tick
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from sklearn.metrics import accuracy_score
 from sklearn.cross_validation import StratifiedShuffleSplit
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
@@ -48,34 +49,37 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
     validationFirstYear=metaData['v_start']
     validationFinalYear=metaData['v_end']
     wfStep=metaData['wf_step']
-    #wfStep=1
     signal =  metaData['signal']
     nfeatures = metaData['n_features']
     tox_adj_proportion = metaData['tox_adj']
     feature_selection = metaData['FS']
-
+    ddTolerance = PRT['DD95_limit']
+    forecastHorizon = PRT['horizon']
+    
     #CAR25 for zigzag
     if signal[:2]=='ZZ':
-        zz_step = [float(x) for x in signal.split()[1].split(',')]
+        zz_step = [float(x) for x in signal.split('_')[1].split(',')]
 
     #create signals
-    lookforward=1
-    if signal[:3] != 'GA1' or signal[:3] != 'gainAhead':
+    if signal != 'GA1' or signal != 'gainAhead':
         if signal[:2] == 'GA':
-            lookforward = int(signal[2:])
+            #wfStep = int(signal[2:])
             #ga_start = mmData_v.iloc[train_index].prior_index.iloc[0]
             ga_start = dataSet.iloc[0].prior_index
-            ga = gainAhead(close.ix[ga_start:],lookforward)
+            ga = gainAhead(close.ix[ga_start:],wfStep)
             dataSet.signal = np.array([-1 if x<0 else 1 for x in ga])
             
         if signal[:2] == 'ZZ':
             zz_end = dataSet.iloc[-1].prior_index
             dataSet.signal = pd.Series(zg(close.ix[:zz_end].values, zz_step[0], \
                             zz_step[1]).pivots_to_modes()[-dataSet.shape[0]:]).shift(-1).fillna(0).values
+
+    else:
+        wfStep=1
+    metaData['wf_step']=wfStep
                             
 
-    ddTolerance = PRT['DD95_limit']
-    forecastHorizon = PRT['horizon']
+
 
     #adjust personal risk tolerance for available data
     #assuming dd increases with sqrt of time
@@ -138,7 +142,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
         if longMemory == False:
             print "%i rows in sample, %i rows out of sample, forecasting %i day(s) ahead.." % (nrows_is, nrows_oos,wfStep)
         else:
-            print "long memory starting with %i rows in sample, %i rows out of sample, forecasting %i day(s) ahead.." % (nrows_is, nrows_oos,wfStep)
+            print "long memory starting with %i rows in sample, %i rows out of sample, forecasting %i bar(s) ahead.." % (nrows_is, nrows_oos,wfStep)
         #cm_y_train = np.array([])
         cm_y_test = np.array([],dtype=float)
         #cm_y_pred_is = np.array([])
@@ -190,7 +194,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
             #        y_train = np.array([-1 if x<0 else 1 for x in ga])[:len(train_index)]
                     
             if signal[:2] == 'ZZ':
-                zz_end = mmData_v.iloc[test_index].prior_index.iloc[0]
+                zz_end = mmData_v.iloc[test_index].prior_index.iloc[len(test_index)-1]
                 y_train = zg(close.ix[:zz_end].values, zz_step[0], \
                                 zz_step[1]).pivots_to_modes()[-len(train_index):]
                 
@@ -222,7 +226,7 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
                         datay_signal.reset_index().iloc[train_index]['index'].values)
             if intersect.size != 0:
                 print "\nDuplicate indexes found in test/training set: Possible Future Leak!"
-            if len(mmData_v.index[-lookforward:].intersection(train_index)) == 0:
+            if len(mmData_v.index[-wfStep:].intersection(train_index)) == 0:
                 #print 'training', X_train.shape
                 if feature_selection == 'RFECV':
                     #Recursive feature elimination with cross-validation: 
@@ -282,9 +286,9 @@ def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_p
         #    print  m[0], ticker,validationFirstYear, validationFinalYear, iterations, signal
         #    print 'Accuracy 100% for', cm_y_test[:-1].shape[0], 'rows'
         #else:
-        if lookforward>1:
-            oos_display_cmatrix(cm_y_test[:-lookforward], cm_y_pred_oos[:-lookforward], m[0],\
-                ticker,validationFirstYear, dataSet.index[-lookforward], iterations, signal)
+        if wfStep>1:
+            oos_display_cmatrix(cm_y_test[:-wfStep], cm_y_pred_oos[:-wfStep], m[0],\
+                ticker,validationFirstYear, dataSet.index[-wfStep], iterations, signal)
         else:
             oos_display_cmatrix(cm_y_test[:-1], cm_y_pred_oos[:-1], m[0],\
                     ticker,validationFirstYear, validationFinalYear, iterations, signal)
@@ -1026,8 +1030,13 @@ def createBenchmark(sst,initialEquity,direction, start,end,ticker):
     benchmarks[ticker+' buyHoldSafef1'] = calcEquity2(buyHoldSafef1.ix[start:end],initialEquity,direction)
     return benchmarks
     
-def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log', ticker=None, \
-                            displayCharts=True, equityStatsSavePath=None):
+def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
+    yscale=kwargs.get('yscale','log')
+    ticker=kwargs.get('ticker',None)
+    verbose=kwargs.get('verbose',True)
+    displayCharts=kwargs.get('displayCharts',True)
+    equityStatsSavePath=kwargs.get('equityStatsSavePath',None)
+    
     equityCurves = {}
     DPS_adj = {}
     #f = [s for s in systems][0]
@@ -1056,7 +1065,8 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
         DPS_adj[dps] = DPS[dps].ix[startDate:]
         
     for sst in DPS_adj:
-        print 'creating equity curve for ', sst
+        if verbose:
+            print 'creating equity curve for ', sst
         zero_index = np.array([x for x in system.index if x not in DPS_adj[sst].index])
         sst_zero = pd.concat([pd.Series(data=0, name='signals', index=zero_index ), system.gainAhead.ix[zero_index],\
                 pd.Series(data=0, name='safef', index=zero_index),pd.Series(data=0, name='CAR25', index=zero_index),\
@@ -1071,7 +1081,8 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, yscale='log
         #DPS_adj[sst] = DPS_adj[sst].drop('index', axis=1)
         
     #create equity curves for safef1
-    print 'creating equity curve for ', direction+systemName
+    if verbose:
+        print 'creating equity curve for ', direction+systemName
     
     if direction == 'long':
         signals = pd.Series(data=np.where(system.signals == -1,0,1), name='signals',\
@@ -1220,17 +1231,27 @@ def createYearlyStats(eCurves, benchStatsByYear=None):
                 yearlyStats[df] =  pd.concat([yearlyStats[df], return_diff, acc_diff], axis =1)
         return yearlyStats
          
-def calcEquity_df(SST, title, leverage=1.0):
+def calcEquity_df(SST, title, **kwargs):
+    #leverage=1.0, equityCurveSavePath=None, pngPath=None, figsize=(8,7), showPlot=True
+    leverage = kwargs.get('leverage',0)
+    equityCurveSavePath = kwargs.get('equityCurveSavePath',None)
+    pngPath = kwargs.get('pngPath',None)
+    pngFilename = kwargs.get('pngFilename',None)
+    figsize = kwargs.get('figsize',(8,7))
+    showPlot =kwargs.get('showPlot',True)
+    verbose = kwargs.get('verbose',True)
+    
     initialEquity = 1.0
     nrows = SST.gainAhead.shape[0]
     #signalCounts = SST.signals.shape[0]
-    print '\nThere are %0.f signal counts' % nrows
-    if 1 in SST.signals.value_counts():
-        print SST.signals.value_counts()[1], 'beLong Signals',
-    if -1 in SST.signals.value_counts():
-        print SST.signals.value_counts()[-1], 'beShort Signals',
-    if 0 in SST.signals.value_counts():
-        print SST.signals.value_counts()[0], 'beFlat Signals',
+    if verbose:
+        print '\nThere are %0.f signal counts' % nrows
+        if 1 in SST.signals.value_counts():
+            print SST.signals.value_counts()[1], 'beLong Signals',
+        if -1 in SST.signals.value_counts():
+            print SST.signals.value_counts()[-1], 'beShort Signals',
+        if 0 in SST.signals.value_counts():
+            print SST.signals.value_counts()[0], 'beFlat Signals',
         
     equityCurves = {}
     for trade in ['l','s','b']:       
@@ -1351,7 +1372,7 @@ def calcEquity_df(SST, title, leverage=1.0):
         barSize = '1 min'
         
     #plt.close('all')
-    fig, (ax1,ax2) = plt.subplots(2,1, figsize=(8,7))
+    fig, (ax1,ax2) = plt.subplots(2,1, figsize=figsize)
     #plt.subplot(2,1,1)
     ind = np.arange(SST.shape[0])
     ax1.plot(ind, equityCurves['l'].equity,label="Long 1 Signals",color='b')
@@ -1372,19 +1393,25 @@ def calcEquity_df(SST, title, leverage=1.0):
         def format_date(x, pos=None):
             thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
             return SST.index[thisind].strftime("%Y-%m-%d %H:%M")
-        ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-        ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        #ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        #ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
         
     else:
         def format_date(x, pos=None):
             thisind = np.clip(int(x + 0.5), 0, SST.shape[0] - 1)
             return SST.index[thisind].strftime("%Y-%m-%d")
-        ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-        ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        #ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        #ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
         
-    # rotate and align the tick labels so they look better
-    fig.autofmt_xdate()
-
+    
+    
+    #minorLocator = MultipleLocator(SST.shape[0])
+    #ax1.xaxis.set_minor_locator(minorLocator)
+    #ax2.xaxis.set_minor_locator(minorLocator)
+    ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+    ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+    ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
+    ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
     # use a more precise date string for the x axis locations in the
     # toolbar
 
@@ -1392,20 +1419,42 @@ def calcEquity_df(SST, title, leverage=1.0):
     ax1.set_title(title)
     ax1.set_ylabel("TWR")
     ax1.legend(loc="best")
-    ax2.set_ylabel("Drawdown")   
-    plt.show()
+    ax2.set_ylabel("Drawdown")
+    #gets rid of space at the end
+    ax1.set_xlim(0, SST.shape[0])
+    ax2.set_xlim(0, SST.shape[0])
+    #shows last date index
+    #xticks = ax1.xaxis.get_minor_ticks()
+    #xticks[1].label1.set_visible(False)
+    #xticks = ax2.xaxis.get_minor_ticks()
+    #xticks[1].label1.set_visible(False)
+    
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+    if pngPath != None:
+        plt.savefig(pngPath+title+'.png', bbox_inches='tight')
+    
+    if showPlot:
+        plt.show()
+    plt.close()
+    
     shortTrades, longTrades = numberZeros(SST.signals)
     allTrades = shortTrades+ longTrades
-    print '\nValidation Period from', SST.index[0],'to',SST.index[-1]
-    print 'TWR for Buy & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
-                (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
-    print 'TWR for %i beLong trades is %0.3f, maxDD %0.3f' %\
-                (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
-    print 'TWR for %i beShort trades is %0.3f, maxDD %0.3f' %\
-                (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
-    print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
-                (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
-    print 'SAFEf:', equityCurves['b'].safef.mean()
+
+    if verbose:
+        hoursTraded = (SST.index[-1]-SST.index[0]).total_seconds()/60.0/60.0
+        avgTrades = float(allTrades)/hoursTraded
+        print '\nValidation Period from', SST.index[0],'to',SST.index[-1]
+        print 'Average trades per hour: %0.2f' % (avgTrades)
+        print 'TWR for Buy & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
+                    (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
+        print 'TWR for %i beLong trades is %0.3f, maxDD %0.3f' %\
+                    (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
+        print 'TWR for %i beShort trades is %0.3f, maxDD %0.3f' %\
+                    (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
+        print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
+                    (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
+        print 'SAFEf:', equityCurves['b'].safef.mean()
 
     SST_equity = equityCurves['b']
     if 'dates' in SST_equity:
@@ -2034,7 +2083,10 @@ def maxCAR25(*args):
     return outer_d
 
 
-def CAR25_df_min(signal_type, signals, signal_index, Close, minFcst=1440, DD95_limit = .005):
+def CAR25_df_min(signal_type, signals, signal_index, Close, **kwargs):
+    verbose = kwargs.get('verbose', True)
+    minFcst=kwargs.get('minFcst',1440)
+    DD95_limit = kwargs.get('DD95_limit',0.005)
     #edited to compute all trades.
     #forecast horizon minimum 1 year, or safef becomes very large
     hold_mins = 1
@@ -2203,36 +2255,32 @@ def CAR25_df_min(signal_type, signals, signal_index, Close, minFcst=1440, DD95_l
     SIG = signal_type
     YIF =  forecast_horizon/60.0
     TPY = FC_trades.mean()/(forecast_horizon/60.0)
-    print '\nSignal: ', SIG
-    print 'Fcst Horizon (Hours): %.1f ' % YIF, 
-    #print ' TotalTrades: %.0f ' % FC_trades.mean(), 
-    print ' Avg. Trades/Hour: %.1f' % TPY
-
     IT_DD_95 = stats.scoreatpercentile(FC_max_IT_DD,95)
     IT_DD_100 = max(FC_max_IT_DD)
-    print 'DD95:  %.3f ' % IT_DD_95,
-    print 'DD100: %.3f ' %  IT_DD_100,
-
     SOR25 = stats.scoreatpercentile(FC_sortino,25)
     SHA25 = stats.scoreatpercentile(FC_sharpe,25)
-    print 'SORTINO25: %.3f ' %  SOR25,
-    print 'SHARPE25: %.3f ' % SHA25
-
-    print 'SAFEf: %.3f ' % fraction,
     #IT_DD_25 = stats.scoreatpercentile(FC_max_IT_DD,25)        
     #IT_DD_50 = stats.scoreatpercentile(FC_max_IT_DD,50)        
-
-
     TWR_25 = stats.scoreatpercentile(FC_tr_eq,25)        
     CAR_25 = 100*(((TWR_25/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
     TWR_50 = stats.scoreatpercentile(FC_tr_eq,50)
     CAR_50 = 100*(((TWR_50/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
     TWR_75 = stats.scoreatpercentile(FC_tr_eq,75)        
     CAR_75 = 100*(((TWR_75/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
+    if verbose:
+        print '\nSignal: ', SIG
+        print 'Fcst Horizon (Hours): %.1f ' % YIF, 
+        #print ' TotalTrades: %.0f ' % FC_trades.mean(), 
+        print ' Avg. Trades/Hour: %.1f' % TPY
+        print 'DD95:  %.3f ' % IT_DD_95,
+        print 'DD100: %.3f ' %  IT_DD_100,
+        print 'SORTINO25: %.3f ' %  SOR25,
+        print 'SHARPE25: %.3f ' % SHA25
+        print 'SAFEf: %.3f ' % fraction,
 
-    print 'CAR25: %.3f ' % CAR_25,
-    print 'CAR50: %.3f ' % CAR_50,
-    print 'CAR75: %.3f ' % CAR_75
+        print 'CAR25: %.3f ' % CAR_25,
+        print 'CAR50: %.3f ' % CAR_50,
+        print 'CAR75: %.3f ' % CAR_75
     metrics = {'C25sig':SIG, 'safef':fraction, 'CAR25':CAR_25, 'CAR50':CAR_50, 'CAR75':CAR_75,\
                 'DD95':IT_DD_95, 'DD100':IT_DD_100, 'SOR25':SOR25, 'SHA25':SHA25, 'YIF':YIF, 'TPY':TPY}
     return metrics

@@ -233,11 +233,11 @@ def save_plot(colnames, filename, title, ylabel, SST):
     # toolbar
     fig.fmt_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
 
-    minorLocator = MultipleLocator(SST.shape[0])
-    ax.xaxis.set_minor_locator(minorLocator)
+    #minorLocator = MultipleLocator(SST.shape[0])
+    #ax.xaxis.set_minor_locator(minorLocator)
 
-    xticks = ax.xaxis.get_minor_ticks()
-    xticks[1].label1.set_visible(False)
+    #xticks = ax.xaxis.get_minor_ticks()
+    #xticks[1].label1.set_visible(False)
 
     fig.autofmt_xdate()
     ax.annotate(str(SST.index[-1]), xy=(0.95, -0.02), ha='left', va='top', xycoords='axes fraction', fontsize=10)

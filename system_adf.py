@@ -101,8 +101,8 @@ def proc_pair(sym1, sym2, param1, param2):
         while 1:
             try:
                
-                bars[sym1]=get_bar(sym1)
-                bars[sym2]=get_bar(sym2)
+                bardict[sym1]=get_bar(sym1)
+                bardict[sym2]=get_bar(sym2)
                 timestamp=int(time.time())
                 date=datetime.datetime.fromtimestamp(
                     timestamp
@@ -117,8 +117,8 @@ def proc_pair(sym1, sym2, param1, param2):
                     lastDate[sym2]=bardate
                     timestamp=bardate
                     
-                    bar1=astrat.getBar(bars[sym1], sym1, int(timestamp))
-                    bar2=astrat.getBar(bars[sym2], sym2, int(timestamp))
+                    bar1=astrat.getBar(bardict[sym1], sym1, int(timestamp))
+                    bar2=astrat.getBar(bardict[sym2], sym2, int(timestamp))
                     signals=astrat.procBar(bar1, bar2, pos[symPair], True)
                     proc_signals(signals, params, symPair, timestamp)
                     
@@ -233,7 +233,7 @@ def start_signal():
 
 pos=dict()
 totalpos=dict()
-bars=dict()
+bardict=dict()
 lastDate=dict()
 SST=bars.get_bar_history(pairs, 'Close')
 get_entryState()

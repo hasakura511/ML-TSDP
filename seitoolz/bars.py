@@ -280,7 +280,8 @@ def get_last_bars(currencyPairs, ylabel, callback):
         try:
             SST=pd.DataFrame()
             returnData=False
-            for pair in currencyPairs:
+            for (filename, ticker, qty) in currencyPairs:
+                pair=ticker
                 minFile='./data/bars/'+pair+'.csv'
                 symbol = pair
                 if os.path.isfile(minFile):

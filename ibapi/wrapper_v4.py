@@ -19,6 +19,7 @@ rtbar={}
 rtdict={}
 rthist={}
 rtfile={}
+rtreqid={}
 
 fask={}
 fasksize={}
@@ -846,10 +847,12 @@ class IBclient(object):
         global rtbar
         global rtdict
         global rtfile
+        global rtreqid
         iserror=False
         
         finished=False
         pricevalue=[]
+        rtreqid[ibcontract.symbol + ibcontract.currency]=tickerid
         rtdict[tickerid]=ibcontract.symbol + ibcontract.currency
         rtfile[tickerid]=filename
         if tickerid not in rtbar:
@@ -885,6 +888,8 @@ class IBclient(object):
         global rtbar
         global rtdict
         global rthist
+        global rtreqid
+        
         iserror=False
         
         pricevalue=[]
@@ -910,6 +915,7 @@ class IBclient(object):
         contract.currency = brokerData['currency']
         ticker = contract.symbol+contract.currency
         #today = dt.today()
+        rtreqid[contract.symbol + contract.currency]=tickerid
     
         print("\nRequesting historical data for %s" % ticker)
     
@@ -950,10 +956,11 @@ class IBclient(object):
         global rtbar
         global rtdict
         global rthist
+        global rtreqid
         iserror=False
-        
-       
+
         rtdict[tickerid]=sym + currency
+        rtreqid[sym+currency]=tickerid
         if tickerid not in rtbar:
             rtbar[tickerid]=data
         data=data.reset_index()
@@ -966,3 +973,14 @@ class IBclient(object):
                  
        
         return rtbar[tickerid]
+
+    def get_bar(self, symbol, currency):
+        
+        global rtreqid
+        global rtbar
+        symname=symbol + currency
+        tickerid=rtreqid[symname]
+        if tickerid in rtbar:
+            return rtbar[tickerid]
+        else:
+            return pd.DataFrame()

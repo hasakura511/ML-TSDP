@@ -82,7 +82,7 @@ else:
 #cycles = 2
 minDataPoints = 10000
 exchange='IDEALPRO'
-symbol='AUD'
+symbol=''
 currency='USD'
 secType='CASH'
 durationStr='1 D'
@@ -116,7 +116,6 @@ for pair in currencyPairs:
         data=pd.read_csv(filename, index_col='Date')
         data=proc_history(symbol, currency,   exchange, secType, whatToShow, data, filename, tickerId)
     get_realtimebar(symbol, currency,   exchange, secType, whatToShow, data, filename, tickerId)
-
     data=get_history(date, symbol, currency, exchange, secType, whatToShow, data, filename, tickerId, minDataPoints, durationStr, barSizeSetting)
    
 finished=False

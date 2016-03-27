@@ -13,6 +13,9 @@ from tzlocal import get_localzone
 callback = IBWrapper()
 client=IBclient(callback)
 
+def get_bar(symbol, currency):
+    return client.get_bar(str(symbol), str(currency))
+    
 def get_ask(symbol, currency):
     global client
     ask=client.get_IBAsk(str(symbol), str(currency))
@@ -53,7 +56,6 @@ def getDataFromIB( brokerData,endDateTime,data):
 
 def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename,tickerId, minDataPoints, durationStr, barSizeSetting):
         print "Requesting history for: " + symbol + currency + " ending: " + date
-        
         brokerData = {}
         brokerData =  {'port':7496, 'client_id':101,\
                              'tickerId':tickerId, 'exchange':exchange,'symbol':symbol,\
@@ -66,35 +68,27 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
          #for date in getHistLoop:
         if data.shape[0] < minDataPoints:
             while data.shape[0] < minDataPoints:      
-                requestedData = getDataFromIB(brokerData, date, data)
-                #update date
-                date = requestedData.index.to_datetime()[0]
+                data = getDataFromIB(brokerData, date, data)
+                
+                date = data.index.to_datetime()[0]
                 #eastern=timezone('US/Eastern')
                 #date=date.astimezone(eastern)
                 date=date.strftime("%Y%m%d %H:%M:%S EST")
                 brokerData['endDateTime']=date
-                if len(data)==0:
-                    data = pd.concat([requestedData,data],axis=0)
-                else:
-                    if sum(pd.concat([requestedData,data],axis=0).duplicated())<100:
-                        data = pd.concat([requestedData,data],axis=0)
+                
                 time.sleep(30)
         else:
-            requestedData = getDataFromIB(brokerData, date, data)
+            data = getDataFromIB(brokerData, date, data)
             #update date
-            date = requestedData.index.to_datetime()[0]
+            date = data.index.to_datetime()[0]
             #eastern=timezone('US/Eastern')
             #date=date.astimezone(eastern)
             date=date.strftime("%Y%m%d %H:%M:%S EST")
             brokerData['endDateTime']=date
-            if len(data)==0:
-                data = pd.concat([requestedData,data],axis=0)
-            else:
-                if sum(pd.concat([requestedData,data],axis=0).duplicated())<100:
-                    data = pd.concat([requestedData,data],axis=0)
+            
             time.sleep(30)
         #set date as last index for next request
     
             
-        return data
+        return data #get_bar(symbol, currency)
         

@@ -66,8 +66,7 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
         	close[hour]=row[1]	
         	date[hour]=str(hour) + ":00"
         	volume[hour]=row[2]
-           
-           writeBar=True
+        	writeBar=True
         #print exchange + ' ' + str(hour) + ' ' + str(open[hour]) + ' ' + \
         #                str(high[hour]) + ' ' + str(low[hour]) + ' ' + \
         #                str(close[hour]) + ' ' + str(volume[hour])

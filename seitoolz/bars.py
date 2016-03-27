@@ -185,7 +185,7 @@ def get_hist_bars(currencyPairs, interval='30m', minDataPoints = 10000, exchange
             durationStr='30 D'
             barSizeSetting='30 mins'
         elif interval == '1h':
-            durationStr='60 D'
+            durationStr='30 D'
             barSizeSetting='1 hour'
         whatToShow='MIDPOINT'
         

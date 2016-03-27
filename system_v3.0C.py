@@ -95,7 +95,32 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
 
                             
 
-def saveModel(dataSet):    
+def saveModel(dataSet, bestModelParams, verbose=True):
+    signal = bestModelParams.signal    
+    #perturbDataPct = 0.0002
+    #longMemory =  False
+    #iterations=1
+    #input_signal = 1
+    #feature_selection = 'None' #RFECV OR Univariate
+    #wfSteps=[1]
+    wf_is_period = bestModelParams.rows
+    #wf_is_periods = [100]
+    #tox_adj_proportion = 0
+    #nfeatures = 10
+
+    iterations=10
+    RSILookback = bestModelParams.RSILookback
+    zScoreLookback = bestModelParams.zScoreLookback
+    ATRLookback = bestModelParams.ATRLookback
+    beLongThreshold = bestModelParams.beLongThreshold
+    DPOLookback = bestModelParams.DPOLookback
+    ACLookback = bestModelParams.ACLookback
+    CCLookback = bestModelParams.CCLookback
+    rStochLookback = bestModelParams.rStochLookback
+    statsLookback = bestModelParams.statsLookback
+    ROCLookback = bestModelParams.ROCLookback
+    model = eval(bestModelParams.params)
+    
     mData = dataSet.drop(['Open','High','Low','Close',
                            'Volume','prior_index','gainAhead'],
                             axis=1).dropna()    
@@ -145,48 +170,51 @@ def saveModel(dataSet):
         cm_oos = confusion_matrix(y_test, y_pred_oos)
         cm_sum_oos = cm_sum_oos + cm_oos
 
-    tpIS = cm_sum_is[1,1]
-    fnIS = cm_sum_is[1,0]
-    fpIS = cm_sum_is[0,1]
-    tnIS = cm_sum_is[0,0]
-    precisionIS = tpIS/(tpIS+fpIS)
-    recallIS = tpIS/(tpIS+fnIS)
-    accuracyIS = (tpIS+tnIS)/(tpIS+fnIS+fpIS+tnIS)
-    f1IS = (2.0 * precisionIS * recallIS) / (precisionIS+recallIS) 
 
-    tpOOS = cm_sum_oos[1,1]
-    fnOOS = cm_sum_oos[1,0]
-    fpOOS = cm_sum_oos[0,1]
-    tnOOS = cm_sum_oos[0,0]
-    precisionOOS = tpOOS/(tpOOS+fpOOS)
-    recallOOS = tpOOS/(tpOOS+fnOOS)
-    accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
-    f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
+    
+    if verbose:
+        tpIS = cm_sum_is[1,1]
+        fnIS = cm_sum_is[1,0]
+        fpIS = cm_sum_is[0,1]
+        tnIS = cm_sum_is[0,0]
+        precisionIS = tpIS/(tpIS+fpIS)
+        recallIS = tpIS/(tpIS+fnIS)
+        accuracyIS = (tpIS+tnIS)/(tpIS+fnIS+fpIS+tnIS)
+        f1IS = (2.0 * precisionIS * recallIS) / (precisionIS+recallIS) 
 
-    print "\n\nSymbol is ", ticker
-    print "Learning algorithm is", model
-    print "Confusion matrix for %i randomized tests" % iterations
-    print "for years ", dataSet.index[0] , " through ", dataSet.index[-2]  
+        tpOOS = cm_sum_oos[1,1]
+        fnOOS = cm_sum_oos[1,0]
+        fpOOS = cm_sum_oos[0,1]
+        tnOOS = cm_sum_oos[0,0]
+        precisionOOS = tpOOS/(tpOOS+fpOOS)
+        recallOOS = tpOOS/(tpOOS+fnOOS)
+        accuracyOOS = (tpOOS+tnOOS)/(tpOOS+fnOOS+fpOOS+tnOOS)
+        f1OOS = (2.0 * precisionOOS * recallOOS) / (precisionOOS+recallOOS) 
+        print "\n\nSymbol is ", ticker
+        print "Learning algorithm is", model
+        print "Confusion matrix for %i randomized tests" % iterations
+        print "for years ", dataSet.index[0] , " through ", dataSet.index[-2]  
 
-    print "\nIn sample"
-    print "     predicted"
-    print "      pos neg"
-    print "pos:  %i  %i  %.2f" % (tpIS, fnIS, recallIS)
-    print "neg:  %i  %i" % (fpIS, tnIS)
-    print "      %.2f          %.2f " % (precisionIS, accuracyIS)
-    print "f1:   %.2f" % f1IS
+        print "\nIn sample"
+        print "     predicted"
+        print "      pos neg"
+        print "pos:  %i  %i  %.2f" % (tpIS, fnIS, recallIS)
+        print "neg:  %i  %i" % (fpIS, tnIS)
+        print "      %.2f          %.2f " % (precisionIS, accuracyIS)
+        print "f1:   %.2f" % f1IS
 
-    print "\nOut of sample"
-    print "     predicted"
-    print "      pos neg"
-    print "pos:  %i  %i  %.2f" % (tpOOS, fnOOS, recallOOS)
-    print "neg:  %i  %i" % (fpOOS, tnOOS)
-    print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
-    print "f1:   %.2f" % f1OOS
+        print "\nOut of sample"
+        print "     predicted"
+        print "      pos neg"
+        print "pos:  %i  %i  %.2f" % (tpOOS, fnOOS, recallOOS)
+        print "neg:  %i  %i" % (fpOOS, tnOOS)
+        print "      %.2f          %.2f " % (precisionOOS, accuracyOOS)
+        print "f1:   %.2f" % f1OOS
 
-    print "\nend of run"
+        print "\nend of run"
 
     model.fit(dX, dy)
+    return model
 
 def wf_classify_validate2(unfilteredData, dataSet, models, model_metrics, \
                            metaData, **kwargs):
@@ -263,6 +291,7 @@ def wf_classify_validate2(unfilteredData, dataSet, models, model_metrics, \
     dataX = mmData_v.drop(dropCol, axis=1) 
     cols = dataX.columns.shape[0]
     metaData['cols']=cols
+    
     feature_names = []
     if verbose == True:
         print '\nTotal %i features: ' % cols
@@ -270,10 +299,14 @@ def wf_classify_validate2(unfilteredData, dataSet, models, model_metrics, \
         if verbose == True:
             print i,x+',',
         feature_names = feature_names+[x]
-    if nfeatures > cols:
-        print 'nfeatures', nfeatures, 'is greater than total features ', cols, '!'
-        print 'Adjusting to', cols, 'features..'
-        nfeatures = cols  
+        
+    if feature_selection is not 'None':
+        if nfeatures > cols:
+            print 'nfeatures', nfeatures, 'is greater than total features ', cols, '!'
+            print 'Adjusting to', cols, 'features..'
+            nfeatures = cols  
+        metaData['cols']=nfeatures
+    
             
     #  Copy from pandas dataframe to numpy arrays
     dy = np.zeros_like(datay_signal.signal)
@@ -355,7 +388,7 @@ def wf_classify_validate2(unfilteredData, dataSet, models, model_metrics, \
                 print "\nDuplicate indexes found in test/training set: Possible Future Leak!"
             if len(mmData_v.index[-wfStep:].intersection(train_index)) == 0:
                 #print 'training', X_train.shape
-                if feature_selection is not None:
+                if feature_selection is not 'None':
                     if feature_selection == 'RFECV':
                         #Recursive feature elimination with cross-validation: 
                         #A recursive feature elimination example with automatic tuning of the
@@ -385,7 +418,7 @@ def wf_classify_validate2(unfilteredData, dataSet, models, model_metrics, \
 
                 #  fit the model to the in-sample data
                 m[1].fit(X_train, y_train)
-
+                print X_train.shape
 
                 #trained_models[m[0]] = pickle.dumps(m[1])
                             
@@ -482,7 +515,7 @@ def wf_classify_validate2(unfilteredData, dataSet, models, model_metrics, \
         #metaData['signal'] = 'SHORT -1'
         #model_metrics = update_report(model_metrics, filterName, cm_y_pred_oos, cm_y_test, datay_gainAhead,\
         #                       cmatrix_test_index, m, metaData,CAR25_Sn1_oos)
-    return model_metrics, st_oos_filt
+    return model_metrics, st_oos_filt, m[1]
         
 #no args -> debug.  else live mode arg 1 = pair, arg 2 = "0" to turn off
 if len(sys.argv)==1:
@@ -495,8 +528,8 @@ if len(sys.argv)==1:
                     #'EURJPY',\
                     #'GBPJPY',\
                     #'AUDJPY',\
-                    'USDJPY',\
-                    #'AUDUSD',\
+                    #'USDJPY',\
+                    'AUDUSD',\
                     #'EURUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
@@ -521,7 +554,7 @@ if len(sys.argv)==1:
     equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
-    modelPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/models/' 
+    modelSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/models/' 
     dataPath = 'D:/ML-TSDP/data/from_IB/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     
@@ -541,7 +574,7 @@ else:
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
     bestParamsPath =  './data/params/'
-    modelPath = './data/models/' 
+    modelSavePath = './data/models/' 
     
     if sys.argv[2] == "0":
         livePairs=[]
@@ -559,8 +592,8 @@ for ticker in livePairs:
 
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 1200
-    #validationSetLength = 500
+    validationSetLength = 480
+    #validationSetLength = 1200
     #validationPeriods = [50,250]
     validationPeriods = [120,240] # min is 2
     #validationStartPoint = None
@@ -570,12 +603,13 @@ for ticker in livePairs:
     zz_steps = [0.006,0.009]
     #zz_steps = [0.009]
     wfSteps=[60]
-    wf_is_periods = [250,500,1000]
+    wf_is_periods = [250,500]
+    #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
-    feature_selection = None # OR Univariate
+    feature_selection = 'None' # OR Univariate
     #feature_selection = 'RFECV'
     #feature_selection = 'Univariate'
     nfeatures = 10
@@ -865,6 +899,7 @@ for ticker in livePairs:
     #########################################################
     validationDict = {}
     BMdict = {}
+    BSMdict={}
     for validationPeriod in validationPeriods:
         #DPScycle = 0
         endOfData = 0
@@ -894,6 +929,7 @@ for ticker in livePairs:
             #init
             model_metrics = init_report()       
             sstDictDF1_ = {} 
+            SMdict={}
             #DPScycle+=1
             
             for signal in signal_types:
@@ -923,7 +959,7 @@ for ticker in livePairs:
                                 'wf_is_period':wf_is_period
                                  }
                         runName = ticker+'_'+data_type+'_'+filterName+'_' + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
-                        model_metrics, sstDictDF1_[runName] = wf_classify_validate2(unfilteredData, dataSet, [m], model_metrics,\
+                        model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData, dataSet, [m], model_metrics,\
                                                                                                                     metaData, showPDFCDF=showPDFCDF,\
                                                                                                                     verbose=verbose)
 
@@ -944,7 +980,8 @@ for ticker in livePairs:
                 if bestModelParams['params'] == str(m[1]):
                     print  '\nBest model found...\n', m[1]
                     bm = m[1]
-            print 'Number of features: ', bestModelParams.n_features, bestModelParams.FS
+            print 'Feature selection: ', bestModelParams.FS
+            print 'Number of features: ', bestModelParams.cols
             print 'WF In-Sample Period:', bestModelParams.rows
             print 'WF Out-of-Sample Period:', bestModelParams.wf_step
             print 'Long Memory: ', longMemory
@@ -955,6 +992,10 @@ for ticker in livePairs:
             if showAllCharts:
                 compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName)
                 
+            #save best model file on last iteration
+            #if endOfData ==1:
+            #   modelToSave = saveModel(dataSet, bestModelParams)
+            
             print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
             #print 'Finished Model Training...'
             
@@ -1009,11 +1050,11 @@ for ticker in livePairs:
                     #save sst's for save file         
                     BMdict[validationPeriod] = bestBothDPS
                     #save model
-                    
+                    BSMdict[validationPeriod] = SMdict[DF1_BMrunName]
                     
                 if showAllCharts:
                     DPSequity = calcEquity_df(bestBothDPS[['signals','gainAhead']], dpsRunName, leverage = bestBothDPS.safef.values)
-            else:
+            elif endOfData ==1:
                 BMdict[validationPeriod] = pd.concat([sstDictDF1_[DF1_BMrunName],\
                                     pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[DF1_BMrunName].index),
                                     pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[DF1_BMrunName].index),
@@ -1021,11 +1062,13 @@ for ticker in livePairs:
                                     pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[DF1_BMrunName].index),
                                     pd.Series(data=DF1_BMrunName, name = 'system', index = sstDictDF1_[DF1_BMrunName].index)
                                     ],axis=1)
+                #save model
+                BSMdict[validationPeriod] = SMdict[DF1_BMrunName]
                 
             #use best params for next step
             for i in range(0,bestModelParams.shape[0]):
                 metaData[bestModelParams.index[i]]=bestModelParams[bestModelParams.index[i]]
-            
+             
             #adjust test dates
             t_start_loc = dataSet.reset_index()[dataSet.reset_index().dates ==bestModelParams.v_end].index[0]
             testFirstYear = dataSet.index[0]
@@ -1053,7 +1096,7 @@ for ticker in livePairs:
                 metaData['v_start']=validationFirstYear
                 metaData['v_end']=validationFinalYear
                 nextRunName = 'Next'+str(validationPeriod)+'_'+DF1_BMrunName
-                model_metrics, sstDictDF1_[nextRunName] = wf_classify_validate2(unfilteredData, dataSet, [m], model_metrics,\
+                model_metrics, sstDictDF1_[nextRunName], savedModel = wf_classify_validate2(unfilteredData, dataSet, [m], model_metrics,\
                                                     metaData, showPDFCDF=showPDFCDF, verbose=verbose)
                 if showAllCharts:
                     compareEquity(sstDictDF1_[nextRunName],nextRunName)
@@ -1169,9 +1212,11 @@ for ticker in livePairs:
                                                                             ],axis=1)                                                               
                                                                              )
           
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
     print '\n\nScoring Validation Curves...'
-    #set validation curves equal length
+    #set validation curves equal length. end date is -2 because GA at [-1] is 0.
     vStartDate = dataSet.index[0]
+    vEndDate = dataSet.index[-2]
     for validationPeriod in validationDict:
         if validationDict[validationPeriod].index[0]>vStartDate:
             vStartDate =  validationDict[validationPeriod].index[0]
@@ -1182,37 +1227,37 @@ for ticker in livePairs:
             vCurve = ticker+' Validation Period '+str(validationPeriod)
             #compareEquity(validationDict[validationPeriod],vCurve)
             if showAllCharts:
-                DPSequity = calcEquity_df(validationDict[validationPeriod].ix[vStartDate:][['signals','gainAhead']], vCurve,\
-                                                    leverage = validationDict[validationPeriod].ix[vStartDate:].safef.values)
+                DPSequity = calcEquity_df(validationDict[validationPeriod].ix[vStartDate:vEndDate][['signals','gainAhead']], vCurve,\
+                                                    leverage = validationDict[validationPeriod].ix[vStartDate:vEndDate].safef.values)
             if scorePath is not None:
                 validationDict[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
                                                                 str(validationDict[validationPeriod].index[0]).replace(':','')+'_to_'+\
                                                                 str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
-            CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
-                                                validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
+            CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:vEndDate].signals,\
+                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int),\
                                                 unfilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
             model = [validationDict[validationPeriod].iloc[-1].system.split('_')[4],\
                             [m[1] for m in models if m[0] ==validationDict[validationPeriod].iloc[-1].system.split('_')[4]][0]]
             metaData['validationPeriod'] = validationPeriod
             #metaData['params'] =model[1]
             vCurve_metrics = update_report(vCurve_metrics, filterName,\
-                                                validationDict[validationPeriod].ix[vStartDate:].signals.values.astype(int), \
-                                                dataSet.ix[validationDict[validationPeriod].ix[vStartDate:].index].signal.values.astype(int),\
+                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].signals.values.astype(int), \
+                                                dataSet.ix[validationDict[validationPeriod].ix[vStartDate:vEndDate].index].signal.values.astype(int),\
                                                 unfilteredData.gainAhead,\
-                                                validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int), model,\
+                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
                                                 metaData,CAR25_oos)
     else:
         vCurve_metrics = init_report()
         for validationPeriod in validationDict:
             vCurve = ticker+' Validation Period '+str(validationPeriod)
             if showAllCharts:
-                compareEquity(validationDict[validationPeriod].ix[vStartDate:],vCurve)
+                compareEquity(validationDict[validationPeriod].ix[vStartDate:vEndDate],vCurve)
             if scorePath is not None:
                 validationDict[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
                                                                 str(validationDict[validationPeriod].index[0]).replace(':','')+'_to_'+\
                                                                 str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
-            CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:].signals,\
-                                                validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int),\
+            CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:vEndDate].signals,\
+                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int),\
                                                 unfilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
             model = [validationDict[validationPeriod].iloc[-1].system.split('_')[4],\
                             [m[1] for m in models if m[0] ==validationDict[validationPeriod].iloc[-1].system.split('_')[4]][0]]
@@ -1220,17 +1265,20 @@ for ticker in livePairs:
             #metaData['params'] =model[1]
             metaData['validationPeriod'] = validationPeriod
             vCurve_metrics = update_report(vCurve_metrics, filterName,\
-                                                validationDict[validationPeriod].ix[vStartDate:].signals.values.astype(int), \
-                                                dataSet.ix[validationDict[validationPeriod].ix[vStartDate:].index].signal.values.astype(int),\
+                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].signals.values.astype(int), \
+                                                dataSet.ix[validationDict[validationPeriod].ix[vStartDate:vEndDate].index].signal.values.astype(int),\
                                                 unfilteredData.gainAhead,\
-                                                validationDict[validationPeriod].ix[vStartDate:].prior_index.values.astype(int), model,\
+                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
                                                 metaData,CAR25_oos)
             
     #score models
     scored_models, bestModelParams = directional_scoring(vCurve_metrics,filterName)
     #bestModelParams['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    
-    print '\n\nBest Validation Period Found:', bestModelParams.validationPeriod
+    if scorePath is not None:
+        scored_models.to_csv(scorePath+version+'_'+ticker+'.csv')
+        
+    print '\nBest Validation Period Found:', bestModelParams.validationPeriod
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
     if showAllCharts:
         BestEquity = calcEquity_df(validationDict[bestModelParams.validationPeriod][['signals','gainAhead']],\
                                             bestModelParams.C25sig, leverage = validationDict[bestModelParams.validationPeriod].safef.values)
@@ -1246,7 +1294,7 @@ for ticker in livePairs:
     bestModelParams = bestModelParams.append(pd.Series(data=lastBartime.strftime("%Y%m%d %H:%M:%S %Z"), index=['lastBarTime']))
     bestModelParams = bestModelParams.append(pd.Series(data=cycleTime, index=['cycleTime']))
     
-    print version, 'Saving Params..'
+    print version_, 'Saving Params..'
     files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
     if version+'_'+ticker + '.csv' not in files:
         BMdf = pd.concat([bestModelParams,bestModelParams],axis=1).transpose()
@@ -1257,10 +1305,10 @@ for ticker in livePairs:
         #BMdf.index = BMdf.timestamp
         BMdf.to_csv(bestParamsPath+version+'_'+ticker+'.csv', index=False)
     
-    if scorePath is not None:
-        scored_models.to_csv(scorePath+version+'_'+ticker+'.csv')
-             
-    print 'Saving Signals..'      
+    print version_, 'Saving Model..'
+    joblib.dump(BSMdict[bestModelParams.validationPeriod], modelSavePath+version_+'_'+ticker+'.joblib',compress=3)
+    
+    print version_, 'Saving Signals..'      
     #init file
     #BMdict[bestModelParams.validationPeriod].tail().to_csv(signalPath + version+'_'+ ticker + '.csv')
     files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]

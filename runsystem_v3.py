@@ -24,12 +24,12 @@ import websocket
 logging.basicConfig(filename='/logs/runsystem_v3.log',level=logging.DEBUG)
 
 debug=False
-pairs=['AUDUSD']
+#pairs=['AUDUSD']
                  
-#pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
-#                'GBPJPY','EURCHF','AUDJPY',\
-#                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
- #                'USDCHF','USDJPY','EURJPY','NZDUSD']
+pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
+                'GBPJPY','EURCHF','AUDJPY',\
+                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
+                 'USDCHF','USDJPY','EURJPY','NZDUSD']
                 
 
 

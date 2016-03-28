@@ -35,7 +35,7 @@ start_time = time.time()
 size = (8,7)
 #systems = ['v1','v2','v3']
 #barSize=''
-versions = ['v1.3','v2.4','v3.1']
+systems = ['v1.3','v2.4','v3.1']
 barSize='30m'
 
 #regime switching params

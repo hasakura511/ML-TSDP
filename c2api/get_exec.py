@@ -60,20 +60,25 @@ def get_c2pos(systemid, c2sym, apikey, systemname):
     data=get_exec_open(systemid,apikey);
     
     jsondata = json.loads(data)
-    if len(jsondata['response']) > 0:
-        dataSet=json_normalize(jsondata['response'])
-        if c2sym not in dataSet['symbol'].values:
-            dataSet=dataSet.append(pd.DataFrame([[c2sym,0,0,'none']],
-                              columns=['symbol','quant_opened','quant_closed','long_or_short']))
-        dataSet=dataSet.set_index(['symbol'])
-        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
-        return dataSet
-    else:
-        dataSet=pd.DataFrame([[c2sym,0,0,'none']],
-                              columns=['symbol','quant_opened','quant_closed','long_or_short'])
-        dataSet=dataSet.set_index(['symbol'])
-        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
-        return dataSet
+    try:
+        if len(jsondata['response']) > 0:
+            dataSet=json_normalize(jsondata['response'])
+            if c2sym not in dataSet['symbol'].values:
+                dataSet=dataSet.append(pd.DataFrame([[c2sym,0,0,'none']],
+                                  columns=['symbol','quant_opened','quant_closed','long_or_short']))
+            dataSet=dataSet.set_index(['symbol'])
+            dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
+            return dataSet
+    except Exception as e:
+        logging.error("get_c2pos", exc_info=True)
+        
+       
+    dataSet=pd.DataFrame([[c2sym,0,0,'none']],
+                          columns=['symbol','quant_opened','quant_closed','long_or_short'])
+    dataSet=dataSet.set_index(['symbol'])
+    dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
+    return dataSet
+    
 
 
 def get_c2livepos(systemid, apikey, systemname):

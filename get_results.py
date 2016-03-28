@@ -209,6 +209,8 @@ def save_plot(colnames, filename, title, ylabel, SST):
     for col in colnames:
         tdiff=SST.index[-1] - SST.index[0]
         tdiff=tdiff.total_seconds()/3600
+        if tdiff == 0:
+            tdiff=1
         perhour=round(len(SST[col].values)/tdiff,2)
         ax.plot( SST[col], label=str(col) + ' [' + str(len(SST[col].values)) + ']' + ' ' + str(perhour) + '/hour')
     barSize='1 day'

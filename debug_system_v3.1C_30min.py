@@ -479,7 +479,7 @@ for ticker in livePairs:
     signal_types = ['gainAhead','ZZ']
     #signal_types = ['ZZ']
     #signal_types = ['gainAhead']
-    zz_steps = [0.009]
+    zz_steps = [0.006,0.009]
     #zz_steps = [0.009]
     wfSteps=[1]
     wf_is_periods = [250,500]

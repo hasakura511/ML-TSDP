@@ -15,6 +15,9 @@ from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.order import adj_size
 from time import gmtime, strftime, localtime, sleep
+import logging
+
+logging.basicConfig(filename='/logs/proc_signal.log',level=logging.DEBUG)
 
 currencyList=dict()
 v1sList=dict()

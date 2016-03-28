@@ -1,3 +1,4 @@
 dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,timestamp
 2016-03-25 16:30:00,1.0,0.000107224223243,6363.0,1.0,,,,bothUSDJPY_30m_ALL_DF1_VotingHard_i1000_fcst2_GA2,,
 2016-03-25 17:00:00,1.0,0.0,6364.0,1.0,,,,bothUSDJPY_30m_ALL_DF1_VotingHard_i1000_fcst2_GA2,110.28,20160327 10:19:33 EDT
+2016-03-25 17:00:00,1.0,0.0,6364.0,1.0,,,,bothUSDJPY_30m_ALL_DF1_VotingHard_i1000_fcst2_GA2,89.76,20160327 19:14:25 EDT

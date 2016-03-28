@@ -5,6 +5,7 @@ from pandas.io.json import json_normalize
 import numpy as np
 import pandas as pd
 import time
+import logging
 
 system_cache={}
 

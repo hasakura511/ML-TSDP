@@ -471,7 +471,7 @@ for ticker in livePairs:
 
     #Model Parameters
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 2400
+    validationSetLength = 1200
     #validationSetLength = 1200
     #validationPeriods = [50,250]
     validationPeriods = [120,240] # min is 2

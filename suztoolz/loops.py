@@ -1063,6 +1063,8 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
     DPS_adj = {}
     for dps in DPS:
         DPS_adj[dps] = DPS[dps].ix[startDate:]
+        #round to nearest integer to reduce commissions
+        DPS_adj[dps].safef = DPS_adj[dps].safef.round()
         
     for sst in DPS_adj:
         if verbose:
@@ -1105,13 +1107,14 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
             
         
     #create equity curve stats    
-    equityStats = pd.DataFrame(columns=['system','avgSafef','cumCAR','MAXDD','sortinoRatio',\
-                           'sharpeRatio','marRatio','k_ratio'], index = range(0,len(equityCurves)))
+    equityStats = pd.DataFrame(columns=['system','avgSafef','numTrades','cumCAR','MAXDD','sortinoRatio',\
+                       'sharpeRatio','marRatio','k_ratio'], index = range(0,len(equityCurves)))
     #this calc dosent exclude non-trading days
     years_in_forecast = (endDate-startDate).total_seconds()/3600.0/365.0
     i=0
     for sst in equityCurves:
         avgSafef = equityCurves[sst].safef.mean()    
+        numTrades = sum((equityCurves[sst].signals * equityCurves[sst].safef).round().diff().fillna(0).values !=0)
         cumCAR = 100*(((equityCurves[sst].equity.iloc[-1]/equityCurves[sst].equity.iloc[0])**(1.0/years_in_forecast))-1.0) 
         MAXDD = max(equityCurves[sst].maxDD)*-100.0
         sortinoRatio = ratio(equityCurves[sst].equity).sortino()
@@ -1122,6 +1125,7 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
         
         equityStats.iloc[i].system = sst
         equityStats.iloc[i].avgSafef = avgSafef
+        equityStats.iloc[i].numTrades = numTrades
         equityStats.iloc[i].cumCAR = cumCAR
         equityStats.iloc[i].MAXDD = MAXDD
         equityStats.iloc[i].sortinoRatio = sortinoRatio
@@ -1136,6 +1140,7 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
     if direction == 'short':
         #short scoring weights drawdowns
         equityStats['avgSafefmm'] =minmax_scale(robust_scale(equityStats.avgSafef.reshape(-1, 1)))
+        equityStats['numTradesmm'] =-minmax_scale(robust_scale(equityStats.numTrades.reshape(-1, 1)))
         equityStats['cumCARmm'] =minmax_scale(robust_scale(equityStats.cumCAR.reshape(-1, 1)))
         equityStats['MAXDDmm'] =minmax_scale(robust_scale(equityStats.MAXDD.reshape(-1, 1)))
         equityStats['sortinoRatiomm'] = minmax_scale(robust_scale(equityStats.sortinoRatio.reshape(-1, 1)))
@@ -1151,8 +1156,9 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
 
         equityStats = equityStats.sort_values(['scoremm'], ascending=False)
     else:
-        #long and both dps scoring
+        #long and both dps scoring. -#trades to reduce trading costs.
         equityStats['avgSafefmm'] =minmax_scale(robust_scale(equityStats.avgSafef.reshape(-1, 1)))
+        equityStats['numTradesmm'] =-minmax_scale(robust_scale(equityStats.numTrades.reshape(-1, 1)))
         equityStats['cumCARmm'] =minmax_scale(robust_scale(equityStats.cumCAR.reshape(-1, 1)))
         equityStats['MAXDDmm'] =minmax_scale(robust_scale(equityStats.MAXDD.reshape(-1, 1)))
         equityStats['sortinoRatiomm'] = minmax_scale(robust_scale(equityStats.sortinoRatio.reshape(-1, 1)))
@@ -1162,17 +1168,19 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
 
         equityStats['scoremm'] =  equityStats.avgSafefmm+equityStats.cumCARmm+\
                                         equityStats.sortinoRatiomm+equityStats.k_ratiomm+\
-                                       equityStats.sharpeRatiomm
+                                       equityStats.sharpeRatiomm+equityStats.numTradesmm
                                        #+equityStats.marRatiomm
                                        #+equityStats.MAXDDmm
 
         equityStats = equityStats.sort_values(['scoremm'], ascending=False)
+        
     topSystem = equityStats.system.iloc[0]
-    benchmarks = createBenchmark(equityCurves[topSystem],1.0,'l', startDate,endDate,ticker)
-    benchStatsByYear = createYearlyStats(benchmarks)
-    #create yearly stats for all equity curves with comparison against benchmark
-    equityCurvesStatsByYear = createYearlyStats(equityCurves, benchStatsByYear)
+
     if displayCharts:
+        benchmarks = createBenchmark(equityCurves[topSystem],1.0,'l', startDate,endDate,ticker)
+        benchStatsByYear = createYearlyStats(benchmarks)
+        #create yearly stats for all equity curves with comparison against benchmark
+        equityCurvesStatsByYear = createYearlyStats(equityCurves, benchStatsByYear)
         displayRankedCharts(equityStats.system.shape[0],benchmarks,benchStatsByYear,equityCurves,equityStats,\
                                     equityCurvesStatsByYear, yscale=yscale)
                                     
@@ -1189,6 +1197,7 @@ def createYearlyStats(eCurves, benchStatsByYear=None):
         eEquity = pd.Series(name='eEquity')
         returns = pd.Series(name='return')
         acc = pd.Series(name='accuracy')
+        numTrades = pd.Series(name='trades')
         for i, df_by_year in enumerate(eCurves[df].groupby(eCurves[df].index.year)):
             #dates
             year = df_by_year[0]
@@ -1211,9 +1220,13 @@ def createYearlyStats(eCurves, benchStatsByYear=None):
             else:
                 acc.set_value(year, accuracy_score(ytrue,ypred))
             
+            #trades
+            nt = sum((df_by_year[1].signals * df_by_year[1].safef).round().diff().fillna(0).values !=0)
+            numTrades.set_value(year, nt)
+            
             #print year,df_by_year[1].shape, ret, accuracy_score(ytrue,ypred)
             
-        yearlyStats[df] = pd.concat([days, iEquity, eEquity, returns, acc], axis=1)
+        yearlyStats[df] = pd.concat([days, numTrades, iEquity, eEquity, returns, acc], axis=1)
         
     if benchStatsByYear is None:
         return yearlyStats
@@ -1439,7 +1452,7 @@ def calcEquity_df(SST, title, **kwargs):
     plt.close()
     
     shortTrades, longTrades = numberZeros(SST.signals)
-    allTrades = shortTrades+ longTrades
+    allTrades = sum((equityCurves['b'].signals * equityCurves['b'].safef).round().diff().fillna(0).values !=0)
 
     if verbose:
         hoursTraded = (SST.index[-1]-SST.index[0]).total_seconds()/60.0/60.0
@@ -1452,7 +1465,7 @@ def calcEquity_df(SST, title, **kwargs):
                     (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
         print 'TWR for %i beShort trades is %0.3f, maxDD %0.3f' %\
                     (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
-        print 'TWR for %i beLong and beShort trades is %0.3f, maxDD %0.3f' %\
+        print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
                     (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
         print 'SAFEf:', equityCurves['b'].safef.mean()
 

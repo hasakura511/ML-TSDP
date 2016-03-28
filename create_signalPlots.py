@@ -84,7 +84,7 @@ def calcEquity_signals(SST, title, **kwargs):
     totalAvgTrades=kwargs.get('totalAvgTrades',None)
     
     initialEquity = 1.0
-    nrows = SST.gainAhead.shape[0]
+    nrows = SST.shape[0]
     #signalCounts = SST.signals.shape[0]
 
         
@@ -263,14 +263,14 @@ def calcEquity_signals(SST, title, **kwargs):
     xticks[1].label1.set_visible(False)
     
     if totalTrades != None and totalAvgTrades != None:
-        text=  '\n%0.f signal counts: ' % nrows
+        text=  '\n%0.f bar counts: ' % nrows
         text+='\nAverage trades per hour per system: %0.2f' \
                                 % (totalAvgTrades)
         text+='\nTWR for %i beLong and beShort trades with DPS is %0.4f, maxDD %0.4f' %\
                     (totalTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
         plt.figtext(0.05,-0.05,text, fontsize=15)
     else:
-        text=  '\n%0.f signal counts: ' % nrows
+        text=  '\n%0.f bar counts: ' % nrows
         if 1 in SST.signals.value_counts():
             text+= '%i beLong,  ' % SST.signals.value_counts()[1]
         if -1 in SST.signals.value_counts():

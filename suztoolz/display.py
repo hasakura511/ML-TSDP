@@ -173,7 +173,12 @@ def showDistribution():
         print 'Kurtosis: ', kurt, ' Skew: ', sk, 'Runs: ', runs
         
 def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equityStats,equityCurvesStatsByYear,\
-                                            vsDPS=False, dpsRank=None, dpsChartRank=0,yscale='log'):
+                                            **kwargs):
+    vsDPS=kwargs.get('vsDPS',False)
+    dpsRank=kwargs.get('dpsRank',None)
+    dpsChartRank=kwargs.get('dpsChartRank',0)
+    yscale=kwargs.get('yscale','log')
+    
     topSystem = equityStats.sort_values(['scoremm'], ascending=False).system.iloc[0]
     leftoverIndex = equityStats.shape[0]%numCharts
     eIndex = range(equityStats.shape[0]-numCharts,-numCharts,-numCharts)
@@ -278,6 +283,9 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             fig2.savefig('samplefigure', bbox_extra_artists=(lgd2,), bbox_inches='tight')
             fig2.autofmt_xdate()
             
+        plt.show() 
+        
+        for sf1 in benchmarks:    
             print '\nbenchmark: ', sf1
             #if sf1 == 'buyHoldSafef1':
             #    print 'Signal: None'
@@ -334,7 +342,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
                 print 'CAR50: %.3f ' % equityStats.loc[equityStats.system == sst].CAR50, 
             if 'CAR75' in equityStats:
                 print 'CAR75: %.3f ' % equityStats.loc[equityStats.system == sst].CAR75
-            print 'maxDD: %.1f%% ' % equityStats.loc[equityStats.system == sst].MAXDD,
+            print 'maxDD: %.1f%% ' % equityStats.loc[equityStats.system == sst].MAXDD
             print 'Sortino: %.3f ' %  equityStats.loc[equityStats.system == sst].sortinoRatio,           
             print 'Sharpe: %.3f ' % equityStats.loc[equityStats.system == sst].sharpeRatio,
             print 'K-Ratio: %.3f ' %  equityStats.loc[equityStats.system == sst].k_ratio,
@@ -349,7 +357,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             #    maxCAR = CAR
             #    maxCARsst = sst
             
-        plt.show()    
+           
     
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5), scoring=None):

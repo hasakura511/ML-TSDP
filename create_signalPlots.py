@@ -33,7 +33,7 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (8,7)
-systems = ['v1','v1.3','v2','v3','v3.1']
+systems = ['v1','v1.3','v2','v2.4','v3','v3.1']
 
 #regime switching params
 lookback = 720

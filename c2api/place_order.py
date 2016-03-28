@@ -1,5 +1,6 @@
 import requests
 from time import gmtime, strftime, time, localtime, sleep
+import logging
 
 def place_order(action, quant, sym, type, systemid, submit,apikey):
     if submit == False:
@@ -26,7 +27,8 @@ def place_order(action, quant, sym, type, systemid, submit,apikey):
     
     r=requests.post(url, params=params, json=data);
     sleep(2)
-    print r.text
+    #print r.text
+    logging.info( str(r.text)  )
 
 def set_position(positions, systemid, submit, apikey):
     if submit == False:
@@ -57,5 +59,6 @@ def set_position(positions, systemid, submit, apikey):
     
     r=requests.post(url, params=params, json=data);
     sleep(2)
-    print r.text
+    #print r.text
+    logging.info( str(r.text)  )
 #place_order('BTO','1','EURUSD','forex')

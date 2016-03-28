@@ -33,7 +33,10 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (8,7)
-systems = ['v1','v2','v3']
+#systems = ['v1','v2','v3']
+#barSize=''
+versions = ['v1.3','v2.4','v3.1']
+barSize='30m'
 
 #regime switching params
 lookback = 720
@@ -339,12 +342,12 @@ def calcEquity_signals(SST, title, **kwargs):
     
 signalFiles = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
 dataFiles = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-pairs = [x[6:12] for x in dataFiles]
+pairs = [x.replace(barSize,'').replace('.csv','').replace('_','') for x in dataFiles if barSize in x]
 dataSets = {}
 maxCTs = {}
 numTrades = {}
 for pair in pairs:
-    dataFilename = [pairs for pairs in dataFiles if pair in pairs][0]
+    dataFilename = [f for f in dataFiles if pair in f and barSize in f][0]
     dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
     if not 'cycleTime' in dataFile:
                         dataFile['cycleTime']=0
@@ -352,7 +355,7 @@ for pair in pairs:
     
     validSignalFiles = {}
     for system in systems: 
-        validSignalFiles[system]=[x for x in signalFiles if system in x]
+        validSignalFiles[system]=[f for f in signalFiles if system in f and barSize in f]
     #for f in [sfile for sfilelist in validSignalFiles for sfile in sfilelist]:
     for system in validSignalFiles:
         if system != 'v1':

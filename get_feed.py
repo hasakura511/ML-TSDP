@@ -31,6 +31,8 @@ from tzlocal import get_localzone
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
 import os
 
+logging.basicConfig(filename='/logs/get_feed.log',level=logging.DEBUG)
+
 currencyList=dict()
 v1sList=dict()
 dpsList=dict()

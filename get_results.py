@@ -530,10 +530,10 @@ def gen_ib(html, counter, cols):
     return (html, counter, cols)
 
 #Paper    
-def gen_paper(html, counter, cols):
+def gen_paper(html, counter, cols, recent=-1):
     html = html + '<h1>Paper</h1><br><table>'
     counter=0
-    cols=4
+    recent=3
     for systemname in systemdict:
       try:
           if systemname != 'stratBTC':
@@ -543,16 +543,16 @@ def gen_paper(html, counter, cols):
 			(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
 
                 c2data=generate_paper_c2_plot(systemname, 'Date', 20000)
-                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
+                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
             
                 data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', 20000)
-                (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
+                (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols, recent)
             
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
+                (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
             
                 data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000, '1 min_')
-                (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
+                (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
 		
         
             #IB Paper
@@ -561,16 +561,16 @@ def gen_paper(html, counter, cols):
 			(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
 
                 ibdata=generate_paper_ib_plot(systemname, 'Date', 20000)
-                (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
+                (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
             
                 data=get_data(systemname, 'paper', 'ib', 'trades', 'times', 20000)
-                (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
+                (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols, recent)
                 
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols)
+                (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
             
                 data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000, '1 min_')
-                (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
+                (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
 		
       except Exception as e:
           logging.error("get_paper", exc_info=True)
@@ -653,6 +653,7 @@ def gen_file(filetype):
         html = html + '<li><a href=c2.html>C2</a></li>'
         html = html + '<li><a href=ib.html>IB</a></li>'
         html = html + '<li><a href=paper.html>Paper</a></li>'
+        html = html + '<li><a href=paper2.html>Recent Paper</a></li>'
         html = html + '<li><a href=btc.html>BTC</a></li>'
     elif filetype == 'sig':
         counter=0
@@ -676,6 +677,11 @@ def gen_file(filetype):
         cols=4
         filename='./data/results/paper.html'
         (html, counter, cols)=gen_paper(html, counter, cols)
+    elif filetype == 'paper2':
+        counter=0
+        cols=4
+        filename='./data/results/paper2.html'
+        (html, counter, cols)=gen_paper(html, counter, cols, 2)
     elif filetype == 'btc':
         counter=0
         cols=4
@@ -697,7 +703,7 @@ def gen_file(filetype):
     	subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
     	logfile.close()
          
-types=['index','sig','c2','ib','paper','btc']
+types=['index','sig','c2','ib','paper','paper2','btc']
 def start_resgen():
     #Prep
     threads = []

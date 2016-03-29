@@ -543,11 +543,13 @@ def gen_paper(html, counter, cols, recent=-1):
       try:
           if systemname != 'stratBTC':
             logging.info (systemname)
-	    #C2 Paper
+	       #C2 Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
-        		if verdict.has_key(systemname):
-                        	  logging.info ('C2:' + systemname)
-        			  (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+                logging.info ('C2:' + systemname)
+                if verdict.has_key(systemname):
+                        logging.info ('C2:' + systemname)
+                        
+                        (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
         
                         c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
                         (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
@@ -578,7 +580,7 @@ def gen_paper(html, counter, cols, recent=-1):
                       data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                       (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
                       
-		      data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+                      data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
                       (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
     		
       except Exception as e:

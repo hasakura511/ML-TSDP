@@ -26,14 +26,16 @@ logging.basicConfig(filename='/logs/runproc_v3.log',level=logging.DEBUG)
 debug=False
 
 files=[['get_results.py',['sig'],1200],
-       ['get_results.py',['c2'],43200],
+       ['get_results.py',['c2'],40000],
        ['get_results.py',['ib'],43200],
-       ['get_results.py',['paper'],1200],
-       ['get_results.py',['btc'], 7500]]
+       ['get_results.py',['paper'],12000],
+       ['get_results.py',['paper2'],1200],
+       ['get_results.py',['btc'], 20500]]
 
 def runfile(file,runargs,sleeptime):
     while 1:
      try:
+        time.sleep(sleeptime)
         f=open ('/logs/' + file + '.log','a')
         print 'Starting ' + file
         f.write('Starting : ' + file)
@@ -50,7 +52,6 @@ def runfile(file,runargs,sleeptime):
 
         f.close()
         ferr.close()
-        time.sleep(sleeptime)
      except Exception as e:
 	 #f=open ('./debug/v3run' + file + '.log','a')
 	 #f.write(e)

@@ -470,7 +470,7 @@ def gen_ib(html, counter, cols):
  
 	html = html + '</table><h1>Recent Trades</h1><br><table>'
 	
-	recent=3
+	recent=1
 	counter=0
 	dhtml=''
 	vhtml=''
@@ -533,7 +533,7 @@ def gen_ib(html, counter, cols):
 def gen_paper(html, counter, cols, recent=-1):
     html = html + '<h1>Paper</h1><br><table>'
     counter=0
-    recent=3
+    cols=4
     for systemname in systemdict:
       try:
           if systemname != 'stratBTC':
@@ -681,7 +681,7 @@ def gen_file(filetype):
         counter=0
         cols=4
         filename='./data/results/paper2.html'
-        (html, counter, cols)=gen_paper(html, counter, cols, 2)
+        (html, counter, cols)=gen_paper(html, counter, cols, 1)
     elif filetype == 'btc':
         counter=0
         cols=4

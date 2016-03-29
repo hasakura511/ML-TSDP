@@ -546,6 +546,7 @@ def gen_paper(html, counter, cols, recent=-1):
 	    #C2 Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
         		if verdict.has_key(systemname):
+                        logging.info ('C2:' + systemname)
         			  (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
         
                         c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
@@ -563,6 +564,8 @@ def gen_paper(html, counter, cols, recent=-1):
             #IB Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
                 if verdict.has_key(systemname):
+                      logging.info ('IB: ' + systemname)
+                      
                       (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
                         
                       ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)

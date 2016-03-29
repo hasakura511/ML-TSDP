@@ -542,7 +542,8 @@ def gen_paper(html, counter, cols, recent=-1):
     for systemname in systemdict:
       try:
           if systemname != 'stratBTC':
-            #C2 Paper
+            logging.info (systemname)
+	    #C2 Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
         		if verdict.has_key(systemname):
         			  (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
@@ -572,8 +573,8 @@ def gen_paper(html, counter, cols, recent=-1):
                       
                       data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                       (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
-                    
-                      data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+                      
+		      data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
                       (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
     		
       except Exception as e:

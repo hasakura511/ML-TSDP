@@ -262,12 +262,12 @@ def save_plot(colnames, filename, title, ylabel, SST):
 
 def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, counter, html, cols=4, recent=-1):
     try:
-	logging.info(' ' + systemname + ', ' + title + ', ' + ylabel)
+        logging.info(' ' + systemname + ', ' + title + ', ' + ylabel)
         SST=data.copy()
         SST[dateCol]=pd.to_datetime(SST[dateCol])
         SST=SST.sort_values(by=[dateCol])
         SST=SST.set_index(dateCol)
-	if recent > 0: 
+        if recent > 0: 
                 SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
 
         
@@ -575,9 +575,9 @@ def gen_paper(html, counter, cols, recent=-1):
 		
       except Exception as e:
           logging.error("get_paper", exc_info=True)
-	  counter = 0
-    html = html + '</table>'
-    return (html, counter, cols)
+          counter = 0
+      html = html + '</table>'
+      return (html, counter, cols)
     
 def gen_btc(html, counter, cols):
     html = html + '<h1>BTC Paper</h1><br><table>'

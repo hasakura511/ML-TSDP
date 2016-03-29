@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-USDCAD,open,short,1.0,0.0,1.31141,0.0,-2.0,0.0,2.0,418.0,,,,,USDCAD,,20160329 13:02:39 EST,20160329 13:02:39 EST,-1.0,17458.09198,380546.2991,19262.09198
+USDCAD,open,short,1.0,0.0,1.30619,0.0,-2.0,0.0,2.0,420.0,,,,,USDCAD,,20160329 18:08:54 EST,20160329 18:08:54 EST,-1.0,17487.98516,380586.43448,19299.98516

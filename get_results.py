@@ -543,7 +543,7 @@ def gen_paper(html, counter, cols, recent=-1):
       try:
           if systemname != 'stratBTC':
             logging.info ('C2: ' + systemname)
-	    #C2 Paper
+            #C2 Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
                 logging.info ('C2:' + systemname)
                 if verdict.has_key(systemname):

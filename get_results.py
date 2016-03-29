@@ -57,6 +57,7 @@ import logging
 
 logging.basicConfig(filename='/logs/get_results.log',level=logging.DEBUG)
 
+initCap=1
 
 def generate_sigplots(counter, html, cols):
     global vdict
@@ -86,8 +87,8 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance']
-        dataSet['PurePLcurve'] = dataSet['purebalance']
+        dataSet['equitycurve'] = dataSet['balance'] - 20000
+        dataSet['PurePLcurve'] = dataSet['purebalance'] - 20000
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -112,8 +113,8 @@ def generate_paper_ib_plot(systemname, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance']
-        dataSet['PurePLcurve'] = dataSet['purebalance']
+        dataSet['equitycurve'] = dataSet['balance'] - 20000
+        dataSet['PurePLcurve'] = dataSet['purebalance'] - 20000
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity, initialEquity, '2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -394,16 +395,16 @@ def gen_c2(html, counter, cols):
             if c2dict.has_key(systemname):
 		(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
 
-                c2data=generate_c2_plot(systemname, 'openedWhen',  20000)
+                c2data=generate_c2_plot(systemname, 'openedWhen',  initCap)
                 (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'openedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols)
                 
-                data=get_data(systemname, 'c2api', 'c2', 'trades','openedWhen', 20000)
+                data=get_data(systemname, 'c2api', 'c2', 'trades','openedWhen', initCap)
                 (counter, html)=generate_mult_plot(data, ['PL'], 'openedWhen', 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols)
                 
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
         
-                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000, '1 min_')
+                data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
 
         except Exception as e:
@@ -437,16 +438,16 @@ def gen_ib(html, counter, cols):
 	    html = html + vhtml
 	    counter=0
 
-            ibdata=generate_ib_plot('IB_Paper','Date', 20000)
+            ibdata=generate_ib_plot('IB_Paper','Date', initCap)
             (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
             
-            ibdata=generate_ib_plot_from_trades('IB_Paper','times', 20000)
+            ibdata=generate_ib_plot_from_trades('IB_Paper','times', initCap)
             (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'times', 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
             
 	    html = html + dhtml
 	    counter = counter + 1
 
-            data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',20000)
+            data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',initCap)
             (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
 
        	    counter=0 
@@ -454,16 +455,16 @@ def gen_ib(html, counter, cols):
 	    html = html + vhtml
 	    counter=0
 
-            ibdata=generate_ib_plot('C2_Paper', 'Date', 20000)
+            ibdata=generate_ib_plot('C2_Paper', 'Date', initCap)
             (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
             
-            ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', 20000)
+            ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', initCap)
             (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'openedWhen', 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
             
 	    html = html + dhtml
 	    counter = counter + 1
 
-            data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', 20000)
+            data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', initCap)
             (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
    
        	    counter=0 
@@ -491,16 +492,16 @@ def gen_ib(html, counter, cols):
 	    html = html + vhtml
 	    counter=0
 
-            ibdata=generate_ib_plot('IB_Paper','Date', 20000)
+            ibdata=generate_ib_plot('IB_Paper','Date', initCap)
             (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'recent_ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols, recent)
 
-            ibdata=generate_ib_plot_from_trades('IB_Paper','times', 20000)
+            ibdata=generate_ib_plot_from_trades('IB_Paper','times', initCap)
             (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'times', 'recent_ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols, recent)
 
             html = html + dhtml
             counter = counter + 1
 
-            data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',20000)
+            data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',initCap)
             (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'recent_ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols, recent)
 
        	    counter=0 
@@ -509,16 +510,16 @@ def gen_ib(html, counter, cols):
 	    html = html + vhtml 
 	    counter=0
 
-            ibdata=generate_ib_plot('C2_Paper', 'Date', 20000)
+            ibdata=generate_ib_plot('C2_Paper', 'Date', initCap)
             (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'recent_ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols, recent)
 
-            ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', 20000)
+            ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', initCap)
             (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'openedWhen', 'recent_ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols, recent)
 
             html = html + dhtml
             counter = counter + 1
 
-            data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', 20000)
+            data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', initCap)
             (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'recent_c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols, recent)
 
        	    counter=0 
@@ -542,16 +543,16 @@ def gen_paper(html, counter, cols, recent=-1):
 		if verdict.has_key(systemname):
 			(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
 
-                c2data=generate_paper_c2_plot(systemname, 'Date', 20000)
+                c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
                 (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
             
-                data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', 20000)
+                data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
                 (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols, recent)
             
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
             
-                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000, '1 min_')
+                data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
 		
         
@@ -560,16 +561,16 @@ def gen_paper(html, counter, cols, recent=-1):
 		if verdict.has_key(systemname):
 			(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
 
-                ibdata=generate_paper_ib_plot(systemname, 'Date', 20000)
+                ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
                 (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
             
-                data=get_data(systemname, 'paper', 'ib', 'trades', 'times', 20000)
+                data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
                 (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols, recent)
                 
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
             
-                data=get_datas(systemdict[systemname], 'from_IB', 'Close', 20000, '1 min_')
+                data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
                 (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
 		
       except Exception as e:
@@ -597,20 +598,20 @@ def gen_btc(html, counter, cols):
                                     systemname = re.sub('c2_','', systemname.rstrip())
                                     systemname = re.sub('_trades.csv','', systemname.rstrip())
                                     
-                                    c2data=generate_paper_c2_plot(systemname, 'Date', 20000)
+                                    c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
                                     (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
                                 
-                                    data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', 20000)
+                                    data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
                                     (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
                             else:
                                     systemname=file
                                     systemname = re.sub('ib_','', systemname.rstrip())
                                     systemname = re.sub('_trades.csv','', systemname.rstrip())
                                     
-                                    ibdata=generate_paper_ib_plot(systemname, 'Date', 20000)
+                                    ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
                                     (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
                                 
-                                    data=get_data(systemname, 'paper', 'ib', 'trades', 'times', 20000)
+                                    data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
                                     (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
                             
                             btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())

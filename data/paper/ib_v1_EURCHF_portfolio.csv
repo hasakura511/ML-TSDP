@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
-EURCHF,EUR,,10000.0,10000.0,1.09065,1.09065,0.0,2.0,0.0,-415.08164,-239.08164,Paper,CHF
+EURCHF,EUR,,-10000.0,-10000.0,1.09142,1.09142,0.0,2.0,0.0,-393.24614,-211.24614,Paper,CHF

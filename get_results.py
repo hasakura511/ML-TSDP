@@ -270,7 +270,6 @@ def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, count
         if recent > 0: 
                 SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
 
-        
         filename='./data/results/' + systemname + ylabel + '.png'
         save_plot(colnames, filename, title, ylabel, SST)
         (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
@@ -331,8 +330,7 @@ def generate_html(filename, counter, html, cols, colspan=False):
         html = html + '</tr>'
         counter=0
     return (counter, html)
-    
-            
+              
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
 commissiondata=pd.read_csv('./data/systems/commission.csv')
@@ -539,6 +537,8 @@ def gen_paper(html, counter, cols, recent=-1):
     html = html + '<h1>Paper</h1><br><table>'
     counter=0
     cols=4
+    for systemname in systemdict:
+        logging.info(systemname)
     for systemname in systemdict:
       try:
           if systemname != 'stratBTC':

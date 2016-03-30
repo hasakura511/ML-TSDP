@@ -270,7 +270,6 @@ def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, count
         if recent > 0: 
                 SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
 
-        
         filename='./data/results/' + systemname + ylabel + '.png'
         save_plot(colnames, filename, title, ylabel, SST)
         (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
@@ -331,8 +330,7 @@ def generate_html(filename, counter, html, cols, colspan=False):
         html = html + '</tr>'
         counter=0
     return (counter, html)
-    
-            
+              
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
 commissiondata=pd.read_csv('./data/systems/commission.csv')
@@ -540,14 +538,19 @@ def gen_paper(html, counter, cols, recent=-1):
     counter=0
     cols=4
     for systemname in systemdict:
+        logging.info(systemname)
+
+    for systemname in systemdict:
       try:
           if systemname != 'stratBTC':
-            logging.info (systemname)
-	    #C2 Paper
+            logging.info ('C2: ' + systemname)
+            #C2 Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
-        		if verdict.has_key(systemname):
-                        	  logging.info ('C2:' + systemname)
-        			  (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+                logging.info ('C2:' + systemname)
+                if verdict.has_key(systemname):
+                        logging.info ('C2:' + systemname)
+                        
+                        (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
         
                         c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
                         (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
@@ -578,14 +581,14 @@ def gen_paper(html, counter, cols, recent=-1):
                       data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                       (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
                       
-		      data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+                      data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
                       (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
-    		
+    	
       except Exception as e:
           logging.error("get_paper", exc_info=True)
           counter = 0
-      html = html + '</table>'
-      return (html, counter, cols)
+    html = html + '</table>'
+    return (html, counter, cols)
     
 def gen_btc(html, counter, cols):
     html = html + '<h1>BTC Paper</h1><br><table>'

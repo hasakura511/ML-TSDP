@@ -539,6 +539,7 @@ def gen_paper(html, counter, cols, recent=-1):
     cols=4
     for systemname in systemdict:
         logging.info(systemname)
+
     for systemname in systemdict:
       try:
           if systemname != 'stratBTC':
@@ -582,12 +583,12 @@ def gen_paper(html, counter, cols, recent=-1):
                       
                       data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
                       (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
-    		
+    	
       except Exception as e:
           logging.error("get_paper", exc_info=True)
           counter = 0
-      html = html + '</table>'
-      return (html, counter, cols)
+    html = html + '</table>'
+    return (html, counter, cols)
     
 def gen_btc(html, counter, cols):
     html = html + '<h1>BTC Paper</h1><br><table>'

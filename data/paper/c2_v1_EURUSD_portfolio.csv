@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-EURUSD,open,short,1.0,0.0,1.1295,0.0,-2.0,0.0,2.0,97.0,,,,,EURUSD,,20160329 23:04:19 EST,20160329 23:04:19 EST,-1.0,19594.6,377514.8,19982.6
+EURUSD,open,long,1.0,0.0,1.13128,0.0,-2.0,0.0,2.0,102.0,,,,,EURUSD,,20160330 06:30:01 EST,20160330 06:30:01 EST,1.0,19589.2,377497.0,19997.2

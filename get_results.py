@@ -410,8 +410,8 @@ def gen_c2(html, counter, cols, recent, systemname):
             (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
 
     except Exception as e:
-        logging.error("get_c2", exc_info=True)
-	    counter = 0
+            logging.error("get_c2", exc_info=True)
+            counter = 0
     html = html + '</table>'
     return (html, counter, cols)
  

@@ -562,8 +562,8 @@ def gen_paper(html, counter, cols, recent, systemname):
                 except Exception as e:
                           logging.error("get_paper", exc_info=True)
                           counter = 0
-    #IB Paper
-    if os.path.isfile('./data/paper/ib_' + systemname + '_trades.csv'):
+        #IB Paper
+        if os.path.isfile('./data/paper/ib_' + systemname + '_trades.csv'):
                 logging.info ('IB: ' + systemname)
                 try:
                       logging.info ('IB: ' + systemname)
@@ -659,6 +659,10 @@ def gen_file(filetype):
     html=''
     counter=0
     cols=3
+    genstrat=''
+    if len(sys.argv)>2:
+	   genstrat=sys.argv[2]
+    
     if filetype == 'index':
         headertitle='Systems'
         filename='./data/results/index.html'
@@ -698,13 +702,13 @@ def gen_file(filetype):
                 fn='./data/results/c2_' + systemname + '.html'
                 html = html + '<li><a href="' + 'c2_' + systemname + '.html">'
                 html = html + systemname + '</a></li>'
-                
-                headerhtml=get_html_header()
-                headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
-                (body, counter, cols)=gen_c2('', counter, cols, recent, systemname) 
-                footerhtml=get_html_footer()
-                
-                write_html(fn, headerhtml, footerhtml, body)
+                if len(genstrat) == 0 or genstrat == systemname:
+                    headerhtml=get_html_header()
+                    headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
+                    (body, counter, cols)=gen_c2('', counter, cols, recent, systemname) 
+                    footerhtml=get_html_footer()
+                    
+                    write_html(fn, headerhtml, footerhtml, body)
         
     elif filetype == 'ib':
         #IB
@@ -732,12 +736,13 @@ def gen_file(filetype):
             html = html + '<li><a href="' + 'paper_' + systemname + '.html">'
             html = html + systemname + '</a></li>'
             
-            headerhtml=get_html_header()
-            headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
-            (body, counter, cols)=gen_paper('', counter, cols, recent, systemname)
-            footerhtml=get_html_footer()
-            
-            write_html(fn, headerhtml, footerhtml, body)
+            if len(genstrat) == 0 or genstrat == systemname:
+                headerhtml=get_html_header()
+                headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
+                (body, counter, cols)=gen_paper('', counter, cols, recent, systemname)
+                footerhtml=get_html_footer()
+                
+                write_html(fn, headerhtml, footerhtml, body)
             
     elif filetype == 'btc':
         counter=0
@@ -745,6 +750,7 @@ def gen_file(filetype):
         filename='./data/results/btc.html'
         headertitle='BTC'
         (html, counter, cols)=gen_btc(html, counter, cols)  
+        
     headerhtml=get_html_header()
     footerhtml=get_html_footer()
     headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())

@@ -696,7 +696,7 @@ def gen_file(filetype):
             if c2dict.has_key(systemname):
                 logging.info(systemname)
                 fn='./data/results/c2_' + systemname + '.html'
-                html = html + '<li><a href=' + 'c2_' + systemname + '.html>'
+                html = html + '<li><a href="' + 'c2_' + systemname + '.html">'
                 html = html + systemname + '</a></li>'
                 
                 headerhtml=get_html_header()
@@ -729,7 +729,7 @@ def gen_file(filetype):
             cols=4
             logging.info(systemname)
             fn='./data/results/paper_' + systemname + '.html'
-            html = html + '<li><a href=' + 'paper_' + systemname + '.html>'
+            html = html + '<li><a href="' + 'paper_' + systemname + '.html">'
             html = html + systemname + '</a></li>'
             
             headerhtml=get_html_header()

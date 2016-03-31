@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-NZDJPY,open,long,1.0,0.0,77.804,0.0,-2.0,0.0,2.0,597.0,,,,,NZDJPY,,20160330 17:46:30 EST,20160330 17:46:30 EST,1.0,15886.88,386562.4,18394.88
+NZDJPY,open,long,1.0,0.0,77.788,0.0,-2.0,0.0,2.0,599.0,,,,,NZDJPY,,20160331 06:10:56 EST,20160331 06:10:56 EST,1.0,15868.144,386563.808,18384.144

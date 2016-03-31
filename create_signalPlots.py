@@ -408,8 +408,16 @@ for pair in pairs:
                                         leverage = dataSet.safef.values, equityCurveSavePath=equityCurveSavePath,\
                                         pngPath=pngPath,verbose=verbose, pngFilename=f[:-4],\
                                         figsize=size, showPlot=showPlot)
-		    print "Saving: " + equityCurveSavePath2+f[:-4]+'.csv'
-                    equityCurve.to_csv(equityCurveSavePath2+f[:-4]+'.csv')
+                    csvFile=f[:-4]
+                    spstr=csvFile.split('_')
+        
+                    if len(spstr) == 3:
+                        (ver, inst, mins)=spstr
+                        (ver1, ver2)=ver.split('.')
+                        csvFile = ver1 + '_' + inst
+                        
+                    print "Saving: " + equityCurveSavePath2+csvFile +'.csv'
+                    equityCurve.to_csv(equityCurveSavePath2+csvFile+'.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
                     numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
@@ -452,8 +460,16 @@ for pair in pairs:
                                         leverage = dataSet.safef.values, equityCurveSavePath=equityCurveSavePath,\
                                         figsize=size, showPlot=showPlot,pngPath=pngPath, pngFilename=f[:-4],\
                                         verbose=verbose)
-		    print 'Saving: ' + equityCurveSavePath2+f[:-4]+'.csv'
-                    equityCurve.to_csv(equityCurveSavePath2+f[:-4]+'.csv')
+		    
+                    csvFile=f[:-4]
+                    spstr=csvFile.split('_')
+        
+                    if len(spstr) == 3:
+                        (ver, inst, mins)=spstr
+                        (ver1, ver2)=ver.split('.')
+                        csvFile = ver1 + '_' + inst
+                    print 'Saving: ' + equityCurveSavePath2+csvFile+'.csv'    
+                    equityCurve.to_csv(equityCurveSavePath2+csvFile+'.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
                     numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
@@ -560,7 +576,13 @@ for title in eCurves_bySystem:
     #print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
     #            (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
     #               eCurves[title2].maxDD.iloc[-1])
-    print 'Saving: ' + equityCurveSavePath2+dI_title+'.csv'
+    spstr=dI_title.split('_')
+    
+    if len(spstr) == 3:
+        (ver, inst, mins)=spstr
+        (ver1, ver2)=ver.split('.')
+        dI_title = ver1 + '_' + inst
+    print 'Saving: ' + equityCurveSavePath2+dI_title+'.csv'    
     eCurves[title2].to_csv(equityCurveSavePath2+dI_title+'.csv')
 
 

@@ -684,7 +684,7 @@ def gen_file(filetype):
         filename='./data/results/ib.html'
         (html, counter, cols)=gen_ib(html, counter, cols)
     elif filetype == 'paper' or filetype == 'paper2':
-        html = html + '<h1>Paper</h1><br><table>'
+        html = html + '<h1>Paper</h1><br>'
         recent = -1
         filename='./data/results/paper.html'
         if filetype == 'paper2':
@@ -701,6 +701,7 @@ def gen_file(filetype):
             html = html + systemname + '</a></li>'
             
             headerhtml=get_html_header()
+            headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
             (body, counter, cols)=gen_paper('', counter, cols, recent, systemname)
             footerhtml=get_html_footer()
             
@@ -713,6 +714,8 @@ def gen_file(filetype):
         (html, counter, cols)=gen_btc(html, counter, cols)  
     headerhtml=get_html_header()
     footerhtml=get_html_footer()
+    headerhtml = re.sub('Index', filetype, headerhtml.rstrip())
+
     write_html(filename, headerhtml, footerhtml, html)
     
     if filetype == 'sig':

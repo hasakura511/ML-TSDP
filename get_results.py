@@ -711,7 +711,7 @@ def gen_file(filetype):
         (html, counter, cols)=gen_btc(html, counter, cols)  
     headerhtml=get_html_header()
     footerhtml=get_html_footer()
-    write_html(filename, headerhtml, footerhtml, body)
+    write_html(filename, headerhtml, footerhtml, html)
     
     if filetype == 'sig':
     	logfile = open('/logs/create_signalPlots.log', 'a')

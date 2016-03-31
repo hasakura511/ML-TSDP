@@ -541,13 +541,14 @@ def gen_paper(html, counter, cols, recent=-1):
         logging.info(systemname)
 
     for systemname in systemdict:
-      try:
+
           if systemname != 'stratBTC':
             logging.info ('C2: ' + systemname)
             #C2 Paper
             if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
                 logging.info ('C2:' + systemname)
                 if verdict.has_key(systemname):
+                    try:
                         logging.info ('C2:' + systemname)
                         
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
@@ -563,30 +564,34 @@ def gen_paper(html, counter, cols, recent=-1):
                     
                         data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
                         (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)        
-
+                    except Exception as e:
+                              logging.error("get_paper", exc_info=True)
+                              counter = 0
             #IB Paper
             if os.path.isfile('./data/paper/ib_' + systemname + '_trades.csv'):
                 logging.info ('IB: ' + systemname)
                 if verdict.has_key(systemname):
-                      logging.info ('IB: ' + systemname)
-                      
-                      (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+                    try:
+                          logging.info ('IB: ' + systemname)
+                          
+                          (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+                            
+                          ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
+                          (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
                         
-                      ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
-                      (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
+                          data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
+                          (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols, recent)
+                          
+                          data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+                          (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
+                          
+                          data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+                          (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
                     
-                      data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
-                      (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols, recent)
-                      
-                      data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                      (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
-                      
-                      data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
-                      (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
-    	
-      except Exception as e:
-          logging.error("get_paper", exc_info=True)
-          counter = 0
+                    except Exception as e:
+                              logging.error("get_paper", exc_info=True)
+                              counter = 0
+          
     html = html + '</table>'
     return (html, counter, cols)
     

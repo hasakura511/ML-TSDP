@@ -689,8 +689,8 @@ def gen_file(filetype):
         if filetype == 'paper2':
             filename='./data/results/paper2.html'
             recent = 1
-            
-        for systemname in systemdict:
+        syslist=systemdict.keys().sort()
+        for systemname in syslist:
             counter=0
             cols=4
             logging.info(systemname)

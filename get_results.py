@@ -684,6 +684,7 @@ def gen_file(filetype):
         filename='./data/results/ib.html'
         (html, counter, cols)=gen_ib(html, counter, cols)
     elif filetype == 'paper' or filetype == 'paper2':
+        html = html + '<h1>Paper</h1><br><table>'
         recent = -1
         filename='./data/results/paper.html'
         if filetype == 'paper2':

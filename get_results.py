@@ -533,63 +533,59 @@ def gen_ib(html, counter, cols):
     return (html, counter, cols)
 
 #Paper    
-def gen_paper(html, counter, cols, recent=-1):
-    html = html + '<h1>Paper</h1><br><table>'
+def gen_paper(html, counter, cols, recent, systemname):
+    html = html + '<h1>Paper - ' + systemname + '</h1><br><table>'
     counter=0
     cols=4
-    for systemname in systemdict:
-        logging.info(systemname)
-
-    for systemname in systemdict:
-
-          if systemname != 'stratBTC':
-            logging.info ('C2: ' + systemname)
-            #C2 Paper
-            if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
+    
+    if systemname != 'stratBTC':
+        logging.info ('C2: ' + systemname)
+        #C2 Paper
+        if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
+                logging.info ('C2:' + systemname)
+                try:
                     logging.info ('C2:' + systemname)
-                    try:
-                        logging.info ('C2:' + systemname)
-                        if verdict.has_key(systemname):
-                            (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
-        
-                        c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
-                        (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
-                    
-                        data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
-                        (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols, recent)
-                    
-                        data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                        (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
-                    
-                        data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
-                        (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)        
-                    except Exception as e:
-                              logging.error("get_paper", exc_info=True)
-                              counter = 0
-            #IB Paper
-            if os.path.isfile('./data/paper/ib_' + systemname + '_trades.csv'):
-                    logging.info ('IB: ' + systemname)
-                    try:
-                          logging.info ('IB: ' + systemname)
-                          if verdict.has_key(systemname):
-                              (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
-                            
-                          ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
-                          (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
+                    if verdict.has_key(systemname):
+                        (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+    
+                    c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
+                    (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
+                
+                    data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
+                    (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols, recent)
+                
+                    data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+                    (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
+                
+                    data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+                    (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)        
+                except Exception as e:
+                          logging.error("get_paper", exc_info=True)
+                          counter = 0
+    #IB Paper
+    if os.path.isfile('./data/paper/ib_' + systemname + '_trades.csv'):
+                logging.info ('IB: ' + systemname)
+                try:
+                      logging.info ('IB: ' + systemname)
+                      if verdict.has_key(systemname):
+                          (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
                         
-                          data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
-                          (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols, recent)
-                          
-                          data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                          (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
-                          
-                          data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
-                          (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
+                      ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
+                      (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
                     
-                    except Exception as e:
-                              logging.error("get_paper", exc_info=True)
-                              counter = 0
-          
+                      data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
+                      (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols, recent)
+                      
+                      data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+                      (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
+                      
+                      data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+                      (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
+                
+                except Exception as e:
+                          logging.error("get_paper", exc_info=True)
+                          counter = 0
+      
     html = html + '</table>'
     return (html, counter, cols)
     
@@ -687,37 +683,59 @@ def gen_file(filetype):
         cols=3
         filename='./data/results/ib.html'
         (html, counter, cols)=gen_ib(html, counter, cols)
-    elif filetype == 'paper':
-        counter=0
-        cols=4
+    elif filetype == 'paper' or filetype == 'paper2':
+        recent = -1
         filename='./data/results/paper.html'
-        (html, counter, cols)=gen_paper(html, counter, cols)
-    elif filetype == 'paper2':
-        counter=0
-        cols=4
-        filename='./data/results/paper2.html'
-        (html, counter, cols)=gen_paper(html, counter, cols, 1)
+        if filetype == 'paper2':
+            filename='./data/results/paper2.html'
+            recent = 1
+            
+        for systemname in systemdict:
+            counter=0
+            cols=4
+            logging.info(systemname)
+            fn='./data/results/paper_' + systemname + '.html'
+            html = html + '<li><a href=' + 'paper_' + systemname + '.html>'
+            html = html + systemname + '</a></li>'
+            
+            headerhtml=get_html_header()
+            (body, counter, cols)=gen_paper('', counter, cols, recent, systemname)
+            footerhtml=get_html_footer()
+            
+            write_html(fn, headerhtml, footerhtml, body)
+            
     elif filetype == 'btc':
         counter=0
         cols=4
         filename='./data/results/btc.html'
         (html, counter, cols)=gen_btc(html, counter, cols)  
-    header=open('./data/results/header.html', 'r')
-    headerhtml=header.read()
-    header.close
-    footer=open('./data/results/footer.html', 'r') 
-    footerhtml=footer.read() 
-    footer.close   
-    f = open(filename, 'w')
-    f.write(headerhtml)
-    f.write(html)
-    f.write(footerhtml)
-    f.close()    
+    headerhtml=get_html_header()
+    footerhtml=get_html_footer()
+    write_html(filename, headerhtml, footerhtml, body)
+    
     if filetype == 'sig':
     	logfile = open('/logs/create_signalPlots.log', 'a')
     	subprocess.call(['python','create_signalPlots.py','1'], stdout = logfile, stderr = logfile)
     	logfile.close()
-         
+
+def get_html_header():
+    header=open('./data/results/header.html', 'r')
+    headerhtml=header.read()
+    header.close
+    return headerhtml
+
+def get_html_footer():
+    footer=open('./data/results/footer.html', 'r') 
+    footerhtml=footer.read() 
+    footer.close
+    return footerhtml
+
+def write_html(filename, headerhtml, footerhtml, body):
+    f = open(filename, 'w')
+    f.write(headerhtml)
+    f.write(body)
+    f.write(footerhtml)
+    f.close() 
 types=['index','sig','c2','ib','paper','paper2','btc']
 def start_resgen():
     #Prep

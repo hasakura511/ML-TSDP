@@ -655,10 +655,12 @@ def gen_btc(html, counter, cols):
 
 def gen_file(filetype):
     filename='./data/results/index.html'
+    headertitle=filetype
     html=''
     counter=0
     cols=3
     if filetype == 'index':
+        headertitle='Systems'
         filename='./data/results/index.html'
         html = html + '<li><a href=sig.html>Signals</a></li>'
         html = html + '<li><a href=c2.html>C2</a></li>'
@@ -671,6 +673,7 @@ def gen_file(filetype):
         counter=0
         cols=5
         filename='./data/results/sig.html'
+        headertitle='Signals'
         (html, counter, cols)=gen_sig(html, counter, cols)
     elif filetype == 'c2' or filetype == 'c2_2':
         #C2
@@ -681,9 +684,11 @@ def gen_file(filetype):
         html = '<h1>C2</h1><br>'
         recent = -1
         filename='./data/results/c2.html'
+        headertitle='C2'
         if filetype == 'c2_2':
             filename='./data/results/c2_2.html'
             html = '<h1>C2 Recent History</h1><br>'
+            headertitle='C2 Recent History'
             recent = 1
         syslist=systemdict.keys()
         syslist.sort()
@@ -706,14 +711,17 @@ def gen_file(filetype):
         counter=0
         cols=3
         filename='./data/results/ib.html'
+        headertitle='IB'
         (html, counter, cols)=gen_ib(html, counter, cols)
     elif filetype == 'paper' or filetype == 'paper2':
         html = html + '<h1>Paper</h1><br>'
         recent = -1
         filename='./data/results/paper.html'
+        headertitle='Paper'
         if filetype == 'paper2':
             filename='./data/results/paper2.html'
             recent = 1
+            headertitle='Paper Recent History'
         syslist=systemdict.keys()
         syslist.sort()
         for systemname in syslist:
@@ -735,10 +743,11 @@ def gen_file(filetype):
         counter=0
         cols=4
         filename='./data/results/btc.html'
+        headertitle='BTC'
         (html, counter, cols)=gen_btc(html, counter, cols)  
     headerhtml=get_html_header()
     footerhtml=get_html_footer()
-    headerhtml = re.sub('Index', filetype, headerhtml.rstrip())
+    headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
 
     write_html(filename, headerhtml, footerhtml, html)
     

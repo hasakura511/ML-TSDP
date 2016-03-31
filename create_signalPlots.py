@@ -300,6 +300,13 @@ def calcEquity_signals(SST, title, **kwargs):
     fig.autofmt_xdate()
     
     if pngPath2 != None and pngFilename != None:
+        
+        
+        spstr=str.split('_', pngFilename)
+        if len(spstr) == 3:
+            (ver, inst, mins)=spstr
+            (ver1, ver2)=str.split('.',ver)
+            pngFilename = ver1 + '_' + inst
         print 'Saving: ' + pngPath2+pngFilename+'.png'
         plt.savefig(pngPath2+pngFilename+'.png', bbox_inches='tight')
     

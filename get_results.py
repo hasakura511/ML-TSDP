@@ -696,7 +696,7 @@ def gen_file(filetype):
                 
                 headerhtml=get_html_header()
                 headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
-                (body, counter, cols)=gen_c2(html, counter, cols, recent, systemname) 
+                (body, counter, cols)=gen_c2('', counter, cols, recent, systemname) 
                 footerhtml=get_html_footer()
                 
                 write_html(fn, headerhtml, footerhtml, body)

@@ -27,6 +27,7 @@ debug=False
 
 files=[['get_results.py',['sig'],1200],
        ['get_results.py',['c2'],40000],
+       ['get_results.py',['c2_2'],25000],
        ['get_results.py',['ib'],43200],
        ['get_results.py',['paper'],12000],
        ['get_results.py',['paper2'],1200],

@@ -389,28 +389,28 @@ def gen_sig(html, counter, cols):
     html = html + '</table>'
     return (html, counter, cols)
 
-def gen_c2(html, counter, cols):
+def gen_c2(html, counter, cols, recent, systemname):
     cols=4
-    html = html + '<h1>C2</h1><br><table>'
-    for systemname in systemdict:
-        try:
-            if c2dict.has_key(systemname):
-		(counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+    html = html + '<h1>' + systemname + '</h1><br><table>'
+    
+    try:
+        if c2dict.has_key(systemname):
+            (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+  
+            c2data=generate_c2_plot(systemname, 'openedWhen',  initCap)
+            (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'openedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols, recent)
+            
+            data=get_data(systemname, 'c2api', 'c2', 'trades','openedWhen', initCap)
+            (counter, html)=generate_mult_plot(data, ['PL'], 'openedWhen', 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols, recent)
+            
+            data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+            (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
+    
+            data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+            (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
 
-                c2data=generate_c2_plot(systemname, 'openedWhen',  initCap)
-                (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'openedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols)
-                
-                data=get_data(systemname, 'c2api', 'c2', 'trades','openedWhen', initCap)
-                (counter, html)=generate_mult_plot(data, ['PL'], 'openedWhen', 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols)
-                
-                data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols)
-        
-                data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
-                (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols)
-
-        except Exception as e:
-            logging.error("get_c2", exc_info=True)
+    except Exception as e:
+        logging.error("get_c2", exc_info=True)
 	    counter = 0
     html = html + '</table>'
     return (html, counter, cols)
@@ -662,6 +662,7 @@ def gen_file(filetype):
         filename='./data/results/index.html'
         html = html + '<li><a href=sig.html>Signals</a></li>'
         html = html + '<li><a href=c2.html>C2</a></li>'
+        html = html + '<li><a href=c2_2.html>Recent C2</a></li>'
         html = html + '<li><a href=ib.html>IB</a></li>'
         html = html + '<li><a href=paper.html>Paper</a></li>'
         html = html + '<li><a href=paper2.html>Recent Paper</a></li>'
@@ -671,12 +672,35 @@ def gen_file(filetype):
         cols=5
         filename='./data/results/sig.html'
         (html, counter, cols)=gen_sig(html, counter, cols)
-    elif filetype == 'c2':
+    elif filetype == 'c2' or filetype == 'c2_2':
         #C2
         counter=0
         cols=4    
         filename='./data/results/c2.html'
-        (html, counter, cols)=gen_c2(html, counter, cols) 
+        
+        html = '<h1>C2</h1><br>'
+        recent = -1
+        filename='./data/results/c2.html'
+        if filetype == 'c2_2':
+            filename='./data/results/c2_2.html'
+            html = '<h1>C2 Recent History</h1><br>'
+            recent = 1
+        syslist=systemdict.keys()
+        syslist.sort()
+        for systemname in syslist:
+            if c2dict.has_key(systemname):
+                logging.info(systemname)
+                fn='./data/results/c2_' + systemname + '.html'
+                html = html + '<li><a href=' + 'c2_' + systemname + '.html>'
+                html = html + systemname + '</a></li>'
+                
+                headerhtml=get_html_header()
+                headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
+                (body, counter, cols)=gen_c2(html, counter, cols, recent, systemname) 
+                footerhtml=get_html_footer()
+                
+                write_html(fn, headerhtml, footerhtml, body)
+        
     elif filetype == 'ib':
         #IB
         counter=0
@@ -741,7 +765,7 @@ def write_html(filename, headerhtml, footerhtml, body):
     f.write(body)
     f.write(footerhtml)
     f.close() 
-types=['index','sig','c2','ib','paper','paper2','btc']
+types=['index','sig','c2','c2_2','ib','paper','paper2','btc']
 def start_resgen():
     #Prep
     threads = []

@@ -70,17 +70,18 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
         if data.shape[0] < minDataPoints:
             while data.shape[0] < minDataPoints:      
                 data = getDataFromIB(brokerData, date, data)
-		logging.info("Received Date: " + str(data.index[0]) )
-                date = data.index.to_datetime()[0]
-                #eastern=timezone('US/Eastern')
-                #date=date.astimezone(eastern)
-                date=date.strftime("%Y%m%d %H:%M:%S EST")
-                brokerData['endDateTime']=date
-                
-                time.sleep(30)
+                if data.shape[0] > 0:
+                    logging.info("Received Date: " + str(data.index[0]) )
+                    date = data.index.to_datetime()[0]
+                    #eastern=timezone('US/Eastern')
+                    #date=date.astimezone(eastern)
+                    date=date.strftime("%Y%m%d %H:%M:%S EST")
+                    brokerData['endDateTime']=date
+                    
+                    time.sleep(30)
         else:
             data = getDataFromIB(brokerData, date, data)
-	    logging.info("Received Date: " + str(data.index[0]) )
+            logging.info("Received Date: " + str(data.index[0]) )
             #update date
             date = data.index.to_datetime()[0]
             #eastern=timezone('US/Eastern')

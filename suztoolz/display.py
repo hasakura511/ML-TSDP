@@ -751,13 +751,17 @@ def getToxCDF(p, display=True):
         print "TOX25: ", TOX25, 'Days:', round(len(X2)*0.25,1)
     return {'TOX05':TOX05,'TOX10':TOX10,'TOX15':TOX15,'TOX20':TOX20,'TOX25':TOX25}
 
-def showPDF(ytrue, ypred, gainAhead, index):
+def showPDF(ytrue, ypred, gainAhead, index, **kwargs):
+    savePath = kwargs.get('savePath',None)
+    filename = kwargs.get('filename',None)
+    showPDFCDF = kwargs.get('showPDFCDF',True)
+    
     n_bins=50
     tp_index = index[np.intersect1d(np.where(ypred == 1), np.where(ytrue == 1))]
     fn_index = index[np.intersect1d(np.where(ypred == -1), np.where(ytrue == 1))]
     fp_index = index[np.intersect1d(np.where(ypred == 1), np.where(ytrue == -1))]
     tn_index = index[np.intersect1d(np.where(ypred == -1), np.where(ytrue == -1))]
-    print '                          ____Price Distribution____'
+    
     fig, axes = plt.subplots(nrows=2, ncols=2)
     ax0, ax1, ax2, ax3 = axes.flat
 
@@ -778,9 +782,19 @@ def showPDF(ytrue, ypred, gainAhead, index):
     #center = (bins[:-1] + bins[1:]) / 2
     #plt.bar(center, hist, align='center', width=width)
     plt.tight_layout()
-    plt.show()
+    if savePath != None and filename != None:
+        plt.savefig(savePath+filename+' PDF.png', bbox_inches='tight')
+        
+    if showPDFCDF:
+        print '                          ____Price Distribution____'
+        plt.show()
+    plt.close()
 
-def showCDF(ytrue, ypred, gainAhead, index):
+def showCDF(ytrue, ypred, gainAhead, index, **kwargs):
+    savePath = kwargs.get('savePath',None)
+    filename = kwargs.get('filename',None)
+    showPDFCDF = kwargs.get('showPDFCDF',True)
+    
     tp_index = index[np.intersect1d(np.where(ypred == 1), np.where(ytrue == 1))]
     fn_index = index[np.intersect1d(np.where(ypred == -1), np.where(ytrue == 1))]
     fp_index = index[np.intersect1d(np.where(ypred == 1), np.where(ytrue == -1))]
@@ -814,11 +828,17 @@ def showCDF(ytrue, ypred, gainAhead, index):
     #ax3.plot(F,pd.Series.sort_values(gainAhead.iloc[tn_index]*100))
     #ax3.set_title('TN %i Accuracy %.2f '% (tn_index.shape[0], accuracy_score(ytrue, ypred)))
 
-    print '                       ____Cumulative Distribution____'
+    
     #plt.plot(F2,X2)
     plt.tight_layout()
-    plt.show()
-
+    if savePath != None and filename != None:
+        plt.savefig(savePath+filename+' CDF.png', bbox_inches='tight')
+        
+    if showPDFCDF:
+        print '                       ____Cumulative Distribution____'
+        plt.show()
+    plt.close()
+        
 def display_CAR25(CAR25):
     print 'Signal: ', CAR25['C25sig'], ' ', CAR25['Type']
     print 'Fcst Horizon (years): %.1f ' % CAR25['YIF'], 
@@ -1014,17 +1034,25 @@ def is_display_cmatrix2(ytrue, ypred, gainAhead, index, m, ticker, testFirstYear
         print "f1:   %.2f" % f1IS
 
 
-def oos_display_cmatrix2(ytrue, ypred, gainAhead, index, m, ticker,testFirstYear, testFinalYear, iterations, signal, show=0):
-    print "\nSymbol is ", ticker
-    print "Learning algorithm is ", m
-    print "Signal is ", signal
-    #print "Confusion matrix for %i randomized tests for %i rows" % (iterations, ytrue.shape[0])
-    print "for years ", testFirstYear, " through ", testFinalYear 
-    
-    print "\nOut of sample"
-    if show==1:
-        showPDF(ytrue, ypred, gainAhead, index)
-        showCDF(ytrue, ypred, gainAhead, index)
+def oos_display_cmatrix2(ytrue, ypred, gainAhead, index, m, ticker,testFirstYear,\
+                                                testFinalYear, iterations, signal, **kwargs):
+    showPDFCDF=kwargs.get('showPDFCDF',True)
+    savePath=kwargs.get('savePath',None)
+    filename=kwargs.get('filename',None)
+    verbose=kwargs.get('verbose',None)
+    if verbose:
+        print "\nSymbol is ", ticker
+        print "Learning algorithm is ", m
+        print "Signal is ", signal
+        #print "Confusion matrix for %i randomized tests for %i rows" % (iterations, ytrue.shape[0])
+        print "for years ", testFirstYear, " through ", testFinalYear 
+        
+        print "\nOut of sample"
+    if showPDFCDF == True or (savePath != None and filename != None):
+        showPDF(ytrue, ypred, gainAhead, index,showPDFCDF=showPDFCDF,\
+                        savePath=savePath,filename=filename)
+        showCDF(ytrue, ypred, gainAhead, index,showPDFCDF=showPDFCDF,\
+                        savePath=savePath,filename=filename)
     else:
         if confusion_matrix(ytrue,ypred).shape != (1,1):
             cm_sum_oos = confusion_matrix(ytrue,ypred).astype(float)

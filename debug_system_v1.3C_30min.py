@@ -534,7 +534,9 @@ for ticker in livePairs:
                     model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
                                                                         dataSet, m, model_metrics,\
                                                                         metaData, showPDFCDF=showPDFCDF,\
-                                                                        verbose=verbose)
+                                                                        verbose=verbose,\
+                                                                        PDFCDFsavePath=chartSavePath,\
+                                                                        PDFCDFfilename=version+' '+ticker)
         else:
             #buy/sell hold
             wfStep=int(signal.split('_')[0][2:])
@@ -558,7 +560,9 @@ for ticker in livePairs:
             model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
                                                                         dataSet, m, model_metrics,\
                                                                         metaData, showPDFCDF=showPDFCDF,\
-                                                                        verbose=verbose)        
+                                                                        verbose=verbose,\
+                                                                        PDFCDFsavePath=chartSavePath,\
+                                                                        PDFCDFfilename=version+' '+ticker)  
     #score models
     scored_models, bestModelParams = directional_scoring(model_metrics,filterName)
     

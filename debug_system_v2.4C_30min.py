@@ -136,14 +136,14 @@ if len(sys.argv)==1:
                     #'EURGBP'\
                     ]
                     
-    showDist =  True
-    showPDFCDF = True
-    showAllCharts = True
+    showDist =  False
+    showPDFCDF = False
+    showAllCharts = False
     perturbData = False
     runDPS = True
     saveParams = False
     saveDataSet = True
-    verbose = True
+    verbose = False
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -533,8 +533,9 @@ for ticker in livePairs:
                                             '_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
                     model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
                                                                         dataSet, m, model_metrics,\
-                                                                        metaData, showPDFCDF=showPDFCDF,\
-                                                                        verbose=verbose)
+                                                                        metaData, showPDFCDF=showPDFCDF,verbose=verbose,\
+                                                                        PDFCDFsavePath=chartSavePath,\
+                                                                        PDFCDFfilename=version+' '+ticker)
         else:
             #buy/sell hold
             wfStep=int(signal.split('_')[0][2:])
@@ -558,7 +559,9 @@ for ticker in livePairs:
             model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
                                                                         dataSet, m, model_metrics,\
                                                                         metaData, showPDFCDF=showPDFCDF,\
-                                                                        verbose=verbose)        
+                                                                        verbose=verbose,\
+                                                                        PDFCDFsavePath=chartSavePath,\
+                                                                        PDFCDFfilename=version+' '+ticker)  
     #score models
     scored_models, bestModelParams = directional_scoring(model_metrics,filterName)
     

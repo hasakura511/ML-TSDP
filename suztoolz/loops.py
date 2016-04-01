@@ -302,6 +302,8 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
     showLearningCurve=kwargs.get('showLearningCurve',False)
     longMemory=kwargs.get('longMemory',False)
     verbose=kwargs.get('verbose',True)
+    PDFCDFsavePath=kwargs.get('PDFCDFsavePath',None)
+    PDFCDFfilename=kwargs.get('PDFCDFfilename',None)
     
     close = unfilteredData.reset_index().Close
     #fill in the prior index. need this for the car25 calc uses the close index
@@ -569,10 +571,11 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
         prior_index_filt = pd.concat([st_oos_filt,unfilteredData.prior_index], axis=1,\
                             join='inner').prior_index.values.astype(int)
         #datay_gainAhead and cm_test_index have the same index. dont need to have same shape because iloc is used in display
-        if verbose == True:
-            print 'Metrics for filtered Validation Datapoints'
+        if verbose == True or showPDFCDF == True or (PDFCDFsavePath != None and PDFCDFfilename != None):
+            #print 'Metrics for filtered Validation Datapoints'
             oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cm_test_index, m[1],\
-                    ticker, validationFirstYear, validationFinalYear, iterations, metaData['filter'],showPDFCDF)
+                    ticker, validationFirstYear, validationFinalYear, iterations, metaData['filter'],showPDFCDF=showPDFCDF,\
+                    savePath=PDFCDFsavePath, filename=PDFCDFfilename,verbose=verbose)
         CAR25_oos = CAR25_df_bars(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
                                 close, DD95_limit =ddTolerance, verbose=verbose,barSize=barSize, minFraction=1)
         #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'LONG', 1)
@@ -602,10 +605,11 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
     
     #compute car, show matrix for all data is unfiltered
     if data_type == 'ALL':           
-        if verbose == True:
-            print 'Metrics for All Validation Datapoints'
+        if verbose == True or showPDFCDF == True or (PDFCDFsavePath != None and PDFCDFfilename != None):
+            #print 'Metrics for All Validation Datapoints'
             oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cmatrix_test_index, m[1], ticker,\
-                                validationFirstYear, validationFinalYear, iterations, 'Long>0',showPDFCDF)
+                                validationFirstYear, validationFinalYear, iterations, 'Long>0',showPDFCDF=showPDFCDF,\
+                                 savePath=PDFCDFsavePath, filename=PDFCDFfilename,verbose=verbose)
         #minfraction set to 1 because no odd lots. 
         CAR25_oos = CAR25_df_bars(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
                                 close, DD95_limit =ddTolerance, verbose=verbose, barSize=barSize, minFraction=1)

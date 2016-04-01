@@ -35,8 +35,593 @@ from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRe
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
 from suztoolz.transform import zigzag as zg
                         #import warnings
-#warnings.filterwarnings('error')                       
+#warnings.filterwarnings('error')
 
+def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
+    verbose = kwargs.get('verbose', True)
+    forecast_horizon=kwargs.get('minFcst',signal_index.shape[0]*3)
+    DD95_limit = kwargs.get('DD95_limit',0.05)
+    barSize = kwargs.get('barSize','30m')
+    number_forecasts  = kwargs.get('number_forecasts',35)
+    minFraction = kwargs.get('minFraction',None)
+    fraction= kwargs.get('fraction',1)
+    #barDict
+    barDict = {
+                    '1 min':60.0,
+                    '30m':2.0,
+                    '10m':6.0,
+                    }
+                    
+    #edited to compute all trades.
+    #forecast horizon minimum 1 year, or safef becomes very large
+    holdBars = 1
+    accuracy_tolerance = 0.005
+    initial_equity = 100000
+    years_in_forecast = forecast_horizon/float(barDict[barSize]*24.0*365.0)
+        
+    #percentOfYearInMarket = number_long_signals /(years_in_study*252.0)
+    #number_signals = index.shape[0]
+    number_trades = forecast_horizon / holdBars
+    numBars = number_trades*holdBars
+    account_balance = np.zeros(numBars+1, dtype=float) 
+    max_IT_DD = np.zeros(numBars+1, dtype=float)     # Maximum Intra-Trade drawdown
+    max_IT_Eq = np.zeros(numBars+1, dtype=float)     # Maximum Intra-Trade equity
+    FC_max_IT_DD = np.zeros(number_forecasts, dtype=float) # Max intra-trade drawdown
+    FC_tr_eq = np.zeros(number_forecasts, dtype=float)     # Trade equity (TWR)
+    FC_trades = np.zeros(number_forecasts, dtype=float)     
+    FC_sortino = np.zeros(number_forecasts, dtype=float)     
+    FC_sharpe = np.zeros(number_forecasts, dtype=float)
+
+    # start loop
+    done = False    
+    while not done:
+        done = True
+        #print 'Using fraction: %.3f ' % fraction,
+        # -----------------------------
+        #   Beginning a new forecast run
+        for i_forecast in range(number_forecasts):
+            #print "forecast ",i_forecast, " of ", number_forecasts
+            #if i_forecast >0:
+             #   print i_forecast-1, 'max_IT_DD', max_IT_DD[i_forecast]
+            #wait = raw_input("PRESS ENTER TO CONTINUE.")
+            #   Initialize for trade sequence
+            i_day = 0    # i_day counts to end of forecast
+            #  Daily arrays, so running history can be plotted
+            # Starting account balance
+            account_balance[0] = initial_equity
+            # Maximum intra-trade equity
+            max_IT_Eq[0] = account_balance[0]    
+            max_IT_DD[0] = 0
+            trades = 0
+            lastPosition = 0
+            #  for each trade
+            #for i_trade in range(0,number_trades):
+            for i_trade in range(0,number_trades):
+                #print 'day', i_trade, 'of',number_trades
+                #  Select the trade and retrieve its index 
+                #  into the price array
+                #  gainer or loser?
+                #  Uniform for win/loss
+                index = random.choice(range(0,len(signal_index)-1))
+                TRADE = signals[index]
+                
+                
+                if TRADE > 0:
+                    direction = 'LONG'
+                else:
+                    direction = 'SHORT'
+                #print direction, fraction
+                if TRADE: #<0 not toxic
+                    entry_index = signal_index[index]
+                    #rint entry_index, TRADE
+                    #  Process the trade, day by day
+                    for i_day_in_trade in range(0,holdBars+1):
+                        if i_day_in_trade==0: #day 0
+                            #  Things that happen immediately 
+                            #  after the close of the signal day
+                            #  Initialize for the trade
+                            entry_price = Close.ix[entry_index]
+                            #print entry_price
+
+                            #print account_balance[i_day], fraction, buy_price
+                            number_shares = account_balance[i_day] * \
+                                            fraction / entry_price
+                            share_dollars = number_shares * entry_price
+                            cash = account_balance[i_day] - \
+                                   share_dollars
+                            #print '155', "buy price", number_shares, "num_shares", share_dollars, "share $", cash, "cash"
+
+                        else: # day n
+                            #print 'iday in trade', i_day_in_trade, 'iday', i_day, 'num trades', number_trades
+                            #  Things that change during a 
+                            #  day the trade is held
+                            i_day = i_day + 1
+                            j = entry_index + i_day_in_trade
+                            #print Close.ix[j], entry_price
+                            #  Drawdown for the trade
+
+                            if direction == 'LONG':
+                                profit = number_shares * (Close.ix[j] - entry_price)
+                            else:                            
+                                profit = number_shares * (entry_price - Close.ix[j])
+
+                            MTM_equity = cash + share_dollars + profit
+                            IT_DD = (max_IT_Eq[i_day-1] - MTM_equity) \
+                                    / max_IT_Eq[i_day-1]
+                            max_IT_DD[i_day] = max(max_IT_DD[i_day-1], \
+                                    IT_DD)
+                            max_IT_Eq[i_day] = max(max_IT_Eq[i_day-1], \
+                                    MTM_equity)
+                            account_balance[i_day] = MTM_equity
+                            #print '175accountbal', account_balance[i_day],'profit', profit, 'itdd', IT_DD,'max_IT_DD[i_day]',max_IT_DD[i_day], 'max_ITEq', max_IT_Eq[i_day]
+
+                            if i_day_in_trade==holdBars: # last day of forecast
+                                #  Exit at the close
+                                exit_price = Close.ix[j]
+                                
+                            #min fraction specifies min order
+                            if minFraction is not None:    
+                                if TRADE*round(fraction) != lastPosition:
+                                    trades += 1
+                                    #print trades, lastPosition, TRADE*round(fraction)
+                                    lastPosition = TRADE*round(fraction)
+                                    #print trades, lastPosition, TRADE*round(fraction)
+                            else:
+                                if TRADE*fraction != lastPosition:
+                                    trades += 1
+                                    #print trades, lastPosition, TRADE*fraction
+                                    lastPosition = TRADE*fraction
+                                    #print trades, lastPosition, TRADE*fraction
+                                    
+                            # Check for end of forecast
+                            #print 'i_day', i_day,'numBars',numBars
+                            if i_day >= numBars:
+                                #print '182##############ENDSAVE i_day', i_day, 'numBars', numBars
+                                FC_max_IT_DD[i_forecast] = max_IT_DD[i_day]
+                                FC_tr_eq[i_forecast] = MTM_equity
+                                FC_trades[i_forecast] = trades
+                                FC_sortino[i_forecast] = ratio(account_balance).sortino()
+                                FC_sharpe[i_forecast] = ratio(account_balance).sharpe()
+                        #print '207maxitdd', max_IT_DD[i_day]
+                                    #print '186maxitdd', max_IT_DD[i_day]
+                                    
+
+                else: # no trade
+                    #print '189iday', i_day, 'num days', numBars, 'num trades', number_trades
+                    MTM_equity = account_balance[i_day]
+                    i_day = i_day + 1
+                    IT_DD = (max_IT_Eq[i_day-1] - MTM_equity) \
+                            / max_IT_Eq[i_day-1]
+                    max_IT_DD[i_day] = max(max_IT_DD[i_day-1], \
+                            IT_DD)
+                    max_IT_Eq[i_day] = max(max_IT_Eq[i_day-1], \
+                            MTM_equity)
+                    account_balance[i_day] = MTM_equity
+                    #print '199no_trade ', 'mtm', MTM_equity, 'itdd', IT_DD, 'max_IT_DD', max_IT_DD[i_day], 'max_IT_Eq', max_IT_Eq[i_day]
+                    #print i_day, numBars
+                    # Check for end of forecast
+                    if i_day >= numBars:
+                        #print '##############ENDSAVE i_day', i_day, 'numBars', numBars
+                        FC_max_IT_DD[i_forecast] = max_IT_DD[i_day]
+                        FC_tr_eq[i_forecast] = MTM_equity
+                        FC_trades[i_forecast] = trades
+                        FC_sortino[i_forecast] = ratio(account_balance).sortino()
+                        FC_sharpe[i_forecast] = ratio(account_balance).sharpe()
+                        #print '207maxitdd', max_IT_DD[i_day]
+
+        #  All the forecasts have been run
+        #  Find the drawdown at the 95th percentile 
+        #print '211maxdd ', FC_max_IT_DD       
+        DD_95 = stats.scoreatpercentile(FC_max_IT_DD,95)    
+        #print 'DD_95',DD_95
+        
+        #stop at minimum fraction
+        if minFraction is not None:
+            if fraction > minFraction:
+                #adjust fraction
+                if (abs(DD95_limit - DD_95) < accuracy_tolerance):
+                    #print '  214 DD95: %.3f ' % DD_95, 'DD95_limit',DD95_limit,"Close enough" 
+                    done = True
+                elif DD_95 == 0: #no drawdown
+                    #print 'dd95 =0'
+                    fraction =  float('inf')
+                    done == True
+                elif DD_95 == 1: #max loss
+                    #print 'dd95=1'
+                    fraction = 0
+                    done == True 
+                else:
+                    #print '  DD95: %.3f ' % DD_95, "DD95_limit",DD95_limit," Adjust fraction from " , fraction,
+                    fraction = fraction * DD95_limit / DD_95
+                    if fraction < minFraction:
+                        fraction = minFraction
+                    #print 'to ', fraction, 'minfraction',minFraction
+                    done = False   
+            else:
+                #stop when fraction<min fraction
+                done==True
+        else:
+            if (abs(DD95_limit - DD_95) < accuracy_tolerance):
+                #print '  214 DD95: %.3f ' % DD_95, "Close enough" 
+                done = True
+            elif DD_95 == 0: #no drawdown
+                #print 'dd95 =0'
+                fraction =  float('inf')
+                done == True
+            elif DD_95 == 1: #max loss
+                #print 'dd95=1'
+                fraction = 0
+                done == True 
+            else:
+                #print '  DD95: %.3f ' % DD_95, "DD95_limit",DD95_limit," Adjust fraction from " , fraction,
+                fraction = fraction * DD95_limit / DD_95
+                if fraction < minFraction:
+                        fraction = minFraction
+                #print 'to ', fraction, 'minfraction',minFraction
+                done = False
+            
+    #  Report
+    SIG = signal_type
+    YIF =  forecast_horizon
+    TPY = FC_trades.mean()/(forecast_horizon)
+    IT_DD_95 = stats.scoreatpercentile(FC_max_IT_DD,95)
+    IT_DD_100 = max(FC_max_IT_DD)
+    SOR25 = stats.scoreatpercentile(FC_sortino,25)
+    SHA25 = stats.scoreatpercentile(FC_sharpe,25)
+    #IT_DD_25 = stats.scoreatpercentile(FC_max_IT_DD,25)        
+    #IT_DD_50 = stats.scoreatpercentile(FC_max_IT_DD,50)        
+    TWR_25 = stats.scoreatpercentile(FC_tr_eq,25)        
+    CAR_25 = 100*(((TWR_25/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
+    TWR_50 = stats.scoreatpercentile(FC_tr_eq,50)
+    CAR_50 = 100*(((TWR_50/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
+    TWR_75 = stats.scoreatpercentile(FC_tr_eq,75)        
+    CAR_75 = 100*(((TWR_75/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
+        
+    if verbose:
+        print '\nSignal: ', SIG
+        print 'Fcst Horizon (%s Bars): %i' % (barSize, YIF) ,
+        #print ' TotalTrades: %.0f ' % FC_trades.mean(), 
+        print ' Avg.Trades/Bar: %.1f' % TPY
+        print 'DD95:  %.3f ' % IT_DD_95,
+        print 'DD100: %.3f ' %  IT_DD_100,
+        print 'SORTINO25: %.3f ' %  SOR25,
+        print 'SHARPE25: %.3f ' % SHA25
+        print 'SAFEf: %.3f ' % fraction,
+
+        print 'CAR25: %.3f ' % CAR_25,
+        print 'CAR50: %.3f ' % CAR_50,
+        print 'CAR75: %.3f ' % CAR_75
+    metrics = {'C25sig':SIG, 'safef':fraction, 'CAR25':CAR_25, 'CAR50':CAR_50, 'CAR75':CAR_75,\
+                'DD95':IT_DD_95, 'DD100':IT_DD_100, 'SOR25':SOR25, 'SHA25':SHA25, 'YIF':YIF, 'TPY':TPY}
+
+    return metrics
+    
+def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
+                           metaData, **kwargs):
+    showPDFCDF= kwargs.get('showPDFCDF',True)
+    showLearningCurve=kwargs.get('showLearningCurve',False)
+    longMemory=kwargs.get('longMemory',False)
+    verbose=kwargs.get('verbose',True)
+    
+    close = unfilteredData.reset_index().Close
+    #fill in the prior index. need this for the car25 calc uses the close index
+    unfilteredData['prior_index'] = pd.concat([dataSet.prior_index, unfilteredData.Close],axis=1,join='outer').prior_index.interpolate(method='linear').dropna()
+    ticker = metaData['ticker']
+    data_type = metaData['data_type']
+    iterations = metaData['iters']
+    testFinalYear= metaData['t_end']
+    validationFirstYear=metaData['v_start']
+    validationFinalYear=metaData['v_end']
+    wfStep=metaData['wf_step']
+    signal =  metaData['signal']
+    nfeatures = metaData['n_features']
+    tox_adj_proportion = metaData['tox_adj']
+    feature_selection = metaData['FS']
+    wf_is_period = metaData['wf_is_period']
+    ddTolerance = metaData['DD95_limit']
+    forecastHorizon = metaData['horizon']
+    barSize = metaData['barSizeSetting']
+    
+    #CAR25 for zigzag
+    if signal[:2]=='ZZ':
+        zz_step = [float(x) for x in signal.split('_')[1].split(',')]
+
+    #create signals
+    if signal != 'GA1' or signal != 'gainAhead':
+        #gainAhead with lookforward
+        if signal[:2] == 'GA':
+            #wfStep = int(signal[2:])
+            #ga_start = mmData_v.iloc[train_index].prior_index.iloc[0]
+            ga_start = dataSet.iloc[0].prior_index
+            ga = gainAhead(close.ix[ga_start:],wfStep)
+            dataSet.signal = np.array([-1 if x<0 else 1 for x in ga])
+            
+        #zigzag
+        if signal[:2] == 'ZZ':
+            zz_end = dataSet.iloc[-1].prior_index
+            dataSet.signal = pd.Series(zg(close.ix[:zz_end].values, zz_step[0], \
+                            zz_step[1]).pivots_to_modes()[-dataSet.shape[0]:]).shift(-1).fillna(0).values
+                            
+        #buyHold                    
+        if signal[:2] == 'BH':
+            dataSet.signal = pd.Series(data=1,index=dataSet.index)
+        
+        #sellHold
+        if signal[:2] == 'SH':
+            dataSet.signal = pd.Series(data=-1,index=dataSet.index)
+            
+    metaData['wf_step']=wfStep
+
+
+    if 'filter' in metaData:
+        filterName = metaData['filter']
+    else:
+        filterName = 'OOS_V'
+
+    dropCol = ['Open','High','Low','Close', 'Volume','gainAhead','signal','dates', 'prior_index']
+
+    #check
+    nrows_is = dataSet.ix[:testFinalYear].dropna().shape[0]
+    if wf_is_period > nrows_is:
+        print 'Walkforward insample period of', wf_is_period, 'is greater than in-sample data of ', nrows_is, '!'
+        print 'Adjusting to', nrows_is, 'rows..'
+        wf_is_period = nrows_is
+
+    mmData = dataSet.ix[:testFinalYear].dropna()[-wf_is_period:]
+    mmData_adj = adjustDataProportion(mmData, tox_adj_proportion)  #drop last row for hold days =1
+    mmData_v = pd.concat([mmData_adj,dataSet.ix[validationFirstYear:validationFinalYear].dropna()], axis=0).reset_index()
+
+    nrows_is = mmData.shape[0]
+    nrows_oos = mmData_v.shape[0]-nrows_is
+        
+    metaData['rows'] = nrows_is
+
+    #nrows = mmData_adj.shape[0]
+    datay_signal = mmData_v[['signal', 'prior_index']]
+    datay_gainAhead = mmData_v.gainAhead
+
+    dataX = mmData_v.drop(dropCol, axis=1) 
+    cols = dataX.columns.shape[0]
+    metaData['cols']=cols
+    
+    feature_names = []
+    if verbose == True:
+        print '\nTotal %i features: ' % cols
+    for i,x in enumerate(dataX.columns):
+        if verbose == True:
+            print i,x+',',
+        feature_names = feature_names+[x]
+        
+    if feature_selection is not 'None':
+        if nfeatures > cols:
+            print 'nfeatures', nfeatures, 'is greater than total features ', cols, '!'
+            print 'Adjusting to', cols, 'features..'
+            nfeatures = cols  
+        metaData['cols']=nfeatures
+    
+            
+    #  Copy from pandas dataframe to numpy arrays
+    dy = np.zeros_like(datay_signal.signal)
+    dX = np.zeros_like(dataX)
+
+    dy = datay_signal.signal.values
+    dX = dataX.values
+    
+    if signal[:2] == 'BH' or signal[:2] == 'SH':
+        cm_test_index = range(wf_is_period,mmData_v.shape[0])
+        
+        if signal[:2] == 'BH':
+            cm_y_test = np.ones(len(cm_test_index))
+            cm_y_pred_oos = np.ones(len(cm_test_index))
+        else:
+            cm_y_test = -np.ones(len(cm_test_index))
+            cm_y_pred_oos = -np.ones(len(cm_test_index))
+            
+    else:
+        #for m in models:
+        if verbose == True:
+            print '\n\nNew WF train/predict loop for', m[1]
+            print "\nStarting Walk Forward run on", metaData['data_type'], "data..."
+            if feature_selection == 'Univariate':
+                print "Using top %i %s features" % (nfeatures, feature_selection)
+            else:
+                print "Using features selection: %s " % feature_selection
+            if longMemory == False:
+                print "%i rows in sample, %i rows out of sample, forecasting %i bar(s) ahead.." % (nrows_is, nrows_oos,wfStep)
+            else:
+                print "long memory starting with %i rows in sample, %i rows out of sample, forecasting %i bar(s) ahead.." % (nrows_is, nrows_oos,wfStep)
+            #cm_y_train = np.array([])
+        cm_y_test = np.array([],dtype=float)
+        #cm_y_pred_is = np.array([])
+        cm_y_pred_oos = np.array([],dtype=float)        
+        cm_train_index = np.array([],dtype=int)
+        cm_test_index = np.array([],dtype=int)
+        
+        leftoverIndex = nrows_oos%wfStep
+        
+        #reverse index to equate the wf tests of different periods, count backwards from the end
+        wfIndex = range(nrows_oos-wfStep,-wfStep,-wfStep)
+        tt_index =[]
+        for i in wfIndex:
+            #last wf index adjust the test index, else step
+            if leftoverIndex > 0 and i == wfIndex[-1]:
+                train_index = range(0,wf_is_period)        
+                test_index = range(wf_is_period,wf_is_period+leftoverIndex)
+                tt_index.insert(0,[train_index,test_index])
+                #print i, 't_start', mmData_v.dates.iloc[train_index[0]], 't_end', mmData_v.dates.iloc[train_index[-1]],\
+                #    'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
+                #print train_index, test_index
+            else:
+                if longMemory == True:
+                    train_index = range(0,wf_is_period+i)
+                else:
+                    train_index = range(i,wf_is_period+i)
+                #the last wfStep indexes are untrained.
+                test_index = range(wf_is_period+i,wf_is_period+i+wfStep)
+                tt_index.insert(0,[train_index,test_index])
+                #print i, 't_start', mmData_v.dates.iloc[train_index[0]], 't_end', mmData_v.dates.iloc[train_index[-1]],\
+                #    'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
+                #print train_index, test_index
+        #c=0
+        #zz_begin = mmData_v.prior_index.iloc[0]
+        for train_index,test_index in tt_index:
+            #c+=1
+            X_train, X_test = dX[train_index], dX[test_index]
+            y_train, y_test = dy[train_index], dy[test_index]
+            
+            #create zigzag signals
+            
+            #ending at test_index so dont need to shift labels
+            #if signal[:3] != 'GA1':
+            #    if signal[:2] == 'GA':
+            #        lookforward = int(signal_types[2][2:])
+            #        ga_start = mmData_v.iloc[train_index].prior_index.iloc[0]
+            #        #ga_start = dataSet.iloc[0].prior_index
+            #        ga = gainAhead(close.ix[ga_start:],lookforward)
+            #        y_train = np.array([-1 if x<0 else 1 for x in ga])[:len(train_index)]
+                    
+            if signal[:2] == 'ZZ':
+                zz_end = mmData_v.iloc[test_index].prior_index.iloc[len(test_index)-1]
+                y_train = zg(close.ix[:zz_end].values, zz_step[0], \
+                                zz_step[1]).pivots_to_modes()[-len(train_index):]
+                
+            #check if there are no intersections
+            intersect = np.intersect1d(datay_signal.reset_index().iloc[test_index]['index'].values,\
+                        datay_signal.reset_index().iloc[train_index]['index'].values)
+            if intersect.size != 0:
+                print "\nDuplicate indexes found in test/training set: Possible Future Leak!"
+            if len(mmData_v.index[-wfStep:].intersection(train_index)) == 0:
+                #print 'training', X_train.shape
+                if feature_selection is not 'None':
+                    if feature_selection == 'RFECV':
+                        #Recursive feature elimination with cross-validation: 
+                        #A recursive feature elimination example with automatic tuning of the
+                        #number of features selected with cross-validation.
+                        rfe = RFECV(estimator=RFE_estimator, step=1)
+                        rfe.fit(X_train, y_train)
+                        #featureRank = [ feature_names[i] for i in rfe.ranking_-1]
+                        featureRank = [ feature_names[i] for i,b in enumerate(rfe.support_) if b==True]
+                        print 'Top %i RFECV features' % len(featureRank)
+                        print featureRank    
+                        metaData['featureRank'] = str(featureRank)
+                        X_train = rfe.transform(X_train)
+                        X_test = rfe.transform(X_test)
+                    else:
+                        #Univariate feature selection
+                        skb = SelectKBest(f_regression, k=nfeatures)
+                        skb.fit(X_train, y_train)
+                        #dX_all = np.vstack((X_train.values, X_test.values))
+                        #dX_t_rfe = X_new[range(0,dX_t.shape[0])]
+                        #dX_v_rfe = X_new[dX_t.shape[0]:]
+                        X_train = skb.transform(X_train)
+                        X_test = skb.transform(X_test)
+                        featureRank = [ feature_names[i] for i in skb.get_support(feature_names)]
+                        metaData['featureRank'] = str(featureRank)
+                        #print 'Top %i univariate features' % len(featureRank)
+                        #print featureRank
+
+                #  fit the model to the in-sample data
+                m[1].fit(X_train, y_train)
+                #print X_train.shape,
+
+                #trained_models[m[0]] = pickle.dumps(m[1])
+                            
+                #y_pred_is = np.array(([-1 if x<0 else 1 for x in m[1].predict(X_train)]))              
+                y_pred_oos = m[1].predict(X_test)
+
+                if m[0][:2] == 'GA':
+                    print featureRank
+                    print '\nProgram:', m[1]._program
+                    #print 'R^2:    ', m[1].score(X_test_all,y_test_all) 
+                
+                #cm_y_train = np.concatenate([cm_y_train,y_train])
+                cm_y_test = np.concatenate([cm_y_test,y_test])
+                #cm_y_pred_is = np.concatenate([cm_y_pred_is,y_pred_is])
+                cm_y_pred_oos = np.concatenate([cm_y_pred_oos,y_pred_oos])
+                #cm_train_index = np.concatenate([cm_train_index,train_index])
+                cm_test_index = np.concatenate([cm_test_index,test_index])
+            
+
+    #create signals 1 and -1
+    #cm_y_pred_oos = np.array([-1 if x<0 else 1 for x in cm_y_pred_oos_ga])
+    #cm_y_test = np.array([-1 if x<0 else 1 for x in cm_y_test_ga])
+    
+    #gives errors when 100% accuracy for binary classification
+    #if confusion_matrix(cm_y_test[:-1], cm_y_pred_oos[:-1]).shape == (1,1):
+    #    print  m[0], ticker,validationFirstYear, validationFinalYear, iterations, signal
+    #    print 'Accuracy 100% for', cm_y_test[:-1].shape[0], 'rows'
+    #else:
+    if verbose == True:
+        if wfStep>1:
+            oos_display_cmatrix(cm_y_test[:-wfStep], cm_y_pred_oos[:-wfStep], m[0],\
+                ticker,validationFirstYear, dataSet.index[-wfStep], iterations, signal)
+        else:
+            oos_display_cmatrix(cm_y_test[:-1], cm_y_pred_oos[:-1], m[0],\
+                    ticker,validationFirstYear, validationFinalYear, iterations, signal)
+    #if data is filtered so need to fill in the holes. signal = 0 for days that filtered
+    st_oos_filt= pd.DataFrame()
+    st_oos_filt['signals'] =  pd.Series(cm_y_pred_oos)
+    st_oos_filt.index = mmData_v['dates'].iloc[cm_test_index]
+            
+    #compute car, show matrix if data is filtered
+    if data_type != 'ALL':
+        
+        prior_index_filt = pd.concat([st_oos_filt,unfilteredData.prior_index], axis=1,\
+                            join='inner').prior_index.values.astype(int)
+        #datay_gainAhead and cm_test_index have the same index. dont need to have same shape because iloc is used in display
+        if verbose == True:
+            print 'Metrics for filtered Validation Datapoints'
+            oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cm_test_index, m[1],\
+                    ticker, validationFirstYear, validationFinalYear, iterations, metaData['filter'],showPDFCDF)
+        CAR25_oos = CAR25_df_bars(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+                                close, DD95_limit =ddTolerance, verbose=verbose,barSize=barSize, minFraction=1)
+        #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'LONG', 1)
+        #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'SHORT', -1)
+                                
+    #add column prior index and gA.  if there are holes, nan values in signals
+    st_oos_filt = pd.concat([st_oos_filt,unfilteredData.gainAhead,unfilteredData.prior_index],\
+                                axis=1, join='outer').ix[validationFirstYear:validationFinalYear]
+    #fills nan with zeros
+    st_oos_filt['signals'].fillna(0, inplace=True)
+    
+    #fill zeros with opposite of input signal, if there are zeros. to return full data
+    cm_y_pred_oos = np.where(st_oos_filt['signals'].values==0,metaData['input_signal']*-1,\
+                                                                st_oos_filt['signals'].values)
+    cm_y_test = np.where(st_oos_filt.gainAhead>0,1,-1)
+    #datay_gainAhead and cmatrix_test_index have the same index
+    datay_gainAhead = st_oos_filt.gainAhead
+    cmatrix_test_index = st_oos_filt.reset_index().index
+
+    #plot learning curve, knn insufficient neighbors
+    if showLearningCurve:
+        try:
+            plot_learning_curve(m[1], m[0], X_train,y_train_ga, scoring='r2')        
+        except:
+            pass
+
+    
+    #compute car, show matrix for all data is unfiltered
+    if data_type == 'ALL':           
+        if verbose == True:
+            print 'Metrics for All Validation Datapoints'
+            oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cmatrix_test_index, m[1], ticker,\
+                                validationFirstYear, validationFinalYear, iterations, 'Long>0',showPDFCDF)
+        #minfraction set to 1 because no odd lots. 
+        CAR25_oos = CAR25_df_bars(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+                                close, DD95_limit =ddTolerance, verbose=verbose, barSize=barSize, minFraction=1)
+        #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+         #                       close, 'LONG', 1)
+        #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
+         #                       close, 'SHORT', -1)
+    #update model metrics
+    #metaData['signal'] = 'LONG 1'
+    model_metrics = update_report(model_metrics, filterName, cm_y_pred_oos, cm_y_test, datay_gainAhead,\
+                            cmatrix_test_index, m, metaData,CAR25_oos)
+    #metaData['signal'] = 'SHORT -1'
+    #model_metrics = update_report(model_metrics, filterName, cm_y_pred_oos, cm_y_test, datay_gainAhead,\
+    #                       cmatrix_test_index, m, metaData,CAR25_Sn1_oos)
+    return model_metrics, st_oos_filt, m[1]
+    
 def wf_classify_validate(unfilteredData, dataSet, models, model_metrics, wf_is_period, \
                            metaData, PRT, showPDFCDF=True, showLearningCurve=False, longMemory=False):
     close = unfilteredData.reset_index().Close
@@ -1020,14 +1605,23 @@ def sss_regress_train(unfilteredData, dataSet, models, model_metrics, metaData, 
 
     return model_metrics
     
-def createBenchmark(sst,initialEquity,direction, start,end,ticker):
+def createBenchmark(sst,initialEquity,direction,start,end,ticker):
     #creates market benchmarks
     benchmarks = {}
     fract = pd.Series(data=1.0, index = sst.index, name='safef')
+    
+    #buyHold
     buyHoldSafef1 = pd.concat([pd.Series(data=1, index =  sst.index, name='signals'),\
                     sst.gainAhead, fract], axis=1)
     buyHoldSafef1.index = buyHoldSafef1.index.to_datetime()
-    benchmarks[ticker+' buyHoldSafef1'] = calcEquity2(buyHoldSafef1.ix[start:end],initialEquity,direction)
+    benchmarks[ticker+' buyHoldSafef1'] = calcEquity2(buyHoldSafef1.ix[start:end],initialEquity,'l')
+    
+    #sellHold
+    sellHoldSafef1 = pd.concat([pd.Series(data=-1, index =  sst.index, name='signals'),\
+                    sst.gainAhead, fract], axis=1)
+    sellHoldSafef1.index = sellHoldSafef1.index.to_datetime()
+    benchmarks[ticker+' sellHoldSafef1'] = calcEquity2(sellHoldSafef1.ix[start:end],initialEquity,'s')
+    
     return benchmarks
     
 def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
@@ -1036,7 +1630,10 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
     verbose=kwargs.get('verbose',True)
     displayCharts=kwargs.get('displayCharts',True)
     equityStatsSavePath=kwargs.get('equityStatsSavePath',None)
-    
+    v3tag=kwargs.get('v3tag',None)
+    returnNoDPS=kwargs.get('returnNoDPS',True)
+    savePath=kwargs.get('savePath',None)
+    numCharts = kwargs.get('numCharts',None)
     equityCurves = {}
     DPS_adj = {}
     #f = [s for s in systems][0]
@@ -1083,27 +1680,28 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
         #DPS_adj[sst] = DPS_adj[sst].drop('index', axis=1)
         
     #create equity curves for safef1
-    if verbose:
-        print 'creating equity curve for ', direction+systemName
-    
-    if direction == 'long':
-        signals = pd.Series(data=np.where(system.signals == -1,0,1), name='signals',\
-                    index= system.index).ix[startDate:]           
-    elif direction == 'short':
-        signals = pd.Series(data=np.where(system.signals == 1,0,-1), name='signals',\
-                    index= system.index).ix[startDate:]
-    else:
-        signals = system.signals.ix[startDate:]
+    if returnNoDPS:
+        if verbose:
+            print 'creating equity curve for ', direction+systemName
+        
+        if direction == 'long':
+            signals = pd.Series(data=np.where(system.signals == -1,0,1), name='signals',\
+                        index= system.index).ix[startDate:]           
+        elif direction == 'short':
+            signals = pd.Series(data=np.where(system.signals == 1,0,-1), name='signals',\
+                        index= system.index).ix[startDate:]
+        else:
+            signals = system.signals.ix[startDate:]
 
-    system_sst = pd.concat([signals, system.gainAhead.ix[startDate:],\
-                        pd.Series(data=system.prior_index.ix[startDate:], name = 'prior_index'),
-                        pd.Series(data=1.0, name = 'safef', index = signals.index),
-                        pd.Series(data=np.nan, name = 'CAR25', index = signals.index),
-                        pd.Series(data=np.nan, name = 'dd95', index = signals.index),
-                        pd.Series(data=np.nan, name = 'ddTol', index = signals.index),
-                        ],axis=1)
-    DPS_adj[direction+systemName] = system_sst
-    equityCurves[direction+systemName] = calcEquity2(system_sst, PRT['initial_equity'],'b')
+        system_sst = pd.concat([signals, system.gainAhead.ix[startDate:],\
+                            pd.Series(data=system.prior_index.ix[startDate:], name = 'prior_index'),
+                            pd.Series(data=1.0, name = 'safef', index = signals.index),
+                            pd.Series(data=np.nan, name = 'CAR25', index = signals.index),
+                            pd.Series(data=np.nan, name = 'dd95', index = signals.index),
+                            pd.Series(data=np.nan, name = 'ddTol', index = signals.index),
+                            ],axis=1)
+        DPS_adj[direction+systemName] = system_sst
+        equityCurves[direction+systemName] = calcEquity2(system_sst, PRT['initial_equity'],'b')
             
         
     #create equity curve stats    
@@ -1176,13 +1774,17 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
         
     topSystem = equityStats.system.iloc[0]
 
-    if displayCharts:
-        benchmarks = createBenchmark(equityCurves[topSystem],1.0,'l', startDate,endDate,ticker)
+    if displayCharts or savePath is not None:
+        if numCharts == None:
+            numCharts = equityStats.system.shape[0]
+            
+        benchmarks = createBenchmark(equityCurves[topSystem],1.0,'', startDate,endDate,ticker)
         benchStatsByYear = createYearlyStats(benchmarks)
         #create yearly stats for all equity curves with comparison against benchmark
         equityCurvesStatsByYear = createYearlyStats(equityCurves, benchStatsByYear)
-        displayRankedCharts(equityStats.system.shape[0],benchmarks,benchStatsByYear,equityCurves,equityStats,\
-                                    equityCurvesStatsByYear, yscale=yscale)
+        displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equityStats,\
+                                    equityCurvesStatsByYear, yscale=yscale, v3tag=v3tag,savePath=savePath, showPlot=displayCharts,\
+                                    verbose=verbose)
                                     
     if equityStatsSavePath is not None:
         equityStats.to_csv(equityStatsSavePath+'eStats_'+systemName+'_'+str(endDate).replace(':','')+'.csv')
@@ -1246,17 +1848,19 @@ def createYearlyStats(eCurves, benchStatsByYear=None):
          
 def calcEquity_df(SST, title, **kwargs):
     #leverage=1.0, equityCurveSavePath=None, pngPath=None, figsize=(8,7), showPlot=True
-    leverage = kwargs.get('leverage',0)
+    leverage = kwargs.get('leverage',1.0)
     equityCurveSavePath = kwargs.get('equityCurveSavePath',None)
     pngPath = kwargs.get('pngPath',None)
     pngFilename = kwargs.get('pngFilename',None)
     figsize = kwargs.get('figsize',(8,7))
     showPlot =kwargs.get('showPlot',True)
     verbose = kwargs.get('verbose',True)
+    version = kwargs.get('version',None)
     
     initialEquity = 1.0
     nrows = SST.gainAhead.shape[0]
     #signalCounts = SST.signals.shape[0]
+    '''
     if verbose:
         print '\nThere are %0.f signal counts' % nrows
         if 1 in SST.signals.value_counts():
@@ -1265,6 +1869,7 @@ def calcEquity_df(SST, title, **kwargs):
             print SST.signals.value_counts()[-1], 'beShort Signals',
         if 0 in SST.signals.value_counts():
             print SST.signals.value_counts()[0], 'beFlat Signals',
+    '''
         
     equityCurves = {}
     for trade in ['l','s','b']:       
@@ -1376,9 +1981,35 @@ def calcEquity_df(SST, title, **kwargs):
             maxDD[i] = max(drawdown[i],maxDD[i-1])          
     SSTcopy.loc[SST.signals==-1,'signals']=1
     SSTcopy.loc[SST.signals==0,'signals']=1
-
     equityCurves['buyHold'] = pd.concat([SSTcopy.reset_index(), safef, trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
-
+    
+    #  Compute cumulative equity for all days (sell and hold)   
+    trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')
+    numBars = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numBars')
+    equity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='equity')
+    maxEquity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='maxEquity')
+    drawdown = pd.Series(data=0.0,index=range(0,len(SST.index)), name='drawdown')
+    maxDD = pd.Series(data=0.0,index=range(0,len(SST.index)),name='maxDD')
+    safef = pd.Series(data=1.0,index=range(0,len(SST.index)),name='safef')
+    for i in range(0,len(SST.index)):
+        if i == 0:
+            equity[i] = initialEquity
+            trades[i] = 0.0
+            numBars[i] = 0.0
+            maxEquity[i] = initialEquity
+            drawdown[i] = 0.0
+            maxDD[i] = 0.0
+        else:
+            trades[i] = safef[i-1] * equity[i-1] * -SST.gainAhead[i-1]
+            numBars[i] = numBars[i-1] + 1 
+            equity[i] = equity[i-1] + trades[i]
+            maxEquity[i] = max(equity[i],maxEquity[i-1])
+            drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
+            maxDD[i] = max(drawdown[i],maxDD[i-1])          
+    SSTcopy.loc[SST.signals==1,'signals']=-1
+    SSTcopy.loc[SST.signals==0,'signals']=-1
+    equityCurves['sellHold'] = pd.concat([SSTcopy.reset_index(), safef, trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
+    
     if not SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
         barSize = '1 day'
     else:
@@ -1392,12 +2023,14 @@ def calcEquity_df(SST, title, **kwargs):
     ax1.plot(ind, equityCurves['s'].equity,label="Short -1 Signals",color='r')
     ax1.plot(ind, equityCurves['b'].equity,label="Long & Short",color='g')
     ax1.plot(ind, equityCurves['buyHold'].equity,label="BuyHold",ls='--',color='c')
+    ax1.plot(ind, equityCurves['sellHold'].equity,label="SellHold",ls='--',color='lightpink')
     #fig, ax = plt.subplots(2)
     #plt.subplot(2,1,2)
     ax2.plot(ind, -equityCurves['l'].drawdown,label="Long 1 Signals",color='b')
     ax2.plot(ind, -equityCurves['s'].drawdown,label="Short -1 Signals",color='r')
     ax2.plot(ind, -equityCurves['b'].drawdown,label="Long & Short",color='g')
     ax2.plot(ind, -equityCurves['buyHold'].drawdown,label="BuyHold",ls='--',color='c')
+    ax2.plot(ind, -equityCurves['sellHold'].drawdown,label="SellHold",ls='--',color='lightpink')
     
     y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
     ax1.yaxis.set_major_formatter(y_formatter)
@@ -1418,9 +2051,9 @@ def calcEquity_df(SST, title, **kwargs):
         
     
     
-    #minorLocator = MultipleLocator(SST.shape[0])
-    #ax1.xaxis.set_minor_locator(minorLocator)
-    #ax2.xaxis.set_minor_locator(minorLocator)
+    minorLocator = MultipleLocator(SST.shape[0])
+    ax1.xaxis.set_minor_locator(minorLocator)
+    ax2.xaxis.set_minor_locator(minorLocator)
     ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
     ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
     ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
@@ -1437,23 +2070,53 @@ def calcEquity_df(SST, title, **kwargs):
     ax1.set_xlim(0, SST.shape[0])
     ax2.set_xlim(0, SST.shape[0])
     #shows last date index
-    #xticks = ax1.xaxis.get_minor_ticks()
-    #xticks[1].label1.set_visible(False)
-    #xticks = ax2.xaxis.get_minor_ticks()
-    #xticks[1].label1.set_visible(False)
+    xticks = ax1.xaxis.get_minor_ticks()
+    xticks[1].label1.set_visible(False)
+    xticks = ax2.xaxis.get_minor_ticks()
+    xticks[1].label1.set_visible(False)
+    
+    #add text to chart
+    text=  '\n%0.f signal counts: ' % nrows
+    if 1 in SST.signals.value_counts():
+        text+= '%i beLong,  ' % SST.signals.value_counts()[1]
+    if -1 in SST.signals.value_counts():
+        text+= '%i beShort,  ' % SST.signals.value_counts()[-1]
+    if 0 in SST.signals.value_counts():
+        text+= '%i beFlat  ' % SST.signals.value_counts()[0]
+    shortTrades, longTrades = numberZeros(equityCurves['b'].signals)
+    allTrades = sum((equityCurves['b'].signals * equityCurves['b'].safef).round().diff().fillna(0).values !=0)
+    hoursTraded = (SST.index[-1]-SST.index[0]).total_seconds()/60.0/60.0
+    avgTrades = float(allTrades)/hoursTraded
+    #text+='\nValidation Period from %s to %s' % (str(SST.index[0]), str(SST.index[-1]))
+    text+='\nAverage trades per hour: %0.2f' % (avgTrades)
+    text+=  '\nTWR for Buy & Hold is %0.4f, %i Bars, maxDD %0.4f' %\
+                (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
+    text+=  '\nTWR for Sell & Hold is %0.4f, %i Bars, maxDD %0.4f' %\
+                (equityCurves['sellHold'].equity.iloc[-1], nrows, equityCurves['sellHold'].maxDD.iloc[-1])
+    text+='\nTWR for %i beLong trades is %0.4f, maxDD %0.4f' %\
+                (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
+    text+='\nTWR for %i beShort trades is %0.4f, maxDD %0.4f' %\
+                (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
+    text+='\nTWR for %i beLong and beShort trades with DPS is %0.4f, maxDD %0.4f' %\
+                (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
+    text+='\nAverage SAFEf: %0.4f' % (equityCurves['b'].safef.mean())
+    plt.figtext(0.05,-0.15,text, fontsize=15)
     
     # rotate and align the tick labels so they look better
     fig.autofmt_xdate()
     if pngPath != None:
-        plt.savefig(pngPath+title+'.png', bbox_inches='tight')
+        if version==None:
+            plt.savefig(pngPath+title+'.png', bbox_inches='tight')
+        else:
+            plt.savefig(pngPath+version+' Signal OOS.png', bbox_inches='tight')
     
     if showPlot:
         plt.show()
-    plt.close()
+    plt.close(fig)
     
     shortTrades, longTrades = numberZeros(SST.signals)
     allTrades = sum((equityCurves['b'].signals * equityCurves['b'].safef).round().diff().fillna(0).values !=0)
-
+    '''
     if verbose:
         hoursTraded = (SST.index[-1]-SST.index[0]).total_seconds()/60.0/60.0
         avgTrades = float(allTrades)/hoursTraded
@@ -1461,6 +2124,8 @@ def calcEquity_df(SST, title, **kwargs):
         print 'Average trades per hour: %0.2f' % (avgTrades)
         print 'TWR for Buy & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
                     (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
+        print 'TWR for Sell & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
+                    (equityCurves['sellHold'].equity.iloc[-1], nrows, equityCurves['sellHold'].maxDD.iloc[-1])
         print 'TWR for %i beLong trades is %0.3f, maxDD %0.3f' %\
                     (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
         print 'TWR for %i beShort trades is %0.3f, maxDD %0.3f' %\
@@ -1468,7 +2133,7 @@ def calcEquity_df(SST, title, **kwargs):
         print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
                     (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
         print 'SAFEf:', equityCurves['b'].safef.mean()
-
+    '''
     SST_equity = equityCurves['b']
     if 'dates' in SST_equity:
         return SST_equity.set_index(pd.DatetimeIndex(SST_equity['dates'])).drop(['dates'], axis=1)
@@ -2094,209 +2759,6 @@ def maxCAR25(*args):
                 key = k
                 global_max = loc_max
     return outer_d
-
-
-def CAR25_df_min(signal_type, signals, signal_index, Close, **kwargs):
-    verbose = kwargs.get('verbose', True)
-    minFcst=kwargs.get('minFcst',1440)
-    DD95_limit = kwargs.get('DD95_limit',0.005)
-    #edited to compute all trades.
-    #forecast horizon minimum 1 year, or safef becomes very large
-    hold_mins = 1
-    number_forecasts = 50
-    fraction = 1.00
-    accuracy_tolerance = 0.001
-    #DD95_limit = .20
-    initial_equity = 100000
-    forecast_horizon = min(minFcst,signal_index.shape[0]) #4 years because start date is 2007
-    years_in_forecast = forecast_horizon/1440.0
-        
-    #percentOfYearInMarket = number_long_signals /(years_in_study*252.0)
-    #number_signals = index.shape[0]
-    number_trades = forecast_horizon / hold_mins
-    number_mins = number_trades*hold_mins
-    account_balance = np.zeros(number_mins+1, dtype=float) 
-    max_IT_DD = np.zeros(number_mins+1, dtype=float)     # Maximum Intra-Trade drawdown
-    max_IT_Eq = np.zeros(number_mins+1, dtype=float)     # Maximum Intra-Trade equity
-    FC_max_IT_DD = np.zeros(number_forecasts, dtype=float) # Max intra-trade drawdown
-    FC_tr_eq = np.zeros(number_forecasts, dtype=float)     # Trade equity (TWR)
-    FC_trades = np.zeros(number_forecasts, dtype=float)     
-    FC_sortino = np.zeros(number_forecasts, dtype=float)     
-    FC_sharpe = np.zeros(number_forecasts, dtype=float)
-
-    # start loop
-
-    done = False    
-    while not done:
-        done = True
-        #print 'Using fraction: %.3f ' % fraction,
-        # -----------------------------
-        #   Beginning a new forecast run
-        for i_forecast in range(number_forecasts):
-            #print "forecast ",i_forecast, " of ", number_forecasts
-            
-            #wait = raw_input("PRESS ENTER TO CONTINUE.")
-            #   Initialize for trade sequence
-            i_day = 0    # i_day counts to end of forecast
-            #  Daily arrays, so running history can be plotted
-            # Starting account balance
-            account_balance[0] = initial_equity
-            # Maximum intra-trade equity
-            max_IT_Eq[0] = account_balance[0]    
-            max_IT_DD[0] = 0
-            trades = 0
-            lastSignal = 0
-            #  for each trade
-            #for i_trade in range(0,number_trades):
-            for i_trade in range(0,number_trades):
-                #print 'day', i_trade, 'of',number_trades
-                #  Select the trade and retrieve its index 
-                #  into the price array
-                #  gainer or loser?
-                #  Uniform for win/loss
-                index = random.choice(range(0,len(signal_index)-1))
-                TRADE = signals[index]
-                
-                
-                if TRADE > 0:
-                    direction = 'LONG'
-                else:
-                    direction = 'SHORT'
-                    
-                if TRADE: #<0 not toxic
-                    entry_index = signal_index[index]
-                    #rint entry_index, TRADE
-                    #  Process the trade, day by day
-                    for i_day_in_trade in range(0,hold_mins+1):
-                        if i_day_in_trade==0: #day 0
-                            #  Things that happen immediately 
-                            #  after the close of the signal day
-                            #  Initialize for the trade
-                            entry_price = Close.ix[entry_index]
-                            #print entry_price
-
-                            #print account_balance[i_day], fraction, buy_price
-                            number_shares = account_balance[i_day] * \
-                                            fraction / entry_price
-                            share_dollars = number_shares * entry_price
-                            cash = account_balance[i_day] - \
-                                   share_dollars
-                            #print '155', "buy price", number_shares, "num_shares", share_dollars, "share $", cash, "cash"
-
-                        else: # day n
-                            #print 'iday in trade', i_day_in_trade, 'iday', i_day, 'num trades', number_trades
-                            #  Things that change during a 
-                            #  day the trade is held
-                            i_day = i_day + 1
-                            j = entry_index + i_day_in_trade
-                            #print Close.ix[j], entry_price
-                            #  Drawdown for the trade
-
-                            if direction == 'LONG':
-                                profit = number_shares * (Close.ix[j] - entry_price)
-                            else:                            
-                                profit = number_shares * (entry_price - Close.ix[j])
-
-                            MTM_equity = cash + share_dollars + profit
-                            IT_DD = (max_IT_Eq[i_day-1] - MTM_equity) \
-                                    / max_IT_Eq[i_day-1]
-                            max_IT_DD[i_day] = max(max_IT_DD[i_day-1], \
-                                    IT_DD)
-                            max_IT_Eq[i_day] = max(max_IT_Eq[i_day-1], \
-                                    MTM_equity)
-                            account_balance[i_day] = MTM_equity
-                            #print '175accountbal', account_balance[i_day],'profit', profit, 'itdd', IT_DD,'max_IT_DD[i_day]',max_IT_DD[i_day], 'max_ITEq', max_IT_Eq[i_day]
-
-                            if i_day_in_trade==hold_mins: # last day of forecast
-                                #  Exit at the close
-                                exit_price = Close.ix[j]
-                                if lastSignal == 0 or TRADE != lastSignal:
-                                    trades += 1
-                                    #print trades, lastSignal, TRADE
-                                    lastSignal = TRADE
-                                
-                                #  Check for end of forecast
-                                if i_day >= number_mins:
-                                    #print '182##############ENDSAVE i_day', i_day, 'number_mins', number_mins
-                                    FC_max_IT_DD[i_forecast] = max_IT_DD[i_day]
-                                    FC_tr_eq[i_forecast] = MTM_equity
-                                    FC_trades[i_forecast] = trades
-                                    #print '186maxitdd', max_IT_DD[i_day]
-                                    
-
-                else: # no trade
-                    #print '189iday', i_day, 'num days', number_mins, 'num trades', number_trades
-                    MTM_equity = account_balance[i_day]
-                    i_day = i_day + 1
-                    IT_DD = (max_IT_Eq[i_day-1] - MTM_equity) \
-                            / max_IT_Eq[i_day-1]
-                    max_IT_DD[i_day] = max(max_IT_DD[i_day-1], \
-                            IT_DD)
-                    max_IT_Eq[i_day] = max(max_IT_Eq[i_day-1], \
-                            MTM_equity)
-                    account_balance[i_day] = MTM_equity
-                    #print '199no_trade ', 'mtm', MTM_equity, 'itdd', IT_DD, 'max_IT_DD', max_IT_DD[i_day], 'max_IT_Eq', max_IT_Eq[i_day]
-                    if i_day >= number_mins:
-                        #print '##############ENDSAVE i_day', i_day, 'number_mins', number_mins
-                        FC_max_IT_DD[i_forecast] = max_IT_DD[i_day]
-                        FC_tr_eq[i_forecast] = MTM_equity
-                        FC_trades[i_forecast] = trades
-                        FC_sortino[i_forecast] = ratio(account_balance).sortino()
-                        FC_sharpe[i_forecast] = ratio(account_balance).sharpe()
-                        #print '207maxitdd', max_IT_DD[i_day]
-
-        #  All the forecasts have been run
-        #  Find the drawdown at the 95th percentile 
-        #print '211maxdd ', FC_max_IT_DD       
-        DD_95 = stats.scoreatpercentile(FC_max_IT_DD,95)    
-        if (abs(DD95_limit - DD_95) < accuracy_tolerance):
-            #print '  214 DD95: %.3f ' % DD_95, "Close enough" 
-            done = True
-        elif DD_95 == 0: #no drawdown
-            fraction =  float('inf')
-            done == True
-        elif DD_95 == 1: #max loss
-            fraction = 0
-            done == True 
-        else:
-            #print '  223DD95: %.3f ' % DD_95, "Adjust fraction from " , fraction,
-            fraction = fraction * DD95_limit / DD_95
-            #print 'to ', fraction
-            done = False
-            
-    #  Report
-    SIG = signal_type
-    YIF =  forecast_horizon/60.0
-    TPY = FC_trades.mean()/(forecast_horizon/60.0)
-    IT_DD_95 = stats.scoreatpercentile(FC_max_IT_DD,95)
-    IT_DD_100 = max(FC_max_IT_DD)
-    SOR25 = stats.scoreatpercentile(FC_sortino,25)
-    SHA25 = stats.scoreatpercentile(FC_sharpe,25)
-    #IT_DD_25 = stats.scoreatpercentile(FC_max_IT_DD,25)        
-    #IT_DD_50 = stats.scoreatpercentile(FC_max_IT_DD,50)        
-    TWR_25 = stats.scoreatpercentile(FC_tr_eq,25)        
-    CAR_25 = 100*(((TWR_25/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
-    TWR_50 = stats.scoreatpercentile(FC_tr_eq,50)
-    CAR_50 = 100*(((TWR_50/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
-    TWR_75 = stats.scoreatpercentile(FC_tr_eq,75)        
-    CAR_75 = 100*(((TWR_75/initial_equity) ** (1.0/years_in_forecast))-1.0)#*percentOfYearInMarket
-    if verbose:
-        print '\nSignal: ', SIG
-        print 'Fcst Horizon (Hours): %.1f ' % YIF, 
-        #print ' TotalTrades: %.0f ' % FC_trades.mean(), 
-        print ' Avg. Trades/Hour: %.1f' % TPY
-        print 'DD95:  %.3f ' % IT_DD_95,
-        print 'DD100: %.3f ' %  IT_DD_100,
-        print 'SORTINO25: %.3f ' %  SOR25,
-        print 'SHARPE25: %.3f ' % SHA25
-        print 'SAFEf: %.3f ' % fraction,
-
-        print 'CAR25: %.3f ' % CAR_25,
-        print 'CAR50: %.3f ' % CAR_50,
-        print 'CAR75: %.3f ' % CAR_75
-    metrics = {'C25sig':SIG, 'safef':fraction, 'CAR25':CAR_25, 'CAR50':CAR_50, 'CAR75':CAR_75,\
-                'DD95':IT_DD_95, 'DD100':IT_DD_100, 'SOR25':SOR25, 'SHA25':SHA25, 'YIF':YIF, 'TPY':TPY}
-    return metrics
 
 
 def CAR25_df(signal_type, signals, signal_index, Close, minFcst=1008, DD95_limit = .20):

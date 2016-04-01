@@ -7,6 +7,8 @@ v3.1
 model drop for v1/v2
 added wf stepping for ga and zz signals
 added verbose mode
+added buyhold/sellhold signal types
+fixed dps mode
 
 v3.0 "KOBE"
 added validation period optimization
@@ -68,14 +70,15 @@ from suztoolz.display import sss_display_cmatrix, is_display_cmatrix2,\
                          showPDF, showCDF, getToxCDF, plot_learning_curve,\
                          directional_scoring, compareEquity, describeDistribution,\
                          offlineMode, oos_display_cmatrix
-from suztoolz.loops import sss_iterate_train, adjustDataProportion, CAR25_df_min,\
-                            maxCAR25, wf_classify_validate, sss_regress_train, calcDPS2,\
+from suztoolz.loops import sss_iterate_train, adjustDataProportion, CAR25_df_bars,\
+                            maxCAR25, wf_classify_validate2, sss_regress_train, calcDPS2,\
                             calcEquity2, createBenchmark, createYearlyStats, findBestDPS,\
                             calcEquity_df
 from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
                         gainAhead, ATR, priceChange, garch, autocorrel, kaufman_efficiency,\
                         volumeSpike, softmax_score, create_indicators, ratio, perturb_data,\
-                        roofingFilter
+                        roofingFilter, getCycleTime
+                        
 from suztoolz.transform import zigzag as zg
 from suztoolz.data import getDataFromIB
 
@@ -95,306 +98,30 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
 
 
-def wf_classify_validate2(unfilteredData, dataSet, models, model_metrics, \
-                           metaData, **kwargs):
-    showPDFCDF= kwargs.get('showPDFCDF',True)
-    showLearningCurve=kwargs.get('showLearningCurve',False)
-    longMemory=kwargs.get('longMemory',False)
-    verbose=kwargs.get('verbose',True)
     
-    close = unfilteredData.reset_index().Close
-    #fill in the prior index. need this for the car25 calc uses the close index
-    unfilteredData['prior_index'] = pd.concat([dataSet.prior_index, unfilteredData.Close],axis=1,join='outer').prior_index.interpolate(method='linear').dropna()
-    ticker = metaData['ticker']
-    data_type = metaData['data_type']
-    iterations = metaData['iters']
-    testFinalYear= metaData['t_end']
-    validationFirstYear=metaData['v_start']
-    validationFinalYear=metaData['v_end']
-    wfStep=metaData['wf_step']
-    signal =  metaData['signal']
-    nfeatures = metaData['n_features']
-    tox_adj_proportion = metaData['tox_adj']
-    feature_selection = metaData['FS']
-    wf_is_period = metaData['wf_is_period']
-    ddTolerance = metaData['DD95_limit']
-    forecastHorizon = metaData['horizon']
+def saveParams(dataSet, bestModelParams, bestParamsPath, modelSavePath, version, barSizeSetting):
+    timenow, lastBartime, cycleTime = getCycleTime(dataSet)
+    bestModelParams = bestModelParams.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+    bestModelParams = bestModelParams.append(pd.Series(data=lastBartime.strftime("%Y%m%d %H:%M:%S %Z"), index=['lastBartime']))
+    bestModelParams = bestModelParams.append(pd.Series(data=cycleTime, index=['cycleTime']))
     
-    #CAR25 for zigzag
-    if signal[:2]=='ZZ':
-        zz_step = [float(x) for x in signal.split('_')[1].split(',')]
-
-    #create signals
-    if signal != 'GA1' or signal != 'gainAhead':
-        if signal[:2] == 'GA':
-            #wfStep = int(signal[2:])
-            #ga_start = mmData_v.iloc[train_index].prior_index.iloc[0]
-            ga_start = dataSet.iloc[0].prior_index
-            ga = gainAhead(close.ix[ga_start:],wfStep)
-            dataSet.signal = np.array([-1 if x<0 else 1 for x in ga])
-            
-        if signal[:2] == 'ZZ':
-            zz_end = dataSet.iloc[-1].prior_index
-            dataSet.signal = pd.Series(zg(close.ix[:zz_end].values, zz_step[0], \
-                            zz_step[1]).pivots_to_modes()[-dataSet.shape[0]:]).shift(-1).fillna(0).values
-    metaData['wf_step']=wfStep
-
-
-    if 'filter' in metaData:
-        filterName = metaData['filter']
+    print '\n'+'Saving Params for '+version
+    files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
+    if version+'_'+ticker+'_'+barSizeSetting+ '.csv' not in files:
+        BMdf = pd.concat([bestModelParams,bestModelParams],axis=1).transpose()
+        #BMdf.index = BMdf.timestamp
+        BMdf.to_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv', index=False)
     else:
-        filterName = 'OOS_V'
-
-    dropCol = ['Open','High','Low','Close', 'Volume','gainAhead','signal','dates', 'prior_index']
-
-    #check
-    nrows_is = dataSet.ix[:testFinalYear].dropna().shape[0]
-    if wf_is_period > nrows_is:
-        print 'Walkforward insample period of', wf_is_period, 'is greater than in-sample data of ', nrows_is, '!'
-        print 'Adjusting to', nrows_is, 'rows..'
-        wf_is_period = nrows_is
-
-    mmData = dataSet.ix[:testFinalYear].dropna()[-wf_is_period:]
-    mmData_adj = adjustDataProportion(mmData, tox_adj_proportion)  #drop last row for hold days =1
-    mmData_v = pd.concat([mmData_adj,dataSet.ix[validationFirstYear:validationFinalYear].dropna()], axis=0).reset_index()
-
-    nrows_is = mmData.shape[0]
-    nrows_oos = mmData_v.shape[0]-nrows_is
-        
-    metaData['rows'] = nrows_is
-
-    #nrows = mmData_adj.shape[0]
-    datay_signal = mmData_v[['signal', 'prior_index']]
-    datay_gainAhead = mmData_v.gainAhead
-
-    dataX = mmData_v.drop(dropCol, axis=1) 
-    cols = dataX.columns.shape[0]
-    metaData['cols']=cols
+        BMdf = pd.read_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv').append(bestModelParams, ignore_index=True)
+        #BMdf.index = BMdf.timestamp
+        BMdf.to_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv', index=False)
     
-    feature_names = []
-    if verbose == True:
-        print '\nTotal %i features: ' % cols
-    for i,x in enumerate(dataX.columns):
-        if verbose == True:
-            print i,x+',',
-        feature_names = feature_names+[x]
-        
-    if feature_selection is not 'None':
-        if nfeatures > cols:
-            print 'nfeatures', nfeatures, 'is greater than total features ', cols, '!'
-            print 'Adjusting to', cols, 'features..'
-            nfeatures = cols  
-        metaData['cols']=nfeatures
-    
-            
-    #  Copy from pandas dataframe to numpy arrays
-    dy = np.zeros_like(datay_signal.signal)
-    dX = np.zeros_like(dataX)
-
-    dy = datay_signal.signal.values
-    dX = dataX.values
-    for m in models:
-        if verbose == True:
-            print '\n\nNew WF train/predict loop for', m[1]
-            print "\nStarting Walk Forward run on", metaData['data_type'], "data..."
-            if feature_selection == 'Univariate':
-                print "Using top %i %s features" % (nfeatures, feature_selection)
-            else:
-                print "Using features selection: %s " % feature_selection
-            if longMemory == False:
-                print "%i rows in sample, %i rows out of sample, forecasting %i bar(s) ahead.." % (nrows_is, nrows_oos,wfStep)
-            else:
-                print "long memory starting with %i rows in sample, %i rows out of sample, forecasting %i bar(s) ahead.." % (nrows_is, nrows_oos,wfStep)
-            #cm_y_train = np.array([])
-        cm_y_test = np.array([],dtype=float)
-        #cm_y_pred_is = np.array([])
-        cm_y_pred_oos = np.array([],dtype=float)        
-        cm_train_index = np.array([],dtype=int)
-        cm_test_index = np.array([],dtype=int)
-        
-        leftoverIndex = nrows_oos%wfStep
-        
-        #reverse index to equate the wf tests of different periods, count backwards from the end
-        wfIndex = range(nrows_oos-wfStep,-wfStep,-wfStep)
-        tt_index =[]
-        for i in wfIndex:
-            #last wf index adjust the test index, else step
-            if leftoverIndex > 0 and i == wfIndex[-1]:
-                train_index = range(0,wf_is_period)        
-                test_index = range(wf_is_period,wf_is_period+leftoverIndex)
-                tt_index.insert(0,[train_index,test_index])
-                #print i, 't_start', mmData_v.dates.iloc[train_index[0]], 't_end', mmData_v.dates.iloc[train_index[-1]],\
-                #    'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
-                #print train_index, test_index
-            else:
-                if longMemory == True:
-                    train_index = range(0,wf_is_period+i)
-                else:
-                    train_index = range(i,wf_is_period+i)
-                #the last wfStep indexes are untrained.
-                test_index = range(wf_is_period+i,wf_is_period+i+wfStep)
-                tt_index.insert(0,[train_index,test_index])
-                #print i, 't_start', mmData_v.dates.iloc[train_index[0]], 't_end', mmData_v.dates.iloc[train_index[-1]],\
-                #    'v_start',mmData_v.dates.iloc[test_index[0]],'v_end', mmData_v.dates.iloc[test_index[-1]]
-                #print train_index, test_index
-        #c=0
-        #zz_begin = mmData_v.prior_index.iloc[0]
-        for train_index,test_index in tt_index:
-            #c+=1
-            X_train, X_test = dX[train_index], dX[test_index]
-            y_train, y_test = dy[train_index], dy[test_index]
-            
-            #create zigzag signals
-            
-            #ending at test_index so dont need to shift labels
-            #if signal[:3] != 'GA1':
-            #    if signal[:2] == 'GA':
-            #        lookforward = int(signal_types[2][2:])
-            #        ga_start = mmData_v.iloc[train_index].prior_index.iloc[0]
-            #        #ga_start = dataSet.iloc[0].prior_index
-            #        ga = gainAhead(close.ix[ga_start:],lookforward)
-            #        y_train = np.array([-1 if x<0 else 1 for x in ga])[:len(train_index)]
-                    
-            if signal[:2] == 'ZZ':
-                zz_end = mmData_v.iloc[test_index].prior_index.iloc[len(test_index)-1]
-                y_train = zg(close.ix[:zz_end].values, zz_step[0], \
-                                zz_step[1]).pivots_to_modes()[-len(train_index):]
-                
-            #check if there are no intersections
-            intersect = np.intersect1d(datay_signal.reset_index().iloc[test_index]['index'].values,\
-                        datay_signal.reset_index().iloc[train_index]['index'].values)
-            if intersect.size != 0:
-                print "\nDuplicate indexes found in test/training set: Possible Future Leak!"
-            if len(mmData_v.index[-wfStep:].intersection(train_index)) == 0:
-                #print 'training', X_train.shape
-                if feature_selection is not 'None':
-                    if feature_selection == 'RFECV':
-                        #Recursive feature elimination with cross-validation: 
-                        #A recursive feature elimination example with automatic tuning of the
-                        #number of features selected with cross-validation.
-                        rfe = RFECV(estimator=RFE_estimator, step=1)
-                        rfe.fit(X_train, y_train)
-                        #featureRank = [ feature_names[i] for i in rfe.ranking_-1]
-                        featureRank = [ feature_names[i] for i,b in enumerate(rfe.support_) if b==True]
-                        print 'Top %i RFECV features' % len(featureRank)
-                        print featureRank    
-                        metaData['featureRank'] = str(featureRank)
-                        X_train = rfe.transform(X_train)
-                        X_test = rfe.transform(X_test)
-                    else:
-                        #Univariate feature selection
-                        skb = SelectKBest(f_regression, k=nfeatures)
-                        skb.fit(X_train, y_train)
-                        #dX_all = np.vstack((X_train.values, X_test.values))
-                        #dX_t_rfe = X_new[range(0,dX_t.shape[0])]
-                        #dX_v_rfe = X_new[dX_t.shape[0]:]
-                        X_train = skb.transform(X_train)
-                        X_test = skb.transform(X_test)
-                        featureRank = [ feature_names[i] for i in skb.get_support(feature_names)]
-                        metaData['featureRank'] = str(featureRank)
-                        #print 'Top %i univariate features' % len(featureRank)
-                        #print featureRank
-
-                #  fit the model to the in-sample data
-                m[1].fit(X_train, y_train)
-                #print X_train.shape,
-
-                #trained_models[m[0]] = pickle.dumps(m[1])
-                            
-                #y_pred_is = np.array(([-1 if x<0 else 1 for x in m[1].predict(X_train)]))              
-                y_pred_oos = m[1].predict(X_test)
-
-                if m[0][:2] == 'GA':
-                    print featureRank
-                    print '\nProgram:', m[1]._program
-                    #print 'R^2:    ', m[1].score(X_test_all,y_test_all) 
-                
-                #cm_y_train = np.concatenate([cm_y_train,y_train])
-                cm_y_test = np.concatenate([cm_y_test,y_test])
-                #cm_y_pred_is = np.concatenate([cm_y_pred_is,y_pred_is])
-                cm_y_pred_oos = np.concatenate([cm_y_pred_oos,y_pred_oos])
-                #cm_train_index = np.concatenate([cm_train_index,train_index])
-                cm_test_index = np.concatenate([cm_test_index,test_index])
-            
-
-        #create signals 1 and -1
-        #cm_y_pred_oos = np.array([-1 if x<0 else 1 for x in cm_y_pred_oos_ga])
-        #cm_y_test = np.array([-1 if x<0 else 1 for x in cm_y_test_ga])
-        
-        #gives errors when 100% accuracy for binary classification
-        #if confusion_matrix(cm_y_test[:-1], cm_y_pred_oos[:-1]).shape == (1,1):
-        #    print  m[0], ticker,validationFirstYear, validationFinalYear, iterations, signal
-        #    print 'Accuracy 100% for', cm_y_test[:-1].shape[0], 'rows'
-        #else:
-        if verbose == True:
-            if wfStep>1:
-                oos_display_cmatrix(cm_y_test[:-wfStep], cm_y_pred_oos[:-wfStep], m[0],\
-                    ticker,validationFirstYear, dataSet.index[-wfStep], iterations, signal)
-            else:
-                oos_display_cmatrix(cm_y_test[:-1], cm_y_pred_oos[:-1], m[0],\
-                        ticker,validationFirstYear, validationFinalYear, iterations, signal)
-        #if data is filtered so need to fill in the holes. signal = 0 for days that filtered
-        st_oos_filt= pd.DataFrame()
-        st_oos_filt['signals'] =  pd.Series(cm_y_pred_oos)
-        st_oos_filt.index = mmData_v['dates'].iloc[cm_test_index]
-                
-        #compute car, show matrix if data is filtered
-        if data_type != 'ALL':
-            
-            prior_index_filt = pd.concat([st_oos_filt,unfilteredData.prior_index], axis=1,\
-                                join='inner').prior_index.values.astype(int)
-            #datay_gainAhead and cm_test_index have the same index. dont need to have same shape because iloc is used in display
-            if verbose == True:
-                print 'Metrics for filtered Validation Datapoints'
-                oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cm_test_index, m[1],\
-                        ticker, validationFirstYear, validationFinalYear, iterations, metaData['filter'],showPDFCDF)
-            CAR25_oos = CAR25_df_min(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
-                                    close, minFcst=forecastHorizon, DD95_limit =ddTolerance, verbose=verbose)
-            #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'LONG', 1)
-            #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'SHORT', -1)
-                                    
-        #add column prior index and gA.  if there are holes, nan values in signals
-        st_oos_filt = pd.concat([st_oos_filt,unfilteredData.gainAhead,unfilteredData.prior_index],\
-                                    axis=1, join='outer').ix[validationFirstYear:validationFinalYear]
-        #fills nan with zeros
-        st_oos_filt['signals'].fillna(0, inplace=True)
-        
-        #fill zeros with opposite of input signal, if there are zeros. to return full data
-        cm_y_pred_oos = np.where(st_oos_filt['signals'].values==0,metaData['input_signal']*-1,\
-                                                                    st_oos_filt['signals'].values)
-        cm_y_test = np.where(st_oos_filt.gainAhead>0,1,-1)
-        #datay_gainAhead and cmatrix_test_index have the same index
-        datay_gainAhead = st_oos_filt.gainAhead
-        cmatrix_test_index = st_oos_filt.reset_index().index
-
-        #plot learning curve, knn insufficient neighbors
-        if showLearningCurve:
-            try:
-                plot_learning_curve(m[1], m[0], X_train,y_train_ga, scoring='r2')        
-            except:
-                pass
+    print 'Saving Model for '+version
+    joblib.dump(BSMdict[bestModelParams.validationPeriod], modelSavePath+version+'_'+ticker+'_'+barSizeSetting+'.joblib',compress=3)
 
         
-        #compute car, show matrix for all data is unfiltered
-        if data_type == 'ALL':           
-            if verbose == True:
-                print 'Metrics for All Validation Datapoints'
-                oos_display_cmatrix2(cm_y_test, cm_y_pred_oos, datay_gainAhead, cmatrix_test_index, m[1], ticker,\
-                                    validationFirstYear, validationFinalYear, iterations, 'Long>0',showPDFCDF)
-            CAR25_oos = CAR25_df_min(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
-                                    close, minFcst=forecastHorizon, DD95_limit =ddTolerance, verbose=verbose)
-            #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
-             #                       close, 'LONG', 1)
-            #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
-             #                       close, 'SHORT', -1)
-        #update model metrics
-        #metaData['signal'] = 'LONG 1'
-        model_metrics = update_report(model_metrics, filterName, cm_y_pred_oos, cm_y_test, datay_gainAhead,\
-                                cmatrix_test_index, m, metaData,CAR25_oos)
-        #metaData['signal'] = 'SHORT -1'
-        #model_metrics = update_report(model_metrics, filterName, cm_y_pred_oos, cm_y_test, datay_gainAhead,\
-        #                       cmatrix_test_index, m, metaData,CAR25_Sn1_oos)
-    return model_metrics, st_oos_filt, m[1]
+        
+
         
 #no args -> debug.  else live mode arg 1 = pair, arg 2 = "0" to turn off
 if len(sys.argv)==1:
@@ -408,11 +135,11 @@ if len(sys.argv)==1:
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
-                    'AUDUSD',\
+                    #'AUDUSD',\
                     #'EURUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
-                    #'USDCHF',\
+                    'USDCHF',\
                     #'NZDUSD',
                     #'EURCHF',\
                     #'EURGBP'\
@@ -421,10 +148,12 @@ if len(sys.argv)==1:
                     
     showDist =  False
     showPDFCDF = False
-    showAllCharts = True
+    showAllCharts = False
+    showBestCharts = True
     perturbData = True
-    runDPS = False
-    verbose= True
+    runDPS = True
+    verbose= False
+    returnNoDPS = False
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
     #signalPath = './debug/'
@@ -436,24 +165,30 @@ if len(sys.argv)==1:
     modelSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/models/' 
     dataPath = 'D:/ML-TSDP/data/from_IB/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
+    chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
     
 else:
     print 'Live Mode', sys.argv[1], sys.argv[2]
     debug=False
     
+    #display
     showDist =  False
     showPDFCDF = False
     showAllCharts = False
+    showBestCharts = False
     perturbData = True
-    runDPS = False
+    runDPS = True
     verbose= False
+    returnNoDPS=False
     
+    #paths
     scorePath = None
     equityStatsSavePath = None
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
     bestParamsPath =  './data/params/'
     modelSavePath = './data/models/' 
+    chartSavePath = './data/simCharts/' 
     
     if sys.argv[2] == "0":
         livePairs=[]
@@ -470,18 +205,22 @@ for ticker in livePairs:
     currency=ticker[3:6]
 
     #Model Parameters
+    maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 1200
+    validationSetLength = 480
     #validationSetLength = 1200
-    #validationPeriods = [50,250]
-    validationPeriods = [120,240] # min is 2
+    #validationPeriods = [50]
+    validationPeriods = [30,120] # min is 2
     #validationStartPoint = None
-    signal_types = ['gainAhead','ZZ']
-    #signal_types = ['ZZ']
+    #signal_types = ['buyHold','sellHold']
+    #signal_types = ['gainAhead','buyHold','sellHold']
+    signal_types = ['gainAhead','zigZag','buyHold','sellHold']
+    #signal_types = ['zigZag']
     #signal_types = ['gainAhead']
-    zz_steps = [0.006,0.009]
+    zz_steps = [0.002]
     #zz_steps = [0.009]
-    wfSteps=[1]
+    #wfSteps=[1,30,60]
+    wfSteps=[1,15,30]
     wf_is_periods = [250,500]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
@@ -494,7 +233,6 @@ for ticker in livePairs:
     nfeatures = 10
     tox_adj_proportion = 0
     
-
     #feature Parameters
     RSILookback = 1.5
     zScoreLookback = 10
@@ -509,17 +247,21 @@ for ticker in livePairs:
 
     #DPS parameters
     #windowLengths = [2] 
-    windowLengths = [10]
-    maxLeverage = [5]
+    windowLengths = [10,50]
+    maxLeverage = [2]
     PRT={}
+    PRT['initial_equity'] = 1
+    #fcst horizon(bars) for dps.  for training,  horizon is set to nrows.  for validation scoring nrows. 
+    PRT['horizon'] = 50
+    #safef set to dd95 where limit is met. e.g. for 50 bars, set saef to where 95% of the mc eq curves' maxDD <=0.01
     PRT['DD95_limit'] = 0.01
     PRT['tailRiskPct'] = 95
-    PRT['initial_equity'] = 1.0
-    PRT['horizon'] = 720
+    #this will be reset later
     PRT['maxLeverage'] = 5
+    #safef=0 if CAR25 < threshold
     PRT['CAR25_threshold'] = 0
-    #CAR25_threshold=-np.inf
-    #CAR25_threshold=0
+    #PRT['CAR25_threshold'] = -np.inf
+
 
     #model selection
     dt_stump = DecisionTreeClassifier(max_depth=1, min_samples_leaf=1)
@@ -531,7 +273,8 @@ for ticker in livePairs:
             #("BayesianRidge", BayesianRidge()),\
              ]
              
-    models = [#("GA_Reg", SymbolicRegressor(population_size=5000, generations=20,
+    models = [('None','None'),
+              #("GA_Reg", SymbolicRegressor(population_size=5000, generations=20,
               #                             tournament_size=20, stopping_criteria=0.0, 
               #                             const_range=(-1.0, 1.0), init_depth=(2, 6), 
               #                             init_method='half and half', transformer=True, 
@@ -601,7 +344,10 @@ for ticker in livePairs:
     for pair in currencyPairs:    
         if barSizeSetting+'_'+pair+'.csv' in files:
             data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)
-            currencyPairsDict[pair] = data
+            if data.shape[0] >= maxReadLines:
+                currencyPairsDict[pair] = data[-maxReadLines:]
+            else:
+                currencyPairsDict[pair] = data
             
     print 'Successfully Retrieved Data. Beginning Preprocessing...'
     ###########################################################
@@ -702,10 +448,15 @@ for ticker in livePairs:
     dataSet['gainAhead'] = gainAhead(dataSet.Close)
     dataSet['signal'] =  np.where(dataSet.gainAhead>0,1,-1)
     
-    for wfStep in wfSteps:
-        print '\nCreating Signal labels..'
-        if 'ZZ' in signal_types:
-            signal_types.remove('ZZ')
+    #check all wfStep < max(validationPeriods)
+    wfSteps=[step for step in wfSteps if step <= max(validationPeriods)]
+        
+    print '\nCreating Signal labels..'
+    #for wfStep in wfSteps:   
+    #    print 'Step', wfStep,
+    if 'zigZag' in signal_types:
+        signal_types.remove('zigZag')
+        for wfStep in wfSteps:   
             for i in zz_steps:
                 #for j in zz_steps:
                 label = 'ZZ'+str(wfStep)+'_'+str(i) + ',-' + str(i)
@@ -713,11 +464,26 @@ for ticker in livePairs:
                 signal_types.append(label)
                 #zz_signals[label] = zg(dataSet.Close, i, -j).pivots_to_modes()
                 
-        if 'gainAhead' in signal_types:
-            signal_types.remove('gainAhead')
+    if 'gainAhead' in signal_types:
+        signal_types.remove('gainAhead')
+        for wfStep in wfSteps:   
             label = 'GA'+str(wfStep)
             print label+',',
             signal_types.append(label)
+            
+    for wfStep in wfSteps:   
+        if 'buyHold' in signal_types:
+            signal_types.remove('buyHold')
+            label = 'BH'+str(wfStep)
+            print label+',',
+            signal_types.append(label)
+
+        if 'sellHold' in signal_types:
+            signal_types.remove('sellHold')
+            label = 'SH'+str(wfStep)
+            print label+',',
+            signal_types.append(label)           
+    print '\nCreated',len(signal_types),'signal types to check'
             
     #find max lookback
     maxlb = max(RSILookback,
@@ -750,10 +516,10 @@ for ticker in livePairs:
     dataSet.index.name ='dates'
     unfilteredData = dataSet.copy(deep=True)
     
-    if dataSet.shape[0] <validationSetLength+max(wf_is_periods):
+    if dataSet.shape[0] < validationSetLength+max(wf_is_periods)+max(validationPeriods):
         message = 'Add more data: dataSet rows '+str(dataSet.shape[0])+\
-                    ' is less than required validation set + training set of '\
-                    + str(validationSetLength+max(wf_is_periods))
+                    ' is less than required validation set + first optimisation period + training set of '\
+                    + str(validationSetLength+max(wf_is_periods)+max(validationPeriods))
         offlineMode(ticker, message, signalPath, version, version_)
     else:
         for i in validationPeriods:
@@ -761,12 +527,15 @@ for ticker in livePairs:
                 message='validationSetLength '+str(validationSetLength)+\
                         ' needs to be divisible by validation period '+ str(i)
                 offlineMode(ticker, message, signalPath, version, version_)
-            if validationSetLength == i:
-                message='validationSetLength '+str(validationSetLength)+\
-                        ' needs to be less than validation period '+ str(i)
+            if i <2:
+                message='Validation Period ' + str(validationPeriod)+ ' needs to be greater than 2'
                 offlineMode(ticker, message, signalPath, version, version_)
+            #if validationSetLength == i:
+            #    message='validationSetLength '+str(validationSetLength)+\
+            #            ' needs to be less than validation period '+ str(i)
+            #    offlineMode(ticker, message, signalPath, version, version_)
                 
-        dataSet = dataSet.iloc[-validationSetLength-max(wf_is_periods):]
+        dataSet = dataSet.iloc[-validationSetLength-max(wf_is_periods)-max(validationPeriods):]
         print '\nProcessed ', dataSet.shape[0], 'rows from', dataSet.index[0], 'to', dataSet.index[-1]
 
         
@@ -777,27 +546,28 @@ for ticker in livePairs:
     #print 'Finished Pre-processing... Beginning Model Training..'
 
     #########################################################
-    validationDict = {}
-    BMdict = {}
+    validationDict_noDPS = {}
+    validationDict_DPS = {}
+    v3signals = {}
     BSMdict={}
     for validationPeriod in validationPeriods:
+        print '\nStarting optimization run for validation period of',validationPeriod
         #DPScycle = 0
         endOfData = 0
-        t_start_loc = max(wf_is_periods)
-        if validationPeriod > dataSet.shape[0]+t_start_loc:
-            print 'Validation Period', validationPeriod, '> dataSet + training period',
-            validationPeriod = dataSet.shape[0]-t_start_loc-1
-            print 'adjusting to', validationPeriod, 'rows'
-        elif validationPeriod <2:
-            print 'Validation Period', validationPeriod, '< 2',
-            validationPeriod = 2
-            print 'adjusting to 2 rows'
-        
+        t_start_loc = max(wf_is_periods)+max(validationPeriods)-validationPeriod
+        #if validationPeriod > dataSet.shape[0]+t_start_loc:
+        #    print 'Validation Period', validationPeriod, '> dataSet + training period',
+        #    validationPeriod = dataSet.shape[0]-t_start_loc-1
+        #    print 'adjusting to', validationPeriod, 'rows'
+        #elif validationPeriod <2:
+        #    print 'Validation Period', validationPeriod, '< 2',
+        #    validationPeriod = 2
+
         testFirstYear = dataSet.index[0]
         testFinalYear = dataSet.index[t_start_loc-1]
         validationFirstYear =dataSet.index[t_start_loc]   
         validationFinalYear =dataSet.index[t_start_loc+validationPeriod-1]
-        
+
         #check if validation start point is less than available training data
         #if validationStartPoint is not None and\
         #            dataSet.shape[0]>dataSet.index[-validationStartPoint:].shape[0]+t_start_loc:
@@ -813,36 +583,63 @@ for ticker in livePairs:
             #DPScycle+=1
             
             for signal in signal_types:
-                for m in models:
-                    #for wfStep in wfSteps:
+                if signal[:2] != 'BH' and signal[:2] != 'SH':
+                    for m in models[1:]:
+                        #for wfStep in wfSteps:
+                        wfStep=int(signal.split('_')[0][2:])
+                        for wf_is_period in wf_is_periods:
+
+                            #check
+                            nrows_is = dataSet.ix[:testFinalYear].shape[0]
+                            if wf_is_period > nrows_is:
+                                print 'Walkforward insample period of', wf_is_period,\
+                                        'is greater than in-sample data of ', nrows_is, '!'
+                                print 'Adjusting to', nrows_is, 'rows..'
+                                wf_is_period = nrows_is
+      
+                            metaData = {'ticker':ticker, 't_start':testFirstYear, 't_end':testFinalYear,\
+                                    'signal':signal, 'data_type':data_type,'filter':filterName, 'input_signal':input_signal,\
+                                    'test_split':0, 'iters':1, 'tox_adj':tox_adj_proportion,'longMemory':longMemory,\
+                                    'n_features':nfeatures, 'FS':feature_selection,'rfe_model':RFE_estimator[0],\
+                                    'v_start':validationFirstYear, 'v_end':validationFinalYear,'wf_step':wfStep,\
+                                    'RSILookback': RSILookback,'zScoreLookback': zScoreLookback,'ATRLookback': ATRLookback,\
+                                    'beLongThreshold': beLongThreshold,'DPOLookback': DPOLookback,'ACLookback': ACLookback,\
+                                    'CCLookback': CCLookback,'rStochLookback': rStochLookback,'statsLookback': statsLookback,\
+                                    'ROCLookback': ROCLookback, 'DD95_limit':PRT['DD95_limit'],'tailRiskPct':PRT['tailRiskPct'],\
+                                    'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
+                                    'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period,'perturbDataPct':perturbDataPct,\
+                                    'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines}
+                            runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_'\
+                                        + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
+                            model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
+                                                                                        dataSet, m, model_metrics,\
+                                                                                        metaData, showPDFCDF=showPDFCDF,\
+                                                                                        verbose=verbose)
+                else:
+                    #buy/sell hold
                     wfStep=int(signal.split('_')[0][2:])
-                    for wf_is_period in wf_is_periods:
+                    wf_is_period = 0
+                    m=('None','None')
 
-                        #check
-                        nrows_is = dataSet.ix[:testFinalYear].shape[0]
-                        if wf_is_period > nrows_is:
-                            print 'Walkforward insample period of', wf_is_period,\
-                                    'is greater than in-sample data of ', nrows_is, '!'
-                            print 'Adjusting to', nrows_is, 'rows..'
-                            wf_is_period = nrows_is
-  
-                        metaData = {'ticker':ticker, 't_start':testFirstYear, 't_end':testFinalYear,\
-                                'signal':signal, 'data_type':data_type,'filter':filterName, 'input_signal':input_signal,\
-                                'test_split':0, 'iters':1, 'tox_adj':tox_adj_proportion,'longMemory':longMemory,\
-                                'n_features':nfeatures, 'FS':feature_selection,'rfe_model':RFE_estimator[0],\
-                                'v_start':validationFirstYear, 'v_end':validationFinalYear,'wf_step':wfStep,\
-                                'RSILookback': RSILookback,'zScoreLookback': zScoreLookback,'ATRLookback': ATRLookback,\
-                                'beLongThreshold': beLongThreshold,'DPOLookback': DPOLookback,'ACLookback': ACLookback,\
-                                'CCLookback': CCLookback,'rStochLookback': rStochLookback,'statsLookback': statsLookback,\
-                                'ROCLookback': ROCLookback, 'DD95_limit':PRT['DD95_limit'],'tailRiskPct':PRT['tailRiskPct'],\
-                                'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
-                                'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period
-                                 }
-                        runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_' + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
-                        model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData, dataSet, [m], model_metrics,\
-                                                                                                                    metaData, showPDFCDF=showPDFCDF,\
-                                                                                                                    verbose=verbose)
-
+                        
+                    metaData = {'ticker':ticker, 't_start':testFirstYear, 't_end':testFinalYear,\
+                            'signal':signal, 'data_type':data_type,'filter':filterName, 'input_signal':input_signal,\
+                            'test_split':0, 'iters':1, 'tox_adj':tox_adj_proportion,'longMemory':longMemory,\
+                            'n_features':nfeatures, 'FS':feature_selection,'rfe_model':RFE_estimator[0],\
+                            'v_start':validationFirstYear, 'v_end':validationFinalYear,'wf_step':wfStep,\
+                            'RSILookback': RSILookback,'zScoreLookback': zScoreLookback,'ATRLookback': ATRLookback,\
+                            'beLongThreshold': beLongThreshold,'DPOLookback': DPOLookback,'ACLookback': ACLookback,\
+                            'CCLookback': CCLookback,'rStochLookback': rStochLookback,'statsLookback': statsLookback,\
+                            'ROCLookback': ROCLookback, 'DD95_limit':PRT['DD95_limit'],'tailRiskPct':PRT['tailRiskPct'],\
+                            'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
+                            'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period,'perturbDataPct':perturbDataPct,\
+                            'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines}
+                    runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_'\
+                                        + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
+                    model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
+                                                                                dataSet, m, model_metrics,\
+                                                                                metaData, showPDFCDF=showPDFCDF,\
+                                                                                verbose=verbose)
             #score models
             scored_models, bestModelParams = directional_scoring(model_metrics,filterName)
             #bestModelParams['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
@@ -855,87 +652,127 @@ for ticker in livePairs:
             if showAllCharts:
                 for runName in sstDictDF1_:
                     compareEquity(sstDictDF1_[runName],runName)
-                
-            for m in models:
-                if bestModelParams['params'] == str(m[1]):
-                    print  '\nBest model found...\n', m[1]
-                    bm = m[1]
-            print 'Feature selection: ', bestModelParams.FS
-            print 'Number of features: ', bestModelParams.cols
-            print 'WF In-Sample Period:', bestModelParams.rows
-            print 'WF Out-of-Sample Period:', bestModelParams.wf_step
-            print 'Long Memory: ', longMemory
-            DF1_BMrunName = ticker+'_'+barSizeSetting+'_'+bestModelParams.data_type+'_'+filterName+'_'  +\
-                                bestModelParams.model + '_i'+str(bestModelParams.rows)\
-                                +'_fcst'+str(bestModelParams.wf_step)+'_'+bestModelParams.signal
-                
-            if showAllCharts:
-                compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName)
-                
-            #save best model file on last iteration
-            #if endOfData ==1:
-            #   modelToSave = saveModel(dataSet, bestModelParams)
+                    
+            if bestModelParams.signal[:2] != 'BH' and bestModelParams.signal[:2] != 'SH':
+                print  '\nBest signal found...', bestModelParams.signal
+                for m in models:
+                    if bestModelParams['params'] == str(m[1]):
+                        print  'Best model found...\n', m[1]
+                        bm = m[1]
+                print 'Feature selection: ', bestModelParams.FS
+                print 'Number of features: ', bestModelParams.cols
+                print 'WF In-Sample Period:', bestModelParams.wf_is_period
+                print 'WF Out-of-Sample Period:', bestModelParams.wf_step
+                print 'Long Memory: ', longMemory         
+                DF1_BMrunName = ticker+'_'+barSizeSetting+'_'+bestModelParams.data_type+'_'+filterName+'_'  +\
+                                    bestModelParams.model + '_i'+str(bestModelParams.wf_is_period)\
+                                    +'_fcst'+str(bestModelParams.wf_step)+'_'+bestModelParams.signal
+            else:
+                print  '\nBest signal found...', bestModelParams.signal       
+                print  'Model: ', bestModelParams.model       
+                DF1_BMrunName = ticker+'_'+barSizeSetting+'_'+bestModelParams.data_type+'_'+filterName+'_'  +\
+                                    bestModelParams.model + '_i'+str(bestModelParams.wf_is_period)\
+                                    +'_fcst'+str(bestModelParams.wf_step)+'_'+bestModelParams.signal
+                                    
+            if showBestCharts:
+                compareEquity(sstDictDF1_[DF1_BMrunName],'Best Optimization  '+DF1_BMrunName)
+            elif runDPS == False:
+                #charts off and dps off -> live with no dps
+                compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName, savePath=chartSavePath,\
+                                showChart=False, ticker=ticker)    
+                                
+            #use best params for next step
+            for i in range(0,bestModelParams.shape[0]):
+                metaData[bestModelParams.index[i]]=bestModelParams[bestModelParams.index[i]]
             
             print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
-            #print 'Finished Model Training...'
             
+            #DPS
             if runDPS:               
                 print '\nDynamic Position Sizing..'
+                DPS_both = {}
                 for wl in windowLengths:
-                    if validationPeriod in validationDict and \
-                           len([x for x in validationDict[validationPeriod].index if x not in sstDictDF1_[DF1_BMrunName].index]) >wl:
-                    #prior validation data available from the third DPScycle. wl<1st cycle vp
-                        sst_bestModelParams = validationDict[validationPeriod].drop(['safef','CAR25','dd95','ddTol','system'], axis=1)
-                        zero_index = np.array([x for x in sst_bestModelParams.index if x not in sstDictDF1_[DF1_BMrunName].index])[-int(wl):]
-                        sst_zero = sst_bestModelParams.ix[zero_index]
-                        sst_bestModelParams = pd.concat([sst_zero,sstDictDF1_[DF1_BMrunName]],axis=0)
+                    if validationPeriod in validationDict_DPS and \
+                           len([x for x in validationDict_DPS[validationPeriod].index\
+                                if x not in sstDictDF1_[DF1_BMrunName].index]) > wl:
+                        #prior validation data available from the third DPScycle. wl<1st cycle vp
+                        sst_bestModel = validationDict_DPS[validationPeriod].drop(['safef','CAR25','dd95','ddTol','system'], axis=1)
+                        zero_index = np.array([x for x in sst_bestModel.index if x not in sstDictDF1_[DF1_BMrunName].index])[-int(wl):]
+                        sst_zero = sst_bestModel.ix[zero_index]
+                        sst_bestModel = pd.concat([sst_zero,sstDictDF1_[DF1_BMrunName]],axis=0)
                         
                         #adjust window length if it is larger than zero index
                         if sst_zero.shape[0]<wl:
                             wl=sst_zero.shape[0]
                     else:
-                        #add zeros if two cycles
+                        #add zeros if first cycle
                         zero_index = dataSet.ix[:sstDictDF1_[DF1_BMrunName].index[0]].index[:-1]
                         sst_zero = pd.concat([pd.Series(data=0, name='signals', index=zero_index ), dataSet.gainAhead.ix[zero_index],\
                                                         dataSet.prior_index.ix[zero_index]], axis=1)
-                        sst_bestModelParams = pd.concat([sst_zero,sstDictDF1_[DF1_BMrunName]],axis=0)
+                        sst_bestModel = pd.concat([sst_zero,sstDictDF1_[DF1_BMrunName]],axis=0)
                         
                         #adjust window length if it is larger than zero index
                         if sst_zero.shape[0]<wl:
                             wl=sst_zero.shape[0]
 
                     #calc DPS
-                    #DPS = {}
-                    DPS_both = {}
-
                     startDate = sstDictDF1_[DF1_BMrunName].index[0]
-                    endDate = sst_bestModelParams.index[-1]
+                    endDate = sst_bestModel.index[-1]
                     for ml in maxLeverage:
                         PRT['maxLeverage'] = ml               
-                        dpsRun, sst_save = calcDPS2(DF1_BMrunName, sst_bestModelParams, PRT, startDate,\
+                        dpsRun, sst_save = calcDPS2(DF1_BMrunName, sst_bestModel, PRT, startDate,\
                                                                     endDate, wl, 'both', threshold=PRT['CAR25_threshold'])
                         DPS_both[dpsRun] = sst_save
                         
                         #dpsRun, sst_save = calcDPS2('BuyHold', buyandhold, PRT, start, end, wl)
                         #DPS[dpsRun] = sst_save
-                    
-                dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModelParams, startDate,\
+                v3tag='Best Optimization '    
+                dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                             endDate,'both', DF1_BMrunName, yscale='linear',\
-                                                            ticker=ticker,displayCharts=showAllCharts,\
-                                                            equityStatsSavePath=equityStatsSavePath, verbose=verbose)
+                                                            ticker=ticker,displayCharts=showBestCharts,\
+                                                            equityStatsSavePath=equityStatsSavePath, verbose=verbose,
+                                                            v3tag=v3tag, returnNoDPS=returnNoDPS)
                 bestBothDPS.index.name = 'dates'
                 bestBothDPS = pd.concat([bestBothDPS, pd.Series(data = dpsRunName,index=bestBothDPS.index, name='system')], \
                                                                 axis=1)
-                if endOfData ==1:
-                    #save sst's for save file         
-                    BMdict[validationPeriod] = bestBothDPS
+                #save best windowlength to metadata
+                if dpsRunName.find('wl') != -1:
+                    metaData['windowLength']=float(dpsRunName[dpsRunName.find('wl'):].split()[0][2:])
+                    metaData['maxLeverage']=int(dpsRunName[dpsRunName.find('maxL'):].split()[0][4:])
+                else:
+                    #no dps
+                    metaData['windowLength']=0
+                    metaData['maxLeverage']=1
+                    
+                if endOfData == 1:
+                    #dps and end of data
+                    if returnNoDPS == False:
+                        #get v3 signal best of either DPS or no DPS, if returnNoDPS is False
+                        v3tag=version+' '+ticker+' Signal OOS'    
+                        dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
+                                                                    endDate,'both', DF1_BMrunName, yscale='linear',\
+                                                                    ticker=ticker,displayCharts=showBestCharts,\
+                                                                    equityStatsSavePath=equityStatsSavePath, verbose=verbose,\
+                                                                    v3tag=v3tag, returnNoDPS=True, savePath=chartSavePath,\
+                                                                    numCharts=1)
+                        bestBothDPS.index.name = 'dates'
+                        bestBothDPS = pd.concat([bestBothDPS, pd.Series(data = dpsRunName,index=bestBothDPS.index, name='system')], \
+                                                                        axis=1)                       
+                        #save sst's for save file         
+                        v3signals[validationPeriod] = bestBothDPS
+                    else:
+                        #NoDPS is being returned
+                        v3signals[validationPeriod] = bestBothDPS
+                        
                     #save model
                     BSMdict[validationPeriod] = SMdict[DF1_BMrunName]
                     
-                if showAllCharts:
-                    DPSequity = calcEquity_df(bestBothDPS[['signals','gainAhead']], dpsRunName, leverage = bestBothDPS.safef.values)
-            elif endOfData ==1:
-                BMdict[validationPeriod] = pd.concat([sstDictDF1_[DF1_BMrunName],\
+                #if showAllCharts:
+                #    DPSequity = calcEquity_df(bestBothDPS[['signals','gainAhead']], v3tag+dpsRunName, leverage = bestBothDPS.safef.values)
+            
+            elif endOfData == 1:
+                #nodps and end of data
+                v3signals[validationPeriod] = pd.concat([sstDictDF1_[DF1_BMrunName],\
                                     pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[DF1_BMrunName].index),
                                     pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[DF1_BMrunName].index),
                                     pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[DF1_BMrunName].index),
@@ -944,10 +781,10 @@ for ticker in livePairs:
                                     ],axis=1)
                 #save model
                 BSMdict[validationPeriod] = SMdict[DF1_BMrunName]
-                
-            #use best params for next step
-            for i in range(0,bestModelParams.shape[0]):
-                metaData[bestModelParams.index[i]]=bestModelParams[bestModelParams.index[i]]
+            else:
+                #no dps and not end of data
+                pass
+
              
             #adjust test dates
             t_start_loc = dataSet.reset_index()[dataSet.reset_index().dates ==bestModelParams.v_end].index[0]
@@ -976,14 +813,48 @@ for ticker in livePairs:
                 metaData['v_start']=validationFirstYear
                 metaData['v_end']=validationFinalYear
                 nextRunName = 'Next'+str(validationPeriod)+'_'+DF1_BMrunName
-                model_metrics, sstDictDF1_[nextRunName], savedModel = wf_classify_validate2(unfilteredData, dataSet, [m], model_metrics,\
+                m = (bestModelParams.model,eval(bestModelParams.params))
+                print 'using', m
+                model_metrics, sstDictDF1_[nextRunName], savedModel = wf_classify_validate2(unfilteredData, dataSet, m, model_metrics,\
                                                     metaData, showPDFCDF=showPDFCDF, verbose=verbose)
-                if showAllCharts:
+                if showBestCharts:
                     compareEquity(sstDictDF1_[nextRunName],nextRunName)
+                    
+                #save noDPS validation Curve
+                if validationPeriod not in validationDict_noDPS:
+                    validationDict_noDPS[validationPeriod] =pd.concat([sstDictDF1_[nextRunName],\
+                                            pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[nextRunName].index),
+                                            pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[nextRunName].index),
+                                            pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[nextRunName].index),
+                                            pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[nextRunName].index),
+                                            pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
+                                            ],axis=1)
+                                            
+                    if sum(np.isnan(validationDict_noDPS[validationPeriod].prior_index.values))>0:
+                        message="Error: NaN in bestBothDPS.prior_index:3 "
+                        offlineMode(ticker, message, signalPath, version, version_)   
+                        
+                else:
+                    validationDict_noDPS[validationPeriod] =validationDict_noDPS[validationPeriod].append(                                                                         
+                                              pd.concat([sstDictDF1_[nextRunName],\
+                                            pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[nextRunName].index),
+                                            pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[nextRunName].index),
+                                            pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[nextRunName].index),
+                                            pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[nextRunName].index),
+                                            pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
+                                            ],axis=1)                                                               
+                                             )
+                                             
+                    if sum(np.isnan(validationDict_noDPS[validationPeriod].prior_index.values))>0:
+                        message="Error: NaN in bestBothDPS.prior_index:4"
+                        offlineMode(ticker, message, signalPath, version, version_)  
+
                 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
                 #print 'Finished Next Period Model Training... '   
+                
                 if runDPS:
                     #if DPS was chosen as the best model to use going forward
+                    DPS_both = {}
                     if dpsRunName.find('wl') != -1:
                         #for ml in maxLeverage:
                         PRT['maxLeverage'] = float(dpsRunName[dpsRunName.find('wl'):].split()[1][4:])
@@ -991,11 +862,11 @@ for ticker in livePairs:
                         wl=float(dpsRunName[dpsRunName.find('wl'):].split()[0][2:])
                         
                         #print 'Beginning Next Period Dynamic Position Sizing..'
-                        if validationPeriod in validationDict and validationDict[validationPeriod].shape>=wl:
-                            sst_bestModelParams = pd.concat([validationDict[validationPeriod].drop(['safef','CAR25','dd95','ddTol','system'],axis=1),\
+                        if validationPeriod in validationDict_DPS and validationDict_DPS[validationPeriod].shape[0]>=wl:
+                            sst_bestModel = pd.concat([validationDict_DPS[validationPeriod].drop(['safef','CAR25','dd95','ddTol','system'],axis=1),\
                                                                 sstDictDF1_[nextRunName]], axis=0)
                         else:
-                            #sst_bestModelParams = pd.concat([sstDictDF1_[DF1_BMrunName],\
+                            #sst_bestModel = pd.concat([sstDictDF1_[DF1_BMrunName],\
                             #                                   sstDictDF1_[nextRunName]], axis=0)
                                                                 
                             #add zeros if two cycles
@@ -1004,232 +875,176 @@ for ticker in livePairs:
                             sst_zero = pd.concat([pd.Series(data=0, name='signals', index=zero_index ),\
                                                             sstDictDF1_[DF1_BMrunName].gainAhead.ix[zero_index],\
                                                             sstDictDF1_[DF1_BMrunName].prior_index.ix[zero_index]], axis=1)
-                            sst_bestModelParams = pd.concat([sst_zero,sstDictDF1_[nextRunName]],axis=0)
+                            sst_bestModel = pd.concat([sst_zero,sstDictDF1_[nextRunName]],axis=0)
                             
                             #adjust window length if it is larger than zero index
                             if sst_zero.shape[0]<wl:
                                 wl=sst_zero.shape[0]
                             
                         #calc DPS
-                        DPS_both = {}
-
                         startDate = sstDictDF1_[nextRunName].index[0]
-                        endDate = sst_bestModelParams.index[-1]
-                        dpsRun, sst_save = calcDPS2(nextRunName, sst_bestModelParams, PRT, startDate,\
+                        endDate = sst_bestModel.index[-1]
+                        dpsRun, sst_save = calcDPS2(nextRunName, sst_bestModel, PRT, startDate,\
                                                                     endDate, wl, 'both', threshold=PRT['CAR25_threshold'])
                         DPS_both[dpsRun] = sst_save
                         
                         #dpsRun, sst_save = calcDPS2('BuyHold', buyandhold, PRT, start, end, wl)
                         #DPS[dpsRun] = sst_save
-                            
-                        dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModelParams, startDate,\
+                        v3tag='Next Period '
+                        dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                                     endDate,'both', nextRunName, yscale='linear',\
-                                                                    ticker=ticker,displayCharts=showAllCharts,\
-                                                                    equityStatsSavePath=equityStatsSavePath, verbose=verbose)
+                                                                    ticker=ticker,displayCharts=showBestCharts,\
+                                                                    equityStatsSavePath=equityStatsSavePath, verbose=verbose,
+                                                                    v3tag=v3tag, returnNoDPS=returnNoDPS)
                         bestBothDPS.index.name = 'dates'
                         bestBothDPS = pd.concat([bestBothDPS, pd.Series(data = dpsRunName,index=bestBothDPS.index, name='system'),\
                                                                 ], axis=1)
-                        if showAllCharts:                                       
-                            DPSequity = calcEquity_df(bestBothDPS[['signals','gainAhead']], dpsRunName, leverage = bestBothDPS.safef.values)
+                        #if showAllCharts:                                       
+                        #    DPSequity = calcEquity_df(bestBothDPS[['signals','gainAhead']], v3tag+dpsRunName, leverage = bestBothDPS.safef.values)
                         print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
                         #print 'Finished Dynamic Position Sizing..'
                         
-                        if validationPeriod not in validationDict:
-                            validationDict[validationPeriod] =bestBothDPS
-                            if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
+                        if validationPeriod not in validationDict_DPS:
+                            validationDict_DPS[validationPeriod] =bestBothDPS
+                            if sum(np.isnan(validationDict_DPS[validationPeriod].prior_index.values))>0:
                                     message = "Error: NaN in bestBothDPS.prior_index:1 "
                                     offlineMode(ticker, message, signalPath, version, version_)
                         else:              
-                            validationDict[validationPeriod] =validationDict[validationPeriod].append(bestBothDPS)
-                            if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
+                            validationDict_DPS[validationPeriod] =validationDict_DPS[validationPeriod].append(bestBothDPS)
+                            if sum(np.isnan(validationDict_DPS[validationPeriod].prior_index.values))>0:
                                     message="Error: NaN in bestBothDPS.prior_index:2 "
-                                    offlineMode(ticker, message, signalPath, version, version_)
-                    else:
-                        #if No DPS was chosen as the best model to use going forward
-                        if validationPeriod not in validationDict:
-                            validationDict[validationPeriod] =    pd.concat([sstDictDF1_[nextRunName],\
-                                                                            pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
-                                                                            ],axis=1)
-                            if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
-                                message="Error: NaN in bestBothDPS.prior_index:3 "
-                                offlineMode(ticker, message, signalPath, version, version_)    
-                        else:                      
-                            validationDict[validationPeriod] =validationDict[validationPeriod].append(                                                                         
-                                                                              pd.concat([sstDictDF1_[nextRunName],\
-                                                                            pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
-                                                                            ],axis=1)                                                               
-                                                                             )
-                            if sum(np.isnan(validationDict[validationPeriod].prior_index.values))>0:
-                                message="Error: NaN in bestBothDPS.prior_index:4"
-                                offlineMode(ticker, message, signalPath, version, version_)    
-                               
-                else:   
-                    #DPSrun == False
-                    if validationPeriod not in validationDict:
-                        validationDict[validationPeriod] =pd.concat([sstDictDF1_[nextRunName],\
-                                                                            pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
-                                                                            ],axis=1)
-                    else:
-                        validationDict[validationPeriod] =validationDict[validationPeriod].append(                                                                         
-                                                                              pd.concat([sstDictDF1_[nextRunName],\
-                                                                            pd.Series(data=1.0, name = 'safef', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'CAR25', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'dd95', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=np.nan, name = 'ddTol', index = sstDictDF1_[nextRunName].index),
-                                                                            pd.Series(data=nextRunName, name = 'system', index = sstDictDF1_[nextRunName].index)
-                                                                            ],axis=1)                                                               
-                                                                             )
+                                    offlineMode(ticker, message, signalPath, version, version_)                               
+
           
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
     print '\n\nScoring Validation Curves...'
-    #set validation curves equal length. end date is -2 because GA at [-1] is 0.
+    #set validation curves equal length. end date for CAR25/metrics is -2 because GA at [-1] is 0.
     vStartDate = dataSet.index[0]
     vEndDate = dataSet.index[-2]
-    for validationPeriod in validationDict:
-        if validationDict[validationPeriod].index[0]>vStartDate:
-            vStartDate =  validationDict[validationPeriod].index[0]
-    
-    if runDPS:
-        vCurve_metrics = init_report()
-        for validationPeriod in validationDict:
-            vCurve = ticker+'_'+barSizeSetting+' Validation Period '+str(validationPeriod)
-            #compareEquity(validationDict[validationPeriod],vCurve)
-            if showAllCharts:
-                DPSequity = calcEquity_df(validationDict[validationPeriod].ix[vStartDate:vEndDate][['signals','gainAhead']], vCurve,\
-                                                    leverage = validationDict[validationPeriod].ix[vStartDate:vEndDate].safef.values)
-            if scorePath is not None:
-                validationDict[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
-                                                                str(validationDict[validationPeriod].index[0]).replace(':','')+'_to_'+\
-                                                                str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
-            CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:vEndDate].signals,\
-                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int),\
-                                                unfilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
-            model = [validationDict[validationPeriod].iloc[-1].system.split('_')[5],\
-                            [m[1] for m in models if m[0] ==validationDict[validationPeriod].iloc[-1].system.split('_')[5]][0]]
-            metaData['validationPeriod'] = validationPeriod
-            #metaData['params'] =model[1]
-            vCurve_metrics = update_report(vCurve_metrics, filterName,\
-                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].signals.values.astype(int), \
-                                                dataSet.ix[validationDict[validationPeriod].ix[vStartDate:vEndDate].index].signal.values.astype(int),\
-                                                unfilteredData.gainAhead,\
-                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
-                                                metaData,CAR25_oos)
-    else:
-        vCurve_metrics = init_report()
-        for validationPeriod in validationDict:
-            vCurve = ticker+'_'+barSizeSetting+' Validation Period '+str(validationPeriod)
-            if showAllCharts:
-                compareEquity(validationDict[validationPeriod].ix[vStartDate:vEndDate],vCurve)
-            if scorePath is not None:
-                validationDict[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
-                                                                str(validationDict[validationPeriod].index[0]).replace(':','')+'_to_'+\
-                                                                str(validationDict[validationPeriod].index[-1]).replace(':','')+'.csv')
-            CAR25_oos = CAR25_df_min(vCurve,validationDict[validationPeriod].ix[vStartDate:vEndDate].signals,\
-                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int),\
-                                                unfilteredData.Close, minFcst=PRT['horizon'] , DD95_limit =PRT['DD95_limit'] )
-            model = [validationDict[validationPeriod].iloc[-1].system.split('_')[5],\
-                            [m[1] for m in models if m[0] ==validationDict[validationPeriod].iloc[-1].system.split('_')[5]][0]]
-            #metaData['model'] = model[0]
-            #metaData['params'] =model[1]
-            metaData['validationPeriod'] = validationPeriod
-            vCurve_metrics = update_report(vCurve_metrics, filterName,\
-                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].signals.values.astype(int), \
-                                                dataSet.ix[validationDict[validationPeriod].ix[vStartDate:vEndDate].index].signal.values.astype(int),\
-                                                unfilteredData.gainAhead,\
-                                                validationDict[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
-                                                metaData,CAR25_oos)
+    for validationPeriod in validationDict_noDPS:
+        if validationDict_noDPS[validationPeriod].index[0]>vStartDate:
+            vStartDate =  validationDict_noDPS[validationPeriod].index[0]
             
+    vCurve_metrics_noDPS = init_report()
+    for validationPeriod in validationDict_noDPS:
+        vCurve = 'No DPS '+ticker+'_'+barSizeSetting+' Validation Period '+str(validationPeriod)
+        if showBestCharts:
+            compareEquity(validationDict_noDPS[validationPeriod],vCurve)
+        if scorePath is not None:
+            validationDict_noDPS[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
+                                                            str(validationDict_noDPS[validationPeriod].index[0]).replace(':','')+'_to_'+\
+                                                            str(validationDict_noDPS[validationPeriod].index[-1]).replace(':','')+'.csv')
+        CAR25_oos = CAR25_df_bars(vCurve,validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].signals,\
+                                            validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int),\
+                                            unfilteredData.Close, DD95_limit =PRT['DD95_limit'],barSize=barSizeSetting,\
+                                            number_forecasts=50, fraction=max(maxLeverage))
+        model = [validationDict_noDPS[validationPeriod].iloc[-1].system.split('_')[5],\
+                        [m[1] for m in models if m[0] ==validationDict_noDPS[validationPeriod].iloc[-1].system.split('_')[5]][0]]
+        #metaData['model'] = model[0]
+        #metaData['params'] =model[1]
+        metaData['validationPeriod'] = validationPeriod
+        vCurve_metrics_noDPS = update_report(vCurve_metrics_noDPS, filterName,\
+                                            validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].signals.values.astype(int), \
+                                            dataSet.ix[validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].index].signal.values.astype(int),\
+                                            unfilteredData.gainAhead,\
+                                            validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
+                                            metaData,CAR25_oos)
     #score models
-    scored_models, bestModelParams = directional_scoring(vCurve_metrics,filterName)
+    scored_models_noDPS, bestModelParams_noDPS = directional_scoring(vCurve_metrics_noDPS,filterName)
+    
     #bestModelParams['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     if scorePath is not None:
-        scored_models.to_csv(scorePath+version+'_'+ticker+'_'+barSizeSetting+'.csv')
+        scored_models_noDPS.to_csv(scorePath+version_+'_'+ticker+'_'+barSizeSetting+'_noDPS.csv')
         
-    print '\nBest Validation Period Found:', bestModelParams.validationPeriod
-    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
-    if showAllCharts:
-        BestEquity = calcEquity_df(validationDict[bestModelParams.validationPeriod][['signals','gainAhead']],\
-                                            bestModelParams.C25sig, leverage = validationDict[bestModelParams.validationPeriod].safef.values)
-    timenow = dt.now(timezone('US/Eastern'))
-    lastBartime = timezone('US/Eastern').localize(dataSet.index[-1].to_datetime())
-    #adjust cycletime if weekend
-    weekday = dt.now(timezone('US/Eastern')).weekday()
-    if weekday == 5 or weekday ==6:
-        cycleTime = round(((time.time() - start_time)/60),2)
-    else:
-        cycleTime = (timenow-lastBartime).total_seconds()/60
-    bestModelParams = bestModelParams.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
-    bestModelParams = bestModelParams.append(pd.Series(data=lastBartime.strftime("%Y%m%d %H:%M:%S %Z"), index=['lastBarTime']))
-    bestModelParams = bestModelParams.append(pd.Series(data=cycleTime, index=['cycleTime']))
+    print '\nBest no DPS Validation Period Found:', bestModelParams_noDPS.validationPeriod    
+    if showBestCharts:
+        BestEquity = calcEquity_df(validationDict_noDPS[bestModelParams_noDPS.validationPeriod][['signals','gainAhead']],\
+                                            'Best No DPS '+bestModelParams_noDPS.C25sig, leverage = validationDict_noDPS[bestModelParams_noDPS.validationPeriod].safef.values)
+    saveParams(dataSet, bestModelParams_noDPS, bestParamsPath, modelSavePath, 'v1',barSizeSetting)
     
-    print version_, 'Saving Params..'
-    files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
-    if version+'_'+ticker+'_'+barSizeSetting+ '.csv' not in files:
-        BMdf = pd.concat([bestModelParams,bestModelParams],axis=1).transpose()
-        #BMdf.index = BMdf.timestamp
-        BMdf.to_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv', index=False)
-    else:
-        BMdf = pd.read_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv').append(bestModelParams, ignore_index=True)
-        #BMdf.index = BMdf.timestamp
-        BMdf.to_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv', index=False)
-    
-    print version_, 'Saving Model..'
-    joblib.dump(BSMdict[bestModelParams.validationPeriod], modelSavePath+version_+'_'+ticker+'_'+barSizeSetting+'.joblib',compress=3)
-    
+    if runDPS:
+        vCurve_metrics_DPS = init_report()
+        for validationPeriod in validationDict_DPS:
+            vCurve = 'DPS '+ticker+'_'+barSizeSetting+' Validation Period '+str(validationPeriod)
+            #compareEquity(validationDict_DPS[validationPeriod],vCurve)
+            if showBestCharts:
+                DPSequity = calcEquity_df(validationDict_DPS[validationPeriod][['signals','gainAhead']], vCurve,\
+                                                    leverage = validationDict_DPS[validationPeriod].safef.values)
+            if scorePath is not None:
+                validationDict_DPS[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
+                                                                str(validationDict_DPS[validationPeriod].index[0]).replace(':','')+'_to_'+\
+                                                                str(validationDict_DPS[validationPeriod].index[-1]).replace(':','')+'.csv')
+            CAR25_oos = CAR25_df_bars(vCurve,validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].signals,\
+                                                validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int),\
+                                                unfilteredData.Close, DD95_limit =PRT['DD95_limit'],barSize=barSizeSetting,\
+                                                number_forecasts=50, fraction=max(maxLeverage))
+            model = [validationDict_DPS[validationPeriod].iloc[-1].system.split('_')[5],\
+                            [m[1] for m in models if m[0] ==validationDict_DPS[validationPeriod].iloc[-1].system.split('_')[5]][0]]
+            metaData['validationPeriod'] = validationPeriod
+            #metaData['params'] =model[1]
+            vCurve_metrics_DPS = update_report(vCurve_metrics_DPS, filterName,\
+                                                validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].signals.values.astype(int), \
+                                                dataSet.ix[validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].index].signal.values.astype(int),\
+                                                unfilteredData.gainAhead,\
+                                                validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
+                                                metaData,CAR25_oos)        
+        #score models
+        scored_models_DPS, bestModelParams_DPS = directional_scoring(vCurve_metrics_DPS,filterName)
+        
+        #bestModelParams['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        if scorePath is not None:
+            scored_models_DPS.to_csv(scorePath+version_+'_'+ticker+'_'+barSizeSetting+'_DPS.csv')
+            
+        print '\nBest DPS Validation Period Found:', bestModelParams_DPS.validationPeriod        
+        if showBestCharts:
+            BestEquity = calcEquity_df(validationDict_DPS[bestModelParams_DPS.validationPeriod][['signals','gainAhead']],\
+                                                'Best DPS '+bestModelParams_DPS.C25sig, leverage = validationDict_DPS[bestModelParams_DPS.validationPeriod].safef.values)
+        saveParams(dataSet, bestModelParams_DPS, bestParamsPath, modelSavePath, 'v2', barSizeSetting)
+
+
     print version_, 'Saving Signals..'      
-    #init file
-    #BMdict[bestModelParams.validationPeriod].tail().to_csv(signalPath + version+'_'+ ticker+'_'+barSizeSetting+ '.csv')
+    timenow, lastBartime, cycleTime = getCycleTime(dataSet)
+    #v3signals[bestModelParams_noDPS.validationPeriod].tail().to_csv(signalPath + version+'_'+ ticker+'_'+barSizeSetting+ '.csv')
     files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
     
     #old version file
     if version+'_'+ ticker+ '.csv' not in files:
-        signalFile = BMdict[bestModelParams.validationPeriod].tail()
+        signalFile = v3signals[bestModelParams_noDPS.validationPeriod].tail()
         signalFile.to_csv(signalPath + version+'_'+ ticker+ '.csv', index=True)
     else:        
         signalFile=pd.read_csv(signalPath+ version+'_'+ ticker+ '.csv', index_col=['dates'])
-        addLine = BMdict[bestModelParams.validationPeriod].iloc[-1]
+        addLine = v3signals[bestModelParams_noDPS.validationPeriod].iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
         addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
-        addLine.name = BMdict[bestModelParams.validationPeriod].iloc[-1].name
+        addLine.name = v3signals[bestModelParams_noDPS.validationPeriod].iloc[-1].name
         signalFile = signalFile.append(addLine)
         signalFile.to_csv(signalPath + version+'_'+ ticker+ '.csv', index=True)
         
     #new version file
     if version_+'_'+ ticker+'_'+barSizeSetting+ '.csv' not in files:
-        #signalFile = BMdict[bestModelParams.validationPeriod].iloc[-2:]
-        addLine = BMdict[bestModelParams.validationPeriod].iloc[-1]
+        #signalFile = v3signals[bestModelParams_noDPS.validationPeriod].iloc[-2:]
+        addLine = v3signals[bestModelParams_noDPS.validationPeriod].iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
         addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
-        addLine.name = BMdict[bestModelParams.validationPeriod].iloc[-1].name
-        signalFile = BMdict[bestModelParams.validationPeriod].iloc[-2:-1].append(addLine)
+        addLine.name = v3signals[bestModelParams_noDPS.validationPeriod].iloc[-1].name
+        signalFile = v3signals[bestModelParams_noDPS.validationPeriod].iloc[-2:-1].append(addLine)
         signalFile.index.name = 'dates'
         signalFile.to_csv(signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index=True)
     else:        
         signalFile=pd.read_csv(signalPath+ version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index_col=['dates'])
-        addLine = BMdict[bestModelParams.validationPeriod].iloc[-1]
+        addLine = v3signals[bestModelParams_noDPS.validationPeriod].iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
         addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
-        addLine.name = BMdict[bestModelParams.validationPeriod].iloc[-1].name
+        addLine.name = v3signals[bestModelParams_noDPS.validationPeriod].iloc[-1].name
         signalFile = signalFile.append(addLine)
         signalFile.to_csv(signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index=True)
     
     print '\n'+version, 'Next Signal:'
-    print BMdict[bestModelParams.validationPeriod].iloc[-1].system
-    print BMdict[bestModelParams.validationPeriod].drop(['system'],axis=1).iloc[-1]
+    print v3signals[bestModelParams_noDPS.validationPeriod].iloc[-1].system
+    print v3signals[bestModelParams_noDPS.validationPeriod].drop(['system'],axis=1).iloc[-1]
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
     print 'Finished Validation Period Parameter Search!'
-    
+    #message="v3 signals offline"
+    #offlineMode(ticker, message, signalPath, version, version_) 
     ##############################################################

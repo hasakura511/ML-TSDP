@@ -4,6 +4,7 @@ Created on Sun Nov 22 20:57:32 2015
 
 @author: hidemi
 """
+import sys
 import math
 import numpy as np
 import pandas as pd
@@ -13,10 +14,13 @@ import matplotlib.dates as mdates
 import matplotlib.ticker as tick
 import seaborn as sns
 import datetime
+from os import listdir
+from os.path import isfile, join
 from pytz import timezone
 from datetime import datetime as dt
 from scipy import stats
 from scipy.stats import kurtosis, skew
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import statsmodels.tsa.stattools as ts
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
 from sklearn.learning_curve import learning_curve
@@ -178,6 +182,10 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
     dpsRank=kwargs.get('dpsRank',None)
     dpsChartRank=kwargs.get('dpsChartRank',0)
     yscale=kwargs.get('yscale','log')
+    v3tag=kwargs.get('v3tag',None)
+    savePath=kwargs.get('savePath',None)
+    showPlot=kwargs.get('showPlot',True)
+    verbose=kwargs.get('verbose',True)
     
     topSystem = equityStats.sort_values(['scoremm'], ascending=False).system.iloc[0]
     leftoverIndex = equityStats.shape[0]%numCharts
@@ -221,8 +229,8 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
                     thisind = np.clip(int(x + 0.5), 0, nrows - 1)
                     return equityCurves[sst].index[thisind].strftime("%Y-%m-%d")
             
-                ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-                ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+                #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+                #ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
                 
             else:
                 barSize = '1 min'
@@ -231,12 +239,20 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
                     thisind = np.clip(int(x + 0.5), 0, nrows - 1)
                     return equityCurves[sst].index[thisind].strftime("%Y-%m-%d %H:%M")
                     
-                ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-                ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-
-            #fig = plt.figure(figsize=(7, 5)) 
-            #plt.subplot(2,1,1)
-
+                #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+                #ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+                
+            minorLocator = MultipleLocator(nrows)
+            ax.xaxis.set_minor_locator(minorLocator)
+            ax2.xaxis.set_minor_locator(minorLocator)
+            ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+            ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+            ax.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
+            ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
+            xticks = ax.xaxis.get_minor_ticks()
+            xticks[1].label1.set_visible(False)
+            xticks = ax2.xaxis.get_minor_ticks()
+            xticks[1].label1.set_visible(False)
             
             ind_ec = np.arange(nrows)
             plt.figure(1)
@@ -254,13 +270,21 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
         #plot benchmarks
         for sf1 in benchmarks: 
             #plt.subplot(2,1,1)
+            if 'sellHold' in sf1:
+                color='lightpink'
+            elif 'buyHold' in sf1:
+                color='c'
+            else:
+                color='lightgreen'
+
             plt.figure(1)
+            ax.set_xlim(0, benchmarks[sf1].shape[0])
             ind_bm = np.arange(benchmarks[sf1].shape[0])
-            ax.plot(ind_bm, benchmarks[sf1].equity,'--', label=sf1)
+            ax.plot(ind_bm, benchmarks[sf1].equity,'--', label=sf1,color=color)
             if vsDPS:
                 plt.title('Rank '+str(dpsChartRank)+' SAFEF1 vs DPS')
             else:
-                plt.title('Top '+str(chartRank).strip('[]')+' Systems')
+                plt.title(v3tag+' Top '+str(chartRank).strip('[]')+' Systems')
             plt.ylabel('Equity')
             y_formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
             ax.yaxis.set_major_formatter(y_formatter)
@@ -273,7 +297,8 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             fig.savefig('samplefigure', bbox_extra_artists=(lgd,), bbox_inches='tight')
             #plt.subplot(2,1,2)
             plt.figure(2)
-            ax2.plot(ind_bm, -benchmarks[sf1].drawdown,'--', label=sf1)
+            ax2.set_xlim(0, benchmarks[sf1].shape[0])
+            ax2.plot(ind_bm, -benchmarks[sf1].drawdown,'--', label=sf1,color=color)
             ax2.yaxis.set_major_formatter(y_formatter)
             plt.ylabel('Drawdown')
             ax2.grid('on')
@@ -282,76 +307,104 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             lgd2 = ax2.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.2),prop={'size':10})
             fig2.savefig('samplefigure', bbox_extra_artists=(lgd2,), bbox_inches='tight')
             fig2.autofmt_xdate()
-            
-        plt.show() 
         
-        for sf1 in benchmarks:    
-            print '\nbenchmark: ', sf1
-            #if sf1 == 'buyHoldSafef1':
-            #    print 'Signal: None'
-            #else:
-            #    print 'Signal: ', sf1
-            startDate = benchmarks[sf1].index.to_datetime()[0]
-            endDate = benchmarks[sf1].index.to_datetime()[-1]
-            yearsInValidation = (endDate-startDate).total_seconds()/3600.0/365.0
-            print 'Validation Length (years): %.2f' % yearsInValidation
-            print 'In the market (Bars): %i' % benchmarks[sf1].numBars.iloc[-1],
-            shortTrades, longTrades = numberZeros(benchmarks[sf1].signals*benchmarks[sf1].safef)
-            allTrades = shortTrades+ longTrades
-            TPY = allTrades/yearsInValidation
-            print ' AvgTrades/Yr: %.2f' % TPY,
-            CAR =100*(((benchmarks[sf1].equity.iloc[-1]/benchmarks[sf1].equity.iloc[0])**(1.0/yearsInValidation))-1.0)
-            print '\nCAR: %.3f' % CAR,
-            MAXDD = max(benchmarks[sf1].maxDD)*-100.0
-            print 'maxDD: %.1f%%' % MAXDD,
-            print 'Sortino: %.3f ' %  ratio(benchmarks[sf1].equity).sortino(),
-            print 'Sharpe: %.3f ' % ratio(benchmarks[sf1].equity).sharpe()
-            marRatio = CAR/-MAXDD
-            slope, intercept, r_value, p_value, std_err = stats.linregress(range(0,len(benchmarks[sf1].equity.values)),benchmarks[sf1].equity.values)
-            k_ratio = (slope/std_err) * math.sqrt(252.0)/len(benchmarks[sf1].equity.values)
-            print 'K-Ratio: %.3f ' %  k_ratio,
-            print 'MAR: %.3f ' % marRatio
-            print benchStatsByYear[sf1]
-        
-        #maxCAR = -np.inf
-        for i,sst in enumerate(topSystems): 
-            dayAhead = (endDate+datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-            signalAhead = equityCurves[sst].signals[-1]
-            if 'CAR25' not in equityCurves[sst].columns:
-                safefAhead = equityStats[equityStats.system==sst].safef.iloc[-1]
-                CAR25ahead = equityStats[equityStats.system==sst].CAR25.iloc[-1]
-                #dd100 as an approx for dd95 because forecast period is only 2 years for df_CAR25 calc
-                dd95Ahead = equityStats[equityStats.system==sst].DD100.iloc[-1]        
-            else:
-                safefAhead = equityCurves[sst].safef.iloc[-1]
-                CAR25ahead = equityCurves[sst].CAR25.iloc[-1]
-                dd95Ahead = equityCurves[sst].dd95.iloc[-1]
+
+        if savePath != None:
+            plt.figure(1)
+            #shortTrades, longTrades = numberZeros(equityCurves[topSystem].signals.values)
+            allTrades = sum((equityCurves[topSystem].signals * equityCurves[topSystem].safef).round().diff().fillna(0).values !=0)
+            hoursTraded = (equityCurves[topSystem].index[-1]-equityCurves[topSystem].index[0]).total_seconds()/60.0/60.0
+            avgTrades = float(allTrades)/hoursTraded
             
-            print '\n',str(chartRank[i]),sst
-            print 'In the Market (Bars): %i' % equityCurves[sst].numBars.iloc[-1],
-            shortTrades, longTrades = numberZeros(equityCurves[sst].signals*equityCurves[sst].safef)
-            allTrades = shortTrades+ longTrades
-            TPY = allTrades/yearsInValidation
-            print ' AvgTrades/Yr: %.2f' % TPY
+            #text= '\nValidation Period from', topSystem.index[0],'to',topSystem.index[-1]
+            text='\nAverage trades per hour: %0.2f' % (avgTrades)
+            #text+='\nTWR for Buy & Hold is %0.3f, %i Bars' % (equityBuyHold[nrows-1], nrows)
+            #text+='\nTWR for Sell & Hold is %0.3f, %i Bars' % (equitySellHold[nrows-1], nrows)
+            #text+='\nTWR for %i beLong trades is %0.3f' % (longTrades, equityBeLongSignals[nrows-1])
+            #text+='\nTWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])
+            text+='\nTWR for %i beLong and beShort trades is %0.3f' % (allTrades,equityCurves[topSystem].equity[-1]) 
             if 'avgSafef' in equityStats:
-                print 'Avg. safef: %.3f' % equityStats.loc[equityStats.system == sst].avgSafef,
-            print 'CAR: %.3f ' % equityStats.loc[equityStats.system == sst].cumCAR,
-            if 'CAR25' in equityStats:
-                print 'CAR25: %.3f ' % equityStats.loc[equityStats.system == sst].CAR25, 
-            if 'CAR50' in equityStats:
-                print 'CAR50: %.3f ' % equityStats.loc[equityStats.system == sst].CAR50, 
-            if 'CAR75' in equityStats:
-                print 'CAR75: %.3f ' % equityStats.loc[equityStats.system == sst].CAR75
-            print 'maxDD: %.1f%% ' % equityStats.loc[equityStats.system == sst].MAXDD
-            print 'Sortino: %.3f ' %  equityStats.loc[equityStats.system == sst].sortinoRatio,           
-            print 'Sharpe: %.3f ' % equityStats.loc[equityStats.system == sst].sharpeRatio,
-            print 'K-Ratio: %.3f ' %  equityStats.loc[equityStats.system == sst].k_ratio,
-            print 'MAR: %.3f ' % equityStats.loc[equityStats.system == sst].marRatio
+                    text+='\nAvg. safef: %.3f' % equityStats.loc[equityStats.system == topSystem].avgSafef
+            plt.figtext(0.05,-0.2,text, fontsize=15)     
+            plt.savefig(savePath+v3tag+'.png', bbox_inches='tight')
             
-            print dayAhead, ' Signal:', equityCurves[sst].signals[-1],
-            print 'safef: %.3f ' % safefAhead, 'CAR25: %.3f ' % CAR25ahead,
-            print 'dd95:%.3f ' % dd95Ahead
-            print equityCurvesStatsByYear[sst]
+        #plot before close
+        if showPlot:
+            plt.show()
+            
+        plt.close(fig)
+        plt.close(fig2)
+                
+        if verbose:
+            for sf1 in benchmarks:    
+                print '\nbenchmark: ', sf1
+                #if sf1 == 'buyHoldSafef1':
+                #    print 'Signal: None'
+                #else:
+                #    print 'Signal: ', sf1
+                startDate = benchmarks[sf1].index.to_datetime()[0]
+                endDate = benchmarks[sf1].index.to_datetime()[-1]
+                yearsInValidation = (endDate-startDate).total_seconds()/3600.0/365.0
+                print 'Validation Length (years): %.2f' % yearsInValidation
+                print 'In the market (Bars): %i' % benchmarks[sf1].numBars.iloc[-1],
+                shortTrades, longTrades = numberZeros(benchmarks[sf1].signals*benchmarks[sf1].safef)
+                allTrades = sum((benchmarks[sf1].signals * benchmarks[sf1].safef).round().diff().fillna(0).values !=0)
+                hoursTraded = (endDate-startDate).total_seconds()/60.0/60.0
+                TPY = allTrades/hoursTraded
+                print ' AvgTrades/Hr: %.2f' % TPY,
+                CAR =100*(((benchmarks[sf1].equity.iloc[-1]/benchmarks[sf1].equity.iloc[0])**(1.0/yearsInValidation))-1.0)
+                print '\nCAR: %.3f' % CAR,
+                MAXDD = max(benchmarks[sf1].maxDD)*-100.0
+                print 'maxDD: %.1f%%' % MAXDD,
+                print 'Sortino: %.3f ' %  ratio(benchmarks[sf1].equity).sortino(),
+                print 'Sharpe: %.3f ' % ratio(benchmarks[sf1].equity).sharpe()
+                marRatio = CAR/-MAXDD
+                slope, intercept, r_value, p_value, std_err = stats.linregress(range(0,len(benchmarks[sf1].equity.values)),benchmarks[sf1].equity.values)
+                k_ratio = (slope/std_err) * math.sqrt(252.0)/len(benchmarks[sf1].equity.values)
+                print 'K-Ratio: %.3f ' %  k_ratio,
+                print 'MAR: %.3f ' % marRatio
+                print benchStatsByYear[sf1]
+            
+            #maxCAR = -np.inf
+            for i,sst in enumerate(topSystems): 
+                #dayAhead = (endDate+datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+                #signalAhead = equityCurves[sst].signals[-1]
+                if 'CAR25' not in equityCurves[sst].columns:
+                    safefAhead = equityStats[equityStats.system==sst].safef.iloc[-1]
+                    CAR25ahead = equityStats[equityStats.system==sst].CAR25.iloc[-1]
+                    #dd100 as an approx for dd95 because forecast period is only 2 years for df_CAR25 calc
+                    dd95Ahead = equityStats[equityStats.system==sst].DD100.iloc[-1]        
+                else:
+                    safefAhead = equityCurves[sst].safef.iloc[-1]
+                    CAR25ahead = equityCurves[sst].CAR25.iloc[-1]
+                    dd95Ahead = equityCurves[sst].dd95.iloc[-1]
+                
+                print '\n',str(chartRank[i]),sst
+                print 'In the Market (Bars): %i' % equityCurves[sst].numBars.iloc[-1],
+                shortTrades, longTrades = numberZeros(equityCurves[sst].signals*equityCurves[sst].safef)
+                allTrades = sum((equityCurves[sst].signals * equityCurves[sst].safef).round().diff().fillna(0).values !=0)
+                hoursTraded = (equityCurves[sst].index[-1]-equityCurves[sst].index[0]).total_seconds()/60.0/60.0
+                TPY = allTrades/hoursTraded
+                print ' AvgTrades/Hr: %.2f' % TPY
+                if 'avgSafef' in equityStats:
+                    print 'Avg. safef: %.3f' % equityStats.loc[equityStats.system == sst].avgSafef,
+                print 'CAR: %.3f ' % equityStats.loc[equityStats.system == sst].cumCAR,
+                if 'CAR25' in equityStats:
+                    print 'CAR25: %.3f ' % equityStats.loc[equityStats.system == sst].CAR25, 
+                if 'CAR50' in equityStats:
+                    print 'CAR50: %.3f ' % equityStats.loc[equityStats.system == sst].CAR50, 
+                if 'CAR75' in equityStats:
+                    print 'CAR75: %.3f ' % equityStats.loc[equityStats.system == sst].CAR75
+                print 'maxDD: %.1f%% ' % equityStats.loc[equityStats.system == sst].MAXDD
+                print 'Sortino: %.3f ' %  equityStats.loc[equityStats.system == sst].sortinoRatio,           
+                print 'Sharpe: %.3f ' % equityStats.loc[equityStats.system == sst].sharpeRatio,
+                print 'K-Ratio: %.3f ' %  equityStats.loc[equityStats.system == sst].k_ratio,
+                print 'MAR: %.3f ' % equityStats.loc[equityStats.system == sst].marRatio
+                print equityCurvesStatsByYear[sst]
+                #print dayAhead, ' Signal:', equityCurves[sst].signals[-1],
+                #print 'safef: %.3f ' % safefAhead, 'CAR25: %.3f ' % CAR25ahead,
+                #print 'dd95:%.3f ' % dd95Ahead
+                
             #save sst with max car    
             #if CAR > maxCAR:
             #    maxCAR = CAR
@@ -517,7 +570,11 @@ def compareEquity_vf(sst, title):
     #        pd.Series(data=equityBeLongAndShortSignals,name='equityBeLongAndShortSignals',index=sst.index),
     #        ],axis=1)
     
-def compareEquity(sst, title):
+def compareEquity(sst, title, **kwargs):
+    savePath = kwargs.get('savePath',None)
+    version= kwargs.get('version',None)
+    showChart = kwargs.get('showChart',True)
+    ticker =  kwargs.get('ticker',None)
     #check if there's time in the index
     if not sst.index.to_datetime()[0].time() and not sst.index.to_datetime()[1].time():
         barSize = '1 day'
@@ -534,10 +591,15 @@ def compareEquity(sst, title):
     if 0 in sst.signals.value_counts():
         print sst.signals.value_counts()[0], 'beFlat Signals',
     #  Compute cumulative equity for all days
-    equityAllSignals = np.zeros(nrows)
-    equityAllSignals[0] = 1
+    equityBuyHold = np.zeros(nrows)
+    equityBuyHold[0] = 1
     for i in range(1,nrows):
-        equityAllSignals[i] = (1+sst.gainAhead.iloc[i-1])*equityAllSignals[i-1]
+        equityBuyHold[i] = (1+sst.gainAhead.iloc[i-1])*equityBuyHold[i-1]
+        
+    equitySellHold = np.zeros(nrows)
+    equitySellHold[0] = 1
+    for i in range(1,nrows):
+        equitySellHold[i] = (1-sst.gainAhead.iloc[i-1])*equitySellHold[i-1]
         
     #  Compute cumulative equity for days with beLong signals    
     equityBeLongSignals = np.zeros(nrows)
@@ -570,11 +632,12 @@ def compareEquity(sst, title):
     
     #plt.close('all')
     fig, ax = plt.subplots(1, figsize=(8,7))
-    ind = np.arange(sst.shape[0])
+    ind = np.arange(nrows)
     ax.plot(ind, equityBeLongSignals,label="Long 1 Signals",color='b')
     ax.plot(ind, equityBeShortSignals,label="Short -1 Signals",color='r')
     ax.plot(ind, equityBeLongAndShortSignals,label="Long & Short",color='g')
-    ax.plot(ind, equityAllSignals,label="BuyHold",ls='--',color='c')
+    ax.plot(ind, equityBuyHold,label="BuyHold",ls='--',color='c')
+    ax.plot(ind, equitySellHold,label="SellHold",ls='--',color='lightpink')
     # rotate and align the tick labels so they look better
     #years = mdates.YearLocator()   # every year
     #months = mdates.MonthLocator()  # every month
@@ -584,7 +647,7 @@ def compareEquity(sst, title):
 
     if barSize != '1 day' :
         def format_date(x, pos=None):
-            thisind = np.clip(int(x + 0.5), 0, sst.shape[0] - 1)
+            thisind = np.clip(int(x + 0.5), 0, nrows - 1)
             return sst.index[thisind].strftime("%Y-%m-%d %H:%M")
             
         #hours = mdates.HourLocator() 
@@ -592,11 +655,11 @@ def compareEquity(sst, title):
         # format the ticks
         #ax.xaxis.set_minor_locator(minutes)
         #ax.xaxis.set_major_locator(hours)
-        ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
         
     else:
         def format_date(x, pos=None):
-            thisind = np.clip(int(x + 0.5), 0, sst.shape[0] - 1)
+            thisind = np.clip(int(x + 0.5), 0, nrows - 1)
             return sst.index[thisind].strftime("%Y-%m-%d")
             
         # format the ticks
@@ -605,27 +668,61 @@ def compareEquity(sst, title):
         #ax.xaxis.set_minor_locator(months)        
         # format the ticks
         #ax.xaxis.set_major_locator(months)
-        ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
         #ax.xaxis.set_minor_locator(years)
         
+    ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+    minorLocator = MultipleLocator(nrows)
+    ax.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
+    ax.xaxis.set_minor_locator(minorLocator)
+    xticks = ax.xaxis.get_minor_ticks()
+    xticks[1].label1.set_visible(False)
+    
+    ax.set_xlim(0, nrows)
     plt.title(title)
     plt.ylabel("TWR")
     plt.legend(loc="best")
     fig.autofmt_xdate()
-    plt.show()
+    
     shortTrades, longTrades = numberZeros(sst.signals.values)
     allTrades = shortTrades+ longTrades
     hoursTraded = (sst.index[-1]-sst.index[0]).total_seconds()/60.0/60.0
     avgTrades = float(allTrades)/hoursTraded
+    
+    if savePath != None:
+        if version==None and ticker==None:
+            plt.savefig(savePath+title+'.png', bbox_inches='tight')
+        else:
+            #text= '\nValidation Period from', sst.index[0],'to',sst.index[-1]
+            text='\nAverage trades per hour: %0.2f' % (avgTrades)
+            #text+='\nTWR for Buy & Hold is %0.3f, %i Bars' % (equityBuyHold[nrows-1], nrows)
+            #text+='\nTWR for Sell & Hold is %0.3f, %i Bars' % (equitySellHold[nrows-1], nrows)
+            #text+='\nTWR for %i beLong trades is %0.3f' % (longTrades, equityBeLongSignals[nrows-1])
+            #text+='\nTWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])
+            text+='\nTWR for %i beLong and beShort trades is %0.3f' % (allTrades,equityBeLongAndShortSignals[nrows-1])   
+            plt.figtext(0.05,-0.0,text, fontsize=15)
+            plt.savefig(savePath+version+' '+ticker+' Signal OOS.png', bbox_inches='tight')
+            
+    if showChart:        
+        plt.show()
+    plt.close(fig)
+    
+        
+    #shortTrades, longTrades = numberZeros(sst.signals.values)
+    #allTrades = shortTrades+ longTrades
+    #hoursTraded = (sst.index[-1]-sst.index[0]).total_seconds()/60.0/60.0
+    #avgTrades = float(allTrades)/hoursTraded
     print '\nValidation Period from', sst.index[0],'to',sst.index[-1]
     print 'Average trades per hour: %0.2f' % (avgTrades)
-    print 'TWR for Buy & Hold is %0.3f, %i Bars' % (equityAllSignals[nrows-1], nrows)
+    print 'TWR for Buy & Hold is %0.3f, %i Bars' % (equityBuyHold[nrows-1], nrows)
+    print 'TWR for Sell & Hold is %0.3f, %i Bars' % (equitySellHold[nrows-1], nrows)
     print 'TWR for %i beLong trades is %0.3f' % (longTrades, equityBeLongSignals[nrows-1])
     print 'TWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])
     print 'TWR for %i beLong and beShort trades is %0.3f' % (allTrades,equityBeLongAndShortSignals[nrows-1])
     
+    
     #check
-    #pd.concat([sst,pd.Series(data=equityAllSignals,name='equityAllSignals',index=sst.index),\
+    #pd.concat([sst,pd.Series(data=equityBuyHold,name='equityBuyHold',index=sst.index),\
     #        pd.Series(data=equityBeLongSignals,name='equityBeLongSignals',index=sst.index),
     #        pd.Series(data=equityBeShortSignals,name='equityBeShortSignals',index=sst.index),
     #        pd.Series(data=equityBeLongAndShortSignals,name='equityBeLongAndShortSignals',index=sst.index),
@@ -765,12 +862,12 @@ def directional_scoring(model_metrics, sample1, sample2=None):
     model_score_s1['TPYmm'] =-minmax_scale(robust_scale(model_score_s1.TPY.reshape(-1, 1)))
     #model_score_s1['rowsmm'] = minmax_scale(robust_scale(model_score_s1.rows.reshape(-1, 1)))   
     model_score_s1['scoremm'] =    model_score_s1.CAR25mm+\
-                                                    model_score_s1.CAR50mm+model_score_s1.CAR75mm+\
-                                                    model_score_s1.fn_magmm+model_score_s1.fp_magmm+\
-                                                    model_score_s1.TPYmm
-                                                    #model_score_s1.DD100mm
-                                                    #model_score_s1.accmm+
-                                                    #+model_score_s1.SOR25mm+
+                                    model_score_s1.CAR50mm+model_score_s1.CAR75mm+\
+                                    model_score_s1.fn_magmm+model_score_s1.fp_magmm+\
+                                    model_score_s1.TPYmm
+                                    #model_score_s1.DD100mm
+                                    #model_score_s1.accmm+
+                                    #+model_score_s1.SOR25mm+
     if sample2 is not None:
         #sample2                        
         model_score_s2 = model_metrics.loc[model_metrics['sample'] == sample2].reset_index()
@@ -893,7 +990,7 @@ def is_display_cmatrix2(ytrue, ypred, gainAhead, index, m, ticker, testFirstYear
     print "\nSymbol is ", ticker
     print "Learning algorithm is ", m
     print "Signal is ", signal
-    print "Confusion matrix for %i randomized tests for %i rows" % (iterations, ytrue.shape[0])
+    #print "Confusion matrix for %i randomized tests for %i rows" % (iterations, ytrue.shape[0])
     print "for years ", testFirstYear, " through ", testFinalYear 
     
     print "\nIn sample"
@@ -921,7 +1018,7 @@ def oos_display_cmatrix2(ytrue, ypred, gainAhead, index, m, ticker,testFirstYear
     print "\nSymbol is ", ticker
     print "Learning algorithm is ", m
     print "Signal is ", signal
-    print "Confusion matrix for %i randomized tests for %i rows" % (iterations, ytrue.shape[0])
+    #print "Confusion matrix for %i randomized tests for %i rows" % (iterations, ytrue.shape[0])
     print "for years ", testFirstYear, " through ", testFinalYear 
     
     print "\nOut of sample"
@@ -982,7 +1079,7 @@ def is_display_cmatrix(cm_sum_is, m, ticker, testFirstYear, testFinalYear, itera
     print "\nSymbol is ", ticker
     print "Learning algorithm is ", m
     print "Signal is ", signal
-    print "Confusion matrix for %i randomized tests" % iterations
+    #print "Confusion matrix for %i randomized tests" % iterations
     print "for years ", testFirstYear, " through ", testFinalYear 
     
     print "\nIn sample"
@@ -1030,7 +1127,7 @@ def oos_display_cmatrix(ytrue, ypred, m, ticker,testFirstYear, testFinalYear, it
     print "\nSymbol is ", ticker
     print "Learning algorithm is ", m
     print "Signal is ", signal
-    print "Confusion matrix for %i randomized tests" % iterations
+    #print "Confusion matrix for %i randomized tests" % iterations
     print "for years ", testFirstYear, " through ", testFinalYear 
     
     print "\nOut of sample"

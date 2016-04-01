@@ -11,15 +11,27 @@ import talib as ta
 import arch
 import random
 import statsmodels.tsa.stattools as ts
+import datetime
+from datetime import datetime as dt
+from pytz import timezone
 from numpy import cumsum, log, polyfit, sqrt, std, subtract
 from numpy.random import randn
 from statsmodels.sandbox.stats.runs import runstest_1samp
 from scipy import stats
-#  -------------------------------
-#  Define functions.
-#  These are retained in the template for reference and
-#  use when needed.
 
+
+def getCycleTime(dataSet, timeZone='US/Eastern'):
+    timenow = dt.now(timezone(timeZone))
+    lastBartime = timezone(timeZone).localize(dataSet.index[-1].to_datetime())
+    #adjust cycletime if weekend
+    weekday = dt.now(timezone(timeZone)).weekday()
+    if weekday == 5 or weekday ==6:
+        cycleTime = round(((time.time() - start_time)/60),2)
+    else:
+        cycleTime = (timenow-lastBartime).total_seconds()/60
+        
+    return timenow, lastBartime, cycleTime
+    
 class zigzag(object):
     '''
     	all list parameters are expected to be an one dimensional

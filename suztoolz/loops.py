@@ -1855,7 +1855,8 @@ def calcEquity_df(SST, title, **kwargs):
     figsize = kwargs.get('figsize',(8,7))
     showPlot =kwargs.get('showPlot',True)
     verbose = kwargs.get('verbose',True)
-    version = kwargs.get('version',None)
+    #version = kwargs.get('version',None)
+    #v3tag = kwargs.get('v3tag',None)
     
     initialEquity = 1.0
     nrows = SST.gainAhead.shape[0]
@@ -2105,10 +2106,10 @@ def calcEquity_df(SST, title, **kwargs):
     # rotate and align the tick labels so they look better
     fig.autofmt_xdate()
     if pngPath != None:
-        if version==None:
+        if pngFilename==None:
             plt.savefig(pngPath+title+'.png', bbox_inches='tight')
         else:
-            plt.savefig(pngPath+version+' Signal OOS.png', bbox_inches='tight')
+            plt.savefig(pngPath+pngFilename+'.png', bbox_inches='tight')
     
     if showPlot:
         plt.show()

@@ -131,7 +131,7 @@ if len(sys.argv)==1:
     
     livePairs =  [
                     #'NZDJPY',\
-                    #'CADJPY',\
+                    'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
                     #'GBPJPY',\
@@ -141,7 +141,7 @@ if len(sys.argv)==1:
                     #'EURUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
-                    'USDCHF',\
+                    #'USDCHF',\
                     #'NZDUSD',
                     #'EURCHF',\
                     #'EURGBP'\
@@ -959,9 +959,11 @@ for ticker in livePairs:
         scored_models_noDPS.to_csv(scorePath+version_+'_'+ticker+'_'+barSizeSetting+'_noDPS.csv')
         
     print '\nBest no DPS Validation Period Found:', bestModelParams_noDPS.validationPeriod    
-    if showBestCharts:
-        BestEquity = calcEquity_df(validationDict_noDPS[bestModelParams_noDPS.validationPeriod][['signals','gainAhead']],\
-                                            'Best No DPS '+bestModelParams_noDPS.C25sig, leverage = validationDict_noDPS[bestModelParams_noDPS.validationPeriod].safef.values)
+    #if showBestCharts:
+    BestEquity = calcEquity_df(validationDict_noDPS[bestModelParams_noDPS.validationPeriod][['signals','gainAhead']],\
+                                        'Best No DPS '+bestModelParams_noDPS.C25sig,showPlot=showBestCharts,\
+                                        leverage = validationDict_noDPS[bestModelParams_noDPS.validationPeriod].safef.values,\
+                                        pngPath=chartSavePath,pngFilename='v1 '+ticker+' Params OOSV')
     saveParams(dataSet, bestModelParams_noDPS, bestParamsPath, modelSavePath, 'v1',barSizeSetting)
     
     if runDPS:
@@ -998,9 +1000,11 @@ for ticker in livePairs:
             scored_models_DPS.to_csv(scorePath+version_+'_'+ticker+'_'+barSizeSetting+'_DPS.csv')
             
         print '\nBest DPS Validation Period Found:', bestModelParams_DPS.validationPeriod        
-        if showBestCharts:
-            BestEquity = calcEquity_df(validationDict_DPS[bestModelParams_DPS.validationPeriod][['signals','gainAhead']],\
-                                                'Best DPS '+bestModelParams_DPS.C25sig, leverage = validationDict_DPS[bestModelParams_DPS.validationPeriod].safef.values)
+        #if showBestCharts:
+        BestEquity = calcEquity_df(validationDict_DPS[bestModelParams_DPS.validationPeriod][['signals','gainAhead']],\
+                                            'Best DPS '+bestModelParams_DPS.C25sig,showPlot=showBestCharts,\
+                                            leverage = validationDict_DPS[bestModelParams_DPS.validationPeriod].safef.values,\
+                                            pngPath=chartSavePath,pngFilename='v2 '+ticker+' Params OOSV')
         saveParams(dataSet, bestModelParams_DPS, bestParamsPath, modelSavePath, 'v2', barSizeSetting)
 
 

@@ -114,6 +114,39 @@ def compress_min_bar(sym, histData, filename, interval='30m'):
              date=datetime.datetime.fromtimestamp(
                         int(timestamp)
                     ).strftime('%Y%m%d  %H:30:00') 
+    elif interval == '10m':
+        mins=int(datetime.datetime.fromtimestamp(
+                    int(timestamp)
+                ).strftime('%M'))
+        if mins < 10:
+            #time
+            date=datetime.datetime.fromtimestamp(
+                        int(timestamp)
+                    ).strftime('%Y%m%d  %H:00:00') 
+        elif mins < 20:
+            #time
+            date=datetime.datetime.fromtimestamp(
+                        int(timestamp)
+                    ).strftime('%Y%m%d  %H:10:00') 
+        elif mins < 30:
+            #time
+            date=datetime.datetime.fromtimestamp(
+                        int(timestamp)
+                    ).strftime('%Y%m%d  %H:20:00') 
+        elif mins < 40:
+            #time
+            date=datetime.datetime.fromtimestamp(
+                        int(timestamp)
+                    ).strftime('%Y%m%d  %H:30:00') 
+        elif mins < 50:
+            #time
+            date=datetime.datetime.fromtimestamp(
+                        int(timestamp)
+                    ).strftime('%Y%m%d  %H:40:00') 
+        else:
+             date=datetime.datetime.fromtimestamp(
+                        int(timestamp)
+                    ).strftime('%Y%m%d  %H:50:00') 
     elif interval == '1h':
         date=datetime.datetime.fromtimestamp(
                 int(timestamp)
@@ -186,6 +219,9 @@ def get_hist_bars(currencyPairs, interval='30m', minDataPoints = 10000, exchange
         if interval == '30m':
             durationStr='30 D'
             barSizeSetting='30 mins'
+        elif interval == '10m':
+            durationStr='10 D'
+            barSizeSetting='10 mins'
         elif interval == '1h':
             durationStr='30 D'
             barSizeSetting='1 hour'

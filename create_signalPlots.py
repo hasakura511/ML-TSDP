@@ -39,7 +39,7 @@ systems = ['v1.3','v2.4','v3.1']
 barSize='30m'
 
 #regime switching params
-lookback = 720
+lookback = 240
 
 pngPath2 = './data/results/'
 equityCurveSavePath2 = './data/signalPlots/'

@@ -70,6 +70,7 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
         if data.shape[0] < minDataPoints:
             while data.shape[0] < minDataPoints:      
                 data = getDataFromIB(brokerData, date, data)
+                data=get_bar(symbol, currency)
                 if data.shape[0] > 0:
                     logging.info("Received Date: " + str(data.index[0]) )
                     date = data.index.to_datetime()[0]
@@ -81,6 +82,7 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
                     time.sleep(30)
         else:
             data = getDataFromIB(brokerData, date, data)
+            data=get_bar(symbol, currency)
             logging.info("Received Date: " + str(data.index[0]) )
             #update date
             date = data.index.to_datetime()[0]

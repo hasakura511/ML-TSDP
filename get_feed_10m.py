@@ -10,16 +10,16 @@ def start_proc():
     
     pairs=bars.get_currencies()
     threads = []
-    bars.get_hist_bars(pairs, interval, minDataPoints, exchange, secType)
+    #bars.get_hist_bars(pairs, interval, minDataPoints, exchange, secType)
     #bars.create_bars(pairs, interval)
       
-    #t1 = threading.Thread(target=bars.get_hist_bars, args=[pairs, interval, minDataPoints, exchange, secType])
-    #t1.daemon=True
-    #threads.append(t1)
+    t1 = threading.Thread(target=bars.get_hist_bars, args=[pairs, interval, minDataPoints, exchange, secType])
+    t1.daemon=True
+    threads.append(t1)
     
-    t2 = threading.Thread(target=bars.create_bars, args=[pairs, interval])
-    t2.daemon=True
-    threads.append(t2)
+    #t2 = threading.Thread(target=bars.create_bars, args=[pairs, interval])
+    #t2.daemon=True
+    #threads.append(t2)
     
     
     [t.start() for t in threads]

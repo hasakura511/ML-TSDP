@@ -30,6 +30,7 @@ from datetime import datetime as dt
 from tzlocal import get_localzone
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
 import os
+import logging
 
 logging.basicConfig(filename='/logs/get_feed.log',level=logging.DEBUG)
 

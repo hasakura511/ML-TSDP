@@ -9,6 +9,7 @@ from pandas.io.json import json_normalize
 from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
+import logging
 
 callback = IBWrapper()
 client=IBclient(callback)
@@ -69,7 +70,7 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
         if data.shape[0] < minDataPoints:
             while data.shape[0] < minDataPoints:      
                 data = getDataFromIB(brokerData, date, data)
-                
+		logging.info("Received Date: " + str(data.index[0]) )
                 date = data.index.to_datetime()[0]
                 #eastern=timezone('US/Eastern')
                 #date=date.astimezone(eastern)
@@ -79,6 +80,7 @@ def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename
                 time.sleep(30)
         else:
             data = getDataFromIB(brokerData, date, data)
+	    logging.info("Received Date: " + str(data.index[0]) )
             #update date
             date = data.index.to_datetime()[0]
             #eastern=timezone('US/Eastern')

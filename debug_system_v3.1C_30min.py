@@ -8,7 +8,9 @@ model drop for v1/v2
 added wf stepping for ga and zz signals
 added verbose mode
 added buyhold/sellhold signal types
-fixed dps mode
+dps mode/nodps modes
+chart saving
+bugfixes
 
 v3.0 "KOBE"
 added validation period optimization
@@ -188,7 +190,7 @@ else:
     dataPath = './data/from_IB/'
     bestParamsPath =  './data/params/'
     modelSavePath = './data/models/' 
-    chartSavePath = './data/simCharts/' 
+    chartSavePath = './data/results/' 
     
     if sys.argv[2] == "0":
         livePairs=[]
@@ -207,7 +209,7 @@ for ticker in livePairs:
     #Model Parameters
     maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 480
+    validationSetLength = 360
     #validationSetLength = 1200
     #validationPeriods = [50]
     validationPeriods = [30,120] # min is 2

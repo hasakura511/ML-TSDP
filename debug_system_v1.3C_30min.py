@@ -172,7 +172,7 @@ else:
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
     bestParamsPath =  './data/params/'
-    chartSavePath = './data/simCharts/' 
+    chartSavePath = './data/results/' 
     
     if sys.argv[2] == "0":
         livePairs=[]

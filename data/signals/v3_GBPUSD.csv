@@ -2244,3 +2244,12 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 62 is less than required validation set + first optimisation period + training set of 980,1368.84363333,20160401 06:18:50 EDT
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 62 is less than required validation set + first optimisation period + training set of 980,1368.84363333,20160401 06:18:50 EDT
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 62 is less than required validation set + first optimisation period + training set of 980,1368.84363333,20160401 06:18:50 EDT
+2016-04-01 08:30:00,1.0,0.0,4218.0,1.0,,,,bothGBPUSD_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,99.4107666667,20160401 10:09:24 EDT
+2016-04-01 10:30:00,-1.0,0.0,4219.0,1.0,,,,bothGBPUSD_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,1.11256666667,20160401 10:31:06 EDT
+2016-04-01 11:00:00,1.0,0.0,4219.0,1.0,,,,bothGBPUSD_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,-3.32083333333,20160401 10:56:40 EDT
+2016-04-01 11:00:00,-1.0,0.0,4219.0,1.0,,,,bothGBPUSD_30m_ALL_DF1_None_i0_fcst1_SH1,90.5107,20160401 12:30:30 EDT
+2016-04-01 12:30:00,-1.0,0.0,4220.0,1.0,,,,"bothGBPUSD_30m_ALL_DF1_VotingHard_i500_fcst15_ZZ15_0.002,-0.002",94.42795,20160401 14:04:25 EDT
+2016-04-01 14:30:00,-1.0,0.0,4219.0,0.0,-1.08930092904,0.0,0.00659380473396,"bothGBPUSD_30m_ALL_DF1_VotingHard_i500_fcst15_ZZ15_0.002,-0.002 DPS wl50.0 maxL2 dd95_0.007 thres_0.0",26.16755,20160401 14:56:10 EDT
+2016-04-01 15:00:00,1.0,0.0,4219.0,1.0,,,,bothGBPUSD_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,16.4757,20160401 15:16:28 EDT
+2016-04-01 15:30:00,-1.0,0.0,4219.0,1.0,,,,bothGBPUSD_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,73.9836666667,20160401 16:43:59 EDT
+2016-04-01 17:00:00,-1.0,0.0,4219.0,1.0,,,,"bothGBPUSD_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002",27.9279166667,20160401 17:27:55 EDT

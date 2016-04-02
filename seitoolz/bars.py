@@ -325,11 +325,13 @@ def get_last_bars(currencyPairs, ylabel, callback):
     while 1:
         try:
             SST=pd.DataFrame()
+            symbols=list()
             returnData=False
-            for (filename, ticker, qty) in currencyPairs:
+            for ticker in currencyPairs:
                 pair=ticker
                 minFile='./data/bars/'+pair+'.csv'
                 symbol = pair
+                
                 if os.path.isfile(minFile):
                     dta=pd.read_csv(minFile).iloc[-1]
                     date=dta['Date']
@@ -353,12 +355,13 @@ def get_last_bars(currencyPairs, ylabel, callback):
                                                
                     if lastDate[symbol] < timestamp:
                         returnData=True
+                        symbols.append(symbol)
                         
             if returnData:
                 data=SST
                 data=data.set_index('Date')
                 data=data.fillna(method='pad')
-                callback(data)
+                callback(data, symbols)
             time.sleep(20)
         except Exception as e:
             logging.error("get_last_bar", exc_info=True)

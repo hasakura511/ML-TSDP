@@ -22,6 +22,8 @@ import logging
 import time
 #import websocket
 from suztoolz.display import offlineMode
+import seitoolz.bars as bars
+
 
 logging.basicConfig(filename='/logs/runsystem_v1v2.log',level=logging.DEBUG)
 

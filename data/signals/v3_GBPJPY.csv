@@ -301,3 +301,13 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 71 is less than required validation set + first optimisation period + training set of 980,1369.2374,20160401 06:19:14 EDT
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 71 is less than required validation set + first optimisation period + training set of 980,1369.2374,20160401 06:19:14 EDT
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 71 is less than required validation set + first optimisation period + training set of 980,1369.2374,20160401 06:19:14 EDT
+2016-04-01 08:30:00,-1.0,0.0,4219.0,1.0,,,,bothGBPJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,34.5324166667,20160401 09:04:31 EDT
+2016-04-01 09:30:00,1.0,0.0,4220.0,1.0,,,,"bothGBPJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002",50.4016833333,20160401 10:20:24 EDT
+2016-04-01 10:30:00,-1.0,0.0,4220.0,1.0,,,,bothGBPJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,17.57225,20160401 10:47:34 EDT
+2016-04-01 11:00:00,-1.0,0.0,4220.0,1.0,,,,"bothGBPJPY_30m_ALL_DF1_VotingHard_i250_fcst30_ZZ30_0.002,-0.002",7.74965,20160401 11:07:44 EDT
+2016-04-01 11:30:00,-1.0,0.0,4220.0,1.0,,,,bothGBPJPY_30m_ALL_DF1_VotingHard_i250_fcst1_GA1,55.41485,20160401 12:25:24 EDT
+2016-04-01 12:30:00,-1.0,0.0,4220.0,0.0,-3.04129830813,0.0,0.00659380473396,bothGBPJPY_30m_ALL_DF1_None_i0_fcst1_SH1 DPS wl50.0 maxL2 dd95_0.007 thres_0.0,80.1431,20160401 13:50:08 EDT
+2016-04-01 14:00:00,-1.0,0.0,4220.0,0.0,-3.02943499325,0.0,0.00659380473396,bothGBPJPY_30m_ALL_DF1_None_i0_fcst1_SH1 DPS wl50.0 maxL2 dd95_0.007 thres_0.0,52.0632166667,20160401 14:52:03 EDT
+2016-04-01 15:00:00,-1.0,0.0,4220.0,1.0,,,,"bothGBPJPY_30m_ALL_DF1_VotingHard_i500_fcst15_ZZ15_0.002,-0.002",85.5799,20160401 16:25:34 EDT
+2016-04-01 16:30:00,-1.0,0.0,4220.0,1.0,,,,"bothGBPJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002",26.2427833333,20160401 16:56:14 EDT
+2016-04-01 17:00:00,-1.0,0.0,4220.0,1.0,,,,"bothGBPJPY_30m_ALL_DF1_VotingHard_i500_fcst30_ZZ30_0.002,-0.002",67.3490166667,20160401 18:07:20 EDT

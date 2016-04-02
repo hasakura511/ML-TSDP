@@ -576,3 +576,12 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 22 is less than required validation set + first optimisation period + training set of 980,1351.5954,20160401 06:01:35 EDT
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 22 is less than required validation set + first optimisation period + training set of 980,1351.5954,20160401 06:01:35 EDT
 2016-04-01 06:21:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Add more data: dataSet rows 22 is less than required validation set + first optimisation period + training set of 980,1351.5954,20160401 06:01:35 EDT
+2016-04-01 08:30:00,-1.0,0.0,4218.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,94.4531666667,20160401 10:04:27 EDT
+2016-04-01 10:30:00,1.0,0.0,4219.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,-6.63576666667,20160401 10:23:21 EDT
+2016-04-01 10:30:00,-1.0,0.0,4219.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,61.07555,20160401 11:31:04 EDT
+2016-04-01 12:00:00,1.0,0.0,4219.0,0.0,-0.259612044496,0.0,0.0029488391231,bothCHFJPY_30m_ALL_DF1_VotingHard_i500_fcst1_GA1 DPS wl10.0 maxL2 dd95_0.003 thres_0.0,49.7174333333,20160401 12:49:43 EDT
+2016-04-01 13:00:00,1.0,0.0,4219.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,77.97235,20160401 14:17:58 EDT
+2016-04-01 14:30:00,-1.0,0.0,4219.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,26.5074333333,20160401 14:56:30 EDT
+2016-04-01 15:00:00,1.0,0.0,4219.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,86.23465,20160401 16:26:14 EDT
+2016-04-01 16:30:00,-1.0,0.0,4219.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,48.7165166667,20160401 17:18:42 EDT
+2016-04-01 17:00:00,-1.0,0.0,4219.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,41.8286,20160401 17:41:49 EDT

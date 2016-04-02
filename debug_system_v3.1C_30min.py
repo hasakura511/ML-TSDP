@@ -101,8 +101,8 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
 
 
     
-def saveParams(dataSet, bestModelParams, bestParamsPath, modelSavePath, version, barSizeSetting):
-    timenow, lastBartime, cycleTime = getCycleTime(dataSet)
+def saveParams(start_time, dataSet, bestModelParams, bestParamsPath, modelSavePath, version, barSizeSetting):
+    timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)
     bestModelParams = bestModelParams.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
     bestModelParams = bestModelParams.append(pd.Series(data=lastBartime.strftime("%Y%m%d %H:%M:%S %Z"), index=['lastBartime']))
     bestModelParams = bestModelParams.append(pd.Series(data=cycleTime, index=['cycleTime']))
@@ -131,12 +131,12 @@ if len(sys.argv)==1:
     
     livePairs =  [
                     #'NZDJPY',\
-                    'CADJPY',\
+                    #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
                     #'GBPJPY',\
                     #'AUDJPY',\
-                    #'USDJPY',\
+                    'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
                     #'GBPUSD',\
@@ -209,10 +209,10 @@ for ticker in livePairs:
     #Model Parameters
     maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 360
+    validationSetLength = 180
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [30,120] # min is 2
+    validationPeriods = [15,30,45] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']
@@ -222,7 +222,7 @@ for ticker in livePairs:
     zz_steps = [0.002]
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
-    wfSteps=[1,15,30]
+    wfSteps=[1,20,30]
     wf_is_periods = [250,500]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
@@ -249,7 +249,7 @@ for ticker in livePairs:
 
     #DPS parameters
     #windowLengths = [2] 
-    windowLengths = [10,50]
+    windowLengths = [30,90]
     maxLeverage = [2]
     PRT={}
     PRT['initial_equity'] = 1
@@ -451,41 +451,53 @@ for ticker in livePairs:
     dataSet['signal'] =  np.where(dataSet.gainAhead>0,1,-1)
     
     #check all wfStep < max(validationPeriods)
-    wfSteps=[step for step in wfSteps if step <= max(validationPeriods)]
-        
+    #wfSteps=[step for step in wfSteps if step <= max(validationPeriods)]
+    signalsDict ={}
     print '\nCreating Signal labels..'
     #for wfStep in wfSteps:   
     #    print 'Step', wfStep,
-    if 'zigZag' in signal_types:
-        signal_types.remove('zigZag')
-        for wfStep in wfSteps:   
-            for i in zz_steps:
-                #for j in zz_steps:
-                label = 'ZZ'+str(wfStep)+'_'+str(i) + ',-' + str(i)
-                print label+',',
-                signal_types.append(label)
-                #zz_signals[label] = zg(dataSet.Close, i, -j).pivots_to_modes()
+    
+    for validationPeriod in validationPeriods:
+        numSig=0
+        signalsDict[validationPeriod]=[]
+        
+        if 'zigZag' in signal_types:
+            #signal_types.remove('zigZag')
+            for wfStep in wfSteps:
+                if wfStep<=validationPeriod:
+                    for i in zz_steps:
+                        #for j in zz_steps:
+                        label = 'ZZ'+str(wfStep)+'_'+str(i) + ',-' + str(i)
+                        print label+',',
+                        signalsDict[validationPeriod].append(label)
+                        numSig+=1
+                    #zz_signals[label] = zg(dataSet.Close, i, -j).pivots_to_modes()
+                    
+        if 'gainAhead' in signal_types:
+            #signal_types.remove('gainAhead')
+            for wfStep in wfSteps:
+                if wfStep<=validationPeriod:
+                    label = 'GA'+str(wfStep)
+                    print label+',',
+                    signalsDict[validationPeriod].append(label)
+                    numSig+=1
                 
-    if 'gainAhead' in signal_types:
-        signal_types.remove('gainAhead')
-        for wfStep in wfSteps:   
-            label = 'GA'+str(wfStep)
-            print label+',',
-            signal_types.append(label)
-            
-    for wfStep in wfSteps:   
+        #for wfStep in wfSteps:   
         if 'buyHold' in signal_types:
-            signal_types.remove('buyHold')
-            label = 'BH'+str(wfStep)
+            #signal_types.remove('buyHold')
+            label = 'BH'+str(min(wfSteps))
             print label+',',
-            signal_types.append(label)
+            signalsDict[validationPeriod].append(label)
+            numSig+=1
 
         if 'sellHold' in signal_types:
-            signal_types.remove('sellHold')
-            label = 'SH'+str(wfStep)
+            #signal_types.remove('sellHold')
+            label = 'SH'+str(min(wfSteps))
             print label+',',
-            signal_types.append(label)           
-    print '\nCreated',len(signal_types),'signal types to check'
+            signalsDict[validationPeriod].append(label)
+            numSig+=1
+            
+        print '\nCreated',numSig,'signal types to check for validation period of', validationPeriod
             
     #find max lookback
     maxlb = max(RSILookback,
@@ -584,7 +596,7 @@ for ticker in livePairs:
             SMdict={}
             #DPScycle+=1
             
-            for signal in signal_types:
+            for signal in signalsDict[validationPeriod]:
                 if signal[:2] != 'BH' and signal[:2] != 'SH':
                     for m in models[1:]:
                         #for wfStep in wfSteps:
@@ -964,7 +976,7 @@ for ticker in livePairs:
                                         'Best No DPS '+bestModelParams_noDPS.C25sig,showPlot=showBestCharts,\
                                         leverage = validationDict_noDPS[bestModelParams_noDPS.validationPeriod].safef.values,\
                                         pngPath=chartSavePath,pngFilename='v1 '+ticker+' Params OOSV')
-    saveParams(dataSet, bestModelParams_noDPS, bestParamsPath, modelSavePath, 'v1',barSizeSetting)
+    saveParams(start_time, dataSet, bestModelParams_noDPS, bestParamsPath, modelSavePath, 'v1',barSizeSetting)
     
     if runDPS:
         vCurve_metrics_DPS = init_report()
@@ -1005,11 +1017,11 @@ for ticker in livePairs:
                                             'Best DPS '+bestModelParams_DPS.C25sig,showPlot=showBestCharts,\
                                             leverage = validationDict_DPS[bestModelParams_DPS.validationPeriod].safef.values,\
                                             pngPath=chartSavePath,pngFilename='v2 '+ticker+' Params OOSV')
-        saveParams(dataSet, bestModelParams_DPS, bestParamsPath, modelSavePath, 'v2', barSizeSetting)
+        saveParams(start_time, dataSet, bestModelParams_DPS, bestParamsPath, modelSavePath, 'v2', barSizeSetting)
 
 
     print version_, 'Saving Signals..'      
-    timenow, lastBartime, cycleTime = getCycleTime(dataSet)
+    timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)
     #v3signals[bestModelParams_noDPS.validationPeriod].tail().to_csv(signalPath + version+'_'+ ticker+'_'+barSizeSetting+ '.csv')
     files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
     

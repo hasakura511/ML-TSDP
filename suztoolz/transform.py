@@ -10,6 +10,7 @@ import pandas as pd
 import talib as ta
 import arch
 import random
+import time
 import statsmodels.tsa.stattools as ts
 import datetime
 from datetime import datetime as dt
@@ -20,7 +21,7 @@ from statsmodels.sandbox.stats.runs import runstest_1samp
 from scipy import stats
 
 
-def getCycleTime(dataSet, timeZone='US/Eastern'):
+def getCycleTime(start_time, dataSet, timeZone='US/Eastern'):
     timenow = dt.now(timezone(timeZone))
     lastBartime = timezone(timeZone).localize(dataSet.index[-1].to_datetime())
     #adjust cycletime if weekend

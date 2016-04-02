@@ -23,7 +23,7 @@ import time
 #import websocket
 from suztoolz.display import offlineMode
 import seitoolz.bars as bars
-
+from multiprocessing import Process, Queue
 
 logging.basicConfig(filename='/logs/runsystem_v1v2.log',level=logging.DEBUG)
 
@@ -115,6 +115,7 @@ def runPair_v1(pair):
         
     try:
             f=open ('/logs/' + version+'_'+pair + 'onBar.log','a')
+            sys.stdout = f
             print 'Starting '+version+': ' + pair
             f.write('Starting '+version+': ' + pair)
             
@@ -147,6 +148,7 @@ def runPair_v2(pair):
         
     try:
             f=open ('/logs/' + version+'_'+pair + 'onBar.log','a')
+            sys.stdout = f
             print 'Starting '+version+': ' + pair
             f.write('Starting '+version+': ' + pair)
             

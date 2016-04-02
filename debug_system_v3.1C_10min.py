@@ -92,7 +92,7 @@ version_ = 'v3.1'
 
 filterName = 'DF1'
 data_type = 'ALL'
-barSizeSetting='30m'
+barSizeSetting='1h'
 #barSizeSetting='1 min'
 currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'GBPJPY','EURCHF','AUDJPY',\
@@ -130,13 +130,13 @@ if len(sys.argv)==1:
     debug=True
     
     livePairs =  [
-                    #'NZDJPY',\
+                    'NZDJPY',\
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
                     #'GBPJPY',\
                     #'AUDJPY',\
-                    'USDJPY',\
+                    #'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
                     #'GBPUSD',\
@@ -154,7 +154,7 @@ if len(sys.argv)==1:
     showBestCharts = True
     perturbData = True
     runDPS = True
-    verbose= False
+    verbose= True
     returnNoDPS = False
     #scorePath = './debug/scored_metrics_'
     #equityStatsSavePath = './debug/'
@@ -209,10 +209,10 @@ for ticker in livePairs:
     #Model Parameters
     maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 180
+    validationSetLength = 1080
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [15,30,45] # min is 2
+    validationPeriods = [90,360] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']
@@ -222,8 +222,8 @@ for ticker in livePairs:
     zz_steps = [0.002]
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
-    wfSteps=[1,20,30]
-    wf_is_periods = [250,500]
+    wfSteps=[1,15,30]
+    wf_is_periods = [750,1500]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
     longMemory =  False
@@ -249,12 +249,12 @@ for ticker in livePairs:
 
     #DPS parameters
     #windowLengths = [2] 
-    windowLengths = [30,90]
+    windowLengths = [30,150]
     maxLeverage = [2]
     PRT={}
     PRT['initial_equity'] = 1
-    #fcst horizon(bars) for dps.  for training,  horizon is set to nrows.  for validation scoring nrows. 
-    PRT['horizon'] = 50
+    #fcst horizon(bars) for dps PRT.  for training,  horizon is set to nrows.  for validation scoring nrows. 
+    PRT['horizon'] = 150
     #safef set to dd95 where limit is met. e.g. for 50 bars, set saef to where 95% of the mc eq curves' maxDD <=0.01
     PRT['DD95_limit'] = 0.01
     PRT['tailRiskPct'] = 95
@@ -450,54 +450,6 @@ for ticker in livePairs:
     dataSet['gainAhead'] = gainAhead(dataSet.Close)
     dataSet['signal'] =  np.where(dataSet.gainAhead>0,1,-1)
     
-    #check all wfStep < max(validationPeriods)
-    #wfSteps=[step for step in wfSteps if step <= max(validationPeriods)]
-    signalsDict ={}
-    print '\nCreating Signal labels..'
-    #for wfStep in wfSteps:   
-    #    print 'Step', wfStep,
-    
-    for validationPeriod in validationPeriods:
-        numSig=0
-        signalsDict[validationPeriod]=[]
-        
-        if 'zigZag' in signal_types:
-            #signal_types.remove('zigZag')
-            for wfStep in wfSteps:
-                if wfStep<=validationPeriod:
-                    for i in zz_steps:
-                        #for j in zz_steps:
-                        label = 'ZZ'+str(wfStep)+'_'+str(i) + ',-' + str(i)
-                        print label+',',
-                        signalsDict[validationPeriod].append(label)
-                        numSig+=1
-                    #zz_signals[label] = zg(dataSet.Close, i, -j).pivots_to_modes()
-                    
-        if 'gainAhead' in signal_types:
-            #signal_types.remove('gainAhead')
-            for wfStep in wfSteps:
-                if wfStep<=validationPeriod:
-                    label = 'GA'+str(wfStep)
-                    print label+',',
-                    signalsDict[validationPeriod].append(label)
-                    numSig+=1
-                
-        #for wfStep in wfSteps:   
-        if 'buyHold' in signal_types:
-            #signal_types.remove('buyHold')
-            label = 'BH'+str(min(wfSteps))
-            print label+',',
-            signalsDict[validationPeriod].append(label)
-            numSig+=1
-
-        if 'sellHold' in signal_types:
-            #signal_types.remove('sellHold')
-            label = 'SH'+str(min(wfSteps))
-            print label+',',
-            signalsDict[validationPeriod].append(label)
-            numSig+=1
-            
-        print '\nCreated',numSig,'signal types to check for validation period of', validationPeriod
             
     #find max lookback
     maxlb = max(RSILookback,
@@ -551,7 +503,44 @@ for ticker in livePairs:
                 
         dataSet = dataSet.iloc[-validationSetLength-max(wf_is_periods)-max(validationPeriods):]
         print '\nProcessed ', dataSet.shape[0], 'rows from', dataSet.index[0], 'to', dataSet.index[-1]
+        
+    #check all wfStep < max(validationPeriods)
+    wfSteps=[step for step in wfSteps if step <= max(validationPeriods)]
+        
+    print '\nCreating Signal labels..'
+    #for wfStep in wfSteps:   
+    #    print 'Step', wfStep,
+    if 'zigZag' in signal_types:
+        signal_types.remove('zigZag')
+        for wfStep in wfSteps:   
+            for i in zz_steps:
+                #for j in zz_steps:
+                label = 'ZZ'+str(wfStep)+'_'+str(i) + ',-' + str(i)
+                print label+',',
+                signal_types.append(label)
+                #zz_signals[label] = zg(dataSet.Close, i, -j).pivots_to_modes()
+                
+    if 'gainAhead' in signal_types:
+        signal_types.remove('gainAhead')
+        for wfStep in wfSteps:   
+            label = 'GA'+str(wfStep)
+            print label+',',
+            signal_types.append(label)
+            
+    for wfStep in wfSteps:   
+        if 'buyHold' in signal_types:
+            signal_types.remove('buyHold')
+            label = 'BH'+str(wfStep)
+            print label+',',
+            signal_types.append(label)
 
+        if 'sellHold' in signal_types:
+            signal_types.remove('sellHold')
+            label = 'SH'+str(wfStep)
+            print label+',',
+            signal_types.append(label)           
+    print '\nCreated',len(signal_types),'signal types to check'
+    
         
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
     
@@ -596,7 +585,7 @@ for ticker in livePairs:
             SMdict={}
             #DPScycle+=1
             
-            for signal in signalsDict[validationPeriod]:
+            for signal in signal_types:
                 if signal[:2] != 'BH' and signal[:2] != 'SH':
                     for m in models[1:]:
                         #for wfStep in wfSteps:

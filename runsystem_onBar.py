@@ -15,12 +15,12 @@ from btapi.get_signal import get_v1signal
 from btapi.get_hist_btcharts import get_bthist
 from btapi.raw_to_ohlc import feed_to_ohlc, feed_ohlc_to_csv
 from seitoolz.paper import adj_size
-from forecast import runv2
+from forecast.debug_system_v2_30min_func import runv2
 import sys
-import pusherclient #live stream client: https://github.com/ekulyk/PythonPusherClient
+#import pusherclient #live stream client: https://github.com/ekulyk/PythonPusherClient
 import logging
 import time
-import websocket
+#import websocket
 from suztoolz.display import offlineMode
 
 logging.basicConfig(filename='/logs/runsystem_v1v2.log',level=logging.DEBUG)
@@ -82,7 +82,7 @@ def get_bars(pairs, interval):
 gotbar=dict()
 def onBar(bar, symbols):
     global gotbar
-    global livePairs
+    global pairs
     
     if not gotbar.has_key(bar['Date']):
         gotbar[bar['Date']]=list()
@@ -91,7 +91,7 @@ def onBar(bar, symbols):
     #global SST
     #SST = SST.combine_first(bar).sort_index()
     
-    if len(gotbar[bar['Date']])==len(livePairs):
+    if len(gotbar[bar['Date']])==len(pairs):
         for sym in gotbar[bar['Date']]:
             runPair_v1(sym)
             runPair_v2(sym)
@@ -122,13 +122,13 @@ def runPair_v1(pair):
             #subprocess.call(['python','debug_system_v1.3C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
-     except Exception as e:
+    except Exception as e:
         	 #f=open ('./debug/v1run' + pair + '.log','a')
         	 #f.write(e)
         	 #f.close()
         	 logging.error("something bad happened", exc_info=True)
  
- def runPair_v2(pair):
+def runPair_v2(pair):
     ticker = pair.split('_')[1]
     version = 'v2'
     version_ = 'v2.4C'
@@ -155,7 +155,7 @@ def runPair_v1(pair):
             #subprocess.call(['python','debug_system_v1.3C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
-     except Exception as e:
+    except Exception as e:
         	 #f=open ('./debug/v1run' + pair + '.log','a')
         	 #f.write(e)
         	 #f.close()

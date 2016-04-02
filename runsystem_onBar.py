@@ -81,12 +81,22 @@ def get_bars(pairs, interval):
         mypairs.append(interval + pair)
     bars.get_last_bars(mypairs, 'Close', onBar)
 
+gotbar=dict()
 def onBar(bar, symbols):
+    global gotbar
+    global livePairs
+    
+    if not gotbar.has_key(bar['Date']):
+        gotbar[bar['Date']]=list()
+    
+    gotbar[bar['Date']].append(symbols)
     #global SST
     #SST = SST.combine_first(bar).sort_index()
-    for sym in symbols:
-        runPair_v1(sym)
-        runPair_v2(sym)
+    
+    if len(gotbar[bar['Date']])==len(livePairs):
+        for sym in gotbar[bar['Date']]:
+            runPair_v1(sym)
+            runPair_v2(sym)
         
 def runPair_v1(pair):
     version = 'v1'

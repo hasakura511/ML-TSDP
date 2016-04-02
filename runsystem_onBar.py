@@ -30,9 +30,12 @@ pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'AUDUSD','EURUSD','GBPUSD','USDCAD',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
                 
-def get_bars(pairs):
+def get_bars(pairs, interval):
     #global SST
-    bars.get_last_bars(pairs, 'Close', onBar)
+    mypairs=list()
+    for pair in pairs:
+        mypairs.append(interval + pair)
+    bars.get_last_bars(mypairs, 'Close', onBar)
 
 def onBar(bar, symbols):
     #global SST
@@ -60,7 +63,7 @@ def runPair(pair):
     
 threads = []
 for pair in pairs:
-	sig_thread = threading.Thread(target=get_bars, args=[[pair]])
+	sig_thread = threading.Thread(target=get_bars, args=[[pair], '30m_'])
 	sig_thread.daemon=True
 	threads.append(sig_thread)
 	sig_thread.start()

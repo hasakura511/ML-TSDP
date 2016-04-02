@@ -134,9 +134,9 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    #'GBPJPY',\
+                    'GBPJPY',\
                     #'AUDJPY',\
-                    'USDJPY',\
+                    #'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
                     #'GBPUSD',\
@@ -178,7 +178,7 @@ else:
     showPDFCDF = False
     showAllCharts = False
     showBestCharts = False
-    perturbData = True
+    perturbData = False
     runDPS = True
     verbose= False
     returnNoDPS=False
@@ -212,7 +212,7 @@ for ticker in livePairs:
     validationSetLength = 180
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [15,30,45] # min is 2
+    validationPeriods = [15,45] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']
@@ -222,7 +222,7 @@ for ticker in livePairs:
     zz_steps = [0.002]
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
-    wfSteps=[1,20,30]
+    wfSteps=[1,15,30]
     wf_is_periods = [250,500]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002

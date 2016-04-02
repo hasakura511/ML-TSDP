@@ -294,7 +294,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.2),prop={'size':10})
             #lgd=ax.legend(loc="upper left",prop={'size':10})
             fig.autofmt_xdate()
-            fig.savefig('samplefigure', bbox_extra_artists=(lgd,), bbox_inches='tight')
+            #fig.savefig('samplefigure', bbox_extra_artists=(lgd,), bbox_inches='tight')
             #plt.subplot(2,1,2)
             plt.figure(2)
             ax2.set_xlim(0, benchmarks[sf1].shape[0])
@@ -305,12 +305,12 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             handles, labels = ax2.get_legend_handles_labels()
             #lgd2=plt.legend(loc="upper left",prop={'size':10})
             lgd2 = ax2.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5,-0.2),prop={'size':10})
-            fig2.savefig('samplefigure', bbox_extra_artists=(lgd2,), bbox_inches='tight')
+            #fig2.savefig('samplefigure', bbox_extra_artists=(lgd2,), bbox_inches='tight')
             fig2.autofmt_xdate()
         
         if showPlot:
             plt.show()
-        plt.close(fig2)
+        
         
         if savePath != None:
             plt.figure(1)
@@ -329,10 +329,10 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             if 'avgSafef' in equityStats:
                     text+='\nAvg. safef: %.3f' % equityStats.loc[equityStats.system == topSystem].avgSafef
             plt.figtext(0.05,-0.2,text, fontsize=15)     
-            plt.savefig(savePath+v3tag+'.png', bbox_inches='tight')
+            fig.savefig(savePath+v3tag+'.png', bbox_inches='tight')
                 
         plt.close(fig)
-        
+        plt.close(fig2)
                 
         if verbose:
             for sf1 in benchmarks:    

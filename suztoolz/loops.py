@@ -39,7 +39,7 @@ from suztoolz.transform import zigzag as zg
 
 def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
     verbose = kwargs.get('verbose', True)
-    forecast_horizon=kwargs.get('minFcst',signal_index.shape[0]*3)
+    forecast_horizon=kwargs.get('minFcst',max(250,signal_index.shape[0]*3))
     DD95_limit = kwargs.get('DD95_limit',0.05)
     barSize = kwargs.get('barSize','30m')
     number_forecasts  = kwargs.get('number_forecasts',35)
@@ -48,8 +48,9 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
     #barDict
     barDict = {
                     '1 min':60.0,
-                    '30m':2.0,
                     '10m':6.0,
+                    '30m':2.0,
+                    '1h':1.0
                     }
                     
     #edited to compute all trades.
@@ -428,6 +429,7 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
                 print "Using top %i %s features" % (nfeatures, feature_selection)
             else:
                 print "Using features selection: %s " % feature_selection
+            print 'Signal type:', signal
             if longMemory == False:
                 print "%i rows in sample, %i rows out of sample, forecasting %i bar(s) ahead.." % (nrows_is, nrows_oos,wfStep)
             else:
@@ -530,6 +532,7 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
                             
                 #y_pred_is = np.array(([-1 if x<0 else 1 for x in m[1].predict(X_train)]))              
                 y_pred_oos = m[1].predict(X_test)
+                #print y_pred_oos.shape
 
                 if m[0][:2] == 'GA':
                     print featureRank
@@ -554,12 +557,14 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
     #    print 'Accuracy 100% for', cm_y_test[:-1].shape[0], 'rows'
     #else:
     if verbose == True:
-        if wfStep>1:
+        #print cm_y_test[:-wfStep].shape[0], cm_y_pred_oos[:-wfStep].shape[0]
+        if cm_y_test[:-wfStep].shape[0]>0:
+        #if wfStep>1:
             oos_display_cmatrix(cm_y_test[:-wfStep], cm_y_pred_oos[:-wfStep], m[0],\
                 ticker,validationFirstYear, dataSet.index[-wfStep], iterations, signal)
-        else:
-            oos_display_cmatrix(cm_y_test[:-1], cm_y_pred_oos[:-1], m[0],\
-                    ticker,validationFirstYear, validationFinalYear, iterations, signal)
+        #else:
+        #    oos_display_cmatrix(cm_y_test[:-1], cm_y_pred_oos[:-1], m[0],\
+        #            ticker,validationFirstYear, validationFinalYear, iterations, signal)
     #if data is filtered so need to fill in the holes. signal = 0 for days that filtered
     st_oos_filt= pd.DataFrame()
     st_oos_filt['signals'] =  pd.Series(cm_y_pred_oos)

@@ -308,7 +308,10 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             fig2.savefig('samplefigure', bbox_extra_artists=(lgd2,), bbox_inches='tight')
             fig2.autofmt_xdate()
         
-
+        if showPlot:
+            plt.show()
+        plt.close(fig2)
+        
         if savePath != None:
             plt.figure(1)
             #shortTrades, longTrades = numberZeros(equityCurves[topSystem].signals.values)
@@ -327,13 +330,9 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
                     text+='\nAvg. safef: %.3f' % equityStats.loc[equityStats.system == topSystem].avgSafef
             plt.figtext(0.05,-0.2,text, fontsize=15)     
             plt.savefig(savePath+v3tag+'.png', bbox_inches='tight')
-            
-        #plot before close
-        if showPlot:
-            plt.show()
-            
+                
         plt.close(fig)
-        plt.close(fig2)
+        
                 
         if verbose:
             for sf1 in benchmarks:    
@@ -1119,7 +1118,11 @@ def is_display_cmatrix(cm_sum_is, m, ticker, testFirstYear, testFinalYear, itera
     print "f1:   %.2f" % f1IS
 
 def oos_display_cmatrix(ytrue, ypred, m, ticker,testFirstYear, testFinalYear, iterations, signal):
-    if confusion_matrix(ytrue,ypred).shape != (1,1):
+    #print confusion_matrix(ytrue,ypred).astype(float).shape
+    #print confusion_matrix(ytrue,ypred)
+    #print ytrue
+    #print ypred
+    if confusion_matrix(ytrue,ypred).astype(float).shape != (1,1):
         cm_sum_oos = confusion_matrix(ytrue,ypred).astype(float)
         tpOOS = cm_sum_oos[1,1]
         fnOOS = cm_sum_oos[1,0]

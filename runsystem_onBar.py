@@ -58,7 +58,7 @@ showDist =  False
 showPDFCDF = False
 showAllCharts = False
 perturbData = False
-runDPS = True
+#runDPS = True
 saveParams = False
 saveDataSet=True
 verbose= False
@@ -71,9 +71,7 @@ bestParamsPath =  '../data/params/'
 chartSavePath = '../data/results/' 
         
 
-            
-
-                                   
+                    
 def get_bars(pairs, interval):
     #global SST
     mypairs=list()
@@ -89,18 +87,19 @@ def onBar(bar, symbols):
         runPair_v2(sym)
         
 def runPair_v1(pair):
+    ticker = pair.split('_')[1]
     version = 'v1'
     version_ = 'v1.3C'
     runDPS = False
-    runData = {'ticker':pair, 'showDist':showDist,'showPDFCDF':showPDFCDF,'showAllCharts':showAllCharts,\
+    runData = {'ticker':ticker, 'showDist':showDist,'showPDFCDF':showPDFCDF,'showAllCharts':showAllCharts,\
                 'runDPS':runDPS,'saveParams':saveParams,'saveDataSet':saveDataSet,'verbose':verbose,\
                 'scorePath' : scorePath, 'equityStatsSavePath' : equityStatsSavePath,'signalPath' : signalPath,\
                 'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
                 'version':version, 'version_':version_, 'filterName':filterName, 'data_type':data_type,\
                 'barSizeSetting':barSizeSetting}
                 
-    if pair not in livePairs:
-        offlineMode(pair, "Offline Mode: turned off in runsystem", signalPath, version, version_)
+    if ticker not in livePairs:
+        offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
         
     try:
             f=open ('/logs/' + version+'_'+pair + 'onBar.log','a')
@@ -109,9 +108,8 @@ def runPair_v1(pair):
             
             ferr=open ('/logs/' + version+'_'+pair + 'onBar_err.log','a')
             ferr.write('Starting '+version+': ' + pair)
-            
             signal=runv2(runData)
-            subprocess.call(['python','debug_system_v1.3C_30min.py',pair,'1'], stdout=f, stderr=ferr)
+            #subprocess.call(['python','debug_system_v1.3C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
      except Exception as e:
@@ -121,18 +119,19 @@ def runPair_v1(pair):
         	 logging.error("something bad happened", exc_info=True)
  
  def runPair_v2(pair):
+    ticker = pair.split('_')[1]
     version = 'v2'
     version_ = 'v2.4C'
     runDPS = True
-    runData = {'ticker':pair, 'showDist':showDist,'showPDFCDF':showPDFCDF,'showAllCharts':showAllCharts,\
+    runData = {'ticker':ticker, 'showDist':showDist,'showPDFCDF':showPDFCDF,'showAllCharts':showAllCharts,\
                 'runDPS':runDPS,'saveParams':saveParams,'saveDataSet':saveDataSet,'verbose':verbose,\
                 'scorePath' : scorePath, 'equityStatsSavePath' : equityStatsSavePath,'signalPath' : signalPath,\
                 'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
                 'version':version, 'version_':version_, 'filterName':filterName, 'data_type':data_type,\
                 'barSizeSetting':barSizeSetting}
                 
-    if pair not in livePairs:
-        offlineMode(pair, "Offline Mode: turned off in runsystem", signalPath, version, version_)
+    if ticker not in livePairs:
+        offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
         
     try:
             f=open ('/logs/' + version+'_'+pair + 'onBar.log','a')
@@ -143,7 +142,7 @@ def runPair_v1(pair):
             ferr.write('Starting '+version+': ' + pair)
             
             signal=runv2(runData)
-            subprocess.call(['python','debug_system_v1.3C_30min.py',pair,'1'], stdout=f, stderr=ferr)
+            #subprocess.call(['python','debug_system_v1.3C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
      except Exception as e:
@@ -154,7 +153,7 @@ def runPair_v1(pair):
              
     
 threads = []
-for pair in livePairs:
+for pair in pairs:
 	sig_thread = threading.Thread(target=get_bars, args=[[pair], barSizeSetting+'_'])
 	sig_thread.daemon=True
 	threads.append(sig_thread)

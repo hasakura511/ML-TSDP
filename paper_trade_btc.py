@@ -152,7 +152,7 @@ def start_trade(systems, commissiondata):
             
 def start_systems():
       global commissiondata
-      global threads         
+      threads=list()         
       systemList=getSystemList()
       
       for systemname in systemList.keys():
@@ -164,7 +164,8 @@ def start_systems():
            sig_thread.daemon=True
            threads.append(sig_thread)
            sig_thread.start()
-
+      while 1:
+         time.sleep(1000)
 
 def getSystemList():
     systemdata=pd.read_csv('./data/systems/system.csv')

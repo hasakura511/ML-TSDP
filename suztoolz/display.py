@@ -310,7 +310,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
         
         if showPlot:
             plt.show()
-        
+        plt.close(fig2)
         
         if savePath != None:
             plt.figure(1)
@@ -332,7 +332,7 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
             fig.savefig(savePath+v3tag+'.png', bbox_inches='tight')
                 
         plt.close(fig)
-        plt.close(fig2)
+        
                 
         if verbose:
             for sf1 in benchmarks:    

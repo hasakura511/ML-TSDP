@@ -61,7 +61,9 @@ def send_alert(msg):
     print msg
     
     # Alert Mail
-    d = datetime.datetime.now() 
+    eastern=timezone('US/Eastern')
+    d = datetime.datetime.now(get_localzone()).astimezone(eastern)
+    print str(d)
     if d.weekday() == 5:
         logging.info("Fortunately Saturday - No Email")
         print "Fortunately Saturday - No Email"

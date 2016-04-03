@@ -156,5 +156,5 @@ def check_bar(pairs, interval, tradingHours=True):
         except Exception as e:
             logging.error("check_bar", exc_info=True)
             
-send_alert('Starting System Monitor Services (R) - NSZ Inc.')
+send_alert('Starting System Monitor Services (R) - NSZ Inc.', 'Starting Monitor...')
 start_proc()

@@ -249,7 +249,7 @@ for ticker in livePairs:
 
     #DPS parameters
     #windowLengths = [2] 
-    windowLengths = [30,90]
+    windowLengths = [20]
     maxLeverage = [2]
     PRT={}
     PRT['initial_equity'] = 1
@@ -768,7 +768,7 @@ for ticker in livePairs:
                                                                     ticker=ticker,displayCharts=showBestCharts,\
                                                                     equityStatsSavePath=equityStatsSavePath, verbose=verbose,\
                                                                     v3tag=v3tag, returnNoDPS=True, savePath=chartSavePath,\
-                                                                    numCharts=1)
+                                                                    )
                         bestBothDPS.index.name = 'dates'
                         bestBothDPS = pd.concat([bestBothDPS, pd.Series(data = dpsRunName,index=bestBothDPS.index, name='system')], \
                                                                         axis=1)                       
@@ -776,6 +776,7 @@ for ticker in livePairs:
                         v3signals[validationPeriod] = bestBothDPS
                     else:
                         #NoDPS is being returned
+                        
                         v3signals[validationPeriod] = bestBothDPS
                         
                     #save model

@@ -36,8 +36,6 @@ logging.basicConfig(filename='/logs/sys_alert.log',level=logging.DEBUG)
 
 intervals = ['30m','1h','10m','1 min']
 def start_proc():
-    interval='1h'
-    
     pairs=bars.get_currencies()
     threads = []
     #bars.get_hist_bars(pairs, interval, minDataPoints, exchange, secType)
@@ -116,4 +114,5 @@ def check_bar(pairs, interval):
         except Exception as e:
             logging.error("check_bar", exc_info=True)
             
-send_alert('hi')
+send_alert('Starting System Monitor Services (R) - NSZ Inc.')
+start_proc()

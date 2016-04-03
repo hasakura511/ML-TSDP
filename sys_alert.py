@@ -56,7 +56,7 @@ def start_proc():
     while 1:
         time.sleep(3600)
 
-def send_alert(msg, tradingHours=True):
+def send_alert(subject, msg, tradingHours=True):
     logging.info(msg)
     print msg
     
@@ -86,7 +86,7 @@ def send_alert(msg, tradingHours=True):
         you='consulting@neospace.com'
         # Create a text/plain message
         message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
-             """ % (me, ", ".join(you), msg, msg)
+             """ % (me, ", ".join(you), subject, msg)
         
         
         # Send the message via our own SMTP server, but don't include the
@@ -143,13 +143,15 @@ def check_bar(pairs, interval, tradingHours=True):
                                         
                     if timestamp - dtimestamp > checktime:
                         message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
-                        #logging.info('Date:' + str(timestamp) + ' ts:' + str(dtimestamp) + ' co:' + str(btimestamp) + " diff " + str(timestamp - btimestamp))
-                        #logging.info('Date:' + str(dataDate) + ' ts: ' + str(barDate) + 'co: ' + str(nowDate) + " diff " + str(timestamp - dtimestamp))
+                        message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + ' Last Feed:' + str(dtimestamp) + " Bar Diff " + str(timestamp - btimestamp)+ '\n'
+                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + 'co: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
                     
                     if timestamp - btimestamp > checktime:
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
+                        message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + ' Last Feed:' + str(dtimestamp) + " Bar Diff " + str(timestamp - btimestamp) + '\n'
+                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + 'co: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
             if len(message) > 0:
-                send_alert(message, tradingHours)
+                send_alert(interval + ' Feed Not Updating', message, tradingHours)
             time.sleep(60)
         except Exception as e:
             logging.error("check_bar", exc_info=True)

@@ -22,7 +22,7 @@ import logging
 import time
 #import websocket
 from suztoolz.display import offlineMode
-import seitoolz.bars as bars
+#import seitoolz.bars as bars
 from multiprocessing import Process, Queue
 import os
 from pytz import timezone
@@ -46,7 +46,7 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
             symbol = pair
             #print minFile
             if os.path.isfile(minFile):
-                print i,'loading',minFile
+                logging.info(str(i)+' loading '+minFile)
                 dta=pd.read_csv(minFile).iloc[-1]
                 date=dta['Date']
                 
@@ -82,15 +82,12 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
             #time.sleep(20)
     except Exception as e:
         logging.error("get_last_bar", exc_info=True)
-
-
-
+        
 def get_last_bars(currencyPairs, ylabel, callback):
     global tickerId
     global lastDate
     while 1:
         try:
-            
             SST=pd.DataFrame()
             symbols=list()
             returnData=False
@@ -100,35 +97,33 @@ def get_last_bars(currencyPairs, ylabel, callback):
                 symbol = pair
                 
                 if os.path.isfile(minFile):
-                    dta=pd.read_csv(minFile)
-                    date=dta.iloc[-1]['Date']
+                    dta=pd.read_csv(minFile).iloc[-1]
+                    date=dta['Date']
                     
                     eastern=timezone('US/Eastern')
                     date=parse(date).replace(tzinfo=eastern)
                     timestamp = time.mktime(date.timetuple())
-                    #print 'loading',minFile,date,dta[ylabel],'\n'
+                    
                     data=pd.DataFrame()
-                    data['Date']=dta['Date']
+                    data['Date']=date
                     data[symbol]=dta[ylabel]
                     data=data.set_index('Date') 
                     
-                    if data.shape[0] > 0:
-                        if SST.shape[0] < 1:
-                            SST=data
-                        else:
-                            SST=SST.join(data)
+                    if len(SST.index.values) < 1:
+                        SST=data
+                    else:
+                        SST=SST.join(data)
                         
-                        if not lastDate.has_key(symbol):
-                            lastDate[symbol]=timestamp
-                                                   
-                        #if lastDate[symbol] < timestamp:
+                    if not lastDate.has_key(symbol):
+                        lastDate[symbol]=timestamp
+                                               
+                    if lastDate[symbol] < timestamp:
                         returnData=True
                         symbols.append(symbol)
-                        #print 'Shape: ' + str(len(SST.index)) 
                         
             if returnData:
-                data=SST.copy()
-                data=data.reset_index() #.set_index('Date')
+                data=SST
+                data=data.set_index('Date')
                 data=data.fillna(method='pad')
                 callback(data, symbols)
             time.sleep(20)
@@ -145,47 +140,45 @@ def get_bars(pairs, interval):
     if debug:
         get_last_bars_debug(mypairs, 'Close', onBar)
     else:
-        #bars.get_last_bars(mypairs, 'Close', onBar)
         get_last_bars(mypairs, 'Close', onBar)
+        #get_last_bars_debug(mypairs, 'Close', onBar)
 
-def onBar(mybar, symbols):
-    global SST
+def onBar(bar, symbols):
     global start_time
     global gotbar
     global pairs
-    print 'onBar:', mybar['Date']
-    bar=mybar.reset_index().iloc[-1]
-    logging.info("onBar: " + str(symbols) + str(bar['Date']))
-    
+    logging.info('received '+str(symbols))
     if not gotbar.has_key(bar['Date']):
         gotbar[bar['Date']]=list()
     #print bar['Date'], gotbar[bar['Date']]
-    gotbar[bar['Date']]=gotbar[bar['Date']] + symbols
-        
-    print bar['Date'], gotbar[bar['Date']], len(gotbar[bar['Date']])
+    for symbol in symbols:
+        if symbol not in gotbar[bar['Date']]:
+            gotbar[bar['Date']].append(symbol)
+    #gotbar[bar['Date']]=[i for sublist in gotbar[bar['Date']] for i in sublist]
+    logging.info(str(bar['Date'])+ str(gotbar[bar['Date']])+ str(len(gotbar[bar['Date']]))+'bars '+ str(len(pairs))+'pairs')
     #global SST
     #SST = SST.combine_first(bar).sort_index()
-    if debug:
-        gotbar[bar['Date']]=[i for sublist in gotbar[bar['Date']] for i in sublist]
-        if len(gotbar[bar['Date']])==len(pairs):
-            print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
-            #print gotbar[bar['Date']]
-            for sym in gotbar[bar['Date']]:
-                print sym, runPair_v1([sym])
-            print 'All signals created for bar',bar['Date'],'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'    
-    else:   
-        if len(gotbar[bar['Date']])>=len(pairs):
-            
-            print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
-            for sym in gotbar[bar['Date']]:
-                print 'onBar RunPair: ' + str(sym)
-                
-                runPair_v1(sym)
+    #if debug:
+    
+    if len(gotbar[bar['Date']])==len(pairs):
+        logging.info( str(len(gotbar[bar['Date']]))+ 'bars collected for '+ str(bar['Date'])+' running systems..')
+        #print gotbar[bar['Date']]
+        for sym in gotbar[bar['Date']]:
+            logging.info( sym)
+            runPair_v1([sym])
+        logging.info( 'All signals created for bar '+str(bar['Date']))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+    #else:   
+    #    if len(gotbar[bar['Date']])==len(pairs):
+    #        print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
+     #       for sym in gotbar[bar['Date']]:
+                #print sym
+     #           runPair_v1(sym)
                 
     
         
 def runPair_v1(pair):
-    ticker = pair.split('_')[1]
+    ticker = pair[0].split('_')[1]
     version = 'v1'
     version_ = 'v1.3C'
     runDPS = False
@@ -198,21 +191,19 @@ def runPair_v1(pair):
                 
         
     try:
-        f=open ('/logs/' + version+'_'+ticker + 'onBar.log','a')
-        orig_stdout = sys.stdout
-        sys.stdout = f
-        print 'Starting '+version+': ' + ticker
-        if ticker not in livePairs:
-            offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
-        #f.write('Starting '+version+': ' + ticker)         
-        #ferr.write('Starting '+version+': ' + ticker)
-        
-        signal, dataSet=runv2(runData)
-        print signal
-        
-        #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
-        #f.close()
-        #ferr.close()
+        with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
+            orig_stdout = sys.stdout
+            sys.stdout = f
+            print 'Starting '+version+': ' + ticker
+            if ticker not in livePairs:
+                offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
+            #f.write('Starting '+version+': ' + ticker)         
+            #ferr.write('Starting '+version+': ' + ticker)
+            signal, dataSet=runv2(runData)
+            print signal
+            #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
+            #f.close()
+            #ferr.close()
 
         sys.stdout = orig_stdout
         runPair_v2(pair, dataSet)
@@ -237,7 +228,7 @@ def runPair_v2(pair, dataSet):
 
         
     try:
-            f=open ('/logs/' + version+'_'+ticker + 'onBar.log','a')
+        with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
             orig_stdout = sys.stdout
             sys.stdout = f
             print 'Starting '+version+': ' + ticker
@@ -253,7 +244,7 @@ def runPair_v2(pair, dataSet):
             #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
             #ferr.close()
-            sys.stdout = orig_stdout
+        sys.stdout = orig_stdout
     except Exception as e:
         	 #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
         	 #ferr.write(e)
@@ -329,7 +320,9 @@ if len(sys.argv)==1:
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
     
+    #while 1:          
     get_bars(livePairs,barSizeSetting+'_')
+    #time.sleep(100)
     
     
 else:
@@ -363,10 +356,26 @@ else:
     #paths
     scorePath = None
     equityStatsSavePath = None
-    signalPath = '../data/signals/'
-    dataPath = '../data/from_IB/'
-    bestParamsPath =  '../data/params/'
-    chartSavePath = '../data/results/' 
+    signalPath = './data/signals/'
+    dataPath = './data/from_IB/'
+    bestParamsPath =  './data/params/'
+    chartSavePath = './data/results/' 
     
-    runThreads()
-	
+    if len(sys.argv) >2:
+        if sys.argv[2] == 'debug':  
+            debug = True
+            logging.info( 'running debug mode...' )
+        
+    if sys.argv[1] == 'single':  
+        while 1:
+            start_time = time.time()
+            logging.info( 'starting single thread mode for bars '+str(barSizeSetting)+str(livePairs) )
+            get_bars(livePairs,barSizeSetting+'_')
+            #time.sleep(100)
+    elif sys.argv[1] == 'multi':
+        runThreads()
+    else:
+        #print 'please specify single or multi, thanks.'
+        sys.exit('please specify single or multi.')
+    
+

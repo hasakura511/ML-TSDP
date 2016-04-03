@@ -38,16 +38,11 @@ intervals = ['30m','1h','10m','1 min']
 def start_proc():
     pairs=bars.get_currencies()
     threads = []
-    #bars.get_hist_bars(pairs, interval, minDataPoints, exchange, secType)
-    #bars.create_bars(pairs, interval)
+
     for interval in intervals:
         t1 = threading.Thread(target=check_bar, args=[pairs, interval])
         t1.daemon=True
         threads.append(t1)
-    
-    #t2 = threading.Thread(target=bars.create_bars, args=[pairs, interval])
-    #t2.daemon=True
-    #threads.append(t2)
     
     [t.start() for t in threads]
     [t.join() for t in threads]

@@ -132,11 +132,12 @@ def check_bar(pairs, interval):
                         checktime = 3
                     elif interval == 'choppy':
                         checktime = 10
-                    print timestamp, dtimestamp,checktime
-                    
+                    logging.info('ts' + str(timestamp) + 'co' + str(dtimestamp) + " diff " + str(timestamp - dtimestamp))
+                                        
                     if timestamp - dtimestamp > checktime:
                         message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
-                    print timestamp, dtimestamp,checktime
+                    logging.info('ts' + str(timestamp) + 'co' + str(btimestamp) + " diff " + str(timestamp - btimestamp))
+                    
                     if timestamp - btimestamp > checktime:
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
             if len(message) > 0:

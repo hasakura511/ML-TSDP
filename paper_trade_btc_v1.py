@@ -52,7 +52,7 @@ def get_btc_bidask(ticker, exchange):
     return (data['Bid'],data['Ask'])
     
 def get_ohlc(ticker, exchange):
-    ohlc[exchange]=feed_ohlc_from_csv(ticker, exchange)
+    ohlc[exchange]=bars.feed_ohlc_from_csv(ticker, exchange)
     return ohlc[exchange]
 
 ### Bitstamp Feed             ###

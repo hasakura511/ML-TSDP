@@ -116,10 +116,10 @@ def check_bar(pairs, interval):
                     
                     data=pd.read_csv(dataFile, index_col='Date')
                     bar=pd.read_csv(barFile, index_col='Date')
-                    eastern=timezone('US/Eastern')
+                    #eastern=timezone('US/Eastern')
                     #timestamp
-                    dataDate=eastern.localize(parse(data.index[-1]))
-                    barDate=eastern.localize(parse(bar.index[-1]))
+                    dataDate=parse(data.index[-1])
+                    barDate=parse(bar.index[-1])
                     dtimestamp = time.mktime(dataDate.timetuple())
                     btimestamp = time.mktime(barDate.timetuple())
                     timestamp=int(time.time())

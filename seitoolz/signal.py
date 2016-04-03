@@ -90,6 +90,7 @@ def get_model_sig(system):
     else:
         pos=pd.DataFrame({}, columns=['dates','signals','safef','comment'])
         pos=pos.set_index('dates')
+        pos.to_csv(filename)
         return pos
         
     

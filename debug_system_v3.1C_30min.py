@@ -209,7 +209,7 @@ for ticker in livePairs:
     #Model Parameters
     maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 180
+    validationSetLength = 90
     #validationSetLength = 1200
     #validationPeriods = [50]
     validationPeriods = [15,45] # min is 2

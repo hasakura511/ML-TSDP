@@ -318,8 +318,58 @@ def update_bars(currencyPairs, interval='30m'):
             time.sleep(20)
         except Exception as e:
             logging.error("update_bars", exc_info=True)
-        
+
 def get_last_bars(currencyPairs, ylabel, callback):
+    global tickerId
+    global lastDate
+    while 1:
+        try:
+            
+            SST=pd.DataFrame()
+            symbols=list()
+            returnData=False
+            for ticker in currencyPairs:
+                pair=ticker
+                minFile='./data/bars/'+pair+'.csv'
+                symbol = pair
+                
+                if os.path.isfile(minFile):
+                    dta=pd.read_csv(minFile)
+                    date=dta.iloc[-1]['Date']
+                    
+                    eastern=timezone('US/Eastern')
+                    date=parse(date).replace(tzinfo=eastern)
+                    timestamp = time.mktime(date.timetuple())
+                    #print 'loading',minFile,date,dta[ylabel],'\n'
+                    data=pd.DataFrame()
+                    data['Date']=dta['Date']
+                    data[symbol]=dta[ylabel]
+                    data=data.set_index('Date') 
+                    
+                    if data.shape[0] > 0:
+                        if SST.shape[0] < 1:
+                            SST=data
+                        else:
+                            SST=SST.join(data)
+                        
+                        if not lastDate.has_key(symbol):
+                            lastDate[symbol]=timestamp
+                                                   
+                        if lastDate[symbol] < timestamp:
+                            returnData=True
+                            symbols.append(symbol)
+                        #print 'Shape: ' + str(len(SST.index)) 
+                        
+            if returnData:
+                data=SST.copy()
+                data=data.reset_index() #.set_index('Date')
+                data=data.fillna(method='pad')
+                callback(data, symbols)
+            time.sleep(20)
+        except Exception as e:
+            logging.error("get_last_bar", exc_info=True)
+            
+def get_last_bar(currencyPairs, ylabel, callback):
     global tickerId
     global lastDate
     while 1:

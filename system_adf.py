@@ -191,7 +191,7 @@ def proc_history():
     #    except Exception as e:
     #        logging.error("proc_history", exc_info=True)
     tickers=np.array(pairs,dtype=object)[:,1]
-    bars.get_last_bars(tickers, 'Close', onBar)
+    bars.get_last_bar(tickers, 'Close', onBar)
 
 def onBar(bar, symbols):
     global SST

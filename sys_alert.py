@@ -129,7 +129,7 @@ def check_bar(pairs, interval, tradingHours=True):
                     nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
                     dtimestamp = time.mktime(dataDate.timetuple())
                     btimestamp = time.mktime(barDate.timetuple())
-                    timestamp=time.mktime(nowDate.timetuple()) + 3600
+                    timestamp=time.mktime(nowDate.timetuple()) + 1800
                     checktime=30
                     if interval == '30m':
                         checktime = 30
@@ -152,7 +152,7 @@ def check_bar(pairs, interval, tradingHours=True):
                         message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + ' Last Feed: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
             if len(message) > 0:
                 send_alert(interval + ' Feed Not Updating', message, tradingHours)
-            time.sleep(60)
+            time.sleep(300)
         except Exception as e:
             logging.error("check_bar", exc_info=True)
             

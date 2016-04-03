@@ -119,15 +119,15 @@ def check_bar(pairs, interval, tradingHours=True):
                      barFile=barPath + pair + '.csv'
                 if os.path.isfile(dataFile) and os.path.isfile(barFile):
                     
-                    data=pd.read_csv(dataFile, index_col='Date')
+                    #data=pd.read_csv(dataFile, index_col='Date')
                     bar=pd.read_csv(barFile, index_col='Date')
                     eastern=timezone('US/Eastern')
                     
                     #timestamp
-                    dataDate=parse(data.index[-1]).replace(tzinfo=eastern)
+                    #dataDate=parse(data.index[-1]).replace(tzinfo=eastern)
                     barDate=parse(bar.index[-1]).replace(tzinfo=eastern)
                     nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
-                    dtimestamp = time.mktime(dataDate.timetuple())
+                    #dtimestamp = time.mktime(dataDate.timetuple())
                     btimestamp = time.mktime(barDate.timetuple())
                     timestamp=time.mktime(nowDate.timetuple()) + 1800
                     checktime=30
@@ -141,15 +141,15 @@ def check_bar(pairs, interval, tradingHours=True):
                         checktime = 10
                     checktime = checktime * 60
                                         
-                    if timestamp - dtimestamp > checktime:
-                        message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
-                        message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + ' Last Feed:' + str(dtimestamp) + " Bar Diff " + str(timestamp - btimestamp)+ '\n'
-                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + ' Last Feed: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
+                    #if timestamp - dtimestamp > checktime:
+                    #    message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
+                    #    message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + ' Last Feed:' + str(dtimestamp) + " Bar Diff " + str(timestamp - btimestamp)+ '\n'
+                    #    message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + ' Last Feed: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
                     
                     if timestamp - btimestamp > checktime:
-                        message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
-                        message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + ' Last Feed: ' + str(dtimestamp) + " Bar Diff " + str(timestamp - btimestamp) + '\n'
-                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + ' Last Feed: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
+                        message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(bar.index[-1]) + '\n'
+                        message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + " Bar Diff " + str(timestamp - btimestamp) + '\n'
+                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + '\n'
             if len(message) > 0:
                 send_alert(interval + ' Feed Not Updating', message, tradingHours)
             time.sleep(300)

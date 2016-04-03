@@ -51,6 +51,19 @@ def get_btc_list():
                 btcList.append(inst)
                 #print 'Found ' + inst
     return btcList
+
+def get_btc_exch_list():
+    dataPath='./data/from_IB/'
+    files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
+    btcList=list()
+    for file in files:
+            if re.search(r'BTCUSD', file):
+                (inst, ext)=file.split('.')
+                (ticker, exch)=inst.split('_')
+                btcList.append(exch)
+                #print 'Found ' + inst
+    return btcList
+    
     
 def get_currencies():
     currencyList=dict()
@@ -468,3 +481,15 @@ def get_bar_history(datas, ylabel):
     except Exception as e:
         logging.error("something bad happened", exc_info=True)
     return SST
+    
+def feed_ohlc_from_csv(ticker, exchange):
+    dataSet=pd.read_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv', index_col='Date')
+    return dataSet
+
+def bar_ohlc_from_csv(ticker, exchange):
+    dataSet=pd.read_csv('./data/bars/' + ticker + '_' + exchange + '.csv', index_col='Date')
+    return dataSet
+    
+def bidask_from_csv(ticker, exchange):
+    dataSet=pd.read_csv('./data/bidask/' + ticker + '_' + exchange + '.csv', index_col='Date')
+    return dataSet

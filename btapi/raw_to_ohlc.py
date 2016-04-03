@@ -155,6 +155,9 @@ def feed_ohlc_to_csv(ticker, exchange):
     dataSet.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
     return dataSet
     
+
+    
+    
 def raw_to_ohlc_from_csv(infile, outfile):
     df=pd.read_csv(infile)
     return raw_to_ohlc(df, outfile)

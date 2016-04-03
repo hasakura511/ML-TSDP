@@ -150,6 +150,7 @@ def check_bar(pairs, interval, tradingHours=True):
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(bar.index[-1]) + '\n'
                         message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + " Bar Diff " + str(timestamp - btimestamp) + '\n'
                         message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + '\n'
+
             if len(message) > 0:
                 send_alert(interval + ' Feed Not Updating', message, tradingHours)
             time.sleep(300)

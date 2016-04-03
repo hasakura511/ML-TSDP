@@ -1,4 +1,6 @@
 import datetime
+import pytz
+
 import pandas as pd
 import numpy as np
 import logging
@@ -57,7 +59,7 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
     data=btcbar[exchange]
     if len(str(timestamp)) > 0 and price > 0 and vol > 0:
         hour=datetime.datetime.fromtimestamp(
-            timestamp
+            timestamp, tz=pytz.timezone('US/Eastern')
         ).strftime('%Y-%m-%d %H:%M') 
         
         if len(open) > 0 and open.has_key(hour):
@@ -169,7 +171,7 @@ def raw_to_ohlc(df, outfile):
         row=df.ix[i]
         if len(str(row[0])) > 0:
             hour=datetime.datetime.fromtimestamp(
-                int(row[0])
+                int(row[0]), tz=pytz.timezone('US/Eastern')
             ).strftime('%Y-%m-%d %H') 
             
             if open.has_key(hour):
@@ -211,7 +213,7 @@ def raw_to_ohlc_min(df, outfile):
         if np.any(np.isnan(row)) or np.all(np.isfinite(row)):
                 pass
         hour=datetime.datetime.fromtimestamp(
-            int(row[0])
+            int(row[0]), tz=pytz.timezone('US/Eastern')
         ).strftime('%Y-%m-%d %H:%M')    
         if len(str(hour)) > 0:
                     

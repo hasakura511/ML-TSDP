@@ -100,6 +100,8 @@ def check_bar(pairs, interval):
             for pair in pairs:
                 dataFile=dataPath + interval + '_' + pair + '.csv'
                 barFile=barPath + interval + '_' + pair + '.csv'
+                if interval == '1 min':
+                    barFile=barPath + pair + '.csv'
                 if os.path.isfile(dataFile) and os.path.isfile(barFile):
                     
                     data=pd.read_csv(dataFile, index_col='Date')

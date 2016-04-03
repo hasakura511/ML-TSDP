@@ -115,6 +115,7 @@ def get_last_bars(currencyPairs, ylabel, callback):
                         SST=SST.join(data)
                         
                     if not lastDate.has_key(symbol):
+                        logging.info('adding '+str(date)+' for '+ symbol)
                         lastDate[symbol]=timestamp
                                                
                     if lastDate[symbol] < timestamp:
@@ -147,7 +148,7 @@ def onBar(bar, symbols):
     global start_time
     global gotbar
     global pairs
-    logging.info('received '+str(symbols))
+    logging.info('received '+str(symbols)+str(bar))
     if not gotbar.has_key(bar['Date']):
         gotbar[bar['Date']]=list()
     #print bar['Date'], gotbar[bar['Date']]
@@ -369,7 +370,8 @@ else:
     if sys.argv[1] == 'single':  
         while 1:
             start_time = time.time()
-            logging.info( 'starting single thread mode for bars '+str(barSizeSetting)+str(livePairs) )
+            logging.info( 'starting single thread mode for '+str(barSizeSetting)+' bars '+str(len(livePairs))+' pairs.')
+            logging.info(str(livePairs) )
             get_bars(livePairs,barSizeSetting+'_')
             #time.sleep(100)
     elif sys.argv[1] == 'multi':

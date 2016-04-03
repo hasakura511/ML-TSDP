@@ -82,12 +82,15 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
             #time.sleep(20)
     except Exception as e:
         logging.error("get_last_bar", exc_info=True)
-        
+
+
+
 def get_last_bars(currencyPairs, ylabel, callback):
     global tickerId
     global lastDate
     while 1:
         try:
+            
             SST=pd.DataFrame()
             symbols=list()
             returnData=False
@@ -97,32 +100,33 @@ def get_last_bars(currencyPairs, ylabel, callback):
                 symbol = pair
                 
                 if os.path.isfile(minFile):
-                    dta=pd.read_csv(minFile).iloc[-1]
-                    date=dta['Date']
+                    dta=pd.read_csv(minFile)
+                    date=dta.iloc[-1]['Date']
                     
                     eastern=timezone('US/Eastern')
                     date=parse(date).replace(tzinfo=eastern)
                     timestamp = time.mktime(date.timetuple())
-                    print 'loading',minFile,date,dta[ylabel]
+                    #print 'loading',minFile,date,dta[ylabel],'\n'
                     data=pd.DataFrame()
-                    data['Date']=date
+                    data['Date']=dta['Date']
                     data[symbol]=dta[ylabel]
                     data=data.set_index('Date') 
                     
-                    if len(SST.index) < 1:
-                        SST=data
-                    else:
-                        SST=SST.join(data)
+                    if data.shape[0] > 0:
+                        if SST.shape[0] < 1:
+                            SST=data
+                        else:
+                            SST=SST.join(data)
                         
-                    if not lastDate.has_key(symbol):
-                        lastDate[symbol]=timestamp
-                                               
-                    #if lastDate[symbol] < timestamp:
-                    returnData=True
-                    symbols.append(symbol)
-                    print 'Shape: ' + str(SST.shape[0]) + str(SST[symbol])
+                        if not lastDate.has_key(symbol):
+                            lastDate[symbol]=timestamp
+                                                   
+                        #if lastDate[symbol] < timestamp:
+                        returnData=True
+                        symbols.append(symbol)
+                        #print 'Shape: ' + str(len(SST.index)) 
                         
-            if returnData and SST.shape[0] > 0:
+            if returnData:
                 data=SST
                 data=data.reset_index() #.set_index('Date')
                 data=data.fillna(method='pad')
@@ -145,18 +149,19 @@ def get_bars(pairs, interval):
         get_last_bars(mypairs, 'Close', onBar)
 
 def onBar(mybar, symbols):
+    global SST
     global start_time
     global gotbar
     global pairs
-    print symbols,
-    bar=mybar
-    logging.info("onBar: " + str(symbols) + str(bar['Date'][-1]))
+    print 'onBar:', mybar['Date']
+    bar=mybar.reset_index().iloc[-1]
+    logging.info("onBar: " + str(symbols) + str(bar['Date']))
     
     if not gotbar.has_key(bar['Date']):
         gotbar[bar['Date']]=list()
     #print bar['Date'], gotbar[bar['Date']]
-    gotbar[bar['Date']].append(symbols)
-    
+    gotbar[bar['Date']]=gotbar[bar['Date']] + symbols
+        
     print bar['Date'], gotbar[bar['Date']], len(gotbar[bar['Date']])
     #global SST
     #SST = SST.combine_first(bar).sort_index()
@@ -170,10 +175,12 @@ def onBar(mybar, symbols):
             print 'All signals created for bar',bar['Date'],'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'    
     else:   
         if len(gotbar[bar['Date']])>=len(pairs):
+            
             print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
             for sym in gotbar[bar['Date']]:
-                #print sym
-                runPair_v1(sym)
+                print 'onBar RunPair: ' + str(sym)
+                
+                #runPair_v1(sym)
                 
     
         

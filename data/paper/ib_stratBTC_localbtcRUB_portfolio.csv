@@ -1,0 +1,2 @@
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
+BTCUSD,BTC,,-1000000.0,-1000000.0,29761.9,29761.9,0.0,7.440475e+11,0.0,2.049424725e+13,3.74769e+13,Paper,USD

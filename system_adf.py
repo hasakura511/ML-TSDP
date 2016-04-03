@@ -195,7 +195,11 @@ def proc_history():
 
 def onBar(bar, symbols):
     global SST
+
     SST = SST.combine_first(bar).sort_index()
+    logging.info("onBar: " + str(SST.iloc[-1]['Date']))
+    for sym in symbols:
+        logging.info("onBar: " + sym)
     
 def get_bar(sym):
     global SST

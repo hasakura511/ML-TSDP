@@ -118,8 +118,8 @@ def check_bar(pairs, interval):
                     bar=pd.read_csv(barFile, index_col='Date')
                     eastern=timezone('US/Eastern')
                     #timestamp
-                    dataDate=parse(data.index[-1]).replace(tzinfo=eastern)
-                    barDate=parse(bar.index[-1]).replace(tzinfo=eastern)
+                    dataDate=eastern.localize(parse(data.index[-1]))
+                    barDate=eastern.localize(parse(bar.index[-1]))
                     dtimestamp = time.mktime(dataDate.timetuple())
                     btimestamp = time.mktime(barDate.timetuple())
                     timestamp=int(time.time())
@@ -132,6 +132,7 @@ def check_bar(pairs, interval):
                         checktime = 3
                     elif interval == 'choppy':
                         checktime = 10
+                    checktime = checktime * 60
                     logging.info('ts' + str(timestamp) + 'co' + str(dtimestamp) + " diff " + str(timestamp - dtimestamp))
                                         
                     if timestamp - dtimestamp > checktime:

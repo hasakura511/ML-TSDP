@@ -137,7 +137,7 @@ def check_bar(pairs, interval):
                                         
                     if timestamp - dtimestamp > checktime:
                         message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
-                    logging.info('ts' + str(timestamp) + 'co' + str(btimestamp) + " diff " + str(timestamp - btimestamp))
+                    logging.info('Date:' + str(dataDate) + 'ts' + str(timestamp) + 'co' + str(btimestamp) + " diff " + str(timestamp - btimestamp))
                     
                     if timestamp - btimestamp > checktime:
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'

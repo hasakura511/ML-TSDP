@@ -22,7 +22,7 @@ import logging
 import time
 #import websocket
 from suztoolz.display import offlineMode
-#import seitoolz.bars as bars
+import seitoolz.bars as bars
 from multiprocessing import Process, Queue
 import os
 from pytz import timezone
@@ -42,7 +42,7 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
         returnData=False
         for i,ticker in enumerate(currencyPairs):
             pair=ticker
-            minFile='D:/ML-TSDP/data/bars/'+pair+'.csv'
+            minFile='./data/bars/'+pair+'.csv'
             symbol = pair
             #print minFile
             if os.path.isfile(minFile):
@@ -103,13 +103,13 @@ def get_last_bars(currencyPairs, ylabel, callback):
                     eastern=timezone('US/Eastern')
                     date=parse(date).replace(tzinfo=eastern)
                     timestamp = time.mktime(date.timetuple())
-                    
+                    print 'loading',minFile,date,dta[ylabel]
                     data=pd.DataFrame()
                     data['Date']=date
                     data[symbol]=dta[ylabel]
                     data=data.set_index('Date') 
                     
-                    if len(SST.index.values) < 1:
+                    if len(SST.index) < 1:
                         SST=data
                     else:
                         SST=SST.join(data)
@@ -117,13 +117,14 @@ def get_last_bars(currencyPairs, ylabel, callback):
                     if not lastDate.has_key(symbol):
                         lastDate[symbol]=timestamp
                                                
-                    if lastDate[symbol] < timestamp:
-                        returnData=True
-                        symbols.append(symbol)
+                    #if lastDate[symbol] < timestamp:
+                    returnData=True
+                    symbols.append(symbol)
+                    print 'Shape: ' + str(SST.shape[0]) + str(SST[symbol])
                         
-            if returnData:
+            if returnData and SST.shape[0] > 0:
                 data=SST
-                data=data.set_index('Date')
+                data=data.reset_index() #.set_index('Date')
                 data=data.fillna(method='pad')
                 callback(data, symbols)
             time.sleep(20)
@@ -140,14 +141,17 @@ def get_bars(pairs, interval):
     if debug:
         get_last_bars_debug(mypairs, 'Close', onBar)
     else:
-        #get_last_bars(mypairs, 'Close', onBar)
-        get_last_bars_debug(mypairs, 'Close', onBar)
+        #bars.get_last_bars(mypairs, 'Close', onBar)
+        get_last_bars(mypairs, 'Close', onBar)
 
-def onBar(bar, symbols):
+def onBar(mybar, symbols):
     global start_time
     global gotbar
     global pairs
     print symbols,
+    bar=mybar
+    logging.info("onBar: " + str(symbols) + str(bar['Date'][-1]))
+    
     if not gotbar.has_key(bar['Date']):
         gotbar[bar['Date']]=list()
     #print bar['Date'], gotbar[bar['Date']]
@@ -162,11 +166,10 @@ def onBar(bar, symbols):
             print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
             #print gotbar[bar['Date']]
             for sym in gotbar[bar['Date']]:
-                print sym,
-                runPair_v1([sym])
+                print sym, runPair_v1([sym])
             print 'All signals created for bar',bar['Date'],'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'    
     else:   
-        if len(gotbar[bar['Date']])==len(pairs):
+        if len(gotbar[bar['Date']])>=len(pairs):
             print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
             for sym in gotbar[bar['Date']]:
                 #print sym

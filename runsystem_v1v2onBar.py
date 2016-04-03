@@ -40,13 +40,13 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
         SST=pd.DataFrame()
         symbols=list()
         returnData=False
-        for ticker in currencyPairs:
+        for i,ticker in enumerate(currencyPairs):
             pair=ticker
             minFile='D:/ML-TSDP/data/bars/'+pair+'.csv'
             symbol = pair
             #print minFile
             if os.path.isfile(minFile):
-                print 'loading',minFile
+                print i,'loading',minFile
                 dta=pd.read_csv(minFile).iloc[-1]
                 date=dta['Date']
                 
@@ -62,10 +62,10 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
                 #data=data.set_index('Date') 
                 dta.name = dta.Date
                 
-                if len(SST.index.values) < 1:
-                    SST=dta
-                else:
-                    SST=SST.join(dta)
+                #if len(SST.index.values) < 1:
+                #    SST=dta
+                #else:
+                 #   SST=SST.join(dta)
                     
                 if not lastDate.has_key(symbol):
                     lastDate[symbol]=timestamp
@@ -78,7 +78,7 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
             #data=SST
             #data=data.set_index('Date')
             #data=data.fillna(method='pad')
-                callback(dta, symbols)
+        callback(dta, symbols)
             #time.sleep(20)
     except Exception as e:
         logging.error("get_last_bar", exc_info=True)
@@ -132,6 +132,7 @@ def get_last_bars(currencyPairs, ylabel, callback):
             
 def get_bars(pairs, interval):
     #global SST
+    #global start_time
     mypairs=list()
     for pair in pairs:
         mypairs.append(interval + pair)
@@ -139,25 +140,30 @@ def get_bars(pairs, interval):
     if debug:
         get_last_bars_debug(mypairs, 'Close', onBar)
     else:
-        get_last_bars(mypairs, 'Close', onBar)
+        #get_last_bars(mypairs, 'Close', onBar)
+        get_last_bars_debug(mypairs, 'Close', onBar)
 
 def onBar(bar, symbols):
+    global start_time
     global gotbar
     global pairs
-    print symbols
+    print symbols,
     if not gotbar.has_key(bar['Date']):
         gotbar[bar['Date']]=list()
     #print bar['Date'], gotbar[bar['Date']]
     gotbar[bar['Date']].append(symbols)
-    #print bar['Date'], gotbar[bar['Date']], len(gotbar[bar['Date']])
+    
+    print bar['Date'], gotbar[bar['Date']], len(gotbar[bar['Date']])
     #global SST
     #SST = SST.combine_first(bar).sort_index()
     if debug:
+        gotbar[bar['Date']]=[i for sublist in gotbar[bar['Date']] for i in sublist]
         if len(gotbar[bar['Date']])==len(pairs):
             print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
+            #print gotbar[bar['Date']]
             for sym in gotbar[bar['Date']]:
                 print sym,
-                runPair_v1(sym)
+                runPair_v1([sym])
             print 'All signals created for bar',bar['Date'],'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'    
     else:   
         if len(gotbar[bar['Date']])==len(pairs):
@@ -196,7 +202,7 @@ def runPair_v1(pair):
             #f.close()
             #ferr.close()
 
-            sys.stdout = orig_stdout
+        sys.stdout = orig_stdout
         runPair_v2(pair, dataSet)
     except Exception as e:
         	 #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
@@ -235,7 +241,7 @@ def runPair_v2(pair, dataSet):
             #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
             #ferr.close()
-            sys.stdout = orig_stdout
+        sys.stdout = orig_stdout
     except Exception as e:
         	 #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
         	 #ferr.write(e)
@@ -259,7 +265,7 @@ def runThreads():
 
 
 logging.basicConfig(filename='/logs/runsystem_v1v2.log',level=logging.DEBUG)
-
+start_time = time.time()
 lastDate={}
 tickerId=1
 gotbar=dict()
@@ -275,21 +281,21 @@ pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  
 if len(sys.argv)==1:          
     livePairs =  [
-                    #'NZDJPY',\
-                    #'CADJPY',\
-                    #'CHFJPY',\
-                    #'EURJPY',\
-                    #'GBPJPY',\
-                    #'AUDJPY',\
-                    #'USDJPY',\
+                    'NZDJPY',\
+                    'CADJPY',\
+                    'CHFJPY',\
+                    'EURJPY',\
+                    'GBPJPY',\
+                    'AUDJPY',\
+                    'USDJPY',\
                     'AUDUSD',\
-                    #'EURUSD',\
-                    #'GBPUSD',\
-                    #'USDCAD',\
-                    #'USDCHF',\
-                    #'NZDUSD',
-                    #'EURCHF',\
-                    #'EURGBP'\
+                    'EURUSD',\
+                    'GBPUSD',\
+                    'USDCAD',\
+                    'USDCHF',\
+                    'NZDUSD',
+                    'EURCHF',\
+                    'EURGBP'\
                     ]
     #settings
     debug=True
@@ -311,7 +317,8 @@ if len(sys.argv)==1:
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
     
-    #get_bars(['AUDUSD'],'30m_')
+    get_bars(livePairs,barSizeSetting+'_')
+    
     
 else:
     livePairs =  [

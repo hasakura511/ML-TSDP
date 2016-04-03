@@ -47,7 +47,7 @@ def start_proc():
     
     #BTC
     btc=bars.get_btc_list()
-    t1 = threading.Thread(target=check_bar, args=[btc, 'choppy'])
+    t1 = threading.Thread(target=check_bar, args=[btc, 'choppy', False])
     t1.daemon=True
     threads.append(t1)
     
@@ -56,26 +56,27 @@ def start_proc():
     while 1:
         time.sleep(3600)
 
-def send_alert(msg):
+def send_alert(msg, tradingHours=True):
     logging.info(msg)
     print msg
     
     # Alert Mail
-    eastern=timezone('US/Eastern')
-    d = datetime.datetime.now(get_localzone()).astimezone(eastern)
-    print str(d)
-    if d.weekday() == 5:
-        logging.info("Fortunately Saturday - No Email")
-        print "Fortunately Saturday - No Email"
-        return
-    if d.weekday() == 6 and d.hour < 18:
-        logging.info("Fortunately Sunday - No Email")
-        print "Fortunately Sunday - No Email"
-        return
-    if d.weekday() == 4 and d.hour > 17:
-        logging.info("Fortunately Friday After Trading Hours - No Email")
-        print "Fortunately Friday After Trading Hours - No Email"
-        return
+    if tradingHours:
+        eastern=timezone('US/Eastern')
+        d = datetime.datetime.now(get_localzone()).astimezone(eastern)
+        print str(d)
+        if d.weekday() == 5:
+            logging.info("Fortunately Saturday - No Email")
+            print "Fortunately Saturday - No Email"
+            return
+        if d.weekday() == 6 and d.hour < 18:
+            logging.info("Fortunately Sunday - No Email")
+            print "Fortunately Sunday - No Email"
+            return
+        if d.weekday() == 4 and d.hour > 17:
+            logging.info("Fortunately Friday After Trading Hours - No Email")
+            print "Fortunately Friday After Trading Hours - No Email"
+            return
     
     try:
         logging.info("Trading Hour - Sending Email Alert")
@@ -102,7 +103,7 @@ def send_alert(msg):
     
 check=dict()
 
-def check_bar(pairs, interval):
+def check_bar(pairs, interval, tradingHours=True):
     dataPath = './data/from_IB/'
     barPath='./data/bars/'
     while 1:
@@ -148,7 +149,7 @@ def check_bar(pairs, interval):
                     if timestamp - btimestamp > checktime:
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
             if len(message) > 0:
-                send_alert(message)
+                send_alert(message, tradingHours)
             time.sleep(60)
         except Exception as e:
             logging.error("check_bar", exc_info=True)

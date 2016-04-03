@@ -34,11 +34,11 @@ from email.mime.text import MIMEText
 
 logging.basicConfig(filename='/logs/sys_alert.log',level=logging.DEBUG)
 
-intervals = ['30m','1h','10m','1 min']
 def start_proc():
     threads = []
 
     #Currencies
+    intervals = ['30m','1h','10m','1 min']
     pairs=bars.get_currencies()
     for interval in intervals:
         t1 = threading.Thread(target=check_bar, args=[pairs, interval])
@@ -52,7 +52,9 @@ def start_proc():
     threads.append(t1)
     
     [t.start() for t in threads]
-    [t.join() for t in threads]
+    #[t.join() for t in threads]
+    while 1:
+        time.sleep(3600)
 
 def send_alert(msg):
     logging.info(msg)
@@ -116,13 +118,15 @@ def check_bar(pairs, interval):
                     
                     data=pd.read_csv(dataFile, index_col='Date')
                     bar=pd.read_csv(barFile, index_col='Date')
-                    #eastern=timezone('US/Eastern')
+                    eastern=timezone('US/Eastern')
+                    
                     #timestamp
-                    dataDate=parse(data.index[-1])
-                    barDate=parse(bar.index[-1])
+                    dataDate=parse(data.index[-1]).replace(tzinfo=eastern)
+                    barDate=parse(bar.index[-1]).replace(tzinfo=eastern)
+                    nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
                     dtimestamp = time.mktime(dataDate.timetuple())
                     btimestamp = time.mktime(barDate.timetuple())
-                    timestamp=int(time.time())
+                    timestamp=time.mktime(nowDate.timetuple()) + 3600
                     checktime=30
                     if interval == '30m':
                         checktime = 30
@@ -133,11 +137,11 @@ def check_bar(pairs, interval):
                     elif interval == 'choppy':
                         checktime = 10
                     checktime = checktime * 60
-                    logging.info('Date:' + str(dataDate) + ' ts: ' + str(timestamp) + 'co: ' + str(dtimestamp) + " diff " + str(timestamp - dtimestamp))
                                         
                     if timestamp - dtimestamp > checktime:
                         message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
-                    logging.info('Date:' + str(dataDate) + 'ts' + str(timestamp) + 'co' + str(btimestamp) + " diff " + str(timestamp - btimestamp))
+                        #logging.info('Date:' + str(timestamp) + ' ts:' + str(dtimestamp) + ' co:' + str(btimestamp) + " diff " + str(timestamp - btimestamp))
+                        #logging.info('Date:' + str(dataDate) + ' ts: ' + str(barDate) + 'co: ' + str(nowDate) + " diff " + str(timestamp - dtimestamp))
                     
                     if timestamp - btimestamp > checktime:
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'

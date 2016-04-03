@@ -82,6 +82,7 @@ def check_bar(pairs, interval):
     barPath='./data/bars/'
     while 1:
         try:
+            message=''
             for pair in pairs:
                 dataFile=dataPath + interval + '_' + pair + '.csv'
                 barFile=barPath + interval + '_' + pair + '.csv'
@@ -105,10 +106,11 @@ def check_bar(pairs, interval):
                         checktime = 3
                     
                     if timestamp - dtimestamp > checktime:
-                        send_alert("Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]))
+                        message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
                     if timestamp - btimestamp > checktime:
-                        send_alert("Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]))
-                    
+                        message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
+            if len(message) > 0:
+                send_alert(message)
             time.sleep(60)
         except Exception as e:
             logging.error("check_bar", exc_info=True)

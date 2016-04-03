@@ -58,15 +58,15 @@ def send_alert(msg):
     
     # Alert Mail
     d = datetime.datetime.now() 
-    if d.isoweekday() == 6:
+    if d.weekday() == 5:
         logging.info("Fortunately Saturday - No Email")
         print "Fortunately Saturday - No Email"
         return
-    if d.isoweekday() == 0 and d.hour < 18:
+    if d.weekday() == 6 and d.hour < 18:
         logging.info("Fortunately Sunday - No Email")
         print "Fortunately Sunday - No Email"
         return
-    if d.isoweekday() == 5 and d.hour > 17:
+    if d.weekday() == 4 and d.hour > 17:
         logging.info("Fortunately Friday After Trading Hours - No Email")
         print "Fortunately Friday After Trading Hours - No Email"
         return

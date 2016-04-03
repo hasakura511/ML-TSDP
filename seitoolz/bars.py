@@ -30,6 +30,7 @@ from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
 import os
 from dateutil.parser import parse
 import logging
+import re
 
 rtbar={}
 rtdict={}
@@ -38,6 +39,18 @@ rtfile={}
 rtreqid={}
 lastDate={}
 tickerId=1
+
+
+def get_btc_list():
+    dataPath='./data/from_IB/'
+    files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
+    btcList=list()
+    for file in files:
+            if re.search(r'BTCUSD', file):
+                (inst, ext)=file.split('.')
+                btcList.append(inst)
+                #print 'Found ' + inst
+    return btcList
     
 def get_currencies():
     currencyList=dict()

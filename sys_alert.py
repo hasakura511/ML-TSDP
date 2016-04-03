@@ -36,13 +36,20 @@ logging.basicConfig(filename='/logs/sys_alert.log',level=logging.DEBUG)
 
 intervals = ['30m','1h','10m','1 min']
 def start_proc():
-    pairs=bars.get_currencies()
     threads = []
 
+    #Currencies
+    pairs=bars.get_currencies()
     for interval in intervals:
         t1 = threading.Thread(target=check_bar, args=[pairs, interval])
         t1.daemon=True
         threads.append(t1)
+    
+    #BTC
+    btc=bars.get_btc_list()
+    t1 = threading.Thread(target=check_bar, args=[btc, 'choppy'])
+    t1.daemon=True
+    threads.append(t1)
     
     [t.start() for t in threads]
     [t.join() for t in threads]
@@ -102,6 +109,9 @@ def check_bar(pairs, interval):
                 barFile=barPath + interval + '_' + pair + '.csv'
                 if interval == '1 min':
                     barFile=barPath + pair + '.csv'
+                if interval == 'choppy':
+                     dataFile=dataPath + pair + '.csv'
+                     barFile=barPath + pair + '.csv'
                 if os.path.isfile(dataFile) and os.path.isfile(barFile):
                     
                     data=pd.read_csv(dataFile, index_col='Date')
@@ -120,6 +130,8 @@ def check_bar(pairs, interval):
                         checktime = 70
                     elif interval == '1 min':
                         checktime = 3
+                    elif interval == 'choppy':
+                        checktime = 10
                     
                     if timestamp - dtimestamp > checktime:
                         message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'

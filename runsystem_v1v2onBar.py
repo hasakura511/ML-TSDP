@@ -153,7 +153,7 @@ def onBar(bar, symbols):
     #global SST
     #SST = SST.combine_first(bar).sort_index()
     if debug:
-        if len(gotbar[bar['Date']])==len(pairs):
+        #if len(gotbar[bar['Date']])==len(pairs):
             print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
             for sym in gotbar[bar['Date']]:
                 print sym,

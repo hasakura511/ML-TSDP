@@ -491,5 +491,8 @@ def bar_ohlc_from_csv(ticker, exchange):
     return dataSet
     
 def bidask_from_csv(ticker, exchange):
-    dataSet=pd.read_csv('./data/bidask/' + ticker + '_' + exchange + '.csv', index_col='Date')
-    return dataSet
+    if os.path.isfile('./data/bidask/' + ticker + '_' + exchange + '.csv'):
+        dataSet=pd.read_csv('./data/bidask/' + ticker + '_' + exchange + '.csv', index_col='Date')
+        return dataSet
+    else:
+        return pd.DataFrame([['20160101 01:01:01',-1,-1]], columns=['Date','Bid','Ask']).set_index('Date')

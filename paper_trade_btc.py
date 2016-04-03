@@ -22,6 +22,7 @@ import time
 import websocket
 import datetime
 from seitoolz.signal import get_dps_model_pos, get_model_pos
+import seitoolz.bars as bars
 
 logging.basicConfig(filename='/logs/paper_trade_btc.log',level=logging.DEBUG)
 

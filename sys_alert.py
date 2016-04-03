@@ -50,8 +50,7 @@ def start_proc():
     #threads.append(t2)
     
     [t.start() for t in threads]
-    #[t.join() for t in threads]
-    #bars.update_bars(pairs, interval)
+    [t.join() for t in threads]
 
 def send_alert(msg):
     logging.info(msg)

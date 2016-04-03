@@ -20,6 +20,7 @@ import pusherclient #live stream client: https://github.com/ekulyk/PythonPusherC
 import logging
 import time
 import websocket
+import datetime
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 
 logging.basicConfig(filename='/logs/paper_trade_btc.log',level=logging.DEBUG)

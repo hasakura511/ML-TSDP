@@ -88,9 +88,8 @@ def get_model_sig(system):
         data=pd.read_csv(filename, index_col='dates')
         return data
     else:
-        pos=pd.DataFrame([['2016-01-01 00:00:01','0','0','']], columns=['dates','signals','safef','comment'])
+        pos=pd.DataFrame({}, columns=['dates','signals','safef','comment'])
         pos=pos.set_index('dates')
-        pos.to_csv(filename)
         return pos
         
     

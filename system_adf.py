@@ -135,14 +135,16 @@ def get_entryState():
         try:
             (sysqty, syscur, sysexch, system)=param
             
-            signal=get_model_sig(system).iloc[-1]
-            print signal['comment']
-            jsondata = json.loads(signal['comment'])
-            entryState=jsondata['Entry']
-            exitState=jsondata['Exit']
-            symPair=jsondata['symPair']
-            print  'SymPair: ' + symPair + ' System: ' + system + ' Entry: ' + str(entryState) + ' Exit: ' + str(exitState)
-            astrat.updateEntry(symPair, entryState, exitState)
+            signal=get_model_sig(system)
+            if len(signal.index) > 0:
+                signal=signal.iloc[-1]
+                print signal['comment']
+                jsondata = json.loads(signal['comment'])
+                entryState=jsondata['Entry']
+                exitState=jsondata['Exit']
+                symPair=jsondata['symPair']
+                print  'SymPair: ' + symPair + ' System: ' + system + ' Entry: ' + str(entryState) + ' Exit: ' + str(exitState)
+                astrat.updateEntry(symPair, entryState, exitState)
         except Exception as e:
             logging.error("get_entryState", exc_info=True)
 

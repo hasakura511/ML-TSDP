@@ -67,7 +67,7 @@ def offlineMode(ticker, errorText, signalPath, ver1, ver2):
             offline.cycleTime = 0
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + ver2+'_'+ ticker + '.csv', index=False)
-            
+        print errorText    
         sys.exit(errorText)
         
 def describeDistribution(qtC,qtP,ticker):

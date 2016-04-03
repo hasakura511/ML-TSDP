@@ -27,64 +27,12 @@ from multiprocessing import Process, Queue
 import os
 from pytz import timezone
 from dateutil.parser import parse
-start_time = time.time()
-logging.basicConfig(filename='/logs/runsystem_v1v2.log',level=logging.DEBUG)
 
-debug=False
 
-filterName = 'DF1'
-data_type = 'ALL'
-barSizeSetting='30m'
+    
 
-pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
-                 'GBPJPY','EURCHF','AUDJPY',\
-                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY','NZDUSD']
-                 
-livePairs =  [
-                #'NZDJPY',\
-                #'CADJPY',\
-                #'CHFJPY',\
-                #'EURJPY',\
-                #'GBPJPY',\
-                #'AUDJPY',\
-                #'USDJPY',\
-                'AUDUSD',\
-                #'EURUSD',\
-                #'GBPUSD',\
-                #'USDCAD',\
-                #'USDCHF',\
-                #'NZDUSD',
-                #'EURCHF',\
-                #'EURGBP'\
-                ]
-#settings
-showDist =  False
-showPDFCDF = False
-showAllCharts = False
-perturbData = False
-#runDPS = True
-saveParams = False
-saveDataSet=True
-verbose= False
-#paths
-scorePath = None
-equityStatsSavePath = None
-#signalPath = '../data/signals/'
-#dataPath = '../data/from_IB/'
-#bestParamsPath =  '../data/params/'
-#chartSavePath = '../data/results/' 
-#scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
-#equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
-signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-dataPath = 'D:/ML-TSDP/data/from_IB/'
-bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
-chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
-lastDate={}
-tickerId=1
-gotbar=dict()
 
-def get_last_bars_check(currencyPairs, ylabel, callback):
+def get_last_bars_debug(currencyPairs, ylabel, callback):
     global tickerId
     global lastDate
     #while 1:
@@ -187,13 +135,16 @@ def get_bars(pairs, interval):
     mypairs=list()
     for pair in pairs:
         mypairs.append(interval + pair)
-    #get_last_bars(mypairs, 'Close', onBar)
-    get_last_bars_check(mypairs, 'Close', onBar)
+        
+    if debug:
+        get_last_bars_debug(mypairs, 'Close', onBar)
+    else:
+        get_last_bars(mypairs, 'Close', onBar)
 
 def onBar(bar, symbols):
     global gotbar
     global pairs
-    print 'onbar', symbols
+    print 'onbar called', symbols
     if not gotbar.has_key(bar['Date']):
         gotbar[bar['Date']]=list()
     #print bar['Date'], gotbar[bar['Date']]
@@ -201,12 +152,18 @@ def onBar(bar, symbols):
     print bar['Date'], gotbar[bar['Date']], len(gotbar[bar['Date']])
     #global SST
     #SST = SST.combine_first(bar).sort_index()
-    
-    if len(gotbar[bar['Date']])==len(pairs)-14:
-        #print  len(gotbar[bar['Date']]), len(pairs)
+    if debug:
+        print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
         for sym in gotbar[bar['Date']]:
             #print sym
             runPair_v1(sym)
+    else:   
+        if len(gotbar[bar['Date']])==len(pairs):
+            print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
+            for sym in gotbar[bar['Date']]:
+                #print sym
+                runPair_v1(sym)
+                
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'    
         
 def runPair_v1(pair):
@@ -292,5 +249,98 @@ def runThreads():
     while 1:
         time.sleep(100)
 
-#get_bars(['AUDUSD'],'30m_')
+
+start_time = time.time()
+logging.basicConfig(filename='/logs/runsystem_v1v2.log',level=logging.DEBUG)
+
+lastDate={}
+tickerId=1
+gotbar=dict()
+
+filterName = 'DF1'
+data_type = 'ALL'
+barSizeSetting='30m'
+
+pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
+                 'GBPJPY','EURCHF','AUDJPY',\
+                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
+                 'USDCHF','USDJPY','EURJPY','NZDUSD']
+                 
+if len(sys.argv)==1:          
+    livePairs =  [
+                    #'NZDJPY',\
+                    #'CADJPY',\
+                    #'CHFJPY',\
+                    #'EURJPY',\
+                    #'GBPJPY',\
+                    #'AUDJPY',\
+                    #'USDJPY',\
+                    'AUDUSD',\
+                    #'EURUSD',\
+                    #'GBPUSD',\
+                    #'USDCAD',\
+                    #'USDCHF',\
+                    #'NZDUSD',
+                    #'EURCHF',\
+                    #'EURGBP'\
+                    ]
+    #settings
+    debug=True
+    showDist =  False
+    showPDFCDF = False
+    showAllCharts = False
+    perturbData = False
+    #runDPS = True
+    saveParams = False
+    saveDataSet=True
+    verbose= False
+    #paths
+    scorePath = None
+    equityStatsSavePath = None
+    #scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
+    #equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
+    signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    dataPath = 'D:/ML-TSDP/data/from_IB/'
+    bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
+    chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
+    
+    get_bars(['AUDUSD'],'30m_')
+    
+else:
+    livePairs =  [
+                    'NZDJPY',\
+                    'CADJPY',\
+                    'CHFJPY',\
+                    'EURJPY',\
+                    'GBPJPY',\
+                    'AUDJPY',\
+                    'USDJPY',\
+                    'AUDUSD',\
+                    'EURUSD',\
+                    'GBPUSD',\
+                    'USDCAD',\
+                    'USDCHF',\
+                    'NZDUSD',
+                    'EURCHF',\
+                    'EURGBP'\
+                    ]
+    #settings
+    debug=False
+    showDist =  False
+    showPDFCDF = False
+    showAllCharts = False
+    perturbData = False
+    #runDPS = True
+    saveParams = False
+    saveDataSet=True
+    verbose= False
+    #paths
+    scorePath = None
+    equityStatsSavePath = None
+    signalPath = '../data/signals/'
+    dataPath = '../data/from_IB/'
+    bestParamsPath =  '../data/params/'
+    chartSavePath = '../data/results/' 
+    
+    runThreads()
 	

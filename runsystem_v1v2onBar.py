@@ -42,7 +42,7 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
         returnData=False
         for ticker in currencyPairs:
             pair=ticker
-            minFile='D:/ML-TSDP/data/bars/'+pair+'.csv'
+            minFile='./data/bars/'+pair+'.csv'
             symbol = pair
             #print minFile
             if os.path.isfile(minFile):

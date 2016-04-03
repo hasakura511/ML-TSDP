@@ -63,6 +63,7 @@ def send_alert(msg):
     print 'Alert'
     
 check=dict()
+
 def check_bar(interval, searchstr):
     dataPath = './data/from_IB/'
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]

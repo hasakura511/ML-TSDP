@@ -53,8 +53,9 @@ logging.basicConfig(filename='/logs/system_adf.log',level=logging.DEBUG)
 pairs=[]
 
 if len(sys.argv) > 1 and sys.argv[1] == 's105JPY':
-    pairs=[['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [10,'JPY','IDEALPRO', 's105_EURJPY']],
-           ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [10,'JPY','IDEALPRO', 's105_USDJPY']],
+    pairs=[
+           #['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [10,'JPY','IDEALPRO', 's105_EURJPY']],
+           #['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [10,'JPY','IDEALPRO', 's105_USDJPY']],
            ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [10,'JPY','IDEALPRO', 's105_CADJPY']],
            ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [10,'JPY','IDEALPRO', 's105_CHFJPY']],
            ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [10,'JPY','IDEALPRO', 's105_GBPJPY']]]
@@ -135,14 +136,16 @@ def get_entryState():
         try:
             (sysqty, syscur, sysexch, system)=param
             
-            signal=get_model_sig(system).iloc[-1]
-            print signal['comment']
-            jsondata = json.loads(signal['comment'])
-            entryState=jsondata['Entry']
-            exitState=jsondata['Exit']
-            symPair=jsondata['symPair']
-            print  'SymPair: ' + symPair + ' System: ' + system + ' Entry: ' + str(entryState) + ' Exit: ' + str(exitState)
-            astrat.updateEntry(symPair, entryState, exitState)
+            signal=get_model_sig(system)
+            if len(signal.index) > 0:
+                signal=signal.iloc[-1]
+                print signal['comment']
+                jsondata = json.loads(signal['comment'])
+                entryState=jsondata['Entry']
+                exitState=jsondata['Exit']
+                symPair=jsondata['symPair']
+                print  'SymPair: ' + symPair + ' System: ' + system + ' Entry: ' + str(entryState) + ' Exit: ' + str(exitState)
+                astrat.updateEntry(symPair, entryState, exitState)
         except Exception as e:
             logging.error("get_entryState", exc_info=True)
 
@@ -226,7 +229,7 @@ def start_signal():
         #print "sym: " + sym1
         for [file2, sym2, param2] in pairs:
             if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
-		logging.info("Prepping " + sym1 + sym2)
+		logging.info("Processing " + sym1 + sym2)
                 seen[sym1+sym2]=1
                 seen[sym2+sym1]=1
                 sig_thread = threading.Thread(target=proc_pair, args=[sym1, sym2, param1, param2])

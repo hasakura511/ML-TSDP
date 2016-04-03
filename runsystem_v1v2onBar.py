@@ -127,7 +127,7 @@ def get_last_bars(currencyPairs, ylabel, callback):
                         #print 'Shape: ' + str(len(SST.index)) 
                         
             if returnData:
-                data=SST
+                data=SST.copy()
                 data=data.reset_index() #.set_index('Date')
                 data=data.fillna(method='pad')
                 callback(data, symbols)
@@ -180,12 +180,12 @@ def onBar(mybar, symbols):
             for sym in gotbar[bar['Date']]:
                 print 'onBar RunPair: ' + str(sym)
                 
-                #runPair_v1(sym)
+                runPair_v1(sym)
                 
     
         
 def runPair_v1(pair):
-    ticker = pair[0].split('_')[1]
+    ticker = pair.split('_')[1]
     version = 'v1'
     version_ = 'v1.3C'
     runDPS = False
@@ -198,19 +198,21 @@ def runPair_v1(pair):
                 
         
     try:
-        with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
-            orig_stdout = sys.stdout
-            sys.stdout = f
-            print 'Starting '+version+': ' + ticker
-            if ticker not in livePairs:
-                offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
-            #f.write('Starting '+version+': ' + ticker)         
-            #ferr.write('Starting '+version+': ' + ticker)
-            signal, dataSet=runv2(runData)
-            print signal
-            #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
-            #f.close()
-            #ferr.close()
+        f=open ('/logs/' + version+'_'+ticker + 'onBar.log','a')
+        orig_stdout = sys.stdout
+        sys.stdout = f
+        print 'Starting '+version+': ' + ticker
+        if ticker not in livePairs:
+            offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
+        #f.write('Starting '+version+': ' + ticker)         
+        #ferr.write('Starting '+version+': ' + ticker)
+        
+        signal, dataSet=runv2(runData)
+        print signal
+        
+        #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
+        #f.close()
+        #ferr.close()
 
         sys.stdout = orig_stdout
         runPair_v2(pair, dataSet)
@@ -235,7 +237,7 @@ def runPair_v2(pair, dataSet):
 
         
     try:
-        with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
+            f=open ('/logs/' + version+'_'+ticker + 'onBar.log','a')
             orig_stdout = sys.stdout
             sys.stdout = f
             print 'Starting '+version+': ' + ticker
@@ -251,7 +253,7 @@ def runPair_v2(pair, dataSet):
             #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
             #ferr.close()
-        sys.stdout = orig_stdout
+            sys.stdout = orig_stdout
     except Exception as e:
         	 #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
         	 #ferr.write(e)

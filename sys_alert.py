@@ -144,12 +144,12 @@ def check_bar(pairs, interval, tradingHours=True):
                     if timestamp - dtimestamp > checktime:
                         message = message + "Feed " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
                         message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + ' Last Feed:' + str(dtimestamp) + " Bar Diff " + str(timestamp - btimestamp)+ '\n'
-                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + 'co: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
+                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + ' Last Feed: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
                     
                     if timestamp - btimestamp > checktime:
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(data.index[-1]) + '\n'
-                        message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + ' Last Feed:' + str(dtimestamp) + " Bar Diff " + str(timestamp - btimestamp) + '\n'
-                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + 'co: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
+                        message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + ' Last Feed: ' + str(dtimestamp) + " Bar Diff " + str(timestamp - btimestamp) + '\n'
+                        message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + ' Last Feed: ' + str(dataDate) + " Data Diff " + str(timestamp - dtimestamp)+ '\n'
             if len(message) > 0:
                 send_alert(interval + ' Feed Not Updating', message, tradingHours)
             time.sleep(60)

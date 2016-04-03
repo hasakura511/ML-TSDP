@@ -55,6 +55,16 @@ def start_proc():
 def send_alert(msg):
     logging.info(msg)
     print msg
+    
+    # Alert Mail
+    d = datetime.datetime.now() 
+    if d.isoweekday() == 5:
+        return
+    if d.isoweekday() == 6 and d.hour < 18:
+        return
+    if d.isoweekday() == 4 and d.hour > 17:
+        return
+        
     try:
         me='catchall@neospace.com'
         you='consulting@neospace.com'

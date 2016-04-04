@@ -11,7 +11,8 @@ from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open
 from seitoolz.signal import get_model_pos
 from seitoolz.order import adj_size
 from time import gmtime, strftime, time, localtime, sleep
-    
-ib_pos=get_ibpos()
+
 c2_pos=get_c2pos()
+ib_pos=get_ibpos()
+
 

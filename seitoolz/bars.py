@@ -382,7 +382,9 @@ def get_last_bars(currencyPairs, ylabel, callback):
                             SST=SST.join(data)
                         
                         if not lastDate.has_key(symbol):
+                            returnData=True
                             lastDate[symbol]=timestamp
+                            symbols.append(symbol)
                                                    
                         if lastDate[symbol] < timestamp:
                             returnData=True

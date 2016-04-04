@@ -84,56 +84,6 @@ def get_last_bars_debug(currencyPairs, ylabel, callback, **kwargs):
     except Exception as e:
         logging.error("get_last_bar", exc_info=True)
         
-def get_last_bars(currencyPairs, ylabel, callback):
-    global tickerId
-    global lastDate
-    while 1:
-        try:
-            SST=pd.DataFrame()
-            symbols=list()
-            returnData=False
-            for ticker in currencyPairs:
-                pair=ticker
-                minFile='./data/bars/'+pair+'.csv'
-                symbol = pair
-                
-                if os.path.isfile(minFile):
-                    dta=pd.read_csv(minFile).iloc[-1]
-                    date=dta['Date']
-                    
-                    eastern=timezone('US/Eastern')
-                    date=parse(date).replace(tzinfo=eastern)
-                    timestamp = time.mktime(date.timetuple())
-                    
-                    data=pd.DataFrame()
-                    data['Date']=date
-                    data[symbol]=dta[ylabel]
-                    data=data.set_index('Date') 
-                    
-                    if len(SST.index.values) < 1:
-                        SST=data
-                    else:
-                        SST=SST.join(data)
-                        
-                    if not lastDate.has_key(symbol):
-                        logging.info('adding '+str(date)+' for '+ symbol)
-                        lastDate[symbol]=timestamp
-                                               
-                    if lastDate[symbol] < timestamp:
-                        logging.info('updating '+str(date)+' for '+ symbol)
-                        returnData=True
-                        symbols.append(symbol)
-                        lastDate[symbol]=timestamp
-                        
-            if returnData:
-                data=SST
-                data=data.set_index('Date')
-                data=data.fillna(method='pad')
-                callback(data, symbols)
-            time.sleep(20)
-        except Exception as e:
-            logging.error("get_last_bar", exc_info=True)
-            
 def get_bars(pairs, interval):
     #global SST
     #global start_time

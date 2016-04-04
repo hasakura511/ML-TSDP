@@ -270,7 +270,10 @@ def get_hist_bars(currencyPairs, interval='30m', minDataPoints = 10000, exchange
                 reqId=tickerId
                 if os.path.isfile(filename):
                     rtbar[reqId]=pd.read_csv(filename, index_col='Date')
-                    date=str(rtbar[reqId].index[0])
+                    eastern=timezone('US/Eastern')
+                    endDateTime=dt.now(get_localzone())
+                    date=endDateTime.astimezone(eastern)
+                    date=date.strftime("%Y%m%d %H:%M:%S EST")
                 else:
                     rtbar[reqId]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
                     eastern=timezone('US/Eastern')

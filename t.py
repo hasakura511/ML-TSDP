@@ -9,5 +9,5 @@ def onBar(bar, symbols):
 		print "OnBar: " + str(bar[symbol]) + '\n'
 	print "==============="
 
-#bars.get_last_bars(['EURUSD','USDJPY'], 'Close', onBar)
-bars.get_last_bars(['BTCUSD_bitfinexUSD','BTCUSD_bitstampUSD'], 'Close', onBar)
+bars.get_last_bars(['EURUSD','USDJPY'], 'Close', onBar)
+#bars.get_last_bars(['BTCUSD_bitfinexUSD','BTCUSD_bitstampUSD'], 'Close', onBar)

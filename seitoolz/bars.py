@@ -445,7 +445,7 @@ def get_bar_history(datas, ylabel):
             if len(SST.index.values) < 2:
                 SST=data
             else:
-                SST=SST.join(data)
+                SST = SST.combine_first(data).sort_index()
         colnames=list()
         for col in SST.columns:
             if col != 'Date' and col != 0:

@@ -22,6 +22,7 @@ import logging
 import time
 import websocket
 from seitoolz.signal import get_dps_model_pos, get_model_pos
+import seitoolz.bars as bars
 
 logging.basicConfig(filename='/logs/get_btcfeed.log',level=logging.DEBUG)
 
@@ -40,18 +41,24 @@ commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + c
 commissiondata=commissiondata.set_index('key')
 
 def get_btc_ask(ticker, exchange):
-    if exchange == 'bitstampUSD':
-        #print 'bitstmp ask' + str(feed[exchange]['ask'])
-        return feed[exchange]['ask']
+    if feed.has_key(exchange):
+        if exchange == 'bitstampUSD':
+            #print 'bitstmp ask' + str(feed[exchange]['ask'])
+            return feed[exchange]['ask']
+        else:
+            return feed[exchange]['price']
     else:
-        return feed[exchange]['price']
+        return -1
 
 def get_btc_bid(ticker, exchange):
-    if exchange == 'bitstampUSD':
-        #print 'bitstmp bid' + str(feed[exchange]['bid'])
-        return feed[exchange]['bid']
+    if feed.has_key(exchange):
+        if exchange == 'bitstampUSD':
+            #print 'bitstmp bid' + str(feed[exchange]['bid'])
+            return feed[exchange]['bid']
+        else:
+            return feed[exchange]['price']
     else:
-        return feed[exchange]['price']
+        return -1
 
 def get_btcfeed():
     get_bitstampfeed()
@@ -109,7 +116,23 @@ def get_ohlc(ticker, exchange):
         
     ohlc[exchange]=feed_ohlc_to_csv(ticker, exchange)
     return ohlc[exchange]
-    
+
+def get_btc_history():
+    global feed
+    global ohlc
+    global systemdata
+    global commissiondata
+    while True:
+      try:
+       myfeed=bars.get_btc_exch_list()
+       for exchange in myfeed: 
+        ticker='BTCUSD'
+        if get_btc_bid(ticker, exchange) > 0 and get_btc_bid(ticker, exchange) > 0:
+            get_ohlc(ticker, exchange)
+       time.sleep(100)
+      except Exception as e:
+          logging.error("get_history", exc_info=True)
+          
 #################################
 ### Bitstamp Feed             ###
 def bitstamp_order_book_callback(data):
@@ -203,9 +226,10 @@ def write_feed():
 threads = []
 feed_thread = threading.Thread(target=get_btcfeed)
 feed_thread.daemon=True
-#signal_thread = threading.Thread(target=get_signal)
-#signal_thread.daemon=True
-#threads.append(signal_thread)
+
+hist_thread = threading.Thread(target=get_btc_history)
+hist_thread.daemon=True
+threads.append(hist_thread)
 #write_feed_thread.start()
 #start_systems()
 #get_signal()
@@ -215,6 +239,7 @@ feed_thread.daemon=True
 #get_bitstampfeed()
 threads.append(feed_thread)
 feed_thread.start()
+hist_thread.start()
 write_feed()
 
 

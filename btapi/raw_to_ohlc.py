@@ -89,8 +89,8 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
             if quote['Volume'] < 0:
                 quote['Volume'] = 0 
             data.loc[hour]=quote
-            #print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
-        
+            #print "Update Bar: bar: sym: " + exchange + " date:" + str(hour) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) 
+                    
         else:
             if len(data.index) > 1:
                 data=data.reset_index()                

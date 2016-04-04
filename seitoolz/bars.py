@@ -343,11 +343,11 @@ def update_bars(currencyPairs, interval='30m'):
                             data=pd.read_csv(dataFile)
                             regentime=60
                             if interval == '30m':
-                                regentime=30*6
+                                regentime=60*6
                             elif interval == '1h':
                                 regentime = 60 * 6
                             elif interval == '10m':
-                                regentime == 10 * 6
+                                regentime == 60 * 6
                             
                             quote=data
                             if quote.shape[0] > regentime:
@@ -378,10 +378,12 @@ def get_last_bars(currencyPairs, ylabel, callback):
                 pair=ticker
                 minFile='./data/bars/'+pair+'.csv'
                 symbol = pair
+                date=''
                 
                 if os.path.isfile(minFile):
                     dta=pd.read_csv(minFile)
-                    date=dta.iloc[-1]['Date']
+                    if len(date) == 0:
+                        date=dta.iloc[-1]['Date']
                     
                     eastern=timezone('US/Eastern')
                     date=parse(date).replace(tzinfo=eastern)
@@ -392,11 +394,14 @@ def get_last_bars(currencyPairs, ylabel, callback):
                     data[symbol]=dta[ylabel]
                     data=data.set_index('Date') 
                     
+                    
+                    
                     if data.shape[0] > 0:
                         if SST.shape[0] < 1:
                             SST=data
                         else:
-                            SST=SST.join(data)
+                            SST = SST.combine_first(data).sort_index()
+                            #SST=SST.join(data)
                         
                         if not lastDate.has_key(symbol):
                             returnData=True

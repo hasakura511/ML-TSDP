@@ -134,14 +134,14 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    'GBPJPY',\
+                    #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
-                    #'USDCHF',\
+                    'USDCHF',\
                     #'NZDUSD',
                     #'EURCHF',\
                     #'EURGBP'\
@@ -212,7 +212,7 @@ for ticker in livePairs:
     validationSetLength = 90
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [15,45] # min is 2
+    validationPeriods = [15,45,90] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']

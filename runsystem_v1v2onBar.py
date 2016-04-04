@@ -22,7 +22,7 @@ import logging
 import time
 #import websocket
 from suztoolz.display import offlineMode
-#import seitoolz.bars as bars
+import seitoolz.bars as bars
 from multiprocessing import Process, Queue
 import os
 from pytz import timezone
@@ -144,7 +144,7 @@ def get_bars(pairs, interval):
     if debug:
         get_last_bars_debug(mypairs, 'Close', onBar,minPath=minPath)
     else:
-        get_last_bars(mypairs, 'Close', onBar)
+        bars.get_last_bars(mypairs, 'Close', onBar)
         #get_last_bars_debug(mypairs, 'Close', onBar)
 
 def onBar(bar, symbols):

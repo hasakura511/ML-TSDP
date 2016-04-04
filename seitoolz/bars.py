@@ -382,8 +382,7 @@ def get_last_bars(currencyPairs, ylabel, callback):
                 
                 if os.path.isfile(minFile):
                     dta=pd.read_csv(minFile)
-                    if len(date) == 0:
-                        date=dta.iloc[-1]['Date']
+                    date=dta.iloc[-1]['Date']
                     
                     eastern=timezone('US/Eastern')
                     date=parse(date).replace(tzinfo=eastern)

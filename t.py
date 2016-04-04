@@ -6,5 +6,5 @@ def onBar(bar, symbols):
 		print "OnBar: " + symbol + '\n'
 	print "==============="
 
-get_last_bars(['EURUSD','USDJPY'], 'Close', onBar)
+bars.get_last_bar(['EURUSD','USDJPY'], 'Close', onBar)
 

@@ -185,11 +185,11 @@ def check_signal(pairs, tradingHours=True):
             for pair in pairs:
                 dataFile=dataPath + pair + '.csv'
                 if re.search(r'v1', pair):
-                    checktime = 5
+                    checktime = 30
                 elif re.search(r'v2', pair):
                     checktime = 30
                 elif re.search(r'v3', pair):
-                    checktime = 300
+                    checktime = 120
                 else:
                     checktime = 360
                     

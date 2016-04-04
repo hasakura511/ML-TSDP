@@ -77,9 +77,9 @@ def generate_sigplots(counter, html, cols):
             filename=system['System']
             if os.path.isfile('./data/results/' + filename + '.png'):
               systems[system['System']]=1
-              if system['Version']=='v1':
-                  filename = 'v1_' + filename
-              (counter, html)=generate_html(filename, counter, html, cols)
+              (counter, html)=generate_sig_html(filename, counter, html, cols)
+            
+              
     return (counter, html)     
     
 def generate_paper_c2_plot(systemname, dateCol, initialEquity):
@@ -315,6 +315,25 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4, rece
         logging.error("something bad happened", exc_info=True)
     return (counter, html)
 
+def generate_sig_html(signal, counter, html, cols, colspan):
+    cols=5
+    filename=signal 
+    if os.path.isfile('./data/results/' + filename + '.png'):
+      (counter, html)=generate_html(filename, counter, html, cols)
+    filename=signal + "_CDF"
+    if os.path.isfile('./data/results/' + filename + '.png'):
+      (counter, html)=generate_html(filename, counter, html, cols)
+    filename=signal + "_OOS"
+    if os.path.isfile('./data/results/' + filename + '.png'):
+      (counter, html)=generate_html(filename, counter, html, cols)
+    filename=signal + "_PDF"
+    if os.path.isfile('./data/results/' + filename + '.png'):
+      (counter, html)=generate_html(filename, counter, html, cols)
+    filename=signal+ "_Params"
+    if os.path.isfile('./data/results/' + filename + '.png'):
+      (counter, html)=generate_html(filename, counter, html, cols)
+    return (counter, html)
+    
 def generate_html(filename, counter, html, cols, colspan=False):
     height=300
     width=300
@@ -363,9 +382,9 @@ for i in systemdata.index:
         systemdict[system['Name']].append(system['ibsym'] + system['ibcur'])
         
     signal=system['System']
-    
-    if system['c2submit'] or system['ibsubmit']:
-    	ver=system['Version']
+    ver=system['Version']
+    	
+    if re.search(r'v', ver) and re.search(r'v',signal):
     	if ver=='v1.1':
 		ver='v1'
     	verdict[system['Name']]=system['Version']
@@ -383,7 +402,7 @@ for i in systemdata.index:
 
 def gen_sig(html, counter, cols):
     counter = 0
-    cols=len(vdict.keys())
+    cols=5 #len(vdict.keys())
     html = html + '<h1>Signals</h1><br><table>'
     (counter, html)=generate_sigplots(counter, html, cols)
     html = html + '</table>'
@@ -395,7 +414,7 @@ def gen_c2(html, counter, cols, recent, systemname):
     
     try:
         if c2dict.has_key(systemname):
-            (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+            (counter, html)=generate_sig_html(verdict[systemname], counter, html, cols, True)
   
             c2data=generate_c2_plot(systemname, 'openedWhen',  initCap)
             (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'openedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols, recent)
@@ -430,7 +449,7 @@ def gen_ib(html, counter, cols):
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (dcounter, dhtml)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', 1, dhtml, cols)
             
-		(dcounter, vhtml)=generate_html(verdict[systemname], 0, vhtml, cols, True)
+		(dcounter, vhtml)=generate_sig_html(verdict[systemname], 0, vhtml, cols, True)
 
          except Exception as e:
             logging.error("get_iblive", exc_info=True)
@@ -484,7 +503,7 @@ def gen_ib(html, counter, cols):
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (dcounter, dhtml)=generate_plots(data, 'recent_ib_' + systemname + 'Signals', 'Recent IB ' + systemname + 'Signals', 'equity', 1, dhtml, cols, recent)
 		
-		(dcounter, vhtml)=generate_html(verdict[systemname], 0, vhtml, cols, True)
+		(dcounter, vhtml)=generate_sig_html(verdict[systemname], 0, vhtml, cols, True)
 
          except Exception as e:
             logging.error("get_iblive", exc_info=True)
@@ -546,7 +565,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                 try:
                     logging.info ('C2:' + systemname)
                     if verdict.has_key(systemname):
-                        (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+                        (counter, html)=generate_sig_html(verdict[systemname], counter, html, cols, True)
     
                     c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
                     (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
@@ -568,7 +587,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                 try:
                       logging.info ('IB: ' + systemname)
                       if verdict.has_key(systemname):
-                          (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+                          (counter, html)=generate_sig_html(verdict[systemname], counter, html, cols, True)
                         
                       ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
                       (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)

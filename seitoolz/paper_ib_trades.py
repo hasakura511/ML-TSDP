@@ -14,25 +14,29 @@ from tzlocal import get_localzone
 
 from paper_account import get_account_value, update_account_value
 from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
+import threading
 
 debug=True
 debug2=False
+lock = threading.Lock()
 
 def get_ib_trades(systemname, date):
     filename='./data/paper/ib_' + systemname + '_trades.csv'
     
     if os.path.isfile(filename):
-        dataSet = pd.read_csv(filename, index_col='permid')
-        if 'PurePL' not in dataSet:
-            dataSet['PurePL']=0
-        return dataSet
+        with lock:
+            dataSet = pd.read_csv(filename, index_col='permid')
+            if 'PurePL' not in dataSet:
+                dataSet['PurePL']=0
+            return dataSet
     else:
         dataSet=pd.DataFrame({}, columns=['permid','account','clientid','commission','commission_currency',\
                             'exchange','execid','expiry','level_0','orderid','price','qty','openqty', \
                             'realized_PnL','side',\
                             'symbol','symbol_currency','times','yield_redemption_date','PurePL'])
         dataSet=dataSet.set_index('permid')
-        dataSet.to_csv(filename)
+        with lock:
+            dataSet.to_csv(filename)
         return dataSet
     
     
@@ -113,7 +117,8 @@ def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
     #print filename
     dataSet['permid'] = dataSet['permid'].astype('int')
     dataSet=dataSet.set_index('permid')   
-    dataSet.to_csv(filename)
+    with lock:
+        dataSet.to_csv(filename)
     
 
     return (account, dataSet)

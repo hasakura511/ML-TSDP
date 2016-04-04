@@ -14,27 +14,31 @@ from tzlocal import get_localzone
 
 from paper_account import get_account_value, update_account_value
 from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
+import threading
 
 debug=False
-        
+lock = threading.Lock()
+
 def get_ib_portfolio(systemname, date):
     filename='./data/paper/ib_' + systemname + '_portfolio.csv'
     
     account=get_account_value(systemname, 'ib', date)
     if os.path.isfile(filename):
-        dataSet = pd.read_csv(filename, index_col='symbol')
-        if 'PurePL' not in dataSet:
-            dataSet['PurePL']=0
-        dataSet=dataSet.reset_index()
-        dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
-        dataSet=dataSet.set_index('symbol')
+        with lock:
+            dataSet = pd.read_csv(filename, index_col='symbol')
+            if 'PurePL' not in dataSet:
+                dataSet['PurePL']=0
+            dataSet=dataSet.reset_index()
+            dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
+            dataSet=dataSet.set_index('symbol')
         return (account, dataSet)
     else:
 
         dataSet=pd.DataFrame({}, columns=['sym','exp','qty','openqty','price','openprice','value','avg_cost','unr_pnl','real_pnl','PurePL','accountid','currency'])
         dataSet['symbol']=dataSet['sym'] + dataSet['currency']        
         dataSet=dataSet.set_index('symbol')
-        dataSet.to_csv(filename)
+        with lock:
+            dataSet.to_csv(filename)
         return (account, dataSet)
    
 def get_ib_pos(systemname, symbol, currency, date):
@@ -81,8 +85,8 @@ def update_ib_portfolio(systemname, pos, date):
     if debug:
         print "Update Portfolio " + systemname + " Qty: " + str(pos['qty']) + \
                         ' symbol: ' + symbol
-    
-    dataSet.to_csv(filename)
+    with lock: 
+        dataSet.to_csv(filename)
     
     account=get_account_value(systemname, 'ib', date)
     return (account, dataSet)

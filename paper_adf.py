@@ -101,7 +101,7 @@ def refresh_paper(sysname):
             os.remove(filename)
             print 'Deleting ' + filename
 
-def get_results(sysname, pairs):
+def get_results(sysname, pairs, files):
     
     ibdata=seigraph.generate_paper_ib_plot(sysname, 'Date', 20000)
     seigraph.generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + sysname + 'ib', sysname + " IB ", 'Equity')
@@ -109,7 +109,7 @@ def get_results(sysname, pairs):
     data=seigraph.get_data(sysname, 'paper', 'ib', 'trades', 'times', 20000)
     seigraph.generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + sysname + 'ib' + sysname+'PL', 'paper_' + sysname + 'ib' + sysname + ' PL', 'PL')
     
-    data=seigraph.get_data_files(np.array(pairs,dtype=object)[:,0], np.array(pairs,dtype=object)[:,1], 'Close', 20000)
+    data=seigraph.get_data_files(files, pairs, 'Close', 20000)
     seigraph.generate_plots(data, 'paper_' + sysname + 'Close', sysname + " Close Price", 'Close')
     
 
@@ -117,20 +117,29 @@ pairs=[]
 
 if len(sys.argv) > 1 and sys.argv[1] == 's105JPY':
     pairs=[
+           ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO', 's105_EURJPY']],
+           ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO', 's105_USDJPY']],
+           ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO', 's105_CADJPY']],
+           ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO', 's105_CHFJPY']],
+           ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [100000,'JPY','IDEALPRO', 's105_GBPJPY']]]
+elif len(sys.argv) > 1 and sys.argv[1] == 's105JPY2':
+    pairs=[
            #['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [10,'JPY','IDEALPRO', 's105_EURJPY']],
            #['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [10,'JPY','IDEALPRO', 's105_USDJPY']],
-           ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [10,'JPY','IDEALPRO', 's105_CADJPY']],
-           ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [10,'JPY','IDEALPRO', 's105_CHFJPY']],
-           ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [10,'JPY','IDEALPRO', 's105_GBPJPY']]]
+           #['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO', 's105_CADJPY']],
+           #['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO', 's105_CHFJPY']],
+           ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [100000,'JPY','IDEALPRO', 's105_GBPJPY']]]
 
 else:
     pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
            ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
 
 sysname='ADF'
-refresh_paper(sysname)
-data=gettrades(sysname)
+
+#data=gettrades(sysname)
 SST=bars.get_bar_history(pairs, 'Close')
+if SST.shape[0] > 3000:
+    SST=SST.tail(3000)
 threads = []
 
 pos=dict()
@@ -138,8 +147,11 @@ totalpos=dict()
 asks=dict()
 bids=dict()
 
-def proc_pair(sym1, sym2, param1, param2):
+def proc_pair(sysname, sym1, sym2, param1, param2):
+       
         symPair=sym1+sym2
+        
+        refresh_paper(sysname)
         if not pos.has_key(symPair):
             pos[symPair]=dict()
         params=dict()
@@ -182,7 +194,7 @@ def proc_pair(sym1, sym2, param1, param2):
                         if pos[symPair][barSym] == 0:
                             pos[symPair].pop(barSym, None)
                             
-                        (mult, currency, exchange)=params[barSym]
+                        (mult, currency, exchange, signalfile)=params[barSym]
                         commissionkey=barSym + currency + exchange
                         commission_pct=0.00002
                         commission_cash=2
@@ -206,9 +218,12 @@ def proc_pair(sym1, sym2, param1, param2):
                             adj_size(model, barSym, sysname, pricefeed,   \
                                 sysname,sysname,mult,barSym, secType, True, \
                                     mult, ibsym,currency,exchange, secType, True, date)
+    
             except Exception as e:
                 logging.error('proc_pair', exc_info=True)
+        
 seen=dict()
+reslist=dict()
 def proc_backtest(sysname, SST):
     for [file1,sym1, mult1] in pairs:
         #print "sym: " + sym1
@@ -216,7 +231,12 @@ def proc_backtest(sysname, SST):
             if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
                 seen[sym1+sym2]=1
                 seen[sym2+sym1]=1
-                sig_thread = threading.Thread(target=proc_pair, args=[sym1, sym2, mult1, mult2])
+                mypairs=[sym1,sym2]
+                myfiles=[file1, file2]
+                mysysname=sysname +'_'+ sym1+'_'+sym2
+                reslist[mysysname]=[mypairs, myfiles]
+                
+                sig_thread = threading.Thread(target=proc_pair, args=[mysysname, sym1, sym2, mult1, mult2])
                 sig_thread.daemon=True
                 threads.append(sig_thread)
     [t.start() for t in threads]
@@ -224,9 +244,8 @@ def proc_backtest(sysname, SST):
 
 proc_backtest(sysname, SST)
 
-#results
-sysname=sysname
-get_results(sysname, pairs)
-
+for sysname in reslist.keys():
+    (mypair,myfile)=reslist[sysname]
+    get_results(sysname, mypair, myfile)
 
 

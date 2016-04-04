@@ -15,9 +15,11 @@ from tzlocal import get_localzone
 from paper_account import get_account_value, update_account_value
 from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
 from paper_c2_trades import get_c2_trades
+import threading
 
 debug=False
 debug2=False
+lock = threading.Lock()
 
 def get_c2_portfolio(systemname, date):
     filename='./data/paper/c2_' + systemname + '_portfolio.csv'
@@ -25,9 +27,10 @@ def get_c2_portfolio(systemname, date):
     account=get_account_value(systemname, 'c2', date)
     
     if os.path.isfile(filename):
-        dataSet = pd.read_csv(filename, index_col='symbol')
-        if 'PurePL' not in dataSet:
-            dataSet['PurePL']=0
+        with lock:
+            dataSet = pd.read_csv(filename, index_col='symbol')
+            if 'PurePL' not in dataSet:
+                dataSet['PurePL']=0
         return (account, dataSet)
         
     else:
@@ -37,7 +40,8 @@ def get_c2_portfolio(systemname, date):
                      'expir','instrument',\
                      'markToMarket_time','openVWAP_timestamp','openedWhen','qty'])
         dataSet = dataSet.set_index('symbol')
-        dataSet.to_csv(filename)
+        with lock:
+            dataSet.to_csv(filename)
         return (account, dataSet)
 
     
@@ -115,6 +119,7 @@ def update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date):
         print "Update Portfolio " + systemname + " " + pos['long_or_short'] + \
                         ' symbol: ' + pos['symbol'] + ' open_or_closed ' + pos['open_or_closed'] + \
                         ' opened: ' + str(pos['quant_opened']) + ' closed: ' + str(pos['quant_closed'])
-    dataSet.to_csv(filename)
+    with lock:
+        dataSet.to_csv(filename)
     account=get_account_value(systemname, 'c2', date)
     return (account, dataSet)

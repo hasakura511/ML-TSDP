@@ -6,7 +6,7 @@ def onBar(bar, symbols):
 	print "Date: " + bar['Date'] + '\n'
 	for symbol in symbols:
 		print "OnBar: " + symbol + '\n'
-		print "OnBar: " + bar[symbol] + '\n'
+		print "OnBar: " + str(bar[symbol]) + '\n'
 	print "==============="
 
 bars.get_last_bars(['EURUSD','USDJPY'], 'Close', onBar)

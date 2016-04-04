@@ -316,11 +316,14 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4, rece
     return (counter, html)
 
 def generate_sig_html(signal, counter, html, cols, colspan):
-    cols=5
+    cols=6
     filename=signal 
     if os.path.isfile('./data/results/' + filename + '.png'):
       (counter, html)=generate_html(filename, counter, html, cols)
     filename=signal + "_CDF"
+    if os.path.isfile('./data/results/' + filename + '.png'):
+      (counter, html)=generate_html(filename, counter, html, cols)
+    filename=signal + "_DPS"
     if os.path.isfile('./data/results/' + filename + '.png'):
       (counter, html)=generate_html(filename, counter, html, cols)
     filename=signal + "_OOS"

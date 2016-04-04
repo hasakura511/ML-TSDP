@@ -32,9 +32,10 @@ from dateutil.parser import parse
     
 
 
-def get_last_bars_debug(currencyPairs, ylabel, callback):
+def get_last_bars_debug(currencyPairs, ylabel, callback, **kwargs):
     global tickerId
     global lastDate
+    minPath = kwargs.get('minPath','./data/bars/')
     #while 1:
     try:
         SST=pd.DataFrame()
@@ -42,7 +43,7 @@ def get_last_bars_debug(currencyPairs, ylabel, callback):
         returnData=False
         for i,ticker in enumerate(currencyPairs):
             pair=ticker
-            minFile='./data/bars/'+pair+'.csv'
+            minFile=minPath+pair+'.csv'
             symbol = pair
             #print minFile
             if os.path.isfile(minFile):
@@ -119,8 +120,10 @@ def get_last_bars(currencyPairs, ylabel, callback):
                         lastDate[symbol]=timestamp
                                                
                     if lastDate[symbol] < timestamp:
+                        logging.info('updating '+str(date)+' for '+ symbol)
                         returnData=True
                         symbols.append(symbol)
+                        lastDate[symbol]=timestamp
                         
             if returnData:
                 data=SST
@@ -139,7 +142,7 @@ def get_bars(pairs, interval):
         mypairs.append(interval + pair)
         
     if debug:
-        get_last_bars_debug(mypairs, 'Close', onBar)
+        get_last_bars_debug(mypairs, 'Close', onBar,minPath=minPath)
     else:
         get_last_bars(mypairs, 'Close', onBar)
         #get_last_bars_debug(mypairs, 'Close', onBar)
@@ -188,7 +191,8 @@ def runPair_v1(pair):
                 'scorePath' : scorePath, 'equityStatsSavePath' : equityStatsSavePath,'signalPath' : signalPath,\
                 'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
                 'version':version, 'version_':version_, 'filterName':filterName, 'data_type':data_type,\
-                'barSizeSetting':barSizeSetting,'currencyPairs':pairs, 'perturbData':perturbData}
+                'barSizeSetting':barSizeSetting,'currencyPairs':pairs, 'perturbData':perturbData,\
+                'modelPath':modelPath}
                 
         
     try:
@@ -224,7 +228,8 @@ def runPair_v2(pair, dataSet):
                 'scorePath' : scorePath, 'equityStatsSavePath' : equityStatsSavePath,'signalPath' : signalPath,\
                 'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
                 'version':version, 'version_':version_, 'filterName':filterName, 'data_type':data_type,\
-                'barSizeSetting':barSizeSetting,'currencyPairs':pairs, 'perturbData':perturbData}
+                'barSizeSetting':barSizeSetting,'currencyPairs':pairs, 'perturbData':perturbData,\
+                'modelPath':modelPath}
                 
 
         
@@ -318,9 +323,10 @@ if len(sys.argv)==1:
     #equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     dataPath = 'D:/ML-TSDP/data/from_IB/'
+    modelPath = 'D:/ML-TSDP/data/models/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
-    
+    minPath= 'D:/ML-TSDP/data/bars/'
     #while 1:          
     get_bars(livePairs,barSizeSetting+'_')
     #time.sleep(100)
@@ -359,8 +365,10 @@ else:
     equityStatsSavePath = None
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
+    modelPath = './data/models/'
     bestParamsPath =  './data/params/'
     chartSavePath = './data/results/' 
+    minPath= './data/bars/'
     
     if len(sys.argv) >2:
         if sys.argv[2] == 'debug':  

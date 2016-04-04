@@ -134,14 +134,14 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    'GBPJPY',\
+                    #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
-                    #'USDCHF',\
+                    'USDCHF',\
                     #'NZDUSD',
                     #'EURCHF',\
                     #'EURGBP'\
@@ -212,7 +212,7 @@ for ticker in livePairs:
     validationSetLength = 90
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [15,45] # min is 2
+    validationPeriods = [15,45,90] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']
@@ -249,7 +249,7 @@ for ticker in livePairs:
 
     #DPS parameters
     #windowLengths = [2] 
-    windowLengths = [30,90]
+    windowLengths = [20]
     maxLeverage = [2]
     PRT={}
     PRT['initial_equity'] = 1
@@ -768,7 +768,7 @@ for ticker in livePairs:
                                                                     ticker=ticker,displayCharts=showBestCharts,\
                                                                     equityStatsSavePath=equityStatsSavePath, verbose=verbose,\
                                                                     v3tag=v3tag, returnNoDPS=True, savePath=chartSavePath,\
-                                                                    numCharts=1)
+                                                                    )
                         bestBothDPS.index.name = 'dates'
                         bestBothDPS = pd.concat([bestBothDPS, pd.Series(data = dpsRunName,index=bestBothDPS.index, name='system')], \
                                                                         axis=1)                       
@@ -776,6 +776,7 @@ for ticker in livePairs:
                         v3signals[validationPeriod] = bestBothDPS
                     else:
                         #NoDPS is being returned
+                        
                         v3signals[validationPeriod] = bestBothDPS
                         
                     #save model

@@ -1,6 +1,7 @@
 import seitoolz.bars as bars
 
 def onBar(bar, symbols):
+	bar=bar.iloc[-1]
 	print "==============="
 	print "Date: " + bar['Date'] + '\n'
 	for symbol in symbols:
@@ -8,5 +9,5 @@ def onBar(bar, symbols):
 		print "OnBar: " + bar[symbol] + '\n'
 	print "==============="
 
-bars.get_last_bar(['EURUSD','USDJPY'], 'Close', onBar)
+bars.get_last_bars(['EURUSD','USDJPY'], 'Close', onBar)
 

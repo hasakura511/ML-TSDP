@@ -108,9 +108,11 @@ check=dict()
 def check_bar(pairs, interval, tradingHours=True):
     dataPath = './data/from_IB/'
     barPath='./data/bars/'
+   
     while 1:
         try:
             message=''
+            count=0
             for pair in pairs:
                 dataFile=dataPath + interval + '_' + pair + '.csv'
                 barFile=barPath + interval + '_' + pair + '.csv'
@@ -152,9 +154,13 @@ def check_bar(pairs, interval, tradingHours=True):
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(bar.index[-1]) + '\n'
                         message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + " Bar Diff " + str(timestamp - btimestamp) + '\n'
                         message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + '\n'
+                        count = count + 1
 
             if len(message) > 0:
-                send_alert(interval + ' Feed Not Updating', message, tradingHours)
+                if interval == 'choppy' and count > 5:
+                    send_alert(interval + ' Feed Not Updating', message, tradingHours)
+                else:
+                    send_alert(interval + ' Feed Not Updating', message, tradingHours)
             time.sleep(300)
         except Exception as e:
             logging.error("check_bar", exc_info=True)

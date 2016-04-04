@@ -401,56 +401,6 @@ def get_last_bars(currencyPairs, ylabel, callback):
         except Exception as e:
             logging.error("get_last_bar", exc_info=True)
             
-def get_last_bar(currencyPairs, ylabel, callback):
-    global tickerId
-    global lastDate
-    while 1:
-        try:
-            SST=pd.DataFrame()
-            symbols=list()
-            returnData=False
-            for ticker in currencyPairs:
-                pair=ticker
-                minFile='./data/bars/'+pair+'.csv'
-                symbol = pair
-                
-                if os.path.isfile(minFile):
-                    dta=pd.read_csv(minFile).iloc[-1]
-                    date=dta['Date']
-                    
-                    eastern=timezone('US/Eastern')
-                    date=parse(date).replace(tzinfo=eastern)
-                    timestamp = time.mktime(date.timetuple())
-                    
-                    data=pd.DataFrame()
-                    data['Date']=date
-                    data[symbol]=dta[ylabel]
-                    data=data.set_index('Date') 
-                    
-                    if len(SST.index.values) < 1:
-                        SST=data
-                    else:
-                        SST=SST.join(data)
-                        
-                    if not lastDate.has_key(symbol):
-                        lastDate[symbol]=timestamp
-                        returnData=True
-                        symbols.append(symbol)
-                                               
-                    if lastDate[symbol] < timestamp:
-                        lastDate[symbol]=timestamp
-                        returnData=True
-                        symbols.append(symbol)
-                        
-            if returnData:
-                data=SST
-                #data=data.set_index('Date')
-                #data=data.fillna(method='pad')
-                callback(data, symbols)
-            time.sleep(20)
-        except Exception as e:
-            logging.error("get_last_bar", exc_info=True)
-            
 def get_bar_history(datas, ylabel):
     try:
         SST=pd.DataFrame()

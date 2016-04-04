@@ -82,8 +82,9 @@ def send_alert(subject, msg, tradingHours=True):
         logging.info("Trading Hour - Sending Email Alert")
         print "Trading Hour - Sending Email Alert"
     
-        me='catchall@neospace.com'
-        you='consulting@neospace.com'
+        me='monitor@neospace.com'
+        #me='root@localhost'
+        you='system_server@neospace.com'
         # Create a text/plain message
         message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
              """ % (me, ", ".join(you), subject, msg)
@@ -92,9 +93,10 @@ def send_alert(subject, msg, tradingHours=True):
         # Send the message via our own SMTP server, but don't include the
         # envelope header.
         server = smtplib.SMTP_SSL('smtp.gmail.com:465')
-        server.ehlo()
+        #server = smtplib.SMTP('localhost')
+	server.ehlo()
         #server.starttls()
-        server.login('catchall@neospace.com','W0h0h0h0')
+        server.login('monitor@neospace.com','W0h0h0h0')
         server.sendmail(me, [you], message)
         server.quit()
     except Exception as e:

@@ -199,9 +199,16 @@ def check_signal(pairs, tradingHours=True):
                     eastern=timezone('US/Eastern')
                     
                     #timestamp
-                    dataDate=parse(data.index[-1]).replace(tzinfo=eastern)
+                    dataDate=''
+                    dtimestamp = 0
+                    try:
+                        dataDate=parse(data.index[-1]).replace(tzinfo=eastern)
+                        dtimestamp = time.mktime(dataDate.timetuple())
+                    except Exception as e:
+                        dataDate=data.index[-1]
+                        dtimestamp=data.index[-1]
+                        
                     nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
-                    dtimestamp = time.mktime(dataDate.timetuple())
                     timestamp=time.mktime(nowDate.timetuple()) + 3600
                    
                     checktime = checktime * 60

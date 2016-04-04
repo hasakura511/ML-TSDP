@@ -249,6 +249,8 @@ totalpos=dict()
 bardict=dict()
 lastDate=dict()
 SST=bars.get_bar_history(pairs, 'Close')
+if SST.shape[0] > 3000:
+    SST=SST.tail(3000)
 get_entryState()
 start_signal()
 proc_history()

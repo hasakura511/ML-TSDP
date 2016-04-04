@@ -183,7 +183,6 @@ def compress_min_bar(sym, histData, filename, interval='30m'):
         #time=time.astimezone(eastern).strftime('%Y-%m-%d %H:%M:00') 
         wap=0
         count=data.shape[0]
-        
         if date in data.index:
                
             quote=data.loc[date].copy()
@@ -196,8 +195,8 @@ def compress_min_bar(sym, histData, filename, interval='30m'):
             if quote['Volume'] < 0:
                 quote['Volume'] = 0 
             data.loc[date]=quote
-            #print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
-        
+            print "Update Bar: bar: sym: " + sym + " date:" + str(date) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) 
+                    
         else:
             if len(data.index) > 1:
                 data=data.reset_index()                
@@ -339,18 +338,23 @@ def update_bars(currencyPairs, interval='30m'):
                     
                     if not lastDate.has_key(symbol):
                         lastDate[symbol]=timestamp
-                        regentime=60
-                        if interval == '30m':
-                            regentime=30*6
-                        elif interval == '1h':
-                            regentime = 60 * 6
-                        elif interval == '10m':
-                            regentime == 10 * 6
-                        
-                        quote=data
-                        if quote.shape[0] > regentime:
-                            quote=quote.tail(regentime)
-                        compress_min_bar(symbol, quote, filename, interval) 
+                        dataFile='./data/from_IB/1 min_'+pair+'.csv'
+                        if os.path.isfile(dataFile):
+                            data=pd.read_csv(dataFile)
+                            regentime=60
+                            if interval == '30m':
+                                regentime=30*6
+                            elif interval == '1h':
+                                regentime = 60 * 6
+                            elif interval == '10m':
+                                regentime == 10 * 6
+                            
+                            quote=data
+                            if quote.shape[0] > regentime:
+                                quote=quote.tail(regentime)
+                            for i in quote.index:
+                                data=quote.ix[i]
+                                compress_min_bar(symbol, data, filename, interval)
                                        
                     if lastDate[symbol] < timestamp:
                         lastDate[symbol]=timestamp

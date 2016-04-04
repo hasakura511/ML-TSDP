@@ -11,6 +11,8 @@ import talib as ta
 import arch
 import random
 import time
+from os import listdir
+from os.path import isfile, join
 import statsmodels.tsa.stattools as ts
 import datetime
 from datetime import datetime as dt
@@ -19,7 +21,29 @@ from numpy import cumsum, log, polyfit, sqrt, std, subtract
 from numpy.random import randn
 from statsmodels.sandbox.stats.runs import runstest_1samp
 from scipy import stats
+from sklearn.externals import joblib
 
+def saveParams(start_time, dataSet, bestModelParams, bestParamsPath, modelSavePath,ticker, version, barSizeSetting,BSMdict):
+    timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)
+    bestModelParams = bestModelParams.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+    bestModelParams = bestModelParams.append(pd.Series(data=lastBartime.strftime("%Y%m%d %H:%M:%S %Z"), index=['lastBartime']))
+    bestModelParams = bestModelParams.append(pd.Series(data=cycleTime, index=['cycleTime']))
+    
+    print '\n'+'Saving Params for '+version
+    files = [ f for f in listdir(bestParamsPath) if isfile(join(bestParamsPath,f)) ]
+    if version+'_'+ticker+'_'+barSizeSetting+ '.csv' not in files:
+        BMdf = pd.concat([bestModelParams,bestModelParams],axis=1).transpose()
+        #BMdf.index = BMdf.timestamp
+        BMdf.to_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv', index=False)
+    else:
+        BMdf = pd.read_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv').append(bestModelParams, ignore_index=True)
+        #BMdf.index = BMdf.timestamp
+        BMdf.to_csv(bestParamsPath+version+'_'+ticker+'_'+barSizeSetting+'.csv', index=False)
+    
+    print 'Saving Model for', version, 'validation period', bestModelParams.validationPeriod
+    runName=BSMdict[bestModelParams.validationPeriod][0]
+    print runName
+    joblib.dump(BSMdict[bestModelParams.validationPeriod][1], modelSavePath+version+'_'+runName+'.joblib',compress=3)
 
 def getCycleTime(start_time, dataSet, timeZone='US/Eastern'):
     timenow = dt.now(timezone(timeZone))

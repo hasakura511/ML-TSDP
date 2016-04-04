@@ -421,26 +421,35 @@ def runv2(runData, dataSet=pd.DataFrame()):
     model_metrics = init_report()       
     sstDictDF1_ = {}
     SMdict={}
-    modelFile = modelPath+version+'_'+ticker+'_'+barSizeSetting+'.joblib'
+    
+    runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_' + bestParams.model+\
+            '_i'+str(bestParams.wf_is_period)+'_fcst'+str(bestParams.signal.split('_')[0][2:])+\
+            '_'+bestParams.signal
+    modelFile = modelPath+version+'_'+runName+'.joblib'
+    
     testFirstYear = dataSet.index[0]
     testFinalYear = dataSet.index[max(wf_is_periods)-1]
     validationFirstYear =dataSet.index[max(wf_is_periods)]
     validationFinalYear =dataSet.index[-1]
-    
-    if validationStartPoint is not None and\
-                dataSet.shape[0]>dataSet.index[-validationStartPoint:].shape[0]+max(wf_is_periods)+max(windowLengths):
-        testFinalYear = dataSet.index[-validationStartPoint-max(windowLengths)-1]
-        validationFirstYear =dataSet.index[-validationStartPoint-max(windowLengths)]    
+    if runDPS:
+        if validationStartPoint is not None and\
+                    dataSet.shape[0]>dataSet.index[-validationStartPoint:].shape[0]+max(wf_is_periods)+max(windowLengths):
+            testFinalYear = dataSet.index[-validationStartPoint-max(windowLengths)-1]
+            validationFirstYear =dataSet.index[-validationStartPoint-max(windowLengths)]    
+    else:
+        if validationStartPoint is not None and\
+                dataSet.shape[0]>dataSet.index[-validationStartPoint:].shape[0]+max(wf_is_periods):
+            testFinalYear = dataSet.index[-validationStartPoint-1]
+            validationFirstYear =dataSet.index[-validationStartPoint]       
         
-    if os.path.isfile(modelFile) and bestParams.signal[:2] != 'BH' and bestParams.signal[:2] != 'SH':
-        print 'Loading model..'
-        m = joblib.load(modelFile)      
+    if os.path.isfile(modelFile) and bestParams.signal[:2] != 'BH' and bestParams.signal[:2] != 'SH' and loadModel:
+
+        print 'Loading model..', runName
+        m = joblib.load(modelFile)
+        print m
         dropCol = ['Open','High','Low','Close', 'Volume','gainAhead','signal', 'prior_index']
         ypred = pd.Series(data=m.predict(dataSet.drop(dropCol, axis=1)), index=dataSet.index,\
                                     name='signals')
-        runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_' + bestParams.model+\
-                        '_i'+str(bestParams.wf_is_period)+'_fcst'+str(bestParams.signal.split('_')[0][2:])+\
-                        '_'+bestParams.signal
         sstDictDF1_[runName]= pd.concat([ypred, dataSet[['gainAhead','prior_index']]], axis=1).ix[validationFirstYear:validationFinalYear]
     else:            
         for signal in signal_types:
@@ -531,10 +540,11 @@ def runv2(runData, dataSet=pd.DataFrame()):
                             bestParams.model + '_i'+str(bestParams.wf_is_period)\
                             +'_fcst'+str(bestParams.wf_step)+'_'+bestParams.signal
     if showAllCharts:
-        compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName)       
-    elif runDPS == False:
         compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName, savePath=chartSavePath,\
-                                showChart=False, ticker=ticker, version=version)
+                                showChart=True, filename=version+'_'+ticker+'_OOS')     
+    else:
+        compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName, savePath=chartSavePath,\
+                                showChart=False, filename=version+'_'+ticker+'_OOS')
 
         
     timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)
@@ -596,7 +606,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
                 
                 #dpsRun, sst_save = calcDPS2('BuyHold', buyandhold, PRT, start, end, wl)
                 #DPS[dpsRun] = sst_save
-        v3tag=version+' '+ticker+' Signal OOS'
+        v3tag=version+'_'+ticker+'_DPS'
         dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                     endDate,'both', DF1_BMrunName, yscale='linear',\
                                                     ticker=ticker,displayCharts=showAllCharts,\
@@ -693,7 +703,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
 
 if __name__ == "__main__":
     #system parameters
-    version = 'v2'
+    version = 'v1'
     version_ = 'v2.4C'
     filterName = 'DF1'
     data_type = 'ALL'
@@ -707,7 +717,7 @@ if __name__ == "__main__":
         debug=True
         
         livePairs =  [
-                        'NZDJPY',\
+                        #'NZDJPY',\
                         #'CADJPY',\
                         #'CHFJPY',\
                         #'EURJPY',\
@@ -720,7 +730,7 @@ if __name__ == "__main__":
                         #'USDCAD',\
                         #'USDCHF',\
                         #'NZDUSD',
-                        #'EURCHF',\
+                        'EURCHF',\
                         #'EURGBP'\
                         ]
                         
@@ -728,10 +738,11 @@ if __name__ == "__main__":
         showPDFCDF = False
         showAllCharts = True
         perturbData = False
-        runDPS = True
+        runDPS = False
         saveParams = False
         saveDataSet = True
-        verbose = False
+        verbose = True
+        loadModel = True
         #scorePath = './debug/scored_metrics_'
         #equityStatsSavePath = './debug/'
         #signalPath = './debug/'
@@ -740,9 +751,10 @@ if __name__ == "__main__":
         equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
         signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
         dataPath = 'D:/ML-TSDP/data/from_IB/'
-        bestParamsPath = 'D:/ML-TSDP/data/params/'        
+        #bestParamsPath = 'D:/ML-TSDP/data/params/'        
+        bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/'      
         chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
-        modelPath = 'D:/ML-TSDP/data/models/'        
+        modelPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/models/'        
         
     else:
         print 'Live Mode', sys.argv[1], sys.argv[2]
@@ -756,7 +768,7 @@ if __name__ == "__main__":
         saveParams = False
         saveDataSet=True
         verbose= False
-        
+        loadModel = True
         scorePath = None
         equityStatsSavePath = None
         signalPath = '../data/signals/'

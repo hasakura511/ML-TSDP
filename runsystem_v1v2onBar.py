@@ -123,6 +123,7 @@ def onBar(bar, symbols):
             runPair_v1([sym])
         logging.info( 'All signals created for bar '+str(bar['Date']))
         logging.info('Elapsed time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+        start_time = time.time()
     #else:   
     #    if len(gotbar[bar['Date']])==len(pairs):
     #        print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'

@@ -574,6 +574,7 @@ def compareEquity(sst, title, **kwargs):
     version= kwargs.get('version',None)
     showChart = kwargs.get('showChart',True)
     ticker =  kwargs.get('ticker',None)
+    filename =  kwargs.get('filename',None)
     #check if there's time in the index
     if not sst.index.to_datetime()[0].time() and not sst.index.to_datetime()[1].time():
         barSize = '1 day'
@@ -689,7 +690,7 @@ def compareEquity(sst, title, **kwargs):
     avgTrades = float(allTrades)/hoursTraded
     
     if savePath != None:
-        if version==None and ticker==None:
+        if filename==None:
             plt.savefig(savePath+title+'.png', bbox_inches='tight')
         else:
             #text= '\nValidation Period from', sst.index[0],'to',sst.index[-1]
@@ -700,7 +701,7 @@ def compareEquity(sst, title, **kwargs):
             #text+='\nTWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])
             text+='\nTWR for %i beLong and beShort trades is %0.3f' % (allTrades,equityBeLongAndShortSignals[nrows-1])   
             plt.figtext(0.05,-0.0,text, fontsize=15)
-            plt.savefig(savePath+version+' '+ticker+' Signal OOS.png', bbox_inches='tight')
+            plt.savefig(savePath+filename+'.png', bbox_inches='tight')
             
     if showChart:        
         plt.show()

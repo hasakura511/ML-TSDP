@@ -1,0 +1,2 @@
+symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
+GBPJPY,open,long,300000.0,0.0,159.746,,-8.4345888,0.0,8.4345888,2.0,,,,,GBPJPY,,20160401 15:44:00 EST,20160401 08:29:00 EST,100000.0,20458.9778864,-162050.72,20474.32

@@ -339,6 +339,8 @@ def update_bars(currencyPairs, interval='30m'):
                     
                     if not lastDate.has_key(symbol):
                         lastDate[symbol]=timestamp
+                        quote=data.iloc[-1]
+                        compress_min_bar(symbol, quote, filename, interval) 
                                        
                     if lastDate[symbol] < timestamp:
                         lastDate[symbol]=timestamp

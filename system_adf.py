@@ -197,7 +197,7 @@ def onBar(bar, symbols):
     global SST
     bar=bar.set_index('Date')
     SST = SST.combine_first(bar).sort_index()
-    logging.info("onBar: " + str(SST.iloc[-1]['Date']))
+    logging.info("onBar: " + str(SST.index[-1]))
     for sym in symbols:
         logging.info("onBar: " + sym)
     

@@ -66,7 +66,7 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, 
                 reset_c2pos_cache(systemid)
    
     if ibsubmit:
-        ib_pos_qty=get_ib_pos(systemname, ibsym, ibcurrency)
+        ib_pos_qty=get_ib_pos(ibsym, ibcurrency)
         system_ibpos_qty=round(system_pos['action']) * ibquant
         
         logging.info( "system_ib_pos: " + str(system_ibpos_qty) )

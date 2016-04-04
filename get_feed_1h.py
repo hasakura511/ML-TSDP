@@ -1,7 +1,10 @@
 import seitoolz.bars as bars
 import threading
 import time
-    
+import logging
+
+logging.basicConfig(filename='/logs/get_feed_1h.log',level=logging.DEBUG)
+
 def start_proc():
     interval='1h'
     minDataPoints = 5000

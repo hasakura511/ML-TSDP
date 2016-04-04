@@ -84,8 +84,8 @@ def prep_pair(sym1, sym2, param1, param2):
                 timestamp=time.mktime(priceHist['timestamp'].timetuple())
                 bar1=astrat.getBar(priceHist[sym1], sym1, int(timestamp))
                 bar2=astrat.getBar(priceHist[sym2], sym2, int(timestamp))
-                signals=astrat.procBar(bar1, bar2, pos[symPair], False)
-                #proc_signals(signals, params, symPair, timestamp)
+                signals=astrat.procBar(bar1, bar2, pos[symPair], True)
+                proc_signals(signals, params, symPair, timestamp)
                 
                 
             except Exception as e:

@@ -157,8 +157,9 @@ def check_bar(pairs, interval, tradingHours=True):
                         count = count + 1
 
             if len(message) > 0:
-                if interval == 'choppy' and count > 5:
-                    send_alert(interval + ' Feed Not Updating', message, tradingHours)
+                if interval == 'choppy':
+                    if count > 5:
+                        send_alert(interval + ' Feed Not Updating', message, tradingHours)
                 else:
                     send_alert(interval + ' Feed Not Updating', message, tradingHours)
             time.sleep(300)

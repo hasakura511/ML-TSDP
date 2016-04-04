@@ -6,13 +6,13 @@ import json
 from pandas.io.json import json_normalize
 from ibapi.place_order import place_order as place_iborder
 from c2api.place_order import place_order as place_c2order
-from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ib_sym_pos
-from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open, reset_c2pos_cache
+from ibapi.get_exec import get_ib_pos, get_exec_open as get_ibexec_open, get_ib_sym_pos
+from c2api.get_exec import get_c2_pos, get_exec_open as get_c2exec_open, reset_c2pos_cache
 from seitoolz.signal import get_model_pos
 from time import gmtime, strftime, time, localtime, sleep
 import logging
 
-def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit):
+def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit):
     system_pos=model_pos.loc[system]
    
     logging.info('==============')
@@ -30,14 +30,8 @@ def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant,
     #print str(system_pos['action'])
     #print "c2: " 
     #print c2_pos
-   
     if c2submit:
-        c2_pos=get_c2pos(systemid,c2sym,c2apikey,systemname).loc[c2sym]
-        c2_pos_qty=int(c2_pos['quant_opened']) - int(c2_pos['quant_closed'])
-        c2_pos_side=c2_pos['long_or_short']
-        if c2_pos_side == 'short':
-            c2_pos_qty=-c2_pos_qty
-        
+        c2_pos_qty=get_c2_pos(systemname, c2sym)           
         system_c2pos_qty=round(system_pos['action']) * c2quant
         logging.info( "system_c2_pos: " + str(system_c2pos_qty) )
         logging.info( "c2_pos: " + str(c2_pos_qty) )
@@ -70,11 +64,11 @@ def adj_size(model_pos, ib_pos, system, systemname, systemid, c2apikey, c2quant,
                 logging.info( 'STO: ' + str(c2quant) )
                 place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
                 reset_c2pos_cache(systemid)
+   
     if ibsubmit:
-        ib_pos=get_ib_sym_pos(ib_pos, ibsym, ibcurrency) 
-        ib_pos=ib_pos.loc[ibsym,ibcurrency]
-        ib_pos_qty=ib_pos['qty']
+        ib_pos_qty=get_ib_pos(systemname, ibsym, ibcurrency)
         system_ibpos_qty=round(system_pos['action']) * ibquant
+        
         logging.info( "system_ib_pos: " + str(system_ibpos_qty) )
         logging.info( "ib_pos: " + str(ib_pos_qty) )
         if system_ibpos_qty > ib_pos_qty:

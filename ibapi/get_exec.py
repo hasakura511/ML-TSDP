@@ -6,6 +6,8 @@ import pandas as pd
 from time import gmtime, strftime, time, localtime, sleep
 import json
 from pandas.io.json import json_normalize
+import os
+
 
 def get_exec():
 
@@ -132,4 +134,35 @@ def get_ib_sym_pos(portfolio_data, symbol, currency):
     #
     return dataSet
 
+def get_ib_portfolio():
+    filename='./data/portfolio/ib_portfolio.csv'
+    
+    if os.path.isfile(filename):
+        dataSet = pd.read_csv(filename, index_col='symbol')
+        if 'PurePL' not in dataSet:
+            dataSet['PurePL']=0
+        dataSet=dataSet.reset_index()
+        dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
+        dataSet=dataSet.set_index('symbol')
+        return dataSet
+    else:
+
+        dataSet=pd.DataFrame({}, columns=['sym','exp','qty','openqty','price','openprice','value','avg_cost','unr_pnl','real_pnl','PurePL','accountid','currency'])
+        dataSet['symbol']=dataSet['sym'] + dataSet['currency']        
+        dataSet=dataSet.set_index('symbol')
+        dataSet.to_csv(filename)
+        return dataSet
+   
+def get_ib_pos(symbol, currency):
+    portfolio_data=get_ib_portfolio()
+    portfolio_data=portfolio_data.reset_index()
+    portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
+    sym_cur=symbol + currency
+    portfolio_data=portfolio_data.set_index('symbol')
+    if sym_cur not in portfolio_data.index.values:
+       return 0
+    else:
+        ib_pos=portfolio_data.loc[sym_cur]
+        ib_pos_qty=ib_pos['qty']
+        return ib_pos_qty
 #get_exec();

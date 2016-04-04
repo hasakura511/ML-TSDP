@@ -10,6 +10,7 @@ from paper_c2_portfolio import get_c2_portfolio, update_c2_portfolio, get_c2_pos
 from ibapi.get_exec import get_ibpos, get_iblivepos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
 from c2api.get_exec import get_c2pos, get_c2livepos, get_exec_open as get_c2exec_open, get_c2pos_from_csv
 
+
 def get_portfolio(systemname, broker, date, isLive=False):
     if not isLive:
         if broker == 'c2':

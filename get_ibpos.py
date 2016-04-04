@@ -13,4 +13,5 @@ from seitoolz.order import adj_size
 from time import gmtime, strftime, time, localtime, sleep
     
 ib_pos=get_ibpos()
+c2_pos=get_c2pos()
 

@@ -40,44 +40,6 @@ def get_c2_portfolio(systemname, date):
         dataSet.to_csv(filename)
         return (account, dataSet)
 
-def update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date):
-    filename='./data/paper/c2_' + systemname + '_portfolio.csv'
-    (account, dataSet)=get_c2_portfolio(systemname, date)
-
-    pos=pos.copy()
-    symbol=pos['symbol']
-    
-    pos['balance']=account['balance'] + tradepl
-    pos['purebalance']=account['purebalance'] + purepl
-    pos['margin_available']=account['buy_power'] + buy_power
-    pos['PurePL']=float(pos['PurePL']) + purepl
-    pos['PL']=float(pos['PL']) + float(tradepl)
-    
-    if debug2:
-         print 'C2 Symbol: ' + pos['symbol'] + ' PurePL: ' + str(pos['PurePL']) + ' From Portfolio'
-         
-    if debug:
-        print "Update Portfolio: " + str(symbol)
-        
-    if abs(pos['quant_opened']) > abs(pos['quant_closed']):
-        if symbol in dataSet.index.values:
-            dataSet = dataSet[dataSet.index != symbol]
-            dataSet=dataSet.reset_index()
-            dataSet=dataSet.append(pos)
-            dataSet=dataSet.set_index('symbol')
-        else:
-            dataSet=dataSet.reset_index()
-            dataSet=dataSet.append(pos)
-            dataSet=dataSet.set_index('symbol')
-    else:
-        dataSet = dataSet[dataSet.index != symbol]
-    if debug:
-        print "Update Portfolio " + systemname + " " + pos['long_or_short'] + \
-                        ' symbol: ' + pos['symbol'] + ' open_or_closed ' + pos['open_or_closed'] + \
-                        ' opened: ' + str(pos['quant_opened']) + ' closed: ' + str(pos['quant_closed'])
-    dataSet.to_csv(filename)
-    account=get_account_value(systemname, 'c2', date)
-    return (account, dataSet)
     
 def get_c2_pos(systemname, c2sym, date):
     
@@ -116,3 +78,43 @@ def get_new_c2_pos(systemname, sym, side, openVWAP, openqty, pl, commission, ptV
                      'expir','instrument',\
                      'markToMarket_time','openVWAP_timestamp','openedWhen','qty']).iloc[-1]
     return pos
+
+
+def update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date):
+    filename='./data/paper/c2_' + systemname + '_portfolio.csv'
+    (account, dataSet)=get_c2_portfolio(systemname, date)
+
+    pos=pos.copy()
+    symbol=pos['symbol']
+    
+    pos['balance']=account['balance'] + tradepl
+    pos['purebalance']=account['purebalance'] + purepl
+    pos['margin_available']=account['buy_power'] + buy_power
+    pos['PurePL']=float(pos['PurePL']) + purepl
+    pos['PL']=float(pos['PL']) + float(tradepl)
+    
+    if debug2:
+         print 'C2 Symbol: ' + pos['symbol'] + ' PurePL: ' + str(pos['PurePL']) + ' From Portfolio'
+         
+    if debug:
+        print "Update Portfolio: " + str(symbol)
+        
+    if abs(pos['quant_opened']) > abs(pos['quant_closed']):
+        if symbol in dataSet.index.values:
+            dataSet = dataSet[dataSet.index != symbol]
+            dataSet=dataSet.reset_index()
+            dataSet=dataSet.append(pos)
+            dataSet=dataSet.set_index('symbol')
+        else:
+            dataSet=dataSet.reset_index()
+            dataSet=dataSet.append(pos)
+            dataSet=dataSet.set_index('symbol')
+    else:
+        dataSet = dataSet[dataSet.index != symbol]
+    if debug:
+        print "Update Portfolio " + systemname + " " + pos['long_or_short'] + \
+                        ' symbol: ' + pos['symbol'] + ' open_or_closed ' + pos['open_or_closed'] + \
+                        ' opened: ' + str(pos['quant_opened']) + ' closed: ' + str(pos['quant_closed'])
+    dataSet.to_csv(filename)
+    account=get_account_value(systemname, 'c2', date)
+    return (account, dataSet)

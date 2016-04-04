@@ -388,6 +388,7 @@ def get_last_bars(currencyPairs, ylabel, callback):
                                                    
                         if lastDate[symbol] < timestamp:
                             returnData=True
+                            lastDate[symbol]=timestamp
                             symbols.append(symbol)
                         #print 'Shape: ' + str(len(SST.index)) 
                         
@@ -433,15 +434,18 @@ def get_last_bar(currencyPairs, ylabel, callback):
                         
                     if not lastDate.has_key(symbol):
                         lastDate[symbol]=timestamp
+                        returnData=True
+                        symbols.append(symbol)
                                                
                     if lastDate[symbol] < timestamp:
+                        lastDate[symbol]=timestamp
                         returnData=True
                         symbols.append(symbol)
                         
             if returnData:
                 data=SST
-                data=data.set_index('Date')
-                data=data.fillna(method='pad')
+                #data=data.set_index('Date')
+                #data=data.fillna(method='pad')
                 callback(data, symbols)
             time.sleep(20)
         except Exception as e:

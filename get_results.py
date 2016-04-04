@@ -77,7 +77,7 @@ def generate_sigplots(counter, html, cols):
             filename=system['System']
             if os.path.isfile('./data/results/' + filename + '.png'):
               systems[system['System']]=1
-              (counter, html)=generate_sig_html(filename, counter, html, cols)
+              (counter, html)=generate_sig_html(filename, counter, html, cols, True)
             
               
     return (counter, html)     

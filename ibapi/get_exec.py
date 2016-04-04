@@ -1,6 +1,4 @@
 from wrapper_v4 import IBWrapper, IBclient
-from swigibpy import Contract as IBcontract
-
 import time
 import pandas as pd
 from time import gmtime, strftime, time, localtime, sleep
@@ -22,7 +20,6 @@ def get_exec_open():
     return (account_value, portfolio_data)
 
 def get_ibpos():
-    datestr=strftime("%Y%m%d", localtime())
     (account_value, portfolio_data)=get_exec_open()
     data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
     dataSet=pd.DataFrame(data)
@@ -39,14 +36,11 @@ def get_iblivepos():
     return get_ibpos()
 
 def get_ibpos_from_csv():
-    datestr=strftime("%Y%m%d", localtime())
     dataSet = pd.read_csv('./data/portfolio/ib_portfolio.csv', index_col=['sym','currency'])
    #
     return dataSet
 
 def get_ib_sym_pos(portfolio_data, symbol, currency):
-    datestr=strftime("%Y%m%d", localtime())
-  
     portfolio_data=portfolio_data.reset_index()
     portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
     sym_cur=symbol + currency

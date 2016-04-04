@@ -62,7 +62,7 @@ def get_c2pos():
     systems=c2list.keys()
     for systemname in systems:
         (systemid, apikey)=c2list[systemname]
-        c2list[sytemname]=get_c2livepos(systemid, apikey, systemname)
+        c2list[systemname]=get_c2livepos(systemid, apikey, systemname)
     return c2list
     
 

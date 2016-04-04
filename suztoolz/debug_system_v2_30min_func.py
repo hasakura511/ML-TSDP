@@ -788,7 +788,7 @@ if __name__ == "__main__":
                     'runDPS':runDPS,'saveParams':saveParams,'saveDataSet':saveDataSet,'verbose':verbose,\
                     'scorePath' : scorePath, 'equityStatsSavePath' : equityStatsSavePath,'signalPath' : signalPath,\
                     'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
-                    'modelPath':modelPath}
+                    'modelPath':modelPath,'loadModel':loadModel}
                     
     signal = runv2(runData)
     

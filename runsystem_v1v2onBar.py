@@ -144,7 +144,7 @@ def runPair_v1(pair):
                 'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
                 'version':version, 'version_':version_, 'filterName':filterName, 'data_type':data_type,\
                 'barSizeSetting':barSizeSetting,'currencyPairs':pairs, 'perturbData':perturbData,\
-                'modelPath':modelPath}
+                'modelPath':modelPath,'loadModel':loadModel}
                 
         
     try:
@@ -181,7 +181,7 @@ def runPair_v2(pair, dataSet):
                 'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
                 'version':version, 'version_':version_, 'filterName':filterName, 'data_type':data_type,\
                 'barSizeSetting':barSizeSetting,'currencyPairs':pairs, 'perturbData':perturbData,\
-                'modelPath':modelPath}
+                'modelPath':modelPath,'loadModel':loadModel}
                 
 
         
@@ -268,6 +268,7 @@ if len(sys.argv)==1:
     saveParams = False
     saveDataSet=True
     verbose= False
+    loadModel=True
     #paths
     scorePath = None
     equityStatsSavePath = None
@@ -312,6 +313,7 @@ else:
     saveParams = False
     saveDataSet=True
     verbose= False
+    loadModel=True
     #paths
     scorePath = None
     equityStatsSavePath = None

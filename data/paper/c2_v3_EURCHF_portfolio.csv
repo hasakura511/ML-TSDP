@@ -1,1 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
+EURCHF,open,short,2.0,1.0,1.09268,1.09269,-4.10122,-0.101220000001,4.0,139.0,20160404 13:43:38 EST,20160404 13:43:38 EST,20160404 13:43:38 EST,,EURCHF,,20160404 13:37:01 EST,20160404 13:37:01 EST,1.0,18738.3410803,399961.33396,19414.3410803

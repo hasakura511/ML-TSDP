@@ -339,13 +339,24 @@ def update_bars(currencyPairs, interval='30m'):
                     
                     if not lastDate.has_key(symbol):
                         lastDate[symbol]=timestamp
-                        quote=data.iloc[-1]
+                        regentime=60
+                        if interval == '30m':
+                            regentime=30*6
+                        elif interval == '1h':
+                            regentime = 60 * 6
+                        elif interval == '10m':
+                            regentime == 10 * 6
+                        
+                        quote=data
+                        if quote.shape[0] > regentime:
+                            quote=quote.tail(regentime)
                         compress_min_bar(symbol, quote, filename, interval) 
                                        
                     if lastDate[symbol] < timestamp:
                         lastDate[symbol]=timestamp
                         quote=data.iloc[-1]
                         compress_min_bar(symbol, quote, filename, interval) 
+                        
             time.sleep(20)
         except Exception as e:
             logging.error("update_bars", exc_info=True)

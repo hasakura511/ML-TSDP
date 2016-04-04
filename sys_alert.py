@@ -26,11 +26,13 @@ import logging
 import re
 import threading
 import seitoolz.bars as bars
+import seitoolz.signal as signal
 import sys
 # Import smtplib for the actual sending function
 import smtplib
 # Import the email modules we'll need
 from email.mime.text import MIMEText
+
 
 logging.basicConfig(filename='/logs/sys_alert.log',level=logging.DEBUG)
 
@@ -48,6 +50,12 @@ def start_proc():
     #BTC
     btc=bars.get_btc_list()
     t1 = threading.Thread(target=check_bar, args=[btc, 'choppy', False])
+    t1.daemon=True
+    threads.append(t1)
+    
+    #Signal
+    signals=signal.get_signal_list()
+    t1 = threading.Thread(target=check_signal, args=[signals, True])
     t1.daemon=True
     threads.append(t1)
     
@@ -82,8 +90,9 @@ def send_alert(subject, msg, tradingHours=True):
         logging.info("Trading Hour - Sending Email Alert")
         print "Trading Hour - Sending Email Alert"
     
-        me='catchall@neospace.com'
-        you='consulting@neospace.com'
+        me='monitor@neospace.com'
+        #me='root@localhost'
+        you='system_server@neospace.com'
         # Create a text/plain message
         message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
              """ % (me, ", ".join(you), subject, msg)
@@ -92,9 +101,10 @@ def send_alert(subject, msg, tradingHours=True):
         # Send the message via our own SMTP server, but don't include the
         # envelope header.
         server = smtplib.SMTP_SSL('smtp.gmail.com:465')
-        server.ehlo()
+        #server = smtplib.SMTP('localhost')
+	server.ehlo()
         #server.starttls()
-        server.login('catchall@neospace.com','W0h0h0h0')
+        server.login('monitor@neospace.com','W0h0h0h0')
         server.sendmail(me, [you], message)
         server.quit()
     except Exception as e:
@@ -106,9 +116,11 @@ check=dict()
 def check_bar(pairs, interval, tradingHours=True):
     dataPath = './data/from_IB/'
     barPath='./data/bars/'
+   
     while 1:
         try:
             message=''
+            count=0
             for pair in pairs:
                 dataFile=dataPath + interval + '_' + pair + '.csv'
                 barFile=barPath + interval + '_' + pair + '.csv'
@@ -150,12 +162,67 @@ def check_bar(pairs, interval, tradingHours=True):
                         message = message + "Bar " + pair + " Interval: " + interval + " Not Updating Since: " + str(bar.index[-1]) + '\n'
                         message = message + 'Date:' + str(timestamp) + ' Last Bar:' + str(btimestamp) + " Bar Diff " + str(timestamp - btimestamp) + '\n'
                         message = message + 'Date:' + str(nowDate) + ' Last Bar: ' + str(barDate) + '\n'
+                        count = count + 1
 
             if len(message) > 0:
-                send_alert(interval + ' Feed Not Updating', message, tradingHours)
+                if interval == 'choppy':
+                    if count > 5:
+                        send_alert(interval + ' Feed Not Updating', message, tradingHours)
+                else:
+                    send_alert(interval + ' Feed Not Updating', message, tradingHours)
             time.sleep(300)
         except Exception as e:
             logging.error("check_bar", exc_info=True)
-            
+
+def check_signal(pairs, tradingHours=True):
+    dataPath = './data/signals/'
+    
+    while 1:
+        try:
+            message=''
+            count=0
+            checktime=30
+            for pair in pairs:
+                dataFile=dataPath + pair + '.csv'
+                if re.search(r'v1', pair):
+                    checktime = 5
+                elif re.search(r'v2', pair):
+                    checktime = 30
+                elif re.search(r'v3', pair):
+                    checktime = 300
+                else:
+                    checktime = 360
+                    
+                if os.path.isfile(dataFile):
+                                        
+                    data=pd.read_csv(dataFile, index_col='dates')
+                    eastern=timezone('US/Eastern')
+                    
+                    #timestamp
+                    dataDate=''
+                    dtimestamp = 0
+                    try:
+                        dataDate=parse(data.index[-1]).replace(tzinfo=eastern)
+                        dtimestamp = time.mktime(dataDate.timetuple())
+                    except Exception as e:
+                        dataDate=data.index[-1]
+                        dtimestamp=data.index[-1]
+                        
+                    nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
+                    timestamp=time.mktime(nowDate.timetuple()) + 3600
+                   
+                    checktime = checktime * 60
+                                        
+                    if timestamp - dtimestamp > checktime:
+                        message = message + "Signal " + pair + " Not Updating Since: " + str(data.index[-1]) + '\n'
+                        message = message + 'Date:' + str(timestamp) + ' Last Signal:' + str(dtimestamp) + " Down For: " + str(round((timestamp - dtimestamp)/60))+ ' mins \n'
+                        message = message + 'Date:' + str(nowDate) + ' Last Signal: ' + str(dataDate) + ' Down For: ' + str(timestamp - dtimestamp)+ ' secs \n'
+                        count = count + 1
+
+            if len(message) > 0:
+                    send_alert(message, message, tradingHours)
+            time.sleep(300)
+        except Exception as e:
+            logging.error("check_bar", exc_info=True)         
 send_alert('Starting System Monitor Services (R) - NSZ Inc.', 'Starting Monitor...')
 start_proc()

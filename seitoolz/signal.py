@@ -99,3 +99,13 @@ def generate_model_manual(system, action, qty):
     pos=pos.set_index(['system'])
     #pos.to_csv('./data/portfolio/gen_model_pos.csv')
     return pos
+    
+
+def get_signal_list():
+    dpsList=dict()
+    systemdata=pd.read_csv('./data/systems/system.csv')
+    systemdata=systemdata.reset_index()
+    for i in systemdata.index:
+        system=systemdata.ix[i]
+        dpsList[system['System']]=1
+    return dpsList.keys()

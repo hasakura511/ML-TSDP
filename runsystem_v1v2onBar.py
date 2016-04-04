@@ -151,7 +151,7 @@ def onBar(mybar, symbols):
     global start_time
     global gotbar
     global pairs
-    
+
     logging.info('received '+str(symbols)+str(bar))
     if not gotbar.has_key(bar['Date']):
         gotbar[bar['Date']]=list()

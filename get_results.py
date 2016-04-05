@@ -445,7 +445,7 @@ for i in systemdata.index:
 
 def gen_sig(html, counter, cols):
     counter = 0
-    cols=5 #len(vdict.keys())
+    cols=3 #len(vdict.keys())
     html = html + '<h1>Signals</h1><br><table>'
     (counter, html)=generate_sigplots(counter, html, cols)
     html = html + '</table>'

@@ -20,7 +20,7 @@ import sys
 import logging
 import time
 #import websocket
-
+start_time = time.time()
 logging.basicConfig(filename='/logs/runsystem_v3.log',level=logging.DEBUG)
 
 debug=False
@@ -35,8 +35,11 @@ pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
 
 #def runv3(pair):
 while 1:
+    logging.info('Total Elapsed time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
     for pair in pairs:
         try:
+            start_time2 = time.time()
+            logging.info('running '+pair)
             f=open ('/logs/' + pair + 'v3.log','a')
             print 'Starting v3: ' + pair
             f.write('Starting v3: ' + pair)
@@ -47,6 +50,7 @@ while 1:
             subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
+            logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes' ) 
         except Exception as e:
             #f=open ('./debug/v3run' + pair + '.log','a')
             #f.write(e)

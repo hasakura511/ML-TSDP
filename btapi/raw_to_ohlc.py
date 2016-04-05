@@ -95,7 +95,7 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
             #print "Update Bar: bar: sym: " + exchange + " date:" + str(hour) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) 
                     
         else:
-            if len(data.index) > 1:
+                #if len(data.index) > 1:
                 #data=data.reset_index()                
                 #data=data.sort_values(by='Date')  
                 #quote=data.iloc[-1]

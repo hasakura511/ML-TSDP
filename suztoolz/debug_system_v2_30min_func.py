@@ -431,7 +431,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
     testFinalYear = dataSet.index[max(wf_is_periods)-1]
     validationFirstYear =dataSet.index[max(wf_is_periods)]
     validationFinalYear =dataSet.index[-1]
-    if runDPS:
+    if runDPS and max(windowLengths) > 0:
         if validationStartPoint is not None and\
                     dataSet.shape[0]>dataSet.index[-validationStartPoint:].shape[0]+max(wf_is_periods)+max(windowLengths):
             print 'adjusting dates'
@@ -578,7 +578,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
 
     ##############################################################
 
-    if runDPS:
+    if runDPS and max(windowLengths) > 0:
         print 'Finished Model Training... Beginning Dynamic Position Sizing..'
         sst_bestModel = sstDictDF1_[DF1_BMrunName].copy(deep=True)
 
@@ -704,7 +704,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
 
 if __name__ == "__main__":
     #system parameters
-    version = 'v1'
+    version = 'v2'
     version_ = 'v2.4C'
     filterName = 'DF1'
     data_type = 'ALL'
@@ -739,7 +739,7 @@ if __name__ == "__main__":
         showPDFCDF = False
         showAllCharts = True
         perturbData = False
-        runDPS = False
+        runDPS = True
         saveParams = False
         saveDataSet = True
         verbose = True

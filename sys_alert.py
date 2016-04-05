@@ -151,6 +151,8 @@ def check_bar(pairs, interval, tradingHours=True):
                         checktime = 3
                     elif interval == 'choppy':
                         checktime = 10
+                        if re.search(r'local', pair):
+                            checktime = 360
                     checktime = checktime * 60
                                         
                     #if timestamp - dtimestamp > checktime:

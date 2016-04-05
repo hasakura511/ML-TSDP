@@ -105,23 +105,25 @@ def generate_sigplots(counter, html, cols):
                 
         headerhtml=get_html_header()                
         headerhtml = re.sub('Index', filename, headerhtml.rstrip())
-        headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br><table>'
+        headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br>'
         counter=0
         body=''
         files=symdict[sym]
         files.sort()
          
         for file in files:
+            body = body + '<table>'
             for ver in vd:
-                (v,vd)=ver.split('\.')
-                (v2,vd2)=file.split('_')
+                v=ver.split('.')[0]
+                v2=file.split('_')[0]
                 if v == v2:
                     (counter, body)=generate_html(ver, counter, body, cols)
                 
             (counter, body)=generate_sig_html(file, counter, body, cols, True)
-                
+            body = body + '</table>'
+            (counter, body)=gen_paper(body, counter, cols, -1, file)
+            
         footerhtml=get_html_footer()
-        footerhtml = '</table>' + footerhtml
         write_html(fn, headerhtml, footerhtml, body)
                 
               

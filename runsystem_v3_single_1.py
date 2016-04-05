@@ -20,21 +20,21 @@ import sys
 import logging
 import time
 #import websocket
-start_time = time.time()
-logging.basicConfig(filename='/logs/runsystem_v3.log',level=logging.DEBUG)
+
+logging.basicConfig(filename='/logs/runsystem_v3_1.log',level=logging.DEBUG)
 
 debug=False
 #pairs=['AUDUSD']
                  
-pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP','GBPJPY',\
-            'EURCHF','AUDJPY','AUDUSD','EURUSD','GBPUSD',\
-            'USDCAD','USDCHF','USDJPY','EURJPY','NZDUSD']
+pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP','GBPJPY']
+#pairs=['EURCHF','AUDJPY','AUDUSD','EURUSD','GBPUSD']
+#pairs=['USDCAD','USDCHF','USDJPY','EURJPY','NZDUSD']
                 
 
 
 #def runv3(pair):
 while 1:
-    logging.info('Total Elapsed time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+    start_time = time.time()
     for pair in pairs:
         try:
             start_time2 = time.time()
@@ -57,6 +57,7 @@ while 1:
             #f.close()
             logging.error("something bad happened", exc_info=True)
             #return
+    logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 '''
 threads = []
 for pair in pairs:

@@ -121,7 +121,7 @@ def generate_sigplots(counter, html, cols):
                 
             (counter, body)=generate_sig_html(file, counter, body, cols, True)
             body = body + '</table>'
-            (counter, body)=gen_paper(body, counter, cols, -1, file)
+            (counter, body, cols)=gen_paper(body, counter, cols, -1, file)
             
         footerhtml=get_html_footer()
         write_html(fn, headerhtml, footerhtml, body)

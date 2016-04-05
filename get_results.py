@@ -73,8 +73,8 @@ def generate_sigplots(counter, html, cols):
     body=''
     for ver in vd:
         (counter, body)=generate_html(ver, counter, body, cols) 
-    footerhtml = '</table>' + footerhtml
     footerhtml=get_html_footer()
+    footerhtml = '</table>' + footerhtml
     write_html(fn, headerhtml, footerhtml, body)
     
    
@@ -109,8 +109,8 @@ def generate_sigplots(counter, html, cols):
         for file in symdict[sym]:
                 (counter, body)=generate_sig_html(file, counter, body, cols, True)
                 
-        footerhtml = '</table>' + footerhtml
         footerhtml=get_html_footer()
+        footerhtml = '</table>' + footerhtml
         write_html(fn, headerhtml, footerhtml, body)
                 
               

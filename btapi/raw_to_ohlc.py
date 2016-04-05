@@ -6,6 +6,7 @@ import numpy as np
 import logging
 import threading
 lock = threading.Lock()
+barlock = threading.Lock()
 
 btchigh=dict()
 btclow=dict()
@@ -104,7 +105,7 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
                     data.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
                 
                 gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-                with lock:
+                with barlock:
                     gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
             #logging.info("New Bar:   " + exchange + " date:" + str(hour) + " open: " + str(open[hour]) + " high:"  + str(high[hour]) + ' low:' + str(low[hour]) + ' close: ' + str(close[hour]) + ' volume:' + str(volume[hour]))
                         

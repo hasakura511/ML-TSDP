@@ -1,0 +1,3 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
+1.0,470.2094144,20160401 15:44:00 EST,20160401 15:44:00 EST,20160401 15:44:00 EST,116.5085,,CHFJPY,short,,20160401 08:29:00 EST,closed,20160401 08:29:00 EST,117.0475,,,100000.0,100000.0,,CHFJPY,,474.32,100000.0,20464.5717648,4.1105856,117643.2,20474.32
+2.0,-8.4345888,,,,,,GBPJPY,long,,20160401 15:44:00 EST,open,20160401 08:29:00 EST,159.746,,,0.0,300000.0,,GBPJPY,,0.0,100000.0,20461.7748256,8.4345888,-22203.76,20474.32

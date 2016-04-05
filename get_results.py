@@ -63,8 +63,19 @@ def generate_sigplots(counter, html, cols):
     global vdict
     vd=vdict.keys()
     vd.sort()
+    filename='versions'
+    fn='./data/results/signal_' + filename + '.html'
+    html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+    html = html + filename + '</a></li>'
+    headerhtml=get_html_header()
+    headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+    body=''
     for ver in vd:
-        (counter, html)=generate_html(ver, counter, html, cols) 
+        (counter, body)=generate_html(ver, counter, body, cols) 
+    footerhtml=get_html_footer()
+    write_html(fn, headerhtml, footerhtml, body)
+    
+   
 
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
@@ -76,9 +87,19 @@ def generate_sigplots(counter, html, cols):
           if not systems.has_key(system['System']):
             filename=system['System']
             if os.path.isfile('./data/results/' + filename + '.png'):
-              systems[system['System']]=1
-              (counter, html)=generate_sig_html(filename, counter, html, cols, True)
-            
+                systems[system['System']]=1
+                fn='./data/results/signal_' + filename + '.html'
+                html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+                html = html + filename + '</a></li>'
+                headerhtml=get_html_header()
+                
+                headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+                headerhtml = headerhtml + '<table>'
+                (counter, body)=generate_sig_html(filename, 0, '', cols, True)
+                footerhtml = '</table>' + footerhtml
+                footerhtml=get_html_footer()
+                write_html(fn, headerhtml, footerhtml, body)
+                
               
     return (counter, html)     
     

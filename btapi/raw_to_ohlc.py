@@ -160,7 +160,7 @@ def feed_ohlc_to_csv(ticker, exchange):
     with lock:
         dataSet.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
     
-    quote=dataSet.iloc[-1]
+    quote=dataSet.reset_index().iloc[-1]
     gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
     with barlock:
         gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')

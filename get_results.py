@@ -63,12 +63,12 @@ def generate_sigplots(counter, html, cols):
     global vdict
     vd=vdict.keys()
     vd.sort()
-    filename='versions'
+    filename='Versions'
     fn='./data/results/signal_' + filename + '.html'
     html = html + '<li><a href="' + 'signal_' + filename + '.html">'
     html = html + filename + '</a></li>'
     headerhtml=get_html_header()
-    headerhtml = headerhtml + '<table>'
+    headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br><table>'
     headerhtml = re.sub('Index', filename, headerhtml.rstrip())
     body=''
     for ver in vd:
@@ -105,7 +105,7 @@ def generate_sigplots(counter, html, cols):
                 
         headerhtml=get_html_header()                
         headerhtml = re.sub('Index', filename, headerhtml.rstrip())
-        headerhtml = headerhtml + '<h1>Paper - ' + filename + '</h1><br><table>'
+        headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br><table>'
         counter=0
         body=''
         files=symdict[sym]

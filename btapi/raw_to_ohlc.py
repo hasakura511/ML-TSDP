@@ -96,11 +96,12 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
                     
         else:
             if len(data.index) > 1:
-                data=data.reset_index()                
-                data=data.sort_values(by='Date')  
-                quote=data.iloc[-1]
+                #data=data.reset_index()                
+                #data=data.sort_values(by='Date')  
+                #quote=data.iloc[-1]
                 #logging.info("Close Bar: " + exchange + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']))
-                data=data.set_index('Date')
+                #data=data.set_index('Date')
+                #data=data.sort_index()
                 #with lock:
                 #    data.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
                 
@@ -157,6 +158,7 @@ def get_feed_ohlc(ticker, exchange):
     
 def feed_ohlc_to_csv(ticker, exchange):
     dataSet=get_feed_ohlc(ticker, exchange)
+    dataSet=dataSet.sort_index()
     with lock:
         dataSet.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
     if dataSet.shape[0] > 0:

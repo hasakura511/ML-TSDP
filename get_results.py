@@ -107,7 +107,7 @@ def generate_sigplots(counter, html, cols):
         headerhtml = re.sub('Index', filename, headerhtml.rstrip())
         headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br>'
         counter=0
-        body=''
+        body=' '
         files=symdict[sym]
         files.sort()
          
@@ -121,7 +121,7 @@ def generate_sigplots(counter, html, cols):
                 
             (counter, body)=generate_sig_html(file, counter, body, cols, True)
             body = body + '</table>'
-            (counter, body, cols)=gen_paper(body, counter, cols, -1, file)
+            (body, counter, cols)=gen_paper(body, counter, cols, -1, file)
             
         footerhtml=get_html_footer()
         write_html(fn, headerhtml, footerhtml, body)

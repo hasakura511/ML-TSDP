@@ -51,7 +51,7 @@ import seitoolz.bars as bars
 logging.basicConfig(filename='/logs/system_adf.log',level=logging.DEBUG)
 
 pairs=[]
-pparams=[]
+pparams=dict()
 
 if len(sys.argv) > 1 and sys.argv[1] == 's105_EURJPY_CADJPY':
     pairs=[

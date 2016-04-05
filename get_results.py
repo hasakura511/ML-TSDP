@@ -63,8 +63,19 @@ def generate_sigplots(counter, html, cols):
     global vdict
     vd=vdict.keys()
     vd.sort()
+    filename='versions'
+    fn='./data/results/signal_' + filename + '.html'
+    html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+    html = html + filename + '</a></li>'
+    headerhtml=get_html_header()
+    headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+    body=''
     for ver in vd:
-        (counter, html)=generate_html(ver, counter, html, cols) 
+        (counter, body)=generate_html(ver, counter, body, cols) 
+    footerhtml=get_html_footer()
+    write_html(fn, headerhtml, footerhtml, body)
+    
+   
 
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
@@ -81,8 +92,9 @@ def generate_sigplots(counter, html, cols):
                 html = html + '<li><a href="' + 'signal_' + filename + '.html">'
                 html = html + filename + '</a></li>'
                 headerhtml=get_html_header()
+                
                 headerhtml = re.sub('Index', filename, headerhtml.rstrip())
-                (counter, body)=generate_sig_html(filename, counter, '', cols, True)
+                (counter, body)=generate_sig_html(filename, 0, '', cols, True)
                 footerhtml=get_html_footer()
                 write_html(fn, headerhtml, footerhtml, body)
                 

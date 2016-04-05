@@ -1,4 +1,5 @@
 data/results/
+data/models/
 results/
 *.pyc
 *.sw[opqrstuvwxyz]

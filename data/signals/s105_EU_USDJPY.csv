@@ -1,0 +1,7 @@
+dates,signals,safef,comment
+1459875480.0,1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""EURJPYUSDJPY"", ""zScore"": -1.08, ""zSMA"": -1.14}"
+1459877280.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""EURJPYUSDJPY"", ""zScore"": -0.96, ""zSMA"": -1.19}"
+1459877400.0,1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""EURJPYUSDJPY"", ""zScore"": -1.0, ""zSMA"": -1.18}"
+1459877460.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""EURJPYUSDJPY"", ""zScore"": -0.82, ""zSMA"": -1.17}"
+1459877640.0,1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""EURJPYUSDJPY"", ""zScore"": -1.02, ""zSMA"": -1.13}"
+1459877820.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""EURJPYUSDJPY"", ""zScore"": -0.91, ""zSMA"": -1.11}"

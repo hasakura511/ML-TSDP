@@ -1,0 +1,3 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
+1.0,-2.0,,,,0.0,,NZDJPY,short,,20160405 10:54:53 EST,open,20160405 10:54:53 EST,75.078,,,0.0,1.0,,NZDJPY,,0.0,-1.0,19998.0,2.0,393393.136,20000.0
+2.0,-2.0,,,,0.0,,GBPJPY,long,,20160405 10:54:54 EST,open,20160405 10:54:54 EST,156.325,,,0.0,1.0,,GBPJPY,,0.0,1.0,19996.0,2.0,379636.536,20000.0

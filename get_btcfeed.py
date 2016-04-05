@@ -221,7 +221,8 @@ def write_feed():
                 data=pd.DataFrame([[nowDate, get_btc_bid('BTCUSD',exchange), get_btc_ask('BTCUSD',exchange)]], columns=['Date','Bid','Ask'])
                 data=data.set_index('Date')
                 data.to_csv('./data/bidask/BTCUSD_' + exchange + '.csv')
-                time.sleep(30)
+                feed_ohlc_to_csv('BTCUSD',exchange)
+            time.sleep(20)
         except Exception as e:
             logging.error("write_feed", exc_info=True)
 

@@ -101,13 +101,13 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
                 quote=data.iloc[-1]
                 #logging.info("Close Bar: " + exchange + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']))
                 data=data.set_index('Date')
-                with lock:
-                    data.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
+                #with lock:
+                #    data.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
                 
-                gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-                with barlock:
-                    gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
-            #logging.info("New Bar:   " + exchange + " date:" + str(hour) + " open: " + str(open[hour]) + " high:"  + str(high[hour]) + ' low:' + str(low[hour]) + ' close: ' + str(close[hour]) + ' volume:' + str(volume[hour]))
+                #gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
+                #with barlock:
+                #    gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
+                #logging.info("New Bar:   " + exchange + " date:" + str(hour) + " open: " + str(open[hour]) + " high:"  + str(high[hour]) + ' low:' + str(low[hour]) + ' close: ' + str(close[hour]) + ' volume:' + str(volume[hour]))
                         
             data=data.reset_index().append(pd.DataFrame([[hour, open[hour], high[hour], low[hour], close[hour], volume[hour]]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
         btcbar[exchange] = data   
@@ -159,6 +159,11 @@ def feed_ohlc_to_csv(ticker, exchange):
     dataSet=get_feed_ohlc(ticker, exchange)
     with lock:
         dataSet.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
+    
+    quote=dataSet.iloc[-1]
+    gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
+    with barlock:
+        gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
     return dataSet
 
     

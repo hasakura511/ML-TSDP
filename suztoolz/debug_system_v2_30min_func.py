@@ -144,7 +144,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
 
     #DPS parameters
     if bestParams.windowLength == 0:
-        windowLengths = []
+        windowLengths = [0]
     else:
         windowLengths = [bestParams.windowLength]    
     maxLeverage = [bestParams.maxLeverage]
@@ -434,6 +434,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
     if runDPS:
         if validationStartPoint is not None and\
                     dataSet.shape[0]>dataSet.index[-validationStartPoint:].shape[0]+max(wf_is_periods)+max(windowLengths):
+            print 'adjusting dates'
             testFinalYear = dataSet.index[-validationStartPoint-max(windowLengths)-1]
             validationFirstYear =dataSet.index[-validationStartPoint-max(windowLengths)]    
     else:
@@ -788,7 +789,7 @@ if __name__ == "__main__":
                     'runDPS':runDPS,'saveParams':saveParams,'saveDataSet':saveDataSet,'verbose':verbose,\
                     'scorePath' : scorePath, 'equityStatsSavePath' : equityStatsSavePath,'signalPath' : signalPath,\
                     'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
-                    'modelPath':modelPath,'loadModel':loadModel}
+                    'modelPath':modelPath}
                     
     signal = runv2(runData)
     

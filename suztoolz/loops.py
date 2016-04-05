@@ -390,12 +390,13 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
     feature_names = []
     if verbose == True:
         print '\nTotal %i features: ' % cols
+        
     for i,x in enumerate(dataX.columns):
         if verbose == True:
             print i,x+',',
         feature_names = feature_names+[x]
         
-    if feature_selection is not 'None':
+    if feature_selection != 'None':
         if nfeatures > cols:
             print 'nfeatures', nfeatures, 'is greater than total features ', cols, '!'
             print 'Adjusting to', cols, 'features..'
@@ -496,7 +497,8 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
                 print "\nDuplicate indexes found in test/training set: Possible Future Leak!"
             if len(mmData_v.index[-wfStep:].intersection(train_index)) == 0:
                 #print 'training', X_train.shape
-                if feature_selection is not 'None':
+                if feature_selection != 'None':
+                    print 'using feature selection',feature_selection
                     if feature_selection == 'RFECV':
                         #Recursive feature elimination with cross-validation: 
                         #A recursive feature elimination example with automatic tuning of the

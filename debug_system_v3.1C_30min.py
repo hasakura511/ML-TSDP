@@ -735,12 +735,12 @@ for ticker in livePairs:
                                                                 axis=1)
                 #save best windowlength to metadata
                 if dpsRunName.find('wl') != -1:
-                    metaData['windowLength']=float(dpsRunName[dpsRunName.find('wl'):].split()[0][2:])
-                    metaData['maxLeverage']=int(dpsRunName[dpsRunName.find('maxL'):].split()[0][4:])
+                    bestModelParams['windowLength']=float(dpsRunName[dpsRunName.find('wl'):].split()[0][2:])
+                    bestModelParams['maxLeverage']=int(dpsRunName[dpsRunName.find('maxL'):].split()[0][4:])
                 else:
                     #no dps
-                    metaData['windowLength']=0
-                    metaData['maxLeverage']=1
+                    bestModelParams['windowLength']=0
+                    bestModelParams['maxLeverage']=1
                     
                 if endOfData == 1:
                     #dps and end of data
@@ -764,7 +764,7 @@ for ticker in livePairs:
                         v3signals[validationPeriod] = bestBothDPS
                         
                     #save model
-                    BSMdict[validationPeriod] = (DF1_BMrunName, SMdict[DF1_BMrunName],metaData)
+                    BSMdict[validationPeriod] = (DF1_BMrunName, SMdict[DF1_BMrunName],bestModelParams)
                     
                 #if showAllCharts:
                 #    DPSequity = calcEquity_df(bestBothDPS[['signals','gainAhead']], v3tag+dpsRunName, leverage = bestBothDPS.safef.values)
@@ -779,7 +779,9 @@ for ticker in livePairs:
                                     pd.Series(data=DF1_BMrunName, name = 'system', index = sstDictDF1_[DF1_BMrunName].index)
                                     ],axis=1)
                 #save model
-                BSMdict[validationPeriod] = (DF1_BMrunName, SMdict[DF1_BMrunName],metaData)
+                bestModelParams['windowLength']=0
+                bestModelParams['maxLeverage']=1
+                BSMdict[validationPeriod] = (DF1_BMrunName, SMdict[DF1_BMrunName],bestModelParams)
             else:
                 #no dps and not end of data
                 pass
@@ -942,14 +944,14 @@ for ticker in livePairs:
         #metaData['model'] = model[0]
         #metaData['params'] =model[1]
         #metaData['validationPeriod'] = validationPeriod
-        metaData = BSMdict[validationPeriod][2]
-        model=[BSMdict[validationPeriod][0],BSMdict[validationPeriod][1]]
+        #metaData = {}
+        model=[[m[0] for m in models],[m[1] for m in models]]
         vCurve_metrics_noDPS = update_report(vCurve_metrics_noDPS, filterName,\
                                             validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].signals.values.astype(int), \
                                             dataSet.ix[validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].index].signal.values.astype(int),\
                                             unfilteredData.gainAhead,\
                                             validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
-                                            metaData,CAR25_oos)
+                                            {'validationPeriod':validationPeriod,'DPS':False},CAR25_oos)
     #score models
     scored_models_noDPS, bestModelParams_noDPS = directional_scoring(vCurve_metrics_noDPS,filterName)
     
@@ -963,7 +965,7 @@ for ticker in livePairs:
                                         'Best No DPS '+bestModelParams_noDPS.C25sig,showPlot=showBestCharts,\
                                         leverage = validationDict_noDPS[bestModelParams_noDPS.validationPeriod].safef.values,\
                                         pngPath=chartSavePath,pngFilename='v1_'+ticker+'_Params')
-    saveParams(start_time, dataSet, bestModelParams_noDPS, bestParamsPath, modelSavePath,ticker, 'v1',barSizeSetting, BSMdict)
+    saveParams(start_time, dataSet, BSMdict[bestModelParams_noDPS.validationPeriod][2], bestParamsPath, modelSavePath,ticker, 'v1',barSizeSetting, BSMdict)
     
     if runDPS:
         vCurve_metrics_DPS = init_report()
@@ -985,14 +987,15 @@ for ticker in livePairs:
             #               [m[1] for m in models if m[0] ==validationDict_DPS[validationPeriod].iloc[-1].system.split('_')[5]][0]]
             #metaData['validationPeriod'] = validationPeriod
             #metaData['params'] =model[1]
-            metaData = BSMdict[validationPeriod][2]
-            model=[BSMdict[validationPeriod][0],BSMdict[validationPeriod][1]]
+            #metaData = BSMdict[validationPeriod][2]
+            #model=[BSMdict[validationPeriod][0],BSMdict[validationPeriod][1]]
+            model=[[m[0] for m in models],[m[1] for m in models]]
             vCurve_metrics_DPS = update_report(vCurve_metrics_DPS, filterName,\
                                                 validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].signals.values.astype(int), \
                                                 dataSet.ix[validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].index].signal.values.astype(int),\
                                                 unfilteredData.gainAhead,\
                                                 validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
-                                                metaData,CAR25_oos)        
+                                                {'validationPeriod':validationPeriod,'DPS':True},CAR25_oos)        
         #score models
         scored_models_DPS, bestModelParams_DPS = directional_scoring(vCurve_metrics_DPS,filterName)
         
@@ -1006,7 +1009,7 @@ for ticker in livePairs:
                                             'Best DPS '+bestModelParams_DPS.C25sig,showPlot=showBestCharts,\
                                             leverage = validationDict_DPS[bestModelParams_DPS.validationPeriod].safef.values,\
                                             pngPath=chartSavePath,pngFilename='v2_'+ticker+'_Params')
-        saveParams(start_time, dataSet, bestModelParams_DPS, bestParamsPath, modelSavePath,ticker, 'v2', barSizeSetting,BSMdict)
+        saveParams(start_time, dataSet, BSMdict[bestModelParams_DPS.validationPeriod][2], bestParamsPath, modelSavePath,ticker, 'v2', barSizeSetting,BSMdict)
 
 
     print version_, 'Saving Signals..'      

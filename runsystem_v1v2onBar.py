@@ -126,7 +126,6 @@ def onBar(bar, symbols):
         logging.info('Runtime: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes' ) 
         logging.info('Last bar time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
         start_time = time.time()
-        
     #else:   
     #    if len(gotbar[bar['Date']])==len(pairs):
     #        print  len(gotbar[bar['Date']]), 'bars collected for', bar['Date'],'running systems..'
@@ -316,7 +315,7 @@ else:
     saveParams = False
     saveDataSet=True
     verbose= False
-    loadModel=True
+    loadModel=False
     #paths
     scorePath = None
     equityStatsSavePath = None

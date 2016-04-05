@@ -105,10 +105,12 @@ def generate_sigplots(counter, html, cols):
                 
         headerhtml=get_html_header()                
         headerhtml = re.sub('Index', filename, headerhtml.rstrip())
-        headerhtml = headerhtml + '<table>'
+        headerhtml = headerhtml + '<h1>Paper - ' + filename + '</h1><br><table>'
         counter=0
+        body=''
         files=symdict[sym]
         files.sort()
+        
         for file in files:
                 (counter, body)=generate_sig_html(file, counter, body, cols, True)
                 
@@ -353,7 +355,7 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4, rece
     return (counter, html)
 
 def generate_sig_html(signal, counter, html, cols, colspan):
-    cols=6
+    cols=4
     filename=signal 
     if os.path.isfile('./data/results/' + filename + '.png'):
       (counter, html)=generate_html(filename, counter, html, cols)

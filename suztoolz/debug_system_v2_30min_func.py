@@ -484,7 +484,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
                                                                             dataSet, m, model_metrics,\
                                                                             metaData, showPDFCDF=showPDFCDF,verbose=verbose,\
                                                                             PDFCDFsavePath=chartSavePath,\
-                                                                            PDFCDFfilename=version+' '+ticker)
+                                                                            PDFCDFfilename=version+'_'+ticker)
             else:
                 #buy/sell hold
                 wfStep=int(signal.split('_')[0][2:])
@@ -510,7 +510,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
                                                                             metaData, showPDFCDF=showPDFCDF,\
                                                                             verbose=verbose,\
                                                                             PDFCDFsavePath=chartSavePath,\
-                                                                            PDFCDFfilename=version+' '+ticker)  
+                                                                            PDFCDFfilename=version+'_'+ticker)  
         #score models
         scored_models, bestParams = directional_scoring(model_metrics,filterName)
         if scorePath is not None:

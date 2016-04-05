@@ -616,7 +616,10 @@ def gen_paper(html, counter, cols, recent, systemname):
                 try:
                     logging.info ('C2:' + systemname)
                     if verdict.has_key(systemname):
-                        (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+                        if os.path.isfile('./data/results/' + systemname + '.png'):
+                            (counter, html)=generate_html(systemname, counter, html, cols, True)
+                        else:
+                            (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
     
                     c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
                     (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
@@ -638,8 +641,11 @@ def gen_paper(html, counter, cols, recent, systemname):
                 try:
                       logging.info ('IB: ' + systemname)
                       if verdict.has_key(systemname):
-                          (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
-                        
+                          if os.path.isfile('./data/results/' + systemname + '.png'):
+                            (counter, html)=generate_html(systemname, counter, html, cols, True)
+                          else:
+                            (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
+    
                       ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
                       (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
                     

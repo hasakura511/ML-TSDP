@@ -68,10 +68,12 @@ def generate_sigplots(counter, html, cols):
     html = html + '<li><a href="' + 'signal_' + filename + '.html">'
     html = html + filename + '</a></li>'
     headerhtml=get_html_header()
+    headerhtml = headerhtml + '<table>'
     headerhtml = re.sub('Index', filename, headerhtml.rstrip())
     body=''
     for ver in vd:
         (counter, body)=generate_html(ver, counter, body, cols) 
+    footerhtml = '</table>' + footerhtml
     footerhtml=get_html_footer()
     write_html(fn, headerhtml, footerhtml, body)
     
@@ -81,6 +83,7 @@ def generate_sigplots(counter, html, cols):
     systemdata=systemdata.reset_index()
     systems=dict()
     systemdata=systemdata.sort_values(by=['c2sym','Version'])
+    symdict=dict()
     for i in systemdata.index:
         system=systemdata.ix[i]
         if system['ibsym'] != 'BTC':
@@ -88,17 +91,27 @@ def generate_sigplots(counter, html, cols):
             filename=system['System']
             if os.path.isfile('./data/results/' + filename + '.png'):
                 systems[system['System']]=1
-                fn='./data/results/signal_' + filename + '.html'
-                html = html + '<li><a href="' + 'signal_' + filename + '.html">'
-                html = html + filename + '</a></li>'
-                headerhtml=get_html_header()
+                (ver, sym)=filename.split('_')
+                if not symdict.has_key(sym):
+                    symdict[sym]=list()
+                symdict[sym].append(filename)
+    syms=symdict.keys().sort()
+    for sym in syms:
+        filename=sym
+        fn='./data/results/signal_' + filename + '.html'
+        html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+        html = html + filename + '</a></li>'
                 
-                headerhtml = re.sub('Index', filename, headerhtml.rstrip())
-                headerhtml = headerhtml + '<table>'
-                (counter, body)=generate_sig_html(filename, 0, '', cols, True)
-                footerhtml = '</table>' + footerhtml
-                footerhtml=get_html_footer()
-                write_html(fn, headerhtml, footerhtml, body)
+        headerhtml=get_html_header()                
+        headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+        headerhtml = headerhtml + '<table>'
+        counter=0
+        for file in symdict[sym]:
+                (counter, body)=generate_sig_html(file, counter, body, cols, True)
+                
+        footerhtml = '</table>' + footerhtml
+        footerhtml=get_html_footer()
+        write_html(fn, headerhtml, footerhtml, body)
                 
               
     return (counter, html)     

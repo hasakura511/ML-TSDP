@@ -110,7 +110,8 @@ def generate_sigplots(counter, html, cols):
         body=''
         files=symdict[sym]
         files.sort()
-        
+        for ver in vd:
+                (counter, body)=generate_html(ver, counter, body, cols) 
         for file in files:
                 (counter, body)=generate_sig_html(file, counter, body, cols, True)
                 

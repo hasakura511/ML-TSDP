@@ -105,14 +105,15 @@ def generate_sigplots(counter, html, cols):
                 
         headerhtml=get_html_header()                
         headerhtml = re.sub('Index', filename, headerhtml.rstrip())
-        headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br>'
+        headerhtml = headerhtml 
         counter=0
         body=' '
         files=symdict[sym]
         files.sort()
          
         for file in files:
-            body = body + '<table>'
+            counter=0
+            body = body + '<h1>Signal - ' + file + '</h1><br><table>'
             for ver in vd:
                 v=ver.split('.')[0]
                 v2=file.split('_')[0]
@@ -464,7 +465,7 @@ def gen_c2(html, counter, cols, recent, systemname):
     
     try:
         if c2dict.has_key(systemname):
-            (counter, html)=generate_sig_html(verdict[systemname], counter, html, cols, True)
+            (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
   
             c2data=generate_c2_plot(systemname, 'openedWhen',  initCap)
             (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'openedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols, recent)
@@ -499,7 +500,7 @@ def gen_ib(html, counter, cols):
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (dcounter, dhtml)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', 1, dhtml, cols)
             
-		(dcounter, vhtml)=generate_sig_html(verdict[systemname], 0, vhtml, cols, True)
+		(dcounter, vhtml)=generate_html(verdict[systemname], 0, vhtml, cols, True)
 
          except Exception as e:
             logging.error("get_iblive", exc_info=True)
@@ -553,7 +554,7 @@ def gen_ib(html, counter, cols):
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (dcounter, dhtml)=generate_plots(data, 'recent_ib_' + systemname + 'Signals', 'Recent IB ' + systemname + 'Signals', 'equity', 1, dhtml, cols, recent)
 		
-		(dcounter, vhtml)=generate_sig_html(verdict[systemname], 0, vhtml, cols, True)
+		(dcounter, vhtml)=generate_html(verdict[systemname], 0, vhtml, cols, True)
 
          except Exception as e:
             logging.error("get_iblive", exc_info=True)
@@ -615,7 +616,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                 try:
                     logging.info ('C2:' + systemname)
                     if verdict.has_key(systemname):
-                        (counter, html)=generate_sig_html(verdict[systemname], counter, html, cols, True)
+                        (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
     
                     c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
                     (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
@@ -637,7 +638,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                 try:
                       logging.info ('IB: ' + systemname)
                       if verdict.has_key(systemname):
-                          (counter, html)=generate_sig_html(verdict[systemname], counter, html, cols, True)
+                          (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
                         
                       ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
                       (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)

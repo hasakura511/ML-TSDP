@@ -76,9 +76,16 @@ def generate_sigplots(counter, html, cols):
           if not systems.has_key(system['System']):
             filename=system['System']
             if os.path.isfile('./data/results/' + filename + '.png'):
-              systems[system['System']]=1
-              (counter, html)=generate_sig_html(filename, counter, html, cols, True)
-            
+                systems[system['System']]=1
+                fn='./data/results/signal_' + filename + '.html'
+                html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+                html = html + filename + '</a></li>'
+                headerhtml=get_html_header()
+                headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+                (counter, body)=generate_sig_html(filename, counter, '', cols, True)
+                footerhtml=get_html_footer()
+                write_html(fn, headerhtml, footerhtml, body)
+                
               
     return (counter, html)     
     

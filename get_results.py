@@ -95,7 +95,8 @@ def generate_sigplots(counter, html, cols):
                 if not symdict.has_key(sym):
                     symdict[sym]=list()
                 symdict[sym].append(filename)
-    syms=symdict.keys().sort()
+    syms=symdict.keys()
+    syms.sort()
     for sym in syms:
         filename=sym
         fn='./data/results/signal_' + filename + '.html'
@@ -106,7 +107,9 @@ def generate_sigplots(counter, html, cols):
         headerhtml = re.sub('Index', filename, headerhtml.rstrip())
         headerhtml = headerhtml + '<table>'
         counter=0
-        for file in symdict[sym]:
+        files=symdict[sym]
+        files.sort()
+        for file in files:
                 (counter, body)=generate_sig_html(file, counter, body, cols, True)
                 
         footerhtml=get_html_footer()

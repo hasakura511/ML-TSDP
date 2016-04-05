@@ -132,7 +132,7 @@ def get_btc_history():
         ticker='BTCUSD'
         if get_btc_bid(ticker, exchange) > 0 and get_btc_bid(ticker, exchange) > 0:
             get_ohlc(ticker, exchange)
-       time.sleep(100)
+       time.sleep(5)
       except Exception as e:
           logging.error("get_history", exc_info=True)
           

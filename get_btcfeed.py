@@ -23,6 +23,9 @@ import time
 import websocket
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 import seitoolz.bars as bars
+import threading
+#lock = threading.Lock()
+
 
 logging.basicConfig(filename='/logs/get_btcfeed.log',level=logging.DEBUG)
 
@@ -129,7 +132,7 @@ def get_btc_history():
         ticker='BTCUSD'
         if get_btc_bid(ticker, exchange) > 0 and get_btc_bid(ticker, exchange) > 0:
             get_ohlc(ticker, exchange)
-       time.sleep(100)
+       time.sleep(5)
       except Exception as e:
           logging.error("get_history", exc_info=True)
           
@@ -218,7 +221,8 @@ def write_feed():
                 data=pd.DataFrame([[nowDate, get_btc_bid('BTCUSD',exchange), get_btc_ask('BTCUSD',exchange)]], columns=['Date','Bid','Ask'])
                 data=data.set_index('Date')
                 data.to_csv('./data/bidask/BTCUSD_' + exchange + '.csv')
-                time.sleep(30)
+                feed_ohlc_to_csv('BTCUSD',exchange)
+            time.sleep(20)
         except Exception as e:
             logging.error("write_feed", exc_info=True)
 

@@ -113,7 +113,7 @@ def generate_sigplots(counter, html, cols):
          
         for file in files:
             for ver in vd:
-                (v,vd)=ver.split('.')
+                (v,vd)=ver.split('\.')
                 (v2,vd2)=file.split('_')
                 if v == v2:
                     (counter, body)=generate_html(ver, counter, body, cols)

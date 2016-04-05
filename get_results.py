@@ -110,10 +110,15 @@ def generate_sigplots(counter, html, cols):
         body=''
         files=symdict[sym]
         files.sort()
-        for ver in vd:
-                (counter, body)=generate_html(ver, counter, body, cols) 
+         
         for file in files:
-                (counter, body)=generate_sig_html(file, counter, body, cols, True)
+            for ver in vd:
+                (v,vd)=ver.split('.')
+                (v2,vd2)=file.split('_')
+                if v == v2:
+                    (counter, body)=generate_html(ver, counter, body, cols)
+                
+            (counter, body)=generate_sig_html(file, counter, body, cols, True)
                 
         footerhtml=get_html_footer()
         footerhtml = '</table>' + footerhtml
@@ -356,7 +361,7 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4, rece
     return (counter, html)
 
 def generate_sig_html(signal, counter, html, cols, colspan):
-    cols=3
+    cols=4
     filename=signal 
     if os.path.isfile('./data/results/' + filename + '.png'):
       (counter, html)=generate_html(filename, counter, html, cols)
@@ -445,7 +450,7 @@ for i in systemdata.index:
 
 def gen_sig(html, counter, cols):
     counter = 0
-    cols=3 #len(vdict.keys())
+    cols=4 #len(vdict.keys())
     html = html + '<h1>Signals</h1><br><table>'
     (counter, html)=generate_sigplots(counter, html, cols)
     html = html + '</table>'

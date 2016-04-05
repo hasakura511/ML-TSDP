@@ -64,10 +64,11 @@ for i in data.index:
 	if system['c2submit']:
 	        c2dict[system['c2id']]=(system['Name'],system['c2api'])
 
+
+get_ibtrades()
+
 for c2id in c2dict:
     (stratName,c2api)=c2dict[c2id]
     get_c2trades(c2id, stratName, c2api)
-
-get_ibtrades()
 
 

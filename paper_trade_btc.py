@@ -26,7 +26,7 @@ import seitoolz.bars as bars
 
 logging.basicConfig(filename='/logs/paper_trade_btc.log',level=logging.DEBUG)
 
-debug=False
+debug=True
 
 feed={}
 ohlc={}
@@ -125,12 +125,12 @@ def start_trade(systems, commissiondata):
 
                     print "Processing " + system['Name'] + " Symbol: " + system['ibsym'] + system['ibcur'] + \
                     " Timestamp: " + str(get_timestamp()) + " Last Trade: " + str(system['last_trade']) + " Freq: " +  str(system['trade_freq'])
-                    #print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
-                    #print        " System Algo: " + str(system['System']) 
-                    #print        " Ask: " + str(ask)
-                    #print        " Bid: " + str(bid)
-                    #print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
-                    #print        " Signal: " + str(system_ibpos_qty)
+                    print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+                    print        " System Algo: " + str(system['System']) 
+                    print        " Ask: " + str(ask)
+                    print        " Bid: " + str(bid)
+                    print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
+                    print        " Signal: " + str(system_ibpos_qty)
                 pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
                 if ask > 0 and bid > 0:
                     eastern=timezone('US/Eastern')

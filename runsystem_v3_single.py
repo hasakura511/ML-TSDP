@@ -50,7 +50,8 @@ while 1:
             subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
-            logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes' ) 
+            logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                                dt.now().strftime("%Y%m%d %H:%M:%S %Z")) 
         except Exception as e:
             #f=open ('./debug/v3run' + pair + '.log','a')
             #f.write(e)

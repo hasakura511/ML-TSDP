@@ -355,7 +355,7 @@ def generate_plots(datas, systemname, title, ylabel, counter, html, cols=4, rece
     return (counter, html)
 
 def generate_sig_html(signal, counter, html, cols, colspan):
-    cols=4
+    cols=3
     filename=signal 
     if os.path.isfile('./data/results/' + filename + '.png'):
       (counter, html)=generate_html(filename, counter, html, cols)

@@ -5,8 +5,8 @@ import pandas as pd
 import numpy as np
 import logging
 import threading
-lock = threading.Lock()
-barlock = threading.Lock()
+lock = threading.RLock()
+barlock = threading.RLock()
 
 btchigh=dict()
 btclow=dict()

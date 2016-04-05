@@ -23,6 +23,9 @@ import time
 import websocket
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 import seitoolz.bars as bars
+import threading
+lock = threading.Lock()
+
 
 logging.basicConfig(filename='/logs/get_btcfeed.log',level=logging.DEBUG)
 
@@ -217,7 +220,8 @@ def write_feed():
             for exchange in feed.keys():
                 data=pd.DataFrame([[nowDate, get_btc_bid('BTCUSD',exchange), get_btc_ask('BTCUSD',exchange)]], columns=['Date','Bid','Ask'])
                 data=data.set_index('Date')
-                data.to_csv('./data/bidask/BTCUSD_' + exchange + '.csv')
+                with lock:
+                    data.to_csv('./data/bidask/BTCUSD_' + exchange + '.csv')
                 time.sleep(30)
         except Exception as e:
             logging.error("write_feed", exc_info=True)

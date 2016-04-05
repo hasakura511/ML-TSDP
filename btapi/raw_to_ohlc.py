@@ -4,6 +4,8 @@ import pytz
 import pandas as pd
 import numpy as np
 import logging
+import threading
+lock = threading.Lock()
 
 btchigh=dict()
 btclow=dict()
@@ -98,10 +100,12 @@ def feed_to_ohlc(ticker, exchange, price, timestamp, vol):
                 quote=data.iloc[-1]
                 #logging.info("Close Bar: " + exchange + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']))
                 data=data.set_index('Date')
-                data.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
+                with lock:
+                    data.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
                 
                 gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], exchange]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-                gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
+                with lock:
+                    gotbar.to_csv('./data/bars/' + ticker + '_' + exchange + '.csv')
             #logging.info("New Bar:   " + exchange + " date:" + str(hour) + " open: " + str(open[hour]) + " high:"  + str(high[hour]) + ' low:' + str(low[hour]) + ' close: ' + str(close[hour]) + ' volume:' + str(volume[hour]))
                         
             data=data.reset_index().append(pd.DataFrame([[hour, open[hour], high[hour], low[hour], close[hour], volume[hour]]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
@@ -152,14 +156,17 @@ def get_feed_ohlc(ticker, exchange):
     
 def feed_ohlc_to_csv(ticker, exchange):
     dataSet=get_feed_ohlc(ticker, exchange)
-    dataSet.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
+    with lock:
+        dataSet.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
     return dataSet
     
 
     
     
 def raw_to_ohlc_from_csv(infile, outfile):
-    df=pd.read_csv(infile)
+    df=pd.DataFrame()
+    with lock:
+        df=pd.read_csv(infile)
     return raw_to_ohlc(df, outfile)
     
 def raw_to_ohlc(df, outfile):
@@ -196,11 +203,14 @@ def raw_to_ohlc(df, outfile):
     		      'Low':low.values(), 'Close':close.values(), 'Volume':volume.values()}, columns=['Date','Open','High','Low','Close','Volume'])	
     dataSet=dataSet.sort_values(by='Date')
     dataSet=dataSet.set_index('Date')
-    dataSet.to_csv(outfile)
+    with lock:
+        dataSet.to_csv(outfile)
     return dataSet
 
 def raw_to_ohlc_min_from_csv(infile, outfile):
-    df=pd.read_csv(infile)
+    df=pd.DataFrame()
+    with lock:
+        df=pd.read_csv(infile)
     raw_to_ohlc_min(df)
 
 def raw_to_ohlc_min(df, outfile):     
@@ -240,5 +250,6 @@ def raw_to_ohlc_min(df, outfile):
     
     dataSet=dataSet.sort_values(by='Date')
     dataSet=dataSet.set_index(['Date'])
-    dataSet.to_csv(outfile)
+    with lock:
+        dataSet.to_csv(outfile)
     return dataSet

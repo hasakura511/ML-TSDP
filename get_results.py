@@ -94,7 +94,9 @@ def generate_sigplots(counter, html, cols):
                 headerhtml=get_html_header()
                 
                 headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+                headerhtml = headerhtml + '<table>'
                 (counter, body)=generate_sig_html(filename, 0, '', cols, True)
+                footerhtml = '</table>' + footerhtml
                 footerhtml=get_html_footer()
                 write_html(fn, headerhtml, footerhtml, body)
                 

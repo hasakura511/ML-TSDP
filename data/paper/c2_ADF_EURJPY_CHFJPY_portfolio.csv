@@ -1,2 +1,1 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-EURJPY,open,short,200000.0,100000.0,126.84775,126.823,-17.5424568,-6.37999999999,11.1624568,8.0,20160404 16:40:00 EST,20160404 16:40:00 EST,20160404 16:40:00 EST,,EURJPY,,20160404 16:29:00 EST,20160404 14:12:00 EST,100000.0,19628.1397112,297468.12,19698.6

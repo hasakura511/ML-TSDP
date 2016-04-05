@@ -51,7 +51,7 @@ while 1:
             f.close()
             ferr.close()
             logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
-                                dt.now().strftime("%Y%m%d %H:%M:%S %Z")) 
+                                dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
         except Exception as e:
             #f=open ('./debug/v3run' + pair + '.log','a')
             #f.write(e)

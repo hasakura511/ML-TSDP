@@ -160,7 +160,6 @@ def feed_ohlc_to_csv(ticker, exchange):
     with lock:
         dataSet.to_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv')
     return dataSet
-    
 
     
     

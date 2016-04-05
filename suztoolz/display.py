@@ -783,7 +783,7 @@ def showPDF(ytrue, ypred, gainAhead, index, **kwargs):
     #plt.bar(center, hist, align='center', width=width)
     plt.tight_layout()
     if savePath != None and filename != None:
-        plt.savefig(savePath+filename+' PDF.png', bbox_inches='tight')
+        plt.savefig(savePath+filename+'_PDF.png', bbox_inches='tight')
         
     if showPDFCDF:
         print '                          ____Price Distribution____'
@@ -832,7 +832,7 @@ def showCDF(ytrue, ypred, gainAhead, index, **kwargs):
     #plt.plot(F2,X2)
     plt.tight_layout()
     if savePath != None and filename != None:
-        plt.savefig(savePath+filename+' CDF.png', bbox_inches='tight')
+        plt.savefig(savePath+filename+'_CDF.png', bbox_inches='tight')
         
     if showPDFCDF:
         print '                       ____Cumulative Distribution____'

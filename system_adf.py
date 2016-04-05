@@ -297,13 +297,22 @@ def onBar(bar, symbols):
         #Proc
         seen=dict()
         if len(symbols) > 1:
-            for sym1 in symbols:
-                for sym2 in symbols:
+            for [file1, sym1, param1] in pairs:
+                #print "sym: " + sym1
+                for [file2, sym2, param2] in pairs:
                     if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
-                        seen[sym1+sym2]=1
-                        seen[sym2+sym1]=1
-                        (sym1,sym2,mult1,mult2)=pparams[sym1+sym2]
-                        proc_onBar(sym1,sym2,mult1,mult2)
+            		 seen[sym1+sym2]=1
+            		 seen[sym2+sym1]=1
+            		 (sym1,sym2,mult1,mult2)=pparams[sym1+sym2]
+            		 proc_onBar(sym1,sym2,mult1,mult2)
+            		                    
+            #for sym1 in symbols:
+            #    for sym2 in symbols:
+            #        if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+            #            seen[sym1+sym2]=1
+            #            seen[sym2+sym1]=1
+            #            (sym1,sym2,mult1,mult2)=pparams[sym1+sym2]
+            #            proc_onBar(sym1,sym2,mult1,mult2)
     except Exception as e:
         logging.error("onBar", exc_info=True)
     

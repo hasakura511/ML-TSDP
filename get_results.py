@@ -147,8 +147,8 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance'].pct_change()
-        dataSet['PurePLcurve'] = dataSet['purebalance'].pct_change()
+        dataSet['equitycurve'] = dataSet['balance'].pct_change() + 1
+        dataSet['PurePLcurve'] = dataSet['purebalance'].pct_change() + 1
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -616,7 +616,7 @@ def gen_ib(html, counter, cols):
 
 #Paper    
 def gen_paper(html, counter, cols, recent, systemname):
-    html = html + '<h1>Paper - ' + systemname + '</h1><br><table>'
+    html = html + '<h1>Paper - ' + systemname + '</h1><br><table><center>'
     counter=0
     cols=4
     
@@ -671,7 +671,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                   twdata=generate_paper_TWR(systemname, 'c2', 'Date', initCap)    
                   (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
                               
-                  html = html + '</table><table>'
+                  html = html + '</table><br><table>'
                   counter=0
                   ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
                   (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)

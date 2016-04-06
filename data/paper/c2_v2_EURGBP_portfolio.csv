@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-EURGBP,open,long,2.0,0.0,0.8038,0.0,-2.0,0.0,2.0,402.0,,,,,EURGBP,,20160405 17:48:15 EST,20160405 17:48:15 EST,2.0,17863.1574,354816.3251,19575.1574
+EURGBP,open,long,2.0,0.0,0.80713,0.0,-2.0,0.0,2.0,415.0,,,,,EURGBP,,20160406 17:23:07 EST,20160406 17:23:07 EST,2.0,17829.30225,354640.71785,19597.30225

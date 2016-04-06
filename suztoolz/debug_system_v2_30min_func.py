@@ -140,6 +140,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
     rStochLookback = bestParams.rStochLookback
     statsLookback = bestParams.statsLookback
     ROCLookback = bestParams.ROCLookback
+    rStochBars = bestParams.rStochBars
     models = [(bestParams.model,eval(bestParams.params))]
 
     #DPS parameters
@@ -233,6 +234,19 @@ def runv2(runData, dataSet=pd.DataFrame()):
              ]    
     '''
     if len(dataSet)==0:
+                
+        #find max lookback
+        maxlb = max(RSILookback,
+                            zScoreLookback,
+                            ATRLookback,
+                            DPOLookback,
+                            ACLookback,
+                            rStochLookback,
+                            ROCLookback,
+                            CCLookback)
+        # add shift
+        maxlb = maxlb+4
+        
         ############################################################
         currencyPairsDict = {}
         files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -294,11 +308,18 @@ def runv2(runData, dataSet=pd.DataFrame()):
                 
                 closes = pd.concat([dataSet.Close, currencyPairsDict2[pair].Close],\
                                         axis=1, join='inner')
-                                                               
+                                        
+                #check if there is enough data to create indicators
+                if closes.shape[0] < maxlb:
+                    message = 'Not enough data to create indicators: intersect of '\
+                        +ticker+' and '+pair +' of '+str(closes.shape[0])+\
+                        ' is less than max lookback of '+str(maxlb)
+                    offlineMode(ticker, message, signalPath, version, version_)
+                    
                 dataSet['corr'+pair] = pd.rolling_corr(closes.iloc[:,0],\
                                                 closes.iloc[:,1], window=CCLookback)
                 dataSet['priceChange'+pair] = priceChange(closes.iloc[:,1])
-                dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,500)
+                dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,rStochBars)
                 dataSet['ROC_'+pair] = ROC(closes.iloc[:,1],ROCLookback)
         
         print nrows-dataSet.shape[0], 'rows lost for', ticker
@@ -312,7 +333,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
 
         #long direction
         dataSet['Pri_ROC'] = ROC(dataSet.Close,ROCLookback)
-        dataSet['Pri_rStoch'] = roofingFilter(dataSet.Close,rStochLookback,500)
+        dataSet['Pri_rStoch'] = roofingFilter(dataSet.Close,rStochLookback,rStochBars)
         dataSet['Pri_rStoch_Y1'] = dataSet['Pri_rStoch'].shift(1)
         dataSet['Pri_rStoch_Y2'] = dataSet['Pri_rStoch'].shift(2)
         dataSet['Pri_rStoch_Y3'] = dataSet['Pri_rStoch'].shift(3)
@@ -374,18 +395,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
                 print label+',',
                 signal_types.append(label)
         '''
-        
-        #find max lookback
-        maxlb = max(RSILookback,
-                            zScoreLookback,
-                            ATRLookback,
-                            DPOLookback,
-                            ACLookback,
-                            rStochLookback,
-                            ROCLookback,
-                            CCLookback)
-        # add shift
-        maxlb = maxlb+4
+
 
         #raise error if nan/inf in dataSet
         for col in dataSet:
@@ -477,7 +487,8 @@ def runv2(runData, dataSet=pd.DataFrame()):
                                 'ROCLookback': ROCLookback, 'DD95_limit':PRT['DD95_limit'],'tailRiskPct':PRT['tailRiskPct'],\
                                 'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
                                 'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period,'perturbDataPct':perturbDataPct,\
-                                'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines}
+                                'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines,\
+                                'rStochBars':rStochBars}
                         runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_' + m[0]+\
                                                 '_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
                         model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
@@ -502,7 +513,8 @@ def runv2(runData, dataSet=pd.DataFrame()):
                         'ROCLookback': ROCLookback, 'DD95_limit':PRT['DD95_limit'],'tailRiskPct':PRT['tailRiskPct'],\
                         'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
                         'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period,'perturbDataPct':perturbDataPct,\
-                        'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines}
+                        'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines,\
+                        'rStochBars':rStochBars}
                 runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_'\
                                     + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
                 model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\

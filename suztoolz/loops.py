@@ -2088,7 +2088,7 @@ def calcEquity_df(SST, title, **kwargs):
     xticks[1].label1.set_visible(False)
     
     #add text to chart
-    text=  '\n%0.f signal counts: ' % nrows
+    text=  '\n%0.f bar counts: ' % nrows
     if 1 in SST.signals.value_counts():
         text+= '%i beLong,  ' % SST.signals.value_counts()[1]
     if -1 in SST.signals.value_counts():
@@ -2118,8 +2118,10 @@ def calcEquity_df(SST, title, **kwargs):
     fig.autofmt_xdate()
     if pngPath != None:
         if pngFilename==None:
+            print 'Saving '+pngPath+title+'.png'
             plt.savefig(pngPath+title+'.png', bbox_inches='tight')
         else:
+            print 'Saving '+pngPath+pngFilename+'.png'
             plt.savefig(pngPath+pngFilename+'.png', bbox_inches='tight')
     
     if showPlot:

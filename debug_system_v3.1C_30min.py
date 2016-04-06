@@ -99,13 +99,6 @@ currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'AUDUSD','EURUSD','GBPUSD','USDCAD',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
 
-
-    
-
-
-        
-        
-
         
 #no args -> debug.  else live mode arg 1 = pair, arg 2 = "0" to turn off
 if len(sys.argv)==1:
@@ -121,11 +114,11 @@ if len(sys.argv)==1:
                     #'USDJPY',\
                     #'AUDUSD',\
                     #'EURUSD',\
-                    #'GBPUSD',\
+                    'GBPUSD',\
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
-                    'EURCHF',\
+                    #'EURCHF',\
                     #'EURGBP'\
                     ]
                     
@@ -205,7 +198,7 @@ for ticker in livePairs:
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
     wfSteps=[1,15,30]
-    wf_is_periods = [250,500]
+    wf_is_periods = [50,250]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
     longMemory =  False
@@ -735,12 +728,12 @@ for ticker in livePairs:
                                                                 axis=1)
                 #save best windowlength to metadata
                 if dpsRunName.find('wl') != -1:
-                    bestModelParams['windowLength']=float(dpsRunName[dpsRunName.find('wl'):].split()[0][2:])
-                    bestModelParams['maxLeverage']=int(dpsRunName[dpsRunName.find('maxL'):].split()[0][4:])
+                    bestModelParams.set_value('windowLength',float(dpsRunName[dpsRunName.find('wl'):].split()[0][2:]))
+                    bestModelParams.set_value('maxLeverage',int(dpsRunName[dpsRunName.find('maxL'):].split()[0][4:]))
                 else:
                     #no dps
-                    bestModelParams['windowLength']=0
-                    bestModelParams['maxLeverage']=1
+                    bestModelParams.set_value('windowLength',0)
+                    bestModelParams.set_value('maxLeverage',1)
                     
                 if endOfData == 1:
                     #dps and end of data
@@ -779,8 +772,8 @@ for ticker in livePairs:
                                     pd.Series(data=DF1_BMrunName, name = 'system', index = sstDictDF1_[DF1_BMrunName].index)
                                     ],axis=1)
                 #save model
-                bestModelParams['windowLength']=0
-                bestModelParams['maxLeverage']=1
+                bestModelParams.set_value('windowLength',0)
+                bestModelParams.set_value('maxLeverage',1)
                 BSMdict[validationPeriod] = (DF1_BMrunName, SMdict[DF1_BMrunName],bestModelParams)
             else:
                 #no dps and not end of data

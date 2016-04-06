@@ -718,21 +718,21 @@ if __name__ == "__main__":
         debug=True
         
         livePairs =  [
-                        #'NZDJPY',\
-                        #'CADJPY',\
-                        #'CHFJPY',\
-                        #'EURJPY',\
-                        #'GBPJPY',\
-                        #'AUDJPY',\
-                        #'USDJPY',\
-                        #'AUDUSD',\
-                        #'EURUSD',\
-                        #'GBPUSD',\
-                        #'USDCAD',\
-                        #'USDCHF',\
-                        #'NZDUSD',
+                        'NZDJPY',\
+                        'CADJPY',\
+                        'CHFJPY',\
+                        'EURJPY',\
+                        'GBPJPY',\
+                        'AUDJPY',\
+                        'USDJPY',\
+                        'AUDUSD',\
+                        'EURUSD',\
+                        'GBPUSD',\
+                        'USDCAD',\
+                        'USDCHF',\
+                        'NZDUSD',
                         'EURCHF',\
-                        #'EURGBP'\
+                        'EURGBP'\
                         ]
                         
         showDist =  False
@@ -743,7 +743,7 @@ if __name__ == "__main__":
         saveParams = False
         saveDataSet = True
         verbose = True
-        loadModel = True
+        loadModel = False
         #scorePath = './debug/scored_metrics_'
         #equityStatsSavePath = './debug/'
         #signalPath = './debug/'
@@ -769,7 +769,7 @@ if __name__ == "__main__":
         saveParams = False
         saveDataSet=True
         verbose= False
-        loadModel = True
+        loadModel = False
         scorePath = None
         equityStatsSavePath = None
         signalPath = '../data/signals/'
@@ -783,14 +783,15 @@ if __name__ == "__main__":
             ticker = sys.argv[1]
             offlineMode(ticker, "Offline Mode: "+sys.argv[0]+' '+sys.argv[1], signalPath, version, version_)
         else:
-            livePairs=[sys.argv[1]]
-            
-    runData = {'ticker':livePairs[0], 'showDist':showDist,'showPDFCDF':showPDFCDF,'showAllCharts':showAllCharts,\
-                    'runDPS':runDPS,'saveParams':saveParams,'saveDataSet':saveDataSet,'verbose':verbose,\
-                    'scorePath' : scorePath, 'equityStatsSavePath' : equityStatsSavePath,'signalPath' : signalPath,\
-                    'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
-                    'modelPath':modelPath}
-                    
-    signal = runv2(runData)
+            ticker=[sys.argv[1]]
+    
+    for ticker in livePairs:
+        runData = {'ticker':ticker, 'showDist':showDist,'showPDFCDF':showPDFCDF,'showAllCharts':showAllCharts,\
+                        'runDPS':runDPS,'saveParams':saveParams,'saveDataSet':saveDataSet,'verbose':verbose,\
+                        'scorePath' : scorePath, 'equityStatsSavePath' : equityStatsSavePath,'signalPath' : signalPath,\
+                        'dataPath' :dataPath, 'bestParamsPath' :  bestParamsPath, 'chartSavePath' :chartSavePath,\
+                        'modelPath':modelPath}
+                        
+        signal = runv2(runData)
     
 

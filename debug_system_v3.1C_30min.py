@@ -112,9 +112,9 @@ if len(sys.argv)==1:
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
-                    #'AUDUSD',\
+                    'AUDUSD',\
                     #'EURUSD',\
-                    'GBPUSD',\
+                    #'GBPUSD',\
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
@@ -219,6 +219,7 @@ for ticker in livePairs:
     ACLookback = 12
     CCLookback = 60
     rStochLookback = 300
+    rStochBars = max(wf_is_periods)
     statsLookback = 100
     ROCLookback = 600
 
@@ -313,7 +314,18 @@ for ticker in livePairs:
              #        ], voting='soft', weights=None)),
              ]    
 
-
+    #find max lookback
+    maxlb = max(RSILookback,
+                        zScoreLookback,
+                        ATRLookback,
+                        DPOLookback,
+                        ACLookback,
+                        rStochLookback,
+                        ROCLookback,
+                        CCLookback)
+    # add shift
+    maxlb = maxlb+4
+    
     ############################################################
     currencyPairsDict = {}
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -375,11 +387,16 @@ for ticker in livePairs:
             
             closes = pd.concat([dataSet.Close, currencyPairsDict2[pair].Close],\
                                     axis=1, join='inner')
-                                                           
+            #check if there is enough data to create indicators
+            if closes.shape[0] < maxlb:
+                message = 'Not enough data to create indicators: intersect of '\
+                    +ticker+' and '+pair +' of '+str(closes.shape[0])+\
+                    ' is less than max lookback of '+str(maxlb)
+                offlineMode(ticker, message, signalPath, version, version_)
             dataSet['corr'+pair] = pd.rolling_corr(closes.iloc[:,0],\
                                             closes.iloc[:,1], window=CCLookback)
             dataSet['priceChange'+pair] = priceChange(closes.iloc[:,1])
-            dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,500)
+            dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,rStochBars)
             dataSet['ROC_'+pair] = ROC(closes.iloc[:,1],ROCLookback)
     
     print nrows-dataSet.shape[0], 'rows lost for', ticker
@@ -393,7 +410,7 @@ for ticker in livePairs:
 
     #long indicators
     dataSet['Pri_ROC'] = ROC(dataSet.Close,ROCLookback)
-    dataSet['Pri_rStoch'] = roofingFilter(dataSet.Close,rStochLookback,500)
+    dataSet['Pri_rStoch'] = roofingFilter(dataSet.Close,rStochLookback,rStochBars)
     dataSet['Pri_rStoch_Y1'] = dataSet['Pri_rStoch'].shift(1)
     dataSet['Pri_rStoch_Y2'] = dataSet['Pri_rStoch'].shift(2)
     dataSet['Pri_rStoch_Y3'] = dataSet['Pri_rStoch'].shift(3)
@@ -474,17 +491,6 @@ for ticker in livePairs:
             
         print '\nCreated',numSig,'signal types to check for validation period of', validationPeriod
             
-    #find max lookback
-    maxlb = max(RSILookback,
-                        zScoreLookback,
-                        ATRLookback,
-                        DPOLookback,
-                        ACLookback,
-                        rStochLookback,
-                        ROCLookback,
-                        CCLookback)
-    # add shift
-    maxlb = maxlb+4
 
     #raise error if nan/inf in dataSet
     for col in dataSet:
@@ -598,7 +604,7 @@ for ticker in livePairs:
                                     'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
                                     'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period,'perturbDataPct':perturbDataPct,\
                                     'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines,\
-                                    'validationPeriod':validationPeriod}
+                                    'validationPeriod':validationPeriod,'rStochBars':rStochBars}
                             runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_'\
                                         + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
                             model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
@@ -624,7 +630,7 @@ for ticker in livePairs:
                             'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
                             'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period,'perturbDataPct':perturbDataPct,\
                             'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines,\
-                            'validationPeriod':validationPeriod}
+                            'validationPeriod':validationPeriod,'rStochBars':rStochBars}
                     runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_'\
                                         + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
                     model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\

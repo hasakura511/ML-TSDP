@@ -152,11 +152,11 @@ def check_bar(pairs, interval, tradingHours=True):
                     elif interval == 'choppy':
                         checktime = 10
                         if re.search(r'local', pair) or re.search(r'kraken', pair):
-                            checktime = 1440
+                            checktime = 14400
                         if re.search(r'itb', pair) or re.search(r'coin', pair):
-                            checktime = 1440
+                            checktime = 14400
                         if re.search(r'curex', pair) or re.search(r'konan', pair):
-                            checktime = 1440
+                            checktime = 14400
                             
                     checktime = checktime * 60
                                         

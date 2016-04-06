@@ -153,6 +153,7 @@ def check_bar(pairs, interval, tradingHours=True):
                         checktime = 10
                         if re.search(r'local', pair) or re.search(r'kraken', pair):
                             checktime = 1440
+                            
                     checktime = checktime * 60
                                         
                     #if timestamp - dtimestamp > checktime:
@@ -193,7 +194,7 @@ def check_signal(pairs, tradingHours=True):
                 elif re.search(r'v3', pair):
                     checktime = 120
                 elif re.search(r's105', pair):
-                    checktime = 1000
+                    checktime = 1440
                 else:
                     checktime = 360
                     

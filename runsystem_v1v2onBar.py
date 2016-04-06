@@ -116,7 +116,7 @@ def onBar(bar, symbols):
     #if debug:
     
     if len(gotbar[bar['Date']])==len(pairs):
-        logging.info( str(len(gotbar[bar['Date']]))+ 'bars collected for '+ str(bar['Date'])+' running systems..')
+       
         #print gotbar[bar['Date']]
         start_time2 = time.time()
         for sym in gotbar[bar['Date']]:
@@ -160,6 +160,8 @@ def runPair_v1(pair):
             #ferr.write('Starting '+version+': ' + ticker)
             signal, dataSet=runv2(runData)
             print signal
+            logging.info('v1 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25)+\
+                                signal.system)
             #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
             #ferr.close()
@@ -201,6 +203,8 @@ def runPair_v2(pair, dataSet):
             
             signal, dataSet=runv2(runData, dataSet)
             print signal
+            logging.info('v2 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25)+\
+                    signal.system)
             #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
             #ferr.close()

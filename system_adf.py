@@ -152,9 +152,12 @@ elif len(sys.argv) > 1 and sys.argv[1] == 's105_USDJPY_GBPJPY':
            #['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [10,'JPY','IDEALPRO', 's105_CC_CHFJPY']]
            ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [10,'JPY','IDEALPRO', 's105_UG_GBPJPY']]
            ]
-else:
+elif len(sys.argv) > 1 and sys.argv[1] == 'stratADF':
     pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
            ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
+else:
+    pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
+       ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
 
 def prep_pair(sym1, sym2, param1, param2):
         global pos

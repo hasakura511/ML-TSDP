@@ -315,20 +315,29 @@ def displayRankedCharts(numCharts,benchmarks,benchStatsByYear,equityCurves,equit
         if savePath != None:
             plt.figure(1)
             #shortTrades, longTrades = numberZeros(equityCurves[topSystem].signals.values)
-            allTrades = sum((equityCurves[topSystem].signals * equityCurves[topSystem].safef).round().diff().fillna(0).values !=0)
+            signals = equityCurves[topSystem].signals * equityCurves[topSystem].safef.astype(int)
+            allTrades = sum((signals).round().diff().fillna(0).values !=0)
             hoursTraded = (equityCurves[topSystem].index[-1]-equityCurves[topSystem].index[0]).total_seconds()/60.0/60.0
             avgTrades = float(allTrades)/hoursTraded
             
             #text= '\nValidation Period from', topSystem.index[0],'to',topSystem.index[-1]
+            text=  '\n%0.f bar counts: ' % signals.shape[0]
+            #if 1 in signals.value_counts():
+            text+= '%i beLong,  ' % signals[signals>0].shape[0]
+            #if -1 in SST.signals.value_counts():
+            text+= '%i beShort,  ' % signals[signals<0].shape[0]
+            #if 0 in SST.signals.value_counts():
+            text+= '%i beFlat  ' % signals[signals==0].shape[0]
             text='\nAverage trades per hour: %0.2f' % (avgTrades)
             #text+='\nTWR for Buy & Hold is %0.3f, %i Bars' % (equityBuyHold[nrows-1], nrows)
             #text+='\nTWR for Sell & Hold is %0.3f, %i Bars' % (equitySellHold[nrows-1], nrows)
             #text+='\nTWR for %i beLong trades is %0.3f' % (longTrades, equityBeLongSignals[nrows-1])
             #text+='\nTWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])
-            text+='\nTWR for %i beLong and beShort trades is %0.3f' % (allTrades,equityCurves[topSystem].equity[-1]) 
+            text+='\nTWR for %i trades with DPS is %0.3f' % (allTrades,equityCurves[topSystem].equity[-1]) 
             if 'avgSafef' in equityStats:
                     text+='\nAvg. safef: %.3f' % equityStats.loc[equityStats.system == topSystem].avgSafef
-            plt.figtext(0.05,-0.2,text, fontsize=15)     
+            plt.figtext(0.05,-0.2,text, fontsize=15)
+            print 'Saving '+savePath+v3tag+'.png'
             fig.savefig(savePath+v3tag+'.png', bbox_inches='tight')
                 
         plt.close(fig)
@@ -693,14 +702,22 @@ def compareEquity(sst, title, **kwargs):
         if filename==None:
             plt.savefig(savePath+title+'.png', bbox_inches='tight')
         else:
+            text=  '\n%0.f bar counts: ' % nrows
+            if 1 in sst.signals.value_counts():
+                text+= '%i beLong,  ' % sst.signals.value_counts()[1]
+            if -1 in sst.signals.value_counts():
+                text+= '%i beShort,  ' % sst.signals.value_counts()[-1]
+            if 0 in sst.signals.value_counts():
+                text+= '%i beFlat  ' % sst.signals.value_counts()[0]
             #text= '\nValidation Period from', sst.index[0],'to',sst.index[-1]
             text='\nAverage trades per hour: %0.2f' % (avgTrades)
             #text+='\nTWR for Buy & Hold is %0.3f, %i Bars' % (equityBuyHold[nrows-1], nrows)
             #text+='\nTWR for Sell & Hold is %0.3f, %i Bars' % (equitySellHold[nrows-1], nrows)
-            #text+='\nTWR for %i beLong trades is %0.3f' % (longTrades, equityBeLongSignals[nrows-1])
-            #text+='\nTWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])
-            text+='\nTWR for %i beLong and beShort trades is %0.3f' % (allTrades,equityBeLongAndShortSignals[nrows-1])   
+            text+='\nTWR for %i beLong trades is %0.3f' % (longTrades, equityBeLongSignals[nrows-1])
+            text+='\nTWR for %i beShort trades is %0.3f' % (shortTrades,equityBeShortSignals[nrows-1])
+            text+='\nTWR for %i trades is %0.3f' % (allTrades,equityBeLongAndShortSignals[nrows-1])   
             plt.figtext(0.05,-0.0,text, fontsize=15)
+            print 'Saving '+savePath+filename+'.png'
             plt.savefig(savePath+filename+'.png', bbox_inches='tight')
             
     if showChart:        

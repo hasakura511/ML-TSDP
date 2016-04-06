@@ -120,11 +120,12 @@ def onBar(bar, symbols):
         #print gotbar[bar['Date']]
         start_time2 = time.time()
         for sym in gotbar[bar['Date']]:
+            logging.info('')
             logging.info(sym+' timenow: '+dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"))
             runPair_v1([sym])
         logging.info( 'All signals created for bar '+str(bar['Date']))
         logging.info('Runtime: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes' ) 
-        logging.info('Last bar time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+        logging.info('Last bar time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes\n' ) 
         start_time = time.time()
     #else:   
     #    if len(gotbar[bar['Date']])==len(pairs):

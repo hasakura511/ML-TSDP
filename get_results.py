@@ -634,6 +634,8 @@ def gen_paper(html, counter, cols, recent, systemname):
             except Exception as e:
                       logging.error("get_paper", exc_info=True)
                       counter = 0
+    html = html + '</table><table>'
+    counter=0
     #IB Paper
     if os.path.isfile('./data/paper/ib_' + systemname + '_trades.csv'):
             logging.info ('IB: ' + systemname)

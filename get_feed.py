@@ -139,7 +139,7 @@ def check_bar():
                     checktime = 3
                     
                     checktime = checktime * 60
-                    logging.error(pair + ' Feed Last Received ' + str(round((timestamp - btimestamp)/60, 2)) + ' mins ago')
+                    logging.info(pair + ' Feed Last Received ' + str(round((timestamp - btimestamp)/60, 2)) + ' mins ago')
                         
                     if timestamp - btimestamp > checktime:
                         logging.error(pair + ' Feed not being received for ' + str(round((timestamp - btimestamp)/60, 2))) + ' mins'

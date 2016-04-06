@@ -50,7 +50,7 @@ while 1:
             subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
-            signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+barSize+'.csv').iloc[-1]
+            signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]
             logging.info(str(signal))
             logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
                                 dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 

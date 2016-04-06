@@ -147,8 +147,8 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance'].diff().pct_change() 
-        dataSet['PurePLcurve'] = dataSet['purebalance'].diff().pct_change()
+        dataSet['equitycurve'] = dataSet['balance'] / dataSet['balance'].shift()
+        dataSet['PurePLcurve'] = dataSet['purebalance'] / dataSet['purebalance'].shift() 
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -634,7 +634,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                     else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                 twdata=generate_paper_TWR(systemname, 'c2', 'Date', initCap)    
-                (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
+                (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'TWR', counter, html, cols, recent)
             
                 html = html + '</table></center><br><center><table>'
                 counter=0
@@ -668,8 +668,8 @@ def gen_paper(html, counter, cols, recent, systemname):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                       else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
-                  twdata=generate_paper_TWR(systemname, 'c2', 'Date', initCap)    
-                  (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
+                  twdata=generate_paper_TWR(systemname, 'ib', 'Date', initCap)    
+                  (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'TWR', counter, html, cols, recent)
                               
                   html = html + '</table></center><br><center><table>'
                   counter=0

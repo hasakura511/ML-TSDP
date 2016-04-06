@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-GBPUSD,open,long,2.0,1.0,1.42045,1.41904,-18.1,-14.1,4.0,462.0,20160405 08:34:56 EST,20160405 08:34:56 EST,20160405 08:34:56 EST,,GBPUSD,,20160405 07:35:11 EST,20160405 07:35:11 EST,-1.0,17327.3,399959.7,19313.3
+GBPUSD,open,long,2.0,0.0,1.41824,,-20.1,-14.1,6.0,462.0,,,,,GBPUSD,,20160405 17:45:41 EST,20160405 07:35:11 EST,1.0,17339.4,357448.7,19327.4

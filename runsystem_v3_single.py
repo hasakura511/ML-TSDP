@@ -26,10 +26,9 @@ logging.basicConfig(filename='/logs/runsystem_v3.log',level=logging.DEBUG)
 debug=False
 #pairs=['AUDUSD']
                  
-pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
-                'GBPJPY','EURCHF','AUDJPY',\
-                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY','NZDUSD']
+pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP','GBPJPY',\
+            'EURCHF','AUDJPY','AUDUSD','EURUSD','GBPUSD',\
+            'USDCAD','USDCHF','USDJPY','EURJPY','NZDUSD']
                 
 
 
@@ -39,7 +38,7 @@ while 1:
     for pair in pairs:
         try:
             start_time2 = time.time()
-            logging.info('running '+pair)
+            logging.info('running v3'+pair)
             f=open ('/logs/' + pair + 'v3.log','a')
             print 'Starting v3: ' + pair
             f.write('Starting v3: ' + pair)
@@ -50,7 +49,8 @@ while 1:
             subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
-            logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes' ) 
+            logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                                dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
         except Exception as e:
             #f=open ('./debug/v3run' + pair + '.log','a')
             #f.write(e)

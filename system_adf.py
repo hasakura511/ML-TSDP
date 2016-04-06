@@ -296,7 +296,7 @@ def onBar(bar, symbols):
             logging.info("onBar: " + sym)
         #Proc
         seen=dict()
-        if len(symbols) > 1:
+        if len(symbols) > 0:
             for [file1, sym1, param1] in pairs:
                 for [file2, sym2, param2] in pairs:
                     if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):

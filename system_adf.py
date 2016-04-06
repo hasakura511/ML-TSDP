@@ -193,7 +193,7 @@ def proc_pair(sym1, sym2, param1, param2):
             logging.error("proc_pair", exc_info=True)
                 
 def proc_onBar(sym1, sym2, param1, param2):
-        logging.info("Processing Bar: " + sym1 + sym2)
+        logging.info("Processing Bar: " + sym1 + '_' + sym2)
                 
         symPair=sym1+sym2
         
@@ -288,6 +288,7 @@ def start_bar():
 def onBar(bar, symbols):
     try:
         global SST
+        global pairs
         bar=bar.set_index('Date')
         SST = SST.combine_first(bar).sort_index()
         SST = SST.fillna(method='pad')
@@ -296,21 +297,21 @@ def onBar(bar, symbols):
             logging.info("onBar: " + sym)
         #Proc
         seen=dict()
-        if len(symbols) > 0:
-            for [file1, sym1, param1] in pairs:
-                for [file2, sym2, param2] in pairs:
-                    if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
-            		 seen[sym1+sym2]=1
-            		 seen[sym2+sym1]=1
-            		 (sym1,sym2,mult1,mult2)=pparams[sym1+sym2]
-            		 proc_onBar(sym1,sym2,mult1,mult2)
-            #for sym1 in symbols:
-            #    for sym2 in symbols:
-            #        if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
-            #            seen[sym1+sym2]=1
-            #            seen[sym2+sym1]=1
-            #            (sym1,sym2,mult1,mult2)=pparams[sym1+sym2]
-            #            proc_onBar(sym1,sym2,mult1,mult2)
+        #if len(symbols) > 0:
+        for [file1, sym1, param1] in pairs:
+            for [file2, sym2, param2] in pairs:
+                if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+        		 seen[sym1+sym2]=1
+        		 seen[sym2+sym1]=1
+        		 (sym1,sym2,mult1,mult2)=pparams[sym1+sym2]
+        		 proc_onBar(sym1,sym2,mult1,mult2)
+        #for sym1 in symbols:
+        #    for sym2 in symbols:
+        #        if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
+        #            seen[sym1+sym2]=1
+        #            seen[sym2+sym1]=1
+        #            (sym1,sym2,mult1,mult2)=pparams[sym1+sym2]
+        #            proc_onBar(sym1,sym2,mult1,mult2)
     except Exception as e:
         logging.error("onBar", exc_info=True)
     
@@ -328,7 +329,7 @@ def start_prep():
         #print "sym: " + sym1
         for [file2, sym2, mult2] in pairs:
             if sym1 != sym2 and not seen.has_key(sym1+sym2) and not seen.has_key(sym2+sym1):
-		logging.info("Prepping " + sym1 + sym2)
+                logging.info("Prepping " + sym1 + sym2)
                 seen[sym1+sym2]=1
                 seen[sym2+sym1]=1
                 

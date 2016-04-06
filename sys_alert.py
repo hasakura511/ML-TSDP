@@ -141,7 +141,7 @@ def check_bar(pairs, interval, tradingHours=True):
                     nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
                     #dtimestamp = time.mktime(dataDate.timetuple())
                     btimestamp = time.mktime(barDate.timetuple())
-                    timestamp=time.mktime(nowDate.timetuple()) + 1800
+                    timestamp=time.mktime(nowDate.timetuple()) + 3600
                     checktime=30
                     if interval == '30m':
                         checktime = 30

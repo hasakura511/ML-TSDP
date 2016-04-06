@@ -9,6 +9,7 @@ from swigibpy import Order as IBOrder
 from IButils import bs_resolve, action_ib_fill
 from pytz import timezone
 from threading import Event
+import logging
 
 MAX_WAIT_SECONDS=10
 MEANINGLESS_NUMBER=1729
@@ -129,47 +130,47 @@ class IBWrapper(EWrapper):
 
 
     def execDetails(self, reqId, contract, execution):
-        
-        """
-        This is called if 
-        
-        a) we have submitted an order and a fill has come back
-        b) We have asked for recent fills to be given to us 
-        
-        We populate the filldata object and also call action_ib_fill in case we need to do something with the 
-          fill data 
-        
-        See API docs, C++, SocketClient Properties, Contract and Execution for more details 
-        """
-        reqId=int(reqId)
-       
-        execid=execution.execId
-        exectime=execution.time
-        thisorderid=int(execution.orderId)
-        account=execution.acctNumber
-        exchange=execution.exchange
-        permid=execution.permId
-        avgprice=execution.price
-        cumQty=execution.cumQty
-        clientid=execution.clientId
-        symbol=contract.symbol
-        expiry=contract.expiry
-        side=execution.side
-        #commission=execution.commission
-        currency=contract.currency
-        
-        
-        execdetails=dict( symbol_currency=str(currency), side=str(side), times=str(exectime), orderid=str(thisorderid), qty=int(cumQty), price=float(avgprice), symbol=str(symbol), expiry=str(expiry), clientid=str(clientid), execid=str(execid), account=str(account), exchange=str(exchange), permid=int(permid))
-        
-        if reqId==FILL_CODE:
-            ## This is a fill from a trade we've just done
-            action_ib_fill(execdetails)
+        try:
+            """
+            This is called if 
             
-        else:
-            ## This is just execution data we've asked for
-            self.add_fill_data(reqId, execdetails)
-
-        
+            a) we have submitted an order and a fill has come back
+            b) We have asked for recent fills to be given to us 
+            
+            We populate the filldata object and also call action_ib_fill in case we need to do something with the 
+              fill data 
+            
+            See API docs, C++, SocketClient Properties, Contract and Execution for more details 
+            """
+            reqId=int(reqId)
+           
+            execid=execution.execId
+            exectime=execution.time
+            thisorderid=int(execution.orderId)
+            account=execution.acctNumber
+            exchange=execution.exchange
+            permid=execution.permId
+            avgprice=execution.price
+            cumQty=execution.cumQty
+            clientid=execution.clientId
+            symbol=contract.symbol
+            expiry=contract.expiry
+            side=execution.side
+            #commission=execution.commission
+            currency=contract.currency
+            
+            
+            execdetails=dict( symbol_currency=str(currency), side=str(side), times=str(exectime), orderid=str(thisorderid), qty=int(cumQty), price=float(avgprice), symbol=str(symbol), expiry=str(expiry), clientid=str(clientid), execid=str(execid), account=str(account), exchange=str(exchange), permid=int(permid))
+            
+            if reqId==FILL_CODE:
+                ## This is a fill from a trade we've just done
+                action_ib_fill(execdetails)
+                
+            else:
+                ## This is just execution data we've asked for
+                self.add_fill_data(reqId, execdetails)
+        except Exception as e:
+            logging.error("execDetails", exc_info=True)
             
     def execDetailsEnd(self, reqId):
         """
@@ -323,85 +324,83 @@ class IBWrapper(EWrapper):
     def historicalData(self, reqId, date, open, high,
                        low, close, volume,
                        barCount, WAP, hasGaps):
-        global rtbar
-        global rtdict
-        global rthist
-        sym=rtdict[reqId]
-        data=rtbar[reqId]
-        if date[:8] == 'finished':
-            print("History request complete")
-            rthist[reqId].set()
-            data=data.reset_index()
-            data=data.sort_values(by='Date')  
-            data=data.set_index('Date')
-        else:
-            data.loc[date] = [open,high,low,close,volume]
-            print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
-                      % (date, open, high, low, close, volume)
-        rtbar[reqId]=data
+        try:
+            global rtbar
+            global rtdict
+            global rthist
+            sym=rtdict[reqId]
+            data=rtbar[reqId]
+            if date[:8] == 'finished':
+                print("History request complete")
+                rthist[reqId].set()
+                data=data.reset_index()
+                data=data.sort_values(by='Date')  
+                data=data.set_index('Date')
+            else:
+                data.loc[date] = [open,high,low,close,volume]
+                #print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+                #          % (date, open, high, low, close, volume)
+            rtbar[reqId]=data
         
-
-            #print(("History %s - Open: %s, High: %s, Low: %s, Close: "
-            #       "%s, Volume: %d, Change: %s, Net: %s") % (date, open, high, low, close, volume, chgpt, chg));
-
-        #return self.data
+        except Exception as e:
+            logging.error("historicalData", exc_info=True)
 
     def realtimeBar(self, reqId, time, open, high, low, close, volume, wap, count):
-
-        """
-        Note we don't use all the information here
-        
-        Just append close prices. 
-        """
-       
-        global pricevalue
-        global finished
-        global rtbar
-        global rtdict
-        global rtfile
-        sym=rtdict[reqId]
-        data=rtbar[reqId]
-        filename=rtfile[reqId]
-        
-        eastern=timezone('US/Eastern')
-        
-        time=datetime.datetime.fromtimestamp(
-                    int(time), eastern
-                ).strftime('%Y%m%d  %H:%M:00') 
-        #time=time.astimezone(eastern).strftime('%Y-%m-%d %H:%M:00') 
-        
-        if time in data.index:
-               
-            quote=data.loc[time]
-            if high > quote['High']:
-                quote['High']=high
-            if low < quote['Low']:
-                quote['Low']=low
-            quote['Close']=close
-            quote['Volume']=quote['Volume'] + volume
-            if quote['Volume'] < 0:
-                quote['Volume'] = 0 
-            data.loc[time]=quote
-            #print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
-        
-        else:
-            if len(data.index) > 1:
-                data=data.reset_index()                
-                data=data.sort_values(by='Date')  
-                quote=data.iloc[-1]
-                print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
-                data=data.set_index('Date')
-                data.to_csv(filename)
+        try:
+            """
+            Note we don't use all the information here
+            
+            Just append close prices. 
+            """
+           
+            global pricevalue
+            global finished
+            global rtbar
+            global rtdict
+            global rtfile
+            sym=rtdict[reqId]
+            data=rtbar[reqId]
+            filename=rtfile[reqId]
+            
+            eastern=timezone('US/Eastern')
+            
+            time=datetime.datetime.fromtimestamp(
+                        int(time), eastern
+                    ).strftime('%Y%m%d  %H:%M:00') 
+            #time=time.astimezone(eastern).strftime('%Y-%m-%d %H:%M:00') 
+            
+            if time in data.index:
+                   
+                quote=data.loc[time]
+                if high > quote['High']:
+                    quote['High']=high
+                if low < quote['Low']:
+                    quote['Low']=low
+                quote['Close']=close
+                quote['Volume']=quote['Volume'] + volume
+                if quote['Volume'] < 0:
+                    quote['Volume'] = 0 
+                data.loc[time]=quote
+                #print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
+            
+            else:
+                if len(data.index) > 1:
+                    data=data.sort_index()          
+                    data.to_csv(filename)
+                    
+                    quote=data.reset_index().iloc[-1]
+                    print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
+                    
+                    gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], sym]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
+                    gotbar.to_csv('./data/bars/' + sym + '.csv')
+                print "New Bar:   " + sym + " date:" + str(time) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(count)
                 
-                gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], sym]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-                gotbar.to_csv('./data/bars/' + sym + '.csv')
-            print "New Bar:   " + sym + " date:" + str(time) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(count)
-            
-            data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
-            
-            
-        rtbar[reqId]=data
-        
+                data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
+                
+                
+            rtbar[reqId]=data
+        except Exception as e:
+            logging.error("realtimeBar", exc_info=True)
         
         #pricevalue.append(close)
 
@@ -554,7 +553,6 @@ class IBclient(object):
         self.cb=callback
         self.accountid=''
 
-    
     def get_contract_details(self, ibcontract, reqId=MEANINGLESS_NUMBER):
     
         """
@@ -701,84 +699,90 @@ class IBclient(object):
 
 
     def get_executions(self, reqId=MEANINGLESS_NUMBER):
-        """
-        Returns a list of all executions done today
-        """
-        assert type(reqId) is int
-        if reqId==FILL_CODE:
-            raise Exception("Can't call get_executions with a reqId of %d as this is reserved for fills %d" % reqId)
-
-        self.cb.init_fill_data()
-        self.cb.init_error()
-        
-        ## We can change ExecutionFilter to subset different orders
-        ef=ExecutionFilter();
-        #ef.m_time="20160101"
-        #ef.client_id=0;
-        t=2;
-       
-        while t > 1:
-            reqId=reqId+1
-            self.tws.reqExecutions(reqId, ef)
+        try:
+            """
+            Returns a list of all executions done today
+            """
+            assert type(reqId) is int
+            if reqId==FILL_CODE:
+                raise Exception("Can't call get_executions with a reqId of %d as this is reserved for fills %d" % reqId)
     
-            iserror=False
-            finished=False
+            self.cb.init_fill_data()
+            self.cb.init_error()
             
-            start_time=time.time()
-            
-            while not finished and not iserror:
-                finished=self.cb.flag_fill_data_finished
-                iserror=self.cb.flag_iserror
-                if (time.time() - start_time) > MAX_WAIT_SECONDS:
-                    finished=True
-                pass
+            ## We can change ExecutionFilter to subset different orders
+            ef=ExecutionFilter();
+            #ef.m_time="20160101"
+            #ef.client_id=0;
+            t=2;
+           
+            while t > 1:
+                reqId=reqId+1
+                self.tws.reqExecutions(reqId, ef)
         
-            if iserror:
-                print self.cb.error_msg
-                print "Problem getting executions"
+                iserror=False
+                finished=False
+                
+                start_time=time.time()
+                
+                while not finished and not iserror:
+                    finished=self.cb.flag_fill_data_finished
+                    iserror=self.cb.flag_iserror
+                    if (time.time() - start_time) > MAX_WAIT_SECONDS:
+                        finished=True
+                    pass
             
-            t=t-1;
+                if iserror:
+                    print self.cb.error_msg
+                    print "Problem getting executions"
+                
+                t=t-1;
+                
+            execlist=self.cb.data_fill_data.values()
             
-        execlist=self.cb.data_fill_data.values()
-        
-        return execlist
-        
+            return execlist
+        except Exception as e:
+            logging.error("get_execution", exc_info=True)       
         
     def get_IB_account_data(self):
-        self.cb.init_portfolio_data()
-        self.cb.init_error()
-        
-        ## Turn on the streaming of accounting information
-        
-        self.tws.reqAccountUpdates(True, self.accountid)
-        
-        start_time=time.time()
-        finished=False
-        iserror=False
+        try:
+            self.cb.init_portfolio_data()
+            self.cb.init_error()
+            
+            ## Turn on the streaming of accounting information
+            
+            self.tws.reqAccountUpdates(True, self.accountid)
+            
+            start_time=time.time()
+            finished=False
+            iserror=False
+    
+            while not finished and not iserror:
+                finished=self.cb.flag_finished_portfolio
+                iserror=self.cb.flag_iserror
+    
+                if (time.time() - start_time) > MAX_WAIT_SECONDS:
+                    finished=True
+                    print "Didn't get an end for account update, might be missing stuff"
+                pass
+            if iserror:
+                print self.cb.error_msg
+                print "Problem getting details"
+                return None
+    
+    
+            
+            ## Turn off the streaming
+            ## Note portfolio_structure will also be updated
+            #self.tws.reqAccountUpdates(False, self.accountid)
+    
+            portfolio_data=self.cb.data_portfoliodata
+            account_value=self.cb.data_accountvalue
+    
+            return (account_value, portfolio_data)
+        except Exception as e:
+            logging.error("get_account", exc_info=True)       
 
-        while not finished and not iserror:
-            finished=self.cb.flag_finished_portfolio
-            iserror=self.cb.flag_iserror
-
-            if (time.time() - start_time) > MAX_WAIT_SECONDS:
-                finished=True
-                print "Didn't get an end for account update, might be missing stuff"
-            pass
-        if iserror:
-            print self.cb.error_msg
-            print "Problem getting details"
-            return None
-
-
-        
-        ## Turn off the streaming
-        ## Note portfolio_structure will also be updated
-        #self.tws.reqAccountUpdates(False, self.accountid)
-
-        portfolio_data=self.cb.data_portfoliodata
-        account_value=self.cb.data_accountvalue
-
-        return (account_value, portfolio_data)
 
     def get_IBAsk(self, symbol, currency):
         global fdict
@@ -829,148 +833,157 @@ class IBclient(object):
         return marketdata
 
     def get_realtimebar(self, ibcontract, ibtype, tickerid, data, filename):
+        try:
+            """
+            Returns a list of snapshotted prices, averaged over 'real time bars'
+            
+            tws is a result of calling IBConnector()
+            
+            """
+            
+            tws=self.tws
+            
+            global finished
+            global iserror
+            global pricevalue
+            global rtbar
+            global rtdict
+            global rtfile
+            global rtreqid
+            iserror=False
+            
+            finished=False
+            pricevalue=[]
+            rtreqid[ibcontract.symbol + ibcontract.currency]=tickerid
+            rtdict[tickerid]=ibcontract.symbol + ibcontract.currency
+            rtfile[tickerid]=filename
+            if tickerid not in rtbar:
+                rtbar[tickerid]=data
+            # Request current price in 5 second increments
+            # It turns out this is the only way to do it (can't get any other increments)
+            
+            tws.reqRealTimeBars(
+                    tickerid,                                          # tickerId,
+                    ibcontract,                                   # contract,
+                    5, 
+                    ibtype,
+                    0)
         
-        """
-        Returns a list of snapshotted prices, averaged over 'real time bars'
         
-        tws is a result of calling IBConnector()
-        
-        """
-        
-        tws=self.tws
-        
-        global finished
-        global iserror
-        global pricevalue
-        global rtbar
-        global rtdict
-        global rtfile
-        global rtreqid
-        iserror=False
-        
-        finished=False
-        pricevalue=[]
-        rtreqid[ibcontract.symbol + ibcontract.currency]=tickerid
-        rtdict[tickerid]=ibcontract.symbol + ibcontract.currency
-        rtfile[tickerid]=filename
-        if tickerid not in rtbar:
-            rtbar[tickerid]=data
-        # Request current price in 5 second increments
-        # It turns out this is the only way to do it (can't get any other increments)
-        
-        tws.reqRealTimeBars(
-                tickerid,                                          # tickerId,
-                ibcontract,                                   # contract,
-                5, 
-                ibtype,
-                0)
+            start_time=time.time()
+            ## get about 16 seconds worth of samples
+            ## could obviously just stop at N bars as well eg. while len(pricevalue)<N:
+            
     
+            
+            ## Cancel the stream
+            #tws.cancelRealTimeBars(MEANINGLESS_ID)
     
-        start_time=time.time()
-        ## get about 16 seconds worth of samples
-        ## could obviously just stop at N bars as well eg. while len(pricevalue)<N:
-        
-
-        
-        ## Cancel the stream
-        #tws.cancelRealTimeBars(MEANINGLESS_ID)
-
-        #if len(pricevalue)==0 or iserror:
-        #    raise Exception("Failed to get price")
-
-        
-        return pricevalue
+            #if len(pricevalue)==0 or iserror:
+            #    raise Exception("Failed to get price")
+    
+            
+            return pricevalue
+        except Exception as e:
+            logging.error("get_realtimebar", exc_info=True)   
         
     def getDataFromIB(self, brokerData,endDateTime,data):
-        WAIT_TIME=60
-        global rtbar
-        global rtdict
-        global rthist
-        global rtreqid
-        
-        iserror=False
-        
-        pricevalue=[]
-        tickerid=brokerData['tickerId']
-        rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
-        if tickerid not in rtbar:
-            rtbar[tickerid]=data
-        #data_cons = pd.DataFrame()
-        # Instantiate our callback object
-        
-    
-        # Instantiate a socket object, allowing us to call TWS directly. Pass our
-        # callback object so TWS can respond.
-        tws = self.tws
-        #tws = EPosixClientSocket(callback, reconnect_auto=True)
-        # Connect to tws running on localhost
-        
-        # Simple contract for GOOG
-        contract = Contract()
-        contract.exchange = brokerData['exchange']
-        contract.symbol = brokerData['symbol']
-        contract.secType = brokerData['secType']
-        contract.currency = brokerData['currency']
-        ticker = contract.symbol+contract.currency
-        #today = dt.today()
-        rtreqid[contract.symbol + contract.currency]=tickerid
-    
-        print("\nRequesting historical data for %s" % ticker)
-    
-        # Request some historical data.
-        rthist[tickerid]=Event()
-        #for endDateTime in getHistLoop:
-        tws.reqHistoricalData(
-            brokerData['tickerId'],                                         # tickerId,
-            contract,                                   # contract,
-            endDateTime,                            #endDateTime
-            brokerData['durationStr'],                                      # durationStr,
-            brokerData['barSizeSetting'],                                    # barSizeSetting,
-            brokerData['whatToShow'],                                   # whatToShow,
-            brokerData['useRTH'],                                          # useRTH,
-            brokerData['formatDate']                                          # formatDate
-            )
-    
-    
-        print("====================================================================")
-        print(" %s History requested, waiting %ds for TWS responses" % (endDateTime, WAIT_TIME))
-        print("====================================================================")
-        
         try:
-            rthist[tickerid].wait(timeout=WAIT_TIME)
-        except KeyboardInterrupt:
-            pass
-        finally:
-            if not rthist[tickerid].is_set():
-                print('Failed to get history within %d seconds' % WAIT_TIME)
+            WAIT_TIME=60
+            global rtbar
+            global rtdict
+            global rthist
+            global rtreqid
+            
+            iserror=False
+            
+            pricevalue=[]
+            tickerid=brokerData['tickerId']
+            rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
+            if tickerid not in rtbar:
+                rtbar[tickerid]=data
+            #data_cons = pd.DataFrame()
+            # Instantiate our callback object
+            
         
-        #data_cons = pd.concat([data_cons,callback.data],axis=0)
-                 
-       
-        return rtbar[tickerid]
+            # Instantiate a socket object, allowing us to call TWS directly. Pass our
+            # callback object so TWS can respond.
+            tws = self.tws
+            #tws = EPosixClientSocket(callback, reconnect_auto=True)
+            # Connect to tws running on localhost
+            
+            # Simple contract for GOOG
+            contract = Contract()
+            contract.exchange = brokerData['exchange']
+            contract.symbol = brokerData['symbol']
+            contract.secType = brokerData['secType']
+            contract.currency = brokerData['currency']
+            ticker = contract.symbol+contract.currency
+            #today = dt.today()
+            rtreqid[contract.symbol + contract.currency]=tickerid
+        
+            print("\nRequesting historical data for %s" % ticker)
+        
+            # Request some historical data.
+            rthist[tickerid]=Event()
+            #for endDateTime in getHistLoop:
+            tws.reqHistoricalData(
+                brokerData['tickerId'],                                         # tickerId,
+                contract,                                   # contract,
+                endDateTime,                            #endDateTime
+                brokerData['durationStr'],                                      # durationStr,
+                brokerData['barSizeSetting'],                                    # barSizeSetting,
+                brokerData['whatToShow'],                                   # whatToShow,
+                brokerData['useRTH'],                                          # useRTH,
+                brokerData['formatDate']                                          # formatDate
+                )
+        
+        
+            print("====================================================================")
+            print(" %s History requested, waiting %ds for TWS responses" % (endDateTime, WAIT_TIME))
+            print("====================================================================")
+            
+            try:
+                rthist[tickerid].wait(timeout=WAIT_TIME)
+            except KeyboardInterrupt:
+                pass
+            finally:
+                if not rthist[tickerid].is_set():
+                    print('Failed to get history within %d seconds' % WAIT_TIME)
+            
+            #data_cons = pd.concat([data_cons,callback.data],axis=0)
+                     
+           
+            return rtbar[tickerid]
+        except Exception as e:
+            logging.error("getDataFromIB", exc_info=True)   
         
     def proc_history(self, tickerid, sym, currency,data):
-        WAIT_TIME=60
-        global rtbar
-        global rtdict
-        global rthist
-        global rtreqid
-        iserror=False
-
-        rtdict[tickerid]=sym + currency
-        rtreqid[sym+currency]=tickerid
-        if tickerid not in rtbar:
-            rtbar[tickerid]=data
-        data=data.reset_index()
-        for i in data.index:
-            tick=data.ix[i]
-            
-            self.cb.historicalData(tickerid, tick['Date'],tick['Open'],tick['High'],
-                                    tick['Low'],tick['Close'],tick['Volume'],-1,-1,-1)
-       
-                 
-       
-        return rtbar[tickerid]
+        try:
+            WAIT_TIME=60
+            global rtbar
+            global rtdict
+            global rthist
+            global rtreqid
+            iserror=False
+    
+            rtdict[tickerid]=sym + currency
+            rtreqid[sym+currency]=tickerid
+            if tickerid not in rtbar:
+                rtbar[tickerid]=data
+            else:
+                data=data.reset_index()
+                for i in data.index:
+                    tick=data.ix[i]
+                    
+                    self.cb.historicalData(tickerid, tick['Date'],tick['Open'],tick['High'],
+                                            tick['Low'],tick['Close'],tick['Volume'],-1,-1,-1)
+               
+                     
+           
+            return rtbar[tickerid]
+        except Exception as e:
+            logging.error("proc_history", exc_info=True)   
 
     def get_bar(self, symbol, currency):
         

@@ -14,6 +14,13 @@ import logging
 callback = IBWrapper()
 client=IBclient(callback)
 
+def reconnect_ib():
+    global callback
+    global client
+    client.tws.eDisconnect()
+    callback = IBWrapper()
+    client=IBclient(callback)
+
 def get_bar(symbol, currency):
     return client.get_bar(str(symbol), str(currency))
     

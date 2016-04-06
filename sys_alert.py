@@ -198,7 +198,7 @@ def check_signal(pairs, tradingHours=True):
                 elif re.search(r'v3', pair):
                     checktime = 120
                 elif re.search(r's105', pair):
-                    checktime = 1440
+                    checktime = 2880
                 else:
                     checktime = 360
                     

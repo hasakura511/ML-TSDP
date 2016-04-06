@@ -147,8 +147,8 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance'].pct_change()
-        dataSet['PurePLcurve'] = dataSet['purebalance'].pct_change()
+        dataSet['equitycurve'] = dataSet['balance'].diff().div(dataSet['balance'].shift(1)) #.pct_change()
+        dataSet['PurePLcurve'] = dataSet['purebalance'].diff().div(dataSet['purebalance'].shift(1)) #.pct_change()
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])

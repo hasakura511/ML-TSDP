@@ -160,8 +160,8 @@ def runPair_v1(pair):
             #ferr.write('Starting '+version+': ' + ticker)
             signal, dataSet=runv2(runData)
             print signal
-            logging.info('v1 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25)+\
-                                signal.system)
+            logging.info('v1 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
+            logging.info(signal.system)
             #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
             #ferr.close()
@@ -203,8 +203,8 @@ def runPair_v2(pair, dataSet):
             
             signal, dataSet=runv2(runData, dataSet)
             print signal
-            logging.info('v2 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25)+\
-                    signal.system)
+            logging.info('v2 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
+            logging.info(signal.system)
             #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
             #ferr.close()

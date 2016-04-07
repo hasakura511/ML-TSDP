@@ -289,12 +289,12 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
     for col in colnames:
         if SST.shape[0] > 0:
             tdiff=SST.index[-1] - SST.index[0]
-            span = tdiff.total_minutes()
+            span = round(tdiff.total_seconds()/60)
             tdiff=tdiff.total_seconds()/3600
             if tdiff == 0:
                 tdiff=1
             perhour=round(len(SST[col].values)/tdiff,2)
-            ax.plot( SST[col], label=str(col) + ' [' + str(len(SST[col].values)) + ' records]' + ' ' + str(perhour) + '/hour Total: ' + span + ' mins')
+            ax.plot( SST[col], label=str(col) + ' [' + str(len(SST.shape[0])) + ' records]' + ' ' + str(perhour) + '/hour Total: ' + span + ' mins')
     barSize='1 day'
     #if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
     #    barSize = '1 day'
@@ -459,13 +459,16 @@ ibdict={}
 verdict={}
 vdict={}
 
+iblive=systemdata.loc[systemdata['ibsubmit']==True].copy()
+iblive['Name']='IB_Live'
+systemdata.append(iblive)
 for i in systemdata.index:
     
     system=systemdata.ix[i]
     #print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
     #print        " System Algo: " + str(system['System']) 
     if system['c2submit']:
-	c2dict[system['Name']]=1  
+	  c2dict[system['Name']]=1  
     if system['ibsubmit']: 
         ibdict[system['Name']]=1 
     if not systemdict.has_key(system['Name']):
@@ -530,7 +533,9 @@ def gen_c2(html, counter, cols, recent, systemname):
 
 def gen_ib(html, counter, cols):
     try:
+        
       systemname='IB_Live'
+      
       html = html + '<h1>IB</h1><br><table>'
       
       cols=4

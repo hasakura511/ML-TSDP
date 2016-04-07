@@ -260,8 +260,8 @@ def runv2(runData, dataSet=pd.DataFrame()):
                         logging.info( 'Not enough data to create indicators: #rows\
                             is less than max lookback of '+str(maxlb))
                         return None, None
-                    logging.info( 'Skipping aux pair '+pair+'. Not enough data to create indicators: #rows\
-                         is less than max lookback of '+str(maxlb))
+                    logging.info( 'Skipping aux pair '+pair+'. Not enough data to create indicators: '+\
+                                        str(data.shape[0])+' rows is less than max lookback of '+str(maxlb))
                 elif data.shape[0] >= maxReadLines:
                     currencyPairsDict[pair] = data[-maxReadLines:]
                 else:

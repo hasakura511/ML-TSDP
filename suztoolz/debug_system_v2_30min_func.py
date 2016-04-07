@@ -538,7 +538,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
             
         if showAllCharts:
             for runName in sstDictDF1_:
-                compareEquity(sstDictDF1_[runName],runName)
+                compareEquity(sstDictDF1_[runName],runName,initialEquity=PRT['initial_equity'])
             
     if bestParams.signal[:2] != 'BH' and bestParams.signal[:2] != 'SH':
         print  '\nBest signal found...', bestParams.signal
@@ -562,10 +562,10 @@ def runv2(runData, dataSet=pd.DataFrame()):
                             +'_fcst'+str(bestParams.wf_step)+'_'+bestParams.signal
     if showAllCharts:
         compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName, savePath=chartSavePath,\
-                                showChart=True, filename=version+'_'+ticker+'_OOS')     
+                                showChart=True, filename=version+'_'+ticker+'_OOS',initialEquity=PRT['initial_equity'])     
     else:
         compareEquity(sstDictDF1_[DF1_BMrunName],DF1_BMrunName, savePath=chartSavePath,\
-                                showChart=False, filename=version+'_'+ticker+'_OOS')
+                                showChart=False, filename=version+'_'+ticker+'_OOS',initialEquity=PRT['initial_equity'])
 
         
     timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)

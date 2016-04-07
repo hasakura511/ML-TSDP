@@ -584,6 +584,7 @@ def compareEquity(sst, title, **kwargs):
     showChart = kwargs.get('showChart',True)
     ticker =  kwargs.get('ticker',None)
     filename =  kwargs.get('filename',None)
+    initialEquity =  kwargs.get('initialEquity',1)
     #check if there's time in the index
     if not sst.index.to_datetime()[0].time() and not sst.index.to_datetime()[1].time():
         barSize = '1 day'
@@ -601,18 +602,18 @@ def compareEquity(sst, title, **kwargs):
         print sst.signals.value_counts()[0], 'beFlat Signals',
     #  Compute cumulative equity for all days
     equityBuyHold = np.zeros(nrows)
-    equityBuyHold[0] = 1
+    equityBuyHold[0] = initialEquity
     for i in range(1,nrows):
         equityBuyHold[i] = (1+sst.gainAhead.iloc[i-1])*equityBuyHold[i-1]
         
     equitySellHold = np.zeros(nrows)
-    equitySellHold[0] = 1
+    equitySellHold[0] = initialEquity
     for i in range(1,nrows):
         equitySellHold[i] = (1-sst.gainAhead.iloc[i-1])*equitySellHold[i-1]
         
     #  Compute cumulative equity for days with beLong signals    
     equityBeLongSignals = np.zeros(nrows)
-    equityBeLongSignals[0] = 1
+    equityBeLongSignals[0] = initialEquity
     for i in range(1,nrows):
         if (sst.signals.iloc[i-1] > 0):
             equityBeLongSignals[i] = (1+sst.gainAhead.iloc[i-1])*equityBeLongSignals[i-1]
@@ -621,7 +622,7 @@ def compareEquity(sst, title, **kwargs):
             
     #  Compute cumulative equity for days with beShort signals    
     equityBeLongAndShortSignals = np.zeros(nrows)
-    equityBeLongAndShortSignals[0] = 1
+    equityBeLongAndShortSignals[0] = initialEquity
     for i in range(1,nrows):
         if (sst.signals.iloc[i-1] < 0):
             equityBeLongAndShortSignals[i] = (1+-sst.gainAhead.iloc[i-1])*equityBeLongAndShortSignals[i-1]
@@ -632,7 +633,7 @@ def compareEquity(sst, title, **kwargs):
 
     #  Compute cumulative equity for days with beShort signals    
     equityBeShortSignals = np.zeros(nrows)
-    equityBeShortSignals[0] = 1
+    equityBeShortSignals[0] = initialEquity
     for i in range(1,nrows):
         if (sst.signals.iloc[i-1] < 0):
             equityBeShortSignals[i] = (1+-sst.gainAhead.iloc[i-1])*equityBeShortSignals[i-1]

@@ -34,7 +34,7 @@ from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRe
                         ExtraTreesRegressor, GradientBoostingRegressor
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
 from suztoolz.transform import zigzag as zg
-                        #import warnings
+#import warnings
 #warnings.filterwarnings('error')
 
 def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
@@ -43,8 +43,11 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
     DD95_limit = kwargs.get('DD95_limit',0.05)
     barSize = kwargs.get('barSize','30m')
     number_forecasts  = kwargs.get('number_forecasts',35)
-    minFraction = kwargs.get('minFraction',None)
-    fraction= kwargs.get('fraction',1)
+    #minsafef sets lower bound on safef. 
+    minSafef = kwargs.get('minSafef',None)
+    safef= kwargs.get('startSafef',1)
+    initial_equity=kwargs.get('initial_equity',100000.0)
+    asset = kwargs.get('asset','FX')
     #barDict
     barDict = {
                     '1 min':60.0,
@@ -53,11 +56,15 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
                     '1h':1.0
                     }
                     
-    #edited to compute all trades.
-    #forecast horizon minimum 1 year, or safef becomes very large
+    def IBcommission(tradeAmount, asset):
+        commission = 2.0
+        if asset == 'FX':
+            return max(2.0, tradeAmount*2e-5)
+        else:
+            return commission
+        
     holdBars = 1
     accuracy_tolerance = 0.005
-    initial_equity = 100000
     years_in_forecast = forecast_horizon/float(barDict[barSize]*24.0*365.0)
         
     #percentOfYearInMarket = number_long_signals /(years_in_study*252.0)
@@ -77,7 +84,7 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
     done = False    
     while not done:
         done = True
-        #print 'Using fraction: %.3f ' % fraction,
+        #print 'Using safef: %.3f ' % safef,
         # -----------------------------
         #   Beginning a new forecast run
         for i_forecast in range(number_forecasts):
@@ -111,7 +118,7 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
                     direction = 'LONG'
                 else:
                     direction = 'SHORT'
-                #print direction, fraction
+                #print direction, safef
                 if TRADE: #<0 not toxic
                     entry_index = signal_index[index]
                     #rint entry_index, TRADE
@@ -124,9 +131,9 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
                             entry_price = Close.ix[entry_index]
                             #print entry_price
 
-                            #print account_balance[i_day], fraction, buy_price
+                            #print account_balance[i_day], safef, buy_price
                             number_shares = account_balance[i_day] * \
-                                            fraction / entry_price
+                                            safef / entry_price
                             share_dollars = number_shares * entry_price
                             cash = account_balance[i_day] - \
                                    share_dollars
@@ -146,7 +153,27 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
                             else:                            
                                 profit = number_shares * (entry_price - Close.ix[j])
 
-                            MTM_equity = cash + share_dollars + profit
+                            if i_day_in_trade==holdBars: # last day of forecast
+                                #  Exit at the close
+                                exit_price = Close.ix[j]
+                            addCommission = 0
+                            #min safef specifies safef as a whole number.
+                            if minSafef is not None:    
+                                if TRADE*round(safef) != lastPosition:
+                                    trades += 1
+                                    #print trades, lastPosition, TRADE*round(safef)
+                                    lastPosition = TRADE*round(safef)
+                                    #print trades, lastPosition, TRADE*round(safef)
+                                    addCommission = -IBcommission(share_dollars+profit, asset)
+                            else:
+                                if TRADE*safef != lastPosition:
+                                    trades += 1
+                                    #print trades, lastPosition, TRADE*safef
+                                    lastPosition = TRADE*safef
+                                    #print trades, lastPosition, TRADE*safef
+                                    addCommission = -IBcommission(share_dollars+profit, asset)
+                            #print addCommission
+                            MTM_equity = cash + share_dollars + profit +addCommission
                             IT_DD = (max_IT_Eq[i_day-1] - MTM_equity) \
                                     / max_IT_Eq[i_day-1]
                             max_IT_DD[i_day] = max(max_IT_DD[i_day-1], \
@@ -155,24 +182,6 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
                                     MTM_equity)
                             account_balance[i_day] = MTM_equity
                             #print '175accountbal', account_balance[i_day],'profit', profit, 'itdd', IT_DD,'max_IT_DD[i_day]',max_IT_DD[i_day], 'max_ITEq', max_IT_Eq[i_day]
-
-                            if i_day_in_trade==holdBars: # last day of forecast
-                                #  Exit at the close
-                                exit_price = Close.ix[j]
-                                
-                            #min fraction specifies min order
-                            if minFraction is not None:    
-                                if TRADE*round(fraction) != lastPosition:
-                                    trades += 1
-                                    #print trades, lastPosition, TRADE*round(fraction)
-                                    lastPosition = TRADE*round(fraction)
-                                    #print trades, lastPosition, TRADE*round(fraction)
-                            else:
-                                if TRADE*fraction != lastPosition:
-                                    trades += 1
-                                    #print trades, lastPosition, TRADE*fraction
-                                    lastPosition = TRADE*fraction
-                                    #print trades, lastPosition, TRADE*fraction
                                     
                             # Check for end of forecast
                             #print 'i_day', i_day,'numBars',numBars
@@ -216,30 +225,30 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
         DD_95 = stats.scoreatpercentile(FC_max_IT_DD,95)    
         #print 'DD_95',DD_95
         
-        #stop at minimum fraction
-        if minFraction is not None:
-            if fraction > minFraction:
-                #adjust fraction
+        #stop at minimum safef
+        if minSafef is not None:
+            if safef > minSafef:
+                #adjust safef
                 if (abs(DD95_limit - DD_95) < accuracy_tolerance):
                     #print '  214 DD95: %.3f ' % DD_95, 'DD95_limit',DD95_limit,"Close enough" 
                     done = True
                 elif DD_95 == 0: #no drawdown
                     #print 'dd95 =0'
-                    fraction =  float('inf')
+                    safef =  float('inf')
                     done == True
                 elif DD_95 == 1: #max loss
                     #print 'dd95=1'
-                    fraction = 0
+                    safef = 0
                     done == True 
                 else:
-                    #print '  DD95: %.3f ' % DD_95, "DD95_limit",DD95_limit," Adjust fraction from " , fraction,
-                    fraction = fraction * DD95_limit / DD_95
-                    if fraction < minFraction:
-                        fraction = minFraction
-                    #print 'to ', fraction, 'minfraction',minFraction
+                    #print '  DD95: %.3f ' % DD_95, "DD95_limit",DD95_limit," Adjust safef from " , safef,
+                    safef = safef * DD95_limit / DD_95
+                    if safef < minSafef:
+                        safef = minSafef
+                    #print 'to ', safef, 'minsafef',minSafef
                     done = False   
             else:
-                #stop when fraction<min fraction
+                #stop when safef<min safef
                 done==True
         else:
             if (abs(DD95_limit - DD_95) < accuracy_tolerance):
@@ -247,18 +256,15 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
                 done = True
             elif DD_95 == 0: #no drawdown
                 #print 'dd95 =0'
-                fraction =  float('inf')
+                safef =  float('inf')
                 done == True
             elif DD_95 == 1: #max loss
                 #print 'dd95=1'
-                fraction = 0
+                safef = 0
                 done == True 
             else:
-                #print '  DD95: %.3f ' % DD_95, "DD95_limit",DD95_limit," Adjust fraction from " , fraction,
-                fraction = fraction * DD95_limit / DD_95
-                if fraction < minFraction:
-                        fraction = minFraction
-                #print 'to ', fraction, 'minfraction',minFraction
+                #print '  DD95: %.3f ' % DD_95, "DD95_limit",DD95_limit," Adjust safef from " , safef,
+                safef = safef * DD95_limit / DD_95
                 done = False
             
     #  Report
@@ -287,12 +293,12 @@ def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
         print 'DD100: %.3f ' %  IT_DD_100,
         print 'SORTINO25: %.3f ' %  SOR25,
         print 'SHARPE25: %.3f ' % SHA25
-        print 'SAFEf: %.3f ' % fraction,
+        print 'SAFEf: %.3f ' % safef,
 
         print 'CAR25: %.3f ' % CAR_25,
         print 'CAR50: %.3f ' % CAR_50,
         print 'CAR75: %.3f ' % CAR_75
-    metrics = {'C25sig':SIG, 'safef':fraction, 'CAR25':CAR_25, 'CAR50':CAR_50, 'CAR75':CAR_75,\
+    metrics = {'C25sig':SIG, 'safef':safef, 'CAR25':CAR_25, 'CAR50':CAR_50, 'CAR75':CAR_75,\
                 'DD95':IT_DD_95, 'DD100':IT_DD_100, 'SOR25':SOR25, 'SHA25':SHA25, 'YIF':YIF, 'TPY':TPY}
 
     return metrics
@@ -324,6 +330,7 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
     ddTolerance = metaData['DD95_limit']
     forecastHorizon = metaData['horizon']
     barSize = metaData['barSizeSetting']
+    initial_equity=metaData['initial_equity']
     
     #CAR25 for zigzag
     if signal[:2]=='ZZ':
@@ -584,7 +591,8 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
                     ticker, validationFirstYear, validationFinalYear, iterations, metaData['filter'],showPDFCDF=showPDFCDF,\
                     savePath=PDFCDFsavePath, filename=PDFCDFfilename,verbose=verbose)
         CAR25_oos = CAR25_df_bars(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
-                                close, DD95_limit =ddTolerance, verbose=verbose,barSize=barSize, minFraction=1)
+                                close, DD95_limit =ddTolerance, verbose=verbose,barSize=barSize, minSafef=1,\
+                                initial_equity=initial_equity)
         #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'LONG', 1)
         #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, prior_index_filt, close, 'SHORT', -1)
                                 
@@ -619,7 +627,8 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
                                  savePath=PDFCDFsavePath, filename=PDFCDFfilename,verbose=verbose)
         #minfraction set to 1 because no odd lots. 
         CAR25_oos = CAR25_df_bars(signal,cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
-                                close, DD95_limit =ddTolerance, verbose=verbose, barSize=barSize, minFraction=1)
+                                close, DD95_limit =ddTolerance, verbose=verbose, barSize=barSize, minSafef=1,\
+                                initial_equity=initial_equity)
         #CAR25_L1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
          #                       close, 'LONG', 1)
         #CAR25_Sn1_oos = CAR25(signal, cm_y_pred_oos, st_oos_filt['prior_index'].values.astype(int),\
@@ -1789,7 +1798,7 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
         if numCharts == None:
             numCharts = equityStats.system.shape[0]
             
-        benchmarks = createBenchmark(equityCurves[topSystem],1.0,'', startDate,endDate,ticker)
+        benchmarks = createBenchmark(equityCurves[topSystem],PRT['initial_equity'],'', startDate,endDate,ticker)
         benchStatsByYear = createYearlyStats(benchmarks)
         #create yearly stats for all equity curves with comparison against benchmark
         equityCurvesStatsByYear = createYearlyStats(equityCurves, benchStatsByYear)
@@ -1866,10 +1875,11 @@ def calcEquity_df(SST, title, **kwargs):
     figsize = kwargs.get('figsize',(8,7))
     showPlot =kwargs.get('showPlot',True)
     verbose = kwargs.get('verbose',True)
+    initialEquity = kwargs.get('initialEquity',1.0)
     #version = kwargs.get('version',None)
     #v3tag = kwargs.get('v3tag',None)
     
-    initialEquity = 1.0
+    #initialEquity = 1.0
     nrows = SST.gainAhead.shape[0]
     #signalCounts = SST.signals.shape[0]
     '''

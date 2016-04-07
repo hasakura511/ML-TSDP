@@ -530,112 +530,17 @@ def gen_c2(html, counter, cols, recent, systemname):
 
 def gen_ib(html, counter, cols):
     try:
-        html = html + '<h1>IB</h1><br><table>'
-        cols=4
-	counter=0
-	dhtml=''
-        vhtml=''
-	for systemname in systemdict:
-         try:
-            if ibdict.has_key(systemname):
-
-                data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                (dcounter, dhtml)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', 1, dhtml, cols)
-            
-		(dcounter, vhtml)=generate_html(verdict[systemname], 0, vhtml, cols, True)
-
-         except Exception as e:
-            logging.error("get_iblive", exc_info=True)
-            counter = 0
-
-        if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
-            html = html + vhtml
-            counter=0
-
-            ibdata=generate_ib_plot('IB_Paper','Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
-            
-            ibdata=generate_ib_plot_from_trades('IB_Paper','times', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'times', 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
-            
-            html = html + dhtml
-            counter = counter + 1
-
-            data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',initCap)
-            (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
-            counter=0 
-        if os.path.isfile('./data/paper/c2_' + 'IB_Live' + '_trades.csv'):
-            html = html + vhtml
-            counter=0
-
-            ibdata=generate_ib_plot('C2_Paper', 'Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
-            
-            ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'openedWhen', 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
-            
-            html = html + dhtml
-            counter = counter + 1
-
-            data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', initCap)
-            (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
-   
-       	    counter=0 
- 
-	html = html + '</table><h1>Recent Trades</h1><br><table>'
+      systemname='IB_Live'
+      html = html + '<h1>IB</h1><br><table>'
+      
+      cols=4
+      counter=0
+      gen_paper(html, counter, cols, 0, systemname)
+      html = html + '</center><h1>Recent Trades</h1><br><center>'
 	
-	recent=1
-	counter=0
-	dhtml=''
-	vhtml=''
-        for systemname in systemdict:
-         try:
-            if ibdict.has_key(systemname):
-
-                data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                (dcounter, dhtml)=generate_plots(data, 'recent_ib_' + systemname + 'Signals', 'Recent IB ' + systemname + 'Signals', 'equity', 1, dhtml, cols, recent)
-		
-		(dcounter, vhtml)=generate_html(verdict[systemname], 0, vhtml, cols, True)
-
-         except Exception as e:
-            logging.error("get_iblive", exc_info=True)
-            counter = 0
-
-        if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
-	    html = html + vhtml
-	    counter=0
-
-            ibdata=generate_ib_plot('IB_Paper','Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'recent_ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols, recent)
-
-            ibdata=generate_ib_plot_from_trades('IB_Paper','times', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'times', 'recent_ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols, recent)
-
-            html = html + dhtml
-            counter = counter + 1
-
-            data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',initCap)
-            (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'recent_ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols, recent)
-
-       	    counter=0 
-
-        if os.path.isfile('./data/paper/c2_' + 'IB_Live' + '_trades.csv'):
-	    html = html + vhtml 
-	    counter=0
-
-            ibdata=generate_ib_plot('C2_Paper', 'Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'recent_ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols, recent)
-
-            ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'openedWhen', 'recent_ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols, recent)
-
-            html = html + dhtml
-            counter = counter + 1
-
-            data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', initCap)
-            (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'recent_c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols, recent)
-
-       	    counter=0 
+      recent=1
+      counter=0
+      gen_paper(html, counter, cols, recent, systemname)
 
     except Exception as e:
         logging.error("gen_ib", exc_info=True)

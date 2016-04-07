@@ -17,6 +17,7 @@ from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
 import threading
 from dateutil.parser import parse
 import datetime
+import re
 
 debug=False
 lock = threading.Lock()
@@ -74,7 +75,11 @@ def update_unr_profit(systemname, pricefeed, currency, date):
         (bid,ask)=bars.bidask_from_csv(sym).iloc[-1]
         dtimestamp=time.mktime(parse(date).timetuple())
         if not histcache.has_key(sym):
-            histcache[sym]=bars.feed_ohlc_from_csv('1 min_' + sym)
+            if re.search(r'BTC',sym):
+                histcache[sym]=bars.feed_ohlc_from_csv(sym)
+            else:
+                histcache[sym]=bars.feed_ohlc_from_csv('1 min_' + sym)
+           
             histdates[sym]=time.mktime(parse(histcache[sym].index[-1]).timetuple())
         if histdates[sym] > dtimestamp:
                 ldate=parse(date).strftime("%Y%m%d  %H:%M:00")

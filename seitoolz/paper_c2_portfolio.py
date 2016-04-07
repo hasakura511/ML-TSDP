@@ -18,6 +18,7 @@ from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
 from paper_c2_trades import get_c2_trades
 import threading
 import logging
+import re
 
 debug=False
 debug2=False
@@ -103,7 +104,10 @@ def update_unr_profit(systemname, pricefeed, currency, date):
         (bid,ask)=bars.bidask_from_csv(sym).iloc[-1]
         dtimestamp=time.mktime(parse(date).timetuple())
         if not histcache.has_key(sym):
-            histcache[sym]=bars.feed_ohlc_from_csv('1 min_' + sym)
+            if re.search(r'BTC',sym):
+                histcache[sym]=bars.feed_ohlc_from_csv(sym)
+            else:
+                histcache[sym]=bars.feed_ohlc_from_csv('1 min_' + sym)
             histdates[sym]=time.mktime(parse(histcache[sym].index[-1]).timetuple())
         if histdates[sym] > dtimestamp:
                 logging.info('unr profit using hist: ' + sym)

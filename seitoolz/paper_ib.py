@@ -22,7 +22,7 @@ debug=False
 def place_order(systemname, action, quant, sym, type, currency, exch, pricefeed, date):
         if debug:
             print "Place IB Order " + action + " " + str(quant) + " " + sym + " " + currency 
-        (account, portfolio)=get_ib_portfolio(systemname, date)
+        (account, portfolio)=get_ib_portfolio(systemname, type, date)
         symbol=sym
         if type == 'CASH':
             symbol=sym+currency
@@ -91,8 +91,8 @@ def exec_open_pos(pos, systemname, quant, sym, type, currency, exch, price, pric
                 print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
             
             purepl=0
-            update_ib_portfolio(systemname, pos, date)
-            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            update_ib_portfolio(systemname, pos, type, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, type, date)
             account=update_account_pnl(systemname, 'ib',tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
             update_ib_trades(systemname, account, pos, tradepl, purepl, buy_power, exch, date)
             
@@ -107,8 +107,8 @@ def exec_open_pos(pos, systemname, quant, sym, type, currency, exch, price, pric
             pos=get_new_ib_pos(systemname, sym, openVWAP, openqty, buy_power, tradepl, commission, currency, date)
             purepl=0
             
-            update_ib_portfolio(systemname, pos, date)
-            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            update_ib_portfolio(systemname, pos, type, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, type, date)
             account=update_account_pnl(systemname, 'ib',tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
             update_ib_trades(systemname, account, pos, tradepl, purepl, buy_power, exch, date)
             
@@ -145,8 +145,8 @@ def exec_close_pos(pos, systemname, quant, sym, type, currency, exch, price, pri
                 print "Trade PL: " + str(purepl)
                 print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
 
-            update_ib_portfolio(systemname, pos, date)
-            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            update_ib_portfolio(systemname, pos, type, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, type, date)
             account=update_account_pnl(systemname, 'ib',tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
             update_ib_trades(systemname, account, pos, tradepl, purepl, buy_power, exch, date)
             

@@ -46,7 +46,7 @@ def get_c2_portfolio(systemname, date):
                      'opening_price_VWAP', 'closing_price_VWAP', 'PL', 'PurePL', 'commission', \
                      'trade_id','closeVWAP_timestamp','closedWhen','closedWhenUnixTimeStamp', \
                      'expir','instrument',\
-                     'markToMarket_time','openVWAP_timestamp','openedWhen','qty'])
+                     'markToMarket_time','openVWAP_timestamp','openedWhen','qty','currency'])
         dataSet = dataSet.set_index('symbol')
         with lock:
             dataSet.to_csv(filename)
@@ -110,7 +110,7 @@ def update_unr_profit(systemname, pricefeed, currency, date):
                 histcache[sym]=bars.feed_ohlc_from_csv('1 min_' + sym)
             histdates[sym]=time.mktime(parse(histcache[sym].index[-1]).timetuple())
         if histdates[sym] > dtimestamp:
-                logging.info('unr profit using hist: ' + sym)
+                #logging.info('unr profit using hist: ' + sym)
                 ldate=parse(date).strftime("%Y%m%d  %H:%M:00")
                 if ldate not in histcache[sym].index:
                     histcache[sym].loc[histcache[sym].index <= ldate].iloc[-1]['Close']
@@ -128,7 +128,7 @@ def update_unr_profit(systemname, pricefeed, currency, date):
 
         (newVWAP, remqty, commission, buy_power, tradepl, ptValue, newside, purepl) =           \
                 calc_close_pos(openVWAP, qty, price, quant,                      \
-                pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], currency, \
+                pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], record['currency'], \
                 pricefeed['C2Mult'])
         record['unr_pnl']=tradepl
         record['pure_unr_pnl']=purepl

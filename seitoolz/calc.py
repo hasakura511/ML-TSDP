@@ -51,6 +51,9 @@ def calc_close_pos(openAt, openqty, closeAt, closeqty, comPct, comCash, currency
     else:
         remqty=openqty + closeqty
     
+    if debug:
+            print 'Close: PL: ' + side + ' ' + str(tradepl) + ' PurePL: ' + str(purepl) + ' Value: ' + str(value) + ' Open: ' + str(openAt) + ' Close: ' + str(closeAt) + ' Qty' + str(closeqty)
+       
     return (openAt, remqty, commission, buy_power, tradepl, mult, side, purepl)
 
 def calc_closeVWAP(closeVWAP, closedqty, addVWAP, addqty):
@@ -87,14 +90,14 @@ def calc_pl(openAt, closeAt, qty, mult, side):
         pl=(openAt - closeAt)*abs(qty)*abs(mult)
         value=closeAt*abs(qty)*abs(mult)
         if debug:
-            print 'PL: ' + side + ' ' + str(pl) + ' Value: ' + str(value) + ' Open: ' + str(openAt) + ' Close: ' + str(closeAt) + ' Qty' + str(qty)
+            print 'Calc: PL: ' + side + ' ' + str(pl) + ' Value: ' + str(value) + ' Open: ' + str(openAt) + ' Close: ' + str(closeAt) + ' Qty' + str(qty)
         return (pl, value)
         
     if side == 'long':
         pl=(closeAt - openAt)*abs(qty)*abs(mult)
         value=closeAt*abs(qty)*abs(mult)
         if debug:
-            print 'PL: ' + side + ' ' + str(pl) + ' Value: ' + str(value) + ' Open: ' + str(openAt) + ' Close: ' + str(closeAt) + ' Qty' + str(qty)
+            print 'Calc: PL: ' + side + ' ' + str(pl) + ' Value: ' + str(value) + ' Open: ' + str(openAt) + ' Close: ' + str(closeAt) + ' Qty' + str(qty)
         return (pl,value)
 
 def get_USD(currency):

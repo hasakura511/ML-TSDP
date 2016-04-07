@@ -106,7 +106,7 @@ def update_ib_trades(systemname, account, pos, tradepl, purepl, buypower, ibexch
         if debug:
             print "Update IB Balance: " + str(account['balance'])  + " PB: " +  str(account['purebalance']) + " PurePL: " + str(account['PurePL']) + ' ' + \
                     systemname + " " + longshort + \
-                    ' symbol: ' + (pos['symbol']+pos['symbol_currency']) + ' qty: ' + str(qty) + \
+                    ' symbol: ' + (pos['symbol']) + ' currency: ' + pos['symbol_currency'] + ' qty: ' + str(qty) + \
                     ' openqty: ' + str(pos['openqty']) + ' open_or_closed ' + openorclosed + ' Buy_Power: ' + str(account['buy_power'])
     #print filename
     dataSet['permid'] = dataSet['permid'].astype('int')

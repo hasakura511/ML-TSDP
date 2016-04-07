@@ -23,7 +23,7 @@ debug=False
 lock = threading.Lock()
 histcache=dict()
 histdates=dict()
-def get_ib_portfolio(systemname, date):
+def get_ib_portfolio(systemname, type, date):
     filename='./data/paper/ib_' + systemname + '_portfolio.csv'
     
     account=get_account_value(systemname, 'ib', date)
@@ -37,22 +37,30 @@ def get_ib_portfolio(systemname, date):
             if 'pure_unr_pnl' not in dataSet:
                 dataSet['pure_unr_pnl']=0
             dataSet=dataSet.reset_index()
-            dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
+            dataSet['symbol']=dataSet['sym']
+            if type == 'CASH':
+                dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
+                
             dataSet=dataSet.set_index('symbol')
         return (account, dataSet)
     else:
 
         dataSet=pd.DataFrame({}, columns=['sym','exp','qty','openqty','price','openprice','value','avg_cost','unr_pnl','real_pnl','PurePL','accountid','currency'])
-        dataSet['symbol']=dataSet['sym'] + dataSet['currency']        
+        dataSet['symbol']=dataSet['sym']
+        if type == 'CASH':
+            dataSet['symbol']=dataSet['sym'] + dataSet['currency']        
         dataSet=dataSet.set_index('symbol')
         with lock:
             dataSet.to_csv(filename)
         return (account, dataSet)
    
-def get_ib_pos(systemname, symbol, currency, date):
-    (account_data, portfolio_data)=get_ib_portfolio(systemname, date)
+def get_ib_pos(systemname, symbol, currency, type, date):
+    (account_data, portfolio_data)=get_ib_portfolio(systemname, type, date)
     portfolio_data=portfolio_data.reset_index()
-    portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
+    if type == 'CASH':
+        portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
+    else:
+        portfolio_data['symbol']=portfolio_data['sym']
     sym_cur=symbol + currency
     portfolio_data=portfolio_data.set_index('symbol')
     if sym_cur not in portfolio_data.index.values:
@@ -62,9 +70,9 @@ def get_ib_pos(systemname, symbol, currency, date):
         ib_pos_qty=ib_pos['qty']
         return ib_pos_qty
 
-def update_unr_profit(systemname, pricefeed, currency, date):
+def update_unr_profit(systemname, pricefeed, currency, type, date):
     filename='./data/paper/ib_' + systemname + '_portfolio.csv'
-    (account, dataSet)=get_ib_portfolio(systemname, date)
+    (account, dataSet)=get_ib_portfolio(systemname, type, date)
     symbols=dataSet.index
     unr_pnl=0
     pure_unr_pnl=0
@@ -99,7 +107,7 @@ def update_unr_profit(systemname, pricefeed, currency, date):
 
         (newVWAP, remqty, commission, buy_power, tradepl, ptValue, newside, purepl) =           \
                 calc_close_pos(openVWAP, qty, price, quant,                      \
-                pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], currency, \
+                pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], record['currency'], \
                 pricefeed['C2Mult'])
         record['unr_pnl']=tradepl
         record['pure_unr_pnl']=purepl
@@ -110,16 +118,20 @@ def update_unr_profit(systemname, pricefeed, currency, date):
         dataSet.to_csv(filename) 
     return (unr_pnl, pure_unr_pnl)  
     
-def update_ib_portfolio(systemname, pos, date):
+def update_ib_portfolio(systemname, pos, type, date):
     filename='./data/paper/ib_' + systemname + '_portfolio.csv'
    
-    (account, dataSet)=get_ib_portfolio(systemname, date)
+    (account, dataSet)=get_ib_portfolio(systemname, type, date)
     
     pos=pos.copy()
-    symbol = pos['sym'] + pos['currency']
+    if type == 'CASH':
+        pos['symbol']=pos['sym'] + pos['currency']
+    else:
+        pos['symbol']=pos['sym']
+    symbol = pos['symbol']
     pos['qty']=pos['openqty']
     pos['price']=pos['openprice']
-    pos['symbol']=symbol
+    
     if debug:
         print "Update Portfolio: " + str(symbol)
 

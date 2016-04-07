@@ -31,7 +31,7 @@ def get_c2_trades(systemname, date):
         dataSet=pd.DataFrame({},columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
         'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
         'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
-        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description','PurePL','qty'])
+        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description','PurePL','qty','currency'])
         dataSet = dataSet.set_index('trade_id')
         dataSet.to_csv(filename)
         return dataSet

@@ -18,7 +18,7 @@ from paper_c2_portfolio import get_c2_pos
 from paper_ib_portfolio import get_ib_pos
 from paper_order import place_order
 
-debug=False
+debug=True
 
 def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit, date):
     system_pos=model_pos.loc[system]
@@ -72,7 +72,7 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
         symbol=ibsym
         if ibtype == 'CASH':
             symbol=ibsym+ibcurrency
-        ib_pos_qty=get_ib_pos(system_name, ibsym, ibcurrency, date)
+        ib_pos_qty=get_ib_pos(system_name, ibsym, ibcurrency, ibtype, date)
         system_ibpos_qty=round(system_pos['action']) * ibquant
         
         if system_ibpos_qty != ib_pos_qty:

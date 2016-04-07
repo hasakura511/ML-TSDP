@@ -294,7 +294,7 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
             if tdiff == 0:
                 tdiff=1
             perhour=round(len(SST[col].values)/tdiff,2)
-            ax.plot( SST[col], label=str(col) + ' [' + str(len(SST.shape[0])) + ' records]' + ' ' + str(perhour) + '/hour Total: ' + span + ' mins')
+            ax.plot( SST[col], label=str(col) + ' [' + str(len(SST.shape[0])) + ' records]' + ' ' + str(perhour) + '/hour Total: ' + str(span) + ' mins')
     barSize='1 day'
     #if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
     #    barSize = '1 day'

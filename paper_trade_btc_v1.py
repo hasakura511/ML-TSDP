@@ -66,9 +66,9 @@ def trade_v1():
     while True:
       try:
        myfeed=bars.get_btc_exch_list()
-       for exchange in myfeed:
+       for inst in myfeed:
             
-        ticker='BTCUSD'
+        (ticker, exchange)=inst.split('_')
         (bid,ask)=get_btc_bidask(ticker, exchange)
         if ask > 0 and bid > 0:
          data=get_ohlc(ticker, exchange)

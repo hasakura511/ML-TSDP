@@ -59,8 +59,8 @@ def get_btc_exch_list():
     for file in files:
             if re.search(r'BTCUSD', file):
                 (inst, ext)=file.split('.')
-                (ticker, exch)=inst.split('_')
-                btcList.append(exch)
+                #(ticker, exch)=inst.split('_')
+                btcList.append(inst)
                 #print 'Found ' + inst
     return btcList
     

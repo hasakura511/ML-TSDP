@@ -538,3 +538,81 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-04-06 17:00:00,1.0,0.0,4393.0,2.0,0.814542143832,0.00210496378484,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",2.3904,20160406 17:02:23 EDT
 2016-04-06 17:30:00,-1.0,0.0,4393.0,1.0,,,,bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,-5.97528333333,20160406 17:24:01 EDT
 2016-04-06 18:00:00,1.0,0.0,4393.0,1.0,,,,bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst30_GA30,-15.1853333333,20160406 17:44:48 EDT
+2016-04-06 18:00:00,1.0,0.0,4393.0,2.0,6.21232317338,0.00195729845706,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",4.48446666667,20160406 18:04:29 EDT
+2016-04-06 18:30:00,-1.0,0.0,4393.0,1.0,,,,bothEURCHF_30m_ALL_DF1_None_i0_fcst1_SH1,-6.51483333333,20160406 18:23:29 EDT
+2016-04-06 19:00:00,1.0,0.0,4393.0,2.0,2.06671328843,0.0012868616981,0.00417028828114,bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_GA15 DPS wl20.0 maxL2 dd95_0.004 thres_0.0,-16.2186666667,20160406 18:43:46 EDT
+2016-04-06 19:00:00,1.0,0.0,4393.0,2.0,0.382752408709,0.00140518972743,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",3.704,20160406 19:03:42 EDT
+2016-04-06 19:30:00,-1.0,0.0,4393.0,2.0,0.0613094362796,0.000988010042855,0.00417028828114,bothEURCHF_30m_ALL_DF1_None_i0_fcst1_SH1 DPS wl20.0 maxL2 dd95_0.004 thres_0.0,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 12 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:38:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 19:42:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-5.94591666667,20160406 19:24:03 EDT
+2016-04-06 20:30:00,-1.0,0.0,4395.0,0.0,-1.83165985749,0.0,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-39.6428833333,20160406 19:50:21 EDT
+2016-04-06 20:30:00,-1.0,0.0,4395.0,1.0,,,,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",-32.009,20160406 19:57:59 EDT
+2016-04-06 20:30:00,1.0,0.0,4392.0,2.0,0.223904166087,0.00072384559583,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:06:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:06:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:06:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:07:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:07:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:07:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:07:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:08:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:08:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:08:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:08:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:09:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:09:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:09:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:09:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:10:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:10:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:10:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:14:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 20:19:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of EURCHF and CHFJPY of 13 is less than max lookback of 604,-23.7953666667,20160406 20:06:12 EDT
+2016-04-06 21:00:00,1.0,0.0,4392.0,0.0,-0.5669077041,0.0,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-32.73585,20160406 20:27:15 EDT
+2016-04-06 21:00:00,1.0,0.0,4392.0,1.0,,,,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",-20.3072,20160406 20:39:41 EDT
+2016-04-06 21:00:00,1.0,0.0,4392.0,1.0,,,,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",0.0303666666667,20160406 21:00:01 EDT
+2016-04-06 21:30:00,1.0,0.0,4392.0,0.0,-0.723567877941,0.0,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst1_ZZ1_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-9.99303333333,20160406 21:20:00 EDT
+2016-04-06 22:00:00,1.0,0.0,4392.0,1.0,,,,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst1_ZZ1_0.002,-0.002",-20.3914833333,20160406 21:39:36 EDT
+2016-04-06 22:00:00,1.0,0.0,4392.0,1.0,,,,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",-0.842533333333,20160406 21:59:09 EDT
+2016-04-06 22:30:00,1.0,0.0,4392.0,2.0,0.21697304816,0.000941349762756,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_ZZ30_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-10.73495,20160406 22:19:15 EDT
+2016-04-06 23:00:00,1.0,0.0,4392.0,2.0,0.072208987628,0.000794916921752,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_ZZ30_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-19.5845333333,20160406 22:40:24 EDT
+2016-04-06 23:00:00,1.0,0.0,4392.0,0.0,-1.36809938565,0.0,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst1_ZZ1_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",0.89315,20160406 23:00:53 EDT
+2016-04-06 23:30:00,1.0,0.0,4392.0,0.0,-0.502124660539,0.0,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst1_ZZ1_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-8.19916666667,20160406 23:21:48 EDT
+2016-04-07 00:00:00,1.0,0.0,4392.0,2.0,0.605803293777,0.0014152528894,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-17.2297666667,20160406 23:42:46 EDT
+2016-04-07 00:00:00,1.0,0.0,4392.0,2.0,0.589316017678,0.00145498202138,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",1.9866,20160407 00:01:59 EDT
+2016-04-07 00:30:00,1.0,0.0,4392.0,2.0,0.689230737628,0.00134321906892,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_ZZ30_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-8.97596666667,20160407 00:21:01 EDT
+2016-04-07 01:00:00,1.0,0.0,4392.0,2.0,0.759726469066,0.000710610541414,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst1_ZZ1_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-19.4314666667,20160407 00:40:34 EDT
+2016-04-07 01:00:00,1.0,0.0,4392.0,2.0,0.988435795882,0.00073331536038,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst1_ZZ1_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-0.566966666667,20160407 00:59:25 EDT
+2016-04-07 01:30:00,-1.0,0.0,4392.0,0.0,-0.100448376168,0.0,0.00417028828114,bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst15_GA15 DPS wl20.0 maxL2 dd95_0.004 thres_0.0,-11.00265,20160407 01:18:59 EDT
+2016-04-07 02:00:00,-1.0,0.0,4392.0,1.0,,,,bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,-21.2425,20160407 01:38:45 EDT
+2016-04-07 02:00:00,-1.0,0.0,4392.0,1.0,,,,bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,-1.38778333333,20160407 01:58:36 EDT
+2016-04-07 02:30:00,1.0,0.0,4392.0,0.0,-0.740056920495,0.0,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst1_ZZ1_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-12.84155,20160407 02:17:09 EDT
+2016-04-07 03:00:00,1.0,0.0,4392.0,1.0,,,,bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst30_GA30,-24.0710833333,20160407 02:35:55 EDT
+2016-04-07 03:00:00,1.0,0.0,4392.0,0.0,-1.36674201461,0.0,0.00417028828114,"bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst1_ZZ1_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-3.30951666667,20160407 02:56:41 EDT
+2016-04-07 03:30:00,-1.0,0.0,4392.0,2.0,1.35030146049,0.00153584377299,0.00417028828114,bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_GA30 DPS wl20.0 maxL2 dd95_0.004 thres_0.0,-13.82725,20160407 03:16:10 EDT
+2016-04-07 04:00:00,1.0,0.0,4392.0,1.0,,,,bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,-24.5806833333,20160407 03:35:25 EDT
+2016-04-07 04:00:00,1.0,0.0,4392.0,1.0,,,,bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,-6.04043333333,20160407 03:53:57 EDT
+2016-04-07 04:30:00,-1.0,0.0,4392.0,1.0,,,,"bothEURCHF_30m_ALL_DF1_VotingHard_i50_fcst30_ZZ30_0.002,-0.002",-17.60645,20160407 04:12:23 EDT
+2016-04-07 04:30:00,-1.0,0.0,4392.0,1.0,,,,bothEURCHF_30m_ALL_DF1_None_i0_fcst1_SH1,1.33748333333,20160407 04:31:20 EDT
+2016-04-07 05:00:00,1.0,0.0,4392.0,1.0,,,,bothEURCHF_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,-9.62613333333,20160407 04:50:22 EDT

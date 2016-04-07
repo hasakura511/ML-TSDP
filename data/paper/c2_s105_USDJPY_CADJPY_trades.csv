@@ -1,3 +1,5 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
-1.0,-2.0,,,,0.0,,USDJPY,short,,20160405 04:59:23 EST,open,20160405 04:59:23 EST,110.501,,,0.0,1.0,,USDJPY,,0.0,-1.0,19998.0,2.0,390275.912,20000.0
-2.0,-2.0,,,,0.0,,CADJPY,long,,20160405 04:59:24 EST,open,20160405 04:59:24 EST,84.203,,,0.0,1.0,,CADJPY,,0.0,1.0,19996.0,2.0,382866.048,20000.0
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance,currency,mark_to_mkt,pure_mark_to_mkt
+1.0,-2.0,,,,0.0,,USDJPY,short,,20160405 04:59:23 EST,open,20160405 04:59:23 EST,110.501,,,0.0,1.0,,USDJPY,,0.0,-1.0,19998.0,2.0,390275.912,20000.0,,,
+2.0,-2.0,,,,0.0,,CADJPY,long,,20160405 04:59:24 EST,open,20160405 04:59:24 EST,84.203,,,0.0,1.0,,CADJPY,,0.0,1.0,19996.0,2.0,382866.048,20000.0,,,
+3.0,-2.0,,,,0.0,,USDJPY,short,,20160407 01:05:03 EST,open,20160407 01:05:03 EST,109.05,,,0.0,1.0,,USDJPY,,0.0,-1.0,19994.0,2.0,373269.648,20000.0,JPY,20018.928,20026.928
+4.0,-2.0,,,,0.0,,CADJPY,long,,20160407 01:05:28 EST,open,20160407 01:05:28 EST,83.579,,,0.0,1.0,,CADJPY,,0.0,1.0,19992.0,2.0,365914.696,20000.0,JPY,20016.248,20028.248

@@ -1,3 +1,5 @@
 dates,signals,safef,comment
 1459925880.0,-1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""USDJPYCHFJPY"", ""zScore"": 2.26, ""zSMA"": 2.55}"
 1459945140.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""USDJPYCHFJPY"", ""zScore"": 0.95, ""zSMA"": 1.37}"
+1460018520.0,-1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""USDJPYCHFJPY"", ""zScore"": 1.53, ""zSMA"": 1.55}"
+1460019360.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""USDJPYCHFJPY"", ""zScore"": 1.0, ""zSMA"": 1.57}"

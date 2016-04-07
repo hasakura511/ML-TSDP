@@ -1,3 +1,6 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
-1.0,-2.0,,,,0.0,,NZDJPY,short,,20160405 10:54:53 EST,open,20160405 10:54:53 EST,75.078,,,0.0,1.0,,NZDJPY,,0.0,-1.0,19998.0,2.0,393393.136,20000.0
-2.0,-2.0,,,,0.0,,GBPJPY,long,,20160405 10:54:54 EST,open,20160405 10:54:54 EST,156.325,,,0.0,1.0,,GBPJPY,,0.0,1.0,19996.0,2.0,379636.536,20000.0
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance,mark_to_mkt,pure_mark_to_mkt,currency
+1.0,-2.0,,,,0.0,,NZDJPY,short,,20160405 10:54:53 EST,open,20160405 10:54:53 EST,75.078,,,0.0,1.0,,NZDJPY,,0.0,-1.0,19998.0,2.0,393393.136,20000.0,,,
+2.0,-2.0,,,,0.0,,GBPJPY,long,,20160405 10:54:54 EST,open,20160405 10:54:54 EST,156.325,,,0.0,1.0,,GBPJPY,,0.0,1.0,19996.0,2.0,379636.536,20000.0,,,
+3.0,-2.0,,,,0.0,,GBPJPY,long,,20160407 01:04:24 EST,open,20160407 01:04:24 EST,154.088,,,0.0,1.0,,GBPJPY,,0.0,1.0,19994.0,2.0,366076.792,20000.0,20012.504,20020.504,
+4.0,-2.0,,,,0.0,,NZDJPY,short,,20160407 01:05:04 EST,open,20160407 01:05:04 EST,74.518,,,0.0,1.0,,NZDJPY,,0.0,-1.0,19992.0,2.0,359519.208,20000.0,19989.56,19999.56,JPY
+5.0,-2.0,,,,0.0,,GBPJPY,long,,20160407 01:05:29 EST,open,20160407 01:05:29 EST,154.101,,,0.0,1.0,,GBPJPY,,0.0,1.0,19990.0,2.0,345958.32,20000.0,20004.92,20018.92,JPY

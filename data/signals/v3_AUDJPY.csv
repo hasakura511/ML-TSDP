@@ -2533,3 +2533,81 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-04-06 17:00:00,-1.0,0.0,4222.0,0.0,-8.16147574856,0.0,0.00417028828114,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",6.97108333333,20160406 17:06:58 EDT
 2016-04-06 17:30:00,1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,-2.00351666667,20160406 17:27:59 EDT
 2016-04-06 18:00:00,-1.0,0.0,4222.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002",-11.13515,20160406 17:48:51 EDT
+2016-04-06 18:30:00,-1.0,0.0,4222.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002",-21.6390833333,20160406 18:08:21 EDT
+2016-04-06 18:30:00,-1.0,0.0,4222.0,0.0,-3.42855630206,0.0,0.00417028828114,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-2.54851666667,20160406 18:27:27 EDT
+2016-04-06 19:00:00,1.0,0.0,4222.0,0.0,-1.73001052071,0.0,0.00417028828114,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-12.25315,20160406 18:47:44 EDT
+2016-04-06 19:30:00,1.0,0.0,4222.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",-22.2085833333,20160406 19:07:47 EDT
+2016-04-06 19:30:00,1.0,0.0,4222.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:29:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:30:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 12 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:31:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:34:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:38:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:42:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:50:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 19:58:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:06:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:06:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:06:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:06:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:07:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:07:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:07:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:07:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:08:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:08:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:08:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:08:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:09:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:09:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:09:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:09:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:10:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:10:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:10:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:14:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:19:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 20:27:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Not enough data to create indicators: intersect of AUDJPY and CADJPY of 13 is less than max lookback of 604,-1.17328333333,20160406 19:28:49 EDT
+2016-04-06 21:30:00,1.0,0.0,4387.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst30_ZZ30_0.002,-0.002",-46.2468666667,20160406 20:43:45 EDT
+2016-04-06 21:30:00,1.0,0.0,4387.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst30_ZZ30_0.002,-0.002",-25.9707666667,20160406 21:04:01 EDT
+2016-04-06 21:30:00,1.0,0.0,4221.0,0.0,-2.37423815442,0.0,0.00417028828114,bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15 DPS wl20.0 maxL2 dd95_0.004 thres_0.0,-6.29186666667,20160406 21:23:42 EDT
+2016-04-06 22:00:00,1.0,0.0,4221.0,1.0,2.31989479942,0.0049717319515,0.00417028828114,bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_GA15 DPS wl20.0 maxL2 dd95_0.004 thres_0.0,-16.3913166667,20160406 21:43:36 EDT
+2016-04-06 22:00:00,1.0,0.0,4221.0,0.0,-0.697859842449,0.0,0.00417028828114,bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15 DPS wl20.0 maxL2 dd95_0.004 thres_0.0,3.11595,20160406 22:03:06 EDT
+2016-04-06 22:30:00,1.0,0.0,4221.0,1.0,3.46047127209,0.00431185116563,0.00417028828114,bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_GA15 DPS wl20.0 maxL2 dd95_0.004 thres_0.0,-6.71603333333,20160406 22:23:17 EDT
+2016-04-06 23:00:00,1.0,0.0,4221.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",-15.53645,20160406 22:44:27 EDT
+2016-04-06 23:00:00,1.0,0.0,4221.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",5.13735,20160406 23:05:08 EDT
+2016-04-06 23:30:00,-1.0,0.0,4221.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-3.78281666667,20160406 23:26:13 EDT
+2016-04-07 00:00:00,-1.0,0.0,4221.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-13.2754333333,20160406 23:46:43 EDT
+2016-04-07 00:30:00,-1.0,0.0,4222.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",-24.14685,20160407 00:05:51 EDT
+2016-04-07 00:30:00,-1.0,0.0,4222.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_ZZ15_0.002,-0.002",-5.03936666667,20160407 00:24:57 EDT
+2016-04-07 01:00:00,-1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,-15.4589,20160407 00:44:32 EDT
+2016-04-07 01:00:00,-1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst30_GA30,3.25063333333,20160407 01:03:15 EDT
+2016-04-07 01:30:00,-1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-7.31736666667,20160407 01:22:40 EDT
+2016-04-07 02:00:00,-1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-16.8373333333,20160407 01:43:09 EDT
+2016-04-07 02:00:00,-1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,2.3785,20160407 02:02:22 EDT
+2016-04-07 02:30:00,1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst15_GA15,-9.17111666667,20160407 02:20:49 EDT
+2016-04-07 03:00:00,-1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-19.5318,20160407 02:40:28 EDT
+2016-04-07 03:00:00,-1.0,0.0,4222.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002",0.677366666667,20160407 03:00:40 EDT
+2016-04-07 03:30:00,-1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-9.9573,20160407 03:20:02 EDT
+2016-04-07 04:00:00,1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,-20.8451166667,20160407 03:39:09 EDT
+2016-04-07 04:00:00,1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_GA15,-2.30931666667,20160407 03:57:41 EDT
+2016-04-07 04:30:00,-1.0,0.0,4222.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_VotingHard_i50_fcst30_GA30,-13.9224666667,20160407 04:16:04 EDT
+2016-04-07 05:00:00,-1.0,0.0,4222.0,0.0,-1.73545401328,0.0,0.00417028828114,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst15_ZZ15_0.002,-0.002 DPS wl20.0 maxL2 dd95_0.004 thres_0.0",-24.7238166667,20160407 04:35:16 EDT
+2016-04-07 05:00:00,-1.0,0.0,4222.0,1.0,,,,"bothAUDJPY_30m_ALL_DF1_VotingHard_i250_fcst30_ZZ30_0.002,-0.002",-5.87261666667,20160407 04:54:07 EDT

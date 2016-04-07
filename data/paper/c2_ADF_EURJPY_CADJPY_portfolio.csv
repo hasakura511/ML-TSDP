@@ -1,2 +1,0 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-CADJPY,open,long,200000.0,100000.0,84.7925,85.0705,239.655304,244.64,4.984696,9.0,20160405 00:09:00 EST,20160405 00:09:00 EST,20160405 00:09:00 EST,,CADJPY,,20160404 20:50:00 EST,20160404 20:50:00 EST,-100000.0,23044.4748376,399588.16,23100.24

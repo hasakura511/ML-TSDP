@@ -141,34 +141,6 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
         return dataSet
-
-def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
-    filename='./data/paper/' + broker + '_' + systemname + '_trades.csv'
-    if os.path.isfile(filename):
-        dataSet=pd.read_csv(filename)
-        #dataSet=dataSet.sort_values(by=[dateCol])
-        
-        dataSet['equitycurve'] = dataSet['balance'].diff().div(dataSet['balance'].shift(1)) #.pct_change()
-        dataSet['PurePLcurve'] = dataSet['purebalance'].diff().div(dataSet['purebalance'].shift(1)) 
-        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].diff().div(dataSet['mark_to_mkt'].shift(1)) #.pct_change()
-        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].diff().div(dataSet['pure_mark_to_mkt'].shift(1)) 
-        if broker == 'ib':
-            dataSet['ls']=dataSet['side']
-            dataSet.ix[dataSet['ls']=='SLD','ls']= 'short'
-            dataSet.ix[dataSet['ls']=='BOT','ls']= 'long'
-            dataSet['Date']=dataSet['times']
-            dataSet=dataSet.set_index('Date')
-            dataSet=dataSet.sort_index()
-        else:
-            dataSet['ls']=dataSet['long_or_short']
-            dataSet['Date']=dataSet['openedWhen']
-            dataSet=dataSet.set_index('Date')
-            dataSet=dataSet.sort_index()
-            
-        return dataSet
-    else:
-        dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
-        return dataSet
         
 def generate_c2_plot(systemname, dateCol, initialEquity):
     filename='./data/c2api/' + systemname + '_trades.csv'
@@ -286,6 +258,35 @@ def get_datas(systems, api, dataType, initialData, interval=''):
     
                     newfiles.append([filename,symbol])      
     return newfiles
+
+
+def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
+    filename='./data/paper/' + broker + '_' + systemname + '_trades.csv'
+    if os.path.isfile(filename):
+        dataSet=pd.read_csv(filename)
+        #dataSet=dataSet.sort_values(by=[dateCol])
+        
+        dataSet['equitycurve'] = dataSet['balance'].diff().div(dataSet['balance'].shift(1)) #.pct_change()
+        dataSet['PurePLcurve'] = dataSet['purebalance'].diff().div(dataSet['purebalance'].shift(1)) 
+        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].diff().div(dataSet['mark_to_mkt'].shift(1)) #.pct_change()
+        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].diff().div(dataSet['pure_mark_to_mkt'].shift(1)) 
+        if broker == 'ib':
+            dataSet['ls']=dataSet['side']
+            dataSet.ix[dataSet['ls']=='SLD','ls']= 'short'
+            dataSet.ix[dataSet['ls']=='BOT','ls']= 'long'
+            dataSet['Date']=dataSet['times']
+            #dataSet=dataSet.set_index('Date')
+            #dataSet=dataSet.sort_index()
+        else:
+            dataSet['ls']=dataSet['long_or_short']
+            dataSet['Date']=dataSet['openedWhen']
+            #dataSet=dataSet.set_index('Date')
+            #dataSet=dataSet.sort_index()
+            
+        return dataSet
+    else:
+        dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
+        return dataSet
                 
 def save_plot(colnames, filename, title, ylabel, SST, comments=''):
     SST=SST.fillna(method='pad')
@@ -333,7 +334,7 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
 
     fig.autofmt_xdate()
     ax.annotate(str(SST.index[-1]), xy=(0.95, -0.02), ha='left', va='top', xycoords='axes fraction', fontsize=10)
-    ax.annotate(comments, xy=(0.02, 0.5), ha='left', va='top', xycoords='axes fraction', fontsize=10)
+    ax.annotate(comments, xy=(0.02, 0.7), ha='left', va='top', xycoords='axes fraction', fontsize=10)
     #plt.axis([0,1.5,0,2.0])
     ax.set_xlim(SST.index[0], SST.index[-1])
     #ax.set_xlabel(str(SST.index[-1]))
@@ -544,7 +545,7 @@ def gen_ib(html, counter, cols):
         
       systemname='IB_Live'
       
-      html = html + '<center>'
+      html = html + '<h1>IB Live</h1><center>'
       
       cols=4
       counter=0

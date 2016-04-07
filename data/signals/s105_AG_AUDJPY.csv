@@ -1,0 +1,8 @@
+dates,signals,safef,comment
+1459897560.0,-1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""AUDJPYGBPJPY"", ""zScore"": 1.08, ""zSMA"": 1.11}"
+1459899000.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""AUDJPYGBPJPY"", ""zScore"": 0.94, ""zSMA"": 1.12}"
+1459899540.0,-1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""AUDJPYGBPJPY"", ""zScore"": 1.07, ""zSMA"": 1.15}"
+1459905360.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""AUDJPYGBPJPY"", ""zScore"": 0.9, ""zSMA"": 1.55}"
+1459905480.0,-1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""AUDJPYGBPJPY"", ""zScore"": 1.02, ""zSMA"": 1.49}"
+1459905600.0,0,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""AUDJPYGBPJPY"", ""zScore"": 0.96, ""zSMA"": 1.42}"
+1459909260.0,-1,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""AUDJPYGBPJPY"", ""zScore"": 1.78, ""zSMA"": 1.86}"

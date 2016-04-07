@@ -333,7 +333,14 @@ for ticker in livePairs:
     for pair in currencyPairs:    
         if barSizeSetting+'_'+pair+'.csv' in files:
             data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)
-            if data.shape[0] >= maxReadLines:
+            if data.shape[0] < maxlb:
+                if pair == ticker:
+                    message =  'Not enough data to create indicators: #rows\
+                        is less than max lookback of '+str(maxlb)
+                    offlineMode(ticker, message, signalPath, version, version_)
+                print( 'Skipping aux pair '+pair+'. Not enough data to create indicators: '+\
+                                    str(data.shape[0])+' rows is less than max lookback of '+str(maxlb))
+            elif data.shape[0] >= maxReadLines:
                 currencyPairsDict[pair] = data[-maxReadLines:]
             else:
                 currencyPairsDict[pair] = data

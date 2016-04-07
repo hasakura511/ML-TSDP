@@ -132,7 +132,9 @@ def save_state(myidx):
     return idx
 
 lastidx=load_state().iloc[-1]['idx']
-refresh_paper_iblive()
+
+if lastidx < 100:
+    refresh_paper_iblive()
 
 data=getibtrades()
 symdict={}

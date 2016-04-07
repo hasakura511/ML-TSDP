@@ -99,7 +99,7 @@ files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 def getibtrades():
     filename='./data/ibapi/trades.csv'
     if os.path.isfile(filename):
-        dataSet=pd.read_csv(filename)
+        dataSet=pd.read_csv(filename, index_col='permid')
         #sums up results to starting acct capital
         #dataSet['equitycurve'] = initialEquity + dataSet['realized_PnL'].cumsum()
         return dataSet
@@ -114,11 +114,29 @@ def refresh_paper_iblive():
             os.remove(filename)
             print 'Deleting ' + filename
 
+
+def load_state():
+    filename='./data/ibapi/getibpnl.csv'
+    if os.path.isfile(filename):
+        idx=pd.read_csv(filename)
+        return idx
+    else:
+        idx=pd.DataFrame([[1]],columns=['idx'])    
+        return idx
+        
+def save_state(myidx):
+    filename='./data/ibapi/getibpnl.csv'
+    idx=pd.DataFrame([[myidx]],columns=['idx'])
+    idx.to_csv(filename)
+    return idx
+
+lastidx=load_state().iloc[-1]['idx']
 refresh_paper_iblive()
 
 data=getibtrades()
 symdict={}
 for i in data.index:
+    if i > lastidx:
         order=data.ix[i]
         sym=order['symbol'] + order['symbol_currency']
         qty=order['qty']
@@ -154,7 +172,9 @@ for i in data.index:
             adj_size(model, sym,systemname,pricefeed,   \
             str('IBLive'),'IBLive',1,sym,secType, True, \
                 1,order['symbol'],order['symbol_currency'],exchange, secType,True,order['times'])
+            save_state(i)
         #time.sleep(1)
+    
         
     
 

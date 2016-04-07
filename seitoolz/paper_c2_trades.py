@@ -48,6 +48,8 @@ def update_c2_trades(systemname, account, pos, tradepl, purepl, buypower, date):
     tradeid=int(pos['trade_id'])
     pos['balance']=account['balance'] 
     pos['purebalance']=account['purebalance']
+    pos['mark_to_mkt']=account['mark_to_mkt']    
+    pos['pure_mark_to_mkt']=account['pure_mark_to_mkt']
     pos['margin_available']=account['buy_power']
     pos['PurePL']=float(pos['PurePL']) + purepl
     pos['PL']=float(pos['PL']) + float(tradepl)

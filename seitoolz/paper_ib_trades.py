@@ -72,6 +72,8 @@ def update_ib_trades(systemname, account, pos, tradepl, purepl, buypower, ibexch
     pos['permid'] = pos['permid'].astype('int')
     pos['balance']=account['balance'] 
     pos['purebalance']=account['purebalance']
+    pos['mark_to_mkt']=account['mark_to_mkt']    
+    pos['pure_mark_to_mkt']=account['pure_mark_to_mkt']
     pos['margin_available']=account['buy_power']
     pos['PurePL']=purepl
     pos['real_pnl']=tradepl

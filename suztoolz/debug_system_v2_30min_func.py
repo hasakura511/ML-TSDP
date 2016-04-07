@@ -255,7 +255,14 @@ def runv2(runData, dataSet=pd.DataFrame()):
         for pair in currencyPairs:    
             if barSizeSetting+'_'+pair+'.csv' in files:
                 data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)
-                if data.shape[0] >= maxReadLines:
+                if data.shape[0] < maxlb:
+                    if pair == ticker:
+                        logging.info( 'Not enough data to create indicators: #rows\
+                            is less than max lookback of '+str(maxlb))
+                        return None, None
+                    logging.info( 'Skipping aux pair '+pair+'. Not enough data to create indicators: #rows\
+                         is less than max lookback of '+str(maxlb))
+                elif data.shape[0] >= maxReadLines:
                     currencyPairsDict[pair] = data[-maxReadLines:]
                 else:
                     currencyPairsDict[pair] = data
@@ -312,7 +319,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
                                         
                 #check if there is enough data to create indicators
                 if closes.shape[0] < maxlb:
-                    logging.info( 'Not enough data to create indicators: intersect of '\
+                    logging.info( 'Skipping '+pair+' features. Not enough data to create indicators: intersect of '\
                         +ticker+' and '+pair +' of '+str(closes.shape[0])+\
                         ' is less than max lookback of '+str(maxlb))
                     #offlineMode(ticker, message, signalPath, version, version_)

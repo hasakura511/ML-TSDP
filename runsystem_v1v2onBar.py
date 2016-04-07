@@ -201,8 +201,10 @@ def runPair_v2(pair, dataSet):
             
             #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
             #ferr.write('Starting '+version+': ' + ticker)
-            
-            signal, dataSet=runv2(runData, dataSet)
+            if dataSet is not None:
+                signal, dataSet=runv2(runData, dataSet)
+            else:
+                signal, dataSet=runv2(runData)
             print signal
             logging.info('v2 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
             logging.info(signal.system)

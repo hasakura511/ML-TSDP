@@ -145,7 +145,7 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
         return dataSet
 
 def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
-    filename='./data/paper/' + broker + '_' + systemname + '_account.csv'
+    filename='./data/paper/' + broker + '_' + systemname + '_trades.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
@@ -154,7 +154,13 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
         dataSet['PurePLcurve'] = dataSet['purebalance'].diff().div(dataSet['purebalance'].shift(1)) 
         dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].diff().div(dataSet['mark_to_mkt'].shift(1)) #.pct_change()
         dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].diff().div(dataSet['pure_mark_to_mkt'].shift(1)) 
-        
+        if broker == 'ib':
+            dataSet['ls']=dataSet['side']
+            dataSet.ix[dataSet['ls']=='SLD','ls'] = 'short'
+            dataSet.ix[dataSet['ls']=='BOT','ls'] = 'long'
+        else:
+            dataSet['ls']=dataSet['long_or_short']
+            
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -277,16 +283,18 @@ def get_datas(systems, api, dataType, initialData, interval=''):
                     newfiles.append([filename,symbol])      
     return newfiles
                 
-def save_plot(colnames, filename, title, ylabel, SST):
+def save_plot(colnames, filename, title, ylabel, SST, comments=''):
     SST=SST.fillna(method='pad')
     fig, ax = plt.subplots()
     for col in colnames:
-        tdiff=SST.index[-1] - SST.index[0]
-        tdiff=tdiff.total_seconds()/3600
-        if tdiff == 0:
-            tdiff=1
-        perhour=round(len(SST[col].values)/tdiff,2)
-        ax.plot( SST[col], label=str(col) + ' [' + str(len(SST[col].values)) + ']' + ' ' + str(perhour) + '/hour')
+        if SST.shape[0] > 0:
+            tdiff=SST.index[-1] - SST.index[0]
+            span = tdiff.total_minutes()
+            tdiff=tdiff.total_seconds()/3600
+            if tdiff == 0:
+                tdiff=1
+            perhour=round(len(SST[col].values)/tdiff,2)
+            ax.plot( SST[col], label=str(col) + ' [' + str(len(SST[col].values)) + ' records]' + ' ' + str(perhour) + '/hour Total: ' + span + ' mins')
     barSize='1 day'
     #if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
     #    barSize = '1 day'
@@ -320,6 +328,7 @@ def save_plot(colnames, filename, title, ylabel, SST):
 
     fig.autofmt_xdate()
     ax.annotate(str(SST.index[-1]), xy=(0.95, -0.02), ha='left', va='top', xycoords='axes fraction', fontsize=10)
+    ax.annotate(comments, xy=(0.02, -0.2), ha='left', va='top', xycoords='axes fraction', fontsize=10)
 
     ax.set_xlim(SST.index[0], SST.index[-1])
     #ax.set_xlabel(str(SST.index[-1]))
@@ -340,12 +349,20 @@ def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, count
         SST[dateCol]=pd.to_datetime(SST[dateCol])
         SST=SST.sort_values(by=[dateCol])
         SST=SST.set_index(dateCol)
+        comments = str(SST.shape[0]) + ' Record Count\n'
+        if ylabel == 'TWR':
+            shorts=len(SST.loc[SST['ls']=='short']['ls'])
+            longs=len(SST.loc[SST['ls']=='long']['ls'])
+            comm=sum(SST['commission'])
+            comments = comments + str(shorts) + ' Short Trades\n'
+            comments = comments + str(longs) + ' Long Trades\n'
+            comments = comments + '$' + str(comm) + ' Total Commission\n'
         if recent > 0: 
                 SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
 
         filename='./data/results/' + systemname + ylabel + '.png'
         save_plot(colnames, filename, title, ylabel, SST)
-        (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
+        (counter, html)=generate_html( systemname + ylabel, counter, html, cols, comments)
     except Exception as e:
         logging.error("something bad happened", exc_info=True)
     

@@ -76,8 +76,6 @@ def generate_sigplots(counter, html, cols):
     footerhtml=get_html_footer()
     footerhtml = '</table>' + footerhtml
     write_html(fn, headerhtml, footerhtml, body)
-    
-   
 
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
@@ -135,10 +133,10 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance'] - 20000
-        dataSet['PurePLcurve'] = dataSet['purebalance'] - 20000
-        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] - 20000
-        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] - 20000
+        dataSet['equitycurve'] = dataSet['balance'] 
+        dataSet['PurePLcurve'] = dataSet['purebalance'] 
+        #dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] - 20000
+        #dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] - 20000
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -159,9 +157,13 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
             dataSet.ix[dataSet['ls']=='SLD','ls']= 'short'
             dataSet.ix[dataSet['ls']=='BOT','ls']= 'long'
             dataSet['Date']=dataSet['times']
+            dataSet=dataSet.set_index('Date')
+            dataSet=dataSet.sort_index()
         else:
             dataSet['ls']=dataSet['long_or_short']
             dataSet['Date']=dataSet['openedWhen']
+            dataSet=dataSet.set_index('Date')
+            dataSet=dataSet.sort_index()
             
         return dataSet
     else:
@@ -187,10 +189,10 @@ def generate_paper_ib_plot(systemname, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance'] - 20000
-        dataSet['PurePLcurve'] = dataSet['purebalance'] - 20000
-        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] - 20000
-        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] - 20000
+        dataSet['equitycurve'] = dataSet['balance'] 
+        dataSet['PurePLcurve'] = dataSet['purebalance'] 
+        #dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] 
+        #dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] 
                 
         return dataSet
     else:
@@ -331,7 +333,7 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
 
     fig.autofmt_xdate()
     ax.annotate(str(SST.index[-1]), xy=(0.95, -0.02), ha='left', va='top', xycoords='axes fraction', fontsize=10)
-    ax.annotate(comments, xy=(0.02, 0.8), ha='left', va='top', xycoords='axes fraction', fontsize=10)
+    ax.annotate(comments, xy=(0.02, 0.5), ha='left', va='top', xycoords='axes fraction', fontsize=10)
     #plt.axis([0,1.5,0,2.0])
     ax.set_xlim(SST.index[0], SST.index[-1])
     #ax.set_xlabel(str(SST.index[-1]))
@@ -546,10 +548,10 @@ def gen_ib(html, counter, cols):
       
       cols=4
       counter=0
-      (html, counter, cols)=gen_paper(html, counter, cols, 0, systemname)
+      (html, counter, cols)=gen_paper(html, counter, cols, -1, systemname)
       html = html + '</center><h1>Recent Trades</h1><br><center>'
 	
-      recent=1
+      recent=3
       counter=0
       (html, counter,cols)=gen_paper(html, counter, cols, recent, systemname)
 

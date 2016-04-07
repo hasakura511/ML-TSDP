@@ -137,6 +137,8 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
         dataSet=dataSet.sort_values(by=[dateCol])
         dataSet['equitycurve'] = dataSet['balance'] - 20000
         dataSet['PurePLcurve'] = dataSet['purebalance'] - 20000
+        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] - 20000
+        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] - 20000
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -150,6 +152,9 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
         
         dataSet['equitycurve'] = dataSet['balance'].diff().div(dataSet['balance'].shift(1)) #.pct_change()
         dataSet['PurePLcurve'] = dataSet['purebalance'].diff().div(dataSet['purebalance'].shift(1)) 
+        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].diff().div(dataSet['mark_to_mkt'].shift(1)) #.pct_change()
+        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].diff().div(dataSet['pure_mark_to_mkt'].shift(1)) 
+        
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -176,6 +181,9 @@ def generate_paper_ib_plot(systemname, dateCol, initialEquity):
         dataSet=dataSet.sort_values(by=[dateCol])
         dataSet['equitycurve'] = dataSet['balance'] - 20000
         dataSet['PurePLcurve'] = dataSet['purebalance'] - 20000
+        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] - 20000
+        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] - 20000
+                
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity, initialEquity, '2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -197,9 +205,13 @@ def generate_ib_plot(systemname, dateCol, initialEquity):
         if systemname == 'C2_Paper':
             dataSet['equitycurve'] = dataSet['balance']
             dataSet['PurePLcurve'] = dataSet['purebalance']
+            dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] 
+            dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] 
         else:
             dataSet['equitycurve'] = dataSet['balance']
-            dataSet['PurePLcurve'] = dataSet['purebalance']
+            dataSet['PurePLcurve'] = dataSet['purebalance'] 
+            dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] 
+            dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] 
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity, dateCol]], columns=['equitycurve', dateCol])
@@ -520,34 +532,33 @@ def gen_ib(html, counter, cols):
             counter = 0
 
         if os.path.isfile('./data/paper/ib_' + 'IB_Live' + '_trades.csv'):
-	    html = html + vhtml
-	    counter=0
+            html = html + vhtml
+            counter=0
 
             ibdata=generate_ib_plot('IB_Paper','Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
+            (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols)
             
             ibdata=generate_ib_plot_from_trades('IB_Paper','times', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'times', 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'times', 'ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols)
             
-	    html = html + dhtml
-	    counter = counter + 1
+            html = html + dhtml
+            counter = counter + 1
 
             data=get_data('IB_Live', 'paper', 'ib', 'trades', 'times',initCap)
             (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'ib_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
-
-       	    counter=0 
+            counter=0 
         if os.path.isfile('./data/paper/c2_' + 'IB_Live' + '_trades.csv'):
-	    html = html + vhtml
-	    counter=0
+            html = html + vhtml
+            counter=0
 
             ibdata=generate_ib_plot('C2_Paper', 'Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols)
             
             ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'openedWhen', 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'openedWhen', 'ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols)
             
-	    html = html + dhtml
-	    counter = counter + 1
+            html = html + dhtml
+            counter = counter + 1
 
             data=get_data('IB_Live', 'paper', 'c2', 'trades', 'openedWhen', initCap)
             (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'c2_' + 'IB_Live' +'PL', 'ib_' + 'IB_Live' + ' PL', 'PL', counter, html, cols)
@@ -578,10 +589,10 @@ def gen_ib(html, counter, cols):
 	    counter=0
 
             ibdata=generate_ib_plot('IB_Paper','Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve'], 'Date', 'recent_ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols, recent)
+            (counter, html)=generate_mult_plot(ibdata, ['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'recent_ib_paper', 'IB Live - Equity', 'Equity', counter, html, cols, recent)
 
             ibdata=generate_ib_plot_from_trades('IB_Paper','times', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'times', 'recent_ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols, recent)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'times', 'recent_ib_paper2', 'IB Live - IB Paper From Trades', 'Equity', counter, html, cols, recent)
 
             html = html + dhtml
             counter = counter + 1
@@ -596,10 +607,10 @@ def gen_ib(html, counter, cols):
 	    counter=0
 
             ibdata=generate_ib_plot('C2_Paper', 'Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'recent_ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols, recent)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'recent_ib_c2', 'IB Live - C2 Paper', 'Equity', counter, html, cols, recent)
 
             ibdata=generate_ib_plot_from_trades('C2_Paper', 'openedWhen', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'openedWhen', 'recent_ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols, recent)
+            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'openedWhen', 'recent_ib_c2_2', 'IB Live - C2 Paper From Trades', 'Equity', counter, html, cols, recent)
 
             html = html + dhtml
             counter = counter + 1
@@ -635,12 +646,12 @@ def gen_paper(html, counter, cols, recent, systemname):
                     else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                 twdata=generate_paper_TWR(systemname, 'c2', 'Date', initCap)    
-                (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'TWR', counter, html, cols, recent)
+                (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'TWR', counter, html, cols, recent)
             
                 html = html + '</table></center><br><center><table>'
                 counter=0
                 c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
-                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
+                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
             
                 data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
                 (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols, recent)
@@ -670,12 +681,12 @@ def gen_paper(html, counter, cols, recent, systemname):
                       else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                   twdata=generate_paper_TWR(systemname, 'ib', 'Date', initCap)    
-                  (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'TWR', counter, html, cols, recent)
+                  (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'TWR', counter, html, cols, recent)
                               
                   html = html + '</table></center><br><center><table>'
                   counter=0
                   ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
-                  (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
+                  (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
                 
                   data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
                   (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols, recent)

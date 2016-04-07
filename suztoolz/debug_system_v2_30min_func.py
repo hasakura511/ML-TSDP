@@ -312,9 +312,9 @@ def runv2(runData, dataSet=pd.DataFrame()):
                                         
                 #check if there is enough data to create indicators
                 if closes.shape[0] < maxlb:
-                    print 'Not enough data to create indicators: intersect of '\
+                    logging.info( 'Not enough data to create indicators: intersect of '\
                         +ticker+' and '+pair +' of '+str(closes.shape[0])+\
-                        ' is less than max lookback of '+str(maxlb)
+                        ' is less than max lookback of '+str(maxlb))
                     #offlineMode(ticker, message, signalPath, version, version_)
                 else:                  
                     dataSet['corr'+pair] = pd.rolling_corr(closes.iloc[:,0],\

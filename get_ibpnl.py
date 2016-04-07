@@ -121,7 +121,8 @@ def load_state():
         idx=pd.read_csv(filename)
         return idx
     else:
-        idx=pd.DataFrame([[1]],columns=['idx'])    
+        idx=pd.DataFrame([[1]],columns=['idx'])  
+        idx.to_csv(filename)
         return idx
         
 def save_state(myidx):

@@ -12,7 +12,6 @@ Created on Tue Mar 08 20:10:29 2016
 1 hour - 500 datapoint per request
 @author: Hidemi
 """
-from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, proc_history, get_bar
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,6 +30,7 @@ import os
 from dateutil.parser import parse
 import logging
 import re
+from ibapi.get_feed import get_history
 
 rtbar={}
 rtdict={}
@@ -84,12 +84,6 @@ def get_currencies():
     return currencyPairs
 
 
-def get_ibfeed(sym, cur):
-    try:
-        get_feed(sym, cur,'IDEALPRO','CASH')
-    except Exception as e:
-        logging.error("get_ibfeed", exc_info=True)
-
 def compress_min_bar(sym, histData, filename, interval='30m'):
     try:
         global pricevalue
@@ -114,9 +108,24 @@ def compress_min_bar(sym, histData, filename, interval='30m'):
         rtdict[reqId]=sym
         rtfile[reqId]=filename
         rtreqid[sym]=reqId
-        if not rtbar.has_key(reqId):
-            rtbar[reqId]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
         
+        
+        if not rtbar.has_key(reqId):
+            dataPath='./data/from_IB/'
+            filename=dataPath+interval+'_'+pair+'.csv'
+            if os.path.isfile(filename):
+                rtbar[reqId]=pd.read_csv(filename, index_col='Date')
+                eastern=timezone('US/Eastern')
+                endDateTime=dt.now(get_localzone())
+                date=endDateTime.astimezone(eastern)
+                date=date.strftime("%Y%m%d %H:%M:%S EST")
+            else:
+                rtbar[reqId]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
+                eastern=timezone('US/Eastern')
+                endDateTime=dt.now(get_localzone())
+                date=endDateTime.astimezone(eastern)
+                date=date.strftime("%Y%m%d %H:%M:%S EST")
+                    
         data=rtbar[reqId]
           
         date=histData['Date']
@@ -199,11 +208,9 @@ def compress_min_bar(sym, histData, filename, interval='30m'):
                     
         else:
             if len(data.index) > 1:
-                data=data.reset_index()                
-                data=data.sort_values(by='Date')  
-                quote=data.iloc[-1]
+                data=data.sort_index()
+                quote=data.reset_index().iloc[-1]
                 print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) 
-                data=data.set_index('Date')
                 data.to_csv(filename)
                 
                 gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], sym]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
@@ -267,18 +274,19 @@ def get_hist_bars(currencyPairs, interval='30m', minDataPoints = 10000, exchange
                 
                 tickerId=tickerId+1
                 reqId=tickerId
-                if os.path.isfile(filename):
-                    rtbar[reqId]=pd.read_csv(filename, index_col='Date')
-                    eastern=timezone('US/Eastern')
-                    endDateTime=dt.now(get_localzone())
-                    date=endDateTime.astimezone(eastern)
-                    date=date.strftime("%Y%m%d %H:%M:%S EST")
-                else:
-                    rtbar[reqId]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
-                    eastern=timezone('US/Eastern')
-                    endDateTime=dt.now(get_localzone())
-                    date=endDateTime.astimezone(eastern)
-                    date=date.strftime("%Y%m%d %H:%M:%S EST")
+                if not rtbar.has_key(reqId):
+                    if os.path.isfile(filename):
+                        rtbar[reqId]=pd.read_csv(filename, index_col='Date')
+                        eastern=timezone('US/Eastern')
+                        endDateTime=dt.now(get_localzone())
+                        date=endDateTime.astimezone(eastern)
+                        date=date.strftime("%Y%m%d %H:%M:%S EST")
+                    else:
+                        rtbar[reqId]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
+                        eastern=timezone('US/Eastern')
+                        endDateTime=dt.now(get_localzone())
+                        date=endDateTime.astimezone(eastern)
+                        date=date.strftime("%Y%m%d %H:%M:%S EST")
                 rtdict[reqId]=pair
                 rtfile[reqId]=filename
                 rtreqid[pair]=reqId
@@ -462,17 +470,23 @@ def get_bar_history(datas, ylabel):
         logging.error("something bad happened", exc_info=True)
     return SST
     
-def feed_ohlc_from_csv(ticker, exchange):
-    dataSet=pd.read_csv('./data/from_IB/' + ticker + '_' + exchange + '.csv', index_col='Date')
+def feed_ohlc_from_csv(ticker):
+    dataSet=pd.read_csv('./data/from_IB/' + ticker  + '.csv', index_col='Date')
     return dataSet
 
-def bar_ohlc_from_csv(ticker, exchange):
-    dataSet=pd.read_csv('./data/bars/' + ticker + '_' + exchange + '.csv', index_col='Date')
+def bar_ohlc_from_csv(ticker):
+    dataSet=pd.read_csv('./data/bars/' + ticker + '.csv', index_col='Date')
     return dataSet
+
+def bidask_to_csv(ticker, date, bid, ask):
+    data=pd.DataFrame([[date, bid, ask]], columns=['Date','Bid','Ask'])
+    data=data.set_index('Date')
+    data.to_csv('./data/bidask/' + ticker + '.csv')
+    return data
     
-def bidask_from_csv(ticker, exchange):
-    if os.path.isfile('./data/bidask/' + ticker + '_' + exchange + '.csv'):
-        dataSet=pd.read_csv('./data/bidask/' + ticker + '_' + exchange + '.csv', index_col='Date')
+def bidask_from_csv(ticker):
+    if os.path.isfile('./data/bidask/' + ticker + '.csv'):
+        dataSet=pd.read_csv('./data/bidask/' + ticker + '.csv', index_col='Date')
         return dataSet
     else:
         return pd.DataFrame([['20160101 01:01:01',-1,-1]], columns=['Date','Bid','Ask']).set_index('Date')

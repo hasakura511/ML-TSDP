@@ -40,19 +40,19 @@ commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + c
 commissiondata=commissiondata.set_index('key')
 
 def get_btc_ask(ticker, exchange):
-    data=bars.bidask_from_csv(ticker, exchange).iloc[-1]
+    data=bars.bidask_from_csv(ticker + '_' + exchange).iloc[-1]
     return data['Ask']
 
 def get_btc_bid(ticker, exchange):
-    data=bars.bidask_from_csv(ticker, exchange).iloc[-1]
+    data=bars.bidask_from_csv(ticker + '_' +  exchange).iloc[-1]
     return data['Bid']
     
 def get_btc_bidask(ticker, exchange):
-    data=bars.bidask_from_csv(ticker, exchange).iloc[-1]
+    data=bars.bidask_from_csv(ticker + '_' +  exchange).iloc[-1]
     return (data['Bid'],data['Ask'])
     
 def get_ohlc(ticker, exchange):
-    ohlc[exchange]=bars.feed_ohlc_from_csv(ticker, exchange)
+    ohlc[exchange]=bars.feed_ohlc_from_csv(ticker + '_' + exchange)
     return ohlc[exchange]
 
 ### Bitstamp Feed             ###

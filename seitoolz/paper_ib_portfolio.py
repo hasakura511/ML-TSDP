@@ -11,14 +11,17 @@ import pytz
 from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
-
+import seitoolz.bars as bars
 from paper_account import get_account_value, update_account_value
 from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
 import threading
+from dateutil.parser import parse
+import datetime
 
 debug=False
 lock = threading.Lock()
-
+histcache=dict()
+histdates=dict()
 def get_ib_portfolio(systemname, date):
     filename='./data/paper/ib_' + systemname + '_portfolio.csv'
     
@@ -28,6 +31,10 @@ def get_ib_portfolio(systemname, date):
             dataSet = pd.read_csv(filename, index_col='symbol')
             if 'PurePL' not in dataSet:
                 dataSet['PurePL']=0
+            if 'unr_pnl' not in dataSet:
+                dataSet['unr_pnl']=0
+            if 'pure_unr_pnl' not in dataSet:
+                dataSet['pure_unr_pnl']=0
             dataSet=dataSet.reset_index()
             dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
             dataSet=dataSet.set_index('symbol')
@@ -53,6 +60,50 @@ def get_ib_pos(systemname, symbol, currency, date):
         ib_pos=portfolio_data.loc[sym_cur]
         ib_pos_qty=ib_pos['qty']
         return ib_pos_qty
+
+def update_unr_profit(systemname, pricefeed, currency, date):
+    filename='./data/paper/ib_' + systemname + '_portfolio.csv'
+    (account, dataSet)=get_ib_portfolio(systemname, date)
+    symbols=dataSet.index
+    unr_pnl=0
+    pure_unr_pnl=0
+    for sym in symbols:
+        record=dataSet.ix[sym].copy()
+        qty=record['qty']
+        openVWAP=record['price']
+        (bid,ask)=bars.bidask_from_csv(sym).iloc[-1]
+        dtimestamp=time.mktime(parse(date).timetuple())
+        if not histcache.has_key(sym):
+            histcache[sym]=bars.feed_ohlc_from_csv('1 min_' + sym)
+            histdates[sym]=time.mktime(parse(histcache[sym].index[-1]).timetuple())
+        if histdates[sym] > dtimestamp:
+                ldate=parse(date).strftime("%Y%m%d  %H:%M:00")
+                if ldate not in histcache[sym].index:
+                    histcache[sym].loc[histcache[sym].index <= ldate].iloc[-1]['Close']
+                else:
+                    bid=histcache[sym].loc[ldate]['Close']
+                    ask=histcache[sym].loc[ldate]['Close']
+        quant=qty
+        price=ask
+        if qty < 0:
+            quant = abs(qty)
+            price = ask
+        else:
+            quant = -abs(qty)
+            price = bid
+
+        (newVWAP, remqty, commission, buy_power, tradepl, ptValue, newside, purepl) =           \
+                calc_close_pos(openVWAP, qty, price, quant,                      \
+                pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], currency, \
+                pricefeed['C2Mult'])
+        record['unr_pnl']=tradepl
+        record['pure_unr_pnl']=purepl
+        unr_pnl=unr_pnl + record['unr_pnl']
+        pure_unr_pnl=pure_unr_pnl+record['pure_unr_pnl']
+        dataSet.ix[sym]=record
+    with lock:
+        dataSet.to_csv(filename) 
+    return (unr_pnl, pure_unr_pnl)  
     
 def update_ib_portfolio(systemname, pos, date):
     filename='./data/paper/ib_' + systemname + '_portfolio.csv'

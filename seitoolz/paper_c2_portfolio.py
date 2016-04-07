@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import time
 import os.path
-
+from dateutil.parser import parse
 import json
 from pandas.io.json import json_normalize
 from seitoolz.signal import get_model_pos
@@ -11,16 +11,19 @@ import pytz
 from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
-
+import seitoolz.bars as bars
+import datetime
 from paper_account import get_account_value, update_account_value
 from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
 from paper_c2_trades import get_c2_trades
 import threading
+import logging
 
 debug=False
 debug2=False
 lock = threading.Lock()
-
+histcache=dict()
+histdates=dict()
 def get_c2_portfolio(systemname, date):
     filename='./data/paper/c2_' + systemname + '_portfolio.csv'
     
@@ -31,6 +34,10 @@ def get_c2_portfolio(systemname, date):
             dataSet = pd.read_csv(filename, index_col='symbol')
             if 'PurePL' not in dataSet:
                 dataSet['PurePL']=0
+            if 'unr_pnl' not in dataSet:
+                dataSet['unr_pnl']=0
+            if 'pure_unr_pnl' not in dataSet:
+                dataSet['pure_unr_pnl']=0
         return (account, dataSet)
         
     else:
@@ -83,7 +90,51 @@ def get_new_c2_pos(systemname, sym, side, openVWAP, openqty, pl, commission, ptV
                      'markToMarket_time','openVWAP_timestamp','openedWhen','qty']).iloc[-1]
     return pos
 
+def update_unr_profit(systemname, pricefeed, currency, date):
+    filename='./data/paper/c2_' + systemname + '_portfolio.csv'
+    (account, dataSet)=get_c2_portfolio(systemname, date)
+    symbols=dataSet.index
+    unr_pnl=0
+    pure_unr_pnl=0
+    for sym in symbols:
+        record=dataSet.ix[sym].copy()
+        qty=record['quant_opened'] - record['quant_closed']
+        openVWAP=record['opening_price_VWAP']
+        (bid,ask)=bars.bidask_from_csv(sym).iloc[-1]
+        dtimestamp=time.mktime(parse(date).timetuple())
+        if not histcache.has_key(sym):
+            histcache[sym]=bars.feed_ohlc_from_csv('1 min_' + sym)
+            histdates[sym]=time.mktime(parse(histcache[sym].index[-1]).timetuple())
+        if histdates[sym] > dtimestamp:
+                logging.info('unr profit using hist: ' + sym)
+                ldate=parse(date).strftime("%Y%m%d  %H:%M:00")
+                if ldate not in histcache[sym].index:
+                    histcache[sym].loc[histcache[sym].index <= ldate].iloc[-1]['Close']
+                else:
+                    bid=histcache[sym].loc[ldate]['Close']
+                    ask=histcache[sym].loc[ldate]['Close']
+        quant=qty
+        price=ask
+        if record['long_or_short'] == 'short':
+            quant = abs(qty)
+            price = ask
+        else:
+            quant = -abs(qty)
+            price = bid
 
+        (newVWAP, remqty, commission, buy_power, tradepl, ptValue, newside, purepl) =           \
+                calc_close_pos(openVWAP, qty, price, quant,                      \
+                pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], currency, \
+                pricefeed['C2Mult'])
+        record['unr_pnl']=tradepl
+        record['pure_unr_pnl']=purepl
+        unr_pnl=unr_pnl + record['unr_pnl']
+        pure_unr_pnl=pure_unr_pnl+record['pure_unr_pnl']
+        dataSet.ix[sym]=record
+    with lock:
+        dataSet.to_csv(filename) 
+    return (unr_pnl, pure_unr_pnl)        
+          
 def update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date):
     filename='./data/paper/c2_' + systemname + '_portfolio.csv'
     (account, dataSet)=get_c2_portfolio(systemname, date)
@@ -121,5 +172,4 @@ def update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date):
                         ' opened: ' + str(pos['quant_opened']) + ' closed: ' + str(pos['quant_closed'])
     with lock:
         dataSet.to_csv(filename)
-    account=get_account_value(systemname, 'c2', date)
-    return (account, dataSet)
+    return dataSet

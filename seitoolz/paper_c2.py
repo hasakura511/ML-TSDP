@@ -12,9 +12,9 @@ from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
 
-from paper_account import get_account_value, update_account_value
+from paper_account import get_account_value, update_account_value, update_account_pnl
 from calc import calc_close_pos, calc_closeVWAP, calc_add_pos, calc_pl
-from paper_c2_portfolio import get_c2_portfolio, update_c2_portfolio, get_c2_pos, get_new_c2_pos
+from paper_c2_portfolio import get_c2_portfolio, update_c2_portfolio, get_c2_pos, get_new_c2_pos, update_unr_profit
 from paper_c2_trades import get_c2_trades, update_c2_trades
 
 debug=False
@@ -98,9 +98,14 @@ def exec_pos_open(pos, systemname, quant, sym, type, currency, exch, price, pric
                 print " Total Closed: " + str(closeVWAP) + "[" + str(closedqty) + "]" 
                 print "Trade PL: " + str(tradepl) + " Total PL: " + str(pos['PL']) + " (Commission: " + str(commission) + ")"
                 print "++++++++++++++++++++"
-                
-            update_c2_trades(systemname, pos, tradepl, 0, buy_power, date)
-            update_c2_portfolio(systemname, pos, tradepl, 0, buy_power, date)
+            purepl=0
+            
+            update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            account=update_account_pnl(systemname, 'c2', tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
+            update_c2_trades(systemname, account, pos, tradepl, purepl, buy_power, date)
+       
+       
         else:
             side='long'
             if quant < 0:
@@ -112,8 +117,12 @@ def exec_pos_open(pos, systemname, quant, sym, type, currency, exch, price, pric
                     pricefeed['C2Mult'])
             
             pos=get_new_c2_pos(systemname, sym, side, price, quant, tradepl, commission, ptValue, date)
-            update_c2_trades(systemname, pos, tradepl, 0, buy_power, date)
-            update_c2_portfolio(systemname, pos, tradepl, 0, buy_power, date)
+            purepl=0
+                        
+            update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            account=update_account_pnl(systemname, 'c2', tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
+            update_c2_trades(systemname, account, pos, tradepl, purepl, buy_power, date)
        
 
 def exec_pos_close(pos, systemname, quant, sym, type, currency, exch, price, pricefeed, date):
@@ -167,7 +176,9 @@ def exec_pos_close(pos, systemname, quant, sym, type, currency, exch, price, pri
             else:
                 pos['open_or_closed']='closed'
                 
-            update_c2_trades(systemname, pos, tradepl, purepl, buy_power, date)
             update_c2_portfolio(systemname, pos, tradepl, purepl, buy_power, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            account=update_account_pnl(systemname, 'c2',tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
+            update_c2_trades(systemname, account, pos, tradepl, purepl, buy_power, date)
             
 

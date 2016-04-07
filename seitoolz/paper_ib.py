@@ -12,10 +12,10 @@ from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
 
-from paper_account import get_account_value, update_account_value
+from paper_account import get_account_value, update_account_value, update_account_pnl
 from calc import calc_close_pos, calc_add_pos, calc_pl
 from paper_ib_trades import get_ib_trades, update_ib_trades
-from paper_ib_portfolio import get_ib_portfolio, update_ib_portfolio, get_ib_pos, get_new_ib_pos
+from paper_ib_portfolio import get_ib_portfolio, update_ib_portfolio, get_ib_pos, get_new_ib_pos, update_unr_profit
 
 debug=False
 
@@ -87,8 +87,12 @@ def exec_open_pos(pos, systemname, quant, sym, type, currency, exch, price, pric
                 print "New PL: " + str(pos['real_pnl']) + " Trade PL: " + str(tradepl) + " (Commission: " + str(commission) + ")"   
                 print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
             
-            update_ib_trades(systemname, pos, tradepl, 0, buy_power, exch, date)
+            purepl=0
             update_ib_portfolio(systemname, pos, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            account=update_account_pnl(systemname, 'ib',tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
+            update_ib_trades(systemname, account, pos, tradepl, purepl, buy_power, exch, date)
+            
                 
 
         else:
@@ -98,9 +102,13 @@ def exec_open_pos(pos, systemname, quant, sym, type, currency, exch, price, pric
                     pricefeed['IBMult'])
              
             pos=get_new_ib_pos(systemname, sym, openVWAP, openqty, buy_power, tradepl, commission, currency, date)
+            purepl=0
             
-            update_ib_trades(systemname, pos, tradepl, 0, buy_power, exch, date)
-            update_ib_portfolio(systemname, pos, date)   
+            update_ib_portfolio(systemname, pos, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            account=update_account_pnl(systemname, 'ib',tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
+            update_ib_trades(systemname, account, pos, tradepl, purepl, buy_power, exch, date)
+            
             
 
 def exec_close_pos(pos, systemname, quant, sym, type, currency, exch, price, pricefeed, date):
@@ -132,7 +140,11 @@ def exec_close_pos(pos, systemname, quant, sym, type, currency, exch, price, pri
                 print "Trade PL: " + str(purepl)
                 print "New VWAP: " + str(openVWAP) + " [" + str(openqty) + "]"
 
-            update_ib_trades(systemname, pos, tradepl, purepl, buy_power, exch, date)
             update_ib_portfolio(systemname, pos, date)
+            (unr_pnl, pure_unr_pnl)=update_unr_profit(systemname, pricefeed, currency, date)
+            account=update_account_pnl(systemname, 'ib',tradepl, purepl, buy_power, unr_pnl, pure_unr_pnl, date)
+            update_ib_trades(systemname, account, pos, tradepl, purepl, buy_power, exch, date)
+            
+            
                 
        

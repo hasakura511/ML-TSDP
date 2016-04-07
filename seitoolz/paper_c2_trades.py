@@ -39,16 +39,8 @@ def get_c2_trades(systemname, date):
     return dataSet
 
 
-def update_c2_trades(systemname, pos, tradepl, purepl, buypower, date):
-    account=get_account_value(systemname, 'c2', date)
-    account['balance']=account['balance']+tradepl
-    account['purebalance']=account['purebalance']+purepl
-    account['buy_power']=account['buy_power']+buypower
-    account['real_pnl']=account['real_pnl'] + tradepl
-    account['PurePL']=account['PurePL'] + purepl
-    account['Date']=date
-    account=update_account_value(systemname, 'c2', account)
-    
+def update_c2_trades(systemname, account, pos, tradepl, purepl, buypower, date):
+
     filename='./data/paper/c2_' + systemname + '_trades.csv'
     dataSet = get_c2_trades(systemname, date)
     

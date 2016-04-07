@@ -40,15 +40,7 @@ def get_ib_trades(systemname, date):
         return dataSet
     
     
-def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
-    account=get_account_value(systemname, 'ib', date)
-    account['balance']=account['balance']+tradepl
-    account['purebalance']=account['purebalance']+purepl
-    account['buy_power']=account['buy_power']+buypower
-    account['real_pnl']=account['real_pnl'] + tradepl
-    account['PurePL']=account['PurePL'] + purepl
-    account['Date']=date
-    account=update_account_value(systemname, 'ib',account)
+def update_ib_trades(systemname, account, pos, tradepl, purepl, buypower, ibexch, date):
     
     filename='./data/paper/ib_' + systemname + '_trades.csv'
    

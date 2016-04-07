@@ -10,6 +10,9 @@ from IButils import bs_resolve, action_ib_fill
 from pytz import timezone
 from threading import Event
 import logging
+from pytz import timezone
+from datetime import datetime as dt
+from tzlocal import get_localzone
 
 MAX_WAIT_SECONDS=10
 MEANINGLESS_NUMBER=1729
@@ -27,6 +30,8 @@ fasksize={}
 fbid={}
 fbidsize={}
 fdict={}
+
+bidaskSaveDate=dict()
 
 def return_IB_connection_info():
     """
@@ -443,12 +448,15 @@ class IBWrapper(EWrapper):
             fask[TickerId]=float(value)
         #print "tickString: ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
 
-
+    
+    
     def tickGeneric(self, TickerId, tickType, value):
+        
         global fasksize
         global fbidsize
         global fask
         global fbid
+        global bidaskSaveDate
         marketdata=self.data_tickdata[TickerId]
 
         ## update generic ticks
@@ -469,10 +477,28 @@ class IBWrapper(EWrapper):
             ## ask
             marketdata[3]=float(value)
             fask[TickerId]=float(value)
+        try:
+            global rtdict
+            sym=rtdict[TickerId]
+            if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) < 30:
+                bidaskSaveDate[sym]=int(time.time())
+            
+                eastern=timezone('US/Eastern')
+                nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
+                
+                self.bidask_to_csv(sym, nowDate, fbid[TickerId], fask[TickerId])
+                
+        except Exception as e:
+            logging.error("tickGeneric", exc_info=True)
         #print "ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
         
         
-           
+    def bidask_to_csv(self, ticker, date, bid, ask):
+        data=pd.DataFrame([[date, bid, ask]], columns=['Date','Bid','Ask'])
+        data=data.set_index('Date')
+        data.to_csv('./data/bidask/' + ticker + '.csv')
+        return data
+        
     def tickSize(self, TickerId, tickType, size):
         global fasksize
         global fbidsize
@@ -813,9 +839,10 @@ class IBclient(object):
         
         ## initialise the tuple
         global fdict
+        global rtdict
         symname=ibcontract.symbol + ibcontract.currency
         fdict[symname]=tickerid
-        
+        rtdict[tickerid]=symname
         self.cb.init_tickdata(tickerid)
         self.cb.init_error()
             

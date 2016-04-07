@@ -1,5 +1,8 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
-2.0,-1.448,20160405 22:31:46 EST,20160405 22:31:46 EST,20160405 22:31:46 EST,115.53,,CHFJPY,long,,20160405 22:29:14 EST,closed,20160405 22:29:14 EST,115.501,,,1.0,1.0,,CHFJPY,,2.552,-1.0,19996.552,4.0,392595.944,20002.552
-1.0,-4.968,20160405 22:32:19 EST,20160405 22:32:19 EST,20160405 22:32:19 EST,84.177,,CADJPY,short,,20160405 22:29:13 EST,closed,20160405 22:29:13 EST,84.166,,,1.0,1.0,,CADJPY,,-0.968000000001,1.0,19993.584,4.0,400003.52,20001.584
-3.0,-2.0,,,,0.0,,CHFJPY,long,,20160405 22:32:53 EST,open,20160405 22:32:53 EST,115.546,,,0.0,1.0,,CHFJPY,,0.0,1.0,19991.584,2.0,389835.472,20001.584
-4.0,-2.0,,,,0.0,,CADJPY,short,,20160405 22:33:23 EST,open,20160405 22:33:23 EST,84.171,,,0.0,1.0,,CADJPY,,0.0,-1.0,19989.584,2.0,382428.424,20001.584
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance,mark_to_mkt,pure_mark_to_mkt,currency
+2.0,-1.448,20160405 22:31:46 EST,20160405 22:31:46 EST,20160405 22:31:46 EST,115.53,,CHFJPY,long,,20160405 22:29:14 EST,closed,20160405 22:29:14 EST,115.501,,,1.0,1.0,,CHFJPY,,2.552,-1.0,19996.552,4.0,392595.944,20002.552,,,
+1.0,-4.968,20160405 22:32:19 EST,20160405 22:32:19 EST,20160405 22:32:19 EST,84.177,,CADJPY,short,,20160405 22:29:13 EST,closed,20160405 22:29:13 EST,84.166,,,1.0,1.0,,CADJPY,,-0.968000000001,1.0,19993.584,4.0,400003.52,20001.584,,,
+3.0,-2.0,,,,0.0,,CHFJPY,long,,20160405 22:32:53 EST,open,20160405 22:32:53 EST,115.546,,,0.0,1.0,,CHFJPY,,0.0,1.0,19991.584,2.0,389835.472,20001.584,,,
+4.0,-2.0,,,,0.0,,CADJPY,short,,20160405 22:33:23 EST,open,20160405 22:33:23 EST,84.171,,,0.0,1.0,,CADJPY,,0.0,-1.0,19989.584,2.0,382428.424,20001.584,,,
+5.0,-2.0,,,,0.0,,CHFJPY,long,,20160407 01:04:27 EST,open,20160407 01:04:27 EST,114.26,,,0.0,1.0,,CHFJPY,,0.0,1.0,19987.584,2.0,372373.544,20001.584,19996.144,20012.144,
+6.0,-2.0,,,,0.0,,CADJPY,short,,20160407 01:05:03 EST,open,20160407 01:05:03 EST,83.56,,,0.0,1.0,,CADJPY,,0.0,-1.0,19985.584,2.0,365020.264,20001.584,19987.544,20005.544,JPY
+7.0,-2.0,,,,0.0,,CHFJPY,long,,20160407 01:05:29 EST,open,20160407 01:05:29 EST,114.248,,,0.0,1.0,,CHFJPY,,0.0,1.0,19983.584,2.0,354966.44,20001.584,19995.16,20017.16,JPY

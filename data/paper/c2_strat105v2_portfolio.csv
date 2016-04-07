@@ -1,5 +1,1 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-USDJPY,open,short,2.0,0.0,109.765,0.0,-2.0,0.0,2.0,3655.0,,,,,USDJPY,,20160406 17:34:24 EST,20160406 17:34:24 EST,-2.0,58.6590399,338153.03418,15674.6590399
-AUDUSD,open,short,1.0,0.0,0.75984,0.0,-2.0,0.0,2.0,3656.0,,,,,AUDUSD,,20160406 17:34:58 EST,20160406 17:34:58 EST,-1.0,56.6590399,342274.87418,15674.6590399
-GBPUSD,open,short,2.0,0.0,1.411985,,-4.0,0.0,4.0,3651.0,,,,,GBPUSD,,20160406 17:35:31 EST,20160406 16:36:27 EST,-1.0,54.6590399,321633.47418,15674.6590399
-USDCHF,open,short,2.0,0.0,0.9562,0.0,-2.0,0.0,2.0,3657.0,,,,,USDCHF,,20160406 17:36:35 EST,20160406 17:36:35 EST,-2.0,51.5700199,306717.40498,15675.5700199
+symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance

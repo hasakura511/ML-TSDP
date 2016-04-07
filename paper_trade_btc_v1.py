@@ -25,7 +25,7 @@ import seitoolz.bars as bars
 import datetime
 logging.basicConfig(filename='/logs/paper_trade_btc_v1.log',level=logging.DEBUG)
 
-debug=False
+debug=True
 
 feed={}
 ohlc={}
@@ -40,19 +40,19 @@ commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + c
 commissiondata=commissiondata.set_index('key')
 
 def get_btc_ask(ticker, exchange):
-    data=bars.bidask_from_csv(ticker, exchange).iloc[-1]
+    data=bars.bidask_from_csv(ticker + '_' + exchange).iloc[-1]
     return data['Ask']
 
 def get_btc_bid(ticker, exchange):
-    data=bars.bidask_from_csv(ticker, exchange).iloc[-1]
+    data=bars.bidask_from_csv(ticker + '_' +  exchange).iloc[-1]
     return data['Bid']
     
 def get_btc_bidask(ticker, exchange):
-    data=bars.bidask_from_csv(ticker, exchange).iloc[-1]
+    data=bars.bidask_from_csv(ticker + '_' +  exchange).iloc[-1]
     return (data['Bid'],data['Ask'])
     
 def get_ohlc(ticker, exchange):
-    ohlc[exchange]=bars.feed_ohlc_from_csv(ticker, exchange)
+    ohlc[exchange]=bars.feed_ohlc_from_csv(ticker + '_' + exchange)
     return ohlc[exchange]
 
 ### Bitstamp Feed             ###
@@ -66,9 +66,9 @@ def trade_v1():
     while True:
       try:
        myfeed=bars.get_btc_exch_list()
-       for exchange in myfeed:
+       for inst in myfeed:
             
-        ticker='BTCUSD'
+        (ticker, exchange)=inst.split('_')
         (bid,ask)=get_btc_bidask(ticker, exchange)
         if ask > 0 and bid > 0:
          data=get_ohlc(ticker, exchange)
@@ -80,7 +80,8 @@ def trade_v1():
                 if system['System'] == 'BTCUSD':
                     system['Name']=system['Name'] + '_' + exchange
                     system['System'] = ticker + '_' + exchange
-                    
+                    system['c2sym'] = ticker + '_' + exchange
+                    system['ibsym'] = ticker + '_' + exchange
                   
                     ask=float(get_btc_ask(ticker, exchange))
                     bid=float(get_btc_bid(ticker, exchange))
@@ -99,7 +100,7 @@ def trade_v1():
                     system_c2pos_qty=round(system_pos['action']) * system['c2qty']
                     system_ibpos_qty=round(system_pos['action']) * system['ibqty']
                     if debug:
-                        print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+                        print "System Name: " + system['Name'] + " C2 Symbol: " + system['c2sym']+ " IB Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
                         print        " System Algo: " + str(system['System']) 
                         print        " Ask: " + str(ask)
                         print        " Bid: " + str(bid)

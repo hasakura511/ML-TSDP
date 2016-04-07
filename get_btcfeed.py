@@ -216,11 +216,10 @@ def write_feed():
     while 1:
         try:
             eastern=timezone('US/Eastern')
-            nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y-%m-%d %H:%M:%S') 
+            nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
             for exchange in feed.keys():
-                data=pd.DataFrame([[nowDate, get_btc_bid('BTCUSD',exchange), get_btc_ask('BTCUSD',exchange)]], columns=['Date','Bid','Ask'])
-                data=data.set_index('Date')
-                data.to_csv('./data/bidask/BTCUSD_' + exchange + '.csv')
+                bars.bidask_to_csv('BTCUSD_'+exchange, nowDate, get_btc_bid('BTCUSD',exchange), get_btc_ask('BTCUSD',exchange))
+                
                 feed_ohlc_to_csv('BTCUSD',exchange)
             time.sleep(20)
         except Exception as e:

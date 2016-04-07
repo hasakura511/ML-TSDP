@@ -1,3 +1,3 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,balance,margin_available,purebalance
-USDJPY,open,short,1.0,0.0,110.551,0.0,-2.0,0.0,2.0,1.0,,,,,USDJPY,,20160405 07:36:39 EST,20160405 07:36:39 EST,-1.0,19996.0,380543.024,20000.0
-GBPJPY,open,long,1.0,0.0,157.023,0.0,-2.0,0.0,2.0,2.0,,,,,GBPJPY,,20160405 07:36:42 EST,20160405 07:36:42 EST,1.0,19994.0,362635.464,20000.0
+symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
+GBPJPY,open,long,1.0,0.0,154.058,0.0,-2.0,0.0,2.0,3.0,,,,,GBPJPY,,20160407 01:05:02 EST,20160407 01:05:02 EST,1.0,JPY,21.144,23.144,19994.0,362896.384,20000.0
+USDJPY,open,short,1.0,0.0,109.078,0.0,-2.0,0.0,2.0,4.0,,,,,USDJPY,,20160407 01:06:24 EST,20160407 01:06:24 EST,-1.0,JPY,22.464,24.464,19992.0,353297.52,20000.0

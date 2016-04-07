@@ -31,7 +31,7 @@ def get_c2_trades(systemname, date):
         dataSet=pd.DataFrame({},columns=['trade_id','PL','closeVWAP_timestamp','closedWhen',\
         'closedWhenUnixTimeStamp','closing_price_VWAP','expir','instrument','long_or_short',\
         'markToMarket_time','openVWAP_timestamp','open_or_closed','openedWhen','opening_price_VWAP',\
-        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description','PurePL','qty'])
+        'ptValue','putcall','quant_closed','quant_opened','strike','symbol','symbol_description','PurePL','qty','currency'])
         dataSet = dataSet.set_index('trade_id')
         dataSet.to_csv(filename)
         return dataSet
@@ -39,16 +39,8 @@ def get_c2_trades(systemname, date):
     return dataSet
 
 
-def update_c2_trades(systemname, pos, tradepl, purepl, buypower, date):
-    account=get_account_value(systemname, 'c2', date)
-    account['balance']=account['balance']+tradepl
-    account['purebalance']=account['purebalance']+purepl
-    account['buy_power']=account['buy_power']+buypower
-    account['real_pnl']=account['real_pnl'] + tradepl
-    account['PurePL']=account['PurePL'] + purepl
-    account['Date']=date
-    account=update_account_value(systemname, 'c2', account)
-    
+def update_c2_trades(systemname, account, pos, tradepl, purepl, buypower, date):
+
     filename='./data/paper/c2_' + systemname + '_trades.csv'
     dataSet = get_c2_trades(systemname, date)
     
@@ -56,6 +48,8 @@ def update_c2_trades(systemname, pos, tradepl, purepl, buypower, date):
     tradeid=int(pos['trade_id'])
     pos['balance']=account['balance'] 
     pos['purebalance']=account['purebalance']
+    pos['mark_to_mkt']=account['mark_to_mkt']    
+    pos['pure_mark_to_mkt']=account['pure_mark_to_mkt']
     pos['margin_available']=account['buy_power']
     pos['PurePL']=float(pos['PurePL']) + purepl
     pos['PL']=float(pos['PL']) + float(tradepl)

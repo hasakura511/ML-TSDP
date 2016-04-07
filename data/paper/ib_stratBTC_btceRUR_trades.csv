@@ -1,2 +1,4 @@
-permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,openprice,purebalance,real_pnl
-1,Paper,Paper,6.825e+11,USD,BITSTAMP,1.0,,,1.0,27300.0,1000000.0,-1000000.0,-6.825e+11,SLD,BTC,USD,20160403 00:26:14 EST,,0.0,-6.8249998e+11,-2.729999996e+14,27300.0,20000.0,-6.825e+11
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,openprice,purebalance,real_pnl,mark_to_mkt,pure_mark_to_mkt
+1,Paper,Paper,6.825e+11,USD,BITSTAMP,1.0,,,1.0,27300.0,1000000.0,-1000000.0,-6.825e+11,SLD,BTC,USD,20160403 00:26:14 EST,,0.0,-6.8249998e+11,-2.729999996e+14,27300.0,20000.0,-6.825e+11,,
+2,Paper,Paper,6.96125e+11,USD,BITCOIN,2.0,,,1.0,27845.0,1000000.0,-1000000.0,-6.96125e+11,SLD,BTCUSD_btceRUR,USD,20160407 01:06:13 EST,,0.0,-1.37862498e+12,-5.514499996e+14,27845.0,20000.0,-6.96125e+11,-2.07474998e+12,20000.0
+3,Paper,Paper,6.9125e+11,USD,BITCOIN,3.0,,,1.0,27650.0,1000000.0,-2000000.0,-6.9125e+11,SLD,BTCUSD_btceRUR,USD,20160407 02:58:36 EST,,0.0,-2.06987498e+12,-8.279499996e+14,27747.5,20000.0,-6.9125e+11,-1.50237498e+12,1.95000002e+12

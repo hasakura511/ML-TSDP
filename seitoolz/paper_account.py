@@ -23,18 +23,10 @@ def get_account_value(systemname, broker, date):
             dataSet = pd.read_csv(filename, index_col=['Date'])
             if 'PurePL' not in dataSet:
                 dataSet['PurePL']=0
+            return dataSet.reset_index().iloc[-1]
     else:
         dataSet=make_new_account(systemname, broker, date)
-                
-    account=pd.DataFrame([[date, dataSet.iloc[-1]['accountid'],
-                            dataSet.iloc[-1]['balance'],dataSet.iloc[-1]['purebalance'],
-                            dataSet.iloc[-1]['buy_power'],
-                            dataSet.iloc[-1]['unr_pnl'], dataSet.iloc[-1]['real_pnl'], 
-                            dataSet.iloc[-1]['PurePL'],
-                            dataSet.iloc[-1]['currency']]], 
-        columns=['Date','accountid','balance','purebalance','buy_power','unr_pnl','real_pnl','PurePL','currency']).iloc[-1]
-        
-    return account
+        return dataSet.reset_index().iloc[-1]
 
 def update_account_value(systemname, broker, account):
     filename='./data/paper/' + broker + '_' + systemname + '_account.csv'
@@ -53,6 +45,21 @@ def update_account_value(systemname, broker, account):
     #print 'Account Update: ' + broker + ' Balance: ' + str(account['balance']) + ' PurePNL:' + str(account['PurePL'])
     return account
 
+def update_account_pnl(systemname, broker, tradepl, purepl, buypower, unr_pnl, pure_unr_pnl, date):
+    account=get_account_value(systemname, broker, date)
+    account['balance']=account['balance']+tradepl
+    account['purebalance']=account['purebalance']+purepl
+    account['buy_power']=account['buy_power']+buypower
+    account['real_pnl']=account['real_pnl'] + tradepl
+    account['PurePL']=account['PurePL'] + purepl
+    account['unr_pnl']=unr_pnl
+    account['pure_unr_pnl']=pure_unr_pnl
+    account['mark_to_mkt']=account['balance']+account['unr_pnl']
+    account['pure_mark_to_mkt']=account['purebalance']+account['pure_unr_pnl']
+    account['Date']=date
+    account=update_account_value(systemname, broker, account)
+    return account
+    
 def make_new_account(systemname, broker, date):
     with lock:
         filename='./data/paper/' + broker + '_' + systemname + '_account.csv'

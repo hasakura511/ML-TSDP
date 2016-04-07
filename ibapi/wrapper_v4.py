@@ -10,6 +10,9 @@ from IButils import bs_resolve, action_ib_fill
 from pytz import timezone
 from threading import Event
 import logging
+from pytz import timezone
+from datetime import datetime as dt
+from tzlocal import get_localzone
 
 MAX_WAIT_SECONDS=10
 MEANINGLESS_NUMBER=1729
@@ -27,6 +30,8 @@ fasksize={}
 fbid={}
 fbidsize={}
 fdict={}
+
+bidaskSaveDate=dict()
 
 def return_IB_connection_info():
     """
@@ -443,12 +448,15 @@ class IBWrapper(EWrapper):
             fask[TickerId]=float(value)
         #print "tickString: ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
 
-
+    
+    
     def tickGeneric(self, TickerId, tickType, value):
+        
         global fasksize
         global fbidsize
         global fask
         global fbid
+        global bidaskSaveDate
         marketdata=self.data_tickdata[TickerId]
 
         ## update generic ticks
@@ -469,10 +477,28 @@ class IBWrapper(EWrapper):
             ## ask
             marketdata[3]=float(value)
             fask[TickerId]=float(value)
+        try:
+            global rtdict
+            sym=rtdict[TickerId]
+            if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) < 30:
+                bidaskSaveDate[sym]=int(time.time())
+            
+                eastern=timezone('US/Eastern')
+                nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
+                
+                self.bidask_to_csv(sym, nowDate, fbid[TickerId], fask[TickerId])
+                
+        except Exception as e:
+            logging.error("tickGeneric", exc_info=True)
         #print "ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
         
         
-           
+    def bidask_to_csv(self, ticker, date, bid, ask):
+        data=pd.DataFrame([[date, bid, ask]], columns=['Date','Bid','Ask'])
+        data=data.set_index('Date')
+        data.to_csv('./data/bidask/' + ticker + '.csv')
+        return data
+        
     def tickSize(self, TickerId, tickType, size):
         global fasksize
         global fbidsize
@@ -813,9 +839,13 @@ class IBclient(object):
         
         ## initialise the tuple
         global fdict
-        symname=ibcontract.symbol + ibcontract.currency
+        global rtdict
+        if ibcontract.secType == 'CASH':
+            symname=ibcontract.symbol + ibcontract.currency
+        else:
+            symname=ibcontract.symbol
         fdict[symname]=tickerid
-        
+        rtdict[tickerid]=symname
         self.cb.init_tickdata(tickerid)
         self.cb.init_error()
             
@@ -854,8 +884,12 @@ class IBclient(object):
             
             finished=False
             pricevalue=[]
-            rtreqid[ibcontract.symbol + ibcontract.currency]=tickerid
-            rtdict[tickerid]=ibcontract.symbol + ibcontract.currency
+            symName=ibcontract.symbol
+            if ibcontract.secType == 'CASH':
+                symName=ibcontract.symbol + ibcontract.currency
+            
+            rtreqid[symName]=tickerid
+            rtdict[tickerid]=symName
             rtfile[tickerid]=filename
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
@@ -899,7 +933,10 @@ class IBclient(object):
             
             pricevalue=[]
             tickerid=brokerData['tickerId']
-            rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
+            rtdict[tickerid]=brokerData['symbol']
+            if brokerData['secType']=='CASH':
+                rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
+            
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
             #data_cons = pd.DataFrame()
@@ -958,7 +995,7 @@ class IBclient(object):
         except Exception as e:
             logging.error("getDataFromIB", exc_info=True)   
         
-    def proc_history(self, tickerid, sym, currency,data):
+    def proc_history(self, tickerid, sym, type, currency,data):
         try:
             WAIT_TIME=60
             global rtbar
@@ -966,9 +1003,12 @@ class IBclient(object):
             global rthist
             global rtreqid
             iserror=False
-    
-            rtdict[tickerid]=sym + currency
-            rtreqid[sym+currency]=tickerid
+            if type == 'CASH':
+                rtdict[tickerid]=sym+currency
+                rtreqid[sym+currency]=tickerid
+            else:
+                rtdict[tickerid]=sym
+                rtreqid[sym]=tickerid
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
             else:

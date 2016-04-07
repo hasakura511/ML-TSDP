@@ -1,3 +1,5 @@
-Date,accountid,balance,purebalance,buy_power,unr_pnl,real_pnl,PurePL,currency
-20160403 00:26:14 EST,paperUSD,20000.0,20000,400000.0,0,0.0,0,USD
-20160403 00:26:14 EST,paperUSD,-6.8249998e+11,20000,-2.729999996e+14,0,-6.825e+11,0,USD
+Date,accountid,balance,purebalance,buy_power,unr_pnl,real_pnl,PurePL,currency,mark_to_mkt,pure_mark_to_mkt,pure_unr_pnl
+20160403 00:26:14 EST,paperUSD,20000.0,20000,400000.0,0.0,0.0,0,USD,,,
+20160403 00:26:14 EST,paperUSD,-6.8249998e+11,20000,-2.729999996e+14,0.0,-6.825e+11,0,USD,,,
+20160407 01:06:13 EST,paperUSD,-1.37862498e+12,20000,-5.514499996e+14,-6.96125e+11,-1.378625e+12,0,USD,-2.07474998e+12,20000.0,0.0
+20160407 02:58:36 EST,paperUSD,-2.06987498e+12,20000,-8.279499996e+14,5.675e+11,-2.069875e+12,0,USD,-1.50237498e+12,1.95000002e+12,1.95e+12

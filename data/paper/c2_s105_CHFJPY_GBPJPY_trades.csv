@@ -1,3 +1,6 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance
-1.0,-2.0,,,,0.0,,GBPJPY,long,,20160405 05:14:54 EST,open,20160405 05:14:54 EST,157.217,,,0.0,1.0,,GBPJPY,,0.0,1.0,19998.0,2.0,386164.904,20000.0
-2.0,-2.0,,,,0.0,,CHFJPY,short,,20160405 05:15:24 EST,open,20160405 05:15:24 EST,115.227,,,0.0,1.0,,CHFJPY,,0.0,-1.0,19996.0,2.0,376024.928,20000.0
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,balance,commission,margin_available,purebalance,mark_to_mkt,pure_mark_to_mkt,currency
+1.0,-2.0,,,,0.0,,GBPJPY,long,,20160405 05:14:54 EST,open,20160405 05:14:54 EST,157.217,,,0.0,1.0,,GBPJPY,,0.0,1.0,19998.0,2.0,386164.904,20000.0,,,
+2.0,-2.0,,,,0.0,,CHFJPY,short,,20160405 05:15:24 EST,open,20160405 05:15:24 EST,115.227,,,0.0,1.0,,CHFJPY,,0.0,-1.0,19996.0,2.0,376024.928,20000.0,,,
+3.0,-2.0,,,,0.0,,CHFJPY,short,,20160407 01:04:23 EST,open,20160407 01:04:23 EST,114.251,,,0.0,1.0,,CHFJPY,,0.0,-1.0,19994.0,2.0,365970.84,20000.0,20004.584,20012.584,
+4.0,-2.0,,,,0.0,,CHFJPY,short,,20160407 01:05:06 EST,open,20160407 01:05:06 EST,114.228,,,0.0,1.0,,CHFJPY,,0.0,-1.0,19992.0,2.0,355918.776,20000.0,20004.608,20014.608,JPY
+5.0,-2.0,,,,0.0,,GBPJPY,long,,20160407 01:05:31 EST,open,20160407 01:05:31 EST,154.099,,,0.0,1.0,,GBPJPY,,0.0,1.0,19990.0,2.0,342358.064,20000.0,20020.144,20034.144,JPY

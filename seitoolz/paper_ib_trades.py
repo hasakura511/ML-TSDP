@@ -40,15 +40,7 @@ def get_ib_trades(systemname, date):
         return dataSet
     
     
-def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
-    account=get_account_value(systemname, 'ib', date)
-    account['balance']=account['balance']+tradepl
-    account['purebalance']=account['purebalance']+purepl
-    account['buy_power']=account['buy_power']+buypower
-    account['real_pnl']=account['real_pnl'] + tradepl
-    account['PurePL']=account['PurePL'] + purepl
-    account['Date']=date
-    account=update_account_value(systemname, 'ib',account)
+def update_ib_trades(systemname, account, pos, tradepl, purepl, buypower, ibexch, date):
     
     filename='./data/paper/ib_' + systemname + '_trades.csv'
    
@@ -80,6 +72,8 @@ def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
     pos['permid'] = pos['permid'].astype('int')
     pos['balance']=account['balance'] 
     pos['purebalance']=account['purebalance']
+    pos['mark_to_mkt']=account['mark_to_mkt']    
+    pos['pure_mark_to_mkt']=account['pure_mark_to_mkt']
     pos['margin_available']=account['buy_power']
     pos['PurePL']=purepl
     pos['real_pnl']=tradepl
@@ -112,7 +106,7 @@ def update_ib_trades(systemname, pos, tradepl, purepl, buypower, ibexch, date):
         if debug:
             print "Update IB Balance: " + str(account['balance'])  + " PB: " +  str(account['purebalance']) + " PurePL: " + str(account['PurePL']) + ' ' + \
                     systemname + " " + longshort + \
-                    ' symbol: ' + (pos['symbol']+pos['symbol_currency']) + ' qty: ' + str(qty) + \
+                    ' symbol: ' + (pos['symbol']) + ' currency: ' + pos['symbol_currency'] + ' qty: ' + str(qty) + \
                     ' openqty: ' + str(pos['openqty']) + ' open_or_closed ' + openorclosed + ' Buy_Power: ' + str(account['buy_power'])
     #print filename
     dataSet['permid'] = dataSet['permid'].astype('int')

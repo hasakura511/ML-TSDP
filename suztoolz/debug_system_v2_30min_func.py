@@ -101,6 +101,7 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
                         roofingFilter, getCycleTime
                         
 from suztoolz.transform import zigzag as zg
+import logging
 #from data import getDataFromIB
 
 
@@ -311,16 +312,16 @@ def runv2(runData, dataSet=pd.DataFrame()):
                                         
                 #check if there is enough data to create indicators
                 if closes.shape[0] < maxlb:
-                    message = 'Not enough data to create indicators: intersect of '\
+                    print 'Not enough data to create indicators: intersect of '\
                         +ticker+' and '+pair +' of '+str(closes.shape[0])+\
                         ' is less than max lookback of '+str(maxlb)
-                    offlineMode(ticker, message, signalPath, version, version_)
-                    
-                dataSet['corr'+pair] = pd.rolling_corr(closes.iloc[:,0],\
-                                                closes.iloc[:,1], window=CCLookback)
-                dataSet['priceChange'+pair] = priceChange(closes.iloc[:,1])
-                dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,rStochBars)
-                dataSet['ROC_'+pair] = ROC(closes.iloc[:,1],ROCLookback)
+                    #offlineMode(ticker, message, signalPath, version, version_)
+                else:                  
+                    dataSet['corr'+pair] = pd.rolling_corr(closes.iloc[:,0],\
+                                                    closes.iloc[:,1], window=CCLookback)
+                    dataSet['priceChange'+pair] = priceChange(closes.iloc[:,1])
+                    dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,rStochBars)
+                    dataSet['ROC_'+pair] = ROC(closes.iloc[:,1],ROCLookback)
         
         print nrows-dataSet.shape[0], 'rows lost for', ticker
         

@@ -25,7 +25,7 @@ import seitoolz.bars as bars
 import datetime
 logging.basicConfig(filename='/logs/paper_trade_btc_v1.log',level=logging.DEBUG)
 
-debug=False
+debug=True
 
 feed={}
 ohlc={}
@@ -80,7 +80,8 @@ def trade_v1():
                 if system['System'] == 'BTCUSD':
                     system['Name']=system['Name'] + '_' + exchange
                     system['System'] = ticker + '_' + exchange
-                    
+                    system['c2sym'] = ticker + '_' + exchange
+                    system['ibsym'] = ticker + '_' + exchange
                   
                     ask=float(get_btc_ask(ticker, exchange))
                     bid=float(get_btc_bid(ticker, exchange))
@@ -99,7 +100,7 @@ def trade_v1():
                     system_c2pos_qty=round(system_pos['action']) * system['c2qty']
                     system_ibpos_qty=round(system_pos['action']) * system['ibqty']
                     if debug:
-                        print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+                        print "System Name: " + system['Name'] + " C2 Symbol: " + system['c2sym']+ " IB Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
                         print        " System Algo: " + str(system['System']) 
                         print        " Ask: " + str(ask)
                         print        " Bid: " + str(bid)

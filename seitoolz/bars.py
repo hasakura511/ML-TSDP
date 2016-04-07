@@ -73,7 +73,7 @@ def get_currencies():
     systemdata=systemdata.reset_index()
     for i in systemdata.index:
         system=systemdata.ix[i]
-        if system['ibsym'] != 'BTC':
+        if system['ibtype'] == 'CASH':
          
           currencyList[system['ibsym']+system['ibcur']]=1
           if system['Version'] == 'v1':

@@ -55,7 +55,7 @@ def get_realtimebar(sym, currency, exchange, type, whatToShow, data, filename, t
 
 def proc_history(sym, currency, exchange, type, whatToShow, data, filename, tickerId):
     global client, callback
-    return client.proc_history(tickerId, sym, currency, data)
+    return client.proc_history(tickerId, sym, type, currency, data)
    
 
 def getDataFromIB( brokerData,endDateTime,data):

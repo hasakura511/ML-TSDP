@@ -23,8 +23,9 @@ def place_order(systemname, action, quant, sym, type, currency, exch, pricefeed,
         if debug:
             print "Place IB Order " + action + " " + str(quant) + " " + sym + " " + currency 
         (account, portfolio)=get_ib_portfolio(systemname, date)
-        
-        symbol=sym+currency
+        symbol=sym
+        if type == 'CASH':
+            symbol=sym+currency
         price=-1
             
         if action == 'SELL':
@@ -58,7 +59,9 @@ def place_order(systemname, action, quant, sym, type, currency, exch, pricefeed,
 def exec_open_pos(pos, systemname, quant, sym, type, currency, exch, price, pricefeed, date):
         if debug:
             print "Place Open IB Order " + str(quant) + " " + sym + " " + currency  
-        symbol=sym+currency
+        symbol=sym
+        if type == 'CASH':
+            symbol=sym+currency
         if 'symbol' in pos:
             pos['symbol']=symbol
             openVWAP=float(pos['openprice'])
@@ -112,7 +115,9 @@ def exec_open_pos(pos, systemname, quant, sym, type, currency, exch, price, pric
             
 
 def exec_close_pos(pos, systemname, quant, sym, type, currency, exch, price, pricefeed, date):
-        symbol=sym+currency
+        symbol=sym
+        if type == 'CASH':
+            symbol=sym+currency
         if 'symbol' in pos:
             pos['symbol']=symbol
             openVWAP=float(pos['openprice'])

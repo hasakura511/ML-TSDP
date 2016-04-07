@@ -69,7 +69,9 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
                 place_order(system_name, 'STO', c2quant, c2sym, c2type, ibcurrency, ibexch, 'c2', pricefeed,date)
                 
     if ibsubmit:
-        symbol=ibsym+ibcurrency
+        symbol=ibsym
+        if ibtype == 'CASH':
+            symbol=ibsym+ibcurrency
         ib_pos_qty=get_ib_pos(system_name, ibsym, ibcurrency, date)
         system_ibpos_qty=round(system_pos['action']) * ibquant
         

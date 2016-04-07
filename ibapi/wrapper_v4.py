@@ -840,7 +840,10 @@ class IBclient(object):
         ## initialise the tuple
         global fdict
         global rtdict
-        symname=ibcontract.symbol + ibcontract.currency
+        if ibcontract.secType == 'CASH':
+            symname=ibcontract.symbol + ibcontract.currency
+        else:
+            symname=ibcontract.symbol
         fdict[symname]=tickerid
         rtdict[tickerid]=symname
         self.cb.init_tickdata(tickerid)
@@ -881,8 +884,12 @@ class IBclient(object):
             
             finished=False
             pricevalue=[]
-            rtreqid[ibcontract.symbol + ibcontract.currency]=tickerid
-            rtdict[tickerid]=ibcontract.symbol + ibcontract.currency
+            symName=ibcontract.symbol
+            if ibcontract.secType == 'CASH':
+                symName=ibcontract.symbol + ibcontract.currency
+            
+            rtreqid[symName]=tickerid
+            rtdict[tickerid]=symName
             rtfile[tickerid]=filename
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
@@ -926,7 +933,10 @@ class IBclient(object):
             
             pricevalue=[]
             tickerid=brokerData['tickerId']
-            rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
+            rtdict[tickerid]=brokerData['symbol']
+            if brokerData['secType']=='CASH':
+                rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
+            
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
             #data_cons = pd.DataFrame()
@@ -985,7 +995,7 @@ class IBclient(object):
         except Exception as e:
             logging.error("getDataFromIB", exc_info=True)   
         
-    def proc_history(self, tickerid, sym, currency,data):
+    def proc_history(self, tickerid, sym, type, currency,data):
         try:
             WAIT_TIME=60
             global rtbar
@@ -993,9 +1003,12 @@ class IBclient(object):
             global rthist
             global rtreqid
             iserror=False
-    
-            rtdict[tickerid]=sym + currency
-            rtreqid[sym+currency]=tickerid
+            if type == 'CASH':
+                rtdict[tickerid]=sym+currency
+                rtreqid[sym+currency]=tickerid
+            else:
+                rtdict[tickerid]=sym
+                rtreqid[sym]=tickerid
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
             else:

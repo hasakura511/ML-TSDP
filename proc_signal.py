@@ -26,7 +26,7 @@ systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
 for i in systemdata.index:
     system=systemdata.ix[i]
-    if system['ibsym'] != 'BTC':
+    if system['ibtype'] != 'BITCOIN':
       currencyList[system['ibsym']+system['ibcur']]=1
       if system['Version'] == 'v1':
           v1sList[system['System']]=1
@@ -45,7 +45,7 @@ for i in systemdata.index:
     try:
        system=systemdata.ix[i]
        model=model_pos
-       if system['ibsym'] != 'BTC':
+       if system['ibtype'] != 'BITCOIN':
             if system['Version'] == 'v1':
                     model=model_pos
             else:

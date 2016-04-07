@@ -64,7 +64,7 @@ def get_models(systems):
     dpsList=dict()
     for i in systems.index:
         system=systems.ix[i]
-        if system['ibsym'] == 'BTC':
+        if system['ibtype'] == 'BITCOIN':
          
           if system['Version'] == 'v1':
               v1sList[system['System']]=1
@@ -139,7 +139,7 @@ def start_trade(systems, commissiondata):
                     date=date.strftime("%Y%m%d %H:%M:%S EST")
                     adj_size(model, system['System'],system['Name'],pricefeed,\
                     str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
-                        system['ibqty'],system['c2sym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
+                        system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
                 #time.sleep(1)
                 system['last_trade']=get_timestamp()
                 systems.loc[symbol]=system
@@ -176,7 +176,7 @@ def getSystemList():
 
     for i in systemdata.index:
         system=systemdata.ix[i]
-        if system['ibsym'] == 'BTC' and system['System'] != 'BTCUSD':
+        if system['ibtype'] == 'BITCOIN' and system['System'] != 'BTCUSD':
          
           currencyList[system['c2sym']]=1
           

@@ -1,0 +1,2 @@
+symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
+BTCUSD_coincheckJPY,open,short,1.0,0.0,46737.0,0.0,-1168425.0,0.0,1168425.0,13.0,,,,,BTCUSD_coincheckJPY,,20160407 09:27:20 EST,20160407 09:27:20 EST,-1.0,USD,-1168425.0,0.0,-147862225.0,-770970000.0,-125890000.0

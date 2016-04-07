@@ -156,10 +156,12 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
         dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].diff().div(dataSet['pure_mark_to_mkt'].shift(1)) 
         if broker == 'ib':
             dataSet['ls']=dataSet['side']
-            dataSet.ix[dataSet['ls']=='SLD','ls'] = 'short'
-            dataSet.ix[dataSet['ls']=='BOT','ls'] = 'long'
+            dataSet.ix[dataSet['ls']=='SLD','ls']= 'short'
+            dataSet.ix[dataSet['ls']=='BOT','ls']= 'long'
+            dataSet['Date']=dataSet['times']
         else:
             dataSet['ls']=dataSet['long_or_short']
+            dataSet['Date']=dataSet['openedWhen']
             
         return dataSet
     else:
@@ -295,6 +297,7 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
                 tdiff=1
             perhour=round(len(SST[col].values)/tdiff,2)
             ax.plot( SST[col], label=str(col) + ' [' + str(SST.shape[0]) + ' records]' + ' ' + str(perhour) + '/hour Total: ' + str(span) + ' mins')
+   
     barSize='1 day'
     #if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
     #    barSize = '1 day'
@@ -328,8 +331,8 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
 
     fig.autofmt_xdate()
     ax.annotate(str(SST.index[-1]), xy=(0.95, -0.02), ha='left', va='top', xycoords='axes fraction', fontsize=10)
-    ax.annotate(comments, xy=(0.02, -0.2), ha='left', va='top', xycoords='axes fraction', fontsize=10)
-
+    ax.annotate(comments, xy=(0.02, 0.8), ha='left', va='top', xycoords='axes fraction', fontsize=10)
+    #plt.axis([0,1.5,0,2.0])
     ax.set_xlim(SST.index[0], SST.index[-1])
     #ax.set_xlabel(str(SST.index[-1]))
 
@@ -361,8 +364,8 @@ def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, count
                 SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
 
         filename='./data/results/' + systemname + ylabel + '.png'
-        save_plot(colnames, filename, title, ylabel, SST)
-        (counter, html)=generate_html( systemname + ylabel, counter, html, cols, comments)
+        save_plot(colnames, filename, title, ylabel, SST, comments)
+        (counter, html)=generate_html( systemname + ylabel, counter, html, cols)
     except Exception as e:
         logging.error("something bad happened", exc_info=True)
     
@@ -459,16 +462,19 @@ ibdict={}
 verdict={}
 vdict={}
 
-iblive=systemdata.ix[systemdata['ibsubmit']==True].copy()
+iblive=systemdata.ix[systemdata['ibsubmit']==True].reset_index().copy()
+print 'IB Live: '  + str(iblive.shape[0])
 iblive['Name']='IB_Live'
-systemdata.append(iblive)
+iblive.index=iblive.index + systemdata.shape[0]
+systemdata=systemdata.append(iblive)
+
 for i in systemdata.index:
     
     system=systemdata.ix[i]
     #print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
     #print        " System Algo: " + str(system['System']) 
     if system['c2submit']:
-	  c2dict[system['Name']]=1  
+	   c2dict[system['Name']]=1  
     if system['ibsubmit']: 
         ibdict[system['Name']]=1 
     if not systemdict.has_key(system['Name']):
@@ -536,16 +542,16 @@ def gen_ib(html, counter, cols):
         
       systemname='IB_Live'
       
-      html = html + '<h1>IB</h1><br><table>'
+      html = html + '<center>'
       
       cols=4
       counter=0
-      gen_paper(html, counter, cols, 0, systemname)
+      (html, counter, cols)=gen_paper(html, counter, cols, 0, systemname)
       html = html + '</center><h1>Recent Trades</h1><br><center>'
 	
       recent=1
       counter=0
-      gen_paper(html, counter, cols, recent, systemname)
+      (html, counter,cols)=gen_paper(html, counter, cols, recent, systemname)
 
     except Exception as e:
         logging.error("gen_ib", exc_info=True)
@@ -607,6 +613,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                       else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
+                  
                   twdata=generate_paper_TWR(systemname, 'ib', 'Date', initCap)    
                   (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'TWR', counter, html, cols, recent)
                               

@@ -1,2 +1,2 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-GBPUSD,-28,1460034763,,,1.40825,,forex,short,2016-04-07 09:12:43,1460034763,open,2016-04-07 09:11:00,1.40804,10000,,0,1,,,101704196,
+GBPUSD,-9,1460034763,,,1.40825,,forex,short,2016-04-07 09:12:43,1460034763,open,2016-04-07 09:11:00,1.40804,10000,,0,1,,,101704196,

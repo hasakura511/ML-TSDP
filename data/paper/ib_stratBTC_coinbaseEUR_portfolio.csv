@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_coinbaseEUR,BTCUSD_coinbaseEUR,,5000000.0,5000000.0,370.254,370.254,-3.7113e+12,9278250000.0,-2591250000.0,-46281750000.0,0.0,Paper,USD,43800000000.0
+BTCUSD_coinbaseEUR,BTCUSD_coinbaseEUR,,6000000.0,6000000.0,370.623333333,370.623333333,-3.7247e+12,9311750000.0,54929500020.0,-55593500000.0,0.0,Paper,USD,1.1080000002e+11

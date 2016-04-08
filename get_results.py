@@ -61,12 +61,11 @@ initCap=1
 
 def generate_sigplots(counter, html, cols):
     global vdict
+    global symdict
     vd=vdict.keys()
     vd.sort()
     filename='Versions'
-    fn='./data/results/signal_' + filename + '.html'
-    html = html + '<li><a href="' + 'signal_' + filename + '.html">'
-    html = html + filename + '</a></li>'
+    fn='./data/results/signal_' + filename + '.html'     
     headerhtml=get_html_header()
     headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br><table>'
     headerhtml = re.sub('Index', filename, headerhtml.rstrip())
@@ -77,29 +76,13 @@ def generate_sigplots(counter, html, cols):
     footerhtml = '</table>' + footerhtml
     write_html(fn, headerhtml, footerhtml, body)
 
-    systemdata=pd.read_csv('./data/systems/system.csv')
-    systemdata=systemdata.reset_index()
-    systems=dict()
-    systemdata=systemdata.sort_values(by=['c2sym','Version'])
-    symdict=dict()
-    for i in systemdata.index:
-        system=systemdata.ix[i]
-        if system['ibsym'] != 'BTC':
-          if not systems.has_key(system['System']):
-            filename=system['System']
-            if os.path.isfile('./data/results/' + filename + '.png'):
-                systems[system['System']]=1
-                (ver, sym)=filename.split('_')
-                if not symdict.has_key(sym):
-                    symdict[sym]=list()
-                symdict[sym].append(filename)
     syms=symdict.keys()
     syms.sort()
     for sym in syms:
         filename=sym
         fn='./data/results/signal_' + filename + '.html'
-        html = html + '<li><a href="' + 'signal_' + filename + '.html">'
-        html = html + filename + '</a></li>'
+        #html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+        #html = html + filename + '</a></li>'
                 
         headerhtml=get_html_header()                
         headerhtml = re.sub('Index', filename, headerhtml.rstrip())
@@ -153,7 +136,6 @@ def generate_c2_plot(systemname, dateCol, initialEquity):
         dataSet=pd.DataFrame([[initialEquity,'2016-01-01']], columns=['equitycurve',dateCol])
         return dataSet
      
-
     return dataSet
         
 def generate_paper_ib_plot(systemname, dateCol, initialEquity):
@@ -448,7 +430,8 @@ def generate_html(filename, counter, html, cols, colspan=False):
         html = html + '</tr>'
         counter=0
     return (counter, html)
-              
+
+            
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
 commissiondata=pd.read_csv('./data/systems/commission.csv')
@@ -504,11 +487,26 @@ for i in systemdata.index:
     else:
         sigdict[system['Name']].append(signal+'')
 
-
+systemdata=pd.read_csv('./data/systems/system.csv')
+systemdata=systemdata.reset_index()
+systems=dict()
+systemdata=systemdata.sort_values(by=['c2sym','Version'])
+symdict=dict()
+for i in systemdata.index:
+    system=systemdata.ix[i]
+    if system['ibsym'] != 'BTC':
+      if not systems.has_key(system['System']):
+        filename=system['System']
+        if os.path.isfile('./data/results/' + filename + '.png'):
+            systems[system['System']]=1
+            (ver, sym)=filename.split('_')
+            if not symdict.has_key(sym):
+                symdict[sym]=list()
+            symdict[sym].append(filename)
+            
 def gen_sig(html, counter, cols):
     counter = 0
     cols=4 #len(vdict.keys())
-    html = html + '<h1>Signals</h1><br><table>'
     (counter, html)=generate_sigplots(counter, html, cols)
     html = html + '</table>'
     return (html, counter, cols)
@@ -562,6 +560,100 @@ def gen_ib(html, counter, cols):
     html = html + '</table>'
     return (html, counter, cols)
 
+eqrank=pd.DataFrame({},columns=['System','IB_Bal','IB_PBL','IB_MM','IB_PMM','IB_Start','IB_End','C2_Bal','C2_PBL','C2_MM','C2_PMM','C2_Start','C2_End'])
+eqrank.set_index('System')
+def gen_eq_rank(systems, recent, html, type='paper'):
+    global eqrank
+    for systemname in systems:
+        print "Ranking " + systemname
+        if type == 'paper' or type == 'signal':
+            data=generate_paper_c2_plot(systemname, 'Date', initCap)
+        elif type == 'c2':
+            data=generate_c2_plot(systemname, 'openedWhen', initCap)
+            data['Date']=data['openedWhen']
+            
+        data['Idx']=pd.to_datetime(data['Date'])
+        data=data.set_index('Idx').sort_index()    
+        if recent > 0: 
+                
+                data=data.ix[data.index[-1] - datetime.timedelta(days=recent):]  
+        c2bal = 0
+        if 'equitycurve' in data and data.shape[0] > 0:
+            c2bal=data['equitycurve'][-1] - data['equitycurve'][0]
+        c2ppnl=0
+        if 'PurePLcurve' in data and data.shape[0] > 0:
+            c2ppnl=data['PurePLcurve'][-1] - data['PurePLcurve'][0]
+        c2mm=0
+        if 'mark_to_mkt' in data and data.shape[0] > 0:
+            c2mm=data['mark_to_mkt'][-1] - data['mark_to_mkt'][0]
+        c2pmm=0
+        if 'pure_mark_to_mkt' in data and data.shape[0] > 0:
+            c2pmm=data['pure_mark_to_mkt'][-1] - data['pure_mark_to_mkt'][0]
+        c2start=data['Date'][0]
+        c2end=data['Date'][-1]
+        data=generate_paper_ib_plot(systemname, 'Date', initCap)
+        data['Idx']=pd.to_datetime(data['Date'])
+        data=data.set_index('Idx').sort_index()
+        if recent > 0: 
+                data=data.ix[data.index[-1] - datetime.timedelta(days=recent):]   
+        ibbal=0
+        if 'equitycurve' in data and data.shape[0] > 0:
+            ibbal=data['equitycurve'][-1] - data['equitycurve'][0]
+        ibppnl=0
+        if 'PurePLcurve' in data and data.shape[0] > 0:
+            ibppnl=data['PurePLcurve'][-1] - data['PurePLcurve'][0]
+        ibmm=0
+        if 'mark_to_mkt' in data and data.shape[0] > 0:
+            ibmm=data['mark_to_mkt'][-1] - data['mark_to_mkt'][0]
+        ibpmm=0
+        if 'mark_to_mkt' in data and data.shape[0] > 0:
+            ibpmm=data['pure_mark_to_mkt'][-1] - data['pure_mark_to_mkt'][0]
+        ibstart=data['Date'][0]
+        ibend=data['Date'][-1]
+        eqrank.ix[systemname]=[systemname, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end]
+     
+    eqrank=eqrank.sort_values(by=['C2_Bal','C2_MM'], ascending=False)    
+    html = html + '<center><table>'
+    html = html + '<tr><td><h3>System</h3></td>'
+    html = html + '<td><h3>C2 Profit</h3></td>'
+    html = html + '<td><h3>C2 Pure Profit</h3></td>'
+    html = html + '<td><h3>C2 Mark to Market</h3></td>'
+    html = html + '<td><h3>C2 Pure Mark to Market</h3></td>'
+    html = html + '<td><h3>C2 Start Date</h3></td>'
+    html = html + '<td><h3>C2 End Date</h3></td>'
+    html = html + '<td><h3>IB Profit</h3></td>'
+    html = html + '<td><h3>IB Pure Profit</h3></td>'
+    html = html + '<td><h3>IB Mark to Market</h3></td>'
+    html = html + '<td><h3>IB Pure Mark to Market</h3></td>'
+    html = html + '<td><h3>IB Start Date</h3></td>'
+    html = html + '<td><h3>IB End Date</h3></td>'
+    html = html + '</tr>'
+    for systemname in eqrank.index:
+        (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
+        html = html + '<tr><td><li><a href=' + type + '_'
+        if type == 'signal':
+            html = html + systemname.split('_')[1]        
+        else:
+            html = html + systemname + str(recent) 
+        html = html + '.html>' + systemname +'</a></li></td>'
+        html = html + '<td>$' + str(round(c2bal,2)) + '</td>'
+        html = html + '<td>$' + str(round(c2ppnl,2)) + '</td>'
+        html = html + '<td>$' + str(round(c2mm,2)) + '</td>'
+        html = html + '<td>$' + str(round(c2pmm,2)) + '</td>'
+        html = html + '<td>' + str(c2start) + '</td>'
+        html = html + '<td>' + str(c2end) + '</td>'
+        html = html + '<td><li><a href=paper' + '_' + systemname
+        html = html + str(recent) + '.html>$' + str(round(ibbal,2)) + '</a></td>'
+        html = html + '<td>$' + str(round(ibppnl,2)) + '</td>'
+        html = html + '<td>$' + str(round(ibmm,2)) + '</td>'
+        html = html + '<td>$' + str(round(ibpmm,2)) + '</td>'
+        html = html + '<td>' + str(ibstart) + '</td>'
+        html = html + '<td>' + str(ibend) + '</td>'
+        html = html + '</tr>'
+    html = html + '</table></center>'
+
+    eqrank.to_csv('./data/results/' + type + '_eq_recent' + str(recent) +'.csv')
+    return (html, eqrank)
 #Paper    
 def gen_paper(html, counter, cols, recent, systemname):
     html = html + '<h1>Paper - ' + systemname + '</h1><br>'
@@ -728,8 +820,21 @@ def gen_file(filetype):
     elif filetype == 'sig':
         counter=0
         cols=5
+        recent=2
         filename='./data/results/sig.html'
         headertitle='Signals'
+        html = html + '<h1>Signals</h1><br>'
+        html = html + '<center><li><a href="' + 'signal_' + 'Versions' + '.html">'
+        html = html + 'Versions' + '</a></li></center><br>'
+        syslist=list()
+        for sym in symdict.keys():
+            syslist = syslist + symdict[sym]
+        (html, eqdata)=gen_eq_rank(syslist, recent, html, 'signal')
+        headerhtml=get_html_header()
+        footerhtml=get_html_footer()
+        headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
+        write_html(filename, headerhtml, footerhtml, html)
+        
         (html, counter, cols)=gen_sig(html, counter, cols)
     elif filetype == 'c2' or filetype == 'c2_2':
         #C2
@@ -746,14 +851,17 @@ def gen_file(filetype):
             html = '<h1>C2 Recent History</h1><br>'
             headertitle='C2 Recent History'
             recent = 1
-        syslist=systemdict.keys()
+        syslist=c2dict.keys()
         syslist.sort()
+        (html, eqdata)=gen_eq_rank(syslist, recent, html, 'c2')
+        headerhtml=get_html_header()
+        footerhtml=get_html_footer()
+        headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
+        write_html(filename, headerhtml, footerhtml, html)
         for systemname in syslist:
             if c2dict.has_key(systemname):
                 logging.info(systemname)
-                fn='./data/results/c2_' + systemname + '.html'
-                html = html + '<li><a href="' + 'c2_' + systemname + '.html">'
-                html = html + systemname + '</a></li>'
+                fn='./data/results/c2_' + systemname + str(recent) + '.html'
                 if len(genstrat) == 0 or genstrat == systemname:
                     headerhtml=get_html_header()
                     headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
@@ -780,13 +888,18 @@ def gen_file(filetype):
             headertitle='Paper Recent History'
         syslist=systemdict.keys()
         syslist.sort()
+        (html, eqdata)=gen_eq_rank(syslist, recent, html, 'paper')
+        headerhtml=get_html_header()
+        footerhtml=get_html_footer()
+        headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
+        write_html(filename, headerhtml, footerhtml, html)
         for systemname in syslist:
             if systemname != 'stratBTC':
                 counter=0
                 cols=4
                 logging.info(systemname)
-                fn='./data/results/paper_' + systemname + '.html'
-                html = html + '<li><a href="' + 'paper_' + systemname + '.html">'
+                fn='./data/results/paper_' + systemname + str(recent) + '.html'
+                html = html + '<li><a href="' + 'paper_' + systemname + str(recent) + '.html">'
                 html = html + systemname + '</a></li>'
                 
                 if len(genstrat) == 0 or genstrat == systemname:

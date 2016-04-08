@@ -884,7 +884,7 @@ def gen_file(filetype):
             filename='./data/results/c2_2.html'
             html = '<h1>C2 Recent History</h1><br>'
             headertitle='C2 Recent History'
-            recent = 1
+            recent = 3
         syslist=c2dict.keys()
         syslist.sort()
         (html, eqdata)=gen_eq_rank(syslist, recent, html, 'c2')

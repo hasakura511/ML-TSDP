@@ -630,9 +630,11 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     html = html + '</tr>'
     for systemname in eqrank.index:
         (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
-        html = html + '<tr><td><li><a href=' + type + '_' + systemname
-        if type != 'signal':
-            html = html + str(recent) 
+        html = html + '<tr><td><li><a href=' + type + '_'
+        if type == 'signal':
+            html = html + systemname.split('_')[1]        
+        else:
+            html = html + systemname + str(recent) 
         html = html + '.html>' + systemname +'</a></li></td>'
         html = html + '<td>$' + str(round(c2bal,2)) + '</td>'
         html = html + '<td>$' + str(round(c2ppnl,2)) + '</td>'

@@ -292,7 +292,7 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
             dataSet['Date']=dataSet['openedWhen']
             #dataSet=dataSet.set_index('Date')
             #dataSet=dataSet.sort_index()
-        dataSet.to_csv('./data/results/paper_' + systemname + '_' + broker + '_TWR.csv')
+        
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -738,6 +738,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                 
                 twdata=generate_paper_TWR(systemname, 'c2', 'Date', initCap) 
+                twdata.to_csv('./data/results/paper_' + systemname + '_' + 'c2' + '_TWR' + str(recent) + 'TWR.csv')
                 (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_TWR'+str(recent), systemname + " C2 TWR", 'TWR', counter, html, cols, recent)
             
                 html = html + '</table></center><br><center><table>'
@@ -774,6 +775,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                   
                   twdata=generate_paper_TWR(systemname, 'ib', 'Date', initCap)    
+                  twdata.to_csv('./data/results/paper_' + systemname + '_' + 'ib' + '_TWR' + str(recent) + 'TWR.csv')                  
                   (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_ib_TWR'+str(recent), systemname + " IB TWR", 'TWR', counter, html, cols, recent)
                               
                   html = html + '</table></center><br><center><table>'

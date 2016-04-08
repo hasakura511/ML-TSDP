@@ -297,7 +297,7 @@ def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
         dataSet['pure_mark_to_mkt'] = (1+((dataSet['pure_mark_to_mkt'].shift(1) - dataSet['pure_mark_to_mkt']) / dataSet['pure_mark_to_mkt'])) #.pct_change()
         dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].cumprod()
         
-        dataSet=dataSet.bfill()
+        dataSet=dataSet.fillna(method='bfill')
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -624,7 +624,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         data=data.set_index('Idx').sort_index()    
         if recent > 0: 
                 data=data.ix[data.index[-1] - datetime.timedelta(days=recent):]  
-        data=data.bfill()
+        data=data.fillna(method='bfill')
         c2bal = 0
         if 'equitycurve' in data and data.shape[0] > 0:
             c2bal=data['equitycurve'][-1] - data['equitycurve'][0]
@@ -644,7 +644,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         data=data.set_index('Idx').sort_index()
         if recent > 0: 
                 data=data.ix[data.index[-1] - datetime.timedelta(days=recent):]   
-        data=data.bfill()
+        data=data.fillna(method='bfill')
         ibbal=0
         if 'equitycurve' in data and data.shape[0] > 0:
             ibbal=data['equitycurve'][-1] - data['equitycurve'][0]
@@ -748,7 +748,9 @@ def gen_paper(html, counter, cols, recent, systemname):
             
                 html = html + '</table></center><br><center><table>'
                 counter=0
+                
                 c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
+                c2data.to_csv('./data/results/paper_' + systemname + '_' + 'c2' + '_Equity' + str(recent) + 'Equity.csv')                
                 (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_Equity'+str(recent), systemname + " C2 Equity", 'Equity', counter, html, cols, recent)
             
                 data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
@@ -786,6 +788,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                   html = html + '</table></center><br><center><table>'
                   counter=0
                   ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
+                  ibdata.to_csv('./data/results/paper_' + systemname + '_' + 'ib' + '_Equity' + str(recent) + 'Equity.csv')    
                   (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_ib_Equity'+str(recent), systemname + " IB Equity", 'Equity', counter, html, cols, recent)
                 
                   data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)

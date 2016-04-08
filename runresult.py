@@ -21,16 +21,16 @@ import logging
 import time
 import websocket
 
-logging.basicConfig(filename='/logs/runproc_v3.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/runresult.log',level=logging.DEBUG)
 
 debug=False
 
-files=[['get_results.py',['sig'],1200],
+files=[['get_results.py',['sig'],3000],
        ['get_results.py',['c2'],40000],
        ['get_results.py',['c2_2'],25000],
-       ['get_results.py',['ib'],43200],
+       ['get_results.py',['ib'],3600],
        ['get_results.py',['paper'],12000],
-       ['get_results.py',['paper2'],1200],
+       ['get_results.py',['paper2'],2400],
        ['get_results.py',['btc'], 20500]]
 
 def runfile(file,runargs,sleeptime):

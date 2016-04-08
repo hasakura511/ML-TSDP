@@ -63,7 +63,7 @@ def update_account_pnl(systemname, broker, tradepl, purepl, buypower, unr_pnl, p
 def make_new_account(systemname, broker, date):
     with lock:
         filename='./data/paper/' + broker + '_' + systemname + '_account.csv'
-        dataSet=pd.DataFrame([[date, 'paperUSD',20000,20000,400000,0,0,0,'USD',20000,20000,0]], 
+        dataSet=pd.DataFrame([[date, 'paperUSD',100000,100000,2000000,0,0,0,'USD',100000,100000,0]], 
             columns=['Date','accountid','balance','purebalance','buy_power','unr_pnl','real_pnl','PurePL','currency',
                      'mark_to_mkt','pure_mark_to_mkt','pure_unr_pnl'])
         dataSet=dataSet.set_index('Date')

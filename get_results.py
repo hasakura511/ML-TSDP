@@ -292,7 +292,7 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
             dataSet['Date']=dataSet['openedWhen']
             #dataSet=dataSet.set_index('Date')
             #dataSet=dataSet.sort_index()
-        
+        dataSet=dataSet.bfill()
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])

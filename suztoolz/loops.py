@@ -2078,7 +2078,7 @@ def calcEquity_df(SST, title, **kwargs):
     ax2.xaxis.set_minor_locator(minorLocator)
     ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
     ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-    ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
+    ax1.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
     ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
     # use a more precise date string for the x axis locations in the
     # toolbar
@@ -2285,7 +2285,14 @@ def calcEquity(sst, initialEquity):
 def calcDPS2(signal_type, sst, PRT, start, end, windowLength, **kwargs):
     #threshold=kwargs.get('threshold',-np.inf)
     trade=kwargs.get('trade','long')
-    
+    asset = kwargs.get('asset','FX')
+    def IBcommission(tradeAmount, asset):
+        commission = 2.0
+        if asset == 'FX':
+            return max(2.0, tradeAmount*2e-5)
+        else:
+            return commission
+            
     #updated: -1 short, 0 flat, 1 long
     if windowLength <=1:
         print 'windowLength needs to be >1 adjusting to 1.5'
@@ -2376,8 +2383,9 @@ def calcDPS2(signal_type, sst, PRT, start, end, windowLength, **kwargs):
                         #print 'beFlat'
                         tradeJ = 0.0
                             
+                    commission = IBcommission(fraction*equity, asset)
                     thisTrade = fraction * tradeJ * equity    
-                    equity = equity + thisTrade
+                    equity = equity + thisTrade -commission
                     maxEquity = max(equity,maxEquity)
                     drawdown = (maxEquity-equity)/maxEquity
                     maxDrawdown = max(drawdown,maxDrawdown)

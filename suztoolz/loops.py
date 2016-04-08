@@ -2307,7 +2307,7 @@ def calcDPS2(signal_type, sst, PRT, start, end, windowLength, **kwargs):
     multiplier = ddTolerance/math.sqrt(forecastHorizon) #assuming dd increases with sqrt of time
     forecastHorizon = windowLength/2.3 #need a bit more than 2x trades of the fcst horizon
     ddTolerance = math.sqrt(forecastHorizon)* multiplier #adjusted dd tolerance for the forecast
-    years_in_forecast = (start-end).total_seconds()/3600.0/24.0/365.0
+    years_in_forecast = (end-start).total_seconds()/3600.0/24.0/365.0
     #years_in_forecast = forecastHorizon / 252.0
     dpsRun = trade + signal_type + ' DPS wl%.1f maxL%i dd95_%.3f thres_%.1f' % (windowLength,maxLeverage,ddTolerance,threshold)
             

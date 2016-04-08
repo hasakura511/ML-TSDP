@@ -113,10 +113,10 @@ if len(sys.argv)==1:
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
-                    #'AUDUSD',\
+                    'AUDUSD',\
                     #'EURUSD',\
                     #'GBPUSD',\
-                    'USDCAD',\
+                    #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
                     #'EURCHF',\
@@ -137,7 +137,8 @@ if len(sys.argv)==1:
     #signalPath = './debug/'
     #dataPath = './data/from_IB/'
     scorePath = 'C:/users/hidemi/desktop/Python/scored_metrics_'
-    equityStatsSavePath = 'C:/Users/Hidemi/Desktop/Python/'
+    equityStatsSavePath = None
+    validationCurveSavePath = 'C:/Users/Hidemi/Desktop/Python/' 
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
     modelSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/models/' 
@@ -185,10 +186,10 @@ for ticker in livePairs:
     #Model Parameters
     maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 240
+    validationSetLength = 45
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [20,40,80] # min is 2
+    validationPeriods = [5,15,45] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']
@@ -198,7 +199,7 @@ for ticker in livePairs:
     zz_steps = [0.002]
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
-    wfSteps=[1,20,40]
+    wfSteps=[1,5,15,30]
     wf_is_periods = [50,250]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
@@ -226,7 +227,7 @@ for ticker in livePairs:
 
     #DPS parameters
     #windowLengths = [2] 
-    windowLengths = [20]
+    windowLengths = [5,20]
     maxLeverage = [2]
     PRT={}
     #ie goes to charts, car25 scoring (affected by commissions)
@@ -941,7 +942,7 @@ for ticker in livePairs:
         if showBestCharts:
             compareEquity(validationDict_noDPS[validationPeriod],vCurve,initialEquity=PRT['initial_equity'])
         if scorePath is not None:
-            validationDict_noDPS[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
+            validationDict_noDPS[validationPeriod].to_csv(validationCurveSavePath+vCurve+'_'+\
                                                             str(validationDict_noDPS[validationPeriod].index[0]).replace(':','')+'_to_'+\
                                                             str(validationDict_noDPS[validationPeriod].index[-1]).replace(':','')+'.csv')
         CAR25_oos = CAR25_df_bars(vCurve,validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].signals,\
@@ -986,7 +987,7 @@ for ticker in livePairs:
                 DPSequity = calcEquity_df(validationDict_DPS[validationPeriod][['signals','gainAhead']], vCurve,\
                                                     leverage = validationDict_DPS[validationPeriod].safef.values,initialEquity=PRT['initial_equity'])
             if scorePath is not None:
-                validationDict_DPS[validationPeriod].to_csv(equityStatsSavePath+vCurve+'_'+\
+                validationDict_DPS[validationPeriod].to_csv(validationCurveSavePath+vCurve+'_'+\
                                                                 str(validationDict_DPS[validationPeriod].index[0]).replace(':','')+'_to_'+\
                                                                 str(validationDict_DPS[validationPeriod].index[-1]).replace(':','')+'.csv')
             CAR25_oos = CAR25_df_bars(vCurve,validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].signals,\

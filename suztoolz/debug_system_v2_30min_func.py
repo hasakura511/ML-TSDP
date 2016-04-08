@@ -148,7 +148,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
     if bestParams.windowLength == 0:
         windowLengths = [0]
     else:
-        windowLengths = [bestParams.windowLength,45,90]    
+        windowLengths = [bestParams.windowLength]    
     maxLeverage = [bestParams.maxLeverage]
     #personal risk tolerance parameters
     PRT={}
@@ -774,7 +774,7 @@ if __name__ == "__main__":
         signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
         dataPath = 'D:/ML-TSDP/data/from_IB/'
         #bestParamsPath = 'D:/ML-TSDP/data/params/'        
-        bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/'      
+        bestParamsPath = 'D:/ML-TSDP/data/params/'      
         chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
         modelPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/models/'        
         

@@ -454,7 +454,7 @@ print 'IB Live: '  + str(iblive.shape[0])
 iblive['Name']='IB_Live'
 iblive.index=iblive.index + systemdata.shape[0]
 systemdata=systemdata.append(iblive)
-
+systemdata = systemdata.ix[systemdata['Name'] != 'stratBTC']
 for i in systemdata.index:
     
     system=systemdata.ix[i]
@@ -647,7 +647,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     locale.setlocale( locale.LC_ALL, '' )
     for systemname in eqrank.index:
         (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
-        html = html + '<tr><td><li><a href=' 
+        html = html + '<tr><td><li><a href="' 
         if type == 'signal':
             html = html +  type + '_' + systemname.split('_')[1]   
         elif type == 'btcv1':
@@ -658,7 +658,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
             color='green'
         else:
             color='red'
-        html = html + '.html>' + systemname +'</a></li></td>'
+        html = html + '.html">' + systemname +'</a></li></td>'
         html = html + '<td>' + str(c2start) + '</td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(c2bal,2), grouping=True ) + '</td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(c2ppnl,2), grouping=True ) + '</td>'
@@ -669,7 +669,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
             color='green'
         else:
             color='red'
-        html = html + '<td><li><a href=' 
+        html = html + '<td><li><a href="' 
         
         if type == 'signal':
             html = html +  type + '_' + systemname.split('_')[1]   
@@ -677,7 +677,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
             html = html + 'btcv1' + str(recent) 
         else:
             html = html + 'paper' + '_' + systemname + str(recent) 
-        html = html + '.html>'
+        html = html + '.html">'
         html = html + str(ibstart) + '</a></li></td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibbal,2), grouping=True ) + '</td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibppnl,2), grouping=True ) + '</td>'

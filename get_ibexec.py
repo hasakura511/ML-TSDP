@@ -40,10 +40,11 @@ def get_ibtrades():
     
     data=get_ibexec()
     dataSet=pd.DataFrame(data)
+    print "Received " + str(dataSet.shape[0]) + ' New Trades'
+    
     if len(dataSet.index) > 0:
 	dataSet=dataSet.set_index('permid')
-	print "Received " + str(dataSet.shape[0]) + ' New Trades'
-    
+	
     	if os.path.isfile(filename):
         	existData = pd.read_csv(filename, index_col='permid')
         	existData =existData.reset_index()

@@ -148,7 +148,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
     if bestParams.windowLength == 0:
         windowLengths = [0]
     else:
-        windowLengths = [bestParams.windowLength]    
+        windowLengths = [bestParams.windowLength,45,90]    
     maxLeverage = [bestParams.maxLeverage]
     #personal risk tolerance parameters
     PRT={}
@@ -158,6 +158,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
     PRT['horizon'] =bestParams.horizon
     PRT['maxLeverage'] =bestParams.maxLeverage
     PRT['CAR25_threshold'] =bestParams.CAR25_threshold
+    PRT['minSafef'] =bestParams.minSafef
     #CAR25_threshold=-np.inf
     #CAR25_threshold=0
 
@@ -622,7 +623,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
                     #print 'both DPS', start,'<=',startDate.date(),'adjusting', start,'to', newStart
                     #sst_bestModel = pd.concat([zerobegin, sst_bestModel], axis=0)
                     
-                dpsRun, sst_save = calcDPS2(DF1_BMrunName, sst_bestModel, PRT, startDate, endDate, wl, 'both', threshold=PRT['CAR25_threshold'])
+                dpsRun, sst_save = calcDPS2(DF1_BMrunName, sst_bestModel, PRT, startDate, endDate, wl, trade='both')
                 DPS_both[dpsRun] = sst_save
                 
                 #dpsRun, sst_save = calcDPS2('BuyHold', buyandhold, PRT, start, end, wl)

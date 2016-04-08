@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_btcoidIDR,BTCUSD_btcoidIDR,,-3000000.0,-3000000.0,5542966.66667,5542966.66667,-5.5566e+16,1.38915e+14,-8.257449999e+14,-4.157225e+14,0.0,Paper,USD,-4.089999999e+14
+BTCUSD_btcoidIDR,BTCUSD_btcoidIDR,,-5000000.0,-5000000.0,5544620.0,5544620.0,-5.5453e+16,1.386325e+14,-7.271625e+14,-6.930775e+14,0.0,Paper,USD,-3.4e+13

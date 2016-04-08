@@ -117,10 +117,7 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance'] 
-        dataSet['PurePLcurve'] = dataSet['purebalance'] 
-        #dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] - 20000
-        #dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] - 20000
+        
         if min(dataSet['balance']) < 0:
             dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))
         if min(dataSet['purebalance']) < 0:
@@ -129,8 +126,10 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
             dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
         if 'pure_mark_to_mkt' in dataSet and min(dataSet['pure_mark_to_mkt']) < 0:
             dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
-        
+        dataSet['equitycurve'] = dataSet['balance'] 
+        dataSet['PurePLcurve'] = dataSet['purebalance']         
         return dataSet
+        
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
         return dataSet
@@ -153,8 +152,7 @@ def generate_paper_ib_plot(systemname, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         dataSet=dataSet.sort_values(by=[dateCol])
-        dataSet['equitycurve'] = dataSet['balance'] 
-        dataSet['PurePLcurve'] = dataSet['purebalance'] 
+        
         if min(dataSet['balance']) < 0:
             dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))
         if min(dataSet['purebalance']) < 0:
@@ -163,11 +161,10 @@ def generate_paper_ib_plot(systemname, dateCol, initialEquity):
             dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
         if 'pure_mark_to_mkt' in dataSet and min(dataSet['pure_mark_to_mkt']) < 0:
             dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
-        
-        #dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] 
-        #dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] 
-                
+        dataSet['equitycurve'] = dataSet['balance'] 
+        dataSet['PurePLcurve'] = dataSet['purebalance']
         return dataSet
+        
     else:
         dataSet=pd.DataFrame([[initialEquity, initialEquity, '2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
         return dataSet

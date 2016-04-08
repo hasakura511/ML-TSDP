@@ -17,6 +17,7 @@ def get_exec(systemid, apikey):
           }
     params={}
     r=requests.post(url, params=params, json=data);
+    print r.text
     logging.info(r.text)
     return r.text
 
@@ -31,6 +32,7 @@ def get_exec_open(systemid, apikey):
     params={}
     
     r=requests.post(url, params=params, json=data);
+    print r.text
     logging.info(r.text)
     return r.text
 

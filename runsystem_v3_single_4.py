@@ -21,16 +21,16 @@ import logging
 import time
 #import websocket
 
-logging.basicConfig(filename='/logs/runsystem_v3_2.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/runsystem_v3_4.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
 debug=False
 #pairs=['AUDUSD']
                  
 #pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP','GBPJPY']
-pairs=['AUDJPY','AUDUSD','EURUSD','GBPUSD']
+#pairs=['AUDJPY','AUDUSD','EURUSD','GBPUSD']
 #pairs=['USDCAD','USDCHF','USDJPY','EURJPY','NZDUSD']
-#pairs=['EURCHF']
+pairs=['EURCHF']
 
 
 #def runv3(pair):

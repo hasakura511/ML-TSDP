@@ -877,7 +877,40 @@ def display_CAR25(CAR25):
 #            'C25sig', 'safef', 'CAR25', 'CAR50', 'CAR75', 'DD95', 'DD100', 'SOR25', 'SHA25', 'YIF', 'TPY',\
 #            'test_split','tox_adj']
 #    return pd.DataFrame(columns=col)
+def validation_scoring(model_metrics, sample1):
+    #create scores, find and save best model
+    #removed f1, rec, rows, to focus more on profitability (magnitude)
+    #removed sortino - equity curve scoring is not factored in here
+    #Only Minmax score of the separated samples 1 and 2 are used to rank between apples and apples.
+    #removed accuracy and drawdown to focus more on monte carlo distribution, added TPY to minimize trades
+    #sample1
+    model_score_s1 = model_metrics.loc[model_metrics['sample'] == sample1].reset_index().copy(deep=True)
+    #model_score_s1['f1mm'] =minmax_scale(robust_scale(model_score_s1.f1.reshape(-1, 1)))
+    #model_score_s1['accmm'] =minmax_scale(robust_scale(model_score_s1.acc.reshape(-1, 1)))
+    #model_score_s1['precmm'] =minmax_scale(robust_scale(model_score_s1.prec.reshape(-1, 1)))
+    #model_score_s1['recmm'] = minmax_scale(robust_scale(model_score_s1.rec.reshape(-1, 1)))
+    #model_score_s1['fn_magmm'] =-minmax_scale(robust_scale(model_score_s1.fn_mag.reshape(-1, 1)))
+    #model_score_s1['fp_magmm'] =-minmax_scale(robust_scale(model_score_s1.fp_mag.reshape(-1, 1)))
+    model_score_s1['CAR25mm'] =minmax_scale(robust_scale(model_score_s1.CAR25.reshape(-1, 1)))
+    model_score_s1['CAR50mm'] =minmax_scale(robust_scale(model_score_s1.CAR50.reshape(-1, 1)))
+    model_score_s1['CAR75mm'] =minmax_scale(robust_scale(model_score_s1.CAR75.reshape(-1, 1)))
+    #model_score_s1['DD100mm'] =-minmax_scale(robust_scale(model_score_s1.DD100.reshape(-1, 1)))
+    #model_score_s1['SOR25mm'] =minmax_scale(robust_scale(model_score_s1.SOR25.reshape(-1, 1)))
+    #model_score_s1['TPYmm'] =-minmax_scale(robust_scale(model_score_s1.TPY.reshape(-1, 1)))
+    #model_score_s1['rowsmm'] = minmax_scale(robust_scale(model_score_s1.rows.reshape(-1, 1)))   
+    model_score_s1['scoremm'] =    model_score_s1.CAR25mm+\
+                                    model_score_s1.CAR50mm+model_score_s1.CAR75mm
+                                    #model_score_s1.fn_magmm+model_score_s1.fp_magmm+\
+                                    #model_score_s1.TPYmm
+                                    #model_score_s1.DD100mm
+                                    #model_score_s1.accmm+
+                                    #+model_score_s1.SOR25mm+
 
+    scored_models = model_score_s1.sort_values(['scoremm'], ascending=False).drop(['index'], axis=1)
+    bestModel = scored_models.iloc[0]
+
+    return scored_models, bestModel
+    
 def directional_scoring(model_metrics, sample1, sample2=None):
     #create scores, find and save best model
     #removed f1, rec, rows, to focus more on profitability (magnitude)

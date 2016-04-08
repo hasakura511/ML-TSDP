@@ -72,7 +72,7 @@ from suztoolz.display import sss_display_cmatrix, is_display_cmatrix2,\
                          oos_display_cmatrix2, init_report, update_report,\
                          showPDF, showCDF, getToxCDF, plot_learning_curve,\
                          directional_scoring, compareEquity, describeDistribution,\
-                         offlineMode, oos_display_cmatrix
+                         offlineMode, oos_display_cmatrix, validation_scoring
 from suztoolz.loops import sss_iterate_train, adjustDataProportion, CAR25_df_bars,\
                             maxCAR25, wf_classify_validate2, sss_regress_train, calcDPS2,\
                             calcEquity2, createBenchmark, createYearlyStats, findBestDPS,\
@@ -110,7 +110,7 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    'GBPJPY',\
+                    #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
                     #'AUDUSD',\
@@ -119,7 +119,7 @@ if len(sys.argv)==1:
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
-                    #'EURCHF',\
+                    'EURCHF',\
                     #'EURGBP'\
                     ]
                     
@@ -127,7 +127,8 @@ if len(sys.argv)==1:
     showDist =  False
     showPDFCDF = False
     showAllCharts = False
-    showBestCharts = True
+    showBestCharts = False
+    showValidationCharts = True
     perturbData = False
     runDPS = True
     verbose= False
@@ -155,6 +156,7 @@ else:
     showPDFCDF = False
     showAllCharts = False
     showBestCharts = False
+    showValidationCharts = False
     perturbData = False
     runDPS = True
     verbose= False
@@ -186,10 +188,10 @@ for ticker in livePairs:
     #Model Parameters
     maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 45
+    validationSetLength = 90
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [5,9,15,45] # min is 2
+    validationPeriods = [9,15,45] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']
@@ -681,7 +683,7 @@ for ticker in livePairs:
                                     bestModelParams.model + '_i'+str(bestModelParams.wf_is_period)\
                                     +'_fcst'+str(bestModelParams.wf_step)+'_'+bestModelParams.signal
                                     
-            if showBestCharts:
+            if showValidationCharts:
                 compareEquity(sstDictDF1_[DF1_BMrunName],'Best Optimization  '+DF1_BMrunName,\
                                         initialEquity=PRT['initial_equity'])
             elif runDPS == False:
@@ -737,7 +739,7 @@ for ticker in livePairs:
                 v3tag='Best Optimization '    
                 dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                             endDate,'both', DF1_BMrunName, yscale='linear',\
-                                                            ticker=ticker,displayCharts=showBestCharts,\
+                                                            ticker=ticker,displayCharts=showValidationCharts,\
                                                             equityStatsSavePath=equityStatsSavePath, verbose=verbose,
                                                             v3tag=v3tag, returnNoDPS=returnNoDPS)
                 bestBothDPS.index.name = 'dates'
@@ -759,7 +761,7 @@ for ticker in livePairs:
                         v3tag=version+'_'+ticker+'_OOS'    
                         dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                                     endDate,'both', DF1_BMrunName, yscale='linear',\
-                                                                    ticker=ticker,displayCharts=showBestCharts,\
+                                                                    ticker=ticker,displayCharts=showValidationCharts,\
                                                                     equityStatsSavePath=equityStatsSavePath, verbose=verbose,\
                                                                     v3tag=v3tag, returnNoDPS=True, savePath=chartSavePath,\
                                                                     )
@@ -828,7 +830,7 @@ for ticker in livePairs:
                 print 'using', m
                 model_metrics, sstDictDF1_[nextRunName], savedModel = wf_classify_validate2(unfilteredData, dataSet, m, model_metrics,\
                                                     metaData, showPDFCDF=showPDFCDF, verbose=verbose)
-                if showBestCharts:
+                if showValidationCharts:
                     compareEquity(sstDictDF1_[nextRunName],nextRunName,initialEquity=PRT['initial_equity'])
                     
                 #save noDPS validation Curve
@@ -904,7 +906,7 @@ for ticker in livePairs:
                         v3tag='Next Period '
                         dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                                     endDate,'both', nextRunName, yscale='linear',\
-                                                                    ticker=ticker,displayCharts=showBestCharts,\
+                                                                    ticker=ticker,displayCharts=showValidationCharts,\
                                                                     equityStatsSavePath=equityStatsSavePath, verbose=verbose,
                                                                     v3tag=v3tag, returnNoDPS=returnNoDPS)
                         bestBothDPS.index.name = 'dates'
@@ -939,7 +941,7 @@ for ticker in livePairs:
     vCurve_metrics_noDPS = init_report()
     for validationPeriod in validationDict_noDPS:
         vCurve = 'No DPS '+ticker+'_'+barSizeSetting+' Validation Period '+str(validationPeriod)
-        if showBestCharts:
+        if showValidationCharts:
             compareEquity(validationDict_noDPS[validationPeriod],vCurve,initialEquity=PRT['initial_equity'])
         if scorePath is not None:
             validationDict_noDPS[validationPeriod].to_csv(validationCurveSavePath+vCurve+'_'+\
@@ -963,16 +965,16 @@ for ticker in livePairs:
                                             validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
                                             {'validationPeriod':validationPeriod,'DPS':False},CAR25_oos)
     #score models
-    scored_models_noDPS, bestModelParams_noDPS = directional_scoring(vCurve_metrics_noDPS,filterName)
+    scored_models_noDPS, bestModelParams_noDPS = validation_scoring(vCurve_metrics_noDPS,filterName)
     
     #bestModelParams['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     if scorePath is not None:
         scored_models_noDPS.to_csv(scorePath+version_+'_'+ticker+'_'+barSizeSetting+'_noDPS.csv')
         
     print '\nBest no DPS Validation Period Found:', bestModelParams_noDPS.validationPeriod    
-    #if showBestCharts:
+    #if showValidationCharts:
     BestEquity = calcEquity_df(validationDict_noDPS[bestModelParams_noDPS.validationPeriod][['signals','gainAhead']],\
-                                        'Best No DPS '+bestModelParams_noDPS.C25sig,showPlot=showBestCharts,\
+                                        'Best No DPS '+bestModelParams_noDPS.C25sig,showPlot=showValidationCharts,\
                                         leverage = validationDict_noDPS[bestModelParams_noDPS.validationPeriod].safef.values,\
                                         pngPath=chartSavePath,pngFilename='v1_'+ticker+'_Params', initialEquity=PRT['initial_equity'])
     saveParams(start_time, dataSet, BSMdict[bestModelParams_noDPS.validationPeriod][2], bestParamsPath, modelSavePath,\
@@ -983,7 +985,7 @@ for ticker in livePairs:
         for validationPeriod in validationDict_DPS:
             vCurve = 'DPS '+ticker+'_'+barSizeSetting+' Validation Period '+str(validationPeriod)
             #compareEquity(validationDict_DPS[validationPeriod],vCurve)
-            if showBestCharts:
+            if showValidationCharts:
                 DPSequity = calcEquity_df(validationDict_DPS[validationPeriod][['signals','gainAhead']], vCurve,\
                                                     leverage = validationDict_DPS[validationPeriod].safef.values,initialEquity=PRT['initial_equity'])
             if scorePath is not None:
@@ -1008,16 +1010,16 @@ for ticker in livePairs:
                                                 validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int), model,\
                                                 {'validationPeriod':validationPeriod,'DPS':True},CAR25_oos)        
         #score models
-        scored_models_DPS, bestModelParams_DPS = directional_scoring(vCurve_metrics_DPS,filterName)
+        scored_models_DPS, bestModelParams_DPS = validation_scoring(vCurve_metrics_DPS,filterName)
         
         #bestModelParams['timestamp'] = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
         if scorePath is not None:
             scored_models_DPS.to_csv(scorePath+version_+'_'+ticker+'_'+barSizeSetting+'_DPS.csv')
             
         print '\nBest DPS Validation Period Found:', bestModelParams_DPS.validationPeriod        
-        #if showBestCharts:
+        #if showValidationCharts:
         BestEquity = calcEquity_df(validationDict_DPS[bestModelParams_DPS.validationPeriod][['signals','gainAhead']],\
-                                            'Best DPS '+bestModelParams_DPS.C25sig,showPlot=showBestCharts,\
+                                            'Best DPS '+bestModelParams_DPS.C25sig,showPlot=showValidationCharts,\
                                             leverage = validationDict_DPS[bestModelParams_DPS.validationPeriod].safef.values,\
                                             pngPath=chartSavePath,pngFilename='v2_'+ticker+'_Params',initialEquity=PRT['initial_equity'])
         saveParams(start_time, dataSet, BSMdict[bestModelParams_DPS.validationPeriod][2], bestParamsPath, modelSavePath,ticker, 'v2', barSizeSetting,BSMdict)

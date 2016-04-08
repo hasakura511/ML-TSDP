@@ -12,8 +12,8 @@ def get_exec(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/requestTrades'
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
     data = { 
-    		"apikey":   apikey,#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
-    		"systemid": systemid
+    		"apikey":   str(apikey),#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
+    		"systemid": str(systemid)
           }
     params={}
     r=requests.post(url, params=params, json=data);
@@ -25,8 +25,8 @@ def get_exec_open(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/requestTradesOpen'
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
     data = { 
-    		"apikey":   apikey,#"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
-    		"systemid": systemid
+    		"apikey":   str(apikey),    #"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
+    		"systemid": str(systemid)
           }
     
     params={}

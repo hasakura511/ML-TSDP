@@ -108,7 +108,7 @@ def update_unr_profit(systemname, pricefeed, currency, type, date):
         (newVWAP, remqty, commission, buy_power, tradepl, ptValue, newside, purepl) =           \
                 calc_close_pos(openVWAP, qty, price, quant,                      \
                 pricefeed['Commission_Pct'],pricefeed['Commission_Cash'], record['currency'], \
-                pricefeed['C2Mult'])
+                pricefeed['IBMult'])
         record['unr_pnl']=tradepl
         record['pure_unr_pnl']=purepl
         unr_pnl=unr_pnl + record['unr_pnl']

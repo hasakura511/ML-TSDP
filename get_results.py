@@ -669,7 +669,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
             color='green'
         else:
             color='red'
-        html = html + '<li><a href=' 
+        html = html + '<td><li><a href=' 
         if type == 'btcv1':
             html = html + 'btcv1' + str(recent) 
         else:

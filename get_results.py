@@ -670,7 +670,10 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         else:
             color='red'
         html = html + '<td><li><a href=' 
-        if type == 'btcv1':
+        
+        if type == 'signal':
+            html = html +  type + '_' + systemname.split('_')[1]   
+        elif type == 'btcv1':
             html = html + 'btcv1' + str(recent) 
         else:
             html = html + 'paper' + '_' + systemname + str(recent) 

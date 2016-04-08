@@ -58,15 +58,18 @@ def get_ibtrades():
 data=pd.read_csv('./data/systems/system.csv')
 data=data.reset_index()
 
-#c2dict={}
-#for i in data.index:
-#        system=data.ix[i]
-#        c2dict[system['c2id']]=(system['Name'],system['c2api'])
+c2dict={}
+for i in data.index:
+        system=data.ix[i]
+	print system['Name'] + ' ' + str(system['c2submit'])
+	if system['c2submit']:
+	        c2dict[system['c2id']]=(system['Name'],system['c2api'])
+
+
+get_ibtrades()
 
 #for c2id in c2dict:
 #    (stratName,c2api)=c2dict[c2id]
 #    get_c2trades(c2id, stratName, c2api)
-
-get_ibtrades()
 
 

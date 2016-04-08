@@ -39,7 +39,7 @@ dps_model_pos=get_dps_model_pos(dpsList.keys())
 
 subprocess.call(['python', 'get_ibpos.py'])
 #ib_pos=get_ibpos()
-ib_pos=get_ibpos_from_csv()
+#ib_pos=get_ibpos_from_csv()
 
 for i in systemdata.index:
     try:

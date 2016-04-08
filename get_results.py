@@ -618,8 +618,8 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         data['Idx']=pd.to_datetime(data['Date'])
         data=data.set_index('Idx').sort_index()    
         if recent > 0: 
-                
                 data=data.ix[data.index[-1] - datetime.timedelta(days=recent):]  
+        data=data.bfill()
         c2bal = 0
         if 'equitycurve' in data and data.shape[0] > 0:
             c2bal=data['equitycurve'][-1] - data['equitycurve'][0]
@@ -639,6 +639,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         data=data.set_index('Idx').sort_index()
         if recent > 0: 
                 data=data.ix[data.index[-1] - datetime.timedelta(days=recent):]   
+        data=data.bfill()
         ibbal=0
         if 'equitycurve' in data and data.shape[0] > 0:
             ibbal=data['equitycurve'][-1] - data['equitycurve'][0]

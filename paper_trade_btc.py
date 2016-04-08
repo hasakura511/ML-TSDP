@@ -111,8 +111,8 @@ def start_trade(systems, commissiondata):
                 bid=float(get_btc_bid(ticker, exchange))
                 
                 commissionkey=system['c2sym']+system['ibcur']+system['ibexch']
-                commission_pct=0.00002
-                commission_cash=2
+                commission_pct=0.0025
+                commission_cash=0
                 if commissionkey in commissiondata.index:
                     commission=commissiondata.loc[commissionkey]
                     commission_pct=float(commission['Pct'])

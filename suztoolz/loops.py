@@ -39,7 +39,7 @@ from suztoolz.transform import zigzag as zg
 
 def CAR25_df_bars(signal_type, signals, signal_index, Close, **kwargs):
     verbose = kwargs.get('verbose', True)
-    forecast_horizon=kwargs.get('minFcst',max(250,signal_index.shape[0]*3))
+    forecast_horizon=kwargs.get('minFcst',max(500,signal_index.shape[0]*3))
     DD95_limit = kwargs.get('DD95_limit',0.05)
     barSize = kwargs.get('barSize','30m')
     number_forecasts  = kwargs.get('number_forecasts',35)

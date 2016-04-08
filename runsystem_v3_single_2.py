@@ -28,9 +28,9 @@ debug=False
 #pairs=['AUDUSD']
                  
 #pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP','GBPJPY']
-pairs=['EURCHF','AUDJPY','AUDUSD','EURUSD','GBPUSD']
+pairs=['AUDJPY','AUDUSD','EURUSD','GBPUSD']
 #pairs=['USDCAD','USDCHF','USDJPY','EURJPY','NZDUSD']
-                
+#pairs=['EURCHF']
 
 
 #def runv3(pair):

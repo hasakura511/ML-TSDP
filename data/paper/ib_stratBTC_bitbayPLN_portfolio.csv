@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_bitbayPLN,BTCUSD_bitbayPLN,,5000000.0,5000000.0,1591.398,1591.398,-1.588e+13,39700000000.0,-3.684e+11,-1.9892475e+11,0.0,Paper,USD,-1.699e+11
+BTCUSD_bitbayPLN,BTCUSD_bitbayPLN,,6000000.0,6000000.0,1592.49833333,1592.49833333,-1.598e+13,39950000000.0,90400000200.0,-2.3887475e+11,0.0,Paper,USD,3.301000002e+11

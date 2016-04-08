@@ -8,7 +8,9 @@ from pandas.io.json import json_normalize
 from ibapi.get_exec import get_exec as get_ibexec
 from c2api.get_exec import get_exec as get_c2exec
 import os
+import logging
 
+logging.basicConfig(filename='/logs/get_exec.log',level=logging.DEBUG)
 
 def get_c2trades(systemid, name, c2api):
     filename='./data/c2api/' + name + '_trades.csv'

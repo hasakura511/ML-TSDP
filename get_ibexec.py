@@ -8,12 +8,13 @@ from pandas.io.json import json_normalize
 from ibapi.get_exec import get_exec as get_ibexec
 from c2api.get_exec import get_exec as get_c2exec
 import os
+import logging
 
+logging.basicConfig(filename='/logs/get_ibexec.log',level=logging.DEBUG)
 
 def get_c2trades(systemid, name, c2api):
     filename='./data/c2api/' + name + '_trades.csv'
     
-    datestr=strftime("%Y%m%d", localtime())
     data=get_c2exec(systemid,c2api);
     
     jsondata = json.loads(data)
@@ -37,11 +38,11 @@ def get_c2trades(systemid, name, c2api):
 def get_ibtrades():
     filename='./data/ibapi/trades' + '.csv'
     
-    datestr=strftime("%Y%m%d", localtime())
     data=get_ibexec()
     dataSet=pd.DataFrame(data)
     if len(dataSet.index) > 0:
 	dataSet=dataSet.set_index('permid')
+	print "Received " + str(dataSet.shape[0]) + ' New Trades'
     
     	if os.path.isfile(filename):
         	existData = pd.read_csv(filename, index_col='permid')

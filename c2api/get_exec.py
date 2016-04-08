@@ -8,7 +8,6 @@ import time
 import logging
 import os
 
-
 def get_exec(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/requestTrades'
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
@@ -18,9 +17,8 @@ def get_exec(systemid, apikey):
           }
     params={}
     r=requests.post(url, params=params, json=data);
-    system_cache[systemid]=r.text
-
-    return system_cache[systemid]
+    logging.info(r.text)
+    return r.text
 
 def get_exec_open(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/requestTradesOpen'
@@ -33,9 +31,8 @@ def get_exec_open(systemid, apikey):
     params={}
     
     r=requests.post(url, params=params, json=data);
-    system_cache[systemid]=r.text
-    
-    return system_cache[systemid]
+    logging.info(r.text)
+    return r.text
 
 def get_c2pos():
     c2list=get_c2_list()

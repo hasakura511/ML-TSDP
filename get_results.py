@@ -649,7 +649,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         html = html + '</tr>'
     html = html + '</table></center>'
 
-    eqrank.to_csv('./data/results/' + type + '_eq_' + str(ibstart) + '_' + str(ibend) + '_recent' + str(recent) +'.csv')
+    eqrank.to_csv('./data/results/' + type + '_eq_recent' + str(recent) +'.csv')
     return (html, eqrank)
 #Paper    
 def gen_paper(html, counter, cols, recent, systemname):

@@ -1,3 +1,5 @@
-permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,openprice,purebalance,real_pnl
-1,Paper,Paper,19.448176,USD,IDEALPRO,1.0,,,1.0,110.501,1000000.0,-1000000.0,-19.448176,SLD,USD,JPY,20160405 04:59:23 EST,,0.0,19980.551824,-572408.8,110.501,20000.0,-19.448176
-2,Paper,Paper,14.819728,USD,IDEALPRO,2.0,,,1.0,84.203,1000000.0,1000000.0,-14.819728,BOT,CAD,JPY,20160405 04:59:24 EST,,0.0,19965.732096,-1313395.2,84.203,20000.0,-14.819728
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,openprice,purebalance,real_pnl,mark_to_mkt,pure_mark_to_mkt
+1,Paper,Paper,19.448176,USD,IDEALPRO,1.0,,,1.0,110.501,1000000.0,-1000000.0,-19.448176,SLD,USD,JPY,20160405 04:59:23 EST,,0.0,19980.551824,-572408.8,110.501,20000.0,-19.448176,,
+2,Paper,Paper,14.819728,USD,IDEALPRO,2.0,,,1.0,84.203,1000000.0,1000000.0,-14.819728,BOT,CAD,JPY,20160405 04:59:24 EST,,0.0,19965.732096,-1313395.2,84.203,20000.0,-14.819728,,
+3,Paper,Paper,18.68061888,USD,IDEALPRO,3.0,,,1.0,108.306,980000.0,-20000.0,18910.9993811,BOT,USD,JPY,20160408 15:06:13 EST,,18929.68,38876.7314771,-379364.256,110.501,38929.68,18910.9993811,-51688898.0397,-51537870.32
+4,Paper,Paper,14.37517312,USD,IDEALPRO,4.0,,,1.0,83.344,980000.0,20000.0,-7422.39117312,SLD,CAD,JPY,20160408 15:06:51 EST,,-7408.016,31454.340304,339394.4,84.203,31521.664,-7422.39117312,968022.500304,974881.664

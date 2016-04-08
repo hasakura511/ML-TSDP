@@ -125,9 +125,9 @@ def generate_paper_c2_plot(systemname, dateCol, initialEquity):
             dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))
         if min(dataSet['purebalance']) < 0:
             dataSet['purebalance'] = dataSet['purebalance'] +max(abs(max(dataSet['purebalance'])), abs(min(dataSet['purebalance'])))
-        if min(dataSet['mark_to_mkt']) < 0:
+        if 'mark_to_mkt' in dataSet and min(dataSet['mark_to_mkt']) < 0:
             dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
-        if min(dataSet['pure_mark_to_mkt']) < 0:
+        if 'pure_mark_to_mkt' in dataSet and min(dataSet['pure_mark_to_mkt']) < 0:
             dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
         
         return dataSet
@@ -159,9 +159,9 @@ def generate_paper_ib_plot(systemname, dateCol, initialEquity):
             dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))
         if min(dataSet['purebalance']) < 0:
             dataSet['purebalance'] = dataSet['purebalance'] +max(abs(max(dataSet['purebalance'])), abs(min(dataSet['purebalance'])))
-        if min(dataSet['mark_to_mkt']) < 0:
+        if 'mark_to_mkt' in dataSet and min(dataSet['mark_to_mkt']) < 0:
             dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
-        if min(dataSet['pure_mark_to_mkt']) < 0:
+        if 'pure_mark_to_mkt' in dataSet and min(dataSet['pure_mark_to_mkt']) < 0:
             dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
         
         #dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] 

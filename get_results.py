@@ -262,7 +262,19 @@ def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
     filename='./data/paper/' + broker + '_' + systemname + '_trades.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
-        dataSet['Idx']=pd.to_datetime(dataSet[dateCol])
+        if broker == 'ib':
+            dataSet['ls']=dataSet['side']
+            dataSet.ix[dataSet['ls']=='SLD','ls']= 'short'
+            dataSet.ix[dataSet['ls']=='BOT','ls']= 'long'
+            dataSet['Date']=dataSet['times']
+            #dataSet=dataSet.set_index('Date')
+            #dataSet=dataSet.sort_index()
+        else:
+            dataSet['ls']=dataSet['long_or_short']
+            dataSet['Date']=dataSet['openedWhen']
+            #dataSet=dataSet.set_index('Date')
+            #dataSet=dataSet.sort_index()
+        dataSet['Idx']=pd.to_datetime(dataSet['Date'])
         dataSet=dataSet.set_index('Idx').sort_index()    
         if recent > 0: 
                 dataSet=dataSet.ix[dataSet.index[-1] - datetime.timedelta(days=recent):] 
@@ -284,18 +296,7 @@ def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
         dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].cumprod()
         dataSet['pure_mark_to_mkt'] = (1+((dataSet['pure_mark_to_mkt'].shift(1) - dataSet['pure_mark_to_mkt']) / dataSet['pure_mark_to_mkt'])) #.pct_change()
         dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].cumprod()
-        if broker == 'ib':
-            dataSet['ls']=dataSet['side']
-            dataSet.ix[dataSet['ls']=='SLD','ls']= 'short'
-            dataSet.ix[dataSet['ls']=='BOT','ls']= 'long'
-            dataSet['Date']=dataSet['times']
-            #dataSet=dataSet.set_index('Date')
-            #dataSet=dataSet.sort_index()
-        else:
-            dataSet['ls']=dataSet['long_or_short']
-            dataSet['Date']=dataSet['openedWhen']
-            #dataSet=dataSet.set_index('Date')
-            #dataSet=dataSet.sort_index()
+        
         dataSet=dataSet.bfill()
         return dataSet
     else:
@@ -741,7 +742,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                     else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                 
-                twdata=generate_paper_TWR(systemname, 'c2', 'Date', initCap) 
+                twdata=generate_paper_TWR(systemname, 'c2', 'openedWhen', recent, initCap) 
                 twdata.to_csv('./data/results/paper_' + systemname + '_' + 'c2' + '_TWR' + str(recent) + 'TWR.csv')
                 (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_TWR'+str(recent), systemname + " C2 TWR", 'TWR', counter, html, cols, recent)
             
@@ -778,7 +779,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                       else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                   
-                  twdata=generate_paper_TWR(systemname, 'ib', 'Date', initCap)    
+                  twdata=generate_paper_TWR(systemname, 'ib', 'times', recent, initCap)    
                   twdata.to_csv('./data/results/paper_' + systemname + '_' + 'ib' + '_TWR' + str(recent) + 'TWR.csv')                  
                   (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_ib_TWR'+str(recent), systemname + " IB TWR", 'TWR', counter, html, cols, recent)
                               

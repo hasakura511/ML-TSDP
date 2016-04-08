@@ -33,11 +33,16 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (8,7)
-versions = ['v1.3','v2.4','v3.1']
-#versions = ['v1.3','v2.4']
+#systems = ['v1','v2','v3']
+#barSize=''
+systems = ['v1.3','v2.4','v3.1']
 barSize='30m'
+
 #regime switching params
 lookback = 90
+
+pngPath2 = './data/results/'
+equityCurveSavePath2 = './data/signalPlots/'
 
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
@@ -54,27 +59,10 @@ else:
     dataPath = 'D:/ML-TSDP/data/from_IB/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     equityCurveSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
-
-    pngPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
+    pngPath = None
     showPlot = True
     verbose = True
     
-def IBcommission(SST,i,tradeAmount,safef, asset):
-    commission = 2.0
-    if asset == 'FX':
-        commission =  max(2.0, tradeAmount*2e-5)
-        
-    if i==0:
-        #first trade
-        return round(commission,2)
-    elif SST.signals[i]*safef[i] !=SST.signals[i-1]*safef[i-1]:
-        #signal change 0/-1 to 1
-        return round(commission,2)
-    else:
-        #no signal change
-        return 0.0
-
-            
 def fixnans(dataSet):
     fixed = np.zeros(dataSet.shape[0])
     for i,s in enumerate(dataSet.values):
@@ -97,15 +85,15 @@ def calcEquity_signals(SST, title, **kwargs):
     verbose = kwargs.get('verbose',True)
     totalTrades= kwargs.get('totalTrades',None)
     totalAvgTrades=kwargs.get('totalAvgTrades',None)
-    asset=kwargs.get('asset','FX')
-    totalCommissions =kwargs.get('totalCommissions',None)
-    initialEquity = 100000.0
-    nrows = SST.gainAhead.shape[0]
-    #signalCounts = SST.signals.shape[0]        
+    
+    initialEquity = 1.0
+    nrows = SST.shape[0]
+    #signalCounts = SST.signals.shape[0]
+
+        
     equityCurves = {}
     for trade in ['l','s','b']:       
         trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')
-        commission = pd.Series(data=0.0, index=range(0,len(SST.index)), name='commission')
         numBars = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numBars')
         equity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='equity')
         maxEquity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='maxEquity')
@@ -115,14 +103,7 @@ def calcEquity_signals(SST, title, **kwargs):
 
         for i in range(0,len(SST.index)):
             if i == 0:
-                if SST.signals[i] != 0:
-                    positionChg =  safef[i] * initialEquity
-                    commission[i]=IBcommission(SST,i,positionChg, safef,asset)
-                else:
-                    positionChg=0
-                    commission[i]=0
-                    
-                equity[i] = initialEquity-commission[i]
+                equity[i] = initialEquity
                 trades[i] = 0.0
                 numBars[i] = 0.0
                 maxEquity[i] = initialEquity
@@ -133,75 +114,54 @@ def calcEquity_signals(SST, title, **kwargs):
                 if trade=='l':
                     if (SST.signals[i-1] > 0):
                         trades[i] = safef[i-1] * equity[i-1] * SST.gainAhead[i-1]
+                        numBars[i] = numBars[i-1] + 1 
                         equity[i] = equity[i-1] + trades[i]
-                        positionChg = (SST.signals[i]*safef[i]-SST.signals[i-1]*safef[i-1])*equity[i]
-                        commission[i]  = IBcommission(SST,i,positionChg, safef,asset)
-                        equity[i] -= commission[i]                       
                         maxEquity[i] = max(equity[i],maxEquity[i-1])
                         drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
-                        numBars[i] = numBars[i-1] + 1 
+
                         #print i, SST.signals[i], trades[i], equity[i], maxEquity[i], drawdown[i], maxDD[i]
                     else:
                         trades[i] = 0.0
-                        equity[i] = equity[i-1] + trades[i]
-                        positionChg = (SST.signals[i]*safef[i]-SST.signals[i-1]*safef[i-1])*equity[i]
-                        commission[i]  = IBcommission(SST,i,positionChg, safef,asset)
-                        equity[i] -= commission[i]                      
                         numBars[i] = numBars[i-1]
+                        equity[i] = equity[i-1]
                         maxEquity[i] = maxEquity[i-1]
                         drawdown[i] = drawdown[i-1]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
-                        
                 elif trade=='s':
                     if (SST.signals[i-1] < 0):
                         trades[i] = safef[i-1] * equity[i-1] * -SST.gainAhead[i-1]
+                        numBars[i] = numBars[i-1] + 1                
                         equity[i] = equity[i-1] + trades[i]
-                        positionChg = (SST.signals[i]*safef[i]-SST.signals[i-1]*safef[i-1])*equity[i]
-                        commission[i]  = IBcommission(SST,i,positionChg, safef,asset)
-                        equity[i] -= commission[i]          
-                        numBars[i] = numBars[i-1] + 1 
                         maxEquity[i] = max(equity[i],maxEquity[i-1])
                         drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
                     else:
                         trades[i] = 0.0
-                        equity[i] = equity[i-1] + trades[i]
-                        positionChg = (SST.signals[i]*safef[i]-SST.signals[i-1]*safef[i-1])*equity[i]
-                        commission[i]  = IBcommission(SST,i,positionChg, safef,asset)
-                        equity[i] -= commission[i]          
                         numBars[i] = numBars[i-1]
+                        equity[i] = equity[i-1]
                         maxEquity[i] = maxEquity[i-1]
                         drawdown[i] = drawdown[i-1]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
                 else:
                     if (SST.signals[i-1] > 0):
                         trades[i] = safef[i-1] * equity[i-1] * SST.gainAhead[i-1]
-                        equity[i] = equity[i-1] + trades[i]
-                        positionChg = (SST.signals[i]*safef[i]-SST.signals[i-1]*safef[i-1])*equity[i]
-                        commission[i]  = IBcommission(SST,i,positionChg, safef,asset)
-                        equity[i] -= commission[i]                            
                         numBars[i] = numBars[i-1] + 1                
+                        equity[i] = equity[i-1] + trades[i]
                         maxEquity[i] = max(equity[i],maxEquity[i-1])
                         drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
                     elif (SST.signals[i-1] < 0):
                         trades[i] = safef[i-1] * equity[i-1] * -SST.gainAhead[i-1]
-                        equity[i] = equity[i-1] + trades[i]
-                        positionChg = (SST.signals[i]*safef[i]-SST.signals[i-1]*safef[i-1])*equity[i]
-                        commission[i]  = IBcommission(SST,i,positionChg, safef,asset)
-                        equity[i] -= commission[i]          
                         numBars[i] = numBars[i-1] + 1                
+                        equity[i] = equity[i-1] + trades[i]
                         maxEquity[i] = max(equity[i],maxEquity[i-1])
                         drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
                     else:
                         trades[i] = 0.0
-                        equity[i] = equity[i-1] + trades[i]
-                        positionChg = (SST.signals[i]*safef[i]-SST.signals[i-1]*safef[i-1])*equity[i]
-                        commission[i]  = IBcommission(SST,i,positionChg, safef,asset)
-                        equity[i] -= commission[i]          
                         numBars[i] = numBars[i-1]
+                        equity[i] = equity[i-1]
                         maxEquity[i] = maxEquity[i-1]
                         drawdown[i] = drawdown[i-1]
                         maxDD[i] = max(drawdown[i],maxDD[i-1])
@@ -214,11 +174,10 @@ def calcEquity_signals(SST, title, **kwargs):
             #changeIndex = SSTcopy.signals[SST.signals==1].index
             SSTcopy.loc[SST.signals==1,'signals']=0
             
-        equityCurves[trade] = pd.concat([SSTcopy.reset_index(), trades, commission, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
+        equityCurves[trade] = pd.concat([SSTcopy.reset_index(), trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
 
     #  Compute cumulative equity for all days (buy and hold)   
     trades = pd.Series(data=0.0, index=range(0,len(SST.index)), name='trade')
-    commission = pd.Series(data=0.0, index=range(0,len(SST.index)), name='commission')
     numBars = pd.Series(data=0.0, index=range(0,len(SST.index)), name='numBars')
     equity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='equity')
     maxEquity = pd.Series(data=0.0,index=range(0,len(SST.index)), name='maxEquity')
@@ -229,23 +188,21 @@ def calcEquity_signals(SST, title, **kwargs):
         if i == 0:
             equity[i] = initialEquity
             trades[i] = 0.0
-            commission[i]=0
             numBars[i] = 0.0
             maxEquity[i] = initialEquity
             drawdown[i] = 0.0
             maxDD[i] = 0.0
         else:
             trades[i] = safef[i-1] * equity[i-1] * SST.gainAhead[i-1]
-            commission[i]=0
             numBars[i] = numBars[i-1] + 1 
-            equity[i] = equity[i-1] + trades[i]-commission[i]
+            equity[i] = equity[i-1] + trades[i]
             maxEquity[i] = max(equity[i],maxEquity[i-1])
             drawdown[i] = (maxEquity[i]-equity[i]) / maxEquity[i]
             maxDD[i] = max(drawdown[i],maxDD[i-1])          
     SSTcopy.loc[SST.signals==-1,'signals']=1
     SSTcopy.loc[SST.signals==0,'signals']=1
 
-    equityCurves['buyHold'] = pd.concat([SSTcopy.reset_index(), safef, trades, commission, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
+    equityCurves['buyHold'] = pd.concat([SSTcopy.reset_index(), safef, trades, numBars, equity,maxEquity,drawdown,maxDD], axis =1)
 
     if not SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
         barSize = '1 day'
@@ -284,14 +241,14 @@ def calcEquity_signals(SST, title, **kwargs):
         #ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
         #ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
         
-    
+    # rotate and align the tick labels so they look better
     
     minorLocator = MultipleLocator(SST.shape[0])
     ax1.xaxis.set_minor_locator(minorLocator)
     ax2.xaxis.set_minor_locator(minorLocator)
     ax1.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
     ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
-    #ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
+    ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
     ax2.xaxis.set_minor_formatter(tick.FuncFormatter(format_date))
     # use a more precise date string for the x axis locations in the
     # toolbar
@@ -301,26 +258,22 @@ def calcEquity_signals(SST, title, **kwargs):
     ax1.set_ylabel("TWR")
     ax1.legend(loc="best")
     ax2.set_ylabel("Drawdown")
-    #gets rid of space at the end
     ax1.set_xlim(0, SST.shape[0])
     ax2.set_xlim(0, SST.shape[0])
-    #shows last date index
     xticks = ax1.xaxis.get_minor_ticks()
     xticks[1].label1.set_visible(False)
     xticks = ax2.xaxis.get_minor_ticks()
     xticks[1].label1.set_visible(False)
     
-    if totalTrades != None and totalAvgTrades != None and totalCommissions != None:
-        text=  '\n%0.f signal counts: ' % nrows
+    if totalTrades != None and totalAvgTrades != None:
+        text=  '\n%0.f bar counts: ' % nrows
         text+='\nAverage trades per hour per system: %0.2f' \
                                 % (totalAvgTrades)
         text+='\nTWR for %i beLong and beShort trades with DPS is %0.4f, maxDD %0.4f' %\
                     (totalTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
-        text+='\nTotal Commissions: $%0.2f' \
-                                % (totalCommissions)
         plt.figtext(0.05,-0.05,text, fontsize=15)
     else:
-        text=  '\n%0.f signal counts: ' % nrows
+        text=  '\n%0.f bar counts: ' % nrows
         if 1 in SST.signals.value_counts():
             text+= '%i beLong,  ' % SST.signals.value_counts()[1]
         if -1 in SST.signals.value_counts():
@@ -333,24 +286,21 @@ def calcEquity_signals(SST, title, **kwargs):
         avgTrades = float(allTrades)/hoursTraded
         #text+='\nValidation Period from %s to %s' % (str(SST.index[0]), str(SST.index[-1]))
         text+='\nAverage trades per hour: %0.2f' % (avgTrades)
-        text+=  '\nTWR for Buy & Hold is %0.4f, %i Bars, maxDD %0.4f' %\
+        text+=  '\nTWR for Buy & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
                     (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
-        text+='\nTWR for %i beLong trades is %0.4f, maxDD %0.4f' %\
+        text+='\nTWR for %i beLong trades is %0.3f, maxDD %0.3f' %\
                     (longTrades, equityCurves['l'].equity.iloc[-1], equityCurves['l'].maxDD.iloc[-1])
-        text+='\nTWR for %i beShort trades is %0.4f, maxDD %0.4f' %\
+        text+='\nTWR for %i beShort trades is %0.3f, maxDD %0.3f' %\
                     (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
-        text+='\nTWR for %i beLong and beShort trades with DPS is %0.4f, maxDD %0.4f' %\
+        text+='\nTWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
                     (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
-        text+='\nAverage SAFEf: %0.4f  Total Comm: $%0.2f' % (equityCurves['b'].safef.mean(),sum(equityCurves['b'].commission))
+        text+='\nAverage SAFEf: %0.3f' % (equityCurves['b'].safef.mean())
         plt.figtext(0.05,-0.15,text, fontsize=15)
-    
-    
-    # rotate and align the tick labels so they look better
+        
     fig.autofmt_xdate()
-    #if pngPath != None:
-    #    plt.savefig(pngPath+title+'.png', bbox_inches='tight')
-    if pngPath != None and pngFilename != None:
     
+    if pngPath2 != None and pngFilename != None:
+        
         spstr=pngFilename.split('_')
         
         if len(spstr) == 3:
@@ -358,13 +308,14 @@ def calcEquity_signals(SST, title, **kwargs):
             (ver1, ver2)=ver.split('.')
             pngFilename = ver1 + '_' + inst
             
-        print 'Saving: ' + pngPath+pngFilename+'.png'
-        plt.savefig(pngPath+pngFilename+'.png', bbox_inches='tight')
-        
+        print 'Saving: ' + pngPath2+pngFilename+'.png'
+        plt.savefig(pngPath2+pngFilename+'.png', bbox_inches='tight')
+    
     if showPlot:
         plt.show()
     plt.close()
     
+
     '''
     if verbose:
         print '\nThere are %0.f signal counts' % nrows
@@ -374,11 +325,10 @@ def calcEquity_signals(SST, title, **kwargs):
             print SST.signals.value_counts()[-1], 'beShort Signals',
         if 0 in SST.signals.value_counts():
             print SST.signals.value_counts()[0], 'beFlat Signals',
-            
     if verbose:
         hoursTraded = (SST.index[-1]-SST.index[0]).total_seconds()/60.0/60.0
         avgTrades = float(allTrades)/hoursTraded
-        print 'Validation Period from %s to %s' % (str(SST.index[0]), str(SST.index[-1]))
+        print '\nValidation Period from', SST.index[0],'to',SST.index[-1]
         print 'Average trades per hour: %0.2f' % (avgTrades)
         print 'TWR for Buy & Hold is %0.3f, %i Bars, maxDD %0.3f' %\
                     (equityCurves['buyHold'].equity.iloc[-1], nrows, equityCurves['buyHold'].maxDD.iloc[-1])
@@ -388,7 +338,7 @@ def calcEquity_signals(SST, title, **kwargs):
                     (shortTrades,equityCurves['s'].equity.iloc[-1], equityCurves['s'].maxDD.iloc[-1])
         print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
                     (allTrades,equityCurves['b'].equity.iloc[-1], equityCurves['b'].maxDD.iloc[-1])
-        print 'Average SAFEf: %0.3f,' % (equityCurves['b'].safef.mean())
+        print 'SAFEf:', equityCurves['b'].safef.mean()
     '''
     SST_equity = equityCurves['b']
     if 'dates' in SST_equity:
@@ -404,23 +354,26 @@ pairs = [x.replace(barSize,'').replace('.csv','').replace('_','') for x in dataF
 dataSets = {}
 maxCTs = {}
 numTrades = {}
-comms = {}
 for pair in pairs:
     dataFilename = [f for f in dataFiles if pair in f and barSize in f][0]
     dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
+    if not 'cycleTime' in dataFile:
+                        dataFile['cycleTime']=0
     print 'Loaded data from', str(dataPath) + str(dataFilename)
     
     validSignalFiles = {}
-    for version in versions: 
-        validSignalFiles[version]=[f for f in signalFiles if version in f and barSize in f]
+    for system in systems: 
+        validSignalFiles[system]=[f for f in signalFiles if system in f and barSize in f]
     #for f in [sfile for sfilelist in validSignalFiles for sfile in sfilelist]:
-    for version in validSignalFiles:
-        if version != 'v1':
-            for f in [sfile for sfile in validSignalFiles[version] if pair in sfile]:
+    for system in validSignalFiles:
+        if system != 'v1':
+            for f in [sfile for sfile in validSignalFiles[system] if pair in sfile]:
 	      filename=str(signalPath)+str(f)
 	      #print filename
 	      if os.path.isfile(filename):
                 signalFile = pd.read_csv(filename, index_col='dates').drop_duplicates()
+		if not 'cycleTime' in signalFile:
+			signalFile['cycleTime']=0
                 print 'Loaded signals from', filename
                 #if there is no prior index in the row, then it's a legacy file
                 if 'prior_index' in signalFile:
@@ -449,7 +402,7 @@ for pair in pairs:
                     dataSet['safef'] = fixnans(dataSet.safef)
                     dataSet = dataSet[['signals','gainAhead','safef']][-lookback:].dropna()
                     maxCT = max(reindexed_sst.cycleTime.fillna(0).round())
-                    title = version +'_maxLag_'+str(maxCT)+\
+                    title = system +'_maxLag_'+str(maxCT)+\
                                 ' '+ reindexed_sst.iloc[-1].system          
                     equityCurve = calcEquity_signals(dataSet,title,\
                                         leverage = dataSet.safef.values, equityCurveSavePath=equityCurveSavePath,\
@@ -463,16 +416,16 @@ for pair in pairs:
                         (ver1, ver2)=ver.split('.')
                         csvFile = ver1 + '_' + inst
                         
-                    print "Saving: " + equityCurveSavePath+csvFile +'.csv'
-                    equityCurve.to_csv(equityCurveSavePath+csvFile+'.csv')
-                    
+                    print "Saving: " + equityCurveSavePath2+csvFile +'.csv'
+                    equityCurve.to_csv(equityCurveSavePath2+csvFile+'.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
                     numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
-                    comms[title] = equityCurve.commission.sum()
         else:
-            for f in [sfile for sfile in validSignalFiles[version] if pair in sfile]:
+            for f in [sfile for sfile in validSignalFiles[system] if pair in sfile]:
                 signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()
+		if not 'cycleTime' in signalFile: 
+                        signalFile['cycleTime']=0
                 print 'Loaded signals from', f
                 #if there is no prior index in the row, then it's a legacy file
                 if 'prior_index' in signalFile:
@@ -501,14 +454,13 @@ for pair in pairs:
                     dataSet['safef'] = fixnans(dataSet.safef)
                     dataSet = dataSet[['signals','gainAhead','safef']][-lookback:].dropna()
                     maxCT = max(reindexed_sst.cycleTime.fillna(0).round())
-                    title = version +'_maxLag_'+str(maxCT)+\
+                    title = system +'_maxLag_'+str(maxCT)+\
                                 ' '+ reindexed_sst.iloc[-1].system       
                     equityCurve = calcEquity_signals(dataSet, title,\
-                                        leverage = dataSet.safef.values,\
-                                        equityCurveSavePath=equityCurveSavePath,\
-                                        figsize=size, showPlot=showPlot,\
-                                        pngPath=pngPath, pngFilename=f[:-4],\
+                                        leverage = dataSet.safef.values, equityCurveSavePath=equityCurveSavePath,\
+                                        figsize=size, showPlot=showPlot,pngPath=pngPath, pngFilename=f[:-4],\
                                         verbose=verbose)
+		    
                     csvFile=f[:-4]
                     spstr=csvFile.split('_')
         
@@ -516,14 +468,11 @@ for pair in pairs:
                         (ver, inst, mins)=spstr
                         (ver1, ver2)=ver.split('.')
                         csvFile = ver1 + '_' + inst
-                        
-                    print "Saving: " + equityCurveSavePath+csvFile +'.csv'
-                    equityCurve.to_csv(equityCurveSavePath+csvFile+'.csv')
-                    
+                    print 'Saving: ' + equityCurveSavePath2+csvFile+'.csv'    
+                    equityCurve.to_csv(equityCurveSavePath2+csvFile+'.csv')
                     dataSets[title] = dataSet
                     maxCTs[title] = maxCT
                     numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
-                    comms[title] = equityCurve.commission.sum()
 
 #set arbitrary start/enddates that exist
 startDate = dataSet.index[0]
@@ -539,7 +488,7 @@ for title in dataSets:
 
 #title by version
 titleDict = {}
-for ver in versions:                    
+for ver in systems:                    
     titleDict[ver] = [title for title in dataSets if str(ver) in title]
 
 #create equal length equity curves.
@@ -556,43 +505,36 @@ eCurves_bySystem = {}
 dateIndexes = {}
 maxCT_bySystem = {}
 totalTrades_bySystem = {}
-totalComms_bySystem = {}
 for ver in titleDict:
     for i,title in enumerate(titleDict[ver]):
         if i == 0:
             dateIndex = eCurves[title].index
             maxCT = maxCTs[title]
             trades = numTrades[title]
-            totalComms = comms[title]
         else:
             dateIndex = dateIndex.intersection(eCurves[title].index)
             trades += numTrades[title]
-            totalComms+=comms[title]
             if maxCTs[title] > maxCT:
                 maxCT = maxCTs[title]
     dateIndexes[ver] = dateIndex
     maxCT_bySystem[ver] = maxCT
     totalTrades_bySystem[ver] = trades
-    totalComms_bySystem[ver]=totalComms
     
-#find max cycletime and date index of all versions
-all = str(versions).replace('[','').replace('\'','').replace(']','')
+#find max cycletime and date index of all systems
+all = str(systems).replace('[','').replace('\'','').replace(']','')
 for i,title in enumerate(eCurves):
     if i == 0:
         dateIndex = eCurves[title].index
         maxCT = maxCTs[title]
         trades = numTrades[title]
-        totalComms = comms[title]
     else:
         dateIndex = dateIndex.intersection(eCurves[title].index)
         trades += numTrades[title]
-        totalComms+=comms[title]
         if maxCTs[title] > maxCT:
             maxCT = maxCTs[title]
     dateIndexes[all] = dateIndex
     maxCT_bySystem[all] = maxCT
     totalTrades_bySystem[all] = trades
-    totalComms_bySystem[all]=totalComms
     
 #add by version
 for ver in titleDict:
@@ -616,8 +558,8 @@ for title in eCurves_bySystem:
                             pd.Series(data=1, name='signals', index = dateIndexes[dI_title])],\
                             axis=1)
     #add cycletime
-    hoursTraded = (dateIndexes[dI_title][-1]-dateIndexes[dI_title][0]).total_seconds()/60.0/60.0
-    avgTrades = float(totalTrades_bySystem[dI_title])/float(title.split()[0])/hoursTraded
+    
+    avgTrades = float(totalTrades_bySystem[dI_title])/float(title.split()[0])/60.0
     title2 = title+' maxLag'+str(maxCT_bySystem[dI_title])
     #print '\n\n'
     eCurves[title2] = calcEquity_signals(equityCons,title2,\
@@ -626,24 +568,22 @@ for title in eCurves_bySystem:
                                     pngPath=pngPath, verbose=False, pngFilename=dI_title,\
                                     figsize=size, showPlot=showPlot, 
                                     totalTrades= totalTrades_bySystem[dI_title],
-                                    totalAvgTrades=avgTrades,
-                                    totalCommissions =  totalComms_bySystem[dI_title])
+                                    totalAvgTrades=avgTrades)
                                     
+    #print 'Validation Period from %s to %s' % (str(equityCons.index[0]), str(equityCons.index[-1]))
+    #print 'There are %0.f bars. Average trades per hour per system: %0.2f' \
+    #                       % (equityCons.shape[0], avgTrades)
+    #print 'TWR for %i beLong and beShort trades with DPS is %0.3f, maxDD %0.3f' %\
+    #            (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
+    #               eCurves[title2].maxDD.iloc[-1])
     spstr=dI_title.split('_')
+    
     if len(spstr) == 3:
         (ver, inst, mins)=spstr
         (ver1, ver2)=ver.split('.')
         dI_title = ver1 + '_' + inst
-    print 'Saving: ' + equityCurveSavePath+dI_title+'.csv'    
-    eCurves[title2].to_csv(equityCurveSavePath+dI_title+'.csv')
-    
-    #print 'Validation Period from %s to %s' % (str(equityCons.index[0]), str(equityCons.index[-1]))
-    #print 'There are %0.f bars. Average trades per hour per system: %0.2f' \
-    #                       % (equityCons.shape[0], avgTrades)
-    #print 'TWR for %i beLong and beShort trades with DPS is %0.5f, maxDD %0.5f' %\
-    #           (totalTrades_bySystem[dI_title], eCurves[title2].equity.iloc[-1],\
-    #               eCurves[title2].maxDD.iloc[-1])
-    #eCurves[title2].to_csv(equityCurveSavePath+dI_title+'_curve.csv')
+    print 'Saving: ' + equityCurveSavePath2+dI_title+'.csv'    
+    eCurves[title2].to_csv(equityCurveSavePath2+dI_title+'.csv')
 
 
 #check

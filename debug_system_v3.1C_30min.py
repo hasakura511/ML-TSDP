@@ -11,6 +11,7 @@ added buyhold/sellhold signal types
 dps mode/nodps modes
 chart saving
 bugfixes
+added commissions in mc
 
 v3.0 "KOBE"
 added validation period optimization

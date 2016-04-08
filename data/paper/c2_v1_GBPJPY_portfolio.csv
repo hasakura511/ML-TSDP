@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-GBPJPY,open,short,1.0,0.0,153.006,0.0,-2.0,0.0,2.0,132.0,,,,,GBPJPY,,20160408 00:35:26 EST,20160408 00:35:26 EST,-1.0,JPY,115.216,117.216,19554.232,372379.616,20078.232
+GBPJPY,open,long,1.0,0.0,153.588,0.0,-2.0,0.0,2.0,133.0,,,,,GBPJPY,,20160408 05:04:09 EST,20160408 05:04:09 EST,1.0,JPY,62.504,64.504,19499.016,372379.616,20027.016

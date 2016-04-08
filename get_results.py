@@ -669,16 +669,14 @@ def gen_eq_rank(systems, recent, html, type='paper'):
             color='green'
         else:
             color='red'
-        html = html + '<td>' + str(ibstart) + '</td>'
-        
-        html = html + '<td style="color: ' + color + ';">'
         html = html + '<li><a href=' 
         if type == 'btcv1':
             html = html + 'btcv1' + str(recent) 
         else:
             html = html + 'paper' + '_' + systemname + str(recent) 
         html = html + '.html>'
-        html = html + locale.currency(round(ibbal,2), grouping=True ) + '</a></li></td>'
+        html = html + str(ibstart) + '</a></li></td>'
+        html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibbal,2), grouping=True ) + '</td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibppnl,2), grouping=True ) + '</td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibmm,2), grouping=True ) + '</td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibpmm,2), grouping=True ) + '</td>'

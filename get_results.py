@@ -61,6 +61,7 @@ initCap=1
 
 def generate_sigplots(counter, html, cols):
     global vdict
+    global symdict
     vd=vdict.keys()
     vd.sort()
     filename='Versions'

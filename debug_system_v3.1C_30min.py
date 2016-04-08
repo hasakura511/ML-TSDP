@@ -189,7 +189,7 @@ for ticker in livePairs:
     validationSetLength = 45
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [15,45] # min is 2
+    validationPeriods = [5,9,15,45] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']

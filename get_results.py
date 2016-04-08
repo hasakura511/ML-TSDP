@@ -370,6 +370,8 @@ def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, count
         SST[dateCol]=pd.to_datetime(SST[dateCol])
         SST=SST.sort_values(by=[dateCol])
         SST=SST.set_index(dateCol)
+        if recent > 0: 
+                SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
         comments = str(SST.shape[0]) + ' Record Count\n'
         if ylabel == 'TWR':
             shorts=len(SST.loc[SST['ls']=='short']['ls'])
@@ -378,9 +380,7 @@ def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, count
             comments = comments + str(shorts) + ' Short Trades\n'
             comments = comments + str(longs) + ' Long Trades\n'
             comments = comments + '$' + str(comm) + ' Total Commission\n'
-        if recent > 0: 
-                SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
-
+        
         filename='./data/results/' + systemname + ylabel + '.png'
         save_plot(colnames, filename, title, ylabel, SST, comments)
         (counter, html)=generate_html( systemname + ylabel, counter, html, cols)

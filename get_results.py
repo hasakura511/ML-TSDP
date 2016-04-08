@@ -248,11 +248,23 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         #dataSet=dataSet.sort_values(by=[dateCol])
+        if min(dataSet['balance']) < 0:
+            dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))
+        if min(dataSet['purebalance']) < 0:
+            dataSet['purebalance'] = dataSet['purebalance'] +max(abs(max(dataSet['purebalance'])), abs(min(dataSet['purebalance'])))
+        if min(dataSet['mark_to_mkt']) < 0:
+            dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
+        if min(dataSet['pure_mark_to_mkt']) < 0:
+            dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
         
-        dataSet['equitycurve'] = dataSet['balance'].diff().div(dataSet['balance'].shift(1)) #.pct_change()
-        dataSet['PurePLcurve'] = dataSet['purebalance'].diff().div(dataSet['purebalance'].shift(1)) 
-        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].diff().div(dataSet['mark_to_mkt'].shift(1)) #.pct_change()
-        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].diff().div(dataSet['pure_mark_to_mkt'].shift(1)) 
+        dataSet['equitycurve'] = (1+((dataSet['balance'].shift(1) - dataSet['balance']) / dataSet['balance'])) #.pct_change()
+        dataSet['equitycurve'] = dataSet['equitycurve'].cumprod()
+        dataSet['PurePLcurve'] = (1+((dataSet['purebalance'].shift(1) - dataSet['purebalance']) / dataSet['purebalance'])) #.pct_change()
+        dataSet['PurePLcurve'] = dataSet['PurePLcurve'].cumprod()
+        dataSet['mark_to_mkt'] = (1+((dataSet['mark_to_mkt'].shift(1) - dataSet['mark_to_mkt']) / dataSet['mark_to_mkt'])) #.pct_change()
+        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].cumprod()
+        dataSet['pure_mark_to_mkt'] = (1+((dataSet['pure_mark_to_mkt'].shift(1) - dataSet['pure_mark_to_mkt']) / dataSet['pure_mark_to_mkt'])) #.pct_change()
+        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].cumprod()
         if broker == 'ib':
             dataSet['ls']=dataSet['side']
             dataSet.ix[dataSet['ls']=='SLD','ls']= 'short'
@@ -265,7 +277,7 @@ def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
             dataSet['Date']=dataSet['openedWhen']
             #dataSet=dataSet.set_index('Date')
             #dataSet=dataSet.sort_index()
-            
+        dataSet.to_csv('./data/results/paper_' + systemname + '_' + broker + '_TWR.csv')
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -708,22 +720,23 @@ def gen_paper(html, counter, cols, recent, systemname):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                     else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
-                twdata=generate_paper_TWR(systemname, 'c2', 'Date', initCap)    
-                (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'TWR', counter, html, cols, recent)
+                
+                twdata=generate_paper_TWR(systemname, 'c2', 'Date', initCap) 
+                (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_TWR'+str(recent), systemname + " C2 TWR", 'TWR', counter, html, cols, recent)
             
                 html = html + '</table></center><br><center><table>'
                 counter=0
                 c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
-                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols, recent)
+                (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_Equity'+str(recent), systemname + " C2 Equity", 'Equity', counter, html, cols, recent)
             
                 data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
-                (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols, recent)
+                (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + '_c2_PL'+str(recent), systemname + ' C2 PL', 'PL', counter, html, cols, recent)
             
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
+                (counter, html)=generate_plots(data, 'paper_' + systemname + '_c2_Signals'+str(recent), systemname + ' C2 Signals', 'equity', counter, html, cols, recent)
             
                 data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
-                (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)        
+                (counter, html)=generate_plots(data, 'paper_' + systemname + '_c2_Close'+str(recent), systemname + " Close Price", 'Close', counter, html, cols, recent)        
                 html = html + '</center></table><br>'
             except Exception as e:
                       logging.error("get_paper", exc_info=True)
@@ -745,21 +758,21 @@ def gen_paper(html, counter, cols, recent, systemname):
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                   
                   twdata=generate_paper_TWR(systemname, 'ib', 'Date', initCap)    
-                  (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'TWR', counter, html, cols, recent)
+                  (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_ib_TWR'+str(recent), systemname + " IB TWR", 'TWR', counter, html, cols, recent)
                               
                   html = html + '</table></center><br><center><table>'
                   counter=0
                   ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
-                  (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols, recent)
+                  (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_ib_Equity'+str(recent), systemname + " IB Equity", 'Equity', counter, html, cols, recent)
                 
                   data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
-                  (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols, recent)
+                  (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + '_ib_PL'+str(recent), systemname + 'IB PL', 'PL', counter, html, cols, recent)
                   
                   data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                  (counter, html)=generate_plots(data, 'ib_' + systemname + 'Signals', 'ib_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
+                  (counter, html)=generate_plots(data, 'paper_' + systemname + '_ib_Signals'+str(recent), systemname + ' IB Signals', 'equity', counter, html, cols, recent)
                   
                   data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
-                  (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
+                  (counter, html)=generate_plots(data, 'paper_' + systemname + '_ib_Close'+str(recent), systemname + " Close Price", 'Close', counter, html, cols, recent)
                   html = html + '</table></center><br>'
                   counter=0
             except Exception as e:

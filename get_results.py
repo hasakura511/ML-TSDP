@@ -271,7 +271,7 @@ def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
             #dataSet=dataSet.sort_index()
         else:
             dataSet['ls']=dataSet['long_or_short']
-            dataSet['Date']=dataSet['openedWhen']
+            dataSet['Date']=dataSet['closedWhen']
             #dataSet=dataSet.set_index('Date')
             #dataSet=dataSet.sort_index()
         dataSet['Idx']=pd.to_datetime(dataSet['Date'])
@@ -567,11 +567,11 @@ def gen_c2(html, counter, cols, recent, systemname):
         if c2dict.has_key(systemname):
             (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
   
-            c2data=generate_c2_plot(systemname, 'openedWhen',  initCap)
-            (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'openedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols, recent)
+            c2data=generate_c2_plot(systemname, 'closedWhen',  initCap)
+            (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'closedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols, recent)
             
-            data=get_data(systemname, 'c2api', 'c2', 'trades','openedWhen', initCap)
-            (counter, html)=generate_mult_plot(data, ['PL'], 'openedWhen', 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols, recent)
+            data=get_data(systemname, 'c2api', 'c2', 'trades','closedWhen', initCap)
+            (counter, html)=generate_mult_plot(data, ['PL'], 'closedWhen', 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols, recent)
             
             data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
             (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
@@ -617,8 +617,8 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         if type == 'paper' or type == 'signal' or type == 'btcv1':
             data=generate_paper_c2_plot(systemname, 'Date', initCap)
         elif type == 'c2':
-            data=generate_c2_plot(systemname, 'openedWhen', initCap)
-            data['Date']=data['openedWhen']
+            data=generate_c2_plot(systemname, 'closedWhen', initCap)
+            data['Date']=data['closedWhen']
             
         data['Idx']=pd.to_datetime(data['Date'])
         data=data.set_index('Idx').sort_index()    
@@ -742,7 +742,7 @@ def gen_paper(html, counter, cols, recent, systemname):
                     else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                 
-                twdata=generate_paper_TWR(systemname, 'c2', 'openedWhen', recent, initCap) 
+                twdata=generate_paper_TWR(systemname, 'c2', 'closedWhen', recent, initCap) 
                 twdata.to_csv('./data/results/paper_' + systemname + '_' + 'c2' + '_TWR' + str(recent) + 'TWR.csv')
                 (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_TWR'+str(recent), systemname + " C2 TWR", 'TWR', counter, html, cols, recent)
             
@@ -753,8 +753,8 @@ def gen_paper(html, counter, cols, recent, systemname):
                 c2data.to_csv('./data/results/paper_' + systemname + '_' + 'c2' + '_Equity' + str(recent) + 'Equity.csv')                
                 (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_Equity'+str(recent), systemname + " C2 Equity", 'Equity', counter, html, cols, recent)
             
-                data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
-                (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + '_c2_PL'+str(recent), systemname + ' C2 PL', 'PL', counter, html, cols, recent)
+                data=get_data(systemname, 'paper', 'c2', 'trades', 'closedWhen', initCap)
+                (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'closedWhen', 'paper_' + systemname + '_c2_PL'+str(recent), systemname + ' C2 PL', 'PL', counter, html, cols, recent)
             
                 data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
                 (counter, html)=generate_plots(data, 'paper_' + systemname + '_c2_Signals'+str(recent), systemname + ' C2 Signals', 'equity', counter, html, cols, recent)
@@ -821,8 +821,8 @@ def gen_btc(html, counter, cols):
             c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
             (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
         
-            data=get_data(systemname, 'paper', 'c2', 'trades', 'openedWhen', initCap)
-            (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'openedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
+            data=get_data(systemname, 'paper', 'c2', 'trades', 'closedWhen', initCap)
+            (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'closedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
 
             (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
             (counter, html)=generate_html('OHLC_paper_' + btcname+'Close', counter, html, cols)

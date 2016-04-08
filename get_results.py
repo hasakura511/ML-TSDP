@@ -853,7 +853,7 @@ def gen_file(filetype):
     elif filetype == 'sig':
         counter=0
         cols=5
-        recent=2
+        recent=3
         filename='./data/results/sig.html'
         headertitle='Signals'
         html = html + '<h1>Signals</h1><br>'
@@ -921,7 +921,7 @@ def gen_file(filetype):
         headertitle='Paper'
         if filetype == 'paper2':
             filename='./data/results/paper2.html'
-            recent = 1
+            recent = 3
             headertitle='Paper Recent History'
         syslist=systemdict.keys()
         syslist.sort()

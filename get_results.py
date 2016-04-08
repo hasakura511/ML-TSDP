@@ -13,6 +13,7 @@ from os.path import isfile, join
 from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, get_ask as get_ib_ask, get_bid as get_ib_bid
 from c2api.place_order import place_order as place_c2order
 import threading
+import locale
 # -*- coding: utf-8 -*-
 """
 Created on Tue Mar 08 20:10:29 2016
@@ -643,6 +644,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     html = html + '<td><h3>IB Pure Mark to Market</h3></td>'
     html = html + '<td><h3>IB End Date</h3></td>'
     html = html + '</tr>'
+    locale.setlocale( locale.LC_ALL, '' )
     for systemname in eqrank.index:
         (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
         html = html + '<tr><td><li><a href=' 
@@ -652,24 +654,30 @@ def gen_eq_rank(systems, recent, html, type='paper'):
             html = html + 'btcv1' + str(recent) 
         else:
             html = html +  type + '_' + systemname + str(recent) 
+        if c2bal > 0:
+            color='green'
+        else:
+            color='red'
         html = html + '.html>' + systemname +'</a></li></td>'
         html = html + '<td>' + str(c2start) + '</td>'
-        html = html + '<td>$' + str(round(c2bal,2)) + '</td>'
-        html = html + '<td>$' + str(round(c2ppnl,2)) + '</td>'
-        html = html + '<td>$' + str(round(c2mm,2)) + '</td>'
-        html = html + '<td>$' + str(round(c2pmm,2)) + '</td>'
+        html = html + '<td style="color: ' + color + ';">' + locale.currency(round(c2bal,2), grouping=True ) + '</td>'
+        html = html + '<td style="color: ' + color + ';">' + locale.currency(round(c2ppnl,2), grouping=True ) + '</td>'
+        html = html + '<td style="color: ' + color + ';">' + locale.currency(round(c2mm,2), grouping=True ) + '</td>'
+        html = html + '<td style="color: ' + color + ';">' + locale.currency(round(c2pmm,2), grouping=True ) + '</td>'
         html = html + '<td>' + str(c2end) + '</td>'
         html = html + '<td>' + str(ibstart) + '</td>'
-        html = html + '<td><li><a href=' 
+        
+        html = html + '<td style="color: ' + color + ';">'
+        html = html + '<li><a href=' 
         if type == 'btcv1':
             html = html + 'btcv1' + str(recent) 
         else:
             html = html + 'paper' + '_' + systemname + str(recent) 
-        html = html + '.html>$' + str(round(ibbal,2)) + '</a></td>'
-        html = html + '<td>$' + str(round(ibppnl,2)) + '</td>'
-        html = html + '<td>$' + str(round(ibmm,2)) + '</td>'
-        html = html + '<td>$' + str(round(ibpmm,2)) + '</td>'
-        
+        html = html + '.html>'
+        html = html + locale.currency(round(ibbal,2), grouping=True ) + '</a></li></td>'
+        html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibppnl,2), grouping=True ) + '</td>'
+        html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibmm,2), grouping=True ) + '</td>'
+        html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibpmm,2), grouping=True ) + '</td>'
         html = html + '<td>' + str(ibend) + '</td>'
         html = html + '</tr>'
     html = html + '</table></center>'

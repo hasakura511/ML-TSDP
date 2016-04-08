@@ -185,10 +185,10 @@ for ticker in livePairs:
     #Model Parameters
     maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 90
+    validationSetLength = 240
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [15,45,90] # min is 2
+    validationPeriods = [20,40,80] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
     #signal_types = ['gainAhead','buyHold','sellHold']
@@ -198,7 +198,7 @@ for ticker in livePairs:
     zz_steps = [0.002]
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
-    wfSteps=[1,15,30]
+    wfSteps=[1,20,40]
     wf_is_periods = [50,250]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
@@ -241,7 +241,7 @@ for ticker in livePairs:
     #safef=0 if CAR25 < threshold
     PRT['CAR25_threshold'] = 0
     #PRT['CAR25_threshold'] = -np.inf
-
+    PRT['minSafef'] =1
 
     #model selection
     dt_stump = DecisionTreeClassifier(max_depth=1, min_samples_leaf=1)
@@ -613,7 +613,7 @@ for ticker in livePairs:
                                     'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
                                     'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period,'perturbDataPct':perturbDataPct,\
                                     'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines,\
-                                    'validationPeriod':validationPeriod,'rStochBars':rStochBars}
+                                    'validationPeriod':validationPeriod,'rStochBars':rStochBars,'minSafef':PRT['minSafef']}
                             runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_'\
                                         + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
                             model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
@@ -639,7 +639,7 @@ for ticker in livePairs:
                             'initial_equity':PRT['initial_equity'],'horizon':PRT['horizon'],'maxLeverage':PRT['maxLeverage'],\
                             'CAR25_threshold':PRT['CAR25_threshold'], 'wf_is_period':wf_is_period,'perturbDataPct':perturbDataPct,\
                             'barSizeSetting':barSizeSetting, 'version':version, 'version_':version_,'maxReadLines':maxReadLines,\
-                            'validationPeriod':validationPeriod,'rStochBars':rStochBars}
+                            'validationPeriod':validationPeriod,'rStochBars':rStochBars,'minSafef':PRT['minSafef']}
                     runName = ticker+'_'+barSizeSetting+'_'+data_type+'_'+filterName+'_'\
                                         + m[0]+'_i'+str(wf_is_period)+'_fcst'+str(wfStep)+'_'+signal
                     model_metrics, sstDictDF1_[runName], SMdict[runName] = wf_classify_validate2(unfilteredData,\
@@ -728,7 +728,7 @@ for ticker in livePairs:
                     for ml in maxLeverage:
                         PRT['maxLeverage'] = ml               
                         dpsRun, sst_save = calcDPS2(DF1_BMrunName, sst_bestModel, PRT, startDate,\
-                                                                    endDate, wl, 'both', threshold=PRT['CAR25_threshold'])
+                                                                    endDate, wl, trade='both')
                         DPS_both[dpsRun] = sst_save
                         
                         #dpsRun, sst_save = calcDPS2('BuyHold', buyandhold, PRT, start, end, wl)
@@ -895,7 +895,7 @@ for ticker in livePairs:
                         startDate = sstDictDF1_[nextRunName].index[0]
                         endDate = sst_bestModel.index[-1]
                         dpsRun, sst_save = calcDPS2(nextRunName, sst_bestModel, PRT, startDate,\
-                                                                    endDate, wl, 'both', threshold=PRT['CAR25_threshold'])
+                                                                    endDate, wl, trade='both')
                         DPS_both[dpsRun] = sst_save
                         
                         #dpsRun, sst_save = calcDPS2('BuyHold', buyandhold, PRT, start, end, wl)

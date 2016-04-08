@@ -2282,7 +2282,10 @@ def calcEquity(sst, initialEquity):
     sst_equity = pd.concat([sst.reset_index(), trade, num_trades, equity,maxEquity,drawdown,maxDD], axis =1)       
     return sst_equity.set_index(pd.DatetimeIndex(sst_equity['index'])).drop(['index'], axis=1)
 
-def calcDPS2(signal_type, sst, PRT, start, end, windowLength, trade='long', threshold=-np.inf):
+def calcDPS2(signal_type, sst, PRT, start, end, windowLength, **kwargs):
+    #threshold=kwargs.get('threshold',-np.inf)
+    trade=kwargs.get('trade','long')
+    
     #updated: -1 short, 0 flat, 1 long
     if windowLength <=1:
         print 'windowLength needs to be >1 adjusting to 1.5'
@@ -2294,7 +2297,9 @@ def calcDPS2(signal_type, sst, PRT, start, end, windowLength, trade='long', thre
     tailRiskPct = PRT['tailRiskPct']
     forecastHorizon = PRT['horizon']
     maxLeverage = PRT['maxLeverage']
-
+    minSafef= PRT['minSafef']
+    threshold=PRT['CAR25_threshold']
+    
     nCurves = 50
     accuracy_tolerance = 0.005
     updateInterval = 1
@@ -2302,7 +2307,7 @@ def calcDPS2(signal_type, sst, PRT, start, end, windowLength, trade='long', thre
     multiplier = ddTolerance/math.sqrt(forecastHorizon) #assuming dd increases with sqrt of time
     forecastHorizon = windowLength/2.3 #need a bit more than 2x trades of the fcst horizon
     ddTolerance = math.sqrt(forecastHorizon)* multiplier #adjusted dd tolerance for the forecast
-    years_in_forecast = (start-end).total_seconds()/3600.0/365.0
+    years_in_forecast = (start-end).total_seconds()/3600.0/24.0/365.0
     #years_in_forecast = forecastHorizon / 252.0
     dpsRun = trade + signal_type + ' DPS wl%.1f maxL%i dd95_%.3f thres_%.1f' % (windowLength,maxLeverage,ddTolerance,threshold)
             
@@ -2412,7 +2417,7 @@ def calcDPS2(signal_type, sst, PRT, start, end, windowLength, trade='long', thre
             dd95_ser[i] = dd95
         else:
             #dont trade
-            safef_ser[i] = 0
+            safef_ser[i] = minSafef
             CAR25_ser[i] = CAR25
             dd95_ser[i] = threshold
     

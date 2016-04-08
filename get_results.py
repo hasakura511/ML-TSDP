@@ -665,6 +665,10 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(c2mm,2), grouping=True ) + '</td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(c2pmm,2), grouping=True ) + '</td>'
         html = html + '<td>' + str(c2end) + '</td>'
+        if ibbal > 0:
+            color='green'
+        else:
+            color='red'
         html = html + '<td>' + str(ibstart) + '</td>'
         
         html = html + '<td style="color: ' + color + ';">'

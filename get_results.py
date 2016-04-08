@@ -630,17 +630,17 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     eqrank=eqrank.sort_values(by=['C2_Bal','C2_MM'], ascending=False)    
     html = html + '<center><table>'
     html = html + '<tr><td><h3>System</h3></td>'
+    html = html + '<td><h3>C2 Start Date</h3></td>'
     html = html + '<td><h3>C2 Profit</h3></td>'
     html = html + '<td><h3>C2 Pure Profit</h3></td>'
     html = html + '<td><h3>C2 Mark to Market</h3></td>'
     html = html + '<td><h3>C2 Pure Mark to Market</h3></td>'
-    html = html + '<td><h3>C2 Start Date</h3></td>'
     html = html + '<td><h3>C2 End Date</h3></td>'
+    html = html + '<td><h3>IB Start Date</h3></td>'
     html = html + '<td><h3>IB Profit</h3></td>'
     html = html + '<td><h3>IB Pure Profit</h3></td>'
     html = html + '<td><h3>IB Mark to Market</h3></td>'
     html = html + '<td><h3>IB Pure Mark to Market</h3></td>'
-    html = html + '<td><h3>IB Start Date</h3></td>'
     html = html + '<td><h3>IB End Date</h3></td>'
     html = html + '</tr>'
     for systemname in eqrank.index:
@@ -653,12 +653,13 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         else:
             html = html +  type + '_' + systemname + str(recent) 
         html = html + '.html>' + systemname +'</a></li></td>'
+        html = html + '<td>' + str(c2start) + '</td>'
         html = html + '<td>$' + str(round(c2bal,2)) + '</td>'
         html = html + '<td>$' + str(round(c2ppnl,2)) + '</td>'
         html = html + '<td>$' + str(round(c2mm,2)) + '</td>'
         html = html + '<td>$' + str(round(c2pmm,2)) + '</td>'
-        html = html + '<td>' + str(c2start) + '</td>'
         html = html + '<td>' + str(c2end) + '</td>'
+        html = html + '<td>' + str(ibstart) + '</td>'
         html = html + '<td><li><a href=' 
         if type == 'btcv1':
             html = html + 'btcv1' + str(recent) 
@@ -668,7 +669,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         html = html + '<td>$' + str(round(ibppnl,2)) + '</td>'
         html = html + '<td>$' + str(round(ibmm,2)) + '</td>'
         html = html + '<td>$' + str(round(ibpmm,2)) + '</td>'
-        html = html + '<td>' + str(ibstart) + '</td>'
+        
         html = html + '<td>' + str(ibend) + '</td>'
         html = html + '</tr>'
     html = html + '</table></center>'

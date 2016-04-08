@@ -258,10 +258,14 @@ def get_datas(systems, api, dataType, initialData, interval=''):
     return newfiles
 
 
-def generate_paper_TWR(systemname, broker, dateCol, initialEquity):
+def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
     filename='./data/paper/' + broker + '_' + systemname + '_trades.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
+        dataSet['Idx']=pd.to_datetime(dataSet[dateCol])
+        dataSet=dataSet.set_index('Idx').sort_index()    
+        if recent > 0: 
+                dataSet=dataSet.ix[dataSet.index[-1] - datetime.timedelta(days=recent):] 
         #dataSet=dataSet.sort_values(by=[dateCol])
         if min(dataSet['balance']) < 0:
             dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))

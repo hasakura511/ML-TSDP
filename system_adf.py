@@ -251,7 +251,7 @@ def get_entryState():
                 logging.info('SymPair: ' + symPair + ' System: ' + system + ' Entry: ' + str(entryState) + ' Exit: ' + str(exitState))
                 if not pos.has_key(symPair):
                     pos[symPair]=dict()
-                pos[symPair][sym]=pos['signals'] * pos['safef']
+                pos[symPair][sym]=signal['signals'] * signal['safef']
                 print "Initializing " + sym + ' with position: ' + str(pos[symPair][sym])                
                 astrat.updateEntry(symPair, entryState, exitState)
         except Exception as e:

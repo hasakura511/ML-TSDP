@@ -282,7 +282,7 @@ def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
             #dataSet=dataSet.sort_index()
         dataSet['Idx']=pd.to_datetime(dataSet['Date'])
         dataSet=dataSet.set_index('Idx').sort_index()    
-        if recent > 0: 
+        if recent > 0 and dataSet.shape[0] > 0: 
                 dataSet=dataSet.ix[dataSet.index[-1] - datetime.timedelta(days=recent):] 
         
         if broker == 'c2live':
@@ -322,8 +322,9 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
     SST=SST.fillna(method='pad')
 
     fig, ax = plt.subplots()
+    print "Saving " + filename + " Records: " + str(SST.shape[0])
     for col in colnames:
-        if SST.shape[0] > 0:
+        if SST.shape[0] > 1:
             tdiff=SST.index[-1] - SST.index[0]
             span = round(tdiff.total_seconds()/60)
             tdiff=tdiff.total_seconds()/3600
@@ -331,17 +332,9 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
                 tdiff=1
             perhour=round(len(SST[col].values)/tdiff,2)
             ax.plot( SST[col], label=str(col) + ' [' + str(SST.shape[0]) + ' records]' + ' ' + str(perhour) + '/hour Total: ' + str(span) + ' mins')
-   
-    barSize='1 day'
-    #if SST.index.to_datetime()[0].time() and not SST.index.to_datetime()[1].time():
-    #    barSize = '1 day'
-    #else:
-    #    barSize = '1 min'
-        
-  
     
     # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
-    if SST.shape[0] > 0:
+    if SST.shape[0] > 1:
         myFmt = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
         ax.xaxis.set_major_formatter(myFmt)
         legend = ax.legend(loc='upper left', shadow=True)
@@ -353,25 +346,19 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
             label.set_fontsize(8)
             label.set_fontweight('bold')
         
-    # rotate and align the tick labels so they look better
-
-    # use a more precise date string for the x axis locations in the
-    # toolbar
-    fig.fmt_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
-
-    #minorLocator = MultipleLocator(SST.shape[0])
-    #ax.xaxis.set_minor_locator(minorLocator)
-
-    #xticks = ax.xaxis.get_minor_ticks()
-    #xticks[1].label1.set_visible(False)
-
-    fig.autofmt_xdate()
-    if SST.shape[0] > 0:
+        fig.fmt_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
+        fig.autofmt_xdate()
         ax.annotate(str(SST.index[-1]), xy=(0.95, -0.02), ha='left', va='top', xycoords='axes fraction', fontsize=10)
         ax.set_xlim(SST.index[0], SST.index[-1])
-    ax.annotate(comments, xy=(0.02, 0.7), ha='left', va='top', xycoords='axes fraction', fontsize=10)
+        ax.annotate(comments, xy=(0.02, 0.7), ha='left', va='top', xycoords='axes fraction', fontsize=10)
     #plt.axis([0,1.5,0,2.0])
-    
+    # rotate and align the tick labels so they look better
+    # use a more precise date string for the x axis locations in the
+    # toolbar
+    #minorLocator = MultipleLocator(SST.shape[0])
+    #ax.xaxis.set_minor_locator(minorLocator)
+    #xticks = ax.xaxis.get_minor_ticks()
+    #xticks[1].label1.set_visible(False)
     #ax.set_xlabel(str(SST.index[-1]))
 
     plt.title(title)
@@ -390,7 +377,7 @@ def generate_mult_plot(data, colnames, dateCol, systemname, title, ylabel, count
         SST[dateCol]=pd.to_datetime(SST[dateCol])
         SST=SST.sort_values(by=[dateCol])
         SST=SST.set_index(dateCol)
-        if recent > 0: 
+        if recent > 0 and SST.shape[0] > 0: 
                 SST=SST.ix[SST.index[-1] - datetime.timedelta(days=recent):]
         comments = str(SST.shape[0]) + ' Record Count\n'
         if ylabel == 'TWR':
@@ -711,8 +698,6 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         html = html + '<tr><td><li><a href="' 
         if type == 'signal':
             html = html +  type + '_' + systemname.split('_')[1]   
-        elif type == 'btcv1':
-            html = html + 'btcv1' + str(recent) 
         else:
             html = html +  type + '_' + systemname + str(recent) 
         if c2bal > 0:
@@ -734,10 +719,8 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         
         if type == 'signal':
             html = html +  type + '_' + systemname.split('_')[1]   
-        elif type == 'btcv1':
-            html = html + 'btcv1' + str(recent) 
         else:
-            html = html + 'paper' + '_' + systemname + str(recent) 
+            html = html + type + '_' + systemname + str(recent) 
         html = html + '.html">'
         html = html + str(ibstart) + '</a></li></td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibbal,2), grouping=True ) + '</td>'
@@ -765,7 +748,9 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
                 html = html + '<center><table>'
                 counter=0
                 if verdict.has_key(systemname):
-                    if os.path.isfile('./data/results/' + systemname + '.png'):
+                    if os.path.isfile('./data/results/' + systemname + str(recent) + '.png'):
+                        (counter, html)=generate_html(systemname, counter, html, cols, False)
+                    elif os.path.isfile('./data/results/' + systemname + '.png'):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                     else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
@@ -806,7 +791,9 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
                   html = html + '<center><table>'
                   counter=0
                   if verdict.has_key(systemname):
-                      if os.path.isfile('./data/results/' + systemname + '.png'):
+                      if os.path.isfile('./data/results/' + systemname + str(recent) + '.png'):
+                        (counter, html)=generate_html(systemname, counter, html, cols, False)
+                      elif os.path.isfile('./data/results/' + systemname + '.png'):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                       else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
@@ -840,30 +827,46 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
       
     return (html, counter, cols)
     
-def gen_btc(html, counter, cols):
-    html = html + '<h1>BTC Paper</h1><br>'
+def gen_btc(html, counter, cols, recent):
     counter = 0
     cols=4
-    recent=-1
-    
     for systemname in btcv1systems:
         ticker = re.sub('stratBTC_','BTCUSD_', systemname.rstrip())
         
-        data = pd.read_csv('./data/from_IB/' + ticker + '.csv', index_col='Date')
-        if data.shape[0] > 2000:
+        data = pd.read_csv('./data/from_IB/' + ticker + '.csv')
+        data['Date']=pd.to_datetime(data['Date'])
+        data=data.set_index('Date').sort_index()    
+        if recent > 0 and data.shape[0] > 0: 
+                data=data.ix[data.index[-1] - datetime.timedelta(days=recent):]  
+                data=data.fillna(method='bfill')
+                
+        if data.shape[0] > 0:
             try:
-                get_v1signal(data.tail(2000),  ticker, systemname, True, True, './data/results/' + systemname + '.png')
+                get_v1signal(data,  ticker, systemname, True, True, './data/results/' + systemname + str(recent)+'.png')
                 plt.close()
                 
             except Exception as e:
                 logging.error("get_btc", exc_info=True)
-                            
+                                    
     
         try:
-            verdict[systemname]=systemname
+            verdict[systemname]=systemname+str(recent)
             exchange = re.sub('stratBTC_','BTCUSD_', systemname.rstrip())
             systemdict[systemname]=[exchange]
-            (html, counter, cols)=gen_paper(html, counter, cols, recent, systemname, '')
+            logging.info(systemname)
+            
+            fn='./data/results/btcv1_' + systemname + str(recent) + '.html'
+            html = html + '<li><a href="' + 'btcv1_' + systemname + str(recent) + '.html">'
+            html = html + systemname + '</a></li>'
+            counter=0
+            
+            headerhtml=get_html_header()
+            headerhtml = re.sub('Index', systemname, headerhtml.rstrip())
+            (body, counter, cols)=gen_paper('', counter, cols, recent, systemname, '')
+            footerhtml=get_html_footer()
+            write_html(fn, headerhtml, footerhtml, body)
+            
+            #(html, counter, cols)=gen_paper(html, counter, cols, recent, systemname, '')
             
             
         except Exception as e: 
@@ -1005,7 +1008,7 @@ def gen_file(filetype):
         (html, eqdata)=gen_eq_rank(btcv1systems, recent, html, 'btcv1')
         
         html = html + '<h1>BTC V1 Recent Signals</h1><br>'
-        recent = 2
+        recent = 3
         (html, eqdata)=gen_eq_rank(btcv1systems, recent, html, 'btcv1')
         
         headerhtml=get_html_header()
@@ -1013,14 +1016,12 @@ def gen_file(filetype):
         headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
         write_html(filename, headerhtml, footerhtml, html)
         
+        recent=3
+        gen_btc('', 0, cols, recent)  
         recent = -1
-        filename='./data/results/btcv1' + str(recent) + '.html'
-        html=''
-        (html, counter, cols)=gen_btc(html, counter, cols)  
-        headerhtml=get_html_header()
-        footerhtml=get_html_footer()
-        headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
-        write_html(filename, headerhtml, footerhtml, html)
+        gen_btc('', 0, cols, recent) 
+        
+        
         
     if filetype == 'sig':
     	logfile = open('/logs/create_signalPlots.log', 'a')

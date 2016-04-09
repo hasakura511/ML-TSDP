@@ -568,7 +568,7 @@ for ticker in livePairs:
     BSMdict={}
     for validationPeriod in validationPeriods:
         print '\nStarting optimization run for validation period of',validationPeriod
-        if feature_selection != 'None:
+        if feature_selection != 'None':
             print 'using feature selection', feature_selection, 'number features', nfeatures
         #DPScycle = 0
         endOfData = 0

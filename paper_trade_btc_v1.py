@@ -115,7 +115,7 @@ def trade_v1():
 
         			  #print ' Qty: ' + str(system['ibqty']) + ' c2 ' + str(system['c2qty'])
                         adj_size(model, system['System'],system['Name'],pricefeed,\
-                        str(system['c2id']),system['c2api'],float(system['c2qty']),system['c2sym'],system['c2type'], system['c2submit'], \
+                            str(system['c2id']),system['c2api'],float(system['c2qty']),system['c2sym'],system['c2type'], system['c2submit'], \
                             float(system['ibqty']),system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
                     time.sleep(10)
       except Exception as e:

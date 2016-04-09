@@ -57,11 +57,13 @@ def get_ib_portfolio(systemname, type, date):
 def get_ib_pos(systemname, symbol, currency, type, date):
     (account_data, portfolio_data)=get_ib_portfolio(systemname, type, date)
     portfolio_data=portfolio_data.reset_index()
+    sym_cur=symbol
     if type == 'CASH':
         portfolio_data['symbol']=portfolio_data['sym'] + portfolio_data['currency']
+        sym_cur=symbol + currency
     else:
         portfolio_data['symbol']=portfolio_data['sym']
-    sym_cur=symbol + currency
+    
     portfolio_data=portfolio_data.set_index('symbol')
     if sym_cur not in portfolio_data.index.values:
        return 0

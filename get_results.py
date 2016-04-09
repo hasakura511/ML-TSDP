@@ -733,7 +733,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     eqrank.to_csv('./data/results/' + type + '_eq_recent' + str(recent) +'.csv')
     return (html, eqrank)
 #Paper    
-def gen_paper(html, counter, cols, recent, systemname, interval='1min_'):
+def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
     html = html + '<center><h1>Paper - ' + systemname + '</h1></center><br>\n'
     counter=0
     cols=4

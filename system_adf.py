@@ -196,7 +196,7 @@ def proc_pair(sym1, sym2, param1, param2):
             logging.error("proc_pair", exc_info=True)
                 
 def proc_onBar(sym1, sym2, param1, param2):
-        logging.info("Processing Bar: " + sym1 + '_' + sym2)
+        
                 
         symPair=sym1+sym2
         
@@ -219,6 +219,7 @@ def proc_onBar(sym1, sym2, param1, param2):
                 lastDate[sym2]=bardate    
                 
             if lastDate[sym1] < timestamp and lastDate[sym2] < timestamp:
+                logging.info("Processing Bar: " + sym1 + '_' + sym2)
                 lastDate[sym1]=bardate
                 lastDate[sym2]=bardate
                 timestamp=bardate
@@ -261,7 +262,7 @@ def proc_signals(signals, params, symPair, timestamp):
     if signals and len(signals) >= 1:
         for signal in signals:
             (barSym, barSig, barCmt)=signal
-            
+            logging.info("Processing Signal: " + barSym + '_' + barCmt)
             if pos[symPair].has_key(barSym):
                 pos[symPair][barSym]=pos[symPair][barSym] + barSig
             else:

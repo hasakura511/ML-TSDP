@@ -117,9 +117,9 @@ if len(sys.argv)==1:
                     #'EURUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
-                    #'USDCHF',\
+                    'USDCHF',\
                     #'NZDUSD',
-                    'EURCHF',\
+                    #'EURCHF',\
                     #'EURGBP'\
                     ]
                     
@@ -188,13 +188,13 @@ for ticker in livePairs:
     #Model Parameters
     maxReadLines = 5000
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 90
+    validationSetLength = 30
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [9,15,45] # min is 2
+    validationPeriods = [3,6,10] # min is 2
     #validationStartPoint = None
     #signal_types = ['buyHold','sellHold']
-    #signal_types = ['gainAhead','buyHold','sellHold']
+    #signal_types = ['gainAhead','zigZag']
     signal_types = ['gainAhead','zigZag','buyHold','sellHold']
     #signal_types = ['zigZag']
     #signal_types = ['gainAhead']
@@ -202,42 +202,43 @@ for ticker in livePairs:
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
     wfSteps=[1,15,30]
-    wf_is_periods = [50,250]
+    wf_is_periods = [25,250]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
-    feature_selection = 'None' # OR Univariate
+    #feature_selection = 'None'
     #feature_selection = 'RFECV'
-    #feature_selection = 'Univariate'
+    feature_selection = 'Univariate'
     nfeatures = 10
     tox_adj_proportion = 0
     
     #feature Parameters
     RSILookback = 1.5
-    zScoreLookback = 10
-    ATRLookback = 5
+    DPOLookback = min(validationPeriods)
+    zScoreLookback = validationSetLength
+    ATRLookback = max(validationPeriods)
     beLongThreshold = 0.0
-    DPOLookback = 10
-    ACLookback = 12
-    CCLookback = 60
-    rStochLookback = 300
+    ACLookback = max(validationPeriods)
+    #cross-correlation
+    CCLookback = max(validationPeriods)
+    rStochLookback = validationSetLength
     rStochBars = max(wf_is_periods)
-    statsLookback = 100
-    ROCLookback = 600
+    statsLookback =  max(wf_is_periods)
+    ROCLookback =  max(wf_is_periods)
 
     #DPS parameters
     #windowLengths = [2] 
-    windowLengths = [5,20]
+    windowLengths = [2]
     maxLeverage = [2]
     PRT={}
     #ie goes to charts, car25 scoring (affected by commissions)
     PRT['initial_equity'] = 10000
     #fcst horizon(bars) for dps.  for training,  horizon is set to nrows.  for validation scoring nrows. 
-    PRT['horizon'] = 50
+    PRT['horizon'] = 20
     #safef set to dd95 where limit is met. e.g. for 50 bars, set saef to where 95% of the mc eq curves' maxDD <=0.01
-    PRT['DD95_limit'] = 0.015
+    PRT['DD95_limit'] = 0.01
     PRT['tailRiskPct'] = 95
     #this will be reset later
     PRT['maxLeverage'] = 2
@@ -399,6 +400,10 @@ for ticker in livePairs:
             
             closes = pd.concat([dataSet.Close, currencyPairsDict2[pair].Close],\
                                     axis=1, join='inner')
+            highs = pd.concat([dataSet.High, currencyPairsDict2[pair].High],\
+                            axis=1, join='inner')
+            lows = pd.concat([dataSet.Low, currencyPairsDict2[pair].Low],\
+                                    axis=1, join='inner')
             #check if there is enough data to create indicators
             if closes.shape[0] < maxlb:
                 message = 'Not enough data to create indicators: intersect of '\
@@ -410,6 +415,9 @@ for ticker in livePairs:
             dataSet['priceChange'+pair] = priceChange(closes.iloc[:,1])
             dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,rStochBars)
             dataSet['ROC_'+pair] = ROC(closes.iloc[:,1],ROCLookback)
+            dataSet['Pri_ATR_'+pair] = zScore(ATR(highs.iloc[:,1],lows.iloc[:,1],\
+                                                    closes.iloc[:,1],ATRLookback), zScoreLookback)
+            dataSet['Pri_DPO_'+pair] = DPO(closes.iloc[:,1],DPOLookback)
     
     print nrows-dataSet.shape[0], 'rows lost for', ticker
     
@@ -440,6 +448,7 @@ for ticker in livePairs:
     dataSet['priceChangeY2'] = dataSet['priceChange'].shift(2)
     dataSet['priceChangeY3'] = dataSet['priceChange'].shift(3)
     dataSet['priceChangeY4'] = dataSet['priceChange'].shift(4)
+    dataSet['Pri_DPO'] = DPO(dataSet.Close,DPOLookback)
     dataSet['mean60_ga'] = pd.rolling_mean(dataSet.priceChange,statsLookback)
     dataSet['std60_ga'] = pd.rolling_std(dataSet.priceChange,statsLookback)
 
@@ -559,6 +568,8 @@ for ticker in livePairs:
     BSMdict={}
     for validationPeriod in validationPeriods:
         print '\nStarting optimization run for validation period of',validationPeriod
+        if feature_selection != 'None':
+            print 'using feature selection', feature_selection, 'number features', nfeatures
         #DPScycle = 0
         endOfData = 0
         t_start_loc = max(wf_is_periods)+max(validationPeriods)-validationPeriod
@@ -663,27 +674,29 @@ for ticker in livePairs:
                     compareEquity(sstDictDF1_[runName],runName, initialEquity=PRT['initial_equity'])
                     
             if bestModelParams.signal[:2] != 'BH' and bestModelParams.signal[:2] != 'SH':
-                print  '\nBest signal found...', bestModelParams.signal
-                for m in models:
-                    if bestModelParams['params'] == str(m[1]):
-                        print  'Best model found...\n', m[1]
-                        bm = m[1]
-                print 'Feature selection: ', bestModelParams.FS
-                print 'Number of features: ', bestModelParams.cols
-                print 'WF In-Sample Period:', bestModelParams.wf_is_period
-                print 'WF Out-of-Sample Period:', bestModelParams.wf_step
-                print 'Long Memory: ', longMemory         
+                if verbose:
+                    print  '\nBest signal found...', bestModelParams.signal
+                    for m in models:
+                        if bestModelParams['params'] == str(m[1]):
+                            print  'Best model found...\n', m[1]
+                            bm = m[1]
+                    print 'Feature selection: ', bestModelParams.FS
+                    print 'Number of features: ', bestModelParams.cols
+                    print 'WF In-Sample Period:', bestModelParams.wf_is_period
+                    print 'WF Out-of-Sample Period:', bestModelParams.wf_step
+                    print 'Long Memory: ', longMemory         
                 DF1_BMrunName = ticker+'_'+barSizeSetting+'_'+bestModelParams.data_type+'_'+filterName+'_'  +\
                                     bestModelParams.model + '_i'+str(bestModelParams.wf_is_period)\
                                     +'_fcst'+str(bestModelParams.wf_step)+'_'+bestModelParams.signal
             else:
-                print  '\nBest signal found...', bestModelParams.signal       
-                print  'Model: ', bestModelParams.model       
+                if verbose:
+                    print  '\nBest signal found...', bestModelParams.signal       
+                    print  'Model: ', bestModelParams.model       
                 DF1_BMrunName = ticker+'_'+barSizeSetting+'_'+bestModelParams.data_type+'_'+filterName+'_'  +\
                                     bestModelParams.model + '_i'+str(bestModelParams.wf_is_period)\
                                     +'_fcst'+str(bestModelParams.wf_step)+'_'+bestModelParams.signal
                                     
-            if showValidationCharts:
+            if showBestCharts:
                 compareEquity(sstDictDF1_[DF1_BMrunName],'Best Optimization  '+DF1_BMrunName,\
                                         initialEquity=PRT['initial_equity'])
             elif runDPS == False:
@@ -739,7 +752,7 @@ for ticker in livePairs:
                 v3tag='Best Optimization '    
                 dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                             endDate,'both', DF1_BMrunName, yscale='linear',\
-                                                            ticker=ticker,displayCharts=showValidationCharts,\
+                                                            ticker=ticker,displayCharts=showBestCharts,\
                                                             equityStatsSavePath=equityStatsSavePath, verbose=verbose,
                                                             v3tag=v3tag, returnNoDPS=returnNoDPS)
                 bestBothDPS.index.name = 'dates'
@@ -761,7 +774,7 @@ for ticker in livePairs:
                         v3tag=version+'_'+ticker+'_OOS'    
                         dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                                     endDate,'both', DF1_BMrunName, yscale='linear',\
-                                                                    ticker=ticker,displayCharts=showValidationCharts,\
+                                                                    ticker=ticker,displayCharts=showBestCharts,\
                                                                     equityStatsSavePath=equityStatsSavePath, verbose=verbose,\
                                                                     v3tag=v3tag, returnNoDPS=True, savePath=chartSavePath,\
                                                                     )
@@ -827,10 +840,10 @@ for ticker in livePairs:
                 metaData['v_end']=validationFinalYear
                 nextRunName = 'Next'+str(validationPeriod)+'_'+DF1_BMrunName
                 m = (bestModelParams.model,eval(bestModelParams.params))
-                print 'using', m
+                #print 'using', m
                 model_metrics, sstDictDF1_[nextRunName], savedModel = wf_classify_validate2(unfilteredData, dataSet, m, model_metrics,\
                                                     metaData, showPDFCDF=showPDFCDF, verbose=verbose)
-                if showValidationCharts:
+                if showBestCharts:
                     compareEquity(sstDictDF1_[nextRunName],nextRunName,initialEquity=PRT['initial_equity'])
                     
                 #save noDPS validation Curve
@@ -906,7 +919,7 @@ for ticker in livePairs:
                         v3tag='Next Period '
                         dpsRunName, bestBothDPS = findBestDPS(DPS_both, PRT, sst_bestModel, startDate,\
                                                                     endDate,'both', nextRunName, yscale='linear',\
-                                                                    ticker=ticker,displayCharts=showValidationCharts,\
+                                                                    ticker=ticker,displayCharts=showBestCharts,\
                                                                     equityStatsSavePath=equityStatsSavePath, verbose=verbose,
                                                                     v3tag=v3tag, returnNoDPS=returnNoDPS)
                         bestBothDPS.index.name = 'dates'
@@ -950,7 +963,8 @@ for ticker in livePairs:
         CAR25_oos = CAR25_df_bars(vCurve,validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].signals,\
                                             validationDict_noDPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int),\
                                             unfilteredData.Close, DD95_limit =PRT['DD95_limit'],barSize=barSizeSetting,\
-                                            number_forecasts=50, startSafef=max(maxLeverage), minSafef=1,initial_equity=PRT['initial_equity'])
+                                            number_forecasts=50, startSafef=max(maxLeverage), minSafef=PRT['minSafef'],\
+                                            initial_equity=PRT['initial_equity'])
         #model = [validationDict_noDPS[validationPeriod].iloc[-1].system.split('_')[5],\
         #                [m[1] for m in models if m[0] ==validationDict_noDPS[validationPeriod].iloc[-1].system.split('_')[5]][0]]
         #metaData['model'] = model[0]
@@ -995,7 +1009,8 @@ for ticker in livePairs:
             CAR25_oos = CAR25_df_bars(vCurve,validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].signals,\
                                                 validationDict_DPS[validationPeriod].ix[vStartDate:vEndDate].prior_index.values.astype(int),\
                                                 unfilteredData.Close, DD95_limit =PRT['DD95_limit'],barSize=barSizeSetting,\
-                                                number_forecasts=50, startSafef=max(maxLeverage), minSafef=0,initial_equity=PRT['initial_equity'])
+                                                number_forecasts=50, startSafef=max(maxLeverage), minSafef=PRT['minSafef'],\
+                                                initial_equity=PRT['initial_equity'])
             #model = [validationDict_DPS[validationPeriod].iloc[-1].system.split('_')[5],\
             #               [m[1] for m in models if m[0] ==validationDict_DPS[validationPeriod].iloc[-1].system.split('_')[5]][0]]
             #metaData['validationPeriod'] = validationPeriod

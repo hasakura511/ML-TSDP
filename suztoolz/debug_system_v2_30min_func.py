@@ -317,19 +317,24 @@ def runv2(runData, dataSet=pd.DataFrame()):
                 
                 closes = pd.concat([dataSet.Close, currencyPairsDict2[pair].Close],\
                                         axis=1, join='inner')
-                                        
+                highs = pd.concat([dataSet.High, currencyPairsDict2[pair].High],\
+                                axis=1, join='inner')
+                lows = pd.concat([dataSet.Low, currencyPairsDict2[pair].Low],\
+                                        axis=1, join='inner')
                 #check if there is enough data to create indicators
                 if closes.shape[0] < maxlb:
-                    logging.info( 'Skipping '+pair+' features. Not enough data to create indicators: intersect of '\
+                    message = 'Not enough data to create indicators: intersect of '\
                         +ticker+' and '+pair +' of '+str(closes.shape[0])+\
-                        ' is less than max lookback of '+str(maxlb))
-                    #offlineMode(ticker, message, signalPath, version, version_)
-                else:                  
-                    dataSet['corr'+pair] = pd.rolling_corr(closes.iloc[:,0],\
-                                                    closes.iloc[:,1], window=CCLookback)
-                    dataSet['priceChange'+pair] = priceChange(closes.iloc[:,1])
-                    dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,rStochBars)
-                    dataSet['ROC_'+pair] = ROC(closes.iloc[:,1],ROCLookback)
+                        ' is less than max lookback of '+str(maxlb)
+                    offlineMode(ticker, message, signalPath, version, version_)
+                dataSet['corr'+pair] = pd.rolling_corr(closes.iloc[:,0],\
+                                                closes.iloc[:,1], window=CCLookback)
+                dataSet['priceChange'+pair] = priceChange(closes.iloc[:,1])
+                dataSet['Pri_rStoch'+pair] = roofingFilter(closes.iloc[:,1],rStochLookback,rStochBars)
+                dataSet['ROC_'+pair] = ROC(closes.iloc[:,1],ROCLookback)
+                dataSet['Pri_ATR_'+pair] = zScore(ATR(highs.iloc[:,1],lows.iloc[:,1],\
+                                                        closes.iloc[:,1],ATRLookback), zScoreLookback)
+                dataSet['Pri_DPO_'+pair] = DPO(closes.iloc[:,1],DPOLookback)
         
         print nrows-dataSet.shape[0], 'rows lost for', ticker
         
@@ -360,6 +365,7 @@ def runv2(runData, dataSet=pd.DataFrame()):
         dataSet['priceChangeY2'] = dataSet['priceChange'].shift(2)
         dataSet['priceChangeY3'] = dataSet['priceChange'].shift(3)
         dataSet['priceChangeY4'] = dataSet['priceChange'].shift(4)
+        dataSet['Pri_DPO'] = DPO(dataSet.Close,DPOLookback)
         dataSet['mean60_ga'] = pd.rolling_mean(dataSet.priceChange,statsLookback)
         dataSet['std60_ga'] = pd.rolling_std(dataSet.priceChange,statsLookback)
 

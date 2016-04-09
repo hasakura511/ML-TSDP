@@ -929,16 +929,16 @@ def directional_scoring(model_metrics, sample1, sample2=None):
     model_score_s1['CAR50mm'] =minmax_scale(robust_scale(model_score_s1.CAR50.reshape(-1, 1)))
     model_score_s1['CAR75mm'] =minmax_scale(robust_scale(model_score_s1.CAR75.reshape(-1, 1)))
     #model_score_s1['DD100mm'] =-minmax_scale(robust_scale(model_score_s1.DD100.reshape(-1, 1)))
-    #model_score_s1['SOR25mm'] =minmax_scale(robust_scale(model_score_s1.SOR25.reshape(-1, 1)))
+    model_score_s1['SOR25mm'] =minmax_scale(robust_scale(model_score_s1.SOR25.reshape(-1, 1)))
     model_score_s1['TPYmm'] =-minmax_scale(robust_scale(model_score_s1.TPY.reshape(-1, 1)))
     #model_score_s1['rowsmm'] = minmax_scale(robust_scale(model_score_s1.rows.reshape(-1, 1)))   
     model_score_s1['scoremm'] =    model_score_s1.CAR25mm+\
                                     model_score_s1.CAR50mm+model_score_s1.CAR75mm+\
                                     model_score_s1.fn_magmm+model_score_s1.fp_magmm+\
-                                    model_score_s1.TPYmm
+                                    model_score_s1.TPYmm+model_score_s1.SOR25mm
                                     #model_score_s1.DD100mm
                                     #model_score_s1.accmm+
-                                    #+model_score_s1.SOR25mm+
+                                    
     if sample2 is not None:
         #sample2                        
         model_score_s2 = model_metrics.loc[model_metrics['sample'] == sample2].reset_index()

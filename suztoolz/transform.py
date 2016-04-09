@@ -22,6 +22,8 @@ from numpy.random import randn
 from statsmodels.sandbox.stats.runs import runstest_1samp
 from scipy import stats
 from sklearn.externals import joblib
+import matplotlib.pyplot as plt
+import matplotlib.ticker as tick
 
 def saveParams(start_time, dataSet, bestModelParams, bestParamsPath, modelSavePath,ticker, version, barSizeSetting,BSMdict):
     timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)
@@ -199,14 +201,35 @@ class zigzag(object):
                 mdd = dd
         return mdd
         
-    def plot_pivots(self, l=2, w=2):
-        plt.figure(figsize=(w,l))
-        plt.xlim(0, len(self.prices))
-        plt.ylim(self.prices.min()*0.99, self.prices.max()*1.01)
-        plt.plot(np.arange(len(self.prices)), self.prices, 'k:', alpha=0.5)
-        plt.plot(np.arange(len(self.prices))[self.pivots != 0], self.prices[self.pivots != 0], 'k-')
-        plt.scatter(np.arange(len(self.prices))[self.pivots == 1], self.prices[self.pivots == 1], color='g')
-        plt.scatter(np.arange(len(self.prices))[self.pivots == -1], self.prices[self.pivots == -1], color='r')
+    def plot_pivots(self, l=2, w=2, mp=None, mv=None):
+    
+        def format_date(x, pos=None):
+            thisind = np.clip(int(x + 0.5), 0, self.prices.shape[0] - 1)
+            return self.prices.index[thisind].strftime("%Y-%m-%d %H:%M")
+            
+        fig = plt.figure(figsize=(w,l))
+        ax = fig.add_subplot(111, xlim=(0, len(self.prices)), ylim=(self.prices.min()*0.99, self.prices.max()*1.01))
+        #ax.plot(np.arange(len(self.prices)), self.prices, 'k:', alpha=0.5)
+        #ax.plot(np.arange(len(self.prices))[self.pivots != 0], self.prices[self.pivots != 0], 'k-')
+        #ax.scatter(np.arange(len(self.prices))[self.pivots == 1], self.prices[self.pivots == 1], color='g')
+        #ax.scatter(np.arange(len(self.prices))[self.pivots == -1], self.prices[self.pivots == -1], color='r')
+        ax.plot(np.arange(len(self.prices)), self.prices, 'k:', alpha=0.5)
+        ax.plot(np.arange(len(self.prices))[self.pivots != 0], self.prices[self.pivots != 0], 'k-')
+        ax.scatter(np.arange(len(self.prices))[self.pivots == 1], self.prices[self.pivots == 1], color='g')
+        ax.scatter(np.arange(len(self.prices))[self.pivots == -1], self.prices[self.pivots == -1], color='r')
+        ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+        fig.autofmt_xdate()
+        if mp is not None and mv is not None:
+            ax.annotate('major peak', mp,
+            xytext=(-20, 20), textcoords='offset points',
+            arrowprops=dict(facecolor='green', shrink=0.05),
+            )
+            ax.annotate('major valley', mv,
+            xytext=(20, -20), textcoords='offset points',
+            arrowprops=dict(facecolor='red', shrink=0.05),
+            )
+        plt.show()
+        plt.close()
     
     def plot_hist(self):
         hist, bins = np.histogram(compute_segment_returns(self.prices,self.pivots), bins=50)

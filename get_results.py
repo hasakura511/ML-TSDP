@@ -282,26 +282,27 @@ def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
         dataSet=dataSet.set_index('Idx').sort_index()    
         if recent > 0: 
                 dataSet=dataSet.ix[dataSet.index[-1] - datetime.timedelta(days=recent):] 
-        #dataSet=dataSet.sort_values(by=[dateCol])
-        if min(dataSet['balance']) < 0:
-            dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))
-        if min(dataSet['purebalance']) < 0:
-            dataSet['purebalance'] = dataSet['purebalance'] +max(abs(max(dataSet['purebalance'])), abs(min(dataSet['purebalance'])))
-        if min(dataSet['mark_to_mkt']) < 0: 
-            dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
-        if min(dataSet['pure_mark_to_mkt']) < 0:
-            dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
+        if dataSet.shape[0] > 0:
+            #dataSet=dataSet.sort_values(by=[dateCol])
+            if min(dataSet['balance']) < 0:
+                dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))
+            if min(dataSet['purebalance']) < 0:
+                dataSet['purebalance'] = dataSet['purebalance'] +max(abs(max(dataSet['purebalance'])), abs(min(dataSet['purebalance'])))
+            if min(dataSet['mark_to_mkt']) < 0: 
+                dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
+            if min(dataSet['pure_mark_to_mkt']) < 0:
+                dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
+            
+            dataSet['equitycurve'] = (1+((dataSet['balance'].shift(-1) - dataSet['balance']) / dataSet['balance'])) #.pct_change()
+            dataSet['equitycurve'] = dataSet['equitycurve'].cumprod()
+            dataSet['PurePLcurve'] = (1+((dataSet['purebalance'].shift(-1) - dataSet['purebalance']) / dataSet['purebalance'])) #.pct_change()
+            dataSet['PurePLcurve'] = dataSet['PurePLcurve'].cumprod()
+            dataSet['mark_to_mkt'] = (1+((dataSet['mark_to_mkt'].shift(-1) - dataSet['mark_to_mkt']) / dataSet['mark_to_mkt'])) #.pct_change()
+            dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].cumprod()
+            dataSet['pure_mark_to_mkt'] = (1+((dataSet['pure_mark_to_mkt'].shift(-1) - dataSet['pure_mark_to_mkt']) / dataSet['pure_mark_to_mkt'])) #.pct_change()
+            dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].cumprod()
         
-        dataSet['equitycurve'] = (1+((dataSet['balance'].shift(-1) - dataSet['balance']) / dataSet['balance'])) #.pct_change()
-        dataSet['equitycurve'] = dataSet['equitycurve'].cumprod()
-        dataSet['PurePLcurve'] = (1+((dataSet['purebalance'].shift(-1) - dataSet['purebalance']) / dataSet['purebalance'])) #.pct_change()
-        dataSet['PurePLcurve'] = dataSet['PurePLcurve'].cumprod()
-        dataSet['mark_to_mkt'] = (1+((dataSet['mark_to_mkt'].shift(-1) - dataSet['mark_to_mkt']) / dataSet['mark_to_mkt'])) #.pct_change()
-        dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].cumprod()
-        dataSet['pure_mark_to_mkt'] = (1+((dataSet['pure_mark_to_mkt'].shift(-1) - dataSet['pure_mark_to_mkt']) / dataSet['pure_mark_to_mkt'])) #.pct_change()
-        dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].cumprod()
-        
-        dataSet=dataSet.fillna(method='bfill')
+            dataSet=dataSet.fillna(method='bfill')
         return dataSet
     else:
         dataSet=pd.DataFrame([[initialEquity,initialEquity,'2016-01-01']], columns=['equitycurve','PurePLcurve',dateCol])
@@ -309,6 +310,7 @@ def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
                 
 def save_plot(colnames, filename, title, ylabel, SST, comments=''):
     SST=SST.fillna(method='pad')
+
     fig, ax = plt.subplots()
     for col in colnames:
         if SST.shape[0] > 0:
@@ -326,18 +328,20 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
     #else:
     #    barSize = '1 min'
         
-    myFmt = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
-    ax.xaxis.set_major_formatter(myFmt)
-    legend = ax.legend(loc='upper left', shadow=True)
+  
     
     # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
-    frame = legend.get_frame()
-    frame.set_facecolor('0.90')
+    if SST.shape[0] > 0:
+        myFmt = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
+        ax.xaxis.set_major_formatter(myFmt)
+        legend = ax.legend(loc='upper left', shadow=True)
+        #frame = legend.get_frame()
+        #frame.set_facecolor('0.90')
     
-    # Set the fontsize
-    for label in legend.get_texts():
-        label.set_fontsize(8)
-        label.set_fontweight('bold')
+        # Set the fontsize
+        for label in legend.get_texts():
+            label.set_fontsize(8)
+            label.set_fontweight('bold')
         
     # rotate and align the tick labels so they look better
 
@@ -352,10 +356,12 @@ def save_plot(colnames, filename, title, ylabel, SST, comments=''):
     #xticks[1].label1.set_visible(False)
 
     fig.autofmt_xdate()
-    ax.annotate(str(SST.index[-1]), xy=(0.95, -0.02), ha='left', va='top', xycoords='axes fraction', fontsize=10)
+    if SST.shape[0] > 0:
+        ax.annotate(str(SST.index[-1]), xy=(0.95, -0.02), ha='left', va='top', xycoords='axes fraction', fontsize=10)
+        ax.set_xlim(SST.index[0], SST.index[-1])
     ax.annotate(comments, xy=(0.02, 0.7), ha='left', va='top', xycoords='axes fraction', fontsize=10)
     #plt.axis([0,1.5,0,2.0])
-    ax.set_xlim(SST.index[0], SST.index[-1])
+    
     #ax.set_xlabel(str(SST.index[-1]))
 
     plt.title(title)
@@ -727,8 +733,8 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     eqrank.to_csv('./data/results/' + type + '_eq_recent' + str(recent) +'.csv')
     return (html, eqrank)
 #Paper    
-def gen_paper(html, counter, cols, recent, systemname):
-    html = html + '<h1>Paper - ' + systemname + '</h1><br>'
+def gen_paper(html, counter, cols, recent, systemname, interval='1min_'):
+    html = html + '<center><h1>Paper - ' + systemname + '</h1></center><br>'
     counter=0
     cols=4
     
@@ -760,11 +766,12 @@ def gen_paper(html, counter, cols, recent, systemname):
                 data=get_data(systemname, 'paper', 'c2', 'trades', 'closedWhen', initCap)
                 data.to_csv('./data/results/paper_' + systemname + '_' + 'c2' + '_PL' + str(recent) + 'PL.csv')                
                 (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'closedWhen', 'paper_' + systemname + '_c2_PL'+str(recent), systemname + ' C2 PL', 'PL', counter, html, cols, recent)
-            
-                data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                (counter, html)=generate_plots(data, 'paper_' + systemname + '_c2_Signals'+str(recent), systemname + ' C2 Signals', 'equity', counter, html, cols, recent)
-            
-                data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+                
+                if sigdict.has_key(systemname):
+                    data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+                    (counter, html)=generate_plots(data, 'paper_' + systemname + '_c2_Signals'+str(recent), systemname + ' C2 Signals', 'equity', counter, html, cols, recent)
+                
+                data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, interval)
                 (counter, html)=generate_plots(data, 'paper_' + systemname + '_c2_Close'+str(recent), systemname + " Close Price", 'Close', counter, html, cols, recent)        
                 html = html + '</center></table><br>'
             except Exception as e:
@@ -800,10 +807,11 @@ def gen_paper(html, counter, cols, recent, systemname):
                   data.to_csv('./data/results/paper_' + systemname + '_' + 'ib' + '_PL' + str(recent) + 'PL.csv') 
                   (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + '_ib_PL'+str(recent), systemname + 'IB PL', 'PL', counter, html, cols, recent)
                   
-                  data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-                  (counter, html)=generate_plots(data, 'paper_' + systemname + '_ib_Signals'+str(recent), systemname + ' IB Signals', 'equity', counter, html, cols, recent)
-                  
-                  data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
+                  if sigdict.has_key(systemname):
+                      data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
+                      (counter, html)=generate_plots(data, 'paper_' + systemname + '_ib_Signals'+str(recent), systemname + ' IB Signals', 'equity', counter, html, cols, recent)
+                      
+                  data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, interval)
                   (counter, html)=generate_plots(data, 'paper_' + systemname + '_ib_Close'+str(recent), systemname + " Close Price", 'Close', counter, html, cols, recent)
                   html = html + '</table></center><br>'
                   counter=0
@@ -817,58 +825,33 @@ def gen_btc(html, counter, cols):
     html = html + '<h1>BTC Paper</h1><br><table>'
     counter = 0
     cols=4
-    for system in btcv1systems:
-        try:
-            systemname='c2_' + system
-            systemname = re.sub('c2_','', systemname.rstrip())
-            systemname = re.sub('_trades.csv','', systemname.rstrip())
-            btcname=re.sub('stratBTC','BTCUSD',systemname.rstrip())
-            
-            c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
-            (counter, html)=generate_mult_plot(c2data,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'c2', systemname + " C2 ", 'Equity', counter, html, cols)
+    recent=-1
+    
+    for systemname in btcv1systems:
+        ticker = re.sub('stratBTC_','BTCUSD_', systemname.rstrip())
         
-            data=get_data(systemname, 'paper', 'c2', 'trades', 'closedWhen', initCap)
-            (counter, html)=generate_mult_plot(data,['PL','PurePL'], 'closedWhen', 'paper_' + systemname + 'c2' + systemname+'PL', 'paper_' + systemname + 'c2' + systemname + ' PL', 'PL', counter, html, cols)
-
-            (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
-            (counter, html)=generate_html('OHLC_paper_' + btcname+'Close', counter, html, cols)
-            
+        data = pd.read_csv('./data/from_IB/' + ticker + '.csv', index_col='Date')
+        if data.shape[0] > 2000:
+            try:
+                get_v1signal(data.tail(2000),  ticker, systemname, True, True, './data/results/' + systemname + '.png')
+                plt.close()
                 
-            systemname='ib_' + system
-            systemname = re.sub('ib_','', systemname.rstrip())
-            systemname = re.sub('_trades.csv','', systemname.rstrip())
+            except Exception as e:
+                logging.error("get_btc", exc_info=True)
+                            
+    
+        try:
+            verdict[systemname]=systemname
+            exchange = re.sub('stratBTC_','BTCUSD_', systemname.rstrip())
+            systemdict[systemname]=[exchange]
+            (html, counter, cols)=gen_paper(html, counter, cols, recent, systemname, '')
             
-            ibdata=generate_paper_ib_plot(systemname, 'Date', initCap)
-            (counter, html)=generate_mult_plot(ibdata,['equitycurve','PurePLcurve'], 'Date', 'paper_' + systemname + 'ib', systemname + " IB ", 'Equity', counter, html, cols)
-        
-            data=get_data(systemname, 'paper', 'ib', 'trades', 'times', initCap)
-            (counter, html)=generate_mult_plot(data,['realized_PnL','PurePL'], 'times', 'paper_' + systemname + 'ib' + systemname+'PL', 'paper_' + systemname + 'ib' + systemname + ' PL', 'PL', counter, html, cols)
-            
-            (counter, html)=generate_html('TWR_' + btcname, counter, html, cols)
-            (counter, html)=generate_html('OHLC_paper_' + btcname+'Close', counter, html, cols)
             
         except Exception as e: 
          counter = 0
          logging.error("get_btc", exc_info=True)
-    dataPath='./data/from_IB/'
-    files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-    btcsearch=re.compile('BTCUSD')
+         
     
-    for file in files:
-            if re.search(btcsearch, file):
-                    systemname=file
-                    systemname = re.sub(dataPath + 'BTCUSD_','', systemname.rstrip())
-                    systemname = re.sub('.csv','', systemname.rstrip())
-                    data = pd.read_csv(dataPath + file, index_col='Date')
-                    if data.shape[0] > 2000:
-                        try:
-                            get_v1signal(data.tail(2000), 'BTCUSD_' + systemname, systemname, True, True, './data/results/TWR_' + systemname + '.png')
-                            plt.close()
-                            data=data.reset_index()
-                            generate_mult_plot(data, ['Close'], 'Date', 'OHLC_paper_' + systemname, 'OHLC_paper_' + systemname, 'Close', counter, html)
-                            plt.close()
-                        except Exception as e:
-                            logging.error("get_btc", exc_info=True)
     html = html + '</table>'
     return (html, counter, cols)      
 

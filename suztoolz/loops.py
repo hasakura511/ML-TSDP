@@ -505,7 +505,7 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
             if len(mmData_v.index[-wfStep:].intersection(train_index)) == 0:
                 #print 'training', X_train.shape
                 if feature_selection != 'None':
-                    print 'using feature selection',feature_selection
+                    #print 'using feature selection',feature_selection
                     if feature_selection == 'RFECV':
                         #Recursive feature elimination with cross-validation: 
                         #A recursive feature elimination example with automatic tuning of the
@@ -514,8 +514,8 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
                         rfe.fit(X_train, y_train)
                         #featureRank = [ feature_names[i] for i in rfe.ranking_-1]
                         featureRank = [ feature_names[i] for i,b in enumerate(rfe.support_) if b==True]
-                        print 'Top %i RFECV features' % len(featureRank)
-                        print featureRank    
+                        #print 'Top %i RFECV features' % len(featureRank)
+                        #print featureRank    
                         metaData['featureRank'] = str(featureRank)
                         X_train = rfe.transform(X_train)
                         X_test = rfe.transform(X_test)
@@ -535,7 +535,8 @@ def wf_classify_validate2(unfilteredData, dataSet, m, model_metrics, \
 
                 #  fit the model to the in-sample data
                 m[1].fit(X_train, y_train)
-                #print X_train.shape,
+                if verbose:
+                    print m[0], signal, X_train.shape,
 
                 #trained_models[m[0]] = pickle.dumps(m[1])
                             

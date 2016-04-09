@@ -234,6 +234,7 @@ def proc_onBar(sym1, sym2, param1, param2):
                 
 def get_entryState():
     global pairs
+    global pos
     
     for [file, sym, param] in pairs:
         try:
@@ -248,6 +249,10 @@ def get_entryState():
                 exitState=jsondata['Exit']
                 symPair=jsondata['symPair']
                 logging.info('SymPair: ' + symPair + ' System: ' + system + ' Entry: ' + str(entryState) + ' Exit: ' + str(exitState))
+                if not pos.has_key(symPair):
+                    pos[symPair]=dict()
+                pos[symPair][sym]=pos['signals'] * pos['safef']
+                print "Initializing " + sym + ' with position: ' + str(pos[symPair][sym])                
                 astrat.updateEntry(symPair, entryState, exitState)
         except Exception as e:
             logging.error("get_entryState", exc_info=True)

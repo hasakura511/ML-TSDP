@@ -24,8 +24,10 @@ sentExitOrder = dict()
 crossAbove=dict()
 crossBelow=dict()
 intSMALength = 30
-dblUpperThreshold = 1
-dblLowerThreshold = 1
+
+dblUpperThreshold = 1;
+dblLowerThreshold = 0;
+
 instPair1Factor=1
 instPair2Factor=1
 dblQty=1

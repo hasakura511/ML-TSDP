@@ -42,11 +42,11 @@ from seitoolz.paper import adj_size
 from time import gmtime, strftime, localtime, sleep
 import logging
 import threading
-import adfapi.s105 as astrat
+import adfapi.s106 as astrat
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
 import seitoolz.bars as bars
-
+import re
 logging.basicConfig(filename='/logs/paper_adf.log',level=logging.DEBUG)
 
 systemdata=pd.read_csv('./data/systems/system.csv')
@@ -118,7 +118,7 @@ pairs=[]
 if len(sys.argv) > 1 and sys.argv[1] == 's105JPY':
     pairs=[
            ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [100000,'JPY','IDEALPRO', 's105_AUDJPY']],
-           ['./data/from_IB/1 min_NZDJPY.csv', 'NZDJPY', [100000,'JPY','IDEALPRO', 's105_NZDJPY']],
+           #['./data/from_IB/1 min_NZDJPY.csv', 'NZDJPY', [100000,'JPY','IDEALPRO', 's105_NZDJPY']],
            ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO', 's105_EURJPY']],
            ['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [100000,'JPY','IDEALPRO', 's105_USDJPY']],
            ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO', 's105_CADJPY']],
@@ -126,15 +126,15 @@ if len(sys.argv) > 1 and sys.argv[1] == 's105JPY':
            ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [100000,'JPY','IDEALPRO', 's105_GBPJPY']]]
 elif len(sys.argv) > 1 and sys.argv[1] == 's105JPY2':
     pairs=[
-           ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO', 's105_EURJPY']],
+           ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [20000,'JPY','IDEALPRO', 's105_EURJPY']],
            #['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [10,'JPY','IDEALPRO', 's105_USDJPY']],
            #['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO', 's105_CADJPY']],
            #['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO', 's105_CHFJPY']],
-           ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [100000,'JPY','IDEALPRO', 's105_GBPJPY']]]
+           ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [20000,'JPY','IDEALPRO', 's105_GBPJPY']]]
 
 else:
-    pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
-           ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
+    pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [20, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
+           ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [20, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
 
 sysname='ADF'
 
@@ -207,8 +207,14 @@ def proc_pair(sysname, sym1, sym2, param1, param2):
                             
                         ask=float(asks[barSym])
                         bid=float(bids[barSym])
-                        secType='CASH'
+                        
                         sym=barSym
+                        secType='CASH'
+                        ibsym=sym[0:3]
+                        if re.search(r'BTC',barSym):
+                            secType='BITCOIN'
+                            ibsym=sym
+                        
                         pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
                         if ask > 0 and bid > 0:
                            
@@ -216,7 +222,6 @@ def proc_pair(sysname, sym1, sym2, param1, param2):
                                 int(timestamp)
                             ).strftime("%Y%m%d %H:%M:%S EST")
                             print 'Signal: ' + barSym + '[' + str(barSig) + ']@' + str(ask)
-                            ibsym=sym[0:3]
                             adj_size(model, barSym, sysname, pricefeed,   \
                                 sysname,sysname,mult,barSym, secType, True, \
                                     mult, ibsym,currency,exchange, secType, True, date)

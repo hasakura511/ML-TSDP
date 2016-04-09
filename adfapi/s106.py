@@ -9,7 +9,7 @@ from numpy import zeros, ones, flipud, log
 from numpy.linalg import inv, eig, cholesky as chol
 import talib as ta
 import seitoolz.portfolio as portfolio
-
+import logging
 from statsmodels.regression.linear_model import OLS
 
 ##### Do not change this function definition ####
@@ -57,11 +57,13 @@ def procBar(bar1, bar2, pos, trade):
     global crossAbove
     global crossBelow
     
+    
     if bar1['Close'] > 0 and bar2['Close'] > 0:
         xd = bar1['Close'] * instPair1Factor
         yd = bar2['Close'] * instPair2Factor
         sym1=bar1['Symbol']
         sym2=bar2['Symbol']
+        logging.info("s106:procBar:" + sym1 + "," + sym2)
         if not pairSeries.has_key(sym1):
             pairSeries[sym1]=list()
         if not pairSeries.has_key(sym2):

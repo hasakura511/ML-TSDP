@@ -43,6 +43,7 @@ from time import gmtime, strftime, localtime, sleep
 import logging
 import threading
 import adfapi.s105 as astrat
+import adfapi.s106 as s106
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
 import seitoolz.bars as bars
@@ -152,6 +153,52 @@ elif len(sys.argv) > 1 and sys.argv[1] == 's105_USDJPY_GBPJPY':
            #['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [10,'JPY','IDEALPRO', 's105_CC_CHFJPY']]
            ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [10,'JPY','IDEALPRO', 's105_UG_GBPJPY']]
            ]
+elif len(sys.argv) > 1 and sys.argv[1] == 's106_EURJPY_CADJPY':
+    astrat=s106
+    pairs=[
+           ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [10,'JPY','IDEALPRO', 's106_EC_EURJPY']],
+           ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [10,'JPY','IDEALPRO', 's106_EC_CADJPY']]
+           ]
+elif len(sys.argv) > 1 and sys.argv[1] == 's106_AUDJPY_CHFJPY':
+    astrat=s106
+    pairs=[
+             ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [10,'JPY','IDEALPRO', 's106_AC_AUDJPY']],
+             ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [10,'JPY','IDEALPRO', 's106_AC_CHFJPY']]
+           ]
+elif len(sys.argv) > 1 and sys.argv[1] == 's106_EURJPY_GBPJPY':
+    astrat=s106
+    pairs=[
+           ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [10,'JPY','IDEALPRO', 's106_EG_EURJPY']],
+           ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [10,'JPY','IDEALPRO', 's106_EG_GBPJPY']]
+           ]
+elif len(sys.argv) > 1 and sys.argv[1] == 's106_EURJPY_CHFJPY':
+    astrat=s106
+    pairs=[
+           ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [10,'JPY','IDEALPRO', 's106_ECH_EURJPY']],
+           ['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [10,'JPY','IDEALPRO', 's106_ECH_CHFJPY']]
+           ]
+elif len(sys.argv) > 1 and sys.argv[1] == 's106_CADJPY_GBPJPY':
+    astrat=s106
+    pairs=[
+           ['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [10,'JPY','IDEALPRO', 's106_CGB_CADJPY']],
+           ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [10,'JPY','IDEALPRO', 's106_CGB_GBPJPY']]
+           ]
+elif len(sys.argv) > 1 and sys.argv[1] == 's106_AUDJPY_GBPJPY':
+    astrat=s106
+    pairs=[
+           ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [10,'JPY','IDEALPRO', 's106_AG_AUDJPY']],
+           ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [10,'JPY','IDEALPRO', 's106_AG_GBPJPY']]
+           ]
+elif len(sys.argv) > 1 and sys.argv[1] == 's106_AUDJPY_EURJPY':
+    astrat=s106
+    pairs=[
+           ['./data/from_IB/1 min_AUDJPY.csv', 'AUDJPY', [10,'JPY','IDEALPRO', 's106_AE_AUDJPY']],
+           ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [10,'JPY','IDEALPRO', 's106_AE_EURJPY']],           
+	   ]
+elif len(sys.argv) > 1 and sys.argv[1] == 's106_stratADF':
+    astrat=s106
+    pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's106_bitfinexUSD']],
+           ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's106_bitstampUSD']]]
 elif len(sys.argv) > 1 and sys.argv[1] == 'stratADF':
     pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
            ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]

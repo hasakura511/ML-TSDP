@@ -58,7 +58,7 @@ import logging
 
 logging.basicConfig(filename='/logs/get_results.log',level=logging.DEBUG)
 
-initCap=1
+initCap=100000
 
 def generate_sigplots(counter, html, cols):
     global vdict

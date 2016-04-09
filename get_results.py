@@ -734,7 +734,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     return (html, eqrank)
 #Paper    
 def gen_paper(html, counter, cols, recent, systemname, interval='1min_'):
-    html = html + '<center><h1>Paper - ' + systemname + '</h1></center><br>'
+    html = html + '<center><h1>Paper - ' + systemname + '</h1></center><br>\n'
     counter=0
     cols=4
     
@@ -756,7 +756,7 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1min_'):
                 twdata.to_csv('./data/results/paper_' + systemname + '_' + 'c2' + '_TWR' + str(recent) + 'TWR.csv')
                 (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_TWR'+str(recent), systemname + " C2 TWR", 'TWR', counter, html, cols, recent)
             
-                html = html + '</table></center><br><center><table>'
+                html = html + '</table></center>\n<br><center><table>'
                 counter=0
                 
                 c2data=generate_paper_c2_plot(systemname, 'Date', initCap)
@@ -774,11 +774,11 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1min_'):
                 data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, interval)
                 (counter, html)=generate_plots(data, 'paper_' + systemname + '_c2_Close'+str(recent), systemname + " Close Price", 'Close', counter, html, cols, recent)        
                 html = html + '</center></table><br>'
+                
             except Exception as e:
                       logging.error("get_paper", exc_info=True)
                       counter = 0
    
-    
     counter=0
     #IB Paper
     if os.path.isfile('./data/paper/ib_' + systemname + '_trades.csv'):
@@ -814,6 +814,7 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1min_'):
                   data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, interval)
                   (counter, html)=generate_plots(data, 'paper_' + systemname + '_ib_Close'+str(recent), systemname + " Close Price", 'Close', counter, html, cols, recent)
                   html = html + '</table></center><br>'
+                  
                   counter=0
             except Exception as e:
                       logging.error("get_paper", exc_info=True)
@@ -822,7 +823,7 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1min_'):
     return (html, counter, cols)
     
 def gen_btc(html, counter, cols):
-    html = html + '<h1>BTC Paper</h1><br><table>'
+    html = html + '<h1>BTC Paper</h1><br>'
     counter = 0
     cols=4
     recent=-1

@@ -126,7 +126,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 's105JPY':
            ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [100000,'JPY','IDEALPRO', 's105_GBPJPY']]]
 elif len(sys.argv) > 1 and sys.argv[1] == 's105JPY2':
     pairs=[
-           #['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [10,'JPY','IDEALPRO', 's105_EURJPY']],
+           ['./data/from_IB/1 min_EURJPY.csv', 'EURJPY', [100000,'JPY','IDEALPRO', 's105_EURJPY']],
            #['./data/from_IB/1 min_USDJPY.csv', 'USDJPY', [10,'JPY','IDEALPRO', 's105_USDJPY']],
            #['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO', 's105_CADJPY']],
            #['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO', 's105_CHFJPY']],

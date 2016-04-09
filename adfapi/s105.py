@@ -175,7 +175,7 @@ def procBar(bar1, bar2, pos, trade):
     
                     
                 
-                    if dblZscoreData >= dblUpperThreshold and crossAbove[sym1+sym2] == 1:
+                    if dblZscoreData >= dblUpperThreshold and crossAbove[sym1+sym2]:
                         
                         #Sell(instPair1, dblQty, strOrderComment);
                         #Buy(instPair2, dblQty2, strOrderComment2);
@@ -192,7 +192,7 @@ def procBar(bar1, bar2, pos, trade):
                 
                         return ([bar1['Symbol'], -abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], abs(dblQty2), strOrderComment2])
-                    elif dblZscoreData <= -1 * dblUpperThreshold and crossBelow==1:
+                    elif dblZscoreData <= -1 * dblUpperThreshold and crossBelow[sym1+sym2]:
                         #Buy(instPair1, dblQty, strOrderComment);
                         #Sell(instPair2, dblQty2, strOrderComment2);
                         #if (myParam.hasOpt)
@@ -211,7 +211,7 @@ def procBar(bar1, bar2, pos, trade):
                 elif not sentExitOrder[sym1+sym2] and pos.has_key(bar1['Symbol']) and pos.has_key(bar2['Symbol']):
                     
                     if pos[bar1['Symbol']] < 0 and pos[bar2['Symbol']] > 0 and \
-                        dblZscoreData <= dblLowerThreshold and crossAbove[sym1+sym2]==1:
+                        dblZscoreData <= dblLowerThreshold and crossAbove[sym1+sym2]:
                         #Buy(instPair1, dblQty, strOrderComment);
                         #Sell(instPair2, dblQty2, strOrderComment2);
     
@@ -229,7 +229,7 @@ def procBar(bar1, bar2, pos, trade):
                                 [bar2['Symbol'], -abs(dblQty2), strOrderComment2])
     
                     elif pos[bar1['Symbol']] > 0 and pos[bar2['Symbol']] < 0 and \
-                        dblZscoreData >= -1 * dblLowerThreshold and crossBelow[sym1+sym2] == 1:
+                        dblZscoreData >= -1 * dblLowerThreshold and crossBelow[sym1+sym2]:
                         #Sell(instPair1, dblQty, strOrderComment);
                         #Buy(instPair2, dblQty2, strOrderComment2);
     

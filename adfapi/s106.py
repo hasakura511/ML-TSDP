@@ -35,6 +35,8 @@ dblRiskPer = 0.05;
 dblTargetPer = 0.05;
 dblStartStop = 0.06;
 dblPlaceStop = 0.14;
+dblBBUOrder = 2;
+dblBBLOrder = 2;
 
 def procBar(bar1, bar2, pos, trade):
     global pairSeries
@@ -131,6 +133,25 @@ def procBar(bar1, bar2, pos, trade):
         #signals['indSmaZscore']=pd.rolling_mean(signals['tsZscore'], intSMALength, min_periods=1)
         #signals['indSmaZscore2']=pd.rolling_mean(signals['tsZscore2'], intSMALength, min_periods=1)    
         
+        (signals['indBbu'], signals['indBbm'], signals['indBbl']) = ta.BBANDS(
+            np.array(signals['tsZscore']), 
+            timeperiod=intSMALength,
+            # number of non-biased standard deviations from the mean
+            nbdevup=dblBBUOrder,
+            nbdevdn=dblBBLOrder,
+            # Moving average type: simple moving average here
+            matype=0)
+            
+        (signals['indBbu2'], signals['indBbm2'], signals['indBbl2']) = ta.BBANDS(
+            np.array(signals['tsZscore2']), 
+            timeperiod=intSMALength,
+            # number of non-biased standard deviations from the mean
+            nbdevup=dblBBUOrder,
+            nbdevdn=dblBBLOrder,
+            # Moving average type: simple moving average here
+            matype=0)
+        
+        
         signals['indSmaZscore']=ta.SMA(np.array(signals['tsZscore']), intSMALength)      
         signals['indSmaZscore2']=ta.SMA(np.array(signals['tsZscore2']), intSMALength)        
         signals=signals.set_index('Date')
@@ -148,19 +169,10 @@ def procBar(bar1, bar2, pos, trade):
 
         if trade:
                 #print strOrderComment
-                                
-                if signals.iloc[-2]['tsZscore'] > signals.iloc[-2]['indSmaZscore']  \
-                        and                                                         \
-                   signals.iloc[-1]['tsZscore'] <= signals.iloc[-1]['indSmaZscore']:
-                        crossBelow[sym1+sym2]=False
-                        crossAbove[sym1+sym2]=True
-
-                if signals.iloc[-2]['tsZscore'] < signals.iloc[-2]['indSmaZscore'] \
-                       and                                                         \
-                   signals.iloc[-1]['tsZscore'] >= signals.iloc[-1]['indSmaZscore']:
-                        crossBelow[sym1+sym2]=True
-                        crossAbove[sym1+sym2]=False
-                       
+                (crossBelow[sym1+sym2], crossAbove[sym1+sym2])=crossCheck(signals, sym1+sym2, 'tsZscore', 'indSmaZscore')                
+                (z1CBBbu, z1CABbu)=crossCheck(signals, 'bb'+sym1+sym2, 'tsZscore', 'indBbu')
+                (z1CBBbl, z1CABbl)=crossCheck(signals, 'bb2'+sym1+sym2, 'tsZscore2','indBbl')
+                
                 #print ' crossAbove: ' + str(crossAbove) + ' crossBelow: ' + str(crossBelow)
                 #crossBelow = signals['tsZscore'].iloc[-1] >= signals['indSmaZscore'].iloc[-1] and crossBelow.any()
                 #crossAbove = signals['tsZscore'].iloc[-1] <= signals['indSmaZscore'].iloc[-1] and crossAbove.any()
@@ -179,7 +191,10 @@ def procBar(bar1, bar2, pos, trade):
     
                     
                 
-                    if dblZscoreData >= dblUpperThreshold and crossAbove[sym1+sym2] == 1:
+                    if dblZscoreData >= dblUpperThreshold and \
+                        z1CABbu:
+                        #crossAbove[sym1+sym2] == 1 and \
+                        
                         
                         #Sell(instPair1, dblQty, strOrderComment);
                         #Buy(instPair2, dblQty2, strOrderComment2);
@@ -196,7 +211,11 @@ def procBar(bar1, bar2, pos, trade):
                 
                         return ([bar1['Symbol'], -abs(dblQty), strOrderComment], 
                                 [bar2['Symbol'], abs(dblQty2), strOrderComment2])
-                    elif dblZscoreData <= -1 * dblUpperThreshold and crossBelow==1:
+                    elif dblZscoreData <= -1 * dblUpperThreshold and \
+                        z1CABbu:
+                        #crossBelow[sym1+sym2] and \
+                        
+                        
                         #Buy(instPair1, dblQty, strOrderComment);
                         #Sell(instPair2, dblQty2, strOrderComment2);
                         #if (myParam.hasOpt)
@@ -215,7 +234,7 @@ def procBar(bar1, bar2, pos, trade):
                 elif not sentExitOrder[sym1+sym2] and pos.has_key(bar1['Symbol']) and pos.has_key(bar2['Symbol']):
                     
                     if pos[bar1['Symbol']] < 0 and pos[bar2['Symbol']] > 0 and \
-                        dblZscoreData <= dblLowerThreshold and crossAbove[sym1+sym2]==1:
+                        dblZscoreData <= dblLowerThreshold and crossAbove[sym1+sym2]==1 and z1CBBbl:
                         #Buy(instPair1, dblQty, strOrderComment);
                         #Sell(instPair2, dblQty2, strOrderComment2);
     
@@ -233,7 +252,7 @@ def procBar(bar1, bar2, pos, trade):
                                 [bar2['Symbol'], -abs(dblQty2), strOrderComment2])
     
                     elif pos[bar1['Symbol']] > 0 and pos[bar2['Symbol']] < 0 and \
-                        dblZscoreData >= -1 * dblLowerThreshold and crossBelow[sym1+sym2] == 1:
+                        dblZscoreData >= -1 * dblLowerThreshold and crossBelow[sym1+sym2] == 1 and z1CBBbl:
                         #Sell(instPair1, dblQty, strOrderComment);
                         #Buy(instPair2, dblQty2, strOrderComment2);
     
@@ -260,6 +279,28 @@ def getBar(price, symbol, date):
 def updateEntry(symPair, entryOrder, exitOrder):
     sentEntryOrder[symPair] = entryOrder
     sentExitOrder[symPair] = exitOrder
+
+def crossCheck(signals, symPair, tsz, check2):
+    global crossBelow
+    global crossAbove
+    if not crossBelow.has_key(symPair):
+        crossBelow[symPair]=False
+    if not crossAbove.has_key(symPair):
+        crossAbove[symPair]=False
+        
+    if signals.iloc[-2][tsz] > signals.iloc[-2][check2]  \
+            and                                                         \
+       signals.iloc[-1][tsz] <= signals.iloc[-1][check2]:
+            crossBelow[symPair]=False
+            crossAbove[symPair]=True
+            
+    if signals.iloc[-2][tsz] < signals.iloc[-2][check2] \
+           and                                                         \
+       signals.iloc[-1][tsz] >= signals.iloc[-1][check2]:
+             crossBelow[symPair]=True
+             crossAbove[symPair]=False
+    
+    return (crossBelow[symPair], crossAbove[symPair])
 #def updateEntry(systemname, broker, sym1, sym2, currency, date, isLive):
 #    data=portfolio.get_portfolio(systemname, broker, date, isLive)
 #    qty1=portfolio.get_pos(data, broker, sym1, currency, date)

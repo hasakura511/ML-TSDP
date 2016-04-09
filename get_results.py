@@ -595,16 +595,16 @@ def gen_c2(html, counter, cols, recent, systemname):
             html = html + '<center><table>'
             
             c2data=generate_c2_plot(systemname, 'closedWhen',  initCap)
-            (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'closedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols, recent)
+            (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'closedWhen', 'c2_' + systemname+'Equity'+str(recent), 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols, recent)
             
             data=get_data(systemname, 'c2api', 'c2', 'trades','closedWhen', initCap)
-            (counter, html)=generate_mult_plot(data, ['PL'], 'closedWhen', 'c2_' + systemname+'PL', 'c2_' + systemname + ' PL', 'PL', counter, html, cols, recent)
+            (counter, html)=generate_mult_plot(data, ['PL'], 'closedWhen', 'c2_' + systemname+'PL'+str(recent), 'c2_' + systemname + ' PL', 'PL', counter, html, cols, recent)
             
             data=get_datas(sigdict[systemname], 'signalPlots', 'equity', 0)
-            (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals', 'equity', counter, html, cols, recent)
+            (counter, html)=generate_plots(data, 'c2_' + systemname + 'Signals', 'c2_' + systemname + 'Signals'+str(recent), 'equity', counter, html, cols, recent)
     
             data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
-            (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
+            (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price"+str(recent), 'Close', counter, html, cols, recent)
             html = html + '</table></center>'
             counter=0
     except Exception as e:

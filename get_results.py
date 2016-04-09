@@ -263,6 +263,8 @@ def get_datas(systems, api, dataType, initialData, interval=''):
 
 def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
     filename='./data/paper/' + broker + '_' + systemname + '_trades.csv'
+    if broker == 'c2live':
+        filename='./data/c2api/' + systemname + '_trades.csv'
     if os.path.isfile(filename):
         dataSet=pd.read_csv(filename)
         if broker == 'ib':
@@ -282,26 +284,34 @@ def generate_paper_TWR(systemname, broker, dateCol, recent, initialEquity):
         dataSet=dataSet.set_index('Idx').sort_index()    
         if recent > 0: 
                 dataSet=dataSet.ix[dataSet.index[-1] - datetime.timedelta(days=recent):] 
+        
+        if broker == 'c2live':
+            dataSet['balance'] = initialEquity + dataSet['PL'].cumsum()
+            dataSet['commission'] = 0
+            
         if dataSet.shape[0] > 0:
             #dataSet=dataSet.sort_values(by=[dateCol])
             if min(dataSet['balance']) < 0:
                 dataSet['balance'] = dataSet['balance'] + max(abs(max(dataSet['balance'])), abs(min(dataSet['balance'])))
-            if min(dataSet['purebalance']) < 0:
-                dataSet['purebalance'] = dataSet['purebalance'] +max(abs(max(dataSet['purebalance'])), abs(min(dataSet['purebalance'])))
-            if min(dataSet['mark_to_mkt']) < 0: 
-                dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
-            if min(dataSet['pure_mark_to_mkt']) < 0:
-                dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
             
             dataSet['equitycurve'] = (1+((dataSet['balance'].shift(-1) - dataSet['balance']) / dataSet['balance'])) #.pct_change()
             dataSet['equitycurve'] = dataSet['equitycurve'].cumprod()
-            dataSet['PurePLcurve'] = (1+((dataSet['purebalance'].shift(-1) - dataSet['purebalance']) / dataSet['purebalance'])) #.pct_change()
-            dataSet['PurePLcurve'] = dataSet['PurePLcurve'].cumprod()
-            dataSet['mark_to_mkt'] = (1+((dataSet['mark_to_mkt'].shift(-1) - dataSet['mark_to_mkt']) / dataSet['mark_to_mkt'])) #.pct_change()
-            dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].cumprod()
-            dataSet['pure_mark_to_mkt'] = (1+((dataSet['pure_mark_to_mkt'].shift(-1) - dataSet['pure_mark_to_mkt']) / dataSet['pure_mark_to_mkt'])) #.pct_change()
-            dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].cumprod()
-        
+            
+            if 'purebalance' in dataSet:
+                if min(dataSet['purebalance']) < 0:
+                    dataSet['purebalance'] = dataSet['purebalance'] +max(abs(max(dataSet['purebalance'])), abs(min(dataSet['purebalance'])))
+                if min(dataSet['mark_to_mkt']) < 0: 
+                    dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'] +max(abs(max(dataSet['mark_to_mkt'])), abs(min(dataSet['mark_to_mkt'])))
+                if min(dataSet['pure_mark_to_mkt']) < 0:
+                    dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'] + max(abs(max(dataSet['pure_mark_to_mkt'])), abs(min(dataSet['pure_mark_to_mkt'])))
+                
+                dataSet['PurePLcurve'] = (1+((dataSet['purebalance'].shift(-1) - dataSet['purebalance']) / dataSet['purebalance'])) #.pct_change()
+                dataSet['PurePLcurve'] = dataSet['PurePLcurve'].cumprod()
+                dataSet['mark_to_mkt'] = (1+((dataSet['mark_to_mkt'].shift(-1) - dataSet['mark_to_mkt']) / dataSet['mark_to_mkt'])) #.pct_change()
+                dataSet['mark_to_mkt'] = dataSet['mark_to_mkt'].cumprod()
+                dataSet['pure_mark_to_mkt'] = (1+((dataSet['pure_mark_to_mkt'].shift(-1) - dataSet['pure_mark_to_mkt']) / dataSet['pure_mark_to_mkt'])) #.pct_change()
+                dataSet['pure_mark_to_mkt'] = dataSet['pure_mark_to_mkt'].cumprod()
+            
             dataSet=dataSet.fillna(method='bfill')
         return dataSet
     else:
@@ -571,12 +581,19 @@ def gen_sig(html, counter, cols):
 
 def gen_c2(html, counter, cols, recent, systemname):
     cols=4
-    html = html + '<h1>' + systemname + '</h1><br><table>'
-    
+    html = html + '<h1>' + systemname + '</h1><br>'
     try:
         if c2dict.has_key(systemname):
-            (counter, html)=generate_html(verdict[systemname], counter, html, cols, True)
-  
+            counter=0
+            html = html + '<center><table>'
+            (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
+            twdata=generate_paper_TWR(systemname, 'c2live', 'closedWhen', recent, initCap) 
+            twdata.to_csv('./data/results/c2_' + systemname + '_' + 'c2' + '_TWR' + str(recent) + 'TWR.csv')
+            (counter, html)=generate_mult_plot(twdata,['equitycurve'], 'Date', 'c2_' + systemname + '_c2_TWR'+str(recent), systemname + " C2 TWR", 'TWR', counter, html, cols, recent)
+            html = html + '</table></center><br>'
+            counter=0
+            html = html + '<center><table>'
+            
             c2data=generate_c2_plot(systemname, 'closedWhen',  initCap)
             (counter, html)=generate_mult_plot(c2data, ['equitycurve'], 'closedWhen', 'c2_' + systemname+'Equity', 'c2_' + systemname + ' Equity', 'Equity', counter, html, cols, recent)
             
@@ -588,7 +605,8 @@ def gen_c2(html, counter, cols, recent, systemname):
     
             data=get_datas(systemdict[systemname], 'from_IB', 'Close', initCap, '1 min_')
             (counter, html)=generate_plots(data, 'paper_' + systemname + 'Close', systemname + " Close Price", 'Close', counter, html, cols, recent)
-
+            html = html + '</table></center>'
+            counter=0
     except Exception as e:
             logging.error("get_c2", exc_info=True)
             counter = 0

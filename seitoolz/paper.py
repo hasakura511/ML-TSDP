@@ -31,12 +31,18 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
         
         if system_c2pos_qty != c2_pos_qty:
             if debug:
-                print "========"
+                print "!!!C2!!!"
                 print "system: " + system_name + " symbol: " + c2sym
                 print "system_c2_pos: " + str(system_c2pos_qty)
                 print "c2_pos: " + str(c2_pos_qty)
-                print "========"
-            
+                print "!!!C2!!!"
+        else:
+            if debug:
+                print "===C2==="
+                print "system: " + system_name + " symbol: " + c2sym
+                print "system_c2_pos: " + str(system_c2pos_qty)
+                print "c2_pos: " + str(c2_pos_qty)
+                print "===C2==="
         if system_c2pos_qty > c2_pos_qty:
             c2quant=system_c2pos_qty - c2_pos_qty
             if c2_pos_qty < 0:        
@@ -77,12 +83,18 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
         
         if system_ibpos_qty != ib_pos_qty:
             if debug:
-                print "========"
+                print "!!!IB!!!"
                 print "system: " + system_name + " symbol: " +symbol
                 print "system_ib_pos: " + str(system_ibpos_qty)
                 print "ib_pos: " + str(ib_pos_qty)
-                print "========"
-        
+                print "!!!IB!!!"
+        else:
+            if debug:
+                print "===IB==="
+                print "system: " + system_name + " symbol: " +symbol
+                print "system_ib_pos: " + str(system_ibpos_qty)
+                print "ib_pos: " + str(ib_pos_qty)
+                print "===IB==="
         if system_ibpos_qty > ib_pos_qty:
             ibquant=float(system_ibpos_qty - ib_pos_qty)
             if debug:

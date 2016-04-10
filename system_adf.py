@@ -44,6 +44,7 @@ import logging
 import threading
 import adfapi.s105 as astrat
 import adfapi.s106 as s106
+import adfapi.s102 as s102
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
 import seitoolz.bars as bars
@@ -199,6 +200,10 @@ elif len(sys.argv) > 1 and sys.argv[1] == 's106_stratADF':
     astrat=s106
     pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's106_bitfinexUSD']],
            ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's106_bitstampUSD']]]
+elif len(sys.argv) > 1 and sys.argv[1] == 's102_stratADF':
+    astrat=s102
+    pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's102_bitfinexUSD']],
+           ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's102_bitstampUSD']]]
 elif len(sys.argv) > 1 and sys.argv[1] == 'stratADF':
     pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
            ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]

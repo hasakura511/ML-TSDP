@@ -43,6 +43,8 @@ from time import gmtime, strftime, localtime, sleep
 import logging
 import threading
 import adfapi.s106 as astrat
+import adfapi.s105 as s105
+import adfapi.s102 as s102
 import seitoolz.graph as seigraph
 import adfapi.adf_helper as adf
 import seitoolz.bars as bars
@@ -131,6 +133,10 @@ elif len(sys.argv) > 1 and sys.argv[1] == 's105JPY2':
            #['./data/from_IB/1 min_CADJPY.csv', 'CADJPY', [100000,'JPY','IDEALPRO', 's105_CADJPY']],
            #['./data/from_IB/1 min_CHFJPY.csv', 'CHFJPY', [100000,'JPY','IDEALPRO', 's105_CHFJPY']],
            ['./data/from_IB/1 min_GBPJPY.csv', 'GBPJPY', [20000,'JPY','IDEALPRO', 's105_GBPJPY']]]
+elif len(sys.argv) > 1 and sys.argv[1] == 's102adf':
+    astrat=s102
+    pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [20, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
+           ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [20, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
 
 else:
     pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [20, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],

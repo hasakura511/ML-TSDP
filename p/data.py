@@ -106,29 +106,30 @@ def loadDatasets(path_datasets, fout, parameters):
             print sym
     symbols, names = np.array(list(symbol_dict.items())).T
     
-    out =  get_quote(dataPath,fout, False, parameters)
-    out['AdjClose']=out['Close']
-    out.columns = out.columns + '_Out'
-    out['Return_Out'] = out['AdjClose_Out'].pct_change()
-    out.to_csv('./p/data/out.csv')
-    data = [get_quote(dataPath, symbol, True, parameters)
+    out =  get_quote(dataPath, fout, 'Out', True, parameters)
+    data = [get_quote(dataPath, symbol, symbol, True, parameters)
           for symbol in symbols]
     dataSet=list()
     dataSet.append(out)
     dataSet.extend(data)
     return dataSet
 
-def get_quote(dataPath,sym, addParam, parameters):
+def get_quote(dataPath, sym, colname, addParam, parameters):
     dataSet=pd.read_csv(dataPath + sym + '.csv',index_col='Date')
     dataSet.index=pd.to_datetime(dataSet.index)
     dataSet=dataSet.sort_index()    
-    if parameters[2] > 0:
-        dataSet=dataSet.iloc[:-parameters[2]]
+    
     if addParam:
+        data=dataSet.iloc[-1].copy()
+        data=dataSet.reset_index().iloc[-1].copy()
+        data['Close']=data['Open']
+        data['Date']=data['Date']+datetime.timedelta(days=1)
+        dataSet=dataSet.reset_index().append(data).set_index('Date')
         #dataSet.columns.values[-1] = 'AdjClose'
         dataSet['AdjClose']=dataSet['Close']
-        dataSet.columns = dataSet.columns + '_' + sym
-        dataSet['Return_%s' %sym] = dataSet['AdjClose_%s' %sym].pct_change()
+        #dataSet['Open']=dataSet['Open']
+        dataSet.columns = dataSet.columns + '_' + colname
+        dataSet['Return_%s' %colname] = dataSet['AdjClose_%s' %colname].pct_change()
     #dataSet=dataSet.ix[dataSet.index[-1] - datetime.timedelta(days=10):]
     print 'Loaded '+ sym + ' ' + str(dataSet.shape[0]) + ' Rows'
     

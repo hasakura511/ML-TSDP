@@ -106,10 +106,10 @@ def performRFClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel
         print 'RFClass Saving ' + fname_out
         with open(fname_out, 'wb') as f:
             cPickle.dump(clf, f, -1)    
-    
     accuracy = clf.score(X_test, y_test)
+    print 'Accuracy:',accuracy
+    return clf
     
-    return accuracy
 def performKNNClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     """
     KNN binary Classification
@@ -124,7 +124,8 @@ def performKNNClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     
     accuracy = clf.score(X_test, y_test)
     
-    return accuracy
+    print 'Accuracy:',accuracy
+    return clf
     
 def performSVMClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     """
@@ -142,7 +143,8 @@ def performSVMClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     
     accuracy = clf.score(X_test, y_test)
     
-    return accuracy
+    print 'Accuracy:',accuracy
+    return clf
     
 def performAdaBoostClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     """
@@ -160,7 +162,8 @@ def performAdaBoostClass(X_train, y_train, X_test, y_test, parameters, fout, sav
     
     accuracy = clf.score(X_test, y_test)
     
-    return accuracy
+    print 'Accuracy:',accuracy
+    return clf
     
 def performGTBClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     """
@@ -176,7 +179,8 @@ def performGTBClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     
     accuracy = clf.score(X_test, y_test)
     
-    return accuracy
+    print 'Accuracy:',accuracy
+    return clf
     
 def performQDAClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     """
@@ -199,4 +203,5 @@ def performQDAClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     
     accuracy = clf.score(X_test, y_test)
     
-    return accuracy
+    print 'Accuracy:',accuracy
+    return clf

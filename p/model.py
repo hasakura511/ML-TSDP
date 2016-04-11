@@ -44,25 +44,25 @@ logging.basicConfig(filename='/logs/p_model.log',level=logging.DEBUG)
 def count_missing(df):
      return len(df) - df.count()
 
-def getPredictionFromBestModel(bestdelta, bestlags, fout, cut, start_test, path_datasets, parameters):
+def getPredictionFromBestModel(bestdelta, bestlags, fout, cut, start_test, dataSets, parameters):
     """
     returns array of prediction and score from best model.
     """
     
-    (X_train, y_train, X_test, y_test)=dataPrep(bestdelta, bestlags, fout, cut, start_test, path_datasets, parameters)
-    accuracies = classifier.performClassification(X_train, y_train, X_test, y_test, 'RF', parameters, fout, True)
-    print 'Accuracy:',accuracies
-    with open(parameters[0], 'rb') as fin:
-        model = cPickle.load(fin)        
+    (X_train, y_train, X_test, y_test)=dataPrep(bestdelta, bestlags, fout, cut, start_test, dataSets, parameters)
+    model = classifier.performClassification(X_train, y_train, X_test, y_test, 'RF', parameters, fout, False)
+    
+    #with open(parameters[0], 'rb') as fin:
+    #    model = cPickle.load(fin)        
         
     return model.predict(X_test), model.score(X_test, y_test)
     
-def dataPrep(maxdelta, maxlag, fout, cut, start_test, path_datasets, parameters):
+def dataPrep(maxdelta, maxlag, fout, cut, start_test, dataSets, parameters):
     lags = range(2, maxlag) 
-    datasets = data.loadDatasets(path_datasets, fout, parameters)
+    
     delta = range(2, maxdelta) 
     print 'Delta days accounted: ', max(delta)
-    datasets = features.applyRollMeanDelayedReturns(datasets, delta)
+    datasets = features.applyRollMeanDelayedReturns(dataSets, delta)
     finance = features.mergeDataframes(datasets, 6, cut)
     print 'Size of data frame: ', finance.shape
     print 'Number of NaN after merging: ', count_missing(finance)
@@ -76,7 +76,7 @@ def dataPrep(maxdelta, maxlag, fout, cut, start_test, path_datasets, parameters)
     X_train, y_train, X_test, y_test  = classifier.prepareDataForClassification(finance, start_test)
     return (X_train, y_train, X_test, y_test)
     
-def performFeatureSelection(maxdeltas, maxlags, fout, cut, start_test, path_datasets, savemodel, method, folds, parameters):
+def performFeatureSelection(maxdeltas, maxlags, fout, cut, start_test, initDataSets, savemodel, method, folds, parameters):
     """
     Performs Feature selection for a specific algorithm
     """
@@ -88,7 +88,7 @@ def performFeatureSelection(maxdeltas, maxlags, fout, cut, start_test, path_data
         print 'Maximum time lag applied', max(lags)
         print ''
         for maxdelta in range(3, maxdeltas + 2):
-            datasets = data.loadDatasets(path_datasets, fout, parameters)
+            datasets=initDataSets.copy()
             delta = range(2, maxdelta) 
             print 'Delta days accounted: ', max(delta)
             datasets = features.applyRollMeanDelayedReturns(datasets, delta)
@@ -193,6 +193,18 @@ def performCV(X_train, y_train, number_folds, algorithm, parameters, fout, savem
     return accuracies.mean()
 
 def get_signal(lookback, portfolio):
+    global nextSignal
+    global lastSignal
+    global start_period
+    global start_test
+    global symbol
+    global file
+    global path_datasets
+    global name
+    global folds
+    global bestModel
+    global interval
+    global dataSets
     #performCV(X_train, y_train, 10, 'QDA', [])
     start_period = datetime.datetime(2015,12,15)  
     start_test = datetime.datetime(2016,3,15)  
@@ -224,16 +236,49 @@ def get_signal(lookback, portfolio):
     parameters.append(bestModel)    
     parameters.append(interval)
     parameters.append(lookback)
-    if len(sys.argv) > 2 and sys.argv[2] == '1':
-        prediction = performFeatureSelection(9,9, file, start_period, start_test, path_datasets, True, 'RF', folds, parameters)    
-    prediction = getPredictionFromBestModel(9, 9, file, start_period, start_test, path_datasets, parameters)
+    dataSets = data.loadDatasets(path_datasets, file, parameters)
+    return next_signal(lookback, portfolio)
+
+def next_signal(lookback, portfolio):
+    global nextSignal
+    global lastSignal
+    global start_period
+    global start_test
+    global symbol
+    global file
+    global path_datasets
+    global name
+    global folds
+    global bestModel
+    global interval
+    global dataSets
+    global sighist
+    parameters=list()
+    parameters.append(bestModel)    
+    parameters.append(interval)
+    parameters.append(lookback)
+    bData=dataSets
     
+    if parameters[2] > 0:
+        bData=[data.iloc[:-parameters[2]].copy()
+                for data in dataSets]
+                    
+    if len(sys.argv) > 2 and sys.argv[2] == '1':
+        prediction = performFeatureSelection(9, 9, file, start_period, start_test, bData, True, 'RF', folds, parameters)    
+    prediction = getPredictionFromBestModel(9, 9, file, start_period, start_test, bData, parameters)
+    lastSignal=nextSignal
+    nextSignal=prediction[0][-1]
+    if nextSignal == 0:
+        nextSignal=-1
     # dataframe of Historical Price
     bars = pd.read_csv(path_datasets + file + '.csv', index_col=0, parse_dates=True)    
     # subset of the data corresponding to test set
     if parameters[2] > 0:
         bars=bars.iloc[:-parameters[2]]
-    bars = bars[-len(prediction[0]):]
+       
+    bars.index=pd.to_datetime(bars.index)
+    bars = bars.ix[start_test:]
+    bars = bars[-(len(prediction[0][:-1])):]
     
     # initialize empty dataframe indexed as the bars. There's going to be perfect match between dates in bars and signals 
     signals = pd.DataFrame(index=bars.index)
@@ -242,7 +287,13 @@ def get_signal(lookback, portfolio):
     signals['signal'] = 0.0
      
     # copying into signals.signal column results of prediction
-    signals['signal'] = prediction[0]
+    print bars.shape[0],' bars ', len(prediction[0][:-1]), 'predictions'
+    if len(sighist) > 0:
+        print 'Last Signal' + str(lastSignal)
+        sighist=np.append(sighist, lastSignal)
+    else:
+        sighist=np.array(prediction[0][:-1])
+    signals['signal'] = sighist
      
     # replace the zeros with -1 (new encoding for Down day)
     signals.signal[signals.signal == 0] = -1
@@ -259,19 +310,25 @@ def get_signal(lookback, portfolio):
      
     # calling portfolio evaluation on signals (predicted returns) and bars 
     # (actual returns)
-    portfolio.setInit(symbol, bars, signals)
-     
+    portfolio.setInit(symbol, bars, signals, nextSignal, lastSignal)
+    
     # backtesting the portfolio and generating returns on top of that 
-    returns = portfolio.backtest_portfolio()
+    portfolio.backtest_portfolio()
+    return nextSignal
+    
     
 def start_lookback(lookback):
      for num in range(0,lookback):
         num=lookback-num
-        get_signal(num, portfolio)
-            
+        if num == lookback:
+            get_signal(num, portfolio)
+        else:
+            next_signal(num,portfolio)
     
 portfolio = backtest.MarketIntradayPortfolio()    
-
+nextSignal=0
+lastSignal=0
+sighist=list()
 if len(sys.argv) > 3 and sys.argv[2] == '3':
     lookback=int(sys.argv[3])
     threads=list()
@@ -280,7 +337,7 @@ if len(sys.argv) > 3 and sys.argv[2] == '3':
     threads.append(sig_thread)
     [t.start() for t in threads]
     portfolio.plot_graph()
-    [t.join() for t in threads]
+    #[t.join() for t in threads]
 else:
      get_signal(0, portfolio)
      portfolio.plot_graph()

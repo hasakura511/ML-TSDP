@@ -303,14 +303,14 @@ else:
                     'GBPJPY',\
                     'AUDJPY',\
                     'USDJPY',\
-                    'AUDUSD',\
-                    'EURUSD',\
-                    'GBPUSD',\
-                    'USDCAD',\
-                    'USDCHF',\
-                    'NZDUSD',
-                    'EURCHF',\
-                    'EURGBP'\
+                    #'AUDUSD',\
+                    #'EURUSD',\
+                    #'GBPUSD',\
+                    #'USDCAD',\
+                    #'USDCHF',\
+                    #'NZDUSD',
+                    #'EURCHF',\
+                    #'EURGBP'\
                     ]
     #settings
     debug=False

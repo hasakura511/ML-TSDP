@@ -50,8 +50,8 @@ tickerId=random.randint(100,9999)
 currencyPairsDict=dict()
 prepData=dict()
 
-def get_ibfeed(sym, cur):
-	get_feed(sym, cur,'IDEALPRO','CASH')
+def get_ibfeed(sym, cur, exchange, secType):
+	get_feed(sym, cur, exchange, secType)
 
 def prep_bar_feed():
     global tickerId

@@ -58,11 +58,7 @@ def get_c2livepos(systemid, apikey, systemname):
         
 def get_c2pos_from_csv(systemname):
     dataSet = pd.read_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv', index_col='symbol')
-    return dataSet
     
-def reset_c2pos_cache(systemid):
-    global system_cache
-    system_cache.pop(systemid, None)
 
 
 def get_c2_portfolio(systemname):

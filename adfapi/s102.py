@@ -134,11 +134,11 @@ def procBar(bar1, bar2, pos, trade):
          
         signals=pd.DataFrame()
         signals['Date']=tsDates[sym1+sym2]
-        signals['tsZscore']=tsZscore[sym1+sym2][-len(tsDates[sym1+sym2]):]
-        signals['tsZscore2']=tsZscore[sym2+sym1][-len(tsDates[sym1+sym2]):]
+        signals['tsZscore']=tsZscore[sym1+sym2][-len(signals['Date']):]
+        signals['tsZscore2']=tsZscore[sym2+sym1][-len(signals['Date']):]
         
-        signals['pair1']=pairSeries[sym1][-len(tsDates[sym1+sym2]):]
-        signals['pair2']=pairSeries[sym2][-len(tsDates[sym1+sym2]):]
+        signals['pair1']=pairSeries[sym1][-len(signals['Date']):]
+        signals['pair2']=pairSeries[sym2][-len(signals['Date']):]
         #signals['indSmaZscore']=pd.rolling_mean(signals['tsZscore'], intSMALength, min_periods=1)
         #signals['indSmaZscore2']=pd.rolling_mean(signals['tsZscore2'], intSMALength, min_periods=1)    
         

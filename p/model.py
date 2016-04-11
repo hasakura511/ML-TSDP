@@ -38,8 +38,15 @@ import data
 import backtest
 import logging
 import threading
+import seitoolz.signal as signal
+import pytz
 
 logging.basicConfig(filename='/logs/p_model.log',level=logging.DEBUG)
+
+portfolio = backtest.MarketIntradayPortfolio()    
+nextSignal=0
+lastSignal=0
+sighist=list()
 
 def count_missing(df):
      return len(df) - df.count()
@@ -192,7 +199,7 @@ def performCV(X_train, y_train, number_folds, algorithm, parameters, fout, savem
     # the function returns the mean of the accuracy on the n-1 folds    
     return accuracies.mean()
 
-def get_signal(lookback, portfolio):
+def get_signal(lookback, portfolio, argv):
     global nextSignal
     global lastSignal
     global start_period
@@ -216,7 +223,7 @@ def get_signal(lookback, portfolio):
     bestModel='./p/params/best.pickle'
     interval='30m_'
     
-    if len(sys.argv) > 1 and sys.argv[1] == '1':
+    if len(argv) > 1 and argv[1] == '1':
         ############## idx ##############    
         symbol = '^GSPC'
         file='idx_^GSPC'
@@ -227,7 +234,7 @@ def get_signal(lookback, portfolio):
         interval='idx_'
         path_datasets='./p/data/'
         name = './p/data/' + file + '.csv'
-        if len(sys.argv) > 2 and sys.argv[2] == '2':
+        if len(argv) > 2 and argv[2] == '2':
             (out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
         ############## idx ##############  
     
@@ -237,9 +244,9 @@ def get_signal(lookback, portfolio):
     parameters.append(interval)
     parameters.append(lookback)
     dataSets = data.loadDatasets(path_datasets, file, parameters)
-    return next_signal(lookback, portfolio)
+    return next_signal(lookback, portfolio, argv)
 
-def next_signal(lookback, portfolio):
+def next_signal(lookback, portfolio, argv):
     global nextSignal
     global lastSignal
     global start_period
@@ -263,14 +270,16 @@ def next_signal(lookback, portfolio):
         bData=[data.iloc[:-parameters[2]].copy()
                 for data in dataSets]
                     
-    if len(sys.argv) > 2 and sys.argv[2] == '1':
+    if len(argv) > 2 and argv[2] == '1':
         prediction = performFeatureSelection(9, 9, file, start_period, start_test, bData, True, 'RF', folds, parameters)    
     prediction = getPredictionFromBestModel(9, 9, file, start_period, start_test, bData, parameters)
     lastSignal=nextSignal
     nextSignal=prediction[0][-1]
     if nextSignal == 0:
         nextSignal=-1
-    if len(sys.argv) > 2 and sys.argv[2] == '2':
+    print 'Next Signal: ' + str(nextSignal)
+    logging.info('Next Signal: ' + str(nextSignal))
+    if len(argv) > 2 and argv[2] == '2':
         return nextSignal
     # dataframe of Historical Price
     bars = pd.read_csv(path_datasets + file + '.csv', index_col=0, parse_dates=True)    
@@ -301,9 +310,9 @@ def next_signal(lookback, portfolio):
     signals.signal[signals.signal == 0] = -1
     
     print 'Last Bar: ' + str(bars.iloc[-1]['Close'])
-    print 'Next Signal: ' + str(signals.signal[-1])
+    
     logging.info('Last Bar: ' + str(bars.iloc[-1]['Close']))
-    logging.info('Next Signal: ' + str(signals.signal[-1]))
+    
     
     # compute the difference between consecutive entries in signals.signal. As
     # signals.signal was an array of 1 and -1 return signals.positions will 
@@ -319,27 +328,11 @@ def next_signal(lookback, portfolio):
     return nextSignal
     
     
-def start_lookback(lookback):
+def start_lookback(lookback, argv):
      for num in range(0,lookback):
         num=lookback-num
         if num == lookback:
-            get_signal(num, portfolio)
+            get_signal(num, portfolio, argv)
         else:
-            next_signal(num,portfolio)
+            next_signal(num,portfolio, argv)
     
-portfolio = backtest.MarketIntradayPortfolio()    
-nextSignal=0
-lastSignal=0
-sighist=list()
-if len(sys.argv) > 3 and sys.argv[2] == '3':
-    lookback=int(sys.argv[3])
-    threads=list()
-    sig_thread = threading.Thread(target=start_lookback, args=[lookback])
-    sig_thread.daemon=True
-    threads.append(sig_thread)
-    [t.start() for t in threads]
-    portfolio.plot_graph()
-    #[t.join() for t in threads]
-else:
-     get_signal(0, portfolio)
-     portfolio.plot_graph()

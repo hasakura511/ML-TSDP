@@ -1,0 +1,3 @@
+symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
+AUDJPY,-21,1460334643,,,81.59400,,forex,long,2016-04-10 20:30:43,1460334643,open,2016-04-10 20:30:34,81.59700,10000,,0,2,,,101744900,
+GBPJPY,29,1460334643,,,152.57500,,forex,short,2016-04-10 20:30:43,1460334643,open,2016-04-10 20:30:37,152.56700,10000,,0,2,,,101744902,

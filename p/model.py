@@ -37,6 +37,7 @@ import classifier
 import data
 import backtest
 import logging
+import threading
 
 logging.basicConfig(filename='/logs/p_model.log',level=logging.DEBUG)
 
@@ -263,15 +264,23 @@ def get_signal(lookback, portfolio):
     # backtesting the portfolio and generating returns on top of that 
     returns = portfolio.backtest_portfolio()
     
-    
-portfolio = backtest.MarketIntradayPortfolio()    
-if len(sys.argv) > 3 and sys.argv[2] == '3':
-    lookback=int(sys.argv[3])
-    for num in range(0,lookback):
+def start_lookback(lookback):
+     for num in range(0,lookback):
         num=lookback-num
         get_signal(num, portfolio)
-        if num == lookback:
-            portfolio.plot_graph()
+            
+    
+portfolio = backtest.MarketIntradayPortfolio()    
+
+if len(sys.argv) > 3 and sys.argv[2] == '3':
+    lookback=int(sys.argv[3])
+    threads=list()
+    sig_thread = threading.Thread(target=start_lookback, args=[lookback])
+    sig_thread.daemon=True
+    threads.append(sig_thread)
+    [t.start() for t in threads]
+    portfolio.plot_graph()
+    [t.join() for t in threads]
 else:
      get_signal(0, portfolio)
      portfolio.plot_graph()

@@ -15,9 +15,9 @@ import pandas.io.data
 from sklearn.qda import QDA
 import re
 from dateutil import parser
-
+import time
 import datetime
-
+import matplotlib.dates as mdates
 import numpy as np
 import matplotlib.pyplot as plt
 try:
@@ -37,7 +37,7 @@ import classifier
 import data
 
 from abc import ABCMeta, abstractmethod
-#import matplotlib.animation as animation
+import matplotlib.animation as animation
 
 class Portfolio(object):
     """An abstract base class representing a portfolio of 
@@ -78,6 +78,7 @@ class MarketIntradayPortfolio(Portfolio):
 
     def __init__(self):
         print 'Initializing MarketIntradayPortfolio'
+        self.ready=False
         
     def setInit(self, symbol, bars, signals, initial_capital=100000.0, shares=500):
         self.symbol = symbol        
@@ -87,6 +88,7 @@ class MarketIntradayPortfolio(Portfolio):
         self.shares = int(shares)
         self.positions = self.generate_positions()
         self.returns = dict()
+        self.ready=False
     def generate_positions(self):
         """Generate the positions DataFrame, based on the signals
         provided by the 'signals' DataFrame."""
@@ -110,6 +112,7 @@ class MarketIntradayPortfolio(Portfolio):
         portfolio['total'] = self.initial_capital + portfolio['profit'].cumsum()
         portfolio['returns'] = portfolio['total'].pct_change()
         self.returns=portfolio
+        self.ready=True
         return portfolio
         
     def plot_graph(self):
@@ -117,6 +120,8 @@ class MarketIntradayPortfolio(Portfolio):
         lines=list()
         f, ax = plt.subplots(2, sharex=True)
         f.patch.set_facecolor('white')
+        while not self.ready:
+            time.sleep(1)
         ylabel = self.symbol + ' Close Price in $'
         #self.bars['Close_Out'].plot(ax=ax[0], color='r', lw=3.)    
         line, =ax[0].plot(self.bars['Close'], color='r', lw=3.)   
@@ -132,14 +137,19 @@ class MarketIntradayPortfolio(Portfolio):
         ax[1].set_xlabel('Date', fontsize=18)
         ax[1].legend(('Portofolio Performance. Capital Invested: 100k $. Shares Traded per day: 500+500',), loc='upper left', prop={"size":8})            
         plt.tick_params(axis='both', which='major', labelsize=8)
+        
         loc = ax[1].xaxis.get_major_locator()
         loc.maxticks[DAILY] = 24
         def update(*args):
-            lines[0].set_ydata(self.bars['Close'])
-            lines[1].set_ydata(self.returns['total'])
+            #lines[0].set_ydata(self.bars['Close'])
+            #lines[1].set_ydata(self.returns['total'])
+            line, =ax[0].plot(self.bars['Close'], color='r', lw=3.)   
+            line, =ax[1].plot(self.returns['total'], color='b', lw=3.) 
+            f.fmt_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
+            f.autofmt_xdate()
             # Return modified artists
             return lines
-        #anim = animation.FuncAnimation(f, update, interval=10)
+        anim = animation.FuncAnimation(f, update, interval=10)
         
         plt.show()
 

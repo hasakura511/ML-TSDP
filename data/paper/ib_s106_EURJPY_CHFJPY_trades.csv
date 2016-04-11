@@ -1,0 +1,3 @@
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
+1,Paper,Paper,2.0,USD,IDEALPRO,1.0,,,1.0,123.465,20000.0,20000.0,-2.0,BOT,EUR,JPY,20160410 20:16:27 EST,,0.0,99998.0,1978270.16,100203.68,123.465,100207.68,100000.0,-2.0
+2,Paper,Paper,2.0,USD,IDEALPRO,2.0,,,1.0,113.527,20000.0,-20000.0,-2.0,SLD,CHF,JPY,20160410 20:16:28 EST,,0.0,99996.0,1958289.408,100047.088,113.527,100055.088,100000.0,-2.0

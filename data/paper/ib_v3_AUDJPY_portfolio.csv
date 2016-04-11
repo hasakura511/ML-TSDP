@@ -1,0 +1,2 @@
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
+AUDJPY,AUD,,40000.0,40000.0,81.873,81.873,-14409.648,2.0,433.424,-96.912,-76.912,Paper,JPY,435.424

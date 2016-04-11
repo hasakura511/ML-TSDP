@@ -196,8 +196,8 @@ def get_signal():
     #performCV(X_train, y_train, 10, 'QDA', [])
     start_period = datetime.datetime(2015,12,15)  
     start_test = datetime.datetime(2016,3,15)  
-    symbol = 'EURUSD'
-    file='30m_EURUSD'
+    symbol = 'EURJPY'
+    file='30m_EURJPY'
     path_datasets='./data/from_IB/'
     name = './p/data/' + file + '.csv'
     folds=10
@@ -207,11 +207,11 @@ def get_signal():
     if len(sys.argv) > 1 and sys.argv[1] == '1':
         ############## idx ##############    
         symbol = '^GSPC'
+        file='idx_^GSPC'
         bestModel='./p/params/bestidx.pickle'
         start_period = datetime.datetime(1995,1,15)  
         start_test = datetime.datetime(2010,3,15)  
-        end_period = datetime.datetime(2016,4,8)
-        file='idx_^GSPC'
+        end_period = datetime.datetime.now()        
         interval='idx_'
         path_datasets='./p/data/'
         name = './p/data/' + file + '.csv'
@@ -222,10 +222,10 @@ def get_signal():
     parameters=list()
     parameters.append(bestModel)    
     parameters.append(interval)
-    if len(sys.argv) > 2 and sys.argv[1] == '1':
+    if len(sys.argv) > 2 and sys.argv[2] == '1':
         prediction = performFeatureSelection(9,9, file, start_period, start_test, path_datasets, True, 'RF', folds, parameters)    
     prediction = getPredictionFromBestModel(9, 9, file, start_period, start_test, path_datasets, parameters)
-     
+    print 'Next Signal: ' + str(prediction[0][-1])
     # dataframe of S&P 500 historical prices (saved locally from Yahho Finance)
     bars = pd.read_csv('./p/data/out.csv', index_col=0, parse_dates=True)    
      

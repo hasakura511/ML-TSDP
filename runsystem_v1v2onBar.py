@@ -115,8 +115,8 @@ def onBar(bar, symbols):
     #SST = SST.combine_first(bar).sort_index()
     #if debug:
     
-    #if len(gotbar[bar['Date']])==len(livePairs):
-    if len([p for p in gotbar[bar['Date']] if p in livePairs]) == len(livePairs):
+    if len(gotbar[bar['Date']])==len(livePairs):
+    #if len([p for p in gotbar[bar['Date']] if p in livePairs]) == len(livePairs):
         #print gotbar[bar['Date']]
         start_time2 = time.time()
         for sym in gotbar[bar['Date']]:
@@ -252,34 +252,34 @@ pairs =  [
                 'GBPJPY',\
                 'AUDJPY',\
                 'USDJPY',\
-                #'AUDUSD',\
-                #'EURUSD',\
-                #'GBPUSD',\
-                #'USDCAD',\
-                #'USDCHF',\
-                #'NZDUSD',
-                #'EURCHF',\
-                #'EURGBP'\
+                'AUDUSD',\
+                'EURUSD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP'\
                 ]
                  
 if len(sys.argv)==1:          
     livePairs =  [
-                    'NZDJPY',\
-                    'CADJPY',\
-                    'CHFJPY',\
-                    'EURJPY',\
-                    'GBPJPY',\
-                    'AUDJPY',\
-                    'USDJPY',\
-                    #'AUDUSD',\
-                    #'EURUSD',\
-                    #'GBPUSD',\
-                    #'USDCAD',\
-                    #'USDCHF',\
-                    #'NZDUSD',
-                    #'EURCHF',\
-                    #'EURGBP'\
-                    ]
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                'AUDUSD',\
+                'EURUSD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP'\
+                ]
     #settings
     debug=True
     showDist =  False
@@ -309,22 +309,22 @@ if len(sys.argv)==1:
     
 else:
     livePairs =  [
-                    'NZDJPY',\
-                    'CADJPY',\
-                    'CHFJPY',\
-                    'EURJPY',\
-                    'GBPJPY',\
-                    'AUDJPY',\
-                    'USDJPY',\
-                    #'AUDUSD',\
-                    #'EURUSD',\
-                    #'GBPUSD',\
-                    #'USDCAD',\
-                    #'USDCHF',\
-                    #'NZDUSD',
-                    #'EURCHF',\
-                    #'EURGBP'\
-                    ]
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                'AUDUSD',\
+                'EURUSD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP'\
+                ]
     #settings
     debug=False
     showDist =  False

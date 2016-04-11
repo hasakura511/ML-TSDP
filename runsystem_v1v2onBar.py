@@ -258,14 +258,14 @@ if len(sys.argv)==1:
                     'GBPJPY',\
                     'AUDJPY',\
                     'USDJPY',\
-                    'AUDUSD',\
-                    'EURUSD',\
-                    'GBPUSD',\
-                    'USDCAD',\
-                    'USDCHF',\
-                    'NZDUSD',
-                    'EURCHF',\
-                    'EURGBP'\
+                    #'AUDUSD',\
+                    #'EURUSD',\
+                    #'GBPUSD',\
+                    #'USDCAD',\
+                    #'USDCHF',\
+                    #'NZDUSD',
+                    #'EURCHF',\
+                    #'EURGBP'\
                     ]
     #settings
     debug=True

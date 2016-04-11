@@ -244,10 +244,23 @@ filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='30m'
 
-pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
-                 'GBPJPY','EURCHF','AUDJPY',\
-                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY','NZDUSD']
+pairs =  [
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                #'AUDUSD',\
+                #'EURUSD',\
+                #'GBPUSD',\
+                #'USDCAD',\
+                #'USDCHF',\
+                #'NZDUSD',
+                #'EURCHF',\
+                #'EURGBP'\
+                ]
                  
 if len(sys.argv)==1:          
     livePairs =  [

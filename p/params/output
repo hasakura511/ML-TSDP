@@ -1,0 +1,470 @@
+OutTime7          0
+OutRolMean7       0
+OutTime8          0
+OutRolMean8       0
+Return_^GDAXI     0
+^GDAXITime2       0
+^GDAXIRolMean2    0
+^GDAXITime3       0
+^GDAXIRolMean3    0
+^GDAXITime4       0
+^GDAXIRolMean4    0
+^GDAXITime5       0
+^GDAXIRolMean5    0
+^GDAXITime6       0
+^GDAXIRolMean6    0
+^GDAXITime7       0
+^GDAXIRolMean7    0
+^GDAXITime8       0
+^GDAXIRolMean8    0
+dtype: int64
+Number of NaN after temporal shifting:  Return_^AXJO      0
+^AXJOTime2        0
+^AXJORolMean2     0
+^AXJOTime3        0
+^AXJORolMean3     0
+^AXJOTime4        0
+^AXJORolMean4     0
+^AXJOTime5        0
+^AXJORolMean5     0
+^AXJOTime6        0
+^AXJORolMean6     0
+^AXJOTime7        0
+^AXJORolMean7     0
+^AXJOTime8        0
+^AXJORolMean8     0
+Return_^HSI       0
+^HSITime2         0
+^HSIRolMean2      0
+^HSITime3         0
+^HSIRolMean3      0
+^HSITime4         0
+^HSIRolMean4      0
+^HSITime5         0
+^HSIRolMean5      0
+^HSITime6         0
+^HSIRolMean6      0
+^HSITime7         0
+^HSIRolMean7      0
+^HSITime8         0
+^HSIRolMean8      0
+                 ..
+Return_^DJI4      0
+Return_^DJI5      0
+Return_^DJI6      0
+Return_^DJI7      0
+Return_^DJI8      0
+Return_^DJI9      0
+Return_^FTSE2     0
+Return_^FTSE3     0
+Return_^FTSE4     0
+Return_^FTSE5     0
+Return_^FTSE6     0
+Return_^FTSE7     0
+Return_^FTSE8     0
+Return_^FTSE9     0
+Return_Out2       0
+Return_Out3       0
+Return_Out4       0
+Return_Out5       0
+Return_Out6       0
+Return_Out7       0
+Return_Out8       0
+Return_Out9       0
+Return_^GDAXI2    0
+Return_^GDAXI3    0
+Return_^GDAXI4    0
+Return_^GDAXI5    0
+Return_^GDAXI6    0
+Return_^GDAXI7    0
+Return_^GDAXI8    0
+Return_^GDAXI9    0
+dtype: int64
+Size of data frame after feature creation:  (5309, 207)
+Parameters -------------------------------->  []
+Size train set:  (3795, 206)
+Size of each fold:  379
+
+Splitting the first 2 chunks at 1/2
+Size of train + test:  (758, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:03:57.465987.pickle
+Accuracy on fold 2:  1.0
+
+Splitting the first 3 chunks at 2/3
+Size of train + test:  (1137, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:00.971953.pickle
+Accuracy on fold 3:  1.0
+
+Splitting the first 4 chunks at 3/4
+Size of train + test:  (1516, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:04.904931.pickle
+Accuracy on fold 4:  1.0
+
+Splitting the first 5 chunks at 4/5
+Size of train + test:  (1895, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:09.903188.pickle
+Accuracy on fold 5:  0.997354497354
+
+Splitting the first 6 chunks at 5/6
+Size of train + test:  (2274, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:15.566669.pickle
+Accuracy on fold 6:  1.0
+
+Splitting the first 7 chunks at 6/7
+Size of train + test:  (2653, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:22.073181.pickle
+Accuracy on fold 7:  1.0
+
+Splitting the first 8 chunks at 7/8
+Size of train + test:  (3032, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:29.534074.pickle
+Accuracy on fold 8:  0.997354497354
+
+Splitting the first 9 chunks at 8/9
+Size of train + test:  (3411, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:37.689199.pickle
+Accuracy on fold 9:  1.0
+
+Splitting the first 10 chunks at 9/10
+Size of train + test:  (3790, 206)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:46.785549.pickle
+Accuracy on fold 10:  1.0
+0.999412110523
+
+australia
+djia
+frankfurt
+hkong
+london
+nasdaq
+nikkei
+paris
+sp500
+Loaded 5320 Rows
+Loaded 5229 Rows
+Loaded 5340 Rows
+Loaded 5174 Rows
+Loaded 5286 Rows
+Loaded 5286 Rows
+Loaded 5461 Rows
+Loaded 5286 Rows
+Loaded 5327 Rows
+Delta days accounted:  9
+Size of data frame:  (5319, 153)
+Number of NaN after merging:  Return_^AXJO        0
+^AXJOTime2          1
+^AXJORolMean2       1
+^AXJOTime3          2
+^AXJORolMean3       2
+^AXJOTime4          3
+^AXJORolMean4       3
+^AXJOTime5          4
+^AXJORolMean5       4
+^AXJOTime6          5
+^AXJORolMean6       5
+^AXJOTime7          6
+^AXJORolMean7       6
+^AXJOTime8          7
+^AXJORolMean8       7
+^AXJOTime9          8
+^AXJORolMean9       8
+Return_^HSI       160
+^HSITime2         161
+^HSIRolMean2      161
+^HSITime3         162
+^HSIRolMean3      162
+^HSITime4         163
+^HSIRolMean4      163
+^HSITime5         164
+^HSIRolMean5      164
+^HSITime6         165
+^HSIRolMean6      165
+^HSITime7         166
+^HSIRolMean7      166
+
+OutRolMean3       138
+OutTime4          138
+OutRolMean4       138
+OutTime5          139
+OutRolMean5       139
+OutTime6          140
+OutRolMean6       140
+OutTime7          141
+OutRolMean7       141
+OutTime8          142
+OutRolMean8       142
+OutTime9          143
+OutRolMean9       143
+Return_^GDAXI      68
+^GDAXITime2        69
+^GDAXIRolMean2     69
+^GDAXITime3        70
+^GDAXIRolMean3     70
+^GDAXITime4        71
+^GDAXIRolMean4     71
+^GDAXITime5        72
+^GDAXIRolMean5     72
+^GDAXITime6        73
+^GDAXIRolMean6     73
+^GDAXITime7        74
+^GDAXIRolMean7     74
+^GDAXITime8        75
+^GDAXIRolMean8     75
+^GDAXITime9        75
+^GDAXIRolMean9     75
+dtype: int64
+Number of NaN after time interpolation:  Return_^AXJO      0
+^AXJOTime2        1
+^AXJORolMean2     1
+^AXJOTime3        2
+^AXJORolMean3     2
+^AXJOTime4        3
+^AXJORolMean4     3
+^AXJOTime5        4
+^AXJORolMean5     4
+^AXJOTime6        5
+^AXJORolMean6     5
+^AXJOTime7        6
+^AXJORolMean7     6
+^AXJOTime8        7
+^AXJORolMean8     7
+^AXJOTime9        8
+^AXJORolMean9     8
+Return_^HSI       0
+^HSITime2         1
+^HSIRolMean2      1
+^HSITime3         2
+^HSIRolMean3      2
+^HSITime4         3
+^HSIRolMean4      3
+^HSITime5         4
+^HSIRolMean5      4
+^HSITime6         5
+^HSIRolMean6      5
+^HSITime7         6
+^HSIRolMean7      6
+                 ..
+OutRolMean3       2
+OutTime4          2
+OutRolMean4       2
+OutTime5          3
+OutRolMean5       3
+OutTime6          4
+OutRolMean6       4
+OutTime7          5
+OutRolMean7       5
+OutTime8          6
+OutRolMean8       6
+OutTime9          7
+OutRolMean9       7
+Return_^GDAXI     0
+^GDAXITime2       1
+^GDAXIRolMean2    1
+^GDAXITime3       2
+^GDAXIRolMean3    2
+^GDAXITime4       3
+^GDAXIRolMean4    3
+^GDAXITime5       4
+^GDAXIRolMean5    4
+^GDAXITime6       5
+^GDAXIRolMean6    5
+^GDAXITime7       6
+^GDAXIRolMean7    6
+^GDAXITime8       7
+^GDAXIRolMean8    7
+^GDAXITime9       7
+^GDAXIRolMean9    7
+dtype: int64
+Number of NaN after mean interpolation:  Return_^AXJO      0
+^AXJOTime2        0
+^AXJORolMean2     0
+^AXJOTime3        0
+^AXJORolMean3     0
+^AXJOTime4        0
+^AXJORolMean4     0
+^AXJOTime5        0
+^AXJORolMean5     0
+^AXJOTime6        0
+^AXJORolMean6     0
+^AXJOTime7        0
+^AXJORolMean7     0
+^AXJOTime8        0
+^AXJORolMean8     0
+^AXJOTime9        0
+^AXJORolMean9     0
+Return_^HSI       0
+^HSITime2         0
+^HSIRolMean2      0
+^HSITime3         0
+^HSIRolMean3      0
+^HSITime4         0
+^HSIRolMean4      0
+^HSITime5         0
+^HSIRolMean5      0
+^HSITime6         0
+^HSIRolMean6      0
+^HSITime7         0
+^HSIRolMean7      0
+                 ..
+OutRolMean3       0
+OutTime4          0
+OutRolMean4       0
+OutTime5          0
+OutRolMean5       0
+OutTime6          0
+OutRolMean6       0
+OutTime7          0
+OutRolMean7       0
+OutTime8          0
+OutRolMean8       0
+OutTime9          0
+OutRolMean9       0
+Return_^GDAXI     0
+^GDAXITime2       0
+^GDAXIRolMean2    0
+^GDAXITime3       0
+^GDAXIRolMean3    0
+^GDAXITime4       0
+^GDAXIRolMean4    0
+^GDAXITime5       0
+^GDAXIRolMean5    0
+^GDAXITime6       0
+^GDAXIRolMean6    0
+^GDAXITime7       0
+^GDAXIRolMean7    0
+^GDAXITime8       0
+^GDAXIRolMean8    0
+^GDAXITime9       0
+^GDAXIRolMean9    0
+dtype: int64
+Number of NaN after temporal shifting:  Return_^AXJO      0
+^AXJOTime2        0
+^AXJORolMean2     0
+^AXJOTime3        0
+^AXJORolMean3     0
+^AXJOTime4        0
+^AXJORolMean4     0
+^AXJOTime5        0
+^AXJORolMean5     0
+^AXJOTime6        0
+^AXJORolMean6     0
+^AXJOTime7        0
+^AXJORolMean7     0
+^AXJOTime8        0
+^AXJORolMean8     0
+^AXJOTime9        0
+^AXJORolMean9     0
+Return_^HSI       0
+^HSITime2         0
+^HSIRolMean2      0
+^HSITime3         0
+^HSIRolMean3      0
+^HSITime4         0
+^HSIRolMean4      0
+^HSITime5         0
+^HSIRolMean5      0
+^HSITime6         0
+^HSIRolMean6      0
+^HSITime7         0
+^HSIRolMean7      0
+                 ..
+Return_^DJI4      0
+Return_^DJI5      0
+Return_^DJI6      0
+Return_^DJI7      0
+Return_^DJI8      0
+Return_^DJI9      0
+Return_^FTSE2     0
+Return_^FTSE3     0
+Return_^FTSE4     0
+Return_^FTSE5     0
+Return_^FTSE6     0
+Return_^FTSE7     0
+Return_^FTSE8     0
+Return_^FTSE9     0
+Return_Out2       0
+Return_Out3       0
+Return_Out4       0
+Return_Out5       0
+Return_Out6       0
+Return_Out7       0
+Return_Out8       0
+Return_Out9       0
+Return_^GDAXI2    0
+Return_^GDAXI3    0
+Return_^GDAXI4    0
+Return_^GDAXI5    0
+Return_^GDAXI6    0
+Return_^GDAXI7    0
+Return_^GDAXI8    0
+Return_^GDAXI9    0
+dtype: int64
+Size of data frame after feature creation:  (5309, 225)
+Parameters -------------------------------->  []
+Size train set:  (3795, 224)
+Size of each fold:  379
+
+Splitting the first 2 chunks at 1/2
+Size of train + test:  (758, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:51.354217.pickle
+Accuracy on fold 2:  1.0
+
+Splitting the first 3 chunks at 2/3
+Size of train + test:  (1137, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:54.997719.pickle
+Accuracy on fold 3:  0.997354497354
+
+Splitting the first 4 chunks at 3/4
+Size of train + test:  (1516, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:04:58.963423.pickle
+Accuracy on fold 4:  1.0
+
+Splitting the first 5 chunks at 4/5
+Size of train + test:  (1895, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:05:03.656579.pickle
+Accuracy on fold 5:  0.997354497354
+
+Splitting the first 6 chunks at 5/6
+Size of train + test:  (2274, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:05:09.197264.pickle
+Accuracy on fold 6:  1.0
+
+Splitting the first 7 chunks at 6/7
+Size of train + test:  (2653, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:05:15.883714.pickle
+Accuracy on fold 7:  1.0
+
+Splitting the first 8 chunks at 7/8
+Size of train + test:  (3032, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:05:23.341994.pickle
+Accuracy on fold 8:  0.997354497354
+
+Splitting the first 9 chunks at 8/9
+Size of train + test:  (3411, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:05:31.593432.pickle
+Accuracy on fold 9:  1.0
+
+Splitting the first 10 chunks at 9/10
+Size of train + test:  (3790, 224)
+RFClass 
+RFClass Saving sp500.csv-2016-04-11 05:05:41.177751.pickle
+Accuracy on fold 10:  1.0
+0.999118165785
+

@@ -115,8 +115,8 @@ def onBar(bar, symbols):
     #SST = SST.combine_first(bar).sort_index()
     #if debug:
     
-    if len(gotbar[bar['Date']])==len(pairs):
-       
+    #if len(gotbar[bar['Date']])==len(livePairs):
+    if len([p for p in gotbar[bar['Date'] if p in livePairs]) = len(livePairs):
         #print gotbar[bar['Date']]
         start_time2 = time.time()
         for sym in gotbar[bar['Date']]:

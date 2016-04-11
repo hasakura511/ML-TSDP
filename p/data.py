@@ -120,10 +120,22 @@ def get_quote(dataPath, sym, colname, addParam, parameters):
     dataSet=dataSet.sort_index()    
     
     if addParam:
+        
+        ###### Future #######
         data=dataSet.iloc[-1].copy()
         data=dataSet.reset_index().iloc[-1].copy()
         data['Close']=data['Open']
-        data['Date']=data['Date']+datetime.timedelta(days=1)
+        if parameters[1] == '30m_': 
+            data['Date']=data['Date']+datetime.timedelta(minutes=30)
+        elif parameters[1] == '1h_': 
+            data['Date']=data['Date']+datetime.timedelta(hours=1)
+        elif parameters[1] == '10m_': 
+            data['Date']=data['Date']+datetime.timedelta(minutes=10)
+        elif parameters[1] == '1 min_': 
+            data['Date']=data['Date']+datetime.timedelta(minutes=1)
+        else:
+            data['Date']=data['Date']+datetime.timedelta(days=1)
+        ###### DataSet ######
         dataSet=dataSet.reset_index().append(data).set_index('Date')
         #dataSet.columns.values[-1] = 'AdjClose'
         dataSet['AdjClose']=dataSet['Close']

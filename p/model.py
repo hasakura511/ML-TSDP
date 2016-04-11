@@ -270,6 +270,8 @@ def next_signal(lookback, portfolio):
     nextSignal=prediction[0][-1]
     if nextSignal == 0:
         nextSignal=-1
+    if len(sys.argv) > 2 and sys.argv[2] == '2':
+        return nextSignal
     # dataframe of Historical Price
     bars = pd.read_csv(path_datasets + file + '.csv', index_col=0, parse_dates=True)    
     # subset of the data corresponding to test set
@@ -310,7 +312,7 @@ def next_signal(lookback, portfolio):
      
     # calling portfolio evaluation on signals (predicted returns) and bars 
     # (actual returns)
-    portfolio.setInit(symbol, bars, signals, nextSignal, lastSignal)
+    portfolio.setInit(symbol, bars, signals, nextSignal, lastSignal,parameters)
     
     # backtesting the portfolio and generating returns on top of that 
     portfolio.backtest_portfolio()

@@ -80,7 +80,7 @@ class MarketIntradayPortfolio(Portfolio):
         print 'Initializing MarketIntradayPortfolio'
         self.ready=False
         
-    def setInit(self, symbol, bars, signals, nextSig, lastSig, initial_capital=100000.0, shares=500):
+    def setInit(self, symbol, bars, signals, nextSig, lastSig, parameters, initial_capital=100000.0, shares=500):
         self.symbol = symbol        
         self.bars = bars
         self.signals = signals
@@ -91,6 +91,7 @@ class MarketIntradayPortfolio(Portfolio):
         self.positions = self.generate_positions()
         self.returns = dict()
         self.ready=False
+        self.parameters=parameters
     def generate_positions(self):
         """Generate the positions DataFrame, based on the signals
         provided by the 'signals' DataFrame."""
@@ -124,6 +125,7 @@ class MarketIntradayPortfolio(Portfolio):
         f.patch.set_facecolor('white')
         while not self.ready:
             time.sleep(1)
+        
         ylabel = self.symbol + ' Close Price in $'
         #self.bars['Close_Out'].plot(ax=ax[0], color='r', lw=3.)    
         line, =ax[0].plot(self.bars['Close'], color='r', lw=3.)   
@@ -139,9 +141,12 @@ class MarketIntradayPortfolio(Portfolio):
         ax[1].set_xlabel('Date', fontsize=18)
         ax[1].legend(('Portofolio Performance. Capital Invested: 100k $. Shares Traded per day: 500+500',), loc='upper left', prop={"size":8})            
         
-        width=0.35
-        line=ax[2].bar(np.array(self.bars.index)[np.array(self.signals['signal']) > 0], np.array(self.signals['signal'])[np.array(self.signals['signal']) > 0], color='g', edgecolor='none') 
-        line=ax[2].bar(np.array(self.bars.index)[np.array(self.signals['signal']) < 0], np.array(self.signals['signal'])[np.array(self.signals['signal']) < 0], color='r', edgecolor='none') 
+        width=-0.35
+        line=ax[2].bar(np.array(self.bars.index)[np.array(self.signals['signal']) > 0], 
+            np.array(self.signals['signal'])[np.array(self.signals['signal']) > 0], width, color='g', 
+            edgecolor='none') 
+        line=ax[2].bar(np.array(self.bars.index)[np.array(self.signals['signal']) < 0], 
+            np.array(self.signals['signal'])[np.array(self.signals['signal']) < 0], width, color='r', edgecolor='none') 
         lines.append(line)
         ax[2].set_ylabel('Signals', fontsize=8)
         ax[2].legend(('Signal',), loc='upper left', prop={"size":8})            
@@ -169,14 +174,15 @@ class MarketIntradayPortfolio(Portfolio):
                     arrowprops=dict(facecolor='red', shrink=0.1),backgroundcolor='white'
                     )
             if self.nextSig > 0:
-                ax[1].annotate('Next Signal', 
-                    xy=(self.bars.index[-1],self.returns['total'][-1]),
-                    xytext=(0, -25), textcoords='offset points', ha='center',fontsize=8,
+                ax[2].annotate('Next', 
+                    xy=(self.bars.index[-1],self.signals['signal'][-1]),
+                    xytext=(0, -25), textcoords='offset points', ha='center',fontsize=8, 
                     arrowprops=dict(facecolor='green', shrink=0.1), backgroundcolor='white'
                     )
             else:
-                ax[1].annotate('Next Signal', xy=(self.bars.index[-1],self.returns['total'][-1]),
-                    xytext=(0, 25), textcoords='offset points',ha='center',fontsize=8,
+                ax[2].annotate('Next', 
+                    xy=(self.bars.index[-1],self.signals['signal'][-1]),
+                    xytext=(0, 25), textcoords='offset points',ha='center',fontsize=8, 
                     arrowprops=dict(facecolor='red', shrink=0.1), backgroundcolor='white'
                     )
                     
@@ -184,23 +190,23 @@ class MarketIntradayPortfolio(Portfolio):
                (self.returns['price_diff'][-1] < 0 and self.lastSig < 0):
                 coord=[0,-35]
                 if self.lastSig > 0:
-                    coord=[0,-35]
+                    coord=[0,-45]
                 else:
                     coord=[0,35]
-                ax[1].annotate('O', 
-                    xy=(self.bars.index[-2],self.returns['total'][-2]), 
+                ax[2].annotate('O', 
+                    xy=(self.bars.index[-2],self.signals['signal'][-2]), 
                     xytext=coord, ha='center',  
                         textcoords='offset points', fontsize=20, color='green')
                         #arrowprops=dict(facecolor='green', shrink=0.001))
             elif self.lastSig != 0:
                 coord=[0,-35]
                 if self.lastSig > 0:
-                    coord=[0,-35]
+                    coord=[0,-45]
                 else:
                     coord=[0,35]
                 #xy=(self.bars.index[-2],self.returns['total'][-2])
-                ax[1].annotate('X', 
-                    xy=(self.bars.index[-2],self.returns['total'][-2]), 
+                ax[2].annotate('X', 
+                    xy=(self.bars.index[-2],self.signals['signal'][-2]), 
                     xytext=coord, ha='center', 
                         textcoords='offset points', fontsize=20, color='red')
                         #arrowprops=dict(facecolor='red', shrink=0.001))
@@ -213,8 +219,10 @@ class MarketIntradayPortfolio(Portfolio):
             #lines[1].set_ydata(self.returns['total'])
             line, =ax[0].plot(self.bars['Close'], color='r', lw=3.)   
             line, =ax[1].plot(self.returns['total'], color='b', lw=3.) 
-            line=ax[2].bar(np.array(self.bars.index)[np.array(self.signals['signal']) > 0], np.array(self.signals['signal'])[np.array(self.signals['signal']) > 0], color='g', edgecolor='none') 
-            line=ax[2].bar(np.array(self.bars.index)[np.array(self.signals['signal']) < 0], np.array(self.signals['signal'])[np.array(self.signals['signal']) < 0], color='r', edgecolor='none') 
+            line=ax[2].bar(np.array(self.bars.index)[np.array(self.signals['signal']) > 0], 
+                np.array(self.signals['signal'])[np.array(self.signals['signal']) > 0], width, color='g', edgecolor='none') 
+            line=ax[2].bar(np.array(self.bars.index)[np.array(self.signals['signal']) < 0], 
+                np.array(self.signals['signal'])[np.array(self.signals['signal']) < 0], width, color='r', edgecolor='none') 
             ax[0].set_title('(' + str(self.bars.index[0]) + '-' + str(self.bars.index[-1]) +')')
             f.fmt_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
             f.autofmt_xdate()

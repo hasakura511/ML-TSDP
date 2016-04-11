@@ -55,9 +55,16 @@ def get_c2livepos(systemid, apikey, systemname):
         dataSet=dataSet.set_index('symbol')
         dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
         return dataSet
+    else:
+        if os.path.isfile('./data/portfolio/c2_' + systemname + '_portfolio.csv'):
+            dataSet=get_c2pos_from_csv(systemname);
+            dataSet=dataSet[dataSet.index == ''].copy()
+            dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
+            return dataSet
         
 def get_c2pos_from_csv(systemname):
     dataSet = pd.read_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv', index_col='symbol')
+    return dataSet
     
 
 

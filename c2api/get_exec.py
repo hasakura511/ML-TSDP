@@ -52,7 +52,7 @@ def get_c2livepos(systemid, apikey, systemname):
     jsondata = json.loads(data)
     if len(jsondata['response']) > 0:
         dataSet=json_normalize(jsondata['response'])
-        dataSet=dataSet.set_index(['symbol'])
+        dataSet=dataSet.set_index('symbol')
         dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
         return dataSet
         

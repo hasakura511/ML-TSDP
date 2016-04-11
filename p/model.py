@@ -36,7 +36,9 @@ import features
 import classifier
 import data
 import backtest
+import logging
 
+logging.basicConfig(filename='/logs/p_model.log',level=logging.DEBUG)
 
 def count_missing(df):
      return len(df) - df.count()
@@ -56,7 +58,7 @@ def getPredictionFromBestModel(bestdelta, bestlags, fout, cut, start_test, path_
     
 def dataPrep(maxdelta, maxlag, fout, cut, start_test, path_datasets, parameters):
     lags = range(2, maxlag) 
-    datasets = data.loadDatasets(path_datasets, fout, parameters[1])
+    datasets = data.loadDatasets(path_datasets, fout, parameters)
     delta = range(2, maxdelta) 
     print 'Delta days accounted: ', max(delta)
     datasets = features.applyRollMeanDelayedReturns(datasets, delta)
@@ -85,7 +87,7 @@ def performFeatureSelection(maxdeltas, maxlags, fout, cut, start_test, path_data
         print 'Maximum time lag applied', max(lags)
         print ''
         for maxdelta in range(3, maxdeltas + 2):
-            datasets = data.loadDatasets(path_datasets, fout, parameters[1])
+            datasets = data.loadDatasets(path_datasets, fout, parameters)
             delta = range(2, maxdelta) 
             print 'Delta days accounted: ', max(delta)
             datasets = features.applyRollMeanDelayedReturns(datasets, delta)
@@ -189,10 +191,7 @@ def performCV(X_train, y_train, number_folds, algorithm, parameters, fout, savem
     # the function returns the mean of the accuracy on the n-1 folds    
     return accuracies.mean()
 
-def get_signal():
-    
-    
-    
+def get_signal(lookback, portfolio):
     #performCV(X_train, y_train, 10, 'QDA', [])
     start_period = datetime.datetime(2015,12,15)  
     start_test = datetime.datetime(2016,3,15)  
@@ -210,28 +209,31 @@ def get_signal():
         file='idx_^GSPC'
         bestModel='./p/params/bestidx.pickle'
         start_period = datetime.datetime(1995,1,15)  
-        start_test = datetime.datetime(2010,3,15)  
+        start_test = datetime.datetime(2016,1,15)  
         end_period = datetime.datetime.now()        
         interval='idx_'
         path_datasets='./p/data/'
         name = './p/data/' + file + '.csv'
-        (out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
+        if len(sys.argv) > 2 and sys.argv[2] == '2':
+            (out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
         ############## idx ##############  
     
     
     parameters=list()
     parameters.append(bestModel)    
     parameters.append(interval)
+    parameters.append(lookback)
     if len(sys.argv) > 2 and sys.argv[2] == '1':
         prediction = performFeatureSelection(9,9, file, start_period, start_test, path_datasets, True, 'RF', folds, parameters)    
     prediction = getPredictionFromBestModel(9, 9, file, start_period, start_test, path_datasets, parameters)
-    print 'Next Signal: ' + str(prediction[0][-1])
-    # dataframe of S&P 500 historical prices (saved locally from Yahho Finance)
-    bars = pd.read_csv('./p/data/out.csv', index_col=0, parse_dates=True)    
-     
+    
+    # dataframe of Historical Price
+    bars = pd.read_csv(path_datasets + file + '.csv', index_col=0, parse_dates=True)    
     # subset of the data corresponding to test set
+    if parameters[2] > 0:
+        bars=bars.iloc[:-parameters[2]]
     bars = bars[-len(prediction[0]):]
-     
+    
     # initialize empty dataframe indexed as the bars. There's going to be perfect match between dates in bars and signals 
     signals = pd.DataFrame(index=bars.index)
      
@@ -243,7 +245,12 @@ def get_signal():
      
     # replace the zeros with -1 (new encoding for Down day)
     signals.signal[signals.signal == 0] = -1
-     
+    
+    print 'Last Bar: ' + str(bars.iloc[-1]['Close'])
+    print 'Next Signal: ' + str(signals.signal[-1])
+    logging.info('Last Bar: ' + str(bars.iloc[-1]['Close']))
+    logging.info('Next Signal: ' + str(signals.signal[-1]))
+    
     # compute the difference between consecutive entries in signals.signal. As
     # signals.signal was an array of 1 and -1 return signals.positions will 
     # be an array of 0s and 2s.
@@ -251,11 +258,20 @@ def get_signal():
      
     # calling portfolio evaluation on signals (predicted returns) and bars 
     # (actual returns)
-    portfolio = backtest.MarketIntradayPortfolio(symbol, bars, signals)
+    portfolio.setInit(symbol, bars, signals)
      
     # backtesting the portfolio and generating returns on top of that 
     returns = portfolio.backtest_portfolio()
     
-    portfolio.plot_graph()
     
-get_signal()
+portfolio = backtest.MarketIntradayPortfolio()    
+if len(sys.argv) > 3 and sys.argv[2] == '3':
+    lookback=int(sys.argv[3])
+    for num in range(0,lookback):
+        num=lookback-num
+        get_signal(num, portfolio)
+        if num == lookback:
+            portfolio.plot_graph()
+else:
+     get_signal(0, portfolio)
+     portfolio.plot_graph()

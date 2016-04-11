@@ -88,7 +88,8 @@ def getStockDataFromWeb(fout, name, path_datasets, start_string, end_string):
     return [out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia]
 
 
-def loadDatasets(path_datasets, fout, interval):
+def loadDatasets(path_datasets, fout, parameters):
+    interval=parameters[1]
     dataPath=path_datasets
     symbol_dict=dict()
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -105,22 +106,24 @@ def loadDatasets(path_datasets, fout, interval):
             print sym
     symbols, names = np.array(list(symbol_dict.items())).T
     
-    out =  get_quote(dataPath,fout, False)
+    out =  get_quote(dataPath,fout, False, parameters)
     out['AdjClose']=out['Close']
     out.columns = out.columns + '_Out'
     out['Return_Out'] = out['AdjClose_Out'].pct_change()
     out.to_csv('./p/data/out.csv')
-    data = [get_quote(dataPath, symbol, True)
+    data = [get_quote(dataPath, symbol, True, parameters)
           for symbol in symbols]
     dataSet=list()
     dataSet.append(out)
     dataSet.extend(data)
     return dataSet
 
-def get_quote(dataPath,sym, addParam=True):
+def get_quote(dataPath,sym, addParam, parameters):
     dataSet=pd.read_csv(dataPath + sym + '.csv',index_col='Date')
     dataSet.index=pd.to_datetime(dataSet.index)
     dataSet=dataSet.sort_index()    
+    if parameters[2] > 0:
+        dataSet=dataSet.iloc[:-parameters[2]]
     if addParam:
         #dataSet.columns.values[-1] = 'AdjClose'
         dataSet['AdjClose']=dataSet['Close']

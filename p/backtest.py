@@ -37,6 +37,7 @@ import classifier
 import data
 
 from abc import ABCMeta, abstractmethod
+#import matplotlib.animation as animation
 
 class Portfolio(object):
     """An abstract base class representing a portfolio of 
@@ -75,7 +76,10 @@ class MarketIntradayPortfolio(Portfolio):
     signals - A pandas DataFrame of signals (1, -1) for each symbol.
     initial_capital - The amount in cash at the start of the portfolio."""
 
-    def __init__(self, symbol, bars, signals, initial_capital=100000.0, shares=500):
+    def __init__(self):
+        print 'Initializing MarketIntradayPortfolio'
+        
+    def setInit(self, symbol, bars, signals, initial_capital=100000.0, shares=500):
         self.symbol = symbol        
         self.bars = bars
         self.signals = signals
@@ -83,7 +87,6 @@ class MarketIntradayPortfolio(Portfolio):
         self.shares = int(shares)
         self.positions = self.generate_positions()
         self.returns = dict()
-        
     def generate_positions(self):
         """Generate the positions DataFrame, based on the signals
         provided by the 'signals' DataFrame."""
@@ -99,7 +102,8 @@ class MarketIntradayPortfolio(Portfolio):
         portfolio = pd.DataFrame(index=self.positions.index)
         self.pos_diff = self.positions.diff()
             
-        portfolio['price_diff'] = self.bars['Close_Out']-self.bars['Open_Out']
+        #portfolio['price_diff'] = self.bars['Close_Out']-self.bars['Open_Out']
+        portfolio['price_diff'] = self.bars['Close']-self.bars['Open']
         portfolio['price_diff'][0:5] = 0.0
         portfolio['profit'] = self.positions[self.symbol] * portfolio['price_diff']
      
@@ -110,25 +114,32 @@ class MarketIntradayPortfolio(Portfolio):
         
     def plot_graph(self):
         # Plot results
+        lines=list()
         f, ax = plt.subplots(2, sharex=True)
         f.patch.set_facecolor('white')
         ylabel = self.symbol + ' Close Price in $'
-        self.bars['Close_Out'].plot(ax=ax[0], color='r', lw=3.)    
-        ax[0].set_ylabel(ylabel, fontsize=18)
+        #self.bars['Close_Out'].plot(ax=ax[0], color='r', lw=3.)    
+        line, =ax[0].plot(self.bars['Close'], color='r', lw=3.)   
+        lines.append(line)
+        ax[0].set_ylabel(ylabel, fontsize=8)
         ax[0].set_xlabel('', fontsize=18)
         ax[0].legend(('Close Price S&P-500',), loc='upper left', prop={"size":8})
         ax[0].set_title('S&P 500 Close Price VS Portofolio Performance (' + str(self.bars.index[0]) + '-' + str(self.bars.index[-1]) +')')
         
-        self.returns['total'].plot(ax=ax[1], color='b', lw=3.)  
+        line, =ax[1].plot(self.returns['total'], color='b', lw=3.) 
+        lines.append(line)
         ax[1].set_ylabel('Portfolio value in $', fontsize=8)
         ax[1].set_xlabel('Date', fontsize=18)
         ax[1].legend(('Portofolio Performance. Capital Invested: 100k $. Shares Traded per day: 500+500',), loc='upper left', prop={"size":8})            
         plt.tick_params(axis='both', which='major', labelsize=8)
         loc = ax[1].xaxis.get_major_locator()
         loc.maxticks[DAILY] = 24
-    
-        #figManager = plt.get_current_fig_manager()
-        #figManager.frame.Maximize(True)
+        def update(*args):
+            lines[0].set_ydata(self.bars['Close'])
+            lines[1].set_ydata(self.returns['total'])
+            # Return modified artists
+            return lines
+        #anim = animation.FuncAnimation(f, update, interval=10)
         
         plt.show()
 

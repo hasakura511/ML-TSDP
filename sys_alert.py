@@ -41,7 +41,7 @@ def start_proc():
 
     #Currencies
     intervals = ['30m','1h','10m','1 min']
-    pairs=bars.get_currencies()
+    pairs=bars.get_symbols()
     for interval in intervals:
         t1 = threading.Thread(target=check_bar, args=[pairs, interval])
         t1.daemon=True

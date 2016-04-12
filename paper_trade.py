@@ -3,7 +3,7 @@ import pandas as pd
 import time
 from os import listdir
 from os.path import isfile, join
-from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, get_ask as get_ib_ask, get_bid as get_ib_bid
+import ibapi.get_feed as feed
 from c2api.place_order import place_order as place_c2order
 import threading
 # -*- coding: utf-8 -*-
@@ -28,7 +28,7 @@ import pytz
 from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
-
+from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
 #other
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
 import numpy as np
@@ -42,6 +42,7 @@ from pandas.io.json import json_normalize
 
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.paper import adj_size
+import seitoolz.bars as bars
 from time import gmtime, strftime, localtime, sleep
 import logging
 
@@ -65,8 +66,6 @@ for i in systemdata.index:
           systemList[system['Name']]=systemList[system['Name']].append(system)
           
 
-currencyPairs = currencyList.keys()
-
 commissiondata=pd.read_csv('./data/systems/commission.csv')
 commissiondata=commissiondata.reset_index()
 commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + commissiondata['Exchange']
@@ -75,61 +74,19 @@ commissiondata=commissiondata.set_index('key')
 start_time = time.time()
 
 debug=False
-
-if len(sys.argv) > 1 and sys.argv[1] == 'debug':
+if len(sys.argv) > 1 and sys.argv[1] == '1':
     debug=True
-
-if debug:
-    showDist =  True
-    showPDFCDF = True
-    showAllCharts = True
-    perturbData = True
-    scorePath = './debug/scored_metrics_'
-    equityStatsSavePath = './debug/'
-    signalPath = './data/signals/'
-    dataPath = './data/from_IB/'
-else:
-    showDist =  False
-    showPDFCDF = False
-    showAllCharts = False
-    perturbData = False
-    scorePath = None
-    equityStatsSavePath = None
-    signalPath = './data/signals/'
-    dataPath = './data/from_IB/'
-
     
+signalPath = './data/signals/'
+dataPath = './data/from_IB/'
+
 #data Parameters
 #cycles = 2
 minDataPoints = 2000
-exchange='IDEALPRO'
-symbol='AUD'
-currency='USD'
-secType='CASH'
 durationStr='1 D'
 barSizeSetting='1 min'
 whatToShow='MIDPOINT'
-ticker = symbol + currency
 
-currencyPairsDict = {}
-tickerId=1
-files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-
-for pair in currencyPairs:
-    filename=dataPath+barSizeSetting+'_'+pair+'.csv'
-    data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
-   
-    eastern=timezone('US/Eastern')
-    endDateTime=dt.now(get_localzone())
-    date=endDateTime.astimezone(eastern)
-    date=date.strftime("%Y%m%d %H:%M:%S EST")
-    
-    symbol = pair[0:3]
-    currency = pair[3:6]
-    tickerId=tickerId+1
-        
-    currencyPairsDict[pair] = data 
-    get_feed(symbol, currency,'IDEALPRO','CASH', tickerId)
 
 def get_timestamp():
 	timestamp = int(time.time())
@@ -151,7 +108,7 @@ def get_models(systems):
     dps_model_pos=get_dps_model_pos(dpsList.keys())    
     return (model_pos, dps_model_pos)    
     
-def start_trade(systems, commissiondata, currencyPairsDict): 
+def start_trade(systems, commissiondata): 
     global debug
     if debug:
        print "Starting " + str(systems.iloc[0]['Name'])
@@ -163,7 +120,12 @@ def start_trade(systems, commissiondata, currencyPairsDict):
             symbols=systems['c2sym'].values
             for symbol in symbols:
               system=systems.loc[symbol].copy()
-              if system['ibsym'] + system['ibcur'] in currencyPairsDict \
+              symbol=system['ibsym']
+              if system['ibtype'] == 'CASH':
+                    symbol = str(system['ibsym']) + str(system['ibcur'])
+              
+              feed_dict=bars.get_bidask_list()
+              if symbol in feed_dict \
                  and \
                  get_timestamp() - int(system['last_trade']) > int(system['trade_freq']):
                      
@@ -172,9 +134,9 @@ def start_trade(systems, commissiondata, currencyPairsDict):
                         model=model_pos
                 else:
                         model=dps_model_pos
-                
-                ask=float(get_ib_ask(str(system['ibsym']),str(system['ibcur'])))
-                bid=float(get_ib_bid(str(system['ibsym']),str(system['ibcur'])))
+            
+                ask=float(bars.get_ask(symbol))
+                bid=float(bars.get_bid(symbol))
                 exchange=system['ibexch']
                 secType=system['ibtype']
                 
@@ -190,14 +152,15 @@ def start_trade(systems, commissiondata, currencyPairsDict):
                     system_c2pos_qty=round(system_pos['action']) * system['c2qty']
                     system_ibpos_qty=round(system_pos['action']) * system['ibqty']
 
-                    print "Processing " + system['Name'] + " Symbol: " + system['ibsym'] + system['ibcur'] + \
+                    print "Processing " + system['Name'] + " Symbol: " + symbol + \
                     " Timestamp: " + str(get_timestamp()) + " Last Trade: " + str(system['last_trade']) + " Freq: " +  str(system['trade_freq'])
-                    #print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
-                    #print        " System Algo: " + str(system['System']) 
-                    #print        " Ask: " + str(ask)
-                    #print        " Bid: " + str(bid)
-                    #print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
-                    #print        " Signal: " + str(system_ibpos_qty)
+                    print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+                    print        " System Algo: " + str(system['System']) 
+                    print        " Ask: " + str(ask)
+                    print        " Bid: " + str(bid)
+                    print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
+                    print        " IB Signal: " + str(system_ibpos_qty)
+                    print        " C2 Signal: " + str(system_c2pos_qty)
                 pricefeed=pd.DataFrame([[ask, bid, 10000, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
                 if ask > 0 and bid > 0:
                     eastern=timezone('US/Eastern')
@@ -221,14 +184,13 @@ def start_trade(systems, commissiondata, currencyPairsDict):
 threads = []
 def start_systems(systemList):
       global commissiondata
-      global currencyPairsDict
       global threads         
       for systemname in systemList.keys():
            systems=systemList[systemname]
            systems['last_trade']=0
            systems['key']=systems['c2sym']
            systems=systems.set_index('key')
-           sig_thread = threading.Thread(target=start_trade, args=[systems,commissiondata,currencyPairsDict])
+           sig_thread = threading.Thread(target=start_trade, args=[systems,commissiondata])
            sig_thread.daemon=True
            threads.append(sig_thread)
            sig_thread.start()

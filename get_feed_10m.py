@@ -2,33 +2,38 @@ import seitoolz.bars as bars
 import threading
 import time
 import logging
+import ibapi.get_feed as feed
 
 logging.basicConfig(filename='/logs/get_feed_10m.log',level=logging.DEBUG)
 
-def start_proc():
-    interval='10m'
-    minDataPoints = 5000
-    exchange='IDEALPRO'
-    secType='CASH'
+interval='10m'
+minDataPoints = 5000
+
+def get_history(contracts):
+    global interval
+    global minDataPoints
+    dataPath = './data/from_IB/'
     
-    pairs=bars.get_currencies()
+    (durationStr, barSizeSetting, whatToShow)=feed.interval_to_ibhist_duration(interval)
+    feed.cache_bar_csv(dataPath, barSizeSetting)
+    for contract in contracts:
+        histdata = feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
+        bars.proc_history(contract, histdata, interval)
+        
+def start_proc():
+    global interval
+    
+    contracts=bars.get_contracts()
+    pairs=bars.get_symbols()
     threads = []
-    #bars.get_hist_bars(pairs, interval, minDataPoints, exchange, secType)
-    #bars.create_bars(pairs, interval)
-      
-    t1 = threading.Thread(target=bars.get_hist_bars, args=[pairs, interval, minDataPoints, exchange, secType])
+    
+    t1 = threading.Thread(target=get_history, args=[contracts])
     t1.daemon=True
     threads.append(t1)
-    
-    #t2 = threading.Thread(target=bars.create_bars, args=[pairs, interval])
-    #t2.daemon=True
-    #threads.append(t2)
-    
     
     [t.start() for t in threads]
     #[t.join() for t in threads]
     bars.update_bars(pairs, interval)
-    
 
 start_proc()
 

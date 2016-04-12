@@ -31,6 +31,7 @@ from os import listdir
 from os.path import isfile, join
 import re
 import pandas as pd
+import seitoolz.bars as bars
 
 def getStock(path_datasets, symbol, start, end):
     """
@@ -79,6 +80,9 @@ def getStockDataFromWeb(fout, name, path_datasets, start_string, end_string):
     australia = getStock(path_datasets, '^AXJO', start, end)
     djia = getStock(path_datasets, '^DJI', start, end) 
     out =  getStock(path_datasets, fout, start, end)
+    
+    bars.bidask_to_csv('ES', out.index[-1], out['Close'][-1], out['Close'][-1])
+    
     #out.columns.values[-1] = 'AdjClose'
     #out.columns = out.columns + '_Out'
     #out['Return_Out'] = out['AdjClose_Out'].pct_change()

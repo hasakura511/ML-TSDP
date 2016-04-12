@@ -336,11 +336,9 @@ class IBWrapper(EWrapper):
             sym=rtdict[reqId]
             data=rtbar[reqId]
             if date[:8] == 'finished':
-                print("History request complete")
+                logging.info("Req ID: " + str(reqId) + " History request complete " + str(data.shape[0]) + " Records")
                 rthist[reqId].set()
-                data=data.reset_index()
-                data=data.sort_values(by='Date')  
-                data=data.set_index('Date')
+                data=data.sort_index()
             else:
                 data.loc[date] = [open,high,low,close,volume]
                 #print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
@@ -386,20 +384,20 @@ class IBWrapper(EWrapper):
                 if quote['Volume'] < 0:
                     quote['Volume'] = 0 
                 data.loc[time]=quote
-                #print "Update Bar: bar: sym: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
-            
+                #print "Update Bar: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
+                data=data.sort_index()          
+                data.to_csv(filename)
             else:
                 if len(data.index) > 1:
                     data=data.sort_index()          
                     data.to_csv(filename)
                     
                     quote=data.reset_index().iloc[-1]
-                    print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(count)
+                    print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
                     
                     gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], sym]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
                     gotbar.to_csv('./data/bars/' + sym + '.csv')
-                print "New Bar:   " + sym + " date:" + str(time) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(count)
-                
+                print "New Bar:   " + sym + " date:" + str(time) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
                 data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
                 
                 
@@ -446,8 +444,7 @@ class IBWrapper(EWrapper):
             ## ask
             marketdata[0][3]=float(value)
             fask[TickerId]=float(value)
-        #print "tickString: ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
-
+        
     
     
     def tickGeneric(self, TickerId, tickType, value):
@@ -480,23 +477,26 @@ class IBWrapper(EWrapper):
         try:
             global rtdict
             sym=rtdict[TickerId]
-            if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) < 30:
-                bidaskSaveDate[sym]=int(time.time())
             
-                eastern=timezone('US/Eastern')
-                nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
+            if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) > 5:
+                if fbid.has_key(TickerId) and fask.has_key(TickerId):
+                    print "tickGeneric SYM: " + sym + " ", fbid[TickerId], fask[TickerId]
+                    bidaskSaveDate[sym]=int(time.time())
                 
-                self.bidask_to_csv(sym, nowDate, fbid[TickerId], fask[TickerId])
+                    eastern=timezone('US/Eastern')
+                    nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
+                    if fbid.has_key(TickerId) > 0 and fask[TickerId] > 0:
+                        self.bidask_to_csv(sym, nowDate, fbid[TickerId], fask[TickerId])
                 
         except Exception as e:
             logging.error("tickGeneric", exc_info=True)
-        #print "ASK: " + str(marketdata[0]) + " ASKSIZE: " + str(marketdata[1]) +  "BID: " + str(marketdata[2]) + " BIDSIZE: " + str(marketdata[3])
         
         
     def bidask_to_csv(self, ticker, date, bid, ask):
         data=pd.DataFrame([[date, bid, ask]], columns=['Date','Bid','Ask'])
         data=data.set_index('Date')
-        data.to_csv('./data/bidask/' + ticker + '.csv')
+        if bid > 0 and ask > 0:
+            data.to_csv('./data/bidask/' + ticker + '.csv')
         return data
         
     def tickSize(self, TickerId, tickType, size):
@@ -523,6 +523,7 @@ class IBWrapper(EWrapper):
         ## update ticks of the form new price
         global fask
         global fbid
+        global bidaskSaveDate
         marketdata=self.data_tickdata[TickerId]
         
         if int(tickType)==1:
@@ -533,7 +534,24 @@ class IBWrapper(EWrapper):
             ## ask
             marketdata[3]=float(price)
             fask[TickerId]=float(price)
-       
+        try:
+            global rtdict
+            sym=rtdict[TickerId]
+           
+            if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) > 5:
+                if fbid.has_key(TickerId) and fask.has_key(TickerId):
+                    bidaskSaveDate[sym]=int(time.time())
+                    print "tickPrice SYM: " + sym + " ", fbid[TickerId], fask[TickerId], " Timer: ",(int(time.time()) - bidaskSaveDate[sym])
+                    
+                
+                    eastern=timezone('US/Eastern')
+                    nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
+                    
+                    if fbid.has_key(TickerId) > 0 and fask[TickerId] > 0:
+                        self.bidask_to_csv(sym, nowDate, fbid[TickerId], fask[TickerId])
+                    
+        except Exception as e:
+            logging.error("tickPrice", exc_info=True)
         #print "tickPrice: ASK: " + str(marketdata[3]) +  " BID: " + str(marketdata[2])
 
     def updateMktDepth(self, id, position, operation, side, price, size):
@@ -810,59 +828,57 @@ class IBclient(object):
             logging.error("get_account", exc_info=True)       
 
 
-    def get_IBAsk(self, symbol, currency):
+    def get_IBAsk(self, symname):
         global fdict
         global fask
-        symname=symbol + currency
         tickerid=fdict[symname]
         if tickerid in fask:
             return fask[tickerid]
         else:
             return -1
         
-    def get_IBBid(self, symbol, currency):
+    def get_IBBid(self, symname):
         global fdict
         global fbid
-        symname=symbol + currency
         tickerid=fdict[symname]
         if tickerid in fbid:
             return fbid[tickerid]
         else:
             return -1
-    def get_IB_market_data(self, ibcontract, tickerid=999):         
-        """
-        Returns granular market data
-        
-        Returns a tuple (bid price, bid size, ask price, ask size)
-        
-        """
-        
-        ## initialise the tuple
-        global fdict
-        global rtdict
-        if ibcontract.secType == 'CASH':
-            symname=ibcontract.symbol + ibcontract.currency
-        else:
-            symname=ibcontract.symbol
-        fdict[symname]=tickerid
-        rtdict[tickerid]=symname
-        self.cb.init_tickdata(tickerid)
-        self.cb.init_error()
+    def get_IB_market_data(self, ibcontract, tickerid=999):     
+        try:
+            """
+            Returns granular market data
             
-        # Request a market data stream 
-        self.tws.reqMktData(
-                tickerid,
-                ibcontract,
-                "",
-                False)       
+            Returns a tuple (bid price, bid size, ask price, ask size)
+            
+            """
+            
+            ## initialise the tuple
+            global fdict
+            global rtdict
+            symname=ibcontract.symbol
+            if ibcontract.secType == 'CASH':
+                symname=ibcontract.symbol + ibcontract.currency
+            
+            fdict[symname]=tickerid
+            rtdict[tickerid]=symname
+            self.cb.init_tickdata(tickerid)
+            self.cb.init_error()
+            
+            # Request a market data stream 
+            self.tws.reqMktData(
+                    tickerid,
+                    ibcontract,
+                    "",
+                    False)       
+    
+            marketdata=self.cb.data_tickdata[tickerid]
+            return marketdata
+        except Exception as e:
+            logging.error("get_IB_market_data", exc_info=True)   
         
-        start_time=time.time()
-        
-        marketdata=self.cb.data_tickdata[tickerid]
-        
-        return marketdata
-
-    def get_realtimebar(self, ibcontract, ibtype, tickerid, data, filename):
+    def get_realtimebar(self, ibcontract, tickerid, whatToShow, data, filename):
         try:
             """
             Returns a list of snapshotted prices, averaged over 'real time bars'
@@ -893,6 +909,10 @@ class IBclient(object):
             rtfile[tickerid]=filename
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
+            
+            contract=ibcontract
+            logging.info("\nRequesting Real Time data for " + contract.symbol + " " + contract.currency + " " + contract.exchange + " " + contract.secType)
+        
             # Request current price in 5 second increments
             # It turns out this is the only way to do it (can't get any other increments)
             
@@ -900,84 +920,58 @@ class IBclient(object):
                     tickerid,                                          # tickerId,
                     ibcontract,                                   # contract,
                     5, 
-                    ibtype,
+                    whatToShow,
                     0)
         
         
             start_time=time.time()
-            ## get about 16 seconds worth of samples
-            ## could obviously just stop at N bars as well eg. while len(pricevalue)<N:
-            
-    
-            
-            ## Cancel the stream
-            #tws.cancelRealTimeBars(MEANINGLESS_ID)
-    
-            #if len(pricevalue)==0 or iserror:
-            #    raise Exception("Failed to get price")
-    
+        
             
             return pricevalue
         except Exception as e:
             logging.error("get_realtimebar", exc_info=True)   
         
-    def getDataFromIB(self, brokerData,endDateTime,data):
+    def get_history(self, date, contract, whatToShow, data,filename,tickerid, minDataPoints, durationStr, barSizeSetting):
         try:
             WAIT_TIME=60
             global rtbar
             global rtdict
             global rthist
             global rtreqid
+
+            rtdict[tickerid]=contract.symbol
+            ticker = contract.symbol
             
-            iserror=False
-            
-            pricevalue=[]
-            tickerid=brokerData['tickerId']
-            rtdict[tickerid]=brokerData['symbol']
-            if brokerData['secType']=='CASH':
-                rtdict[tickerid]=brokerData['symbol'] + brokerData['currency']
+            if contract.secType =='CASH':
+                rtdict[tickerid]=contract.symbol + contract.currency
+                ticker=contract.symbol + contract.currency
             
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
-            #data_cons = pd.DataFrame()
-            # Instantiate our callback object
             
-        
-            # Instantiate a socket object, allowing us to call TWS directly. Pass our
-            # callback object so TWS can respond.
             tws = self.tws
-            #tws = EPosixClientSocket(callback, reconnect_auto=True)
-            # Connect to tws running on localhost
+
+            rtreqid[ticker]=tickerid
             
-            # Simple contract for GOOG
-            contract = Contract()
-            contract.exchange = brokerData['exchange']
-            contract.symbol = brokerData['symbol']
-            contract.secType = brokerData['secType']
-            contract.currency = brokerData['currency']
-            ticker = contract.symbol+contract.currency
-            #today = dt.today()
-            rtreqid[contract.symbol + contract.currency]=tickerid
-        
-            print("\nRequesting historical data for %s" % ticker)
+            logging.info("Req ID: " + str(tickerid) + " Requesting historical data End Date: " + date + " for " + contract.symbol + " " + contract.currency + " " + contract.exchange + " " + contract.secType)
         
             # Request some historical data.
             rthist[tickerid]=Event()
             #for endDateTime in getHistLoop:
             tws.reqHistoricalData(
-                brokerData['tickerId'],                                         # tickerId,
+                tickerid,                                         # tickerId,
                 contract,                                   # contract,
-                endDateTime,                            #endDateTime
-                brokerData['durationStr'],                                      # durationStr,
-                brokerData['barSizeSetting'],                                    # barSizeSetting,
-                brokerData['whatToShow'],                                   # whatToShow,
-                brokerData['useRTH'],                                          # useRTH,
-                brokerData['formatDate']                                          # formatDate
+                date,                            #endDateTime
+                durationStr,                                      # durationStr,
+                barSizeSetting,                                    # barSizeSetting,
+                whatToShow,                                   # whatToShow,
+                0,                                          # useRTH,
+                1                                         # formatDate
                 )
         
         
             print("====================================================================")
-            print(" %s History requested, waiting %ds for TWS responses" % (endDateTime, WAIT_TIME))
+            print(" %s History requested, waiting %ds for TWS responses" % (date, WAIT_TIME))
             print("====================================================================")
             
             try:
@@ -988,14 +982,12 @@ class IBclient(object):
                 if not rthist[tickerid].is_set():
                     print('Failed to get history within %d seconds' % WAIT_TIME)
             
-            #data_cons = pd.concat([data_cons,callback.data],axis=0)
-                     
            
             return rtbar[tickerid]
         except Exception as e:
-            logging.error("getDataFromIB", exc_info=True)   
+            logging.error("get_history", exc_info=True)   
         
-    def proc_history(self, tickerid, sym, type, currency,data):
+    def proc_history(self, tickerid, contract ,data):
         try:
             WAIT_TIME=60
             global rtbar
@@ -1003,12 +995,17 @@ class IBclient(object):
             global rthist
             global rtreqid
             iserror=False
+            
+            sym=contract.symbol 
+            currency=contract.currency
+            
             if type == 'CASH':
                 rtdict[tickerid]=sym+currency
                 rtreqid[sym+currency]=tickerid
             else:
                 rtdict[tickerid]=sym
                 rtreqid[sym]=tickerid
+                
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
             else:
@@ -1020,17 +1017,16 @@ class IBclient(object):
                                             tick['Low'],tick['Close'],tick['Volume'],-1,-1,-1)
                
                      
-           
             return rtbar[tickerid]
         except Exception as e:
             logging.error("proc_history", exc_info=True)   
 
-    def get_bar(self, symbol, currency):
+    def get_bar(self, symname):
         
         global rtreqid
         global rtbar
-        symname=symbol + currency
         tickerid=rtreqid[symname]
+        logging.info("get_bar:" + symname + ":" + str(tickerid))
         if tickerid in rtbar:
             return rtbar[tickerid]
         else:

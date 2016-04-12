@@ -1,0 +1,2 @@
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
+1,Paper,Paper,276040.0,USD,BITCOIN,1.0,,,1.0,5520800.0,20.0,20.0,-276040.0,BOT,BTCUSD_btcoidIDR,USD,20160411 09:25:04 EST,,0.0,-176040.0,-108416000.0,-452080.0,5520800.0,100000.0,100000.0,-276040.0

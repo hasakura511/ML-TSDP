@@ -201,8 +201,11 @@ class zigzag(object):
                 mdd = dd
         return mdd
         
-    def plot_pivots(self, l=2, w=2, mp=None, mv=None):
-    
+    def plot_pivots(self, l=6, w=6,**kwargs):
+        mp=kwargs.get('mp',None)
+        mv=kwargs.get('mv',None)
+        cycleList = kwargs.get('cycleList',None)
+        indicators = kwargs.get('indicators',None)
         def format_date(x, pos=None):
             thisind = np.clip(int(x + 0.5), 0, self.prices.shape[0] - 1)
             return self.prices.index[thisind].strftime("%Y-%m-%d %H:%M")
@@ -228,6 +231,20 @@ class zigzag(object):
             xytext=(20, -20), textcoords='offset points',
             arrowprops=dict(facecolor='red', shrink=0.05),
             )
+        if cycleList is not None:
+            for l in cycleList:
+                 ax.annotate(str(l[0]), l[1],
+                 xytext=(5, 0), textcoords='offset points',
+                 size='medium')
+        if indicators is not None:
+            ax2=ax.twinx()
+            ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+            for i,ind in enumerate(indicators):
+                ax2.plot(np.arange(len(indicators)),indicators[ind], label=ind)
+            handles, labels = ax2.get_legend_handles_labels()
+            lgd2 = ax2.legend(handles, labels, loc='best',prop={'size':10})
+        ax.set_xlim(0, len(self.prices))
+        
         plt.show()
         plt.close()
     
@@ -394,8 +411,8 @@ def autocorrel(close, lb, period=1):
     if type(close) is pd.core.series.Series:
         close = close.values
 
-    ac = np.insert(ta.CORREL(close[0:len(close)-period], close[period:len(close)], timeperiod=lb),0,np.nan)
-    return ac
+    ac = np.insert(ta.CORREL(close[0:len(close)-period], close[period:len(close)], timeperiod=lb),0,np.zeros(period))
+    return np.nan_to_num(ac)
     
 def kaufman_efficiency(close,lb):
     if type(close) is pd.core.series.Series:

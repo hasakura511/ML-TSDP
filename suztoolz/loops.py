@@ -1779,18 +1779,18 @@ def findBestDPS(DPS, PRT, system, start, end, direction, systemName, **kwargs):
         equityStats['avgSafefmm'] =minmax_scale(robust_scale(equityStats.avgSafef.reshape(-1, 1)))
         equityStats['numTradesmm'] =-minmax_scale(robust_scale(equityStats.numTrades.reshape(-1, 1)))
         equityStats['cumCARmm'] =minmax_scale(robust_scale(equityStats.cumCAR.reshape(-1, 1)))
-        equityStats['MAXDDmm'] =minmax_scale(robust_scale(equityStats.MAXDD.reshape(-1, 1)))
+        #equityStats['MAXDDmm'] =minmax_scale(robust_scale(equityStats.MAXDD.reshape(-1, 1)))
         equityStats['sortinoRatiomm'] = minmax_scale(robust_scale(equityStats.sortinoRatio.reshape(-1, 1)))
         #equityStats['marRatiomm'] =minmax_scale(robust_scale(equityStats.marRatio.reshape(-1, 1)))
-        equityStats['sharpeRatiomm'] =minmax_scale(robust_scale(equityStats.sharpeRatio.reshape(-1, 1)))
-        equityStats['k_ratiomm'] =minmax_scale(robust_scale(equityStats.k_ratio.reshape(-1, 1)))
+        #equityStats['sharpeRatiomm'] =minmax_scale(robust_scale(equityStats.sharpeRatio.reshape(-1, 1)))
+        #equityStats['k_ratiomm'] =minmax_scale(robust_scale(equityStats.k_ratio.reshape(-1, 1)))
 
         equityStats['scoremm'] =  equityStats.avgSafefmm+equityStats.cumCARmm+\
-                                        equityStats.sortinoRatiomm+equityStats.k_ratiomm+\
-                                       equityStats.sharpeRatiomm+equityStats.numTradesmm
+                                        equityStats.sortinoRatiomm+equityStats.numTradesmm
+                                       #equityStats.sharpeRatiomm
                                        #+equityStats.marRatiomm
                                        #+equityStats.MAXDDmm
-
+                                        #equityStats.k_ratiomm+\
         equityStats = equityStats.sort_values(['scoremm'], ascending=False)
         
     topSystem = equityStats.system.iloc[0]

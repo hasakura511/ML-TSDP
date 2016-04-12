@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-USDCAD,USD,,20000.0,20000.0,1.27665,1.27665,0.0,2.0,-5.28856,259.12464,309.12464,Paper,CAD,-3.28856
+USDCAD,USD,,-20000.0,-20000.0,1.27712,1.27712,0.0,2.0,-4.39168,264.1502,316.1502,Paper,CAD,-2.39168

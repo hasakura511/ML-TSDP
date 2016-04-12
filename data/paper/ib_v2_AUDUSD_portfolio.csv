@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-AUDUSD,AUD,,20000.0,20000.0,0.75638,0.75638,0.0,2.0,71.8,-163.2,-73.2,Paper,USD,73.8
+AUDUSD,AUD,,20000.0,20000.0,0.75638,0.75638,15371.0,2.0,241.4,76.2,170.2,Paper,USD,243.4

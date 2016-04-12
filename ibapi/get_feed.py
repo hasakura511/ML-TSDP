@@ -10,6 +10,15 @@ from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
 import logging
+from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
+import seitoolz.bars as bars
+from dateutil.parser import parse
+import os
+import random
+
+currencyPairsDict=dict()
+prepData=dict()
+tickerId=random.randint(100,9999)
 
 callback = IBWrapper()
 client=IBclient(callback)
@@ -21,86 +30,219 @@ def reconnect_ib():
     callback = IBWrapper()
     client=IBclient(callback)
 
-def get_bar(symbol, currency):
-    return client.get_bar(str(symbol), str(currency))
+def get_bar(symbol):
+    return client.get_bar(str(symbol))
     
-def get_ask(symbol, currency):
+def get_ask(symbol):
     global client
-    ask=client.get_IBAsk(str(symbol), str(currency))
+    ask=client.get_IBAsk(str(symbol))
     return ask
     
-def get_bid(symbol, currency):
+def get_bid(symbol):
     global client
-    return client.get_IBBid(symbol, currency)
+    return client.get_IBBid(str(symbol))
    
-def get_feed(sym, currency, exchange, type, tickerId):
+def get_feed(contract, tickerId):
     global tickerid, client, callback
-    # Simple contract for GOOG
-    contract = Contract()
-    contract.symbol = sym
-    contract.secType = type
-    contract.exchange = exchange
-    contract.currency = currency
-    ans=client.get_IB_market_data(contract, tickerId)
+    client.get_IB_market_data(contract, tickerId)
 
-def get_realtimebar(sym, currency, exchange, type, whatToShow, data, filename, tickerId):
+def get_realtimebar(ibcontract, tickerid, whatToShow, data, filename):
     global client, callback
-    # Simple contract for GOOG
-    contract = Contract()
-    contract.symbol = sym
-    contract.secType = type
-    contract.exchange = exchange
-    contract.currency = currency
-    client.get_realtimebar(contract, whatToShow, tickerId, data, filename)
+    client.get_realtimebar(ibcontract, tickerid, whatToShow, data, filename)
 
-def proc_history(sym, currency, exchange, type, whatToShow, data, filename, tickerId):
+def proc_history(tickerId, contract, data):
     global client, callback
-    return client.proc_history(tickerId, sym, type, currency, data)
-   
+    return client.proc_history(tickerId, contract, data)
 
-def getDataFromIB( brokerData,endDateTime,data):
-    data=client.getDataFromIB(brokerData,endDateTime,data)
-    return data
-
-def get_history(date, symbol, currency, exchange, type, whatToShow,data,filename,tickerId, minDataPoints, durationStr, barSizeSetting):
-        print "Requesting history for: " + symbol + currency + " ending: " + date
-        brokerData = {}
-        brokerData =  {'port':7496, 'client_id':101,\
-                             'tickerId':tickerId, 'exchange':exchange,'symbol':symbol,\
-                             'secType':type,'currency':currency,\
-                             'endDateTime':date, 'durationStr':durationStr,\
-                             'barSizeSetting':barSizeSetting,\
-                             'whatToShow':whatToShow, 'useRTH':0, 'formatDate': 1 \
-                              }
+def get_history(date, contract, whatToShow, data,filename, tickerId, minDataPoints, durationStr, barSizeSetting):
+        symbol= contract.symbol
+        currency=contract.currency
+        ticker=symbol        
+        if contract.secType == 'CASH':
+            ticker=symbol+currency
+        print "Requesting history for: " + ticker + " ending: " + date
                               
          #for date in getHistLoop:
         if data.shape[0] < minDataPoints:
             while data.shape[0] < minDataPoints:      
-                data = getDataFromIB(brokerData, date, data)
-                data=get_bar(symbol, currency)
+                data = client.get_history(date, contract, whatToShow, data,filename,tickerId, minDataPoints, durationStr, barSizeSetting)
+                data = get_bar(ticker)
                 if data.shape[0] > 0:
                     logging.info("Received Date: " + str(data.index[0]) )
-                    date = data.index.to_datetime()[0]
+                    date = data.sort_index().index.to_datetime()[0]
                     #eastern=timezone('US/Eastern')
                     #date=date.astimezone(eastern)
                     date=date.strftime("%Y%m%d %H:%M:%S EST")
-                    brokerData['endDateTime']=date
                     
                     time.sleep(30)
+                else:
+                    return data
         else:
-            data = getDataFromIB(brokerData, date, data)
-            data=get_bar(symbol, currency)
+
+            data = client.get_history(date, contract, whatToShow, data,filename,tickerId, minDataPoints, durationStr, barSizeSetting)
+            data = get_bar(ticker)
             logging.info("Received Date: " + str(data.index[0]) )
             #update date
-            date = data.index.to_datetime()[0]
+            date = data.sort_index().index.to_datetime()[0]
             #eastern=timezone('US/Eastern')
             #date=date.astimezone(eastern)
             date=date.strftime("%Y%m%d %H:%M:%S EST")
-            brokerData['endDateTime']=date
             
             time.sleep(30)
+            
         #set date as last index for next request
     
-            
-        return data #get_bar(symbol, currency)
+        return data
         
+def get_TickerId(symbol):
+    global tickerId
+    global currencyPairsDict
+    if not currencyPairsDict.has_key(symbol):
+            tickerId=tickerId+1
+            currencyPairsDict[symbol] = tickerId
+    return currencyPairsDict[symbol]
+
+def get_TickerDict():
+    global currencyPairsDict
+    return currencyPairsDict
+    
+def cache_bar_csv(dataPath, barSizeSetting, symfilter=''):
+    global prepData
+    symbols=bars.get_contracts()
+    for contract in symbols:
+        symbol=contract.symbol
+        if contract.secType == 'CASH':
+            symbol = contract.symbol + contract.currency
+        pair=symbol
+        if len(symfilter) == 0 or pair == symfilter:
+            logging.info( 'Reading Existing Data For ' + symbol )
+            filename=dataPath+barSizeSetting+'_'+symbol+'.csv'
+            pair=symbol
+            tickerId=get_TickerId(pair)
+            data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
+               
+            if os.path.isfile(filename):           
+                data=pd.read_csv(filename, index_col='Date')
+                data=proc_history(tickerId, contract, data)
+            else:
+                data.to_csv(filename)
+            
+            prepData[pair]=data
+            logging.info( 'Done Reading Existing Data For ' + pair )
+    return prepData
+
+def get_bar_bidask(symfilter = ''):
+    global tickerId
+    symbols=bars.get_contracts()
+    for contract in symbols:
+        pair=contract.symbol
+        if contract.secType == 'CASH':
+            pair=contract.symbol + contract.currency 
+        if len(symfilter) == 0 or pair == symfilter:
+            logging.info(  'Subscribing Bid/Ask to ' + pair  )
+            eastern=timezone('US/Eastern')
+            endDateTime=dt.now(get_localzone())
+            date=endDateTime.astimezone(eastern)
+            date=date.strftime("%Y%m%d %H:%M:%S EST")
+            tickerId=get_TickerId(pair)
+            get_feed(contract, tickerId)
+            logging.info( 'Done Subscribing to ' + pair  )
+        
+def get_bar_feed(dataPath, whatToShow, barSizeSetting, symfilter=''):
+    global prepData
+    symbols=bars.get_contracts()
+    for contract in symbols:
+        pair=contract.symbol
+        if contract.secType == 'CASH':
+            pair = contract.symbol + contract.currency
+        if len(symfilter) == 0 or pair == symfilter:
+            logging.info(  'Subscribing Realtime Bar to ' + pair  )
+            filename=dataPath+barSizeSetting+'_'+pair+'.csv'
+            tickerId=get_TickerId(pair)
+            get_realtimebar(contract, tickerId, whatToShow, prepData[pair], filename)
+            logging.info( 'Done Subscribing to ' + pair  )
+
+def interval_to_ibhist_duration(interval):
+    durationStr='1 D'
+    barSizeSetting='1 min'
+    if interval == '30m':
+        durationStr='30 D'
+        barSizeSetting='30 mins'
+    elif interval == '10m':
+        durationStr='10 D'
+        barSizeSetting='10 mins'
+    elif interval == '1h':
+        durationStr='30 D'
+        barSizeSetting='1 hour'
+    whatToShow='MIDPOINT'
+    return (durationStr, barSizeSetting, whatToShow)
+    
+def get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter=''):
+    global tickerId
+    global currencyPairsDict
+    symbols=bars.get_contracts()
+    for contract in symbols:
+        pair=contract.symbol
+        if contract.secType == 'CASH':
+            pair = contract.symbol + contract.currency
+        if len(symfilter) == 0 or pair == symfilter:
+            logging.info(  'Getting History for ' + pair  )
+            filename=dataPath+barSizeSetting+'_'+pair+'.csv'
+            
+            eastern=timezone('US/Eastern')
+            endDateTime=dt.now(get_localzone())
+            date=endDateTime.astimezone(eastern)
+            date=date.strftime("%Y%m%d %H:%M:%S EST")
+            tickerId=get_TickerId(pair)
+            data=get_history(date, contract, whatToShow, prepData[pair], filename, tickerId, minDataPoints, durationStr, barSizeSetting)
+    
+            logging.info( 'Done Getting History for ' + pair  )
+            if len(symfilter) > 0:
+                return data
+            
+def check_bar(interval, symfilter=''):
+    dataPath = './data/from_IB/'
+    barPath='./data/bars/'
+    
+    try:
+        count=0
+        symbols=bars.get_contracts()
+        for contract in symbols:
+            pair=contract.symbol
+            if contract.secType == 'CASH':
+                pair = contract.symbol + contract.currency
+            if len(symfilter) == 0 or pair == symfilter:
+                dataFile=dataPath + interval + '_' + pair + '.csv'
+                barFile=barPath + pair + '.csv'
+                
+                if os.path.isfile(dataFile) and os.path.isfile(barFile):
+                    #data=pd.read_csv(dataFile, index_col='Date')
+                    bar=pd.read_csv(barFile, index_col='Date')
+                    eastern=timezone('US/Eastern')
+                    
+                    #timestamp
+                    #dataDate=parse(data.index[-1]).replace(tzinfo=eastern)
+                    nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
+                    if bar.shape[0] > 0:
+                        barDate=parse(bar.index[-1]).replace(tzinfo=eastern)         
+                    else:
+                        barDate=datetime.date(2000,1,1)
+                    #dtimestamp = time.mktime(dataDate.timetuple())
+                    btimestamp = time.mktime(barDate.timetuple())
+                    timestamp=time.mktime(nowDate.timetuple()) + 3600
+                    checktime = 3
+                    
+                    checktime = checktime * 60
+                    logging.info(pair + ' Feed Last Received ' + str(round((timestamp - btimestamp)/60, 2)) + ' mins ago')
+                        
+                    if timestamp - btimestamp > checktime:
+                        logging.error(pair + ' Feed not being received for ' + str(round((timestamp - btimestamp)/60, 2))) + ' mins'
+                        if len(symfilter) > 0:
+                            return False
+                        count = count + 1
+        if count > 5:
+                return False
+        else:
+                return True
+    except Exception as e:
+            logging.error("check_bar", exc_info=True)

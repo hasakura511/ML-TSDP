@@ -3,6 +3,7 @@ import pandas as pd
 import time
 from os import listdir
 from os.path import isfile, join
+from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
 # -*- coding: utf-8 -*-
 """
 Created on Tue Mar 08 20:10:29 2016
@@ -30,7 +31,6 @@ import os
 from dateutil.parser import parse
 import logging
 import re
-from ibapi.get_feed import get_history
 
 rtbar={}
 rtdict={}
@@ -40,6 +40,15 @@ rtreqid={}
 lastDate={}
 tickerId=1
 
+def get_bidask_list():
+    dataPath='./data/bidask/'
+    files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
+    baList=list()
+    for file in files:
+            (inst, ext)=file.split('.')
+            baList.append(inst)
+            #print 'Found BidAsk: ' + inst
+    return baList
 
 def get_btc_list():
     dataPath='./data/from_IB/'
@@ -66,23 +75,46 @@ def get_btc_exch_list():
     
     
 def get_currencies():
-    currencyList=dict()
-    v1sList=dict()
-    dpsList=dict()
+    return get_symbols()
+
+
+def get_symbols():
+    symList=dict()
+    
     systemdata=pd.read_csv('./data/systems/system.csv')
     systemdata=systemdata.reset_index()
     for i in systemdata.index:
         system=systemdata.ix[i]
+        symbol=system['ibsym']
         if system['ibtype'] == 'CASH':
-         
-          currencyList[system['ibsym']+system['ibcur']]=1
-          if system['Version'] == 'v1':
-              v1sList[system['System']]=1
-          else:
-              dpsList[system['System']]=1
-    currencyPairs = currencyList.keys()
-    return currencyPairs
+          symbol=system['ibsym']+system['ibcur']
+        if system['ibtype'] != 'BITCOIN':
+          symList[symbol]=[symbol, system['ibexch'], system['ibtype'], system['ibcur']]
+          
+       
+    return symList.keys()
 
+def get_contracts():
+    symList=dict()
+    
+    systemdata=pd.read_csv('./data/systems/system.csv')
+    systemdata=systemdata.reset_index()
+    for i in systemdata.index:
+        system=systemdata.ix[i]
+        contract = Contract()
+        symbol=system['ibsym']
+        if system['ibtype'] == 'CASH':
+          symbol=system['ibsym']+system['ibcur']
+        if system['ibtype'] != 'BITCOIN':
+                contract.symbol = system['ibsym']
+                contract.secType = system['ibtype']
+                contract.exchange = system['ibexch']
+                contract.currency = system['ibcur']
+                if system['ibtype'] == 'FUT':
+                        contract.localSymbol= system['iblocalsym']
+                symList[symbol]=contract
+          
+    return symList.values()  
 
 def compress_min_bar(sym, histData, filename, interval='30m'):
     try:
@@ -239,8 +271,8 @@ def create_bars(currencyPairs, interval='30m'):
                     compress_min_bar(symbol, quote, filename, interval)
     except Exception as e:
         logging.error("create_bars", exc_info=True)
-            
-def get_hist_bars(currencyPairs, interval='30m', minDataPoints = 10000, exchange='IDEALPRO', secType='CASH'):
+         
+def proc_history(contract, histdata, interval='30m'):
     try:
         global rtbar
         global rtdict
@@ -250,78 +282,67 @@ def get_hist_bars(currencyPairs, interval='30m', minDataPoints = 10000, exchange
         
         dataPath='./data/from_IB/'
         
-        for pair in currencyPairs:
-            filename=dataPath+interval+'_'+pair+'.csv'
-            symbol = pair[0:3]
-            currency = pair[3:6]
+        symbol= contract.symbol
+        currency=contract.currency
+        pair=symbol
+        if contract.secType == 'CASH':
+            pair=symbol+currency
+        filename=dataPath+interval+'_'+pair+'.csv'
+        
+        reqId=0
+        date=''
+        if not rtreqid.has_key(pair):
             
-            durationStr='1 D'
-            barSizeSetting='1 min'
-            if interval == '30m':
-                durationStr='30 D'
-                barSizeSetting='30 mins'
-            elif interval == '10m':
-                durationStr='10 D'
-                barSizeSetting='10 mins'
-            elif interval == '1h':
-                durationStr='30 D'
-                barSizeSetting='1 hour'
-            whatToShow='MIDPOINT'
+            tickerId=tickerId+1
+            reqId=tickerId
+            if not rtbar.has_key(reqId):
+                if os.path.isfile(filename):
+                    rtbar[reqId]=pd.read_csv(filename, index_col='Date')
+                    eastern=timezone('US/Eastern')
+                    endDateTime=dt.now(get_localzone())
+                    date=endDateTime.astimezone(eastern)
+                    date=date.strftime("%Y%m%d %H:%M:%S EST")
+                else:
+                    rtbar[reqId]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
+                    eastern=timezone('US/Eastern')
+                    endDateTime=dt.now(get_localzone())
+                    date=endDateTime.astimezone(eastern)
+                    date=date.strftime("%Y%m%d %H:%M:%S EST")
+                    
+            rtdict[reqId]=pair
+            rtfile[reqId]=filename
+            rtreqid[pair]=reqId
             
-            reqId=0
-            date=''
-            if not rtreqid.has_key(pair):
-                
-                tickerId=tickerId+1
-                reqId=tickerId
-                if not rtbar.has_key(reqId):
-                    if os.path.isfile(filename):
-                        rtbar[reqId]=pd.read_csv(filename, index_col='Date')
-                        eastern=timezone('US/Eastern')
-                        endDateTime=dt.now(get_localzone())
-                        date=endDateTime.astimezone(eastern)
-                        date=date.strftime("%Y%m%d %H:%M:%S EST")
-                    else:
-                        rtbar[reqId]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
-                        eastern=timezone('US/Eastern')
-                        endDateTime=dt.now(get_localzone())
-                        date=endDateTime.astimezone(eastern)
-                        date=date.strftime("%Y%m%d %H:%M:%S EST")
-                rtdict[reqId]=pair
-                rtfile[reqId]=filename
-                rtreqid[pair]=reqId
-                
-                print 'Starting: ' + date
-            else:
-                reqId=rtreqid[pair]
-                
+            print 'Starting: ' + date
+        else:
+            reqId=rtreqid[pair]
+            
+        data = rtbar[reqId]
+        
+        if len(histdata.index) > 1:
             data = rtbar[reqId]
-            histdata = get_history(date, symbol, currency, exchange, secType, whatToShow, data, filename, reqId, minDataPoints, durationStr, barSizeSetting)
+            data = data.reset_index().set_index('Date')
+            histdata=histdata.reset_index().set_index('Date')
+            #data.to_csv('test1')
+            #histdata.to_csv('test2')
             
-            if len(histdata.index) > 1:
-                data = rtbar[reqId]
-                data = data.reset_index().set_index('Date')
-                histdata=histdata.reset_index().set_index('Date')
-                #data.to_csv('test1')
-                #histdata.to_csv('test2')
-                
-                data = data.combine_first(histdata)
-                #data.to_csv('test3')
-                 
-                data  =data.reset_index() 
-                histdata = histdata.reset_index()
-                
-                data=data.sort_values(by='Date')  
-                quote=data.iloc[-1]
-                #print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) 
-                data=data.set_index('Date')
-                rtbar[reqId]=data
-                data.to_csv(filename)
-                
-                
-                #gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], pair]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-                #gotbar.to_csv('./data/bars/' + interval + '_' + pair + '.csv')
-                #time.sleep(30)
+            data = data.combine_first(histdata)
+            #data.to_csv('test3')
+             
+            data  =data.reset_index() 
+            histdata = histdata.reset_index()
+            
+            data=data.sort_values(by='Date')  
+            quote=data.iloc[-1]
+            #print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) 
+            data=data.set_index('Date')
+            rtbar[reqId]=data
+            data.to_csv(filename)
+            
+            
+            #gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], pair]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
+            #gotbar.to_csv('./data/bars/' + interval + '_' + pair + '.csv')
+            #time.sleep(30)
     except Exception as e:
         logging.error("get_hist_bars", exc_info=True)
 
@@ -483,6 +504,14 @@ def bidask_to_csv(ticker, date, bid, ask):
     data=data.set_index('Date')
     data.to_csv('./data/bidask/' + ticker + '.csv')
     return data
+
+def get_ask(ticker):
+    data=bidask_from_csv(ticker).iloc[-1]
+    return data['Ask']
+
+def get_bid(ticker):
+    data=bidask_from_csv(ticker).iloc[-1]
+    return data['Bid']
     
 def bidask_from_csv(ticker):
     if os.path.isfile('./data/bidask/' + ticker + '.csv'):

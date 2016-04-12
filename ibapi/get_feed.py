@@ -116,7 +116,8 @@ def cache_bar_csv(dataPath, barSizeSetting, symfilter=''):
         pair=symbol
         if len(symfilter) == 0 or pair == symfilter:
             logging.info( 'Reading Existing Data For ' + symbol )
-            filename=dataPath+barSizeSetting+'_'+symbol+'.csv'
+            interval=duration_to_interval(barSizeSetting)
+            filename=dataPath+interval+'_'+pair+'.csv'
             pair=symbol
             tickerId=get_TickerId(pair)
             data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
@@ -157,11 +158,22 @@ def get_bar_feed(dataPath, whatToShow, barSizeSetting, symfilter=''):
             pair = contract.symbol + contract.currency
         if len(symfilter) == 0 or pair == symfilter:
             logging.info(  'Subscribing Realtime Bar to ' + pair  )
-            filename=dataPath+barSizeSetting+'_'+pair+'.csv'
+            interval=duration_to_interval(barSizeSetting)
+            filename=dataPath+interval+'_'+pair+'.csv'
             tickerId=get_TickerId(pair)
             get_realtimebar(contract, tickerId, whatToShow, prepData[pair], filename)
             logging.info( 'Done Subscribing to ' + pair  )
 
+def duration_to_interval(duration):
+    if duration == '1 min':
+        return '1 min'
+    elif duration == '30 mins':
+        return '30m'
+    elif duration == '10 mins':
+        return '10m'
+    elif duration == '1 hour':
+        return '1h'
+        
 def interval_to_ibhist_duration(interval):
     durationStr='1 D'
     barSizeSetting='1 min'
@@ -187,8 +199,8 @@ def get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSettin
             pair = contract.symbol + contract.currency
         if len(symfilter) == 0 or pair == symfilter:
             logging.info(  'Getting History for ' + pair  )
-            filename=dataPath+barSizeSetting+'_'+pair+'.csv'
-            
+            interval=duration_to_interval(barSizeSetting)
+            filename=dataPath+interval+'_'+pair+'.csv'
             eastern=timezone('US/Eastern')
             endDateTime=dt.now(get_localzone())
             date=endDateTime.astimezone(eastern)
@@ -200,9 +212,10 @@ def get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSettin
             if len(symfilter) > 0:
                 return data
             
-def check_bar(interval, symfilter=''):
+def check_bar(barSizeSetting, symfilter=''):
     dataPath = './data/from_IB/'
     barPath='./data/bars/'
+    interval=duration_to_interval(barSizeSetting)
     
     try:
         count=0

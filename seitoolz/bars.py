@@ -236,7 +236,7 @@ def compress_min_bar(sym, histData, filename, interval='30m'):
             if quote['Volume'] < 0:
                 quote['Volume'] = 0 
             data.loc[date]=quote
-            print "Update Bar: bar: sym: " + sym + " date:" + str(date) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) 
+            #print "Update Bar: bar: sym: " + sym + " date:" + str(date) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) 
                     
         else:
             if len(data.index) > 1:

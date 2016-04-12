@@ -61,10 +61,12 @@ def get_history(date, contract, whatToShow, data,filename, tickerId, minDataPoin
         if contract.secType == 'CASH':
             ticker=symbol+currency
         print "Requesting history for: " + ticker + " ending: " + date
-                              
+        mydata=data
          #for date in getHistLoop:
         if data.shape[0] < minDataPoints:
-            while data.shape[0] < minDataPoints:      
+            count=0
+            while data.shape[0] < minDataPoints:    
+                
                 data = client.get_history(date, contract, whatToShow, data,filename,tickerId, minDataPoints, durationStr, barSizeSetting)
                 data = get_bar(ticker)
                 if data.shape[0] > 0:
@@ -76,19 +78,25 @@ def get_history(date, contract, whatToShow, data,filename, tickerId, minDataPoin
                     
                     time.sleep(30)
                 else:
-                    return data
+                    count=count + 1
+                    if count > 10:
+                        return mydata
         else:
 
             data = client.get_history(date, contract, whatToShow, data,filename,tickerId, minDataPoints, durationStr, barSizeSetting)
             data = get_bar(ticker)
-            logging.info("Received Date: " + str(data.index[0]) )
-            #update date
-            date = data.sort_index().index.to_datetime()[0]
-            #eastern=timezone('US/Eastern')
-            #date=date.astimezone(eastern)
-            date=date.strftime("%Y%m%d %H:%M:%S EST")
-            
-            time.sleep(30)
+            if data.shape[0] > 0:
+                logging.info("Received Date: " + str(data.index[0]) )
+                #update date
+                date = data.sort_index().index.to_datetime()[0]
+                #eastern=timezone('US/Eastern')
+                #date=date.astimezone(eastern)
+                date=date.strftime("%Y%m%d %H:%M:%S EST")
+                
+                time.sleep(30)
+                return data
+            else:
+                return mydata
             
         #set date as last index for next request
     

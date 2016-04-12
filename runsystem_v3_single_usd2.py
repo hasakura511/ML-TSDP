@@ -21,12 +21,13 @@ import logging
 import time
 #import websocket
 
-logging.basicConfig(filename='/logs/runsystem_v3_eur.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/runsystem_v3_usd.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
 debug=False
-pairs=['EURCHF','EURGBP','USDCHF']
-#pairs=['AUDUSD','EURUSD','GBPUSD','USDCAD','NZDUSD','USDCHF']
+#pairs=['EURCHF','EURGBP','USDCHF']
+pairs=['USDCAD']
+#pairs=['AUDUSD','EURUSD','GBPUSD','NZDUSD']
 #pairs=['NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
 #pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP','GBPJPY']
 #pairs=['EURCHF','AUDJPY','AUDUSD','EURUSD','GBPUSD']
@@ -48,7 +49,7 @@ while 1:
             ferr=open ('/logs/' + pair + 'v3_err.log','a')
             ferr.write('Starting V3: ' + pair)
 
-            subprocess.call(['python','debug_system_v3.1C_30min_eur.py',pair,'1'], stdout=f, stderr=ferr)
+            subprocess.call(['python','debug_system_v3.1C_30min_usd.py',pair,'1'], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
             signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]

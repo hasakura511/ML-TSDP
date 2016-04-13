@@ -169,9 +169,10 @@ def get_bar_feed(dataPath, whatToShow, barSizeSetting, symfilter=''):
             interval=duration_to_interval(barSizeSetting)
             filename=dataPath+interval+'_'+pair+'.csv'
             tickerId=get_TickerId(pair)
+            
             get_realtimebar(contract, tickerId, whatToShow, prepData[pair], filename)
             logging.info( 'Done Subscribing to ' + pair  )
-
+            
 def duration_to_interval(duration):
     if duration == '1 min':
         return '1 min'

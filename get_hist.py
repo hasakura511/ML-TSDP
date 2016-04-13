@@ -32,12 +32,12 @@ def start_feed(symFilter):
     feed_thread.daemon=True
     threads.append(feed_thread)
     
-    hist_thread = threading.Thread(target=feed.get_bar_hist, args=[dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symFilter])
-    hist_thread.daemon=True
-    threads.append(hist_thread)
-    
     [t.start() for t in threads]
-    [t.join() for t in threads]
+    data=feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symFilter)
+    interval=feed.duration_to_interval(barSizeSetting)
+    filename=dataPath+interval+'_'+symFilter+'.csv'
+    data.to_csv(filename)
+    #[t.join() for t in threads]
 
 if len(sys.argv) > 1:
     symFilter=sys.argv[1]

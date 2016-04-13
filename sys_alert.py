@@ -4,8 +4,6 @@ import pandas as pd
 import time
 from os import listdir
 from os.path import isfile, join
-from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, proc_history
-from c2api.place_order import place_order as place_c2order
 from dateutil.parser import parse
 import math
 import matplotlib.pyplot as plt

@@ -77,7 +77,7 @@ def get_history(date, contract, whatToShow, data,filename, tickerId, minDataPoin
                     #date=date.astimezone(eastern)
                     date=date.strftime("%Y%m%d %H:%M:%S EST")
                     time.sleep(30)
-                    if data.shape[0] < minDataPoints:
+                    if data.shape[0] > minDataPoints:
                         finished=True
                 else:
                     count=count + 1

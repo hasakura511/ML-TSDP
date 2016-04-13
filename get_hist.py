@@ -27,12 +27,12 @@ whatToShow='MIDPOINT'
 def start_feed(symFilter):
     feed.cache_bar_csv(dataPath, barSizeSetting, symFilter)
     
-    threads = []
-    feed_thread = threading.Thread(target=feed.get_bar_feed, args=[dataPath, whatToShow, barSizeSetting, symFilter])
-    feed_thread.daemon=True
-    threads.append(feed_thread)
-    
-    [t.start() for t in threads]
+    if durationStr == '1 min':
+        threads = []
+        feed_thread = threading.Thread(target=feed.get_bar_feed, args=[dataPath, whatToShow, barSizeSetting, symFilter])
+        feed_thread.daemon=True
+        threads.append(feed_thread)
+        [t.start() for t in threads]
     data=feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symFilter)
     interval=feed.duration_to_interval(barSizeSetting)
     filename=dataPath+interval+'_'+symFilter+'.csv'

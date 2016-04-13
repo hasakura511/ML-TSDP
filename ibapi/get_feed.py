@@ -65,21 +65,24 @@ def get_history(date, contract, whatToShow, data,filename, tickerId, minDataPoin
          #for date in getHistLoop:
         if data.shape[0] < minDataPoints:
             count=0
-            while data.shape[0] < minDataPoints:    
+            finished=False
+            while not finished:    
                 
                 data = client.get_history(date, contract, whatToShow, data,filename,tickerId, minDataPoints, durationStr, barSizeSetting)
                 data = get_bar(ticker)
                 if data.shape[0] > 0:
-                    logging.info("Received Date: " + str(data.index[0]) )
+                    logging.info("Received Date: " + str(data.index[0]) + " " + str(data.shape[0]) + " records out of " + str(minDataPoints) )
                     date = data.sort_index().index.to_datetime()[0]
                     #eastern=timezone('US/Eastern')
                     #date=date.astimezone(eastern)
                     date=date.strftime("%Y%m%d %H:%M:%S EST")
-                    
                     time.sleep(30)
+                    if data.shape[0] < minDataPoints:
+                        finished=True
                 else:
                     count=count + 1
                     if count > 10:
+                        finished=True
                         return mydata
         else:
 

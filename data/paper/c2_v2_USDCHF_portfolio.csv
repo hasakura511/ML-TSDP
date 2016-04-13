@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-USDCHF,open,long,4.0,0.0,0.9654875,,-14.95978,-4.95978,10.0,12.0,,,,,USDCHF,,20160413 13:38:05 EST,20160413 07:39:08 EST,2.0,CHF,40.61362,42.61362,99638.50718,1961106.01256,99718.50718
+USDCHF,open,long,4.0,2.0,0.9654875,0.96644,2.32263,14.32263,12.0,12.0,20160413 14:08:32 EST,20160413 14:08:32 EST,20160413 14:08:32 EST,,USDCHF,,20160413 13:38:05 EST,20160413 07:39:08 EST,-2.0,CHF,17.28241,19.28241,99655.78959,1980670.62392,99737.78959

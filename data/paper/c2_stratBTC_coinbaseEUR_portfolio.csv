@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_coinbaseEUR,open,short,2.0,0.0,377.33,0.0,-1.88665,0.0,1.88665,49.0,,,,,BTCUSD_coinbaseEUR,,20160413 13:28:49 EST,20160413 13:28:49 EST,-2.0,USD,-1.88665,0.0,99844.47785,1999251.54,100026.68
+BTCUSD_coinbaseEUR,open,long,2.0,0.0,377.65,0.0,-1.88825,0.0,1.88825,58.0,,,,,BTCUSD_coinbaseEUR,,20160413 17:41:34 EST,20160413 17:41:34 EST,2.0,USD,-1.88825,0.0,99813.80265,1999251.54,100030.0

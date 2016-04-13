@@ -1,0 +1,2 @@
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
+1,Paper,Paper,2330.6,USD,BITCOIN,1.0,,,1.0,46612.0,20.0,-20.0,-2330.6,SLD,BTCUSD_coincheckJPY,USD,20160413 04:53:04 EST,,0.0,97669.4,1067760.0,95338.8,46612.0,100000.0,100000.0,-2330.6

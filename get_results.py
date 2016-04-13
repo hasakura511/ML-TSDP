@@ -10,8 +10,6 @@ from os.path import isfile, join
 import re
 from os import listdir
 from os.path import isfile, join
-from ibapi.get_feed import get_feed, get_realtimebar,getDataFromIB, get_history, get_ask as get_ib_ask, get_bid as get_ib_bid
-from c2api.place_order import place_order as place_c2order
 import threading
 import locale
 # -*- coding: utf-8 -*-

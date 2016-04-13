@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_okcoinCNY,open,long,2.0,0.0,2752.8,0.0,-13.764,0.0,13.764,641.0,,,,,BTCUSD_okcoinCNY,,20160413 12:55:59 EST,20160413 12:55:59 EST,2.0,USD,-13.764,0.0,82736.74215,1994592.1,100218.94
+BTCUSD_okcoinCNY,open,long,2.0,0.0,2754.25,0.0,-13.77125,0.0,13.77125,643.0,,,,,BTCUSD_okcoinCNY,,20160413 13:51:57 EST,20160413 13:51:57 EST,2.0,USD,-13.77125,0.0,82680.12825,1994592.1,100217.4

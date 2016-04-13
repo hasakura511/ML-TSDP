@@ -717,6 +717,8 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         
         if type == 'signal':
             html = html +  type + '_' + systemname.split('_')[1]   
+        elif type == 'c2' or type == 'c2_2':
+            html = html + 'paper' + '_' + systemname + str(recent) 
         else:
             html = html + type + '_' + systemname + str(recent) 
         html = html + '.html">'

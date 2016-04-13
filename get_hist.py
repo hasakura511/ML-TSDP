@@ -19,12 +19,8 @@ Created on Tue Mar 08 20:10:29 2016
 logging.basicConfig(filename='/logs/get_hist.log',level=logging.DEBUG)
 
 dataPath = './data/from_IB/'
-minDataPoints = 10000
-durationStr='2 W'
-barSizeSetting='30 mins'
-whatToShow='MIDPOINT'
 
-def start_feed(symFilter):
+def start_feed(symFilter, durationStr, barSizeSetting,whatToShow):
     feed.cache_bar_csv(dataPath, barSizeSetting, symFilter)
     
     if durationStr == '1 min':
@@ -39,8 +35,13 @@ def start_feed(symFilter):
     data.to_csv(filename)
     #[t.join() for t in threads]
 
-if len(sys.argv) > 1:
+if len(sys.argv) > 3:
     symFilter=sys.argv[1]
-    start_feed(symFilter)
+    interval=sys.argv[2]
+    minDataPoints = sys.argv[3]
+    (durationStr, barSizeSetting,whatToShow)=feed.interval_to_ibhist_duration(interval)
+    start_feed(symFilter, durationStr, barSizeSetting, whatToShow)
+else:
+    print 'The syntax is: get_hist.py EURAUD 30m 10000'
 
 

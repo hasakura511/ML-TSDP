@@ -186,7 +186,10 @@ def duration_to_interval(duration):
 def interval_to_ibhist_duration(interval):
     durationStr='1 D'
     barSizeSetting='1 min'
-    if interval == '30m':
+    if interval == '1m':
+        durationStr='1 D'
+        barSizeSetting='1 min'
+    elif interval == '30m':
         durationStr='30 D'
         barSizeSetting='30 mins'
     elif interval == '10m':

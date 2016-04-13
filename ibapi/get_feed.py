@@ -50,9 +50,9 @@ def get_realtimebar(ibcontract, tickerid, whatToShow, data, filename):
     global client, callback
     client.get_realtimebar(ibcontract, tickerid, whatToShow, data, filename)
 
-def proc_history(tickerId, contract, data):
+def proc_history(tickerId, contract, data, barSizeSetting):
     global client, callback
-    return client.proc_history(tickerId, contract, data)
+    return client.proc_history(tickerId, contract, data, barSizeSetting)
 
 def get_history(date, contract, whatToShow, data,filename, tickerId, minDataPoints, durationStr, barSizeSetting):
         symbol= contract.symbol
@@ -135,7 +135,7 @@ def cache_bar_csv(dataPath, barSizeSetting, symfilter=''):
                
             if os.path.isfile(filename):           
                 data=pd.read_csv(filename, index_col='Date')
-                data=proc_history(tickerId, contract, data)
+                data=proc_history(tickerId, contract, data, barSizeSetting)
             else:
                 data.to_csv(filename)
             
@@ -203,7 +203,64 @@ def interval_to_ibhist_duration(interval):
         barSizeSetting='1 hour'
     whatToShow='MIDPOINT'
     return (durationStr, barSizeSetting, whatToShow)
-    
+
+
+        
+def get_bar_date(barSizeSetting, date):
+        interval=duration_to_interval(barSizeSetting)
+        timestamp = time.mktime(date.timetuple())
+        if interval == '30m':
+            mins=int(datetime.datetime.fromtimestamp(
+                        int(timestamp)
+                    ).strftime('%M'))
+            if mins < 30:
+                #time
+                date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:00:00') 
+            else:
+                 date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:30:00') 
+        elif interval == '10m':
+            mins=int(datetime.datetime.fromtimestamp(
+                        int(timestamp)
+                    ).strftime('%M'))
+            if mins < 10:
+                #time
+                date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:00:00') 
+            elif mins < 20:
+                #time
+                date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:10:00') 
+            elif mins < 30:
+                #time
+                date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:20:00') 
+            elif mins < 40:
+                #time
+                date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:30:00') 
+            elif mins < 50:
+                #time
+                date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:40:00') 
+            else:
+                 date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:50:00') 
+        elif interval == '1h':
+            date=datetime.datetime.fromtimestamp(
+                    int(timestamp)
+                ).strftime('%Y%m%d  %H:00:00') 
+        return date
+        
 def get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter=''):
     global tickerId
     global currencyPairsDict
@@ -219,7 +276,8 @@ def get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSettin
             eastern=timezone('US/Eastern')
             endDateTime=dt.now(get_localzone())
             date=endDateTime.astimezone(eastern)
-            date=date.strftime("%Y%m%d %H:%M:%S EST")
+            #date=date.strftime("%Y%m%d %H:%M:%S EST")
+            date=get_bar_date(barSizeSetting, date) + ' EST'
             tickerId=get_TickerId(pair)
             data=get_history(date, contract, whatToShow, prepData[pair], filename, tickerId, minDataPoints, durationStr, barSizeSetting)
     

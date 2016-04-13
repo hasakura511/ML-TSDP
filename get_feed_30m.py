@@ -7,7 +7,7 @@ import ibapi.get_feed as feed
 logging.basicConfig(filename='/logs/get_feed_30m.log',level=logging.DEBUG)
 
 interval='30m'
-minDataPoints = 5000
+minDataPoints = 10000
 
 def get_history(contracts):
     global interval

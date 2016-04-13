@@ -13,6 +13,7 @@ import logging
 from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
+import re
 
 MAX_WAIT_SECONDS=10
 MEANINGLESS_NUMBER=1729
@@ -24,7 +25,7 @@ rtdict={}
 rthist={}
 rtfile={}
 rtreqid={}
-
+rtbarsize={}
 fask={}
 fasksize={}
 fbid={}
@@ -324,8 +325,19 @@ class IBWrapper(EWrapper):
         """
         setattr(self, "flag_finished_portfolio", True)
 
-    
-         
+    def is_bar_date(self, dateStr, barSizeSetting):
+        if barSizeSetting == '30 mins':
+            if re.search(r'\d\d\d\d\d\d  \d\d:[03]0:00', dateStr):
+                return True
+        elif barSizeSetting == '10 mins':
+            if re.search(r'\d\d\d\d\d\d  \d\d:[012345]0:00', dateStr):
+                return True
+        elif barSizeSetting == '1 hour':
+            if re.search(r'\d\d\d\d\d\d  \d\d:00:00', dateStr):
+                return True
+        else:
+            return True
+        return False
     def historicalData(self, reqId, date, open, high,
                        low, close, volume,
                        barCount, WAP, hasGaps):
@@ -333,6 +345,8 @@ class IBWrapper(EWrapper):
             global rtbar
             global rtdict
             global rthist
+            global rtbarsize
+            barSizeSetting=rtbarsize[reqId]
             sym=rtdict[reqId]
             data=rtbar[reqId]
             if date[:8] == 'finished':
@@ -340,9 +354,11 @@ class IBWrapper(EWrapper):
                 rthist[reqId].set()
                 data=data.sort_index()
             else:
-                data.loc[date] = [open,high,low,close,volume]
-                #print "History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
-                #          % (date, open, high, low, close, volume)
+                if self.is_bar_date(str(date), barSizeSetting):
+                    data.loc[date] = [open,high,low,close,volume]
+                else:  
+                    print "Skipping Off Date History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+                              % (date, open, high, low, close, volume)
             rtbar[reqId]=data
         
         except Exception as e:
@@ -937,10 +953,11 @@ class IBclient(object):
             global rtdict
             global rthist
             global rtreqid
+            global rtbarsize
 
             rtdict[tickerid]=contract.symbol
             ticker = contract.symbol
-            
+            rtbarsize[tickerid]=barSizeSetting
             if contract.secType =='CASH':
                 rtdict[tickerid]=contract.symbol + contract.currency
                 ticker=contract.symbol + contract.currency
@@ -986,13 +1003,15 @@ class IBclient(object):
         except Exception as e:
             logging.error("get_history", exc_info=True)   
         
-    def proc_history(self, tickerid, contract ,data):
+    def proc_history(self, tickerid, contract ,data,barSizeSetting):
         try:
             WAIT_TIME=60
             global rtbar
             global rtdict
             global rthist
             global rtreqid
+            global rtbarsize
+            rtbarsize[tickerid]=barSizeSetting
             iserror=False
             
             sym=contract.symbol 
@@ -1006,14 +1025,15 @@ class IBclient(object):
                 rtreqid[sym]=tickerid
                 
             if tickerid not in rtbar:
-                rtbar[tickerid]=data
-            else:
-                data=data.reset_index()
-                for i in data.index:
-                    tick=data.ix[i]
+                rtbar[tickerid]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
                     
-                    self.cb.historicalData(tickerid, tick['Date'],tick['Open'],tick['High'],
-                                            tick['Low'],tick['Close'],tick['Volume'],-1,-1,-1)
+            
+            data=data.reset_index()
+            for i in data.index:
+                tick=data.ix[i]
+                
+                self.cb.historicalData(tickerid, tick['Date'],tick['Open'],tick['High'],
+                                        tick['Low'],tick['Close'],tick['Volume'],-1,-1,-1)
                
                      
             return rtbar[tickerid]

@@ -21,7 +21,7 @@ logging.basicConfig(filename='/logs/get_hist.log',level=logging.DEBUG)
 dataPath = './data/from_IB/'
 minDataPoints = 10000
 durationStr='2 W'
-barSizeSetting='30 min'
+barSizeSetting='30 mins'
 whatToShow='MIDPOINT'
 
 def start_feed(symFilter):

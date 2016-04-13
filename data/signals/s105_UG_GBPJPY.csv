@@ -12,3 +12,5 @@ dates,signals,safef,comment
 1460471460.0,0,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""USDJPYGBPJPY"", ""zScore"": -1.39, ""zSMA"": -1.55}"
 1460484840.0,-1,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""USDJPYGBPJPY"", ""zScore"": 0.29, ""zSMA"": -0.13}"
 1460548800.0,0,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""USDJPYGBPJPY"", ""zScore"": -1.19, ""zSMA"": -1.27}"
+1460552820.0,-1,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""USDJPYGBPJPY"", ""zScore"": 0.2, ""zSMA"": -0.47}"
+1460556180.0,0,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""USDJPYGBPJPY"", ""zScore"": -1.84, ""zSMA"": -1.95}"

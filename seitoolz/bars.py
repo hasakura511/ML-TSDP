@@ -236,7 +236,7 @@ def compress_min_bar(sym, histData, filename, interval='30m'):
             if quote['Volume'] < 0:
                 quote['Volume'] = 0 
             data.loc[date]=quote
-            print "Update Bar: bar: sym: " + sym + " date:" + str(date) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) 
+            #print "Update Bar: bar: sym: " + sym + " date:" + str(date) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) 
                     
         else:
             if len(data.index) > 1:
@@ -319,7 +319,7 @@ def proc_history(contract, histdata, interval='30m'):
             
         data = rtbar[reqId]
         
-        if len(histdata.index) > 1:
+        if not histdata == None and len(histdata.index) > 1:
             data = rtbar[reqId]
             data = data.reset_index().set_index('Date')
             histdata=histdata.reset_index().set_index('Date')
@@ -338,6 +338,7 @@ def proc_history(contract, histdata, interval='30m'):
             data=data.set_index('Date')
             rtbar[reqId]=data
             data.to_csv(filename)
+        return data
             
             
             #gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], pair]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')

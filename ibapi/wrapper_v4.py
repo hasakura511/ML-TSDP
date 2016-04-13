@@ -385,8 +385,7 @@ class IBWrapper(EWrapper):
                     quote['Volume'] = 0 
                 data.loc[time]=quote
                 #print "Update Bar: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
-                data=data.sort_index()          
-                data.to_csv(filename)
+                
             else:
                 if len(data.index) > 1:
                     data=data.sort_index()          

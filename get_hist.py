@@ -38,7 +38,7 @@ def start_feed(symFilter, durationStr, barSizeSetting, whatToShow, minDataPoints
 if len(sys.argv) > 3:
     symFilter=sys.argv[1]
     interval=sys.argv[2]
-    minDataPoints = sys.argv[3]
+    minDataPoints = int(sys.argv[3])
     (durationStr, barSizeSetting,whatToShow)=feed.interval_to_ibhist_duration(interval)
     start_feed(symFilter, durationStr, barSizeSetting, whatToShow, minDataPoints)
 else:

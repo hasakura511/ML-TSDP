@@ -150,6 +150,7 @@ def get_quote(dataPath, sym, colname, addParam, parameters):
         ###### Future #######
         data=dataSet.iloc[-1].copy()
         data=dataSet.reset_index().iloc[-1].copy()
+        #data['Open']=data['Close']
         data['Close']=data['Open']
         if parameters[1] == '30m_': 
             data['Date']=data['Date']+datetime.timedelta(minutes=30)

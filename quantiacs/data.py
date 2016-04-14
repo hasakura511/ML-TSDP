@@ -1,3 +1,3 @@
 import quantiacsToolbox as qtb
-returnDict=qtb.runts('s101.py')
+returnDict=qtb.runts('simpleTS.py')
 print returnDict

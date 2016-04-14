@@ -3,15 +3,15 @@ import numpy as np
 import pandas as pd
 import datetime
 from sklearn import preprocessing
-from datetime import datetime
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import neighbors
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.svm import SVC
-import operator
-import pandas.io.data
+from sklearn import cluster, covariance, manifold
 from sklearn.qda import QDA
+
+import operator
 import re
 from dateutil import parser
 
@@ -41,8 +41,10 @@ def prepareDataForClassification(dataset, start_test):
     le = preprocessing.LabelEncoder()
     
     dataset['UpDown'] = dataset['Return_Out']
-    dataset.UpDown[dataset.UpDown >= 0] = 'Up'
-    dataset.UpDown[dataset.UpDown < 0] = 'Down'
+    dataset.ix[dataset.UpDown >= 0,'UpDown'] = 'Up'
+    dataset.ix[dataset.UpDown < 0,'UpDown'] = 'Down'
+    #dataset.UpDown[dataset.UpDown >= 0] = 'Up'
+    #dataset.UpDown[dataset.UpDown < 0] = 'Down'
     dataset.UpDown = le.fit(dataset.UpDown).transform(dataset.UpDown)
     
     features = dataset.columns[1:-1]
@@ -86,13 +88,6 @@ def performClassification(X_train, y_train, X_test, y_test, method, parameters, 
         
 def performRFClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     global savePath
-    """
-    Random Forest Binary Classification
-    #data=pd.DataFrame()
-    #data['X']=X_train
-    #data['Y']=y_train
-    #data.to_csv('./p/data/pp.csv')    
-    """
     print 'RFClass ' 
     
     clf = RandomForestClassifier(n_estimators=1000, n_jobs=-1)

@@ -60,7 +60,7 @@ def mySettings():
 # import necessary Packages below:
 import numpy
 
-def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, exposure, equity, settings):
+def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure, equity, settings):
     ''' This system uses trend following techniques to allocate capital into the desired equities'''
 
     nMarkets=CLOSE.shape[1]

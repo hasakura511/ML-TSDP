@@ -41,8 +41,6 @@ import threading
 import seitoolz.signal as signal
 import pytz
 
-logging.basicConfig(filename='/logs/p_model.log',level=logging.DEBUG)
-
 portfolio = backtest.MarketIntradayPortfolio()    
 nextSignal=0
 lastSignal=0
@@ -214,7 +212,7 @@ def get_signal(lookback, portfolio, argv):
     global dataSets
     #performCV(X_train, y_train, 10, 'QDA', [])
     start_period = datetime.datetime(2015,12,15)  
-    start_test = datetime.datetime(2016,3,15)  
+    start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
     symbol = 'EURJPY'
     file='30m_EURJPY'
     path_datasets='./data/from_IB/'
@@ -229,7 +227,7 @@ def get_signal(lookback, portfolio, argv):
         file='idx_^GSPC'
         bestModel='./p/params/bestidx.pickle'
         start_period = datetime.datetime(1995,1,15)  
-        start_test = datetime.datetime(2016,1,15)  
+        start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
         end_period = datetime.datetime.now()        
         interval='idx_'
         path_datasets='./p/data/'
@@ -237,13 +235,28 @@ def get_signal(lookback, portfolio, argv):
         if len(argv) > 2 and argv[2] == '2':
             (out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
         ############## idx ##############  
+    elif len(argv) > 1 and argv[1] == '3':
+        ############## idx ##############    
+        path_datasets='./quantiacs/tickerData/'
+        symbol = 'ES'
+        file='F_ES'
+        bestModel='./p/params/bestidx.pickle'
+        start_period = datetime.datetime(1995,1,15)  
+        start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
+        end_period = datetime.datetime.now()        
+        interval='F_'
+        
+        name = './p/data/' + file + '.csv'
+        #if len(argv) > 2 and argv[2] == '2':
+            #(out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
+        ############## idx ##############  
+    
     
     
     parameters=list()
     parameters.append(bestModel)    
     parameters.append(interval)
     parameters.append(lookback)
-    dataSets = data.loadDatasets(path_datasets, file, parameters)
     return next_signal(lookback, portfolio, argv)
 
 def next_signal(lookback, portfolio, argv):
@@ -264,12 +277,12 @@ def next_signal(lookback, portfolio, argv):
     parameters.append(bestModel)    
     parameters.append(interval)
     parameters.append(lookback)
+    bData=list()
+    dataSets = data.loadDatasets(path_datasets, file, parameters)
     bData=dataSets
-    
-    if parameters[2] > 0:
-        bData=[data.iloc[:-parameters[2]].copy()
-                for data in dataSets]
-                    
+    print 'Training with sample up to: ' + str(start_test)
+    print 'Creating Backtest Signal Up To: ' + str(bData[0].index[-2])
+    print 'Last Open: ',str(bData[0]['Open_Out'][-2]),  ' Last Close: ', bData[0]['Close_Out'][-2], ' Providing Look Future Data: Open ',bData[0]['Open_Out'][-1],' Close ',bData[0]['Close_Out'][-1]
     if len(argv) > 2 and argv[2] == '1':
         prediction = performFeatureSelection(9, 9, file, start_period, start_test, bData, True, 'RF', folds, parameters)    
     prediction = getPredictionFromBestModel(9, 9, file, start_period, start_test, bData, parameters)
@@ -281,16 +294,17 @@ def next_signal(lookback, portfolio, argv):
     logging.info('Next Signal: ' + str(nextSignal))
     if len(argv) > 2 and argv[2] == '2':
         return nextSignal
+    
     # dataframe of Historical Price
-    bars = pd.read_csv(path_datasets + file + '.csv', index_col=0, parse_dates=True)    
+    bars=data.get_quote(path_datasets, file.split('.')[0], '', False, parameters)
     # subset of the data corresponding to test set
-    if parameters[2] > 0:
-        bars=bars.iloc[:-parameters[2]]
-       
-    bars.index=pd.to_datetime(bars.index)
+    #if parameters[2] > 0:
+    #    bars=bars.iloc[:-parameters[2]]  
+    #bars.index=pd.to_datetime(bars.index)
     bars = bars.ix[start_test:]
     bars = bars[-(len(prediction[0][:-1])):]
-    
+    bars=bars.sort_index()
+    print 'Backtesting with data feed up to: ' + str(bars.index[-1])
     # initialize empty dataframe indexed as the bars. There's going to be perfect match between dates in bars and signals 
     signals = pd.DataFrame(index=bars.index)
      
@@ -325,11 +339,12 @@ def next_signal(lookback, portfolio, argv):
     
     # backtesting the portfolio and generating returns on top of that 
     portfolio.backtest_portfolio()
+    print 'Backtesting Complete'
     return nextSignal
     
     
 def start_lookback(lookback, argv):
-     for num in range(0,lookback):
+     for num in range(0,lookback+1):
         num=lookback-num
         if num == lookback:
             get_signal(num, portfolio, argv)

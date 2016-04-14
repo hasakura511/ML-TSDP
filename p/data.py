@@ -9,6 +9,7 @@ from sklearn import neighbors
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.svm import SVC
+from dateutil.parser import parse
 import operator
 import pandas.io.data
 from sklearn.qda import QDA
@@ -26,7 +27,7 @@ except ImportError:
 from matplotlib.collections import LineCollection
 
 from sklearn import cluster, covariance, manifold
-
+import os
 from os import listdir
 from os.path import isfile, join
 import re
@@ -111,18 +112,39 @@ def loadDatasets(path_datasets, fout, parameters):
     symbols, names = np.array(list(symbol_dict.items())).T
     
     out =  get_quote(dataPath, fout, 'Out', True, parameters)
-    data = [get_quote(dataPath, symbol, symbol, True, parameters)
-          for symbol in symbols]
+    data = list()
+    for symbol in symbols:
+        dataFrame=get_quote(dataPath, symbol, symbol, True, parameters)
+        if dataFrame.shape[0]>0:
+            data.append(dataFrame)
+        
     dataSet=list()
     dataSet.append(out)
     dataSet.extend(data)
     return dataSet
 
 def get_quote(dataPath, sym, colname, addParam, parameters):
-    dataSet=pd.read_csv(dataPath + sym + '.csv',index_col='Date')
+    filename=dataPath + sym + '.csv'
+    if os.path.isfile(filename):
+        dataSet=pd.read_csv(filename,index_col='Date')
+        if not dataSet.shape[0]>0:
+            return dataSet
+    else:
+        filename=dataPath + sym + '.txt'
+        dataSet=pd.read_csv(filename)
+        dataSet=dataSet.rename(columns=lambda x: x.strip()[0:1].upper() + x.strip()[1:].lower())
+        #for x in dataSet.columns.copy():
+            #if x not in ['Date','Open','High','Low','Close','Volume','Vol']:
+            #    dataSet=dataSet.drop(x, axis=1)
+        dataSet['Date']=[parse(str(x)) for x in dataSet['Date']]
+        print dataSet.columns
+        dataSet=dataSet.set_index('Date')
+        
     dataSet.index=pd.to_datetime(dataSet.index)
     dataSet=dataSet.sort_index()    
-    
+    if parameters[2] > 0:
+        dataSet=dataSet.iloc[:-parameters[2]].sort_index().copy();
+        
     if addParam:
         
         ###### Future #######

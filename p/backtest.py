@@ -234,7 +234,7 @@ class MarketIntradayPortfolio(Portfolio):
             #plt.draw()
             # Return modified artists
             return lines
-        anim = animation.FuncAnimation(f, update, interval=2)
+        anim = animation.FuncAnimation(f, update, interval=5)
         
         plt.show()
 

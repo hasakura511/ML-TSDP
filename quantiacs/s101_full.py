@@ -335,7 +335,7 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
     symbol = 'ES'
     file='F_ES'
     bestModel=''
-    lookback=10
+    lookback=1
     start_period = parse(str(DATE[0]))
     start_test = parse(str(DATE[-1])) - datetime.timedelta(days=lookback*2+14)  
     end_period = parse(str(DATE[-1]))

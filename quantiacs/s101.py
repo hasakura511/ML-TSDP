@@ -335,7 +335,7 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
     symbol = 'ES'
     file='F_ES'
     bestModel=''
-    lookback=10
+    lookback=20
     start_period = parse(str(DATE[0]))
     start_test = parse(str(DATE[-1])) - datetime.timedelta(days=lookback*2+14)  
     end_period = parse(str(DATE[-1]))
@@ -378,7 +378,7 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
     if nextSignal == 0:
         nextSignal=-1
     print 'Next Signal: ', nextSignal
-    pos[0][idx]=nextSignal
+    pos[0][idx]=nextSignal * 1
     
     print symbols
     print pos
@@ -416,8 +416,9 @@ def mySettings():
     'F_TY', 'F_US', 'F_W', 'F_YM']
 
     settings['lookback']= 6000
-    settings['budget']= 10**6
+    settings['budget']= 20000
     settings['slippage']= 0.05
-    settings['participation']= 0.1
-
+    #settings['participation']= 0.1
+    #settings['beginInSample']='20160408'
+    #settings['endInSample']='20160412'
     return settings

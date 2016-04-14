@@ -26,3 +26,5 @@ dates,signals,safef,comment
 1460449680.0,0,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""EURJPYCADJPY"", ""zScore"": -1.51, ""zSMA"": -1.73}"
 1460450700.0,-1,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""EURJPYCADJPY"", ""zScore"": 0.1, ""zSMA"": -1.28}"
 1460454480.0,-2,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""EURJPYCADJPY"", ""zScore"": 2.31, ""zSMA"": 2.35}"
+1460593800.0,-1,1,"{""Entry"": 0, ""Exit"": 1, ""symPair"": ""EURJPYCADJPY"", ""zScore"": -0.06, ""zSMA"": 0.16}"
+1460599260.0,0,1,"{""Entry"": 1, ""Exit"": 0, ""symPair"": ""EURJPYCADJPY"", ""zScore"": -1.61, ""zSMA"": -1.69}"

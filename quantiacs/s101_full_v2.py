@@ -13,6 +13,7 @@ from sklearn.qda import QDA
 import talib as ta
 from dateutil.parser import parse
 import logging
+
 #import keras as k
 #import tensorflow as tf
 
@@ -221,10 +222,19 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
             """
             returns array of prediction and score from best model.
             """
+            if not settings.has_key('models'):
+                settings['models']=dict()
+            models=settings['models']
             
             (X_train, y_train, X_test, y_test)=dataPrep(bestdelta, bestlags, fout, cut, start_test, dataSets, parameters)
-            model = performClassification(X_train, y_train, X_test, y_test, 'RF', parameters, fout, False)
-            
+            if not models.has_key(fout):
+                print 'Creating model'
+                model = performClassification(X_train, y_train, X_test, y_test, 'RF', parameters, fout, False)
+                models[fout]=model                
+                settings['models']=models
+            else:
+                print 'Using from pre-trained model'
+                model=models[fout]
             #with open(parameters[0], 'rb') as fin:
             #    model = cPickle.load(fin)        
                 
@@ -285,21 +295,46 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
             return dataSet
         
         def get_quote(symbols, sym, colname, addParam, parameters):
+            if not settings.has_key('quotecache'):
+                settings['quotecache']=dict()
+            quotes=settings['quotecache']
             idx=symbols.index(sym)
-            dataSet=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Vol','Oi','P','R','Rinfo'])
-            dataSet['Date']=DATE
-            dataSet['Date']=[parse(str(x)) for x in dataSet['Date']]
-            dataSet['Open']=OPEN[:,idx]
-            dataSet['High']=HIGH[:,idx]
-            dataSet['Low']=LOW[:,idx]
-            dataSet['Close']=CLOSE[:,idx]
-            dataSet['Vol']=VOL[:,idx]
-            dataSet['Oi']=OI[:,idx]
-            dataSet['P']=P[:,idx]
-            dataSet['R']=R[:,idx]
-            dataSet['Rinfo']=RINFO[:,idx]
-            dataSet=dataSet.set_index('Date')
-                
+            if not quotes.has_key(sym):
+                print 'Creating Quote ' + sym
+                dataSet=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Vol','Oi','P','R','Rinfo'])
+                dataSet['Date']=DATE
+                dataSet['Date']=[parse(str(x)) for x in dataSet['Date']]
+                dataSet['Open']=OPEN[:,idx]
+                dataSet['High']=HIGH[:,idx]
+                dataSet['Low']=LOW[:,idx]
+                dataSet['Close']=CLOSE[:,idx]
+                dataSet['Vol']=VOL[:,idx]
+                dataSet['Oi']=OI[:,idx]
+                dataSet['P']=P[:,idx]
+                dataSet['R']=R[:,idx]
+                dataSet['Rinfo']=RINFO[:,idx]
+                dataSet=dataSet.set_index('Date')
+                quotes[sym]=dataSet
+                settings['quotecache']=quotes
+            else:
+                print 'Loading Quote from Cache ' + sym
+                quote=quotes[sym]
+                dataSet=quote.reset_index().iloc[-1].copy()
+                dataSet['Date']=DATE[-1]
+                dataSet['Date']=parse(str(dataSet['Date']))
+                dataSet['Open']=OPEN[-1,idx]
+                dataSet['High']=HIGH[-1,idx]
+                dataSet['Low']=LOW[-1,idx]
+                dataSet['Close']=CLOSE[-1,idx]
+                dataSet['Vol']=VOL[-1,idx]
+                dataSet['Oi']=OI[-1,idx]
+                dataSet['P']=P[-1,idx]
+                dataSet['R']=R[-1,idx]
+                dataSet['Rinfo']=RINFO[-1,idx]
+                quote=quote.reset_index().append(dataSet).set_index('Date').sort_index()
+                quotes[sym]=quote
+                settings['quotecache']=quotes
+            dataSet=settings['quotecache'][sym]
             dataSet.index=pd.to_datetime(dataSet.index)
             dataSet=dataSet.sort_index()    
             #if parameters[2] > 0:
@@ -337,10 +372,10 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
         symbol = 'ES'
         file='F_ES'
         bestModel=''
-        lookback=100
+        lookback=1
         daysToEvaluate=10
         start_period = parse(str(DATE[0]))
-        start_test = parse(str(DATE[-1])) - datetime.timedelta(days=lookback*2+14)  
+        start_test = parse(str(DATE[-1])) - datetime.timedelta(days=lookback*2+1)  
         end_period = parse(str(DATE[-1]))
         interval='F_'
         parameters=list()
@@ -423,7 +458,7 @@ def mySettings():
     'F_TY', 'F_US', 'F_W', 'F_YM']
 
     settings['lookback']= 6000
-    settings['budget']= 250000
+    settings['budget']= 1000000
     settings['slippage']= 0.05
     #settings['participation']= 1
     #settings['beginInSample']='20160401'

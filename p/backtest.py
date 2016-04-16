@@ -157,6 +157,19 @@ class MarketIntradayPortfolio(Portfolio):
                 #line, =ax1.plot(self.bars['Close'], color='r', lw=3.)   
                 lines1.append(line)
                 
+                ydepth=np.empty(len(self.bars.index))
+                ydepth.fill(count)
+                pg=np.array(self.returns[algo]['price_diff'])
+                colordepth=np.empty(len(self.bars.index)).astype(str)
+                colordepth.fill('green')
+                colordepth[np.array(self.returns[algo]['price_diff']) < 0]='red'
+                zpos=np.empty(len(self.bars.index))
+                zpos.fill(min(self.bars['Close']))
+                line=ax1.bar3d(ydepth, mpl.dates.date2num(self.bars.index.to_pydatetime()),
+                     zpos, 
+                       0.5,0.5,abs(np.array(pg)),
+                   color=colordepth, zsort='average', alpha=0.5, edgecolor='none')
+                lines1.append(line)
                 
                 count = count - 1
                 #, 
@@ -300,24 +313,28 @@ class MarketIntradayPortfolio(Portfolio):
             count = len(self.ranking)
             for [algo,equity] in self.ranking:
                 x1, y1, _ = proj3d.proj_transform(count, mpl.dates.date2num(self.bars.index.to_pydatetime())[-1],
-                                                  self.bars['Close'][-1], ax1.get_proj())
+                                                  max(abs(np.array(self.returns[algo]['profit']))), ax4.get_proj())
                 
                 if self.returns[algo]['profit'][-1] > 0:
                     
-                   line= ax1.annotate('Chg: ' + str(round(self.returns[algo]['price_diff'][-1],2)) + '\nPL: $' + 
+                   line= ax4.annotate('Chg: ' + str(round(self.returns[algo]['price_diff'][-1],2)) + '\nPL: $' + 
                         str(round(self.returns[algo]['profit'][-1])), 
                         xycoords='data', xy=(x1,y1),
-                        xytext=(0, -55), textcoords='offset points',ha='center',fontsize=8,
-                        arrowprops=dict(facecolor=color2[algo], shrink=0.1), backgroundcolor='white'
+                        xytext=(0, 35), textcoords='offset points',ha='center',fontsize=8,
+                        arrowprops=dict(fc='green',ec='green', shrinkA=0.1,shrinkB=0.1,
+                                        arrowstyle="<|-, head_length=1, head_width=0.5"), 
+                        backgroundcolor='white'
                         )
                    lines1.append(line)
                        
                 else:
-                    line=ax1.annotate('Chg: ' + str(round(self.returns[algo]['price_diff'][-1],2)) + '\nPL: $' + 
+                    line=ax4.annotate('Chg: ' + str(round(self.returns[algo]['price_diff'][-1],2)) + '\nPL: $' + 
                         str(round(self.returns[algo]['profit'][-1],2)), 
                         xycoords='data', xy=(x1,y1),
-                        xytext=(0, 55), textcoords='offset points',ha='center',fontsize=8,
-                        arrowprops=dict(facecolor=color2[algo], shrink=0.1),backgroundcolor='white'
+                        xytext=(0, 35), textcoords='offset points',ha='center',fontsize=8,
+                        arrowprops=dict(fc='red',ec='red', shrinkA=0.1,shrinkB=0.1,
+                                        arrowstyle="-|>, head_length=1, head_width=0.5"), 
+                        backgroundcolor='white'
                         )
                     lines1.append(line)
                 
@@ -377,7 +394,7 @@ class MarketIntradayPortfolio(Portfolio):
                     
         
         def update(*args):
-            print "Updating Graph"
+            #print "Updating Graph"
             #lines[0].set_ydata(self.bars['Close'])
             #lines[1].set_ydata(self.returns['total'])
             draw_close()
@@ -416,7 +433,7 @@ class MarketIntradayPortfolio(Portfolio):
             ax2.yaxis.set_ticks(np.arange(begindate, finaldate, freq))
             ax3.yaxis.set_ticks(np.arange(begindate, finaldate, freq))
             ax4.yaxis.set_ticks(np.arange(begindate, finaldate, freq))
-            print "Finished Updating Graph"
+            #print "Finished Updating Graph"
             return lines
             
         #fig.show()

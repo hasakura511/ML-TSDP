@@ -1,2 +1,0 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_localbtcGBP,open,long,2.0,0.0,377.36,0.0,-1.8868,0.0,1.8868,1.0,,,,,BTCUSD_localbtcGBP,,20160408 23:27:55 EST,20160408 23:27:55 EST,2.0,USD,-1.8868,0.0,99998.1132,1999245.28,100000.0

@@ -1,2 +1,0 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,currency,balance,commission,margin_available,mark_to_mkt,pure_mark_to_mkt,purebalance
-1.0,-135.475,,,,0.0,,BTCUSD_btceRUR,long,,20160413 13:44:43 EST,open,20160413 13:44:43 EST,27095.0,,,0.0,2.0,,BTCUSD_btceRUR,,0.0,2.0,USD,99864.525,135.475,1945810.0,99729.05,100000.0,100000.0

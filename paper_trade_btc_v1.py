@@ -67,71 +67,72 @@ def trade_v1():
     global systemdata
     global commissiondata
     while True:
-      try:
+      
        myfeed=bars.get_btc_exch_list()
        for inst in myfeed:
-        print 'Inst: ',inst
-        (ticker, exchange)=inst.split('_')
-        (bid,ask)=get_btc_bidask(ticker, exchange)
-        if ask > 0 and bid > 0:
-         data=get_ohlc(ticker, exchange)
-         if data.shape[0] > 3000:
-            #model=get_v1signal(data.tail(2000), ticker, exchange)
-            #model=get_v1signal(data, ticker, exchange)
-            print 'Exchange: ',exchange
-            sysarg=np.array(['system_s101','5','2','0',exchange])
-            models.reset_cache()
-            nextSignal=models.get_signal(0, models.portfolio, sysarg)
-            model=generate_model_sig(ticker+'_'+ exchange, str(data.index[-1]), int(nextSignal), abs(int(nextSignal)))
-            
-            for i in systemdata.index:
-                system=systemdata.ix[i].copy()
-                if system['System'] == 'BTCUSD':
-                    system['Name']=system['Name'] + '_' + exchange
-                    system['System'] = ticker + '_' + exchange
-                    system['c2sym'] = ticker + '_' + exchange
-                    system['ibsym'] = ticker + '_' + exchange
+          try:
+                print 'Inst: ',inst
+                (ticker, exchange)=inst.split('_')
+                (bid,ask)=get_btc_bidask(ticker, exchange)
+                if ask > 0 and bid > 0:
+                 data=get_ohlc(ticker, exchange)
+                 if data.shape[0] > 3000:
+                    #model=get_v1signal(data.tail(2000), ticker, exchange)
+                    #model=get_v1signal(data, ticker, exchange)
+                    print 'Exchange: ',exchange
+                    sysarg=np.array(['system_s101','5','2','0',exchange])
+                    models.reset_cache()
+                    nextSignal=models.get_signal(0, models.portfolio, sysarg)
+                    model=generate_model_sig(ticker+'_'+ exchange, str(data.index[-1]), int(nextSignal), abs(int(nextSignal)))
                     
-                    ask=float(get_btc_ask(ticker, exchange))
-                    bid=float(get_btc_bid(ticker, exchange))
-                    secType=system['ibtype']
-                    
-                    
-                    commissionkey=system['ibsym']+system['ibcur']+system['ibexch']
-                    commission_pct=0.0025
-                    commission_cash=0
-                    if commissionkey in commissiondata.index:
-                        commission=commissiondata.loc[commissionkey]
-                        commission_pct=float(commission['Pct'])
-                        commission_cash=float(commission['Cash'])
-                   
-                    system_pos=model.loc[system['System']]
-                    system_c2pos_qty=round(system_pos['action']) * system['c2qty']
-                    system_ibpos_qty=round(system_pos['action']) * system['ibqty']
-                    if debug:
-                        print "System Name: " + system['Name'] + " C2 Symbol: " + system['c2sym']+ " IB Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
-                        print        " System Algo: " + str(system['System']) 
-                        print        " Ask: " + str(ask)
-                        print        " Bid: " + str(bid)
-                        print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
-                        print        " Signal: " + str(system_ibpos_qty)
-                    pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
-                    if ask > 0 and bid > 0:
-                        eastern=timezone('US/Eastern')
-                        endDateTime=dt.now(get_localzone())
-                        date=endDateTime.astimezone(eastern)
-                        date=date.strftime("%Y%m%d %H:%M:%S EST")
-
-        			  #print ' Qty: ' + str(system['ibqty']) + ' c2 ' + str(system['c2qty'])
-                        adj_size(model, system['System'],system['Name'],pricefeed,\
-                            str(system['c2id']),system['c2api'],float(system['c2qty']),system['c2sym'],system['c2type'], system['c2submit'], \
-                            float(system['ibqty']),system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
-                    time.sleep(10)
-      except Exception as e:
-        #f=open ('./debug/get_btcfeed_cerrors.log','a')
-        #f.write(e)
-        #f.close()
-        logging.error("get_signal", exc_info=True)
+                    for i in systemdata.index:
+                        system=systemdata.ix[i].copy()
+                        if system['System'] == 'BTCUSD':
+                            system['Name']=system['Name'] + '_' + exchange
+                            system['System'] = ticker + '_' + exchange
+                            system['c2sym'] = ticker + '_' + exchange
+                            system['ibsym'] = ticker + '_' + exchange
+                            
+                            ask=float(get_btc_ask(ticker, exchange))
+                            bid=float(get_btc_bid(ticker, exchange))
+                            secType=system['ibtype']
+                            
+                            
+                            commissionkey=system['ibsym']+system['ibcur']+system['ibexch']
+                            commission_pct=0.0025
+                            commission_cash=0
+                            if commissionkey in commissiondata.index:
+                                commission=commissiondata.loc[commissionkey]
+                                commission_pct=float(commission['Pct'])
+                                commission_cash=float(commission['Cash'])
+                           
+                            system_pos=model.loc[system['System']]
+                            system_c2pos_qty=round(system_pos['action']) * system['c2qty']
+                            system_ibpos_qty=round(system_pos['action']) * system['ibqty']
+                            if debug:
+                                print "System Name: " + system['Name'] + " C2 Symbol: " + system['c2sym']+ " IB Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
+                                print        " System Algo: " + str(system['System']) 
+                                print        " Ask: " + str(ask)
+                                print        " Bid: " + str(bid)
+                                print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
+                                print        " Signal: " + str(system_ibpos_qty)
+                            pricefeed=pd.DataFrame([[ask, bid, 1, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
+                            if ask > 0 and bid > 0:
+                                eastern=timezone('US/Eastern')
+                                endDateTime=dt.now(get_localzone())
+                                date=endDateTime.astimezone(eastern)
+                                date=date.strftime("%Y%m%d %H:%M:%S EST")
+        
+                			  #print ' Qty: ' + str(system['ibqty']) + ' c2 ' + str(system['c2qty'])
+                                adj_size(model, system['System'],system['Name'],pricefeed,\
+                                    str(system['c2id']),system['c2api'],float(system['c2qty']),system['c2sym'],system['c2type'], system['c2submit'], \
+                                    float(system['ibqty']),system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
+                            time.sleep(10)
+          except Exception as e:
+            #f=open ('./debug/get_btcfeed_cerrors.log','a')
+            #f.write(e)
+            #f.close()
+            logging.error("get_signal", exc_info=True)
 
 trade_v1()
 

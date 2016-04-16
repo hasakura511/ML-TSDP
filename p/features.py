@@ -11,7 +11,6 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.svm import SVC
 import operator
 import pandas.io.data
-from sklearn.qda import QDA
 import re
 from dateutil import parser
 

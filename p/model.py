@@ -11,7 +11,6 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.svm import SVC
 import operator
 import pandas.io.data
-from sklearn.qda import QDA
 import re
 from dateutil import parser
 from dateutil.parser import parse
@@ -296,6 +295,21 @@ def get_signal(lookback, portfolio, argv):
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'
         qty=20000
+        folds=10
+    elif len(argv) > 1 and argv[1] == '5':
+        symbol = 'bitstampUSD'
+        if len(argv) > 4:
+            symbol=argv[4]
+        interval='BTCUSD_'        
+        file=interval + symbol
+        bar=bars.get_bar(file)
+        date=parse(bar.index[-1])
+        #start_period = datetime.datetime(2015,07,15)  
+        start_test = date - datetime.timedelta(minutes=lookback*2+72)  
+        start_period = start_test - datetime.timedelta(minutes=4000)
+        path_datasets='./data/from_IB/'
+        name = './p/data/' + file + '.csv'
+        qty=20
         folds=10
     return next_signal(lookback, portfolio, argv)
 

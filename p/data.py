@@ -12,7 +12,6 @@ from sklearn.svm import SVC
 from dateutil.parser import parse
 import operator
 import pandas.io.data
-from sklearn.qda import QDA
 import re
 from dateutil import parser
 

@@ -19,7 +19,6 @@ import operator
 from matplotlib.dates import DAILY
 import matplotlib as mpl
 import pandas.io.data
-from sklearn.qda import QDA
 import re
 from dateutil import parser
 import time

@@ -13,12 +13,9 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticD
 from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn import cluster, covariance, manifold
-
-
 import operator
 import re
 from dateutil import parser
-
 import datetime
 
 import numpy as np

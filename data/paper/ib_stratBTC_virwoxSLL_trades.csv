@@ -1,4 +1,0 @@
-permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
-1,Paper,Paper,5594.95,USD,BITCOIN,1.0,,,1.0,111899.0,20.0,20.0,-5594.95,BOT,BTCUSD_virwoxSLL,USD,20160411 13:34:47 EST,,0.0,94405.05,-237980.0,88810.1,111899.0,100000.0,100000.0,-5594.95
-2,Paper,Paper,5664.95,USD,BITCOIN,2.0,,,1.0,113299.0,40.0,-20.0,22335.05,SLD,BTCUSD_virwoxSLL,USD,20160412 12:22:18 EST,,28000.0,116740.1,-237980.0,111075.15,113299.0,128000.0,128000.0,22335.05
-3,Paper,Paper,5669.95,USD,BITCOIN,3.0,,,1.0,113399.0,40.0,20.0,-7669.95,BOT,BTCUSD_virwoxSLL,USD,20160412 12:28:42 EST,,-2000.0,109070.15,-237980.0,103400.2,113399.0,126000.0,126000.0,-7669.95

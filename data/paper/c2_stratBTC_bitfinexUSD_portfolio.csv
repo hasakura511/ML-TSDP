@@ -1,2 +1,0 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_bitfinexUSD,open,short,2.0,0.0,420.97,0.0,-2.10485,0.0,2.10485,1.0,,,,,BTCUSD_bitfinexUSD,,20160410 22:22:47 EST,20160410 22:22:47 EST,-2.0,USD,-2.10485,0.0,99997.89515,1999158.06,100000.0

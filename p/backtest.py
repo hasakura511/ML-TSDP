@@ -337,12 +337,12 @@ class MarketIntradayPortfolio(Portfolio):
                         backgroundcolor='white'
                         )
                     lines1.append(line)
-                
+                name=algo.split('_')[-1]
                 if self.nextSig[algo] > 0:
                     x3, y3, _ = proj3d.proj_transform(count, mpl.dates.date2num(self.bars.index.to_pydatetime())[-1],
                                                    0, ax3.get_proj())
                 
-                    line=ax3.annotate(algo, 
+                    line=ax3.annotate(name, 
                         xycoords='data', xy=(x3,y3),
                         xytext=(0, -30), textcoords='offset points', ha='center',fontsize=8, 
                         arrowprops=dict(fc='green',ec='green', shrinkA=0.1,shrinkB=0.1,arrowstyle="-|>, head_length=1, head_width=0.5"), backgroundcolor='white'
@@ -352,7 +352,7 @@ class MarketIntradayPortfolio(Portfolio):
                     x3, y3, _ = proj3d.proj_transform(count, mpl.dates.date2num(self.bars.index.to_pydatetime())[-1],
                                                    0, ax3.get_proj())
                 
-                    line=ax3.annotate(algo, 
+                    line=ax3.annotate(name, 
                         xycoords='data', xy=(x3,y3),
                         xytext=(0, -30), textcoords='offset points', ha='center',fontsize=8, 
                         arrowprops=dict(fc='red',ec='red', shrinkA=0.1,shrinkB=0.1,arrowstyle="<|-, head_length=1, head_width=0.5"), backgroundcolor='white'

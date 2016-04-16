@@ -259,7 +259,7 @@ def get_signal(lookback, portfolio, argv):
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,12,15)  
-        start_test = date - datetime.timedelta(minutes=lookback*30*2+14*30)  
+        start_test = date - datetime.timedelta(minutes=lookback*30*2+72*30)  
         start_period = start_test - datetime.timedelta(hours=2000)
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'
@@ -288,7 +288,7 @@ def get_signal(lookback, portfolio, argv):
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,07,15)  
-        start_test = date - datetime.timedelta(hours=lookback*2+14)  
+        start_test = date - datetime.timedelta(hours=lookback*2+72)  
         start_period = start_test - datetime.timedelta(hours=4000)
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'

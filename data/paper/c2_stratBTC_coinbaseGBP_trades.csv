@@ -1,0 +1,2 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,currency,balance,commission,margin_available,mark_to_mkt,pure_mark_to_mkt,purebalance
+1.0,-1.5337,,,,0.0,,BTCUSD_coinbaseGBP,short,,20160416 03:05:14 EST,open,20160416 03:05:14 EST,306.74,,,0.0,2.0,,BTCUSD_coinbaseGBP,,0.0,-2.0,USD,99998.4663,1.5337,1999386.52,99996.9326,100000.0,100000.0

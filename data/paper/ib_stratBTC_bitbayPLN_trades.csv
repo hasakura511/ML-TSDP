@@ -1,0 +1,2 @@
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
+1,Paper,Paper,82.3,USD,BITCOIN,1.0,,,1.0,1646.0,20.0,20.0,-82.3,BOT,BTCUSD_bitbayPLN,USD,20160416 06:34:35 EST,,0.0,99917.7,1967080.0,99835.4,1646.0,100000.0,100000.0,-82.3

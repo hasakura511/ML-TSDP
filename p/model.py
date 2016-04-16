@@ -306,7 +306,7 @@ def get_signal(lookback, portfolio, argv):
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,07,15)  
         start_test = date - datetime.timedelta(minutes=lookback*2+72)  
-        start_period = start_test - datetime.timedelta(minutes=4000)
+        start_period = start_test - datetime.timedelta(minutes=3000)
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'
         qty=20
@@ -449,4 +449,18 @@ def start_lookback(lookback, argv):
             get_signal(num, portfolio, argv)
         else:
             next_signal(num,portfolio, argv)
-    
+
+def reset_cache():
+    global portfolio
+    global nextSignal
+    global lastSignal
+    global sighist
+    global models
+    global signals
+    data.reset_cache()
+    portfolio = backtest.MarketIntradayPortfolio()    
+    nextSignal=0
+    lastSignal=0
+    sighist=list()
+    models=dict()
+    signals=dict()

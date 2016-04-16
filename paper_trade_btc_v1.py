@@ -75,11 +75,12 @@ def trade_v1():
         (bid,ask)=get_btc_bidask(ticker, exchange)
         if ask > 0 and bid > 0:
          data=get_ohlc(ticker, exchange)
-         if data.shape[0] > 5000:
+         if data.shape[0] > 3000:
             #model=get_v1signal(data.tail(2000), ticker, exchange)
             #model=get_v1signal(data, ticker, exchange)
             print 'Exchange: ',exchange
             sysarg=np.array(['system_s101','5','2','0',exchange])
+            models.reset_cache()
             nextSignal=models.get_signal(0, models.portfolio, sysarg)
             model=generate_model_sig(ticker+'_'+ exchange, str(data.index[-1]), int(nextSignal), abs(int(nextSignal)))
             

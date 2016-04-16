@@ -122,6 +122,9 @@ def loadDatasets(path_datasets, fout, parameters):
     print 'Done Loading Data'
     return dataSet
 
+def reset_cache():
+    global qcache
+    qcache=dict()
 qcache=dict()
 def get_quote(dataPath, sym, colname, addParam, parameters):
     global qcache

@@ -103,13 +103,12 @@ def loadDatasets(path_datasets, fout, parameters):
         ireg=re.search(r'\W',fout)
         if ireg:
             fsym=fout.split(ireg.group(0))[1]
-        #print 'loadDataSets: ' + fsym
         if re.search(r''+interval, file) and not re.search(fsym,file):
             sym=file.split('.')[0]
             symbol_dict[sym]=sym
-            print sym
+            print 'loadDatasets: ', sym
     symbols, names = np.array(list(symbol_dict.items())).T
-    
+    print 'loadDatasets: Main Symbol', fout
     out =  get_quote(dataPath, fout, 'Out', True, parameters)
     data = list()
     for symbol in symbols:
@@ -120,6 +119,7 @@ def loadDatasets(path_datasets, fout, parameters):
     dataSet=list()
     dataSet.append(out)
     dataSet.extend(data)
+    print 'Done Loading Data'
     return dataSet
 
 qcache=dict()
@@ -144,9 +144,9 @@ def get_quote(dataPath, sym, colname, addParam, parameters):
     
         dataSet.index=pd.to_datetime(dataSet.index)
         dataSet=dataSet.sort_index()    
-        qcache[sym]=dataSet
+        qcache[sym]=dataSet.copy()
     else:
-        dataSet=qcache[sym]
+        dataSet=qcache[sym].copy()
     if parameters[2] > 0:
         dataSet=dataSet.iloc[:-parameters[2]].copy().sort_index();
         
@@ -168,6 +168,8 @@ def get_quote(dataPath, sym, colname, addParam, parameters):
         elif parameters[1] == '10m_': 
             data['Date']=data['Date']+datetime.timedelta(minutes=10)
         elif parameters[1] == '1 min_': 
+            data['Date']=data['Date']+datetime.timedelta(minutes=1)
+        elif parameters[1] == 'BTCUSD_':
             data['Date']=data['Date']+datetime.timedelta(minutes=1)
         else:
             data['Date']=data['Date']+datetime.timedelta(days=1)

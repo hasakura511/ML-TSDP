@@ -311,6 +311,7 @@ def get_signal(lookback, portfolio, argv):
         name = './p/data/' + file + '.csv'
         qty=20
         folds=10
+        print 'Starting s101 for: ',symbol
     return next_signal(lookback, portfolio, argv)
 
 def next_signal(lookback, portfolio, argv):

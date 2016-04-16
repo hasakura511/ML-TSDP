@@ -25,7 +25,7 @@ import seitoolz.bars as bars
 import datetime
 import p.model as models
 from seitoolz.signal import generate_model_sig
-
+import numpy as np
 logging.basicConfig(filename='/logs/paper_trade_btc_v1.log',level=logging.DEBUG)
 
 debug=True
@@ -70,7 +70,7 @@ def trade_v1():
       try:
        myfeed=bars.get_btc_exch_list()
        for inst in myfeed:
-            
+        print 'Inst: ',inst
         (ticker, exchange)=inst.split('_')
         (bid,ask)=get_btc_bidask(ticker, exchange)
         if ask > 0 and bid > 0:
@@ -78,7 +78,8 @@ def trade_v1():
          if data.shape[0] > 5000:
             #model=get_v1signal(data.tail(2000), ticker, exchange)
             #model=get_v1signal(data, ticker, exchange)
-            sysarg=[5,2,0,exchange]
+            print 'Exchange: ',exchange
+            sysarg=np.array(['system_s101','5','2','0',exchange])
             nextSignal=models.get_signal(0, models.portfolio, sysarg)
             model=generate_model_sig(ticker+'_'+ exchange, str(data.index[-1]), int(nextSignal), abs(int(nextSignal)))
             

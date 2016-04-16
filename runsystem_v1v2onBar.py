@@ -195,8 +195,8 @@ def runPair_v2(pair, dataSet):
             orig_stdout = sys.stdout
             sys.stdout = f
             print 'Starting '+version+': ' + ticker
-            if ticker not in livePairs:
-                offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
+            #if ticker not in livePairs:
+            offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
             #f.write('Starting '+version+': ' + ticker)
             
             #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')

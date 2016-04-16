@@ -32,7 +32,7 @@ from transform import softmax_score, numberZeros, ratio, hurst
 
 
 sns.set_style("darkgrid", {"axes.facecolor": ".9"})
-sns.color_palette("Set1", n_colors=8, desat=.5)
+sns.color_palette("Set1", n_colors=10, desat=.5)
 
 def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
@@ -68,7 +68,7 @@ def offlineMode(ticker, errorText, signalPath, ver1, ver2):
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + ver2+'_'+ ticker + '.csv', index=False)
         print errorText    
-        sys.exit(errorText)
+        #sys.exit(errorText)
         
 def describeDistribution(qtC,qtP,ticker):
     hold_days = 1

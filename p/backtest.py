@@ -137,7 +137,7 @@ class MarketIntradayPortfolio(Portfolio):
         while not self.ready:
             time.sleep(1)
         
-        ylabel = self.symbol + ' Close Price in $'
+        ylabel = self.symbol + ' Close Price'
         fig, [ax1, ax4, ax2, ax3] = plt.subplots(4, 1, sharey=True, figsize=(10, 8), subplot_kw={'projection': '3d'})  
         fig.patch.set_facecolor('white')
         lines1=list()
@@ -327,13 +327,23 @@ class MarketIntradayPortfolio(Portfolio):
                         )
                    lines1.append(line)
                        
-                else:
+                elif self.returns[algo]['profit'][-1] < 0:
                     line=ax4.annotate('Chg: ' + str(round(self.returns[algo]['price_diff'][-1],2)) + '\nPL: $' + 
                         str(round(self.returns[algo]['profit'][-1],2)), 
                         xycoords='data', xy=(x1,y1),
                         xytext=(0, 35), textcoords='offset points',ha='center',fontsize=8,
                         arrowprops=dict(fc='red',ec='red', shrinkA=0.1,shrinkB=0.1,
                                         arrowstyle="-|>, head_length=1, head_width=0.5"), 
+                        backgroundcolor='white'
+                        )
+                    lines1.append(line)
+                else:
+                    line=ax4.annotate('Chg: ' + str(round(self.returns[algo]['price_diff'][-1],2)) + '\nPL: $' + 
+                        str(round(self.returns[algo]['profit'][-1],2)), 
+                        xycoords='data', xy=(x1,y1),
+                        xytext=(0, 35), textcoords='offset points',ha='center',fontsize=8,
+                        arrowprops=dict(fc='black',ec='black', shrinkA=0.1,shrinkB=0.1,
+                                        arrowstyle="|-|"), 
                         backgroundcolor='white'
                         )
                     lines1.append(line)
@@ -346,6 +356,16 @@ class MarketIntradayPortfolio(Portfolio):
                         xycoords='data', xy=(x3,y3),
                         xytext=(0, -30), textcoords='offset points', ha='center',fontsize=8, 
                         arrowprops=dict(fc='green',ec='green', shrinkA=0.1,shrinkB=0.1,arrowstyle="-|>, head_length=1, head_width=0.5"), backgroundcolor='white'
+                        )
+                    lines3.append(line)
+                elif self.nextSig[algo] == 0:
+                    x3, y3, _ = proj3d.proj_transform(count, mpl.dates.date2num(self.bars.index.to_pydatetime())[-1],
+                                                   0, ax3.get_proj())
+                
+                    line=ax3.annotate(name, 
+                        xycoords='data', xy=(x3,y3),
+                        xytext=(0, -30), textcoords='offset points', ha='center',fontsize=8, 
+                        arrowprops=dict(fc='black',ec='black', shrinkA=0.1,shrinkB=0.1,arrowstyle="|-|"), backgroundcolor='white'
                         )
                     lines3.append(line)
                 else:
@@ -387,6 +407,19 @@ class MarketIntradayPortfolio(Portfolio):
                         xycoords='data', xy=(x3_2,y3_2),
                         xytext=coord, ha='center',
                             textcoords='offset points', fontsize=20, color='red')
+                            #arrowprops=dict(facecolor='red', shrink=0.001))
+                    lines1.append(line)
+                elif self.lastSig[algo] == 0:
+                    coord=[-16,-25]
+                    if self.lastSig[algo] > 0:
+                        coord=[-16,-25]
+                    else:
+                        coord=[-16,-25]
+                    #xy=(self.bars.index[-2],self.returns['total'][-2])
+                    line=ax2.annotate('-',
+                        xycoords='data', xy=(x3_2,y3_2),
+                        xytext=coord, ha='center',
+                            textcoords='offset points', fontsize=20, color='black')
                             #arrowprops=dict(facecolor='red', shrink=0.001))
                     lines1.append(line)
                 count = count - 1
@@ -489,6 +522,7 @@ class MarketIntradayPortfolio(Portfolio):
         #fig.fmt_ydata = mdates.DateFormatter('%Y-%m-%d %H:%M:%S')
         #fig.autofmt_ydate()
         
+        ax1.zaxis.set_major_formatter(FormatStrFormatter('%.0f'))
         ax2.zaxis.set_major_formatter(FormatStrFormatter('$%.0f'))
         ax4.zaxis.set_major_formatter(FormatStrFormatter('$%.0f'))
         ax1.invert_xaxis()

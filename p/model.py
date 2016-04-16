@@ -222,6 +222,7 @@ def get_signal(lookback, portfolio, argv):
     global interval
     global dataSets
     global sighist
+    global qty
     lastSignal=dict()
     nextSignal=dict()
     sighist=dict()
@@ -246,6 +247,7 @@ def get_signal(lookback, portfolio, argv):
         interval='idx_'
         path_datasets='./p/data/'
         name = './p/data/' + file + '.csv'
+        qty=500
         if len(argv) > 2 and argv[2] == '2':
             (out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
         ############## idx ##############  
@@ -263,6 +265,7 @@ def get_signal(lookback, portfolio, argv):
         start_period = start_test - datetime.timedelta(hours=2000)
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'
+        qty=20000
         folds=10
         ############## idx ##############  
     elif len(argv) > 1 and argv[1] == '3':
@@ -274,7 +277,7 @@ def get_signal(lookback, portfolio, argv):
         start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
         end_period = datetime.datetime.now()        
         interval='F_'
-        
+        qty=1
         name = './p/data/' + file + '.csv'
         #if len(argv) > 2 and argv[2] == '2':
             #(out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
@@ -292,6 +295,7 @@ def get_signal(lookback, portfolio, argv):
         start_period = start_test - datetime.timedelta(hours=4000)
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'
+        qty=20000
         folds=10
     return next_signal(lookback, portfolio, argv)
 
@@ -309,6 +313,7 @@ def next_signal(lookback, portfolio, argv):
     global interval
     global dataSets
     global sighist
+    global qty
     bestModelFile='./p/params/bestModel.pickle'
     parameters=list()
     parameters.append(bestModelFile)    
@@ -323,6 +328,21 @@ def next_signal(lookback, portfolio, argv):
     if len(argv) > 2 and argv[2] == '1':
         prediction = performFeatureSelection(9, 9, file, start_period, start_test, bData, True, 'RF', folds, parameters)    
     signals=getPredictionFromBestModel(9, 9, file, start_period, start_test, bData, parameters)
+    # Create Blend #
+    bpred=np.array(signals[signals.keys()[-1]][0])
+    bacc=signals[signals.keys()[-1]][1]
+    bpred[bpred==0]=-1
+    algos=signals.keys()
+    for algo in algos:
+        # Replace 0 with -1 for trading
+        (prediction, accuracy)=signals[algo]
+        prediction=np.array(prediction)
+        prediction[prediction==0]=-1
+        signals[algo]=[prediction,accuracy]
+        bpred[bpred!=prediction]=0
+        bacc=(bacc+accuracy)/2
+    signals[file+'_Blend']=[bpred,bacc] 
+    # Create Blend #
     bestalgo=dict()    
     for algo in signals.keys():
         (prediction, accuracy)=signals[algo]
@@ -331,8 +351,8 @@ def next_signal(lookback, portfolio, argv):
         else:
             lastSignal[algo]=0
         nextSignal[algo]=prediction[-1]
-        if nextSignal[algo] == 0:
-            nextSignal[algo]=-1
+        #if nextSignal[algo] == 0:
+        #    nextSignal[algo]=-1
         bestalgo[algo]=[prediction, accuracy]
         if len(bestModel) == 0 or signals[algo][1] > signals[bestModel][1]:
             bestModel=algo
@@ -378,7 +398,7 @@ def next_signal(lookback, portfolio, argv):
         signals[algo] = sighist[algo]
          
         # replace the zeros with -1 (new encoding for Down day)
-        signals.ix[signals[algo] == 0, algo] = -1
+        #signals.ix[signals[algo] == 0, algo] = -1
         signals[algo+'_pos'] = signals[algo].diff()     
     
     
@@ -390,7 +410,7 @@ def next_signal(lookback, portfolio, argv):
      
     # calling portfolio evaluation on signals (predicted returns) and bars 
     # (actual returns)
-    portfolio.setInit(symbol, bars, signals, algos, nextSignal, lastSignal, parameters)
+    portfolio.setInit(symbol, bars, signals, algos, nextSignal, lastSignal, parameters,0,qty)
     
     # backtesting the portfolio and generating returns on top of that 
     (portfolioData, returns, ranking)=portfolio.backtest_portfolio()

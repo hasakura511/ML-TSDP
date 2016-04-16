@@ -252,16 +252,19 @@ def get_signal(lookback, portfolio, argv):
     elif len(argv) > 1 and argv[1] == '2':
         ############## idx ##############    
         symbol = 'EURJPY'
-        bar=bars.get_bar('30m_EURJPY')
+        if len(argv) > 4:
+            symbol=argv[4]
+        interval='30m_'        
+        file=interval + symbol
+        bar=bars.get_bar(file)
         date=parse(bar.index[-1])
-        start_period = datetime.datetime(2015,12,15)  
+        #start_period = datetime.datetime(2015,12,15)  
         start_test = date - datetime.timedelta(minutes=lookback*30*2+14)  
-        symbol = 'EURJPY'
-        file='30m_EURJPY'
+        start_period = start_test - datetime.timedelta(hours=2000)
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'
         folds=10
-        interval='30m_'        ############## idx ##############  
+        ############## idx ##############  
     elif len(argv) > 1 and argv[1] == '3':
         ############## idx ##############    
         path_datasets='./quantiacs/tickerData/'
@@ -277,10 +280,16 @@ def get_signal(lookback, portfolio, argv):
             #(out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
         ############## idx ##############  
     elif len(argv) > 1 and argv[1] == '4':
-        bar=bars.get_bar('30m_EURJPY')
+        symbol = 'EURJPY'
+        if len(argv) > 4:
+            symbol=argv[4]
+        interval='1h_'        
+        file=interval + symbol
+        bar=bars.get_bar(file)
         date=parse(bar.index[-1])
-        start_period = datetime.datetime(2015,07,15)  
+        #start_period = datetime.datetime(2015,07,15)  
         start_test = date - datetime.timedelta(hours=lookback*2+14)  
+        start_period = start_test - datetime.timedelta(hours=4000)
         symbol = 'EURJPY'
         file='1h_EURJPY'
         path_datasets='./data/from_IB/'
@@ -335,8 +344,8 @@ def next_signal(lookback, portfolio, argv):
         logging.info(algo + ' Next Signal: ' + str(nextSignal[algo]))
     
     print 'Best Model: ',bestModel, ' Accuracy: ', signals[bestModel][1]
-    if len(argv) > 2 and argv[2] == '2':
-            return nextSignal[bestModel]
+    #if len(argv) > 2 and argv[2] == '2':
+    #        return nextSignal[bestModel]
     
     # dataframe of Historical Price
     bars=data.get_quote(path_datasets, file.split('.')[0], '', False, parameters)
@@ -388,11 +397,15 @@ def next_signal(lookback, portfolio, argv):
     
     # backtesting the portfolio and generating returns on top of that 
     (portfolioData, returns, ranking)=portfolio.backtest_portfolio()
-    count=1
-    for [rank,equity] in ranking:
-        print rank, '#',count, ' with returns of: $', equity
-        count = count + 1
-        
+    count=len(ranking)
+    for [algo,equity] in ranking:
+        print algo, '#',count, ' with returns of: $', equity, ' Next Signal: ', nextSignal[algo]
+        count = count - 1
+    (bestModel,bestEquity) =ranking[-1]
+    print 'Best Model: ',bestModel,' Next Signal:',nextSignal[algo]
+    if len(argv) > 2 and argv[2] == '2':
+        return nextSignal[bestModel]
+    
     print 'Backtesting Complete'
     return nextSignal[bestModel]
     

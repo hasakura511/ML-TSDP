@@ -472,6 +472,9 @@ def bar_ohlc_from_csv(ticker):
     dataSet=pd.read_csv('./data/bars/' + ticker + '.csv', index_col='Date')
     return dataSet
 
+def get_bar(ticker):
+     return bar_ohlc_from_csv(ticker)
+    
 def bidask_to_csv(ticker, date, bid, ask):
     data=pd.DataFrame([[date, bid, ask]], columns=['Date','Bid','Ask'])
     data=data.set_index('Date')

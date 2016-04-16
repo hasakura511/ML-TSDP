@@ -14,7 +14,7 @@ import pandas.io.data
 from sklearn.qda import QDA
 import re
 from dateutil import parser
-
+from dateutil.parser import parse
 import datetime
 
 import numpy as np
@@ -40,6 +40,7 @@ import logging
 import threading
 import seitoolz.signal as signal
 import pytz
+import seitoolz.bars as bars
 
 portfolio = backtest.MarketIntradayPortfolio()    
 nextSignal=0
@@ -248,6 +249,19 @@ def get_signal(lookback, portfolio, argv):
         if len(argv) > 2 and argv[2] == '2':
             (out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
         ############## idx ##############  
+    elif len(argv) > 1 and argv[1] == '2':
+        ############## idx ##############    
+        symbol = 'EURJPY'
+        bar=bars.get_bar('30m_EURJPY')
+        date=parse(bar.index[-1])
+        start_period = datetime.datetime(2015,12,15)  
+        start_test = date - datetime.timedelta(minutes=lookback*30*2+14)  
+        symbol = 'EURJPY'
+        file='30m_EURJPY'
+        path_datasets='./data/from_IB/'
+        name = './p/data/' + file + '.csv'
+        folds=10
+        interval='30m_'        ############## idx ##############  
     elif len(argv) > 1 and argv[1] == '3':
         ############## idx ##############    
         path_datasets='./quantiacs/tickerData/'
@@ -263,8 +277,10 @@ def get_signal(lookback, portfolio, argv):
             #(out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
         ############## idx ##############  
     elif len(argv) > 1 and argv[1] == '4':
+        bar=bars.get_bar('30m_EURJPY')
+        date=parse(bar.index[-1])
         start_period = datetime.datetime(2015,07,15)  
-        start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
+        start_test = date - datetime.timedelta(hours=lookback*2+14)  
         symbol = 'EURJPY'
         file='1h_EURJPY'
         path_datasets='./data/from_IB/'

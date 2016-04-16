@@ -115,7 +115,7 @@ def loadDatasets(path_datasets, fout, parameters):
     data = list()
     for symbol in symbols:
         dataFrame=get_quote(dataPath, symbol, symbol, True, parameters)
-        if dataFrame.shape[0]>0:
+        if dataFrame.shape[0]>2000:
             data.append(dataFrame)
         
     dataSet=list()
@@ -123,35 +123,45 @@ def loadDatasets(path_datasets, fout, parameters):
     dataSet.extend(data)
     return dataSet
 
+qcache=dict()
 def get_quote(dataPath, sym, colname, addParam, parameters):
+    global qcache
     filename=dataPath + sym + '.csv'
-    if os.path.isfile(filename):
-        dataSet=pd.read_csv(filename,index_col='Date')
-        if not dataSet.shape[0]>0:
-            return dataSet
+    if not qcache.has_key(sym):
+        if os.path.isfile(filename):
+            dataSet=pd.read_csv(filename,index_col='Date')
+            if not dataSet.shape[0]>2000:
+                return dataSet
+        else:
+            filename=dataPath + sym + '.txt'
+            dataSet=pd.read_csv(filename)
+            dataSet=dataSet.rename(columns=lambda x: x.strip()[0:1].upper() + x.strip()[1:].lower())
+            #for x in dataSet.columns.copy():
+                #if x not in ['Date','Open','High','Low','Close','Volume','Vol']:
+                #    dataSet=dataSet.drop(x, axis=1)
+            dataSet['Date']=[parse(str(x)) for x in dataSet['Date']]
+            print dataSet.columns
+            dataSet=dataSet.set_index('Date')
+    
+        dataSet.index=pd.to_datetime(dataSet.index)
+        dataSet=dataSet.sort_index()    
+        qcache[sym]=dataSet
     else:
-        filename=dataPath + sym + '.txt'
-        dataSet=pd.read_csv(filename)
-        dataSet=dataSet.rename(columns=lambda x: x.strip()[0:1].upper() + x.strip()[1:].lower())
-        #for x in dataSet.columns.copy():
-            #if x not in ['Date','Open','High','Low','Close','Volume','Vol']:
-            #    dataSet=dataSet.drop(x, axis=1)
-        dataSet['Date']=[parse(str(x)) for x in dataSet['Date']]
-        print dataSet.columns
-        dataSet=dataSet.set_index('Date')
-        
-    dataSet.index=pd.to_datetime(dataSet.index)
-    dataSet=dataSet.sort_index()    
+        dataSet=qcache[sym]
     if parameters[2] > 0:
-        dataSet=dataSet.iloc[:-parameters[2]].sort_index().copy();
+        dataSet=dataSet.iloc[:-parameters[2]].copy().sort_index();
         
     if addParam:
         
         ###### Future #######
         data=dataSet.iloc[-1].copy()
         data=dataSet.reset_index().iloc[-1].copy()
-        #data['Open']=data['Close']
+        #data['Open']=(data['High'] + data['Low'])/2
         data['Close']=data['Open']
+        #data['Open']=data['Close']
+        #data['High']=data['Open']
+        #data['Low']=data['Open']
+        #data['Volume']=0
         if parameters[1] == '30m_': 
             data['Date']=data['Date']+datetime.timedelta(minutes=30)
         elif parameters[1] == '1h_': 

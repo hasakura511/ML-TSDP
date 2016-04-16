@@ -49,18 +49,28 @@ sighist=list()
 def count_missing(df):
      return len(df) - df.count()
 
+models=dict()
+signals=dict()
 def getPredictionFromBestModel(bestdelta, bestlags, fout, cut, start_test, dataSets, parameters):
+    global models
+    global signals
     """
     returns array of prediction and score from best model.
     """
-    
+    algos=['RF','KNN','SVM','ADA','GTB','QDA','GBayes','Voting', 'LDA']
     (X_train, y_train, X_test, y_test)=dataPrep(bestdelta, bestlags, fout, cut, start_test, dataSets, parameters)
-    model = classifier.performClassification(X_train, y_train, X_test, y_test, 'RF', parameters, fout, False)
     
+    for algo in algos:
+        if not models.has_key(fout+'_'+algo):
+            model = classifier.performClassification(X_train, y_train, X_test, y_test, algo, parameters, fout, False)
+            models[fout+'_'+algo]=model
+        else:
+            model=models[fout+'_'+algo]
+        signals[fout+'_'+algo]=[model.predict(X_test), model.score(X_test, y_test)]
     #with open(parameters[0], 'rb') as fin:
     #    model = cPickle.load(fin)        
         
-    return model.predict(X_test), model.score(X_test, y_test)
+    return signals
     
 def dataPrep(maxdelta, maxlag, fout, cut, start_test, dataSets, parameters):
     lags = range(2, maxlag) 
@@ -210,6 +220,11 @@ def get_signal(lookback, portfolio, argv):
     global bestModel
     global interval
     global dataSets
+    global sighist
+    lastSignal=dict()
+    nextSignal=dict()
+    sighist=dict()
+    bestModel=''
     #performCV(X_train, y_train, 10, 'QDA', [])
     start_period = datetime.datetime(2015,12,15)  
     start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
@@ -218,14 +233,12 @@ def get_signal(lookback, portfolio, argv):
     path_datasets='./data/from_IB/'
     name = './p/data/' + file + '.csv'
     folds=10
-    bestModel='./p/params/best.pickle'
     interval='30m_'
     
     if len(argv) > 1 and argv[1] == '1':
         ############## idx ##############    
         symbol = '^GSPC'
         file='idx_^GSPC'
-        bestModel='./p/params/bestidx.pickle'
         start_period = datetime.datetime(1995,1,15)  
         start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
         end_period = datetime.datetime.now()        
@@ -240,7 +253,6 @@ def get_signal(lookback, portfolio, argv):
         path_datasets='./quantiacs/tickerData/'
         symbol = 'ES'
         file='F_ES'
-        bestModel='./p/params/bestidx.pickle'
         start_period = datetime.datetime(1995,1,15)  
         start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
         end_period = datetime.datetime.now()        
@@ -250,13 +262,15 @@ def get_signal(lookback, portfolio, argv):
         #if len(argv) > 2 and argv[2] == '2':
             #(out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia)=data.getStockDataFromWeb(symbol, name, path_datasets, str(start_period), str(end_period))
         ############## idx ##############  
-    
-    
-    
-    parameters=list()
-    parameters.append(bestModel)    
-    parameters.append(interval)
-    parameters.append(lookback)
+    elif len(argv) > 1 and argv[1] == '4':
+        start_period = datetime.datetime(2015,07,15)  
+        start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
+        symbol = 'EURJPY'
+        file='1h_EURJPY'
+        path_datasets='./data/from_IB/'
+        name = './p/data/' + file + '.csv'
+        folds=10
+        interval='1h_'
     return next_signal(lookback, portfolio, argv)
 
 def next_signal(lookback, portfolio, argv):
@@ -273,8 +287,9 @@ def next_signal(lookback, portfolio, argv):
     global interval
     global dataSets
     global sighist
+    bestModelFile='./p/params/bestModel.pickle'
     parameters=list()
-    parameters.append(bestModel)    
+    parameters.append(bestModelFile)    
     parameters.append(interval)
     parameters.append(lookback)
     bData=list()
@@ -285,62 +300,85 @@ def next_signal(lookback, portfolio, argv):
     print 'Last Open: ',str(bData[0]['Open_Out'][-2]),  ' Last Close: ', bData[0]['Close_Out'][-2], ' Providing Look Future Data: Open ',bData[0]['Open_Out'][-1],' Close ',bData[0]['Close_Out'][-1]
     if len(argv) > 2 and argv[2] == '1':
         prediction = performFeatureSelection(9, 9, file, start_period, start_test, bData, True, 'RF', folds, parameters)    
-    prediction = getPredictionFromBestModel(9, 9, file, start_period, start_test, bData, parameters)
-    lastSignal=nextSignal
-    nextSignal=prediction[0][-1]
-    if nextSignal == 0:
-        nextSignal=-1
-    print 'Next Signal: ' + str(nextSignal)
-    logging.info('Next Signal: ' + str(nextSignal))
+    signals=getPredictionFromBestModel(9, 9, file, start_period, start_test, bData, parameters)
+    bestalgo=dict()    
+    for algo in signals.keys():
+        (prediction, accuracy)=signals[algo]
+        if nextSignal.has_key(algo):
+            lastSignal[algo]=nextSignal[algo]
+        else:
+            lastSignal[algo]=0
+        nextSignal[algo]=prediction[-1]
+        if nextSignal[algo] == 0:
+            nextSignal[algo]=-1
+        bestalgo[algo]=[prediction, accuracy]
+        if len(bestModel) == 0 or signals[algo][1] > signals[bestModel][1]:
+            bestModel=algo
+        print algo, ' Accuracy ', accuracy
+        print algo, ' Next Signal: ' + str(nextSignal[algo])
+        logging.info(algo + ' Next Signal: ' + str(nextSignal[algo]))
+    
+    print 'Best Model: ',bestModel, ' Accuracy: ', signals[bestModel][1]
     if len(argv) > 2 and argv[2] == '2':
-        return nextSignal
+            return nextSignal[bestModel]
     
     # dataframe of Historical Price
     bars=data.get_quote(path_datasets, file.split('.')[0], '', False, parameters)
     # subset of the data corresponding to test set
     #if parameters[2] > 0:
     #    bars=bars.iloc[:-parameters[2]]  
-    #bars.index=pd.to_datetime(bars.index)
-    bars = bars.ix[start_test:]
-    bars = bars[-(len(prediction[0][:-1])):]
+    
+    bars.index=bars.index.to_pydatetime()
+    #bars = bars.ix[start_test:]
+    
+    bars = bars[-(len(prediction[:-1])):]
     bars=bars.sort_index()
     print 'Backtesting with data feed up to: ' + str(bars.index[-1])
     # initialize empty dataframe indexed as the bars. There's going to be perfect match between dates in bars and signals 
     signals = pd.DataFrame(index=bars.index)
-     
-    # initialize signals.signal column to zero
-    signals['signal'] = 0.0
-     
-    # copying into signals.signal column results of prediction
-    print bars.shape[0],' bars ', len(prediction[0][:-1]), 'predictions'
-    if len(sighist) > 0:
-        print 'Last Signal' + str(lastSignal)
-        sighist=np.append(sighist, lastSignal)
-    else:
-        sighist=np.array(prediction[0][:-1])
-    signals['signal'] = sighist
-     
-    # replace the zeros with -1 (new encoding for Down day)
-    signals.signal[signals.signal == 0] = -1
+    algos=bestalgo.keys()
+    for algo in algos:
+        # initialize signals.signal column to zero
+        signals[algo] = 0.0
+        (prediction, accuracy)=bestalgo[algo]
+        # copying into signals.signal column results of prediction
+        print algo, ' with ', bars.shape[0],' bars ', len(prediction[:-1]), 'predictions'
+        if sighist.has_key(algo):
+            print 'Last Signal' + str(lastSignal[algo])
+            sighist[algo]=np.append(sighist[algo], lastSignal[algo])
+        else:
+            sighist[algo]=np.array(prediction[:-1])
+            
+        if len(bars.index) < len(sighist[algo]):
+            print 'Bar Length: ', len(bars.index),' Longer than Sig Length:',len(sighist[algo]), 'Adjusting sighist'
+            sighist[algo]=sighist[algo][-len(bars.index):]
+        print algo, ' Bar Length: ', len(bars.index),' Sig Length:',len(sighist[algo])
+        signals[algo] = sighist[algo]
+         
+        # replace the zeros with -1 (new encoding for Down day)
+        signals.ix[signals[algo] == 0, algo] = -1
+        signals[algo+'_pos'] = signals[algo].diff()     
+    
     
     print 'Last Bar: ' + str(bars.iloc[-1]['Close'])
-    
     logging.info('Last Bar: ' + str(bars.iloc[-1]['Close']))
-    
-    
     # compute the difference between consecutive entries in signals.signal. As
     # signals.signal was an array of 1 and -1 return signals.positions will 
     # be an array of 0s and 2s.
-    signals['positions'] = signals['signal'].diff()     
      
     # calling portfolio evaluation on signals (predicted returns) and bars 
     # (actual returns)
-    portfolio.setInit(symbol, bars, signals, nextSignal, lastSignal,parameters)
+    portfolio.setInit(symbol, bars, signals, algos, nextSignal, lastSignal, parameters)
     
     # backtesting the portfolio and generating returns on top of that 
-    portfolio.backtest_portfolio()
+    (portfolioData, returns, ranking)=portfolio.backtest_portfolio()
+    count=1
+    for [rank,equity] in ranking:
+        print rank, '#',count, ' with returns of: $', equity
+        count = count + 1
+        
     print 'Backtesting Complete'
-    return nextSignal
+    return nextSignal[bestModel]
     
     
 def start_lookback(lookback, argv):

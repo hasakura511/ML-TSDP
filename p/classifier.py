@@ -7,9 +7,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn import neighbors
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import VotingClassifier
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn import cluster, covariance, manifold
-from sklearn.qda import QDA
+
 
 import operator
 import re
@@ -47,7 +51,12 @@ def prepareDataForClassification(dataset, start_test):
     #dataset.UpDown[dataset.UpDown < 0] = 'Down'
     dataset.UpDown = le.fit(dataset.UpDown).transform(dataset.UpDown)
     
+    #for x in dataset.columns.copy():
+    #            if re.search(r'(Open|High|Low|Close|Volume|Vol|Rinfo|R|P|Oi)', x):
+    #                dataset=dataset.drop(x, axis=1)
+                    
     features = dataset.columns[1:-1]
+    
     X = dataset[features]    
     y = dataset.UpDown    
     
@@ -82,9 +91,14 @@ def performClassification(X_train, y_train, X_test, y_test, method, parameters, 
     
     elif method == 'GTB': 
         return performGTBClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
-
+    elif method == 'GBayes': 
+        return performGBayesClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
     elif method == 'QDA': 
         return performQDAClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
+    elif method == 'LDA': 
+        return performLDAClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
+    elif method == 'Voting': 
+        return performVotingClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
         
 def performRFClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     global savePath
@@ -102,7 +116,7 @@ def performRFClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel
         with open(fname_out, 'wb') as f:
             cPickle.dump(clf, f, -1)    
     accuracy = clf.score(X_test, y_test)
-    print 'Accuracy:',accuracy
+    print 'RF Accuracy:',accuracy
     return clf
     
 def performKNNClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
@@ -113,13 +127,17 @@ def performKNNClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     clf.fit(X_train, y_train)
 
     if savemodel == True:
-        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
-        with open(savePath + fname_out, 'wb') as f:
+        fname_out = savePath + '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        if len(parameters) > 0:
+            fname_out=parameters[0]
+        
+        print 'Saving ' + fname_out
+        with open(fname_out, 'wb') as f:
             cPickle.dump(clf, f, -1)    
     
     accuracy = clf.score(X_test, y_test)
     
-    print 'Accuracy:',accuracy
+    print 'KNN Accuracy:',accuracy
     return clf
     
 def performSVMClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
@@ -132,13 +150,17 @@ def performSVMClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     clf.fit(X_train, y_train)
  
     if savemodel == True:
-        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
-        with open(savePath + fname_out, 'wb') as f:
+        fname_out = savePath + '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        if len(parameters) > 0:
+            fname_out=parameters[0]
+        
+        print 'Saving ' + fname_out
+        with open(fname_out, 'wb') as f:
             cPickle.dump(clf, f, -1)    
     
     accuracy = clf.score(X_test, y_test)
     
-    print 'Accuracy:',accuracy
+    print 'SVM Accuracy:',accuracy
     return clf
     
 def performAdaBoostClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
@@ -151,13 +173,17 @@ def performAdaBoostClass(X_train, y_train, X_test, y_test, parameters, fout, sav
     clf.fit(X_train, y_train)
 
     if savemodel == True:
-        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
-        with open(savePath + fname_out, 'wb') as f:
-            cPickle.dump(clf, f, -1)    
+        fname_out = savePath + '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        if len(parameters) > 0:
+            fname_out=parameters[0]
+        
+        print 'Saving ' + fname_out
+        with open(fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)      
     
     accuracy = clf.score(X_test, y_test)
     
-    print 'Accuracy:',accuracy
+    print 'ADA Accuracy:',accuracy
     return clf
     
 def performGTBClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
@@ -168,27 +194,50 @@ def performGTBClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     clf.fit(X_train, y_train)
  
     if savemodel == True:
-        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
-        with open(savePath + fname_out, 'wb') as f:
-            cPickle.dump(clf, f, -1)    
+        fname_out = savePath + '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        if len(parameters) > 0:
+            fname_out=parameters[0]
+        
+        print 'Saving ' + fname_out
+        with open(fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)      
     
     accuracy = clf.score(X_test, y_test)
     
-    print 'Accuracy:',accuracy
+    print 'GTB Accuracy:',accuracy
     return clf
+def performGBayesClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
+    """
+    Gaussian Bayes
+    """
+    clf = GaussianNB()
+    clf.fit(X_train, y_train)
+ 
+    if savemodel == True:
+        fname_out = savePath + '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        if len(parameters) > 0:
+            fname_out=parameters[0]
+        
+        print 'Saving ' + fname_out
+        with open(fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)      
     
+    accuracy = clf.score(X_test, y_test)
+    
+    print 'GBayes Accuracy:',accuracy
+    return clf    
 def performQDAClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     """
     Quadratic Discriminant Analysis binary Classification
     """
-    def replaceTiny(x):
-        if (abs(x) < 0.0001):
-            x = 0.0001
+    #def replaceTiny(x):
+    #    if (abs(x) < 0.0001):
+    #        x = 0.0001
     
-    X_train = X_train.apply(replaceTiny)
-    X_test = X_test.apply(replaceTiny)
+    #X_train = X_train.apply(replaceTiny)
+    #X_test = X_test.apply(replaceTiny)
     
-    clf = QDA()
+    clf = QuadraticDiscriminantAnalysis()
     clf.fit(X_train, y_train)
 
     if savemodel == True:
@@ -198,5 +247,60 @@ def performQDAClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     
     accuracy = clf.score(X_test, y_test)
     
-    print 'Accuracy:',accuracy
+    print 'QDA Accuracy:',accuracy
+    return clf
+
+def performLDAClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
+    """
+    Quadratic Discriminant Analysis binary Classification
+    """
+    #def replaceTiny(x):
+    #    if (abs(x) < 0.0001):
+    #        x = 0.0001
+    
+    #X_train = X_train.apply(replaceTiny)
+    #X_test = X_test.apply(replaceTiny)
+    
+    clf = LinearDiscriminantAnalysis()
+    clf.fit(X_train, y_train)
+
+    if savemodel == True:
+        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        with open(savePath + fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)    
+    
+    accuracy = clf.score(X_test, y_test)
+    
+    print 'LDA Accuracy:',accuracy
+    return clf
+def performVotingClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
+    """
+    Quadratic Discriminant Analysis binary Classification
+    """
+    #def replaceTiny(x):
+    #    if (abs(x) < 0.0001):
+    #        x = 0.0001
+    
+    #X_train = X_train.apply(replaceTiny)
+    #X_test = X_test.apply(replaceTiny)
+    
+    clf = VotingClassifier(estimators=[
+                 ("GNBayes",GaussianNB()),\
+                 ("LDA", LinearDiscriminantAnalysis()), \
+                 ("KNN", KNeighborsClassifier(n_neighbors=5, weights='uniform')), \
+                 #("SVC", SVC())
+                 #("RF", RandomForestClassifier()), \
+                 #("GTB", GradientBoostingClassifier(n_estimators=100)), \
+                 #("ADA", AdaBoostClassifier())
+                 ], voting='hard')
+    clf.fit(X_train, y_train)
+
+    if savemodel == True:
+        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        with open(savePath + fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)    
+    
+    accuracy = clf.score(X_test, y_test)
+    
+    print 'Voting Accuracy:',accuracy
     return clf

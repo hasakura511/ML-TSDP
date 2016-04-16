@@ -259,7 +259,7 @@ def get_signal(lookback, portfolio, argv):
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,12,15)  
-        start_test = date - datetime.timedelta(minutes=lookback*30*2+14)  
+        start_test = date - datetime.timedelta(minutes=lookback*30*2+14*30)  
         start_period = start_test - datetime.timedelta(hours=2000)
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'
@@ -290,12 +290,9 @@ def get_signal(lookback, portfolio, argv):
         #start_period = datetime.datetime(2015,07,15)  
         start_test = date - datetime.timedelta(hours=lookback*2+14)  
         start_period = start_test - datetime.timedelta(hours=4000)
-        symbol = 'EURJPY'
-        file='1h_EURJPY'
         path_datasets='./data/from_IB/'
         name = './p/data/' + file + '.csv'
         folds=10
-        interval='1h_'
     return next_signal(lookback, portfolio, argv)
 
 def next_signal(lookback, portfolio, argv):
@@ -348,7 +345,7 @@ def next_signal(lookback, portfolio, argv):
     #        return nextSignal[bestModel]
     
     # dataframe of Historical Price
-    bars=data.get_quote(path_datasets, file.split('.')[0], '', False, parameters)
+    bars=data.get_quote(path_datasets, file, '', False, parameters)
     # subset of the data corresponding to test set
     #if parameters[2] > 0:
     #    bars=bars.iloc[:-parameters[2]]  

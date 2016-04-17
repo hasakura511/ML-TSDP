@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_rockEUR,BTCUSD_rockEUR,,20.0,20.0,379.1,379.1,0.0,18.955,-18.955,-116.474,-21.2,Paper,USD,0.0
+BTCUSD_rockEUR,BTCUSD_rockEUR,,-20.0,-20.0,377.59,377.59,0.0,18.8795,-18.8795,-165.5535,-51.4,Paper,USD,0.0

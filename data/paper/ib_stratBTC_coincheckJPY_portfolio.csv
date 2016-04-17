@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_coincheckJPY,BTCUSD_coincheckJPY,,20.0,20.0,46567.0,46567.0,0.0,2328.35,-2328.35,-62941.5,-2260.0,Paper,USD,0.0
+BTCUSD_coincheckJPY,BTCUSD_coincheckJPY,,-20.0,-20.0,46739.0,46739.0,0.0,2336.95,-2336.95,-61838.45,1180.0,Paper,USD,0.0

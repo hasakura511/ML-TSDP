@@ -112,7 +112,9 @@ class MarketIntradayPortfolio(Portfolio):
         """Backtest the portfolio and return a DataFrame containing
         the equity curve and the percentage returns."""
         self.rank=dict()
+        self.accuracy=dict()
         portfolio = dict()
+                
         for algo in self.algos:
             portfolio[algo]=pd.DataFrame(index=self.positions.index)
             self.pos_diff=dict()
@@ -125,8 +127,13 @@ class MarketIntradayPortfolio(Portfolio):
             portfolio[algo]['returns'] = portfolio[algo]['total'].pct_change()
             self.rank[algo]=float(portfolio[algo]['total'][-1] - portfolio[algo]['total'][0])
             self.returns=portfolio
+            c=np.array(self.returns[algo]['profit'])
+            c[c>0]=1
+            c[c<0]=0
+            accuracy=round(float(c.sum())/len(c),2)*100
+            self.accuracy[algo]=accuracy
         #self.ranking= sorted(self.rank.items(), key=operator.itemgetter(1), reverse=True)
-        self.ranking= sorted(self.rank.items(), key=operator.itemgetter(1))
+        self.ranking= sorted(self.accuracy.items(), key=operator.itemgetter(1))
         self.ready=True
         return (portfolio, self.rank, self.ranking)
         
@@ -150,9 +157,17 @@ class MarketIntradayPortfolio(Portfolio):
                 #if not color2.has_key(algo):
                 color2[algo]='#'+'%06X' % randint(0, 0xFFFFFF)
                 #ax1.plot_wireframe(np.array(self.bars.index), np.array(self.bars['Close']), count, rstride=11, cstride=0)
-                line=ax1.plot_wireframe(count, mpl.dates.date2num(self.bars.index.to_pydatetime()), 
-                                        np.array(self.bars['Close']), rstride=10, cstride=10, 
-                                        color=color2[algo], label=str(count)+' ' + algo)
+                ydepth=np.empty(len(self.bars.index))
+                ydepth.fill(count)                
+                line, =ax1.plot(ydepth, mpl.dates.date2num(self.bars.index.to_pydatetime()), 
+                                        np.array(self.bars['Close']), 
+                            label=str(count)+' ' + algo + ' ' + str(self.accuracy[algo]) + '%', # label of the curve
+                            color = color2[algo],      # colour of the curve
+                            linewidth = 5           # thickness of the line
+                            )
+                #line=ax1.plot_wireframe(count, mpl.dates.date2num(self.bars.index.to_pydatetime()), 
+                #                        np.array(self.bars['Close']), rstride=10, cstride=10, 
+                #                        color=color2[algo], label=str(count)+' ' + algo)
                 #line, =ax1.plot(self.bars['Close'], color='r', lw=3.)   
                 lines1.append(line)
                 
@@ -188,10 +203,18 @@ class MarketIntradayPortfolio(Portfolio):
             for [algo,equity] in self.ranking:
                 if not color2.has_key(algo):
                     color2[algo]='#'+'%06X' % randint(0, 0xFFFFFF)
-                    
-                line=ax2.plot_wireframe(count, mpl.dates.date2num(self.bars.index.to_pydatetime()),
+                
+                ydepth=np.empty(len(self.bars.index))
+                ydepth.fill(count)                
+                line, =ax2.plot(ydepth, mpl.dates.date2num(self.bars.index.to_pydatetime()), 
                                         np.array(self.returns[algo]['total'], dtype=float), 
-                                        rstride=10, cstride=10, color=color2[algo], label=algo)
+                            label=str(count)+' ' + algo + ' ' + str(self.accuracy[algo]) + '%', # label of the curve
+                            color = color2[algo],      # colour of the curve
+                            linewidth = 3           # thickness of the line
+                            )
+                #line=ax2.plot_wireframe(count, mpl.dates.date2num(self.bars.index.to_pydatetime()),
+                #                        np.array(self.returns[algo]['total'], dtype=float), 
+                #                        rstride=10, cstride=10, color=color2[algo], label=algo)
                 lines2.append(line)
                 #if self.returns[algo]['total'][-1] > maxequity:
                 #    maxequity=self.returns[algo]['total'][-1]
@@ -455,7 +478,7 @@ class MarketIntradayPortfolio(Portfolio):
             lines.extend(lines2)
             lines.extend(lines3)
             lines.extend(lines4)
-            ax2.set_title('Trading Period [' + str(self.bars.index[0]) + ' - ' + str(self.bars.index[-1]) +']', 
+            ax1.set_title('Trading Period [' + str(self.bars.index[0]) + ' - ' + str(self.bars.index[-1]) +']', 
                                        fontsize=12,y=1.05)
             
             finaldate=mpl.dates.date2num(self.bars.index.to_pydatetime())[-1]+1

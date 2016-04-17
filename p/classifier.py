@@ -34,6 +34,7 @@ import re
 import pandas as pd
 
 savePath='./p/params/'
+
 def prepareDataForClassification(dataset, start_test):
     """
     generates categorical output column, attach to dataframe 
@@ -47,6 +48,13 @@ def prepareDataForClassification(dataset, start_test):
     #dataset.UpDown[dataset.UpDown >= 0] = 'Up'
     #dataset.UpDown[dataset.UpDown < 0] = 'Down'
     dataset.UpDown = le.fit(dataset.UpDown).transform(dataset.UpDown)
+    
+    #print 'Dropping Data Missing: ', count_missing(dataset)
+    #dataset=dataset.replace([np.inf, -np.inf], np.nan)
+    #dataset=dataset.fillna(method='bfill')
+    #dataset=dataset.fillna(method='pad')
+    #dataset=dataset.dropna(subset=dataset.columns, how="all")
+    #print 'Data Missing: ', count_missing(dataset)
     
     #for x in dataset.columns.copy():
     #            if re.search(r'(Open|High|Low|Close|Volume|Vol|Rinfo|R|P|Oi)', x):
@@ -64,6 +72,16 @@ def prepareDataForClassification(dataset, start_test):
     y_test = y[y.index >= start_test]
     
     return X_train, y_train, X_test, y_test   
+
+def count_missing(df):
+    res=len(df) - df.count()
+    print 'Null Values:', df.isnull().sum().sum()
+    #print 'Inf Values:', df.isinf().sum().sum()
+    #for r in res:
+    #    if r > 0:
+    #        print r
+    #return res
+    return sum(np.array(res))
     
 def performClassification(X_train, y_train, X_test, y_test, method, parameters, fout, savemodel):
     """

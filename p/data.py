@@ -40,7 +40,7 @@ def getStock(path_datasets, symbol, start, end):
     Returns pandas dataframe.
     """
     df =  pd.io.data.get_data_yahoo(symbol, start, end)
-    df.to_csv(path_datasets+'idx_' + symbol + '.csv')
+    df.to_csv(path_datasets[0]+'idx_' + symbol + '.csv')
     
     #df.columns.values[-1] = 'AdjClose'
     #df.columns = df.columns + '_' + symbol
@@ -94,31 +94,36 @@ def getStockDataFromWeb(fout, name, path_datasets, start_string, end_string):
 
 def loadDatasets(path_datasets, fout, parameters):
     interval=parameters[1]
-    dataPath=path_datasets
-    symbol_dict=dict()
-    files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-    for file in files:
-        
-        fsym=fout
-        ireg=re.search(r'\W',fout)
-        if ireg:
-            fsym=fout.split(ireg.group(0))[1]
-        if re.search(r''+interval, file) and not re.search(fsym,file):
-            sym=file.split('.')[0]
-            symbol_dict[sym]=sym
-            print 'loadDatasets: ', sym
-    symbols, names = np.array(list(symbol_dict.items())).T
-    print 'loadDatasets: Main Symbol', fout
-    out =  get_quote(dataPath, fout, 'Out', True, parameters)
-    data = list()
-    for symbol in symbols:
-        dataFrame=get_quote(dataPath, symbol, symbol, True, parameters)
-        if dataFrame.shape[0]>1000:
-            data.append(dataFrame)
-        
     dataSet=list()
-    dataSet.append(out)
-    dataSet.extend(data)
+    count=0
+    for dataPath in path_datasets:
+        symbol_dict=dict()
+        files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+        for file in files:
+            
+            fsym=fout
+            ireg=re.search(r'\W',fout)
+            if ireg:
+                fsym=fout.split(ireg.group(0))[1]
+            for inter in interval:
+                if re.search(r''+inter, file) and not re.search(fsym,file):
+                    sym=file.rsplit('.',1)[0]
+                    
+                    symbol_dict[sym]=sym
+                    print 'loadDatasets: ', sym
+        symbols, names = np.array(list(symbol_dict.items())).T
+        print 'loadDatasets: Main Symbol', fout
+        
+        data = list()
+        for symbol in symbols:
+            dataFrame=get_quote(dataPath, symbol, symbol, True, parameters)
+            if dataFrame.shape[0]>1000:
+                data.append(dataFrame)
+        if count == 0:
+            out =  get_quote(dataPath, fout, 'Out', True, parameters)
+            dataSet.append(out)
+        dataSet.extend(data)
+        count = count + 1
     print 'Done Loading Data'
     return dataSet
 

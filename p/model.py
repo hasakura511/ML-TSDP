@@ -45,12 +45,13 @@ portfolio = backtest.MarketIntradayPortfolio()
 nextSignal=0
 lastSignal=0
 sighist=list()
+models=dict()
+signals=dict()
 
 def count_missing(df):
      return len(df) - df.count()
 
-models=dict()
-signals=dict()
+
 def getPredictionFromBestModel(bestdelta, bestlags, fout, cut, start_test, dataSets, parameters):
     global models
     global signals
@@ -231,10 +232,10 @@ def get_signal(lookback, portfolio, argv):
     start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
     symbol = 'EURJPY'
     file='30m_EURJPY'
-    path_datasets='./data/from_IB/'
+    path_datasets=np.array(['./data/from_IB/'])
     name = './p/data/' + file + '.csv'
     folds=10
-    interval='30m_'
+    interval=['30m_']
     
     if len(argv) > 1 and argv[1] == '1':
         ############## idx ##############    
@@ -243,8 +244,8 @@ def get_signal(lookback, portfolio, argv):
         start_period = datetime.datetime(1995,1,15)  
         start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
         end_period = datetime.datetime.now()        
-        interval='idx_'
-        path_datasets='./p/data/'
+        interval=['idx_']
+        path_datasets=np.array(['./p/data/'])
         name = './p/data/' + file + '.csv'
         qty=500
         if len(argv) > 2 and argv[2] == '2':
@@ -255,27 +256,27 @@ def get_signal(lookback, portfolio, argv):
         symbol = 'EURJPY'
         if len(argv) > 4:
             symbol=argv[4]
-        interval='30m_'        
-        file=interval + symbol
+        interval=['30m_']     
+        file=interval[0] + symbol
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,12,15)  
         start_test = date - datetime.timedelta(minutes=lookback*30*2+72*30)  
         start_period = start_test - datetime.timedelta(hours=2000)
-        path_datasets='./data/from_IB/'
+        path_datasets=np.array(['./data/from_IB/'])
         name = './p/data/' + file + '.csv'
         qty=20000
         folds=10
         ############## idx ##############  
     elif len(argv) > 1 and argv[1] == '3':
         ############## idx ##############    
-        path_datasets='./quantiacs/tickerData/'
+        path_datasets=np.array(['./quantiacs/tickerData/'])
         symbol = 'ES'
         file='F_ES'
         start_period = datetime.datetime(1995,1,15)  
         start_test = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=lookback*2+14)  
         end_period = datetime.datetime.now()        
-        interval='F_'
+        interval=['F_']
         qty=1
         name = './p/data/' + file + '.csv'
         #if len(argv) > 2 and argv[2] == '2':
@@ -285,14 +286,14 @@ def get_signal(lookback, portfolio, argv):
         symbol = 'EURJPY'
         if len(argv) > 4:
             symbol=argv[4]
-        interval='1h_'        
-        file=interval + symbol
+        interval=['1h_']  
+        file=interval[0] + symbol
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,07,15)  
         start_test = date - datetime.timedelta(hours=lookback*2+72)  
         start_period = start_test - datetime.timedelta(hours=4000)
-        path_datasets='./data/from_IB/'
+        path_datasets=np.array(['./data/from_IB/'])
         name = './p/data/' + file + '.csv'
         qty=20000
         folds=10
@@ -300,14 +301,14 @@ def get_signal(lookback, portfolio, argv):
         symbol = 'bitstampUSD'
         if len(argv) > 4:
             symbol=argv[4]
-        interval='BTCUSD_'        
-        file=interval + symbol
+        interval=['BTCUSD_']
+        file=interval[0] + symbol
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,07,15)  
         start_test = date - datetime.timedelta(minutes=lookback*2+72)  
         start_period = start_test - datetime.timedelta(minutes=3000)
-        path_datasets='./data/from_IB/'
+        path_datasets=np.array(['./data/from_IB/'])
         name = './p/data/' + file + '.csv'
         qty=20
         folds=10
@@ -316,18 +317,52 @@ def get_signal(lookback, portfolio, argv):
         symbol = '#USSPX500'
         if len(argv) > 4:
             symbol=argv[4]
-        interval='1d_'        
-        file=interval + symbol
+        interval=['1d_']
+        file=interval[0] + symbol
         #bar=bars.get_bar(file)
         #date=parse(bar.index[-1])
         date = datetime.datetime(2016,04,15,22,30,00)  
         start_test = date - datetime.timedelta(days=lookback*2+72)  
         start_period = start_test - datetime.timedelta(days=1500)
-        path_datasets='./data/from_MT4/'
+        path_datasets=np.array(['./data/from_MT4/'])
         name = './p/data/' + file + '.csv'
         qty=200
         folds=10
         print 'Starting s101 for: ',symbol
+    elif len(argv) > 1 and argv[1] == '7':
+        symbol = '^GSPC'
+        #symbol = '#USSPX500'
+        if len(argv) > 4:
+            symbol=argv[4]
+        interval=['idx_','1d_','BTCUSD_']        
+        file=interval[0] + symbol
+        #bar=bars.get_bar(file)
+        #date=parse(bar.index[-1])
+        date = datetime.datetime(2016,04,15,22,30,00)  
+        start_test = date - datetime.timedelta(days=lookback*2+14)  
+        start_period = start_test - datetime.timedelta(days=1500)
+        path_datasets= np.array(['./p/data/','./data/from_MT4/','./data/from_MT4/fut/','./data/from_MT4/usstocks/'])
+        name = './p/data/' + file + '.csv'
+        qty=200
+        folds=10
+        print 'Starting s101 for: ',symbol
+    elif len(argv) > 1 and argv[1] == '8':
+        #symbol = '^GSPC'
+        symbol = '#USSPX500'
+        if len(argv) > 4:
+            symbol=argv[4]
+        interval=['1h_']        
+        file=interval[0] + symbol
+        #bar=bars.get_bar(file)
+        #date=parse(bar.index[-1])
+        date = datetime.datetime(2016,04,15,22,30,00)  
+        start_test = date - datetime.timedelta(days=lookback*2+14)  
+        start_period = start_test - datetime.timedelta(hours=1500)
+        path_datasets= np.array(['./data/from_MT4/','./data/from_MT4/fut/','./data/from_MT4/usstocks/'])
+        name = './p/data/' + file + '.csv'
+        qty=200
+        folds=10
+        print 'Starting s101 for: ',symbol    
     return next_signal(lookback, portfolio, argv)
 
 def next_signal(lookback, portfolio, argv):
@@ -396,7 +431,7 @@ def next_signal(lookback, portfolio, argv):
     #        return nextSignal[bestModel]
     
     # dataframe of Historical Price
-    bars=data.get_quote(path_datasets, file, '', False, parameters)
+    bars=data.get_quote(path_datasets[0], file, '', False, parameters)
     # subset of the data corresponding to test set
     #if parameters[2] > 0:
     #    bars=bars.iloc[:-parameters[2]]  

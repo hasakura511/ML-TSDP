@@ -113,7 +113,7 @@ def loadDatasets(path_datasets, fout, parameters):
     data = list()
     for symbol in symbols:
         dataFrame=get_quote(dataPath, symbol, symbol, True, parameters)
-        if dataFrame.shape[0]>2000:
+        if dataFrame.shape[0]>1000:
             data.append(dataFrame)
         
     dataSet=list()
@@ -132,7 +132,7 @@ def get_quote(dataPath, sym, colname, addParam, parameters):
     if not qcache.has_key(sym):
         if os.path.isfile(filename):
             dataSet=pd.read_csv(filename,index_col='Date')
-            if not dataSet.shape[0]>2000:
+            if not dataSet.shape[0]>1000:
                 return dataSet
         else:
             filename=dataPath + sym + '.txt'

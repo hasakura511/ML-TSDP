@@ -322,7 +322,7 @@ def get_signal(lookback, portfolio, argv):
         #date=parse(bar.index[-1])
         date = datetime.datetime(2016,04,15,22,30,00)  
         start_test = date - datetime.timedelta(days=lookback*2+72)  
-        start_period = start_test - datetime.timedelta(days=2000)
+        start_period = start_test - datetime.timedelta(days=1500)
         path_datasets='./data/from_MT4/'
         name = './p/data/' + file + '.csv'
         qty=200

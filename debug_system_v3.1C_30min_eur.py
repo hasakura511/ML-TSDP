@@ -95,33 +95,52 @@ filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='30m'
 #barSizeSetting='1 min'
-currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
-                 'GBPJPY','EURCHF','AUDJPY',\
-                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY','NZDUSD']
+currencyPairs =  [
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                'AUDUSD',\
+                'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
+                'EURNZD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP'\
+                ]
 
         
 #no args -> debug.  else live mode arg 1 = pair, arg 2 = "0" to turn off
 if len(sys.argv)==1:
     debug=True
     
-    livePairs =  [
-                    #'NZDJPY',\
-                    #'CADJPY',\
-                    #'CHFJPY',\
-                    #'EURJPY',\
-                    #'GBPJPY',\
-                    #'AUDJPY',\
-                    #'USDJPY',\
-                    #'AUDUSD',\
-                    #'EURUSD',\
-                    #'GBPUSD',\
-                    #'USDCAD',\
-                    'USDCHF',\
-                    #'NZDUSD',
-                    #'EURCHF',\
-                    #'EURGBP'\
-                    ]
+    livePairs =   [
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                'AUDUSD',\
+                'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
+                'EURNZD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP'\
+                ]
                     
                     
     showDist =  False

@@ -190,9 +190,10 @@ def runPair_v2(pair, dataSet):
                 'modelPath':modelPath,'loadModel':loadModel}
                 
     if offline:
-        message = "Offline Mode: turned off in runsystem"
-        offlineMode(ticker, message, signalPath, version, version_)
-        logging.info(version+' '+ticker+' '+message)
+        with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(ticker, message, signalPath, version, version_)
+            logging.info(version+' '+ticker+' '+message)
     else:
         try:
             with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
@@ -260,6 +261,7 @@ pairs =  [
                 'EURUSD',\
                 'EURAUD',\
                 'EURCAD',\
+                'EURNZD',\
                 'GBPUSD',\
                 'USDCAD',\
                 'USDCHF',\
@@ -269,7 +271,7 @@ pairs =  [
                 ]
                  
 if len(sys.argv)==1:          
-    livePairs =  [
+    livePairs =    [
                 'NZDJPY',\
                 'CADJPY',\
                 'CHFJPY',\
@@ -281,6 +283,7 @@ if len(sys.argv)==1:
                 'EURUSD',\
                 'EURAUD',\
                 'EURCAD',\
+                'EURNZD',\
                 'GBPUSD',\
                 'USDCAD',\
                 'USDCHF',\

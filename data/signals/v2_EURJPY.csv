@@ -2801,3 +2801,8 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-04-15 16:30:00,-1.0,0.0,4658.0,1.0,-79.8938277022,0.0,0.00208514414057,bothEURJPY_30m_ALL_DF1_None_i0_fcst1_SH1 DPS wl2.0 maxL2 dd95_0.002 thres_0.0,-26.3357166667,20160415 16:03:39 EDT
 2016-04-15 17:00:00,-1.0,0.0,4658.0,1.0,-82.3295857825,0.0,0.00208514414057,bothEURJPY_30m_ALL_DF1_None_i0_fcst1_SH1 DPS wl2.0 maxL2 dd95_0.002 thres_0.0,-26.0861166667,20160415 16:33:54 EDT
 2016-04-16 02:55:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-26.0861166667,20160415 16:33:54 EDT
+2016-04-17 17:22:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-26.0861166667,20160415 16:33:54 EDT
+2016-04-17 17:32:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-26.0861166667,20160415 16:33:54 EDT
+2016-04-17 18:02:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-26.0861166667,20160415 16:33:54 EDT
+2016-04-17 18:28:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-26.0861166667,20160415 16:33:54 EDT
+2016-04-17 18:33:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-26.0861166667,20160415 16:33:54 EDT

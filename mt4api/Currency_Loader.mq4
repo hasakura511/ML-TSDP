@@ -10,7 +10,7 @@
 //---- input parameters
 extern int  BarsMin=100;         // Minimal number bars in history which might be loaded into files.
 extern int MaxBarsInFile = 200000; // Max Bars for loading into file.
-extern int FrequencyUpdate = 5; // this value identify frequency update for files in sec.
+extern int FrequencyUpdate = 30; // this value identify frequency update for files in sec.
 extern bool LoadM1  = true;       //Timeframes of securities which data will be loaded onto File if True       
 extern bool LoadM5  = true;
 extern bool LoadM15 = true;

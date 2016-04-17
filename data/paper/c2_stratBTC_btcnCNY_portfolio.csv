@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_btcnCNY,open,long,2.0,0.0,2788.34,0.0,-13.9417,0.0,13.9417,28.0,,,,,BTCUSD_btcnCNY,,20160416 19:53:28 EST,20160416 19:53:28 EST,2.0,USD,-13.9417,0.0,99219.5273,1994403.8,99986.64
+BTCUSD_btcnCNY,open,short,2.0,0.0,2793.5,0.0,-13.9675,0.0,13.9675,37.0,,,,,BTCUSD_btcnCNY,,20160416 23:39:57 EST,20160416 23:39:57 EST,-2.0,USD,-13.9675,0.0,98991.4283,1994403.8,100010.0

@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_bitbayPLN,open,long,2.0,0.0,1633.0,0.0,-8.165,0.0,8.165,19.0,,,,,BTCUSD_bitbayPLN,,20160416 16:05:32 EST,20160416 16:05:32 EST,2.0,USD,-8.165,0.0,99755.6401,1996728.0,100057.96
+BTCUSD_bitbayPLN,open,long,2.0,0.0,1629.0,0.0,-8.145,0.0,8.145,23.0,,,,,BTCUSD_bitbayPLN,,20160416 23:47:56 EST,20160416 23:47:56 EST,2.0,USD,-8.145,0.0,99716.4651,1996728.0,100083.96

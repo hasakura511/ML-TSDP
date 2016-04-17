@@ -258,6 +258,8 @@ pairs =  [
                 'USDJPY',\
                 'AUDUSD',\
                 'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
                 'GBPUSD',\
                 'USDCAD',\
                 'USDCHF',\
@@ -277,6 +279,8 @@ if len(sys.argv)==1:
                 'USDJPY',\
                 'AUDUSD',\
                 'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
                 'GBPUSD',\
                 'USDCAD',\
                 'USDCHF',\
@@ -322,6 +326,8 @@ else:
                 'USDJPY',\
                 'AUDUSD',\
                 'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
                 'GBPUSD',\
                 'USDCAD',\
                 'USDCHF',\

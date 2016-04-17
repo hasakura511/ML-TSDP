@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_okcoinCNY,BTCUSD_okcoinCNY,,20.0,20.0,2794.13,2794.13,0.0,139.7065,-139.7065,-5149.1965,-127.8,Paper,USD,0.0
+BTCUSD_okcoinCNY,BTCUSD_okcoinCNY,,20.0,20.0,2788.09,2788.09,0.0,139.4045,-139.4045,-5813.1855,-234.2,Paper,USD,0.0

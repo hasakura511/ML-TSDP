@@ -1,2 +1,2 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-@ESM6,163,1460930579,,,2062.75000,,future,long,2016-04-17 18:02:59,1460930579,open,2016-04-17 18:02:43,2062.25000,50,,0,1,,,101863024,
+@ESM6,475,1460930579,,,2062.75000,,future,long,2016-04-17 18:02:59,1460930579,open,2016-04-17 18:02:43,2062.25000,50,,0,1,,,101863024,

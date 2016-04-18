@@ -1,1 +1,3 @@
-symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
+EURCAD,EUR,,20000.0,20000.0,1.46358,1.46358,0.0,2.0,-4.69064,39.94712,43.94712,Paper,CAD,-2.69064
+EURAUD,EUR,,20000.0,20000.0,1.47364,1.47364,0.0,2.0,-3.78704,63.46076,67.46076,Paper,AUD,-1.78704

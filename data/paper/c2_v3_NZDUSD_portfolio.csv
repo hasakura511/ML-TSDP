@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-NZDUSD,open,long,2.0,0.0,0.6922,0.0,-2.0,0.0,2.0,24.0,,,,,NZDUSD,,20160416 22:43:43 EST,20160416 22:43:43 EST,2.0,USD,-18.2,-16.2,99794.8,1986458.0,99974.8
+NZDUSD,open,short,2.0,0.0,0.69083,0.0,-2.0,0.0,2.0,25.0,,,,,NZDUSD,,20160417 21:25:41 EST,20160417 21:25:41 EST,-2.0,USD,0.599999999999,2.6,99763.4,1986458.0,99947.4

@@ -223,6 +223,8 @@ def get_signal(lookback, portfolio, argv):
     global dataSets
     global sighist
     global qty
+    global playSafe
+    playSafe='0'
     lastSignal=dict()
     nextSignal=dict()
     sighist=dict()
@@ -256,6 +258,8 @@ def get_signal(lookback, portfolio, argv):
         symbol = 'EURJPY'
         if len(argv) > 4:
             symbol=argv[4]
+        if len(argv) > 5:
+            playSafe=argv[5]
         interval=['30m_']     
         file=interval[0] + symbol
         bar=bars.get_bar(file)
@@ -481,17 +485,34 @@ def next_signal(lookback, portfolio, argv):
     # backtesting the portfolio and generating returns on top of that 
     (portfolioData, returns, ranking)=portfolio.backtest_portfolio()
     count=len(ranking)
+    accurateModel=''
+    accurateModelRate=0
     for [algo,accWR] in ranking:
         equity=returns[algo]
-        print algo, '#',count, ' Accuracy: ', round(portfolioData[algo]['accuracy'][-1],2)*100,'% Returns: $', equity, \
+        accuracy= round(portfolioData[algo]['accuracy'][-1],2)*100
+        print algo, '#',count, ' Accuracy: ', accuracy ,'% Returns: $', equity, \
             ' Accuracy W. Returns: $', accWR, ' Next Signal: ', nextSignal[algo], ''
+        if playSafe == '1' and accuracy >=99 and accWR >= 0:
+                accurateModel=algo
+                accurateModelRate=accuracy
         count = count - 1
     (bestModel,bestAccuracy) =ranking[-1]
-    print 'Best Model: ',bestModel,' Next Signal:',nextSignal[algo]
+    if playSafe == '1' and accurateModelRate > 0:
+        bestModel=accurateModel
+        bestAccuracy=accurateModelRate
+    print 'Best Model: ',bestModel,' Next Signal:',nextSignal[bestModel]
+    print 'Backtesting Complete'
+    
+        
+    # Testing #2
+    #    signals[algo] = sighist[algo]
+    #    # replace the zeros with -1 (new encoding for Down day)
+    #    #signals.ix[signals[algo] == 0, algo] = -1
+    #    signals[algo+'_pos'] = signals[algo].diff()    
     if len(argv) > 2 and argv[2] == '2':
         return nextSignal[bestModel]
     
-    print 'Backtesting Complete'
+    
     return nextSignal[bestModel]
     
     

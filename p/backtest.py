@@ -128,6 +128,7 @@ class MarketIntradayPortfolio(Portfolio):
             d=np.array(portfolio[algo]['profit']).copy()
             d[d>0]=1
             d[d<0]=0
+            d[np.array(self.positions[algo])==0]=1
             for i in np.arange(1,len(d)+1):
                 c=float(sum(d[0:i]))/(i)
                 d[i-1]=c
@@ -137,6 +138,7 @@ class MarketIntradayPortfolio(Portfolio):
             c=np.array(self.returns[algo]['profit'])
             c[c>0]=1
             c[c<0]=0
+            c[np.array(self.positions[algo])==0]=1
             accuracy=round(float(c.sum())/len(c),2)*self.rank[algo]
             self.accuracy[algo]=accuracy
         #self.ranking= sorted(self.rank.items(), key=operator.itemgetter(1), reverse=True)

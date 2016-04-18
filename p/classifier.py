@@ -48,7 +48,6 @@ def prepareDataForClassification(dataset, start_test):
     #dataset.UpDown[dataset.UpDown >= 0] = 'Up'
     #dataset.UpDown[dataset.UpDown < 0] = 'Down'
     dataset.UpDown = le.fit(dataset.UpDown).transform(dataset.UpDown)
-    
     #print 'Dropping Data Missing: ', count_missing(dataset)
     #dataset=dataset.replace([np.inf, -np.inf], np.nan)
     #dataset=dataset.fillna(method='bfill')

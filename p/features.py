@@ -70,7 +70,11 @@ def mergeDataframes(datasets, index, cut):
     
     first = subset[0].join(subset[1:], how = 'outer')
     finance = datasets[0].iloc[:, index:].join(first, how = 'left') 
-    #finance = finance[finance.index > cut]
+    date=finance.index[0]
+    for dataset in datasets:
+        if dataset.index[0] > date:
+            date=dataset.index[0]
+    finance = finance[finance.index >= date]
     return finance
 
 def applyTimeLag(dataset, lags, delta):

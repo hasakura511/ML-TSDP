@@ -125,12 +125,19 @@ class MarketIntradayPortfolio(Portfolio):
             portfolio[algo]['profit'] = self.positions[algo] * portfolio[algo]['price_diff']
             portfolio[algo]['total'] = self.initial_capital + portfolio[algo]['profit'].cumsum()
             portfolio[algo]['returns'] = portfolio[algo]['total'].pct_change()
+            d=np.array(portfolio[algo]['profit']).copy()
+            d[d>0]=1
+            d[d<0]=0
+            for i in np.arange(1,len(d)+1):
+                c=float(sum(d[0:i]))/(i)
+                d[i-1]=c
+            portfolio[algo]['accuracy']=d
             self.rank[algo]=float(portfolio[algo]['total'][-1] - portfolio[algo]['total'][0])
             self.returns=portfolio
             c=np.array(self.returns[algo]['profit'])
             c[c>0]=1
             c[c<0]=0
-            accuracy=round(float(c.sum())/len(c),2)*100
+            accuracy=round(float(c.sum())/len(c),2)*self.rank[algo]
             self.accuracy[algo]=accuracy
         #self.ranking= sorted(self.rank.items(), key=operator.itemgetter(1), reverse=True)
         self.ranking= sorted(self.accuracy.items(), key=operator.itemgetter(1))
@@ -161,7 +168,7 @@ class MarketIntradayPortfolio(Portfolio):
                 ydepth.fill(count)                
                 line, =ax1.plot(ydepth, mpl.dates.date2num(self.bars.index.to_pydatetime()), 
                                         np.array(self.bars['Close']), 
-                            label=str(count)+' ' + algo + ' ' + str(self.accuracy[algo]) + '%', # label of the curve
+                            label=str(count)+' ' + algo + ' ' + str(round(self.returns[algo]['accuracy'][-1],2)*100)  + '%', # label of the curve
                             color = color2[algo],      # colour of the curve
                             linewidth = 5           # thickness of the line
                             )
@@ -189,7 +196,6 @@ class MarketIntradayPortfolio(Portfolio):
                 #, 
                               #size=10,zorder=1)    
             ax1.set_zlabel(ylabel, fontsize=8)
-            ax1.legend(loc='upper left', fontsize=8)
             
         lines2=list()
         #global maxequity
@@ -208,9 +214,9 @@ class MarketIntradayPortfolio(Portfolio):
                 ydepth.fill(count)                
                 line, =ax2.plot(ydepth, mpl.dates.date2num(self.bars.index.to_pydatetime()), 
                                         np.array(self.returns[algo]['total'], dtype=float), 
-                            label=str(count)+' ' + algo + ' ' + str(self.accuracy[algo]) + '%', # label of the curve
+                            label=str(count)+' ' + algo + ' ', # label of the curve
                             color = color2[algo],      # colour of the curve
-                            linewidth = 3           # thickness of the line
+                            linewidth = 5           # thickness of the line
                             )
                 #line=ax2.plot_wireframe(count, mpl.dates.date2num(self.bars.index.to_pydatetime()),
                 #                        np.array(self.returns[algo]['total'], dtype=float), 
@@ -275,8 +281,18 @@ class MarketIntradayPortfolio(Portfolio):
                 colordepth[np.array(self.signals[algo]) < 0]='red'
                 line=ax3.bar3d(ydepth, mpl.dates.date2num(self.bars.index.to_pydatetime()), 
                      zpos, 
-                     0.5,0.5,abs(np.array(self.signals[algo])),
+                     0.5,0.5,abs(np.array(self.signals[algo]))*np.array(self.returns[algo]['accuracy']),
                    color=colordepth, zsort='average', alpha=0.5, edgecolor='none')
+                lines3.append(line)
+                
+                ydepth=np.empty(len(self.bars.index))
+                ydepth.fill(count)                
+                line, =ax3.plot(ydepth, mpl.dates.date2num(self.bars.index.to_pydatetime()), 
+                                        np.array(self.returns[algo]['accuracy']), 
+                            label=str(count)+' ' + algo + ' ' + str(self.accuracy[algo]) + '%', # label of the curve
+                            color = color2[algo],      # colour of the curve
+                            linewidth = 5           # thickness of the line
+                            )
                 lines3.append(line)
                 #, zdir='y', alpha=0.5, edgecolor='none', label=algo + ' short') 
                 #ydepth=np.empty(len(mpl.dates.date2num(self.bars.index.to_pydatetime())[np.array(self.signals[algo]) < 0]))
@@ -286,6 +302,8 @@ class MarketIntradayPortfolio(Portfolio):
                 #    1,1,1,
                 #    color='red', zsort='average',alpha=0.5, edgecolor='none', label=algo + ' short') 
                 #lines3.append(line)
+                ax1.legend(loc='upper left', fontsize=8)
+            
                 count = count - 1
             #ax3.yaxis.set_ticks(np.arange(mpl.dates.date2num(self.bars.index.to_pydatetime())[0],mpl.dates.date2num(self.bars.index.to_pydatetime())[-1],
             #                              (mpl.dates.date2num(self.bars.index.to_pydatetime())[-1]-

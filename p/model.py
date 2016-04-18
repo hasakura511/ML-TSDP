@@ -261,7 +261,7 @@ def get_signal(lookback, portfolio, argv):
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,12,15)  
-        start_test = date - datetime.timedelta(minutes=lookback*30*2+72*30)  
+        start_test = date - datetime.timedelta(days=3)  
         start_period = start_test - datetime.timedelta(hours=2000)
         path_datasets=np.array(['./data/from_IB/'])
         name = './p/data/' + file + '.csv'
@@ -351,12 +351,12 @@ def get_signal(lookback, portfolio, argv):
         symbol = '#USSPX500'
         if len(argv) > 4:
             symbol=argv[4]
-        interval=['1h_']        
+        interval=['30m_']        
         file=interval[0] + symbol
         #bar=bars.get_bar(file)
         #date=parse(bar.index[-1])
         date = datetime.datetime(2016,04,15,22,30,00)  
-        start_test = date - datetime.timedelta(days=lookback*2+7)  
+        start_test = date - datetime.timedelta(days=3)  
         start_period = start_test - datetime.timedelta(hours=1500)
         path_datasets= np.array(['./data/from_MT4/','./data/from_MT4/fut/','./data/from_MT4/usstocks/'])
         name = './p/data/' + file + '.csv'
@@ -481,9 +481,10 @@ def next_signal(lookback, portfolio, argv):
     # backtesting the portfolio and generating returns on top of that 
     (portfolioData, returns, ranking)=portfolio.backtest_portfolio()
     count=len(ranking)
-    for [algo,accuracy] in ranking:
+    for [algo,accWR] in ranking:
         equity=returns[algo]
-        print algo, '#',count, ' with Accuracy: ',accuracy,'% Returns of: $', equity, ' Next Signal: ', nextSignal[algo]
+        print algo, '#',count, ' Accuracy: ', round(portfolioData[algo]['accuracy'][-1],2)*100,'% Returns: $', equity, \
+            ' Accuracy W. Returns: $', accWR, ' Next Signal: ', nextSignal[algo], ''
         count = count - 1
     (bestModel,bestAccuracy) =ranking[-1]
     print 'Best Model: ',bestModel,' Next Signal:',nextSignal[algo]

@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_localbtcRUB,open,short,2.0,0.0,30289.19,0.0,-151.44595,0.0,151.44595,64.0,,,,,BTCUSD_localbtcRUB,,20160417 18:43:10 EST,20160417 18:43:10 EST,-2.0,USD,-151.44595,0.0,105539.1636,1937996.04,124916.42
+BTCUSD_localbtcRUB,open,short,2.0,0.0,30476.19,0.0,-152.38095,0.0,152.38095,94.0,,,,,BTCUSD_localbtcRUB,,20160418 14:12:28 EST,20160418 14:12:28 EST,-2.0,USD,-152.38095,0.0,99646.47315,1937189.3,128018.04

@@ -190,10 +190,19 @@ def runPair_v2(pair, dataSet):
                 'modelPath':modelPath,'loadModel':loadModel}
                 
     if offline:
-        with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
-            message = "Offline Mode: turned off in runsystem"
-            offlineMode(ticker, message, signalPath, version, version_)
-            logging.info(version+' '+ticker+' '+message)
+        try:
+            with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
+                orig_stdout = sys.stdout
+                sys.stdout = f
+                message = "Offline Mode: turned off in runsystem"
+                offlineMode(ticker, message, signalPath, version, version_)
+                logging.info(version+' '+ticker+' '+message)
+            sys.stdout = orig_stdout
+        except Exception as e:
+                 #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
+                 #ferr.write(e)
+                 #ferr.close()
+                 logging.error("something bad happened", exc_info=True)
     else:
         try:
             with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
@@ -331,6 +340,7 @@ else:
                 'EURUSD',\
                 'EURAUD',\
                 'EURCAD',\
+                'EURNZD',\
                 'GBPUSD',\
                 'USDCAD',\
                 'USDCHF',\

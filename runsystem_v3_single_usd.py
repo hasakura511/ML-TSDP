@@ -25,9 +25,11 @@ logging.basicConfig(filename='/logs/runsystem_v3_usd.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
 debug=False
+#20160418
+pairs=['AUDUSD','NZDUSD','GBPUSD']
 #pairs=['EURCHF','EURGBP','USDCHF']
 #pairs=['USDCAD', 'AUDUSD','NZDUSD']
-pairs=['EURUSD','GBPUSD', 'AUDUSD','NZDUSD']
+#pairs=['EURUSD','GBPUSD', 'AUDUSD','NZDUSD']
 #pairs=['NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
 #pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP','GBPJPY']
 #pairs=['EURCHF','AUDJPY','AUDUSD','EURUSD','GBPUSD']

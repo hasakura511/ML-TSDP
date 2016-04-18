@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_btcdeEUR,BTCUSD_btcdeEUR,,20.0,20.0,377.49,377.49,-7549.8,18.8745,-18.8745,-18.8745,0.0,Paper,USD,0.0
+BTCUSD_btcdeEUR,BTCUSD_btcdeEUR,,-20.0,-20.0,379.95,379.95,0.0,18.9975,-18.9975,11.328,49.2,Paper,USD,0.0

@@ -56,18 +56,20 @@ if len(sys.argv) > 3 and sys.argv[2] == '3':
     #[t.join() for t in threads]
 else:
      nextSignal=model.get_signal(0, model.portfolio, sys.argv)
+     print "Next Signal: " + str(nextSignal)
      if (len(sys.argv) > 2 and sys.argv[2] == '2'):
          sysfile='s101'
          if sys.argv[1]=='1':
              sysfile='s101_ES'
-         if sys.argv[2]=='2':
+         if sys.argv[1]=='2':
              sysfile='s101_EURJPY'
              if len(sys.argv) > 4:
                  sysfile='s101_' + sys.argv[4]
-         if sys.argv[2]=='9':
+         if sys.argv[1]=='9':
              sysfile='s101v2_EURJPY'
              if len(sys.argv) > 4:
                  sysfile='s101v2_' + sys.argv[4]
+             print "Signal File: " + sysfile
          eastern=pytz.timezone('US/Eastern')
          nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
          signal.generate_model_sig(sysfile, str(nowDate), nextSignal, 1, '')

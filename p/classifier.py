@@ -5,12 +5,15 @@ import datetime
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import neighbors
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import VotingClassifier
+from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
+from sklearn.linear_model import SGDClassifier
 from sklearn.svm import SVC
 from sklearn import cluster, covariance, manifold
 import operator
@@ -113,6 +116,12 @@ def performClassification(X_train, y_train, X_test, y_test, method, parameters, 
         return performLDAClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
     elif method == 'Voting': 
         return performVotingClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
+    elif method == 'ET': 
+        return performETClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
+    elif method == 'BNB': 
+        return performBNBClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
+    elif method == 'SGD': 
+        return performSGDClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
         
 def performRFClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     global savePath
@@ -317,4 +326,49 @@ def performVotingClass(X_train, y_train, X_test, y_test, parameters, fout, savem
     accuracy = clf.score(X_test, y_test)
     
     print 'Voting Accuracy:',accuracy
+    return clf
+    
+def performETClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
+   
+    clf = ExtraTreesClassifier()
+    clf.fit(X_train, y_train)
+
+    if savemodel == True:
+        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        with open(savePath + fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)    
+    
+    accuracy = clf.score(X_test, y_test)
+    
+    print 'ETAccuracy:',accuracy
+    return clf
+
+def performBNBClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
+   
+    clf = BernoulliNB()
+    clf.fit(X_train, y_train)
+
+    if savemodel == True:
+        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        with open(savePath + fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)    
+    
+    accuracy = clf.score(X_test, y_test)
+    
+    print 'BNB Accuracy:',accuracy
+    return clf
+
+def performSGDClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
+   
+    clf = SGDClassifier()
+    clf.fit(X_train, y_train)
+
+    if savemodel == True:
+        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        with open(savePath + fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)    
+    
+    accuracy = clf.score(X_test, y_test)
+    
+    print 'MNB Accuracy:',accuracy
     return clf

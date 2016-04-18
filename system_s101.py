@@ -64,6 +64,10 @@ else:
              sysfile='s101_EURJPY'
              if len(sys.argv) > 4:
                  sysfile='s101_' + sys.argv[4]
+         if sys.argv[2]=='9':
+             sysfile='s101v2_EURJPY'
+             if len(sys.argv) > 4:
+                 sysfile='s101v2_' + sys.argv[4]
          eastern=pytz.timezone('US/Eastern')
          nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
          signal.generate_model_sig(sysfile, str(nowDate), nextSignal, 1, '')

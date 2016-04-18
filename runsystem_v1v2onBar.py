@@ -340,6 +340,7 @@ else:
                 'EURUSD',\
                 'EURAUD',\
                 'EURCAD',\
+                'EURNZD',\
                 'GBPUSD',\
                 'USDCAD',\
                 'USDCHF',\

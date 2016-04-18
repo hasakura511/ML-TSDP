@@ -212,7 +212,8 @@ for ticker in livePairs:
     #validationPeriods = [50]
     validationPeriods = [3,6,10] # min is 2
     #validationStartPoint = None
-    signal_types = ['sellHold']
+    #signal_types = ['sellHold']
+    signal_types = ['buyHold']
     #signal_types = ['gainAhead','zigZag']
     #signal_types = ['gainAhead','zigZag','buyHold','sellHold']
     #signal_types = ['zigZag']

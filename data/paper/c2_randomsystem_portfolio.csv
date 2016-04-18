@@ -1,3 +1,3 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-EURCAD,open,long,2.0,0.0,1.46358,0.0,-2.0,0.0,2.0,3.0,,,,,EURCAD,,20160417 21:35:26 EST,20160417 21:35:26 EST,2.0,CAD,-4.2422,-2.2422,100035.94712,1956065.5514,100043.94712
-EURAUD,open,long,2.0,0.0,1.47364,0.0,-2.0,0.0,2.0,4.0,,,,,EURAUD,,20160417 21:35:27 EST,20160417 21:35:27 EST,2.0,AUD,-4.38272,-2.38272,100099.40788,1956065.5514,100111.40788
+EURAUD,open,short,2.0,0.0,1.46626,0.0,-2.0,0.0,2.0,5.0,,,,,EURAUD,,20160418 07:06:13 EST,20160418 07:06:13 EST,-2.0,AUD,-0.0640400000039,1.93596,99985.50492,1956065.5514,100001.50492
+EURCAD,open,short,2.0,0.0,1.45755,0.0,-2.0,0.0,2.0,6.0,,,,,EURCAD,,20160418 07:06:52 EST,20160418 07:06:52 EST,-2.0,CAD,-0.804159999999,1.19584,99891.36848,1956065.5514,99911.36848

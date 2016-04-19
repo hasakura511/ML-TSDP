@@ -236,7 +236,7 @@ void OnTimer()
           }
 
          if (orderquant > 0){
-             Info( "STO)" + DoubleToStr(orderquant) );
+             Info( "STO" + DoubleToStr(orderquant) );
              place_order("STO", orderquant);
           }
        }

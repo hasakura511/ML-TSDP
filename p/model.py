@@ -47,7 +47,7 @@ lastSignal=0
 sighist=dict()
 models=dict()
 signals=dict()
-algolist=['RF','KNN','SVM','ADA','GTB','QDA','GBayes','Voting', 'LDA','ET','BNB','SGD']
+algolist=['RF','KNN','SVM','ADA','GTB','QDA','GBayes','Voting', 'LDA','ET','BNB','SGD','PAC']
 
 def count_missing(df):
      return len(df) - df.count()
@@ -362,11 +362,10 @@ def get_signal(lookback, portfolio, argv):
             symbol=argv[4]
         interval=['30m_']        
         file=interval[0] + symbol
-        #bar=bars.get_bar(file)
-        #date=parse(bar.index[-1])
-        date = datetime.datetime(2016,04,15,22,30,00)  
+        bar=bars.get_bar(file)
+        date=parse(bar.index[-1])
         start_test = date - datetime.timedelta(days=3)  
-        start_period = start_test - datetime.timedelta(hours=1500)
+        start_period = start_test - datetime.timedelta(hours=1000)
         path_datasets= np.array(['./data/from_MT4/','./data/from_MT4/fut/','./data/from_MT4/usstocks/'])
         name = './p/data/' + file + '.csv'
         qty=200

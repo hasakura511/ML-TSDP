@@ -7,6 +7,6 @@ xcopy /y /c /z C:\mql4\files\*.* data\from_mt4\
 xcopy /y /c /z C:\mql4\files\fut\*.* data\from_mt4\fut\
 xcopy /y /c /z C:\mql4\files\usstocks\*.* data\from_mt4\usstocks\
 xcopy /y /c /z data\signals\*.* C:\mql4\files\signals\
-xcopy /y /s /c /z C:\mql4\files\bars\*.* data\from_mt4\bars\
-xcopy /y /s /c /z C:\mql4\files\bidask\*.* data\from_mt4\bidask\
+xcopy /y /s /c /z C:\mql4\files\bars\*.* data\bars\
+xcopy /y /s /c /z C:\mql4\files\bidask\*.* data\bidask\
 exit

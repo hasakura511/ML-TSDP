@@ -5,6 +5,7 @@ import datetime
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import neighbors
+from sklearn.linear_model import PassiveAggressiveClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
@@ -122,6 +123,9 @@ def performClassification(X_train, y_train, X_test, y_test, method, parameters, 
         return performBNBClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
     elif method == 'SGD': 
         return performSGDClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
+    elif method == 'PAC':
+        return performPAClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel)
+        
         
 def performRFClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
     global savePath
@@ -370,5 +374,20 @@ def performSGDClass(X_train, y_train, X_test, y_test, parameters, fout, savemode
     
     accuracy = clf.score(X_test, y_test)
     
-    print 'MNB Accuracy:',accuracy
+    print 'SGD Accuracy:',accuracy
     return clf
+
+def performPAClass(X_train, y_train, X_test, y_test, parameters, fout, savemodel):
+   
+    clf = PassiveAggressiveClassifier()
+    clf.fit(X_train, y_train)
+
+    if savemodel == True:
+        fname_out = '{}-{}.pickle'.format(fout, datetime.datetime.now())
+        with open(savePath + fname_out, 'wb') as f:
+            cPickle.dump(clf, f, -1)    
+    
+    accuracy = clf.score(X_test, y_test)
+    
+    print 'PAC Accuracy:',accuracy
+    return clf 

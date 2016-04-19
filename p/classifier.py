@@ -52,13 +52,16 @@ def prepareDataForClassification(dataset, start_test):
     #dataset.UpDown[dataset.UpDown >= 0] = 'Up'
     #dataset.UpDown[dataset.UpDown < 0] = 'Down'
     dataset.UpDown = le.fit(dataset.UpDown).transform(dataset.UpDown)
-    #print 'Dropping Data Missing: ', count_missing(dataset)
-    #dataset=dataset.replace([np.inf, -np.inf], np.nan)
-    #dataset=dataset.fillna(method='bfill')
-    #dataset=dataset.fillna(method='pad')
-    #dataset=dataset.dropna(subset=dataset.columns, how="all")
-    #print 'Data Missing: ', count_missing(dataset)
-    
+    print 'Dropping Data Missing: ', count_missing(dataset)
+    dataset=dataset.replace([np.inf, -np.inf], np.nan)
+    dataset=dataset.fillna(method='bfill')
+    dataset=dataset.fillna(method='pad')
+    dataset=dataset.fillna(0)
+    dataset=dataset.dropna(subset=dataset.columns, how="any")
+    print 'Data Missing: ', count_missing(dataset)
+    missing=dataset[dataset.isnull().any(axis=1)]
+    missing.to_csv('./test.csv')
+
     #for x in dataset.columns.copy():
     #            if re.search(r'(Open|High|Low|Close|Volume|Vol|Rinfo|R|P|Oi)', x):
     #                dataset=dataset.drop(x, axis=1)
@@ -80,6 +83,7 @@ def count_missing(df):
     res=len(df) - df.count()
     print 'Null Values:', df.isnull().sum().sum()
     #print 'Inf Values:', df.isinf().sum().sum()
+    #print res;
     #for r in res:
     #    if r > 0:
     #        print r

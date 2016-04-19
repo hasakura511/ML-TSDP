@@ -65,7 +65,6 @@ def mergeDataframes(datasets, index, cut):
     """
     merges datasets in the list 
     """
-    #subset = []tion
     subset = [dataset.iloc[:, index:] for dataset in datasets[1:]]
     
     first = subset[0].join(subset[1:], how = 'outer')

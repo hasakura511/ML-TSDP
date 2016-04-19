@@ -323,17 +323,16 @@ def get_signal(lookback, portfolio, argv):
         folds=10
         print 'Starting s101 for: ',symbol
     elif len(argv) > 1 and argv[1] == '6':
-        symbol = '#USSPX500'
+        symbol = '#S&P500_M6'
         if len(argv) > 4:
             symbol=argv[4]
-        interval=['1d_']
+        interval=['30m_']
         file=interval[0] + symbol
-        #bar=bars.get_bar(file)
-        #date=parse(bar.index[-1])
-        date = datetime.datetime(2016,04,15,22,30,00)  
-        start_test = date - datetime.timedelta(days=lookback*2+72)  
+        bar=bars.get_bar(file)
+        date=parse(bar.index[-1])
+        start_test = date - datetime.timedelta(days=3)  
         start_period = start_test - datetime.timedelta(days=1500)
-        path_datasets=np.array(['./data/from_MT4/'])
+        path_datasets=np.array(['./data/from_MT4/fut/'])
         name = './p/data/' + file + '.csv'
         qty=200
         folds=10
@@ -343,12 +342,12 @@ def get_signal(lookback, portfolio, argv):
         symbol = '#S&P500_M6'
         if len(argv) > 4:
             symbol=argv[4]
-        interval=['1d_','idx_','BTCUSD_']        
+        interval=['30m_','idx_','BTCUSD_']        
         file=interval[0] + symbol
-        #bar=bars.get_bar(file)
-        #date=parse(bar.index[-1])
-        date = datetime.datetime(2016,04,15,22,30,00)  
-        start_test = date - datetime.timedelta(days=lookback*2+14)  
+        bar=bars.get_bar(file)
+        date=parse(bar.index[-1])
+        #date = datetime.datetime(2016,04,15,22,30,00)  
+        start_test = date - datetime.timedelta(days=3)  
         start_period = start_test - datetime.timedelta(days=1500)
         path_datasets= np.array(['./data/from_MT4/fut/','./p/data/','./data/from_MT4/','./data/from_MT4/usstocks/'])
         name = './p/data/' + file + '.csv'
@@ -360,13 +359,18 @@ def get_signal(lookback, portfolio, argv):
         symbol = '#USSPX500'
         if len(argv) > 4:
             symbol=argv[4]
-        interval=['30m_']        
+        interval=['30m_']
         file=interval[0] + symbol
-        bar=bars.get_bar(file)
+        bar=bars.get_bar(symbol)
         date=parse(bar.index[-1])
-        start_test = date - datetime.timedelta(days=3)  
+        start_test = date - datetime.timedelta(days=3)
         start_period = start_test - datetime.timedelta(hours=1000)
-        path_datasets= np.array(['./data/from_MT4/','./data/from_MT4/fut/','./data/from_MT4/usstocks/'])
+        path_datasets= np.array(['./data/from_MT4/',
+                                 #'./data/from_MT4/fut/',
+                                 #'./data/from_MT4/usstocks/',
+                                 #'./p/data/',
+                                 #'./data/from_IB/'
+                                 ])
         name = './p/data/' + file + '.csv'
         qty=200
         folds=10

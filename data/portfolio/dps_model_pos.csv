@@ -1,4 +1,3 @@
 system,action,qty
-v3_CADJPY,1.0,1.0
-,-1.0
-s106_AC_CHFJPY,1.0,1.0
+s106_bitstampUSD,-1.0,-1.0
+s106_bitfinexUSD,1.0,1.0

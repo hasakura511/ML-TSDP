@@ -96,6 +96,7 @@ def loadDatasets(path_datasets, fout, parameters):
     interval=parameters[1]
     dataSet=list()
     count=0
+    
     for dataPath in path_datasets:
         symbol_dict=dict()
         files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
@@ -108,21 +109,35 @@ def loadDatasets(path_datasets, fout, parameters):
             for inter in interval:
                 if re.search(r''+inter, file) and not re.search(fsym,file):
                     sym=file.rsplit('.',1)[0]
-                    
                     symbol_dict[sym]=sym
                     print 'loadDatasets: ', sym
         symbols, names = np.array(list(symbol_dict.items())).T
         print 'loadDatasets: Main Symbol', fout
         
         data = list()
+        maxdate=datetime.datetime(1970,1,1)
         for symbol in symbols:
             dataFrame=get_quote(dataPath, symbol, symbol, True, parameters)
+            dataFrame.index=pd.to_datetime(dataFrame.index)
+            dataFrame=dataFrame.sort_index()   
+            
             if dataFrame.shape[0]>1000:
+                if dataFrame.index[0] > maxdate:
+                    maxdate=dataFrame.index[0];
+                    print symbol, ' Start: ', dataFrame.index[0], 'Start Period:',maxdate
                 data.append(dataFrame)
+            
         if count == 0:
-            out =  get_quote(dataPath, fout, 'Out', True, parameters)
-            dataSet.append(out)
+            dataFrame =  get_quote(dataPath, fout, 'Out', True, parameters)
+            if dataFrame.index[0] > maxdate:
+                maxdate=dataFrame.index[0];
+            dataSet.append(dataFrame)
+        #for df in data:
+        #    df=df[df.index >= maxdate]
+        #    if df.shape[0]>1000:
+        #        dataSet.append(df)
         dataSet.extend(data)
+        dataSet=[ df[df.index >= maxdate] for df in dataSet ]
         count = count + 1
     print 'Done Loading Data'
     return dataSet
@@ -190,5 +205,5 @@ def get_quote(dataPath, sym, colname, addParam, parameters):
         dataSet['Return_%s' %colname] = dataSet['AdjClose_%s' %colname].pct_change()
     #dataSet=dataSet.ix[dataSet.index[-1] - datetime.timedelta(days=10):]
     print 'Loaded '+ sym + ' ' + str(dataSet.shape[0]) + ' Rows'
-    
+   
     return dataSet

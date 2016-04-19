@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_btcoidIDR,open,long,2.0,0.0,5629000.0,0.0,-28145.0,0.0,28145.0,67.0,,,,,BTCUSD_btcoidIDR,,20160418 12:42:45 EST,20160418 12:42:45 EST,2.0,USD,-28145.0,0.0,-3638855.0,-9355600.0,112400.0
+BTCUSD_btcoidIDR,open,long,2.0,0.0,5621700.0,0.0,-28108.5,0.0,28108.5,73.0,,,,,BTCUSD_btcoidIDR,,20160418 19:08:46 EST,20160418 19:08:46 EST,2.0,USD,-28108.5,0.0,-3995142.0,-9355600.0,93400.0

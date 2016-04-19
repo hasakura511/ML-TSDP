@@ -10,11 +10,11 @@
 //---- input parameters
 //extern int  BarsMin=100;         // Minimal number bars in history which might be loaded into files.
 //extern int MaxBarsInFile = 200000; // Max Bars for loading into file.
-extern int FrequencyUpdate = 30; // this value identify frequency update for files in sec.
+extern int FrequencyUpdate = 15; // this value identify frequency update for files in sec.
 extern string signal;     //Signal File
 extern double qty; // Order Quantity
-extern bool AllowInfo = true;
-extern bool AllowLogFile = true;
+extern bool AllowInfo = false;
+extern bool AllowLogFile = false;
 
 int pos=0;
 string ExpertName = "Proc_Signal";
@@ -129,29 +129,48 @@ int get_mt4_pos() {
 
 void place_order(string action, double quant) {
    
-    for (int ii=OrdersTotal()-1 ; ii>=0 ; ii--)
+    for (int i=0 ; i < OrdersTotal() ; i++)
    {
-      if (!OrderSelect(ii,SELECT_BY_POS)) continue;
-         if (OrderSymbol() == Symbol()) {
+      if (!OrderSelect(i,SELECT_BY_POS)) 
+         continue;
+      if (OrderSymbol() == Symbol()) {
             if (StringCompare("STC",action)==0 || 
                 StringCompare("BTC",action)==0) {
                  if (quant > 0) {
                     int order_type=OrderType();
-                  
-                     if (order_type == OP_SELL || 
+                    double closeqty=0;
+                    if (quant >= OrderLots())
+                     closeqty=OrderLots();
+                    else
+                     closeqty = quant;
+                    double price=Ask;
+                    if (order_type == OP_SELL || 
                          order_type == OP_SELLLIMIT || 
                          order_type == OP_SELLSTOP) {
-                        quant-=OrderLots();
+                        price=Ask;
+                       
                      } else {
-                        quant-=OrderLots();
+                        price=Bid;
                     
                      }
-                     OrderTakeProfit();
+                     quant-=closeqty;
+                     int slippage=3;
+                     color arrow_color=0xFFEEFF;
+                     
+                     int ticket=  OrderTicket();
+                     OrderClose(
+                                   ticket,      // ticket
+                                   closeqty,        // volume
+                                   price,       // close price
+                                   slippage,    // slippage
+                                   arrow_color  // color
+                        );
+                     //double profit=OrderTakeProfit();
+                    
                   }
                 
             }
          }
-          
     }
    if (StringCompare("BTO",action)==0) {
              double orderqty=quant;

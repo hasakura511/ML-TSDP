@@ -1,4 +1,4 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-NZDUSD,16,1461026143,,,0.69780,,forex,long,2016-04-18 20:35:43,1461026143,open,2016-04-18 20:35:15,0.69776,10000,,0,2,,,101887664,
-NZDJPY,299,1460930580,,,74.58300,,forex,long,2016-04-17 18:03:00,1460930580,open,2016-04-17 18:00:41,74.54400,10000,,0,2,,,101862885,
-GBPUSD,105,1461035726,,,1.42358,,forex,long,2016-04-18 23:15:26,1460734851,open,2016-04-15 08:40:48,1.41836,10000,,4,6,,,101846521,
+NZDUSD,103,1461026143,,,0.69780,,forex,long,2016-04-18 20:35:43,1461041736,open,2016-04-18 20:35:15,0.69934,10000,,0,10,,,101887664,
+NZDJPY,316,1460930580,,,74.58300,,forex,long,2016-04-17 18:03:00,1461041736,open,2016-04-17 18:00:41,75.96320,10000,,0,10,,,101862885,
+USDCHF,-163,1461040573,,,0.96338,,forex,long,2016-04-19 00:36:13,1461041736,open,2016-04-19 00:35:40,0.96356,10000,,0,10,,,101890153,

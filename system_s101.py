@@ -59,8 +59,10 @@ else:
      print "Next Signal: " + str(nextSignal)
      if (len(sys.argv) > 2 and sys.argv[2] == '2'):
          sysfile='s101'
-         if sys.argv[1]=='1':
+         if sys.argv[1]=='7':
              sysfile='s101_ES'
+         if sys.argv[1]=='8':
+             sysfile='s101_SPY'
          if sys.argv[1]=='2':
              sysfile='s101_EURJPY'
              if len(sys.argv) > 4:

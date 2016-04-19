@@ -9,8 +9,8 @@
 #property strict
 //---- input parameters
 extern int  BarsMin=100;         // Minimal number bars in history which might be loaded into files.
-extern int MaxBarsInFile = 20000000; // Max Bars for loading into file.
-extern int FrequencyUpdate = 60; // this value identify frequency update for files in sec.
+extern int MaxBarsInFile = 200000; // Max Bars for loading into file.
+extern int FrequencyUpdate = 30; // this value identify frequency update for files in sec.
 extern bool LoadM1  = true;       //Timeframes of securities which data will be loaded onto File if True       
 extern bool LoadM5  = true;
 extern bool LoadM15 = true;
@@ -20,14 +20,14 @@ extern bool LoadH4  = true;
 extern bool LoadD1  = true;
 extern bool LoadW1  = true;
 extern bool LoadMN  = true;
-extern bool AllowInfo = False;
-extern bool AllowLogFile = False;
+extern bool AllowInfo = false;
+extern bool AllowLogFile = false;
 
-string ExpertName = "Currency_Loader";
+string ExpertName = "USStocks_Loader";
 
 double ArrayM1[][6], ArrayM5[][6], ArrayM15[][6], ArrayM30[][6], ArrayH1[][6],ArrayH4[][6], ArrayD1[][6], ArrayW1[][6], ArrayMN[][6]; 
 int ct, iDigits, Tryes=5, Pause=500, ArrSizeM1, ArrSizeM5, ArrSizeM15, ArrSizeM30, ArrSizeH1, ArrSizeH4, ArrSizeD1, ArrSizeW1, ArrSizeMN, i, i2, i3, h1, h2, h3, h4, h5, h6, h7, h8, h9, LCM1, LCM5, LCM15, LCM30, LCH1, LCH4, LCD1, LCW1, LCMN, LastError;
-string CString, x, x2, FileNameM1, FileNameM5, FileNameM15, FileNameM30, FileNameH1, FileNameH4, FileNameD1, FileNameW1, FileNameMN, FilePatch, FirstLine;
+string CString, x, x2, FileBidAsk, FileBar, FileNameM1, FileNameM5, FileNameM15, FileNameM30, FileNameH1, FileNameH4, FileNameD1, FileNameW1, FileNameMN, FilePatch, FirstLine, BidAskFirstLine;
 
 int OnInit()
   {
@@ -36,6 +36,9 @@ int OnInit()
    x2="\\";
    iDigits=MarketInfo(Symbol(),MODE_DIGITS);
    FilePatch = "usstocks\\"; 
+   FileBidAsk="bidask\\" + Symbol() + ".csv";
+   FileBar="bars\\" + Symbol() + ".csv";
+   
    FileNameM1 = FilePatch+"1 min_"+Symbol()+".csv"; 
    FileNameM5 = FilePatch+"5m_" +Symbol()+".csv"; 
    FileNameM15 = FilePatch+"15m_"+Symbol()+".csv"; 
@@ -46,6 +49,7 @@ int OnInit()
    FileNameW1 = FilePatch+"1w_"+Symbol()+".csv"; 
    FileNameMN = FilePatch+"1mo_"+Symbol()+".csv"; 
    FirstLine =  "Date,Open,High,Low,Close,Volume";
+   BidAskFirstLine =  "Date,Bid,Ask";
    
    ct=0;
    EventSetTimer(FrequencyUpdate);
@@ -66,15 +70,81 @@ void OnDeinit(const int reason)
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick()
-  {
+{
 //---
-   printf("OnTick\n");
-   
-  }
+   //printf("OnTick\n");
+
+    
+}
 //+------------------------------------------------------------------+
 //| Timer function                                                   |
 //+------------------------------------------------------------------+
 
+void writeBar()
+{  
+      //1m bars
+       FileBar="bars\\" + Symbol() + ".csv";
+       h1 = FileOpen(FileBar,FILE_CSV|FILE_WRITE);
+       FileWrite(h1,FirstLine);
+       CString=TimeToStr(iTime(Symbol(),PERIOD_M1,0)) + "," + 
+               DoubleToStr(iOpen(Symbol(),PERIOD_M1,0))+","+
+               DoubleToStr(iHigh(Symbol(),PERIOD_M1,0))+","+
+               DoubleToStr(iLow(Symbol(),PERIOD_M1,0))+","+
+               DoubleToStr(iClose(Symbol(),PERIOD_M1,0))+","+
+               DoubleToStr(iVolume(Symbol(),PERIOD_M1,0));
+       FileWrite(h1,CString);
+       FileClose(h1);
+       
+       //30m bars
+       FileBar="bars\\30m_" + Symbol() + ".csv";
+       h1 = FileOpen(FileBar,FILE_CSV|FILE_WRITE);
+       FileWrite(h1,FirstLine);
+       CString=TimeToStr(iTime(Symbol(),PERIOD_M30,0)) + "," + 
+               DoubleToStr(iOpen(Symbol(),PERIOD_M30,0))+","+
+               DoubleToStr(iHigh(Symbol(),PERIOD_M30,0))+","+
+               DoubleToStr(iLow(Symbol(),PERIOD_M30,0))+","+
+               DoubleToStr(iClose(Symbol(),PERIOD_M30,0))+","+
+               DoubleToStr(iVolume(Symbol(),PERIOD_M30,0));
+       FileWrite(h1,CString);
+       FileClose(h1);
+       
+       //1h bars
+       FileBar="bars\\1h_" + Symbol() + ".csv";
+       h1 = FileOpen(FileBar,FILE_CSV|FILE_WRITE);
+       FileWrite(h1,FirstLine);
+       CString=TimeToStr(iTime(Symbol(),PERIOD_H1,0)) + "," + 
+               DoubleToStr(iOpen(Symbol(),PERIOD_H1,0))+","+
+               DoubleToStr(iHigh(Symbol(),PERIOD_H1,0))+","+
+               DoubleToStr(iLow(Symbol(),PERIOD_H1,0))+","+
+               DoubleToStr(iClose(Symbol(),PERIOD_H1,0))+","+
+               DoubleToStr(iVolume(Symbol(),PERIOD_H1,0));
+       FileWrite(h1,CString);
+       FileClose(h1);
+       
+       //1d bars
+       FileBar="bars\\1d_" + Symbol() + ".csv";
+       h1 = FileOpen(FileBar,FILE_CSV|FILE_WRITE);
+       FileWrite(h1,FirstLine);
+       CString=TimeToStr(iTime(Symbol(),PERIOD_D1,0)) + "," + 
+               DoubleToStr(iOpen(Symbol(),PERIOD_D1,0))+","+
+               DoubleToStr(iHigh(Symbol(),PERIOD_D1,0))+","+
+               DoubleToStr(iLow(Symbol(),PERIOD_D1,0))+","+
+               DoubleToStr(iClose(Symbol(),PERIOD_D1,0))+","+
+               DoubleToStr(iVolume(Symbol(),PERIOD_D1,0));
+       FileWrite(h1,CString);
+       FileClose(h1);
+}
+
+
+void writeBidAsk()
+{
+       h1 = FileOpen(FileBidAsk,FILE_CSV|FILE_WRITE);
+       FileWrite(h1,BidAskFirstLine);
+       CString=TimeToStr(iTime(Symbol(),PERIOD_M1,0)) +"," +
+            DoubleToStr(Bid)+","+DoubleToStr(Ask);
+       FileWrite(h1, CString);
+       FileClose(h1);
+}
 bool ROpen=false;
 void OnTimer()
   {
@@ -89,6 +159,8 @@ void OnTimer()
       if(LoadD1){LoadingD1();}
       if(LoadW1){LoadingW1();}
       if(LoadMN){LoadingMN();}
+      writeBar();
+      writeBidAsk();
       ROpen=false;
       
   }
@@ -106,27 +178,29 @@ double OnTester()
 // loading history data from M1
 void LoadingM1(){//1
 int MaxBars=MaxBarsInFile;
-if(LoadM1 && iBars(Symbol(),PERIOD_M1)>BarsMin){ArrayCopyRates(ArrayM1,Symbol(),PERIOD_M1); ArrSizeM1=ArrayRange(ArrayM1,0);}
- if(ArrSizeM1>1){//2
- if(MaxBars>ArrSizeM1){MaxBars=ArrSizeM1;}
-  for(i2=1; i2<=Tryes; i2++){//3
-  h1 = FileOpen(FileNameM1,FILE_CSV|FILE_WRITE);
-  if(h1==-1){LastError=GetLastError();Info("1.2",1,""," There is an error while opening file: "+FileNameM1+" at "+i2+" Try  "+ErrorDescription(LastError));Pause=Pause+Pause; Sleep(Pause); continue; }else{Info("1.2",2,"","File "+FileNameM1+" successfully opened ");} 
-  FileWrite(h1,FirstLine);
-   for (i=MaxBars-1; i>=0; i-- ){//4
-   CString=CString+TimeToStr(ArrayM1[i][0],TIME_DATE)+" ";    //  date of bar
-   CString=CString+TimeToStr(ArrayM1[i][0],TIME_MINUTES)+","; //  time of bar
-   CString=CString+DoubleToStr(ArrayM1[i][1],iDigits)+","; //  Open price
-   CString=CString+DoubleToStr(ArrayM1[i][3],iDigits)+","; //  High price
-   CString=CString+DoubleToStr(ArrayM1[i][2],iDigits)+","; //  Low price
-   CString=CString+DoubleToStr(ArrayM1[i][4],iDigits)+","; //  Close price
-   CString=CString+DoubleToStr(ArrayM1[i][5],0); //  Volume
-   FileWrite(h1,CString);
-   CString="";
-   }//4
-   FileClose(h1);
-   LCM1 = iTime(Symbol(),PERIOD_M1,0);
-   return;
+if(LoadM1 && iBars(Symbol(),PERIOD_M1)>BarsMin){
+   ArrayCopyRates(ArrayM1,Symbol(),PERIOD_M1); 
+   ArrSizeM1=ArrayRange(ArrayM1,0);}
+   if(ArrSizeM1>1){//2
+    if(MaxBars>ArrSizeM1){MaxBars=ArrSizeM1;}
+     for(i2=1; i2<=Tryes; i2++){//3
+        h1 = FileOpen(FileNameM1,FILE_CSV|FILE_WRITE);
+        if(h1==-1){LastError=GetLastError();Info("1.2",1,""," There is an error while opening file: "+FileNameM1+" at "+i2+" Try  "+ErrorDescription(LastError));Pause=Pause+Pause; Sleep(Pause); continue; }else{Info("1.2",2,"","File "+FileNameM1+" successfully opened ");} 
+        FileWrite(h1,FirstLine);
+         for (i=MaxBars-1; i>=0; i-- ){//4
+         CString=CString+TimeToStr(ArrayM1[i][0],TIME_DATE)+" ";    //  date of bar
+         CString=CString+TimeToStr(ArrayM1[i][0],TIME_MINUTES)+","; //  time of bar
+         CString=CString+DoubleToStr(ArrayM1[i][1],iDigits)+","; //  Open price
+         CString=CString+DoubleToStr(ArrayM1[i][3],iDigits)+","; //  High price
+         CString=CString+DoubleToStr(ArrayM1[i][2],iDigits)+","; //  Low price
+         CString=CString+DoubleToStr(ArrayM1[i][4],iDigits)+","; //  Close price
+         CString=CString+DoubleToStr(ArrayM1[i][5],0); //  Volume
+         FileWrite(h1,CString);
+         CString="";
+      }//4
+      FileClose(h1);
+      LCM1 = iTime(Symbol(),PERIOD_M1,0);
+      return;
   }//3
  }//2
 }//1

@@ -78,17 +78,59 @@ void OnTick()
 }
 //+------------------------------------------------------------------+
 //| Timer function                                                   |
-//+------------------------------------------------------------------+
+//+------------------------------------------------------------------+       
+
 void writeBar()
-{
+{  
+      //1m bars
+       FileBar="bars\\" + Symbol() + ".csv";
        h1 = FileOpen(FileBar,FILE_CSV|FILE_WRITE);
        FileWrite(h1,FirstLine);
-       CString=CString+TimeToStr(iTime(Symbol(),PERIOD_M1,0)) + "," + 
+       CString=TimeToStr(iTime(Symbol(),PERIOD_M1,0)) + "," + 
                DoubleToStr(iOpen(Symbol(),PERIOD_M1,0))+","+
                DoubleToStr(iHigh(Symbol(),PERIOD_M1,0))+","+
                DoubleToStr(iLow(Symbol(),PERIOD_M1,0))+","+
                DoubleToStr(iClose(Symbol(),PERIOD_M1,0))+","+
                DoubleToStr(iVolume(Symbol(),PERIOD_M1,0));
+       FileWrite(h1,CString);
+       FileClose(h1);
+       
+       //30m bars
+       FileBar="bars\\30m_" + Symbol() + ".csv";
+       h1 = FileOpen(FileBar,FILE_CSV|FILE_WRITE);
+       FileWrite(h1,FirstLine);
+       CString=TimeToStr(iTime(Symbol(),PERIOD_M30,0)) + "," + 
+               DoubleToStr(iOpen(Symbol(),PERIOD_M30,0))+","+
+               DoubleToStr(iHigh(Symbol(),PERIOD_M30,0))+","+
+               DoubleToStr(iLow(Symbol(),PERIOD_M30,0))+","+
+               DoubleToStr(iClose(Symbol(),PERIOD_M30,0))+","+
+               DoubleToStr(iVolume(Symbol(),PERIOD_M30,0));
+       FileWrite(h1,CString);
+       FileClose(h1);
+       
+       //1h bars
+       FileBar="bars\\1h_" + Symbol() + ".csv";
+       h1 = FileOpen(FileBar,FILE_CSV|FILE_WRITE);
+       FileWrite(h1,FirstLine);
+       CString=TimeToStr(iTime(Symbol(),PERIOD_H1,0)) + "," + 
+               DoubleToStr(iOpen(Symbol(),PERIOD_H1,0))+","+
+               DoubleToStr(iHigh(Symbol(),PERIOD_H1,0))+","+
+               DoubleToStr(iLow(Symbol(),PERIOD_H1,0))+","+
+               DoubleToStr(iClose(Symbol(),PERIOD_H1,0))+","+
+               DoubleToStr(iVolume(Symbol(),PERIOD_H1,0));
+       FileWrite(h1,CString);
+       FileClose(h1);
+       
+       //1d bars
+       FileBar="bars\\1d_" + Symbol() + ".csv";
+       h1 = FileOpen(FileBar,FILE_CSV|FILE_WRITE);
+       FileWrite(h1,FirstLine);
+       CString=TimeToStr(iTime(Symbol(),PERIOD_D1,0)) + "," + 
+               DoubleToStr(iOpen(Symbol(),PERIOD_D1,0))+","+
+               DoubleToStr(iHigh(Symbol(),PERIOD_D1,0))+","+
+               DoubleToStr(iLow(Symbol(),PERIOD_D1,0))+","+
+               DoubleToStr(iClose(Symbol(),PERIOD_D1,0))+","+
+               DoubleToStr(iVolume(Symbol(),PERIOD_D1,0));
        FileWrite(h1,CString);
        FileClose(h1);
 }

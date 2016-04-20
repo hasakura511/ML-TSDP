@@ -571,7 +571,8 @@ def gen_c2(html, counter, cols, recent, systemname):
         if c2dict.has_key(systemname):
             counter=0
             html = html + '<center><table>'
-            (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
+            if os.path.isfile('./data/results/' + verdict[systemname] + '.png'):
+                (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
             if sigdict.has_key(systemname):
                     sigs=sigdict[systemname]
                     for sig in sigs:

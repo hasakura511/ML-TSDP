@@ -59,8 +59,8 @@ def prepareDataForClassification(dataset, start_test):
     dataset=dataset.fillna(0)
     dataset=dataset.dropna(subset=dataset.columns, how="any")
     print 'Data Missing: ', count_missing(dataset)
-    missing=dataset[dataset.isnull().any(axis=1)]
-    missing.to_csv('./test.csv')
+    #missing=dataset[dataset.isnull().any(axis=1)]
+    #missing.to_csv('./test.csv')
 
     #for x in dataset.columns.copy():
     #            if re.search(r'(Open|High|Low|Close|Volume|Vol|Rinfo|R|P|Oi)', x):

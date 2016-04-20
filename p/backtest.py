@@ -146,9 +146,10 @@ class MarketIntradayPortfolio(Portfolio):
         self.ready=True
         return (portfolio, self.rank, self.ranking)
         
-    def plot_graph(self):
+    def plot_graph(self, savefig=False, filename='./data/results/s101.png'):
         # Plot results
         #f, ax = plt.subplots(2, sharex=True)
+        
         while not self.ready:
             time.sleep(1)
         
@@ -572,14 +573,23 @@ class MarketIntradayPortfolio(Portfolio):
         ax3.invert_xaxis()
         ax4.invert_xaxis()
         #plt.gca().invert_xaxis()
-        anim = animation.FuncAnimation(fig, update, interval=5)
+        if not savefig:
+            anim = animation.FuncAnimation(fig, update, interval=5)
+            plt.show()
+        else:
+            plt.savefig(filename)
         #fig.show()
         #plt.draw()
-        plt.show()
+        #plt.savefig(filename)    
+
         
         #while 1:
         #    update()
         #    plt.draw()
         #    time.sleep(5)
-        
+
+    def saveEquity(self,  filename, algo):
+        self.returns[algo]['equity']=self.returns[algo]['total']
+        self.returns[algo].to_csv(filename)
+    
 

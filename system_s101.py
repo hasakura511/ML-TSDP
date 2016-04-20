@@ -61,6 +61,8 @@ else:
          sysfile='s101'
          if sys.argv[1]=='1':
              sysfile='s101_GSPI'
+         if sys.argv[1]=='6':
+             sysfile='s101_ESM'
          if sys.argv[1]=='7':
              sysfile='s101_ES'
          if sys.argv[1]=='8':
@@ -77,6 +79,8 @@ else:
          eastern=pytz.timezone('US/Eastern')
          nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern)
          signal.generate_model_sig(sysfile, str(nowDate), nextSignal, 1, '')
+         model.portfolio.plot_graph(True, './data/results/' + sysfile + '.png')
+         model.portfolio.saveEquity('./data/signalPlots/' + sysfile + '.csv',model.bestModel)
          
      else:
          model.portfolio.plot_graph()

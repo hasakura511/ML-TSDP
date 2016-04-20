@@ -572,6 +572,12 @@ def gen_c2(html, counter, cols, recent, systemname):
             counter=0
             html = html + '<center><table>'
             (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
+            if sigdict.has_key(systemname):
+                    sigs=sigdict[systemname]
+                    for sig in sigs:
+                        if os.path.isfile('./data/results/' + sig + '.png'):
+                            (counter, html)=generate_html(sig, counter, html, cols, False)
+                            
             twdata=generate_paper_TWR(systemname, 'c2live', 'closedWhen', recent, initCap) 
             twdata.to_csv('./data/results/c2_' + systemname + '_' + 'c2' + '_TWR' + str(recent) + 'TWR.csv')
             (counter, html)=generate_mult_plot(twdata,['equitycurve'], 'Date', 'c2_' + systemname + '_c2_TWR'+str(recent), systemname + " C2 TWR", 'TWR', counter, html, cols, recent)
@@ -754,7 +760,12 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                     else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
-                
+                if sigdict.has_key(systemname):
+                    sigs=sigdict[systemname]
+                    for sig in sigs:
+                        if os.path.isfile('./data/results/' + sig + '.png'):
+                            (counter, html)=generate_html(sig, counter, html, cols, False)
+                            
                 twdata=generate_paper_TWR(systemname, 'c2', 'closedWhen', recent, initCap) 
                 twdata.to_csv('./data/results/paper_' + systemname + '_' + 'c2' + '_TWR' + str(recent) + 'TWR.csv')
                 (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_c2_TWR'+str(recent), systemname + " C2 TWR", 'TWR', counter, html, cols, recent)
@@ -797,7 +808,12 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                       else:
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
-                  
+                  if sigdict.has_key(systemname):
+                    sigs=sigdict[systemname]
+                    for sig in sigs:
+                        if os.path.isfile('./data/results/' + sig + '.png'):
+                            (counter, html)=generate_html(sig, counter, html, cols, False)
+                            
                   twdata=generate_paper_TWR(systemname, 'ib', 'times', recent, initCap)    
                   twdata.to_csv('./data/results/paper_' + systemname + '_' + 'ib' + '_TWR' + str(recent) + 'TWR.csv')                  
                   (counter, html)=generate_mult_plot(twdata,['equitycurve','PurePLcurve','mark_to_mkt','pure_mark_to_mkt'], 'Date', 'paper_' + systemname + '_ib_TWR'+str(recent), systemname + " IB TWR", 'TWR', counter, html, cols, recent)

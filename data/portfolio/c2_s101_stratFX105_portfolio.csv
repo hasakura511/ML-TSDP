@@ -1,3 +1,3 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-NZDUSD,366,1461026143,,,0.69780,,forex,long,2016-04-18 20:35:43,1461041736,open,2016-04-18 20:35:15,0.69934,10000,,0,10,,,101887664,
-USDCHF,290,1461063966,,,0.96366,,forex,short,2016-04-19 07:06:06,1461063966,open,2016-04-19 07:05:41,0.96364,10000,,0,10,,,101895029,
+EURJPY,217,1461103604,,,124.07700,,forex,short,2016-04-19 18:06:44,1461103604,open,2016-04-19 18:05:52,124.07100,10000,,0,10,,,101911539,
+USDCHF,2,1461215195,,,0.97133,,forex,long,2016-04-21 01:06:35,1461215195,open,2016-04-21 01:05:58,0.97131,10000,,0,10,,,101942581,

@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_krakenUSD,BTCUSD_krakenUSD,,-20.0,-20.0,442.682,442.682,0.0,22.1341,-22.1341,-367.81965,353.16,Paper,USD,0.0
+BTCUSD_krakenUSD,BTCUSD_krakenUSD,,20.0,20.0,446.863,446.863,0.0,22.34315,-22.34315,-404.6892,516.74,Paper,USD,0.0

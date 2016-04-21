@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_rockEUR,open,long,2.0,0.0,379.19,0.0,-1.89595,0.0,1.89595,23.0,,,,,BTCUSD_rockEUR,,20160418 09:26:04 EST,20160418 09:26:04 EST,2.0,USD,-1.89595,0.0,99905.6759,1999234.32,99990.98
+BTCUSD_rockEUR,open,long,2.0,0.0,398.17,0.0,-1.99085,0.0,1.99085,29.0,,,,,BTCUSD_rockEUR,,20160421 16:19:22 EST,20160421 16:19:22 EST,2.0,USD,-1.99085,0.0,99911.4418,1999234.32,100020.42

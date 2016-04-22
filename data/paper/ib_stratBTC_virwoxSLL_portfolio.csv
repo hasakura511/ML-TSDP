@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-BTCUSD_virwoxSLL,BTCUSD_virwoxSLL,,-20.0,-20.0,118375.0,118375.0,0.0,5918.75,-5918.75,-575974.1,-71520.0,Paper,USD,0.0
+BTCUSD_virwoxSLL,BTCUSD_virwoxSLL,,20.0,20.0,117300.0,117300.0,0.0,5865.0,-5865.0,-626862.7,-92980.0,Paper,USD,0.0

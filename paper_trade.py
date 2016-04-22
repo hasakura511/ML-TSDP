@@ -97,6 +97,7 @@ def get_models(systems):
     dpsList=dict()
     for i in systems.index:
         system=systems.ix[i]
+        print system['ibtype']
         if system['ibtype'] != 'BITCOIN':
           if system['Version'] == 'v1':
               v1sList[system['System']]=1

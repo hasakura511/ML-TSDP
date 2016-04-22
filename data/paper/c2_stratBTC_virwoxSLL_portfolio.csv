@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_virwoxSLL,open,short,2.0,0.0,117098.0,0.0,-585.49,0.0,585.49,94.0,,,,,BTCUSD_virwoxSLL,,20160422 06:59:15 EST,20160422 06:59:15 EST,-2.0,USD,-585.49,0.0,-17077.025,1771002.0,90298.0
+BTCUSD_virwoxSLL,open,long,2.0,0.0,117299.0,0.0,-586.495,0.0,586.495,95.0,,,,,BTCUSD_virwoxSLL,,20160422 07:55:36 EST,20160422 07:55:36 EST,2.0,USD,-586.495,0.0,-18652.015,1771002.0,89896.0

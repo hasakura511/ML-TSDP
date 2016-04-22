@@ -1,5 +1,15 @@
 data/results/
 data/models/
+data/from_MT4/
+data/params/
+data/signalPlots/
+data/bars/
+data/bidask/
+data/btapi/
+data/c2api/
+data/ibapi/
+data/paper/
+data/portfolio/
 results/
 *.pyc
 *.sw[opqrstuvwxyz]

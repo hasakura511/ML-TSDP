@@ -25,8 +25,9 @@ logging.basicConfig(filename='/logs/runsystem_v3_eur.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
 debug=False
-#201604018
-pairs=['EURCAD','EURAUD','USDCAD','EURNZD','EURGBP','USDCHF','EURCHF']
+pairs=['EURCAD','EURAUD','EURNZD','EURCHF','GBPUSD','USDCAD','USDCHF']
+#pairs=['EURCAD','EURAUD','EURNZD','EURGBP','EURCHF','EURUSD','GBPUSD','USDCAD']
+#pairs=['EURCAD','EURAUD','USDCAD','EURNZD','EURGBP','USDCHF','EURCHF']
 #pairs=['EURGBP','EURCAD','EURAUD','EURNZD','USDCAD']
 #pairs=['AUDUSD','EURUSD','GBPUSD','USDCAD','NZDUSD','USDCHF']
 #pairs=['NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']

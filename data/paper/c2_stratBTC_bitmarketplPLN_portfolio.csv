@@ -1,0 +1,2 @@
+symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
+BTCUSD_bitmarketplPLN,open,long,2.0,0.0,1709.02,0.0,-8.5451,0.0,8.5451,19.0,,,,,BTCUSD_bitmarketplPLN,,20160422 07:08:24 EST,20160422 07:08:24 EST,2.0,USD,-8.5451,0.0,99811.765313,1996661.48,100126.0828

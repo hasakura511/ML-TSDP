@@ -113,7 +113,16 @@ currencyPairs =   [
                 'USDCHF',\
                 'NZDUSD',
                 'EURCHF',\
-                'EURGBP'\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
                 ]
 
         

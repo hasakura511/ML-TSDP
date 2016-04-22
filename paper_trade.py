@@ -98,7 +98,6 @@ def get_models(systems):
     for i in systems.index:
         system=systems.ix[i]
         if system['ibtype'] != 'BITCOIN':
-         
           if system['Version'] == 'v1':
               v1sList[system['System']]=1
           else:

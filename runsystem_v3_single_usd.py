@@ -26,7 +26,8 @@ version_ = '3.1'
 barSize='30m'
 debug=False
 #20160418
-pairs=['AUDUSD','NZDUSD','USDCHF']
+pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD']
+#pairs=['AUDUSD','NZDUSD','USDCHF']
 #pairs=['AUDUSD','NZDUSD','EURUSD','GBPUSD']
 #pairs=['EURCHF','EURGBP','USDCHF']
 #pairs=['USDCAD', 'AUDUSD','NZDUSD']

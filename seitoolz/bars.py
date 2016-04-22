@@ -45,7 +45,7 @@ def get_bidask_list():
     files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
     baList=list()
     for file in files:
-            (inst, ext)=file.split('.')
+            inst=file.rsplit('.',1)[0]
             baList.append(inst)
             #print 'Found BidAsk: ' + inst
     return baList
@@ -56,7 +56,7 @@ def get_btc_list():
     btcList=list()
     for file in files:
             if re.search(r'BTCUSD', file):
-                (inst, ext)=file.split('.')
+                inst=file.rsplit('.',1)[0]
                 btcList.append(inst)
                 #print 'Found ' + inst
     return btcList
@@ -67,8 +67,7 @@ def get_btc_exch_list():
     btcList=list()
     for file in files:
             if re.search(r'BTCUSD', file):
-                (inst, ext)=file.split('.')
-                #(ticker, exch)=inst.split('_')
+                inst=file.rsplit('.',1)[0]
                 btcList.append(inst)
                 #print 'Found ' + inst
     return btcList

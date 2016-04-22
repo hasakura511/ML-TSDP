@@ -87,8 +87,6 @@ def getStockDataFromWeb(fout, name, path_datasets, start_string, end_string):
     #out.columns = out.columns + '_Out'
     #out['Return_Out'] = out['AdjClose_Out'].pct_change()
     
-    
-    
     return [out, nasdaq, djia, frankfurt, london, paris, hkong, nikkei, australia]
 
 

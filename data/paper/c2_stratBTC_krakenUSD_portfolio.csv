@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_krakenUSD,open,long,2.0,0.0,449.079,0.0,-2.245395,0.0,2.245395,50.0,,,,,BTCUSD_krakenUSD,,20160422 07:48:43 EST,20160422 07:48:43 EST,2.0,USD,-2.245395,0.0,99851.94581,1999144.62,100069.898
+BTCUSD_krakenUSD,open,long,2.0,0.0,447.916,0.0,-2.23958,0.0,2.23958,54.0,,,,,BTCUSD_krakenUSD,,20160422 11:40:55 EST,20160422 11:40:55 EST,2.0,USD,-2.23958,0.0,99838.43285,1999144.62,100074.252

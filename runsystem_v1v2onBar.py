@@ -276,7 +276,16 @@ pairs =  [
                 'USDCHF',\
                 'NZDUSD',
                 'EURCHF',\
-                'EURGBP'\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
                 ]
                  
 if len(sys.argv)==1:          
@@ -298,7 +307,16 @@ if len(sys.argv)==1:
                 'USDCHF',\
                 'NZDUSD',
                 'EURCHF',\
-                'EURGBP'\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
                 ]
     #settings
     debug=True
@@ -328,7 +346,7 @@ if len(sys.argv)==1:
     
     
 else:
-    livePairs =  [
+    livePairs = [
                 'NZDJPY',\
                 'CADJPY',\
                 'CHFJPY',\
@@ -346,7 +364,16 @@ else:
                 'USDCHF',\
                 'NZDUSD',
                 'EURCHF',\
-                'EURGBP'\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
                 ]
     #settings
     debug=False

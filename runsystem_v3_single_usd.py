@@ -26,7 +26,7 @@ version_ = '3.1'
 barSize='30m'
 debug=False
 #20160418
-pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD']
+pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD']
 #pairs=['AUDUSD','NZDUSD','USDCHF']
 #pairs=['AUDUSD','NZDUSD','EURUSD','GBPUSD']
 #pairs=['EURCHF','EURGBP','USDCHF']
@@ -40,33 +40,35 @@ pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD']
 
 
 #def runv3(pair):
-while 1:
-    start_time = time.time()
-    for pair in pairs:
-        try:
-            start_time2 = time.time()
-            logging.info('running v3'+pair)
-            f=open ('/logs/' + pair + 'v3.log','a')
-            print 'Starting v3: ' + pair
-            f.write('Starting v3: ' + pair)
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info('running v3'+pair)
+        f=open ('/logs/' + pair + 'v3.log','a')
+        print 'Starting v3: ' + pair
+        f.write('Starting v3: ' + pair)
 
-            ferr=open ('/logs/' + pair + 'v3_err.log','a')
-            ferr.write('Starting V3: ' + pair)
+        ferr=open ('/logs/' + pair + 'v3_err.log','a')
+        ferr.write('Starting V3: ' + pair)
 
-            subprocess.call(['python','debug_system_v3.1C_30min_usd.py',pair,'1'], stdout=f, stderr=ferr)
-            f.close()
-            ferr.close()
-            signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]
-            logging.info(str(signal))
-            logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
-                                dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
-        except Exception as e:
-            #f=open ('./debug/v3run' + pair + '.log','a')
-            #f.write(e)
-            #f.close()
-            logging.error("something bad happened", exc_info=True)
-            #return
-    logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+        subprocess.call(['python','debug_system_v3.1C_30min_usd.py',pair,'1'], stdout=f, stderr=ferr)
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]
+        logging.info(str(signal))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v3run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed'
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 '''
 threads = []
 for pair in pairs:

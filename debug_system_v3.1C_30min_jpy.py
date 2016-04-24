@@ -113,7 +113,16 @@ currencyPairs =   [
                 'USDCHF',\
                 'NZDUSD',
                 'EURCHF',\
-                'EURGBP'\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
                 ]
 
         
@@ -121,26 +130,35 @@ currencyPairs =   [
 if len(sys.argv)==1:
     debug=True
     
-    livePairs =   [
-                'NZDJPY',\
-                'CADJPY',\
-                'CHFJPY',\
-                'EURJPY',\
-                'GBPJPY',\
-                'AUDJPY',\
-                'USDJPY',\
-                'AUDUSD',\
-                'EURUSD',\
-                'EURAUD',\
-                'EURCAD',\
-                'EURNZD',\
-                'GBPUSD',\
-                'USDCAD',\
-                'USDCHF',\
-                'NZDUSD',
-                'EURCHF',\
-                'EURGBP'\
-                ]
+    livePairs =  [
+                    #'NZDJPY',\
+                    #'CADJPY',\
+                    #'CHFJPY',\
+                    #'EURJPY',\
+                    #'GBPJPY',\
+                    #'AUDJPY',\
+                    #'USDJPY',\
+                    #'EURCHF',\
+                    #'EURGBP',\
+                    #'EURUSD',\
+                    #'EURAUD',\
+                    #'EURCAD',\
+                    #'EURNZD',\
+                    #'AUDUSD',\
+                    #'GBPUSD',\
+                    #'USDCAD',\
+                    #'USDCHF',\
+                    #'NZDUSD',
+                    #'AUDCAD',\
+                    #'AUDCHF',\
+                    #'AUDNZD',\
+                    #'GBPAUD',\
+                    #'GBPCAD',\
+                    #'GBPNZD',\
+                    #'NZDCHF',\
+                    #'NZDCAD',\
+                    'CADCHF'
+                    ]
                     
                     
     showDist =  False
@@ -205,15 +223,15 @@ for ticker in livePairs:
     currency=ticker[3:6]
 
     #Model Parameters
-    maxReadLines = 5000
+    maxReadLines = 500
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 30
+    validationSetLength = 3
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [3,6,10] # min is 2
+    validationPeriods = [3] # min is 2
     #validationStartPoint = None
-    #signal_types = ['sellHold']
-    signal_types = ['buyHold']
+    #signal_types = ['buyHold']
+    signal_types = ['sellHold']
     #signal_types = ['gainAhead','zigZag']
     #signal_types = ['gainAhead','zigZag','buyHold','sellHold']
     #signal_types = ['zigZag']
@@ -221,16 +239,16 @@ for ticker in livePairs:
     zz_steps = [0.002]
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
-    wfSteps=[1,15,30]
-    wf_is_periods = [25,250]
+    wfSteps=[1]
+    wf_is_periods = [25]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
-    #feature_selection = 'None'
+    feature_selection = 'None'
     #feature_selection = 'RFECV'
-    feature_selection = 'Univariate'
+    #feature_selection = 'Univariate'
     nfeatures = 10
     tox_adj_proportion = 0
     

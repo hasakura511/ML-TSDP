@@ -80,12 +80,12 @@ def get_timestamp():
 	return timestamp
         
 def start_trade(systems, commissiondata): 
-    global debug
-    if debug:
-       print "Starting " + str(systems.iloc[0]['Name'])
-       logging.info("Starting " + str(systems.iloc[0]['Name']))
-    finished=False
-    while not finished:
+        global debug
+        if debug:
+           print "Starting " + str(systems.iloc[0]['Name'])
+           logging.info("Starting " + str(systems.iloc[0]['Name']))
+        finished=False
+        #while not finished:
         try:
             (model_pos, dps_model_pos)=get_models(systems)
             symbols=systems['c2sym'].values
@@ -165,8 +165,9 @@ def start_systems():
            sig_thread.daemon=True
            threads.append(sig_thread)
            sig_thread.start()
-      while 1:
-         time.sleep(1000)
+      [t.join() for t in threads]
+      #while 1:
+      #   time.sleep(1000)
 
 def getSystemList():
     systemdata=pd.read_csv('./data/systems/system.csv')

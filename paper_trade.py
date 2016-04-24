@@ -109,12 +109,12 @@ def get_models(systems):
     return (model_pos, dps_model_pos)    
     
 def start_trade(systems, commissiondata): 
-    global debug
-    if debug:
-       print "Starting " + str(systems.iloc[0]['Name'])
-       logging.info("Starting " + str(systems.iloc[0]['Name']))
-    finished=False
-    while not finished:
+        global debug
+        if debug:
+           print "Starting " + str(systems.iloc[0]['Name'])
+           logging.info("Starting " + str(systems.iloc[0]['Name']))
+        finished=False
+        #while not finished:
         try:
             (model_pos, dps_model_pos)=get_models(systems)
             symbols=systems['c2sym'].values
@@ -194,8 +194,9 @@ def start_systems(systemList):
            sig_thread.daemon=True
            threads.append(sig_thread)
            sig_thread.start()
-      while 1:
-          time.sleep(100)
+      #while 1:
+      #    time.sleep(100)
+      [t.join() for t in threads]
          
 start_systems(systemList)
     

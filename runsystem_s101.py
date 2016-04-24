@@ -39,6 +39,7 @@ def runv2(pair):
             
             ferr=open ('/logs/s101' + pair + 'v2_err.log','a')
             ferr.write('Starting s101: ' + pair)
+            subprocess.call(['python','system_s101.py','2','2','0',pair,'1'], stdout=f, stderr=ferr)
             
             subprocess.call(['python','system_s101.py','9','2','0',pair], stdout=f, stderr=ferr)
             f.close()

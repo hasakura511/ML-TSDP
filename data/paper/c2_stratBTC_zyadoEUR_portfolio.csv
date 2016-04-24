@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-BTCUSD_zyadoEUR,open,long,2.0,0.0,396.56,0.0,-1.9828,0.0,1.9828,13.0,,,,,BTCUSD_zyadoEUR,,20160422 15:44:30 EST,20160422 15:44:30 EST,2.0,USD,-1.9828,0.0,99949.15055,1999212.1,99998.7
+BTCUSD_zyadoEUR,open,long,2.0,0.0,397.99,0.0,-1.98995,0.0,1.98995,23.0,,,,,BTCUSD_zyadoEUR,,20160423 13:51:47 EST,20160423 13:51:47 EST,2.0,USD,-1.98995,0.0,99916.79465,1999212.1,100005.92

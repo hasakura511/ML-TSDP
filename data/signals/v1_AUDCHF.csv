@@ -1,0 +1,4 @@
+dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
+2016-04-22 16:00:00,-1.0,0.000835172701784,432,1.0,,,,AUDCHF_30m_ALL_DF1_None_i0_fcst1_SH1
+2016-04-22 16:30:00,-1.0,-0.000814607299676,433,1.0,,,,AUDCHF_30m_ALL_DF1_None_i0_fcst1_SH1
+2016-04-22 17:00:00,-1.0,0.0,434,1.0,,,,AUDCHF_30m_ALL_DF1_None_i0_fcst1_SH1

@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-NZDJPY,NZD,,-20000.0,-20000.0,76.569,76.569,0.0,2.0,-12.912,-14.912,-10.912,Paper,JPY,-10.912
+NZDJPY,NZD,,20000.0,20000.0,76.631,76.631,0.0,2.0,-12.912,-27.824,-21.824,Paper,JPY,-10.912

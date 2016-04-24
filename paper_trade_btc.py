@@ -144,7 +144,7 @@ def start_trade(systems, commissiondata):
                 system['last_trade']=get_timestamp()
                 systems.loc[symbol]=system
                             
-            time.sleep(10)
+            #time.sleep(10)
         except Exception as e:
             #f=open ('./debug/papererrors.log','a')
             #f.write(e)

@@ -57,14 +57,14 @@ def generate_sigplots(counter, html, cols):
     filename='Versions'
     fn='./data/results/signal_' + filename + '.html'     
     headerhtml=get_html_header()
-    headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br><table>'
+    headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br><center><table>'
     headerhtml = re.sub('Index', filename, headerhtml.rstrip())
     body=''
     for ver in vd:
         if os.path.isfile('./data/results/' + ver + '.png'):
             (counter, body)=generate_html(ver, counter, body, cols) 
     footerhtml=get_html_footer()
-    footerhtml = '</table>' + footerhtml
+    footerhtml = '</table></center>' + footerhtml
     write_html(fn, headerhtml, footerhtml, body)
 
     syms=symdict.keys()
@@ -85,7 +85,7 @@ def generate_sigplots(counter, html, cols):
          
         for file in files:
             counter=0
-            body = body + '<h1>Signal - ' + file + '</h1><br><table>'
+            body = body + '<h1>Signal - ' + file + '</h1><br><center><table>'
             for ver in vd:
                 v=ver.split('.')[0]
                 v2=file.split('_')[0]
@@ -94,7 +94,7 @@ def generate_sigplots(counter, html, cols):
                         (counter, body)=generate_html(ver, counter, body, cols)
                 
             (counter, body)=generate_sig_html(file, counter, body, cols, True)
-            body = body + '</table>'
+            body = body + '</table></center>'
             (body, counter, cols)=gen_paper(body, counter, cols, 2, file)
             
         footerhtml=get_html_footer()

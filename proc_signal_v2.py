@@ -74,11 +74,12 @@ def start_systems():
       systemdata=systemdata.reset_index()
       for i in systemdata.index:
           system=systemdata.ix[i]
-          if systemList.has_key(system['Name']):
-              systemList[system['Name']]=systemList[system['Name']].append(system)
-          else:
-              systemList[system['Name']]=pd.DataFrame()
-              systemList[system['Name']]=systemList[system['Name']].append(system)
+          if len(sys.argv) < 2 or (len(sys.argv[2]) > 0 and sys.argv[2] == system['Name']):
+              if systemList.has_key(system['Name']):
+                  systemList[system['Name']]=systemList[system['Name']].append(system)
+              else:
+                  systemList[system['Name']]=pd.DataFrame()
+                  systemList[system['Name']]=systemList[system['Name']].append(system)
               
       for systemname in systemList.keys():
            systems=systemList[systemname]

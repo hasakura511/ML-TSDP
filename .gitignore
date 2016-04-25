@@ -8,8 +8,6 @@ data/bidask/
 data/btapi/
 data/c2api/
 data/ibapi/
-data/paper/
-data/portfolio/
 results/
 *.pyc
 *.sw[opqrstuvwxyz]

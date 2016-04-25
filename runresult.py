@@ -26,12 +26,12 @@ logging.basicConfig(filename='/logs/runresult.log',level=logging.DEBUG)
 debug=False
 
 files=[['get_results.py',['sig'],3000],
-       ['get_results.py',['c2'],3600],
-       ['get_results.py',['c2_2'],3600],
+       ['get_results.py',['c2'],2500],
+       ['get_results.py',['c2_2'],2800],
        ['get_results.py',['ib'],3600],
-       ['get_results.py',['paper'],5000],
-       ['get_results.py',['paper2'],2400],
-       ['get_results.py',['btc'], 20500]]
+       ['get_results.py',['paper'],3300],
+       ['get_results.py',['paper2'],2200],
+       ['get_results.py',['btc'], 5000]]
 
 def runfile(file,runargs,sleeptime):
     while 1:

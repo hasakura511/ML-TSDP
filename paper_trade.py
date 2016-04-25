@@ -97,13 +97,12 @@ def start_trade(systems, commissiondata):
                     " Timestamp: " + str(get_timestamp()) + " Last Trade: " + str(system['last_trade']) + " Freq: " +  str(system['trade_freq'])
                     print "System Name: " + system['Name'] + " Symbol: " + system['ibsym'] + " Currency: " + system['ibcur']
                     print        " System Algo: " + str(system['System']) 
-                    print        " Ask: " + str(ask)
-                    print        " Bid: " + str(bid)
                     print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
                     print        " IB Signal: " + str(system_ibpos_qty)
                     print        " C2 Signal: " + str(system_c2pos_qty)
                 pricefeed=pd.DataFrame([[ask, bid, float(system['c2mult']), float(system['ibmult']), exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
                 if ask > 0 and bid > 0:
+                    print "Symbol: ", system['c2sym'], " Ask: ", str(ask), " Bid: ", str(bid)
                     eastern=timezone('US/Eastern')
                     endDateTime=dt.now(get_localzone())
                     date=endDateTime.astimezone(eastern)
@@ -121,9 +120,7 @@ def start_trade(systems, commissiondata):
 
 def start_systems():
         threads = []
-      
-        systemList=dict()
-        
+        systemList=dict()  
         systemdata=pd.read_csv('./data/systems/system.csv')
         systemdata=systemdata.reset_index()
         for i in systemdata.index:
@@ -140,7 +137,6 @@ def start_systems():
         commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + commissiondata['Exchange']
         commissiondata=commissiondata.set_index('key')
         for systemname in systemList.keys():
-           
            systems=systemList[systemname]
            systems['last_trade']=0
            systems['key']=systems['c2sym']

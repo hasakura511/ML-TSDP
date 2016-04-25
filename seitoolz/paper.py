@@ -25,6 +25,7 @@ def adj_size(model_pos, system, system_name, pricefeed, c2systemid, c2apikey, c2
    
     c2submit=True
     ibsubmit=True
+                
     if c2submit:
         c2_pos_qty=get_c2_pos(system_name, c2sym, date)           
         system_c2pos_qty=round(system_pos['action']) * c2quant

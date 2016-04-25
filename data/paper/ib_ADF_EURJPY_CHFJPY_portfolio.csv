@@ -1,3 +1,0 @@
-symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-EURJPY,EUR,,100000.0,100000.0,123.3335,123.3335,108533.48,4.3413392,128.5067168,494.6672544,503.36,Paper,JPY,130.68
-CHFJPY,CHF,,-400000.0,-400000.0,113.528,113.528,-199541.76,3.9908352,-245.5971232,-7.9923712,0.0,Paper,JPY,-237.6

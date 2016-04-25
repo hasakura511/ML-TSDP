@@ -36,28 +36,7 @@ from time import gmtime, strftime, localtime, sleep
 import logging
 
 logging.basicConfig(filename='/logs/paper_trade.log',level=logging.DEBUG)
-
-currencyList=dict()
-systemList=dict()
-
-systemdata=pd.read_csv('./data/systems/system.csv')
-systemdata=systemdata.reset_index()
-for i in systemdata.index:
-      system=systemdata.ix[i]
-      currencyList[system['c2sym']]=1
-      if systemList.has_key(system['Name']):
-          systemList[system['Name']]=systemList[system['Name']].append(system)
-      else:
-          systemList[system['Name']]=pd.DataFrame()
-          systemList[system['Name']]=systemList[system['Name']].append(system)
-          
-commissiondata=pd.read_csv('./data/systems/commission.csv')
-commissiondata=commissiondata.reset_index()
-commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + commissiondata['Exchange']
-commissiondata=commissiondata.set_index('key')
-     
 start_time = time.time()
-
 debug=False
 signalPath = './data/signals/'
 dataPath = './data/from_IB/'
@@ -140,11 +119,28 @@ def start_trade(systems, commissiondata):
         except Exception as e:
             logging.error("something bad happened", exc_info=True)
 
-threads = []
-def start_systems(systemList):
-      global commissiondata
-      global threads         
-      for systemname in systemList.keys():
+def start_systems():
+        threads = []
+      
+        systemList=dict()
+        
+        systemdata=pd.read_csv('./data/systems/system.csv')
+        systemdata=systemdata.reset_index()
+        for i in systemdata.index:
+              system=systemdata.ix[i]
+              if len(sys.argv) < 2 or (len(sys.argv[2]) > 0 and sys.argv[2] == system['Name']):
+                  if systemList.has_key(system['Name']):
+                      systemList[system['Name']]=systemList[system['Name']].append(system)
+                  else:
+                      systemList[system['Name']]=pd.DataFrame()
+                      systemList[system['Name']]=systemList[system['Name']].append(system)
+                  
+        commissiondata=pd.read_csv('./data/systems/commission.csv')
+        commissiondata=commissiondata.reset_index()
+        commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + commissiondata['Exchange']
+        commissiondata=commissiondata.set_index('key')
+        for systemname in systemList.keys():
+           
            systems=systemList[systemname]
            systems['last_trade']=0
            systems['key']=systems['c2sym']
@@ -153,10 +149,10 @@ def start_systems(systemList):
            sig_thread.daemon=True
            threads.append(sig_thread)
            sig_thread.start()
-      #while 1:
-      #    time.sleep(100)
-      [t.join() for t in threads]
+        #while 1:
+        #    time.sleep(100)
+        [t.join() for t in threads]
          
-start_systems(systemList)
+start_systems()
     
 

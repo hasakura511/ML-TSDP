@@ -91,7 +91,7 @@ def start_systems():
            threads.append(sig_thread)
            sig_thread.start()
       [t.join() for t in threads]
-         
+      
+subprocess.call(['python', 'get_ibpos.py'])       
 start_systems()
-    
-
+subprocess.call(['python', 'get_ibpos.py'])

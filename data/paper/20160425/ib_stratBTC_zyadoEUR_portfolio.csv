@@ -1,0 +1,2 @@
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
+BTCUSD_zyadoEUR,BTCUSD_zyadoEUR,,20.0,20.0,403.68,403.68,0.0,20.184,-20.184,-376.3765,119.4,Paper,USD,0.0

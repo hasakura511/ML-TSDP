@@ -447,19 +447,20 @@ def generate_sig_html(signal, counter, html, cols, colspan):
     return (counter, html)
     
 def generate_html(filename, counter, html, cols, colspan=False):
-    height=300
-    width=300
-    if counter == 0 or colspan:
+    if os.path.isfile('./data/results/' + filename + '.png'):
+        height=300
+        width=300
+        if counter == 0 or colspan:
             html = html + '<tr>'
-    html = html + '<td '
-    if colspan:
-	html=html + 'colspan=' + str(cols)
-    html = html + '><center><a href="' + filename + '.png">'
-    html = html + '<img src="' + filename + '.png"  width=' + str(width) + ' height=' + str(height) + '></a></center></td>'
-    counter = counter + 1
-    if counter >= cols or colspan:
-        html = html + '</tr>'
-        counter=0
+        html = html + '<td '
+        if colspan:
+            html=html + 'colspan=' + str(cols)
+        html = html + '><center><a href="' + filename + '.png">'
+        html = html + '<img src="' + filename + '.png"  width=' + str(width) + ' height=' + str(height) + '></a></center></td>'
+        counter = counter + 1
+        if counter >= cols or colspan:
+            html = html + '</tr>'
+            counter=0
     return (counter, html)
 
             

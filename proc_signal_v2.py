@@ -65,7 +65,7 @@ def start_trade(systems):
         except Exception as e:
             logging.error("something bad happened", exc_info=True)
 
-def start_systems(systemList):
+def start_systems():
       threads = []        
       systemList=dict()
         

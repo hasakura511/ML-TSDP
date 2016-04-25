@@ -1,0 +1,2 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,currency,balance,commission,margin_available,mark_to_mkt,pure_mark_to_mkt,purebalance
+1.0,-2.0,,,,0.0,,USDCAD,long,,20160425 07:05:17 EST,open,20160425 07:05:17 EST,1.26773,,,0.0,2.0,,USDCAD,,0.0,2.0,CAD,99998.0,2.0,1980012.96882,99995.36936,99999.36936,100000.0

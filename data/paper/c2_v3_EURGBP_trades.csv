@@ -1,0 +1,2 @@
+trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,currency,balance,commission,margin_available,mark_to_mkt,pure_mark_to_mkt,purebalance
+1.0,-2.0,,,,0.0,,EURGBP,short,,20160425 07:05:19 EST,open,20160425 07:05:19 EST,0.77887,,,0.0,2.0,,EURGBP,,0.0,-2.0,GBP,99998.0,2.0,1977482.8683,99990.07345,99994.07345,100000.0

@@ -6,15 +6,6 @@ from os.path import isfile, join
 import ibapi.get_feed as feed
 from c2api.place_order import place_order as place_c2order
 import threading
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 08 20:10:29 2016
-3 mins - 2150 dp per request
-10 mins - 630 datapoints per request
-30 mins - 1025 datapoints per request
-1 hour - 500 datapoint per request
-@author: Hidemi
-"""
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,7 +20,6 @@ from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
 from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
-#other
 from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
 import numpy as np
 import pandas as pd
@@ -39,7 +29,6 @@ import pandas as pd
 import time
 import json
 from pandas.io.json import json_normalize
-
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.paper import adj_size
 import seitoolz.bars as bars
@@ -54,18 +43,14 @@ systemList=dict()
 systemdata=pd.read_csv('./data/systems/system.csv')
 systemdata=systemdata.reset_index()
 for i in systemdata.index:
-    system=systemdata.ix[i]
-    if system['ibtype'] != 'BITCOIN':
-     
+      system=systemdata.ix[i]
       currencyList[system['c2sym']]=1
-      
       if systemList.has_key(system['Name']):
           systemList[system['Name']]=systemList[system['Name']].append(system)
       else:
           systemList[system['Name']]=pd.DataFrame()
           systemList[system['Name']]=systemList[system['Name']].append(system)
           
-
 commissiondata=pd.read_csv('./data/systems/commission.csv')
 commissiondata=commissiondata.reset_index()
 commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + commissiondata['Exchange']
@@ -74,49 +59,33 @@ commissiondata=commissiondata.set_index('key')
 start_time = time.time()
 
 debug=False
-if len(sys.argv) > 1 and sys.argv[1] == '1':
-    debug=True
-    
 signalPath = './data/signals/'
 dataPath = './data/from_IB/'
 
-#data Parameters
-#cycles = 2
-minDataPoints = 2000
-durationStr='1 D'
-barSizeSetting='1 min'
-whatToShow='MIDPOINT'
-
+if len(sys.argv) > 1 and sys.argv[1] == '1':
+    debug=True
 
 def get_timestamp():
 	timestamp = int(time.time())
 	return timestamp
     
 def get_models(systems):
-    v1sList=dict()
     dpsList=dict()
     for i in systems.index:
         system=systems.ix[i]
-        print system['ibtype']
-        if system['ibtype'] != 'BITCOIN':
-          if system['Version'] == 'v1':
-              v1sList[system['System']]=1
-          else:
-              dpsList[system['System']]=1
-          
-    model_pos=get_model_pos(v1sList.keys())
+        dpsList[system['System']]=1
     dps_model_pos=get_dps_model_pos(dpsList.keys())    
-    return (model_pos, dps_model_pos)    
+    return dps_model_pos
     
 def start_trade(systems, commissiondata): 
         global debug
         if debug:
            print "Starting " + str(systems.iloc[0]['Name'])
            logging.info("Starting " + str(systems.iloc[0]['Name']))
-        finished=False
+        #finished=False
         #while not finished:
         try:
-            (model_pos, dps_model_pos)=get_models(systems)
+            model_pos=get_models(systems)
             symbols=systems['c2sym'].values
             for symbol in symbols:
               system=systems.loc[symbol].copy()
@@ -125,16 +94,9 @@ def start_trade(systems, commissiondata):
                     symbol = str(system['ibsym']) + str(system['ibcur'])
               
               feed_dict=bars.get_bidask_list()
-              if symbol in feed_dict \
-                 and \
-                 get_timestamp() - int(system['last_trade']) > int(system['trade_freq']):
-                     
+              if symbol in feed_dict:
+                #and get_timestamp() - int(system['last_trade']) > int(system['trade_freq']):
                 model=model_pos
-                if system['Version'] == 'v1':
-                        model=model_pos
-                else:
-                        model=dps_model_pos
-            
                 ask=float(bars.get_ask(symbol))
                 bid=float(bars.get_bid(symbol))
                 exchange=system['ibexch']
@@ -176,9 +138,6 @@ def start_trade(systems, commissiondata):
                             
             #time.sleep(30)
         except Exception as e:
-            #f=open ('./debug/papererrors.log','a')
-            #f.write(e)
-            #f.close()
             logging.error("something bad happened", exc_info=True)
 
 threads = []

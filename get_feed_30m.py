@@ -43,7 +43,7 @@ def get_history(contracts):
                 logging.error("something bad happened", exc_info=True)  
 =======
                 logging.error("something bad happened", exc_info=True)
-        dataSet=pd.DataFrame({}, columns=['Date'])
+        dataSet=pd.DataFrame({}, columns=['Date']).set_index('Date')
         dataSet.to_csv('./data/systems/restore_hist.csv')
 >>>>>>> 5eb591542d5e8ba98b189224ac54c6669e977ecb
         time.sleep(600)    

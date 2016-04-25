@@ -57,7 +57,7 @@ def start_trade(systems):
                 #and get_timestamp() - int(system['last_trade']) > int(system['trade_freq']):
                 if system['c2submit'] or system['ibsubmit']:
                     adj_size(model, system['System'], system['Name'], 
-                             str(system['c2id']),system['c2api'],
+                             str(int(system['c2id'])),system['c2api'],
                              system['c2qty'],system['c2sym'],system['c2type'],system['c2submit'], 
                              system['ibqty'],system['ibsym'],system['ibcur'],
                              system['ibexch'],system['ibtype'],system['ibsubmit'],

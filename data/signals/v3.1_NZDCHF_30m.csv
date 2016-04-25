@@ -1,3 +1,5 @@
 dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,timestamp
 2016-04-22 16:30:00,-1.0,-0.000968277731847,439.0,1.0,,,,bothNZDCHF_30m_ALL_DF1_None_i0_fcst1_SH1,,
 2016-04-22 17:00:00,-1.0,0.0,440.0,1.0,,,,bothNZDCHF_30m_ALL_DF1_None_i0_fcst1_SH1,0.61,20160423 21:12:33 EDT
+2016-04-25 08:30:00,-1.0,0.0,440.0,1.0,,,,bothNZDCHF_30m_ALL_DF1_None_i0_fcst1_SH1,-28.14865,20160425 08:01:51 EDT
+2016-04-25 10:00:00,-1.0,0.0,441.0,1.0,,,,bothNZDCHF_30m_ALL_DF1_None_i0_fcst1_SH1,-24.7353,20160425 09:35:15 EDT

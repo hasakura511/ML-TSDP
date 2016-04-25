@@ -1,8 +1,12 @@
 import seitoolz.bars as bars
+import pandas as pd
 import threading
 import time
 import logging
 import ibapi.get_feed as feed
+from pytz import timezone
+from dateutil.parser import parse
+import datetime
 
 logging.basicConfig(filename='/logs/get_feed_30m.log',level=logging.DEBUG)
 
@@ -17,9 +21,27 @@ def get_history(contracts):
     (durationStr, barSizeSetting, whatToShow)=feed.interval_to_ibhist_duration(interval)
     feed.cache_bar_csv(dataPath, barSizeSetting)
     for contract in contracts:
-        histdata = feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
-        bars.proc_history(contract, histdata, interval)
-        
+        try:
+            histdata = feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
+            bars.proc_history(contract, histdata, interval)
+        except Exception as e:
+            logging.error("something bad happened", exc_info=True)
+    
+    while 1:
+        dataSet=pd.read_csv('./data/systems/restore_hist.csv', index_col=0)
+        for date in dataSet.index:
+            try:
+                eastern=timezone('US/Eastern')
+                #timestamp
+                date=parse(str(date)).replace(tzinfo=eastern)
+                for contract in contracts:
+                  
+                        histdata = feed.get_bar_hist_date(date, dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
+                        bars.proc_history(contract, histdata, interval)
+            except Exception as e:
+                logging.error("something bad happened", exc_info=True)  
+        time.sleep(600)    
+         
 def start_proc():
     global interval
     

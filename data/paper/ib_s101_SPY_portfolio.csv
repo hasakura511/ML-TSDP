@@ -1,0 +1,2 @@
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
+#S&P500_M6,#S&P500_M6,,-2.0,-2.0,2080.0,2080.0,0.0,4.16,0.0,-408.328,-400.0,Paper,USD,

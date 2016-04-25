@@ -12,15 +12,6 @@ from os import listdir
 from os.path import isfile, join
 import threading
 import locale
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 08 20:10:29 2016
-3 mins - 2150 dp per request
-10 mins - 630 datapoints per request
-30 mins - 1025 datapoints per request
-1 hour - 500 datapoint per request
-@author: Hidemi
-"""
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -759,7 +750,7 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                     elif os.path.isfile('./data/results/' + systemname + '.png'):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
-                    else:
+                    elif os.path.isfile('./data/results/' + verdict[systemname] + '.png'):
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                 if sigdict.has_key(systemname):
                     sigs=sigdict[systemname]
@@ -807,7 +798,7 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
                       elif os.path.isfile('./data/results/' + systemname + '.png'):
                         (counter, html)=generate_html(systemname, counter, html, cols, False)
-                      else:
+                      elif os.path.isfile('./data/results/' + verdict[systemname] + '.png'):
                         (counter, html)=generate_html(verdict[systemname], counter, html, cols, False)
                   if sigdict.has_key(systemname):
                     sigs=sigdict[systemname]

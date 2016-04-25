@@ -40,7 +40,7 @@ def get_history(contracts):
                         bars.proc_history(contract, histdata, interval)
             except Exception as e:
                 logging.error("something bad happened", exc_info=True)
-        dataSet=pd.DataFrame({}, columns=['Date'])
+        dataSet=pd.DataFrame({}, columns=['Date']).set_index('Date')
         dataSet.to_csv('./data/systems/restore_hist.csv')
         time.sleep(600)    
          

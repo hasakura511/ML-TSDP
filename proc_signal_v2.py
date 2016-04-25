@@ -60,7 +60,8 @@ def start_trade(systems):
                              str(system['c2id']),system['c2api'],
                              system['c2qty'],system['c2sym'],system['c2type'],system['c2submit'], 
                              system['ibqty'],system['ibsym'],system['ibcur'],
-                             system['ibexch'],system['ibtype'],system['ibsubmit'])
+                             system['ibexch'],system['ibtype'],system['ibsubmit'],
+                             system['iblocalsym'])
               #time.sleep(30)
         except Exception as e:
             logging.error("something bad happened", exc_info=True)

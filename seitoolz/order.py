@@ -12,7 +12,7 @@ from seitoolz.signal import get_model_pos
 from time import gmtime, strftime, time, localtime, sleep
 import logging
 
-def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit):
+def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit, iblocalsym=''):
     system_pos=model_pos.loc[system]
    
     logging.info('==============')
@@ -70,10 +70,10 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, 
         if system_ibpos_qty > ib_pos_qty:
             ibquant=int(system_ibpos_qty - ib_pos_qty)
             logging.info( 'BUY: ' + str(ibquant) )
-            place_iborder('BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
+            place_iborder('BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);
         if system_ibpos_qty < ib_pos_qty:
             ibquant=int(ib_pos_qty - system_ibpos_qty)
             logging.info( 'SELL: ' + str(ibquant) )
-            place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
+            place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);
     #
     #place_iborder(ibaction, ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);

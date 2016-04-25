@@ -66,7 +66,7 @@ class PlaceOrderExample(EWrapper):
                                             commissionReport.commission,
                                             commissionReport.realizedPNL)
 
-def place_order(action, quant, sym, type, currency, exchange, submit):
+def place_order(action, quant, sym, type, currency, exchange, submit, iblocalsym=''):
     if submit == False:
           return 0;
     #prompt = input("WARNING: This example will place an order on your IB "
@@ -92,6 +92,7 @@ def place_order(action, quant, sym, type, currency, exchange, submit):
     contract.secType = type
     contract.exchange = exchange
     contract.currency = currency
+    contract.localSymbol=iblocalsym
 
     print('Waiting for valid order id')
     order_id = callback.order_ids.get(timeout=WAIT_TIME)

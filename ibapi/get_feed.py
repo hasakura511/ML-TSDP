@@ -67,7 +67,6 @@ def get_history(date, contract, whatToShow, data,filename, tickerId, minDataPoin
             count=0
             finished=False
             while not finished:    
-                
                 data = client.get_history(date, contract, whatToShow, data,filename,tickerId, minDataPoints, durationStr, barSizeSetting)
                 data = get_bar(ticker)
                 if data.shape[0] > 0:
@@ -281,6 +280,25 @@ def get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSettin
             tickerId=get_TickerId(pair)
             data=get_history(date, contract, whatToShow, prepData[pair], filename, tickerId, minDataPoints, durationStr, barSizeSetting)
     
+            logging.info( 'Done Getting History for ' + pair  )
+            if len(symfilter) > 0:
+                return data
+                
+def get_bar_hist_date(date, dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter=''):
+    global tickerId
+    global currencyPairsDict
+    symbols=bars.get_contracts()
+    for contract in symbols:
+        pair=contract.symbol
+        if contract.secType == 'CASH':
+            pair = contract.symbol + contract.currency
+        if len(symfilter) == 0 or pair == symfilter:
+            logging.info(  'Getting History for ' + pair  )
+            interval=duration_to_interval(barSizeSetting)
+            filename=dataPath+interval+'_'+pair+'.csv'
+            date=get_bar_date(barSizeSetting, date) + ' EST'
+            tickerId=get_TickerId(pair)
+            data=get_history(date, contract, whatToShow, prepData[pair], filename, tickerId, minDataPoints, durationStr, barSizeSetting)
             logging.info( 'Done Getting History for ' + pair  )
             if len(symfilter) > 0:
                 return data

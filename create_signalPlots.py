@@ -33,12 +33,41 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (8,7)
-versions = ['v1.3','v2.4','v3.1']
+versions = ['v1.3']
 #versions = ['v1.3','v2.4']
 barSize='30m'
 #regime switching params
 lookback = 90
-
+pairs=[
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                'AUDUSD',\
+                'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
+                'EURNZD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
+                ]
+                
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
     signalPath = './data/signals/'
@@ -400,7 +429,7 @@ def calcEquity_signals(SST, title, **kwargs):
     
 signalFiles = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
 dataFiles = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-pairs = [x.replace(barSize,'').replace('.csv','').replace('_','') for x in dataFiles if barSize in x]
+#pairs = [x.replace(barSize,'').replace('.csv','').replace('_','') for x in dataFiles if barSize in x]
 dataSets = {}
 maxCTs = {}
 numTrades = {}

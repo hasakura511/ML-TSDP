@@ -161,7 +161,7 @@ def start_trade(systems, commissiondata):
                     print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
                     print        " IB Signal: " + str(system_ibpos_qty)
                     print        " C2 Signal: " + str(system_c2pos_qty)
-                pricefeed=pd.DataFrame([[ask, bid, 10000, 1, exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
+                pricefeed=pd.DataFrame([[ask, bid, float(system['c2mult']), float(system['ibmult']), exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
                 if ask > 0 and bid > 0:
                     eastern=timezone('US/Eastern')
                     endDateTime=dt.now(get_localzone())

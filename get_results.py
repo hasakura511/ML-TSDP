@@ -61,7 +61,8 @@ def generate_sigplots(counter, html, cols):
     headerhtml = re.sub('Index', filename, headerhtml.rstrip())
     body=''
     for ver in vd:
-        (counter, body)=generate_html(ver, counter, body, cols) 
+        if os.path.isfile('./data/results/' + ver + '.png'):
+            (counter, body)=generate_html(ver, counter, body, cols) 
     footerhtml=get_html_footer()
     footerhtml = '</table>' + footerhtml
     write_html(fn, headerhtml, footerhtml, body)
@@ -89,7 +90,8 @@ def generate_sigplots(counter, html, cols):
                 v=ver.split('.')[0]
                 v2=file.split('_')[0]
                 if v == v2:
-                    (counter, body)=generate_html(ver, counter, body, cols)
+                    if os.path.isfile('./data/results/' + ver + '.png'):
+                        (counter, body)=generate_html(ver, counter, body, cols)
                 
             (counter, body)=generate_sig_html(file, counter, body, cols, True)
             body = body + '</table>'

@@ -981,7 +981,7 @@ def gen_file(filetype):
         headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
         write_html(filename, headerhtml, footerhtml, html)
         
-        (html, counter, cols)=gen_sig(html, counter, cols)
+        (html, counter, cols)=gen_v4(html, counter, cols)
     elif filetype == 'sig':
         counter=0
         cols=5

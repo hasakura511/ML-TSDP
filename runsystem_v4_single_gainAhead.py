@@ -33,36 +33,36 @@ logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=l
 
 
 #def runv4(pair):
-#while 1:
-start_time = time.time()
-for pair in pairs:
-    try:
-        start_time2 = time.time()
-        logging.info(str(dt.now())+' running v'+version_+' '+pair)
-        f=open ('/logs/' + pair + 'v'+version+ '.log','a')
-        print str(dt.now()), ' Starting v'+version_+': ' + pair
-        f.write(str(dt.now())+' Starting v'+version_+': ' + pair)
+while 1:
+    start_time = time.time()
+    for pair in pairs:
+        try:
+            start_time2 = time.time()
+            logging.info(str(dt.now())+' running v'+version_+' '+pair)
+            f=open ('/logs/' + pair + 'v'+version+ '.log','a')
+            print str(dt.now()), ' Starting v'+version_+': ' + pair
+            f.write(str(dt.now())+' Starting v'+version_+': ' + pair)
 
-        ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
-        ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
+            ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
+            ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
 
-        subprocess.call(['python',scriptName,pair,bias,volatility],\
-                                stdout=f, stderr=ferr)
-        f.close()
-        ferr.close()
-        signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'_'+barSize+'.csv').iloc[-1]
-        logging.info(str(signal))
-        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
-                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
-    except Exception as e:
-        #f=open ('./debug/v4run' + pair + '.log','a')
-        #f.write(e)
-        #f.close()
-        logging.error("something bad happened", exc_info=True)
-        #return
-logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed'
-print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+            subprocess.call(['python',scriptName,pair,bias,volatility],\
+                                    stdout=f, stderr=ferr)
+            f.close()
+            ferr.close()
+            signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'_'+barSize+'.csv').iloc[-1]
+            logging.info(str(signal))
+            logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                                dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+        except Exception as e:
+            #f=open ('./debug/v4run' + pair + '.log','a')
+            #f.write(e)
+            #f.close()
+            logging.error("something bad happened", exc_info=True)
+            #return
+    logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+    print len(pairs), 'pairs completed'
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 '''
 threads = []
 for pair in pairs:

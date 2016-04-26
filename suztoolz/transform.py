@@ -24,6 +24,9 @@ from scipy import stats
 from sklearn.externals import joblib
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tick
+from cycler import cycler
+import seaborn as sns
+from itertools import cycle
 
 def saveParams(start_time, dataSet, bestModelParams, bestParamsPath, modelSavePath,ticker, version, barSizeSetting,BSMdict):
     timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)
@@ -70,6 +73,7 @@ class zigzag(object):
         self.down_thresh = down_thresh
         self.pivots = self.peak_valley_pivots()
         self.initial_pivot = self._identify_initial_pivot()
+        self.eCurves = {}
       
     def peak_valley_pivots(self):
         """
@@ -206,6 +210,9 @@ class zigzag(object):
         mv=kwargs.get('mv',None)
         cycleList = kwargs.get('cycleList',None)
         indicators = kwargs.get('indicators',None)
+        signals = kwargs.get('signals',None)
+        initialEquity = kwargs.get('initialEquity',1)
+        chartTitle = kwargs.get('chartTitle',1)
         def format_date(x, pos=None):
             thisind = np.clip(int(x + 0.5), 0, self.prices.shape[0] - 1)
             return self.prices.index[thisind].strftime("%Y-%m-%d %H:%M")
@@ -231,20 +238,67 @@ class zigzag(object):
             xytext=(20, -20), textcoords='offset points',
             arrowprops=dict(facecolor='red', shrink=0.05),
             )
-        if cycleList is not None:
+        if cycleList is not None and signals is None:
             for l in cycleList:
                  ax.annotate(str(l[0]), l[1],
                  xytext=(5, 0), textcoords='offset points',
                  size='medium')
+                 
         if indicators is not None:
+            plt.rc('lines', linewidth=1)
+            plt.rc('axes', prop_cycle=(cycler('color', ['r', 'g', 'b', 'y']) +
+                                       cycler('linestyle', ['-', '--', ':', '-.'])))
             ax2=ax.twinx()
             ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+            
             for i,ind in enumerate(indicators):
                 ax2.plot(np.arange(len(indicators)),indicators[ind], label=ind)
             handles, labels = ax2.get_legend_handles_labels()
             lgd2 = ax2.legend(handles, labels, loc='best',prop={'size':10})
+            ax2.set_xlim(0, len(indicators))
+            
+        if signals is not None:
+            plt.rc('lines', linewidth=2)
+            #sns.palplot(sns.hls_palette(len(signals.columns), l=.3, s=.8))
+            #plt.style.use('ggplot')
+            linecycle = cycle(['-', '--'])
+            #plt.rc('axes', prop_cycle=(cycler('color',\
+            #            [plt.cm.cool(i) for i in np.linspace(0, 1, len(signals.columns))])))
+            nrows = len(self.prices)
+            ax2=ax.twinx()
+            ax2.set_color_cycle(sns.color_palette("husl", len(signals.columns)))
+            ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+            ax2.set_title(chartTitle)
+            ga_pct = self.prices.pct_change().shift(-1).fillna(0)
+            ga_pct.name = 'gainAhead'
+            
+            for col in signals:
+                sig = pd.Series(data=0, index=self.prices.index)
+                for idx in signals[col].index:
+                   #print x,idx,signals[col][idx]
+                   sig.set_value(idx,signals[col][idx])
+                #  Compute cumulative equity for days with beShort signals    
+                equityBeLongAndShortSignals = np.zeros(nrows)
+                equityBeLongAndShortSignals[0] = initialEquity
+                for i in range(1,nrows):
+                    if (sig.iloc[i-1] < 0):
+                        equityBeLongAndShortSignals[i] = (1+-ga_pct.iloc[i-1])*equityBeLongAndShortSignals[i-1]
+                    elif (sig.iloc[i-1] > 0):
+                        equityBeLongAndShortSignals[i] = (1+ga_pct.iloc[i-1])*equityBeLongAndShortSignals[i-1]
+                    else:
+                        equityBeLongAndShortSignals[i] = equityBeLongAndShortSignals[i-1]
+                        
+                self.eCurves[col]=equityBeLongAndShortSignals
+            
+            #add to axis
+            for col in self.eCurves:
+                ax2.plot(np.arange(nrows),equityBeLongAndShortSignals, label=col, ls=next(linecycle))
+                    
+            handles, labels = ax2.get_legend_handles_labels()
+            lgd2 = ax2.legend(handles, labels, loc='best',prop={'size':10})
+            ax2.set_xlim(0, nrows)                
+                
         ax.set_xlim(0, len(self.prices))
-        
         plt.show()
         plt.close()
     
@@ -381,12 +435,14 @@ def perturb_data(p,mean):
     #purturbed_data = np.ceil(purturbed_data)
     return p+purturbed_data
     
-def garch(returns):
+def garch(returns, verbose=False):
     #this one is fast but has a future leak.
     am = arch.arch_model(returns*100)
     #res = am.fit(iter=10)
-    res = am.fit()
+    res = am.fit(disp='off')
     forecast = np.sqrt(res.params['omega'] + res.params['alpha[1]'] * res.resid**2 + res.conditional_volatility**2 * res.params['beta[1]'])
+    if verbose:
+        print res.summary()
     return forecast
     
 def garch2(returns, maxlb):
@@ -434,9 +490,44 @@ def directionalVolumeSpike(volume, p, lb):
         dvs[i] = volume[i]/np.mean(volume[i-lb:i])*r[i]
     return dvs
 
+def smoothHurst(p,bars):
+    if type(p) is pd.core.series.Series:
+        p = close.values
+
+    bars=30
+    nrows=p.shape[0]
+    Dimen=np.zeros(nrows)
+    Hurst=np.zeros(nrows)
+    SmoothHurst=np.zeros(nrows)
+
+    if bars%2>0:
+        bars=bars-1
+        
+    a1 = math.exp(-math.sqrt(2)*math.pi/10.0)
+    b1 = 2.0*a1*math.cos(math.sqrt(2)*math.radians(180)/10.0)
+
+    c3 = -a1*a1
+    c2 = b1
+    c1 = 1-c2-c3
+
+    for i,lb in enumerate(range(bars, nrows)):
+        #print i,lb
+        N3 = (max(p[i:lb]) - min(p[i:lb]))/float(bars)
+        N2 = (max(p[i:lb-bars/2]) - min(p[i:lb-bars/2]))/float(bars/2)
+        #print i, lb-bars/2, p[i:lb-bars/2]
+        N1 = (max(p[lb-bars/2:lb]) - min(p[lb-bars/2:lb]))/float(bars/2)
+        #print p[lb-bars/2:lb]
+        if N1>0 and N2>0 and N3>0:
+            Dimen[lb] = .5*((log(N1+N2)-log(N3))/log(2)+Dimen[lb-1])
+        Hurst[lb]=2-Dimen[lb]
+        #print Hurst
+        SmoothHurst[lb]=c1*(Hurst[lb]+Hurst[lb-1])/2+c2*SmoothHurst[lb-1]\
+                                +c3*SmoothHurst[lb-2]
+    return SmoothHurst
+    
 def hurst(ts):
     #create range of lag values
-    lags = range(2,100)
+    lags = range(2,len(ts))
     #calculate the array of the variances of the lagged differences
     tau = [sqrt(std(subtract(ts[lag:], ts[:-lag]))) for lag in lags]
     #use a linear fit to estimate the hurt exponent

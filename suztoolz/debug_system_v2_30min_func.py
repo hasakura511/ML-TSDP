@@ -739,27 +739,29 @@ if __name__ == "__main__":
     currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                      'GBPJPY','EURCHF','AUDJPY',\
                      'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                     'USDCHF','USDJPY','EURJPY','NZDUSD']
+                     'USDCHF','USDJPY','EURJPY','NZDUSD','EURAUD','EURCAD']
                     
     if len(sys.argv)==1:
         debug=True
         
         livePairs =  [
-                        'NZDJPY',\
-                        'CADJPY',\
-                        'CHFJPY',\
-                        'EURJPY',\
-                        'GBPJPY',\
-                        'AUDJPY',\
-                        'USDJPY',\
-                        'AUDUSD',\
-                        'EURUSD',\
-                        'GBPUSD',\
-                        'USDCAD',\
-                        'USDCHF',\
-                        'NZDUSD',
-                        'EURCHF',\
-                        'EURGBP'\
+                        #'NZDJPY',\
+                        #'CADJPY',\
+                        #'CHFJPY',\
+                        #'EURJPY',\
+                        #'GBPJPY',\
+                        #'AUDJPY',\
+                        #'USDJPY',\
+                        #'AUDUSD',\
+                        #'EURUSD',\
+                        'EURAUD',\
+                        'EURCAD',\
+                        #'GBPUSD',\
+                        #'USDCAD',\
+                        #'USDCHF',\
+                        #'NZDUSD',
+                        #'EURCHF',\
+                        #'EURGBP'\
                         ]
                         
         showDist =  False

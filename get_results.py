@@ -620,6 +620,7 @@ eqrank.set_index('System')
 def gen_eq_rank(systems, recent, html, type='paper'):
     global eqrank
     for systemname in systems:
+      if re.search(r'v4', systemname):
         print "Ranking " + systemname
         if type == 'paper' or type == 'signal' or type == 'btcv1' or type=='v4':
             data=generate_paper_c2_plot(systemname, 'Date', initCap)

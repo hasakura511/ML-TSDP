@@ -26,7 +26,7 @@ version = '4'
 version_ = '43'
 barSize='30m'
 bias='gainAhead'
-volatility=0.1
+volatility='0.1'
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['EURAUD','EURNZD','EURCAD','EURCHF','EURUSD']
 logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)

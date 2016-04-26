@@ -916,7 +916,7 @@ def gen_file(filetype):
         
         syslist=list()
         for sym in symdict.keys():
-            if symdict[sym] != None and len(symdict[sym]) > 0 and re.search(r'v4', symdict[sym]):
+            if symdict.has_key(sym) and symdict[sym] != None and len(symdict[sym]) > 0 and re.search(r'v4', symdict[sym]):
                 syslist = syslist + symdict[sym]
         (html, eqdata)=gen_eq_rank(syslist, recent, html, 'v4')
         headerhtml=get_html_header()

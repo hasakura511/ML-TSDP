@@ -1070,7 +1070,7 @@ def write_html(filename, headerhtml, footerhtml, body):
     f.write(body)
     f.write(footerhtml)
     f.close() 
-types=['index','sig','c2','c2_2','ib','paper','paper2','btc']
+types=['index','sig','c2','c2_2','ib','paper','paper2','btc','v4']
 def start_resgen():
     #Prep
     threads = []

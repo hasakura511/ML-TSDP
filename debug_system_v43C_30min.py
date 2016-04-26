@@ -689,8 +689,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #modes = smoothHurst(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=True)
     #pc = data.Close.pct_change().fillna(0)
     #zs=abs(pc[-1]-pc.mean())/pc.std()
-    modes = volatilityClassifier(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=debug,\
-                                               ticker=ticker, savePath=chartSavePath+'MODE2')
+    modes = volatilityClassifier(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=showCharts,\
+                                               ticker=ticker, savePath=chartSavePath+'MODE1')
     mode = modes[-1]
     if i ==supportResistanceLB:
         modePred = pd.Series(data=-1, index=data.index, name='volatilityPrediction')

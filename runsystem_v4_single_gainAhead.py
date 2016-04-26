@@ -23,7 +23,7 @@ import time
 
 
 version = '4'
-version_ = '4.3'
+version_ = '43'
 barSize='30m'
 bias='gainAhead'
 volatility=0.1

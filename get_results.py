@@ -429,21 +429,14 @@ def generate_sig_html(signal, counter, html, cols, colspan):
     filename=signal 
     if os.path.isfile('./data/results/' + filename + '.png'):
       (counter, html)=generate_html(filename, counter, html, cols)
-    filename=signal + "_CDF"
-    if os.path.isfile('./data/results/' + filename + '.png'):
-      (counter, html)=generate_html(filename, counter, html, cols)
-    filename=signal + "_DPS"
-    if os.path.isfile('./data/results/' + filename + '.png'):
-      (counter, html)=generate_html(filename, counter, html, cols)
-    filename=signal + "_OOS"
-    if os.path.isfile('./data/results/' + filename + '.png'):
-      (counter, html)=generate_html(filename, counter, html, cols)
-    filename=signal + "_PDF"
-    if os.path.isfile('./data/results/' + filename + '.png'):
-      (counter, html)=generate_html(filename, counter, html, cols)
-    filename=signal+ "_Params"
-    if os.path.isfile('./data/results/' + filename + '.png'):
-      (counter, html)=generate_html(filename, counter, html, cols)
+    dataPath='./data/results/'
+    files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+    for file in files:
+        if re.search(r'' + signal, file):        
+            filename=file
+            if os.path.isfile('./data/results/' + filename + '.png'):
+              (counter, html)=generate_html(filename, counter, html, cols)
+    
     return (counter, html)
     
 def generate_html(filename, counter, html, cols, colspan=False):

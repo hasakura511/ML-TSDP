@@ -49,6 +49,54 @@ logging.basicConfig(filename='/logs/get_results.log',level=logging.DEBUG)
 
 initCap=100000
 
+def generate_v4plots(counter, html, cols):
+    global vdict
+    global symdict
+    vd=vdict.keys()
+    vd.sort()
+    filename='Versions'
+    fn='./data/results/v4_' + filename + '.html'     
+    headerhtml=get_html_header()
+    headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br><center>'
+    body=''
+
+    syms=symdict.keys()
+    syms.sort()
+    for sym in syms:
+        filename=sym
+        fn='./data/results/v4_' + filename + '.html'
+        #html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+        #html = html + filename + '</a></li>'
+                
+        headerhtml=get_html_header()                
+        headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+        headerhtml = headerhtml 
+        counter=0
+        body=' '
+        files=symdict[sym]
+        files.sort()
+         
+        for file in files:
+          if re.search(r'v4', file):
+            counter=0
+            body = body + '<h1>Signal - ' + file + '</h1><br><center><table>'
+            for ver in vd:
+                v=ver.split('.')[0]
+                v2=file.split('_')[0]
+                if v == v2:
+                    if os.path.isfile('./data/results/' + ver + '.png'):
+                        (counter, body)=generate_html(ver, counter, body, cols)
+                
+            (counter, body)=generate_sig_html(file, counter, body, cols, True)
+            body = body + '</table></center>'
+            (body, counter, cols)=gen_paper(body, counter, cols, 2, file)
+            
+        footerhtml=get_html_footer()
+        write_html(fn, headerhtml, footerhtml, body)
+                
+              
+    return (counter, html)     
+    
 def generate_sigplots(counter, html, cols):
     global vdict
     global symdict
@@ -551,6 +599,14 @@ def gen_sig(html, counter, cols):
     html = html + '</table>'
     return (html, counter, cols)
 
+def gen_v4(html, counter, cols):
+    counter = 0
+    cols=4 #len(vdict.keys())
+    (counter, html)=generate_v4plots(counter, html, cols)
+    html = html + '</table>'
+    return (html, counter, cols)
+
+
 def gen_c2(html, counter, cols, recent, systemname):
     cols=4
     html = html + '<h1>' + systemname + '</h1><br>'
@@ -620,12 +676,14 @@ eqrank.set_index('System')
 def gen_eq_rank(systems, recent, html, type='paper'):
     global eqrank
     for systemname in systems:
+      if re.search(r'v4', systemname):
         print "Ranking " + systemname
-        if type == 'paper' or type == 'signal' or type == 'btcv1':
+        if type == 'paper' or type == 'signal' or type == 'btcv1' or type=='v4':
             data=generate_paper_c2_plot(systemname, 'Date', initCap)
         elif type == 'c2':
             data=generate_c2_plot(systemname, 'closedWhen', initCap)
             data['Date']=data['closedWhen']
+       
             
         data['Idx']=pd.to_datetime(data['Date'])
         data=data.set_index('Idx').sort_index()    
@@ -688,7 +746,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     for systemname in eqrank.index:
         (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
         html = html + '<tr><td><li><a href="' 
-        if type == 'signal':
+        if type == 'signal' or type == 'v4':
             html = html +  type + '_' + systemname.split('_')[1]   
         else:
             html = html +  type + '_' + systemname + str(recent) 
@@ -709,7 +767,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
             color='red'
         html = html + '<td><li><a href="' 
         
-        if type == 'signal':
+        if type == 'signal' or type == 'v4':
             html = html +  type + '_' + systemname.split('_')[1]   
         elif type == 'c2' or type == 'c2_2':
             html = html + 'paper' + '_' + systemname + str(recent) 
@@ -895,6 +953,7 @@ def gen_file(filetype):
         headertitle='Systems'
         filename='./data/results/index.html'
         html = html + '<li><a href=sig.html>Signals</a></li>'
+        html = html + '<li><a href=v4.html>V4</a></li>'
         html = html + '<li><a href=c2.html>C2</a></li>'
         html = html + '<li><a href=c2_2.html>Recent C2</a></li>'
         html = html + '<li><a href=ib.html>IB</a></li>'
@@ -905,6 +964,23 @@ def gen_file(filetype):
         footerhtml=get_html_footer()
         headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
         write_html(filename, headerhtml, footerhtml, html)
+    elif filetype == 'v4':
+        counter=0
+        cols=5
+        recent=3
+        filename='./data/results/v4.html'
+        headertitle='V4'
+        html = html + '<h1>V4</h1><br><center>'      
+        syslist=list()
+        for sym in symdict.keys():
+            if symdict.has_key(sym) and symdict[sym] != None and len(symdict[sym]) > 0 and re.search(r'v4', str(symdict[sym])):
+                syslist = syslist + symdict[sym]
+        (html, eqdata)=gen_eq_rank(syslist, recent, html, 'v4')
+        headerhtml=get_html_header()
+        footerhtml=get_html_footer()
+        headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
+        write_html(filename, headerhtml, footerhtml, html)   
+        (html, counter, cols)=gen_v4(html, counter, cols)
     elif filetype == 'sig':
         counter=0
         cols=5
@@ -1050,7 +1126,7 @@ def write_html(filename, headerhtml, footerhtml, body):
     f.write(body)
     f.write(footerhtml)
     f.close() 
-types=['index','sig','c2','c2_2','ib','paper','paper2','btc']
+types=['index','sig','c2','c2_2','ib','paper','paper2','btc','v4']
 def start_resgen():
     #Prep
     threads = []

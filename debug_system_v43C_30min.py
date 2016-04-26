@@ -287,7 +287,7 @@ if len(sys.argv)==1:
                     #'EURUSD',\
                     #'EURAUD',\
                     #'EURCAD',\
-                    #'EURNZD',\
+                    'EURNZD',\
                     #'AUDUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
@@ -307,7 +307,7 @@ if len(sys.argv)==1:
     dataPath = 'D:/ML-TSDP/data/from_IB/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
-    chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker+'_'
+    chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
     #display params
     showCharts=False
     showFinalChartOnly=True
@@ -690,7 +690,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #pc = data.Close.pct_change().fillna(0)
     #zs=abs(pc[-1]-pc.mean())/pc.std()
     modes = volatilityClassifier(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=showCharts,\
-                                               ticker=ticker, savePath=chartSavePath+'MODE1')
+                                               ticker=ticker, savePath=chartSavePath)
     mode = modes[-1]
     if i ==supportResistanceLB:
         modePred = pd.Series(data=-1, index=data.index, name='volatilityPrediction')
@@ -1101,7 +1101,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         enumerate(sorted(inner_valleys+inner_peaks)[1:])]
             zz_inner.plot_pivots(l=8,w=8, cycleList=cycleList2,mode=modePred.ix[data.iloc[index].index],\
                                            indicators=indicator_df, chartTitle=ticker+' '+is_period,\
-                                           savePath=chartSavePath+'TECH_'+is_period, debug=debug)
+                                           savePath=chartSavePath+'_TECH_'+is_period, debug=debug)
                                            
     dpsDF_all = pd.DataFrame()
 
@@ -1248,18 +1248,18 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         #cycle
         mr=False
         metric2='dpsRunName'
-        curve='finalWorst'
+        curve='finalBest'
         #metric2=metric
         #curve='WorstCAR25 of reDPS B/W'
         if verbose:
             print 'Cycle mode - choosing signal from', curve
     else:
         #trend - select from the worst
-        mr=True
+        mr=False
         metric2='dpsRunName'
-        curve='finalBest'        
+        #curve='finalBest'        
         #metric2=metric
-        #curve='BestCAR25 of reDPS B/W'
+        #curve='WorstCAR25 of reDPS B/W'
         if verbose:
             print 'Cycle mode - choosing signal from', curve
 
@@ -1286,7 +1286,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                             #shortStart=(shortStart, data2.Close[shortStart]),\
                             cycleList=cycleList,mode=modePred[start:],\
                             signals=signalDF,chartTitle=ticker+' metric '+curve+', bias '+bias[0]+', Signal addAuxPairs '+str(addAuxPairs),\
-                            savePath=chartSavePath+'SIGNAL', debug=debug
+                            savePath=chartSavePath+'_SIGNAL', debug=debug
                             )
             
         zz.plot_pivots(l=8,w=8,\
@@ -1297,7 +1297,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                             #shortStart=(shortStart, data2.Close[shortStart]),\
                             cycleList=cycleList,mode=modePred[start:],\
                             signals=finalDF,chartTitle=ticker+' reDPS of B/W by '+metric+' final curves',\
-                            savePath=chartSavePath+'FINAL', debug=debug
+                            savePath=chartSavePath+'_FINAL', debug=debug
                             )
                             
         if mode==0:
@@ -1310,7 +1310,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=DpsRankByMetricB,chartTitle=ticker+' Best Rank '+metric,\
-                                savePath=chartSavePath+'BRANK', debug=debug
+                                savePath=chartSavePath+'_BRANK', debug=debug
                                 )
                                 
             zz.plot_pivots(l=8,w=8,\
@@ -1321,7 +1321,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=DpsRankByMetricW,chartTitle=ticker+' Worst Rank '+metric,\
-                                savePath=chartSavePath+'WRANK', debug=debug
+                                savePath=chartSavePath+'_WRANK', debug=debug
                                 )    
         else:
         #trend mode
@@ -1333,7 +1333,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=DpsRankByMetricB,chartTitle=ticker+' Best Rank '+metric,\
-                                savePath=chartSavePath+'BRANK', debug=debug
+                                savePath=chartSavePath+'_BRANK', debug=debug
                                 )
                                 
             zz.plot_pivots(l=8,w=8,\
@@ -1344,7 +1344,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=DpsRankByMetricW,chartTitle=ticker+' Worst Rank '+metric,\
-                                savePath=chartSavePath+'WRANK', debug=debug
+                                savePath=chartSavePath+'_WRANK', debug=debug
                                 )       
                             
         for is_period in signalSets:
@@ -1365,7 +1365,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=signalSets[is_period],chartTitle=ticker+' '+is_period,\
-                                savePath=chartSavePath+'ODDS_'+is_period, debug=debug
+                                savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                 )
             else:
                 zz.plot_pivots(l=8,w=8,\
@@ -1376,12 +1376,12 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         shortStart=(shortStart, data2.Close[shortStart]),\
                                         cycleList=cycleList,mode=modePred[start:],\
                                         signals=signalSets[is_period],chartTitle=ticker+' '+is_period,\
-                                        savePath=chartSavePath+'ODDS_'+is_period, debug=debug
+                                        savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                         )
 if showCharts:
     modes = volatilityClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
                                         data.Close.shape[0],threshold=volatilityThreshold,\
-                                        showPlot=debug, ticker=ticker, savePath=chartSavePath+'MODE2')
+                                        showPlot=debug, ticker=ticker, savePath=chartSavePath+'_MODE2')
     if debug:
         for x in DpsRankByMetricB:
             DpsRankByMetricB[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 

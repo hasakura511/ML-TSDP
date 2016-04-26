@@ -324,7 +324,7 @@ else:
     #currency=ticker[3:6]
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'
-    chartSavePath = './data/results/'+version+'_'+ticker+'_'
+    chartSavePath = './data/results/'+version+'_'+ticker
     
     #display params
     showCharts=False

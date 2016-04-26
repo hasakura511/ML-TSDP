@@ -621,11 +621,12 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     global eqrank
     for systemname in systems:
         print "Ranking " + systemname
-        if type == 'paper' or type == 'signal' or type == 'btcv1':
+        if type == 'paper' or type == 'signal' or type == 'btcv1' or type=='v4':
             data=generate_paper_c2_plot(systemname, 'Date', initCap)
         elif type == 'c2':
             data=generate_c2_plot(systemname, 'closedWhen', initCap)
             data['Date']=data['closedWhen']
+       
             
         data['Idx']=pd.to_datetime(data['Date'])
         data=data.set_index('Idx').sort_index()    
@@ -688,7 +689,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     for systemname in eqrank.index:
         (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
         html = html + '<tr><td><li><a href="' 
-        if type == 'signal':
+        if type == 'signal' or type == 'v4':
             html = html +  type + '_' + systemname.split('_')[1]   
         else:
             html = html +  type + '_' + systemname + str(recent) 
@@ -709,7 +710,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
             color='red'
         html = html + '<td><li><a href="' 
         
-        if type == 'signal':
+        if type == 'signal' or type == 'v4':
             html = html +  type + '_' + systemname.split('_')[1]   
         elif type == 'c2' or type == 'c2_2':
             html = html + 'paper' + '_' + systemname + str(recent) 
@@ -905,6 +906,25 @@ def gen_file(filetype):
         footerhtml=get_html_footer()
         headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
         write_html(filename, headerhtml, footerhtml, html)
+    elif filetype == 'v4':
+        counter=0
+        cols=5
+        recent=3
+        filename='./data/results/v4.html'
+        headertitle='V4'
+        html = html + '<h1>V4</h1><br><center>'
+        
+        syslist=list()
+        for sym in symdict.keys():
+            if re.search(r'v4', symdict[sym]):
+                syslist = syslist + symdict[sym]
+        (html, eqdata)=gen_eq_rank(syslist, recent, html, 'v4')
+        headerhtml=get_html_header()
+        footerhtml=get_html_footer()
+        headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
+        write_html(filename, headerhtml, footerhtml, html)
+        
+        (html, counter, cols)=gen_sig(html, counter, cols)
     elif filetype == 'sig':
         counter=0
         cols=5

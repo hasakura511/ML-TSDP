@@ -300,7 +300,7 @@ if len(sys.argv)==1:
                     #'GBPCAD',\
                     #'GBPNZD',\
                     #'NZDCHF',\
-                    'NZDCAD',\
+                    #'NZDCAD',\
                     #'CADCHF'
                     ]
     ticker =livePairs[0]
@@ -1382,14 +1382,15 @@ if showCharts:
     modes = volatilityClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
                                         data.Close.shape[0],threshold=volatilityThreshold,\
                                         showPlot=debug, ticker=ticker, savePath=chartSavePath+'MODE2')
-    for x in DpsRankByMetricB:
-        DpsRankByMetricB[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
-    for x in DpsRankByMetricW:
-        DpsRankByMetricW[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
-    for x in finalDF:
-        finalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
-    for x in signalDF:
-        signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv')
+    if debug:
+        for x in DpsRankByMetricB:
+            DpsRankByMetricB[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
+        for x in DpsRankByMetricW:
+            DpsRankByMetricW[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
+        for x in finalDF:
+            finalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
+        for x in signalDF:
+            signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv')
 
 sst=signalDF['tripleFiltered'].copy(deep=True)
 

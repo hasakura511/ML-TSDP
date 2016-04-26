@@ -27,6 +27,7 @@ version_ = '43'
 barSize='30m'
 bias='gainAhead'
 volatility=0.1
+scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['EURAUD','EURNZD','EURCAD','EURCHF','EURUSD']
 logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
@@ -45,7 +46,7 @@ for pair in pairs:
         ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
         ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
 
-        subprocess.call(['python','debug_system_v'+version_+'C_30min.py',pair,bias,volatility],\
+        subprocess.call(['python',scriptName,pair,bias,volatility],\
                                 stdout=f, stderr=ferr)
         f.close()
         ferr.close()

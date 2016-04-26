@@ -20,7 +20,6 @@ AddAuxPairs & nfeatures
 
 
 Created on Sat Feb 27 10:46:08 2016
-
 @author: Hidemi
 """
 import sys

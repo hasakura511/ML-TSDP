@@ -49,6 +49,54 @@ logging.basicConfig(filename='/logs/get_results.log',level=logging.DEBUG)
 
 initCap=100000
 
+def generate_v4plots(counter, html, cols):
+    global vdict
+    global symdict
+    vd=vdict.keys()
+    vd.sort()
+    filename='Versions'
+    fn='./data/results/v4_' + filename + '.html'     
+    headerhtml=get_html_header()
+    headerhtml = headerhtml + '<h1>Signal - ' + filename + '</h1><br><center>'
+    body=''
+
+    syms=symdict.keys()
+    syms.sort()
+    for sym in syms:
+        filename=sym
+        fn='./data/results/v4_' + filename + '.html'
+        #html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+        #html = html + filename + '</a></li>'
+                
+        headerhtml=get_html_header()                
+        headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+        headerhtml = headerhtml 
+        counter=0
+        body=' '
+        files=symdict[sym]
+        files.sort()
+         
+        for file in files:
+          if re.search(r'v4', file):
+            counter=0
+            body = body + '<h1>Signal - ' + file + '</h1><br><center><table>'
+            for ver in vd:
+                v=ver.split('.')[0]
+                v2=file.split('_')[0]
+                if v == v2:
+                    if os.path.isfile('./data/results/' + ver + '.png'):
+                        (counter, body)=generate_html(ver, counter, body, cols)
+                
+            (counter, body)=generate_sig_html(file, counter, body, cols, True)
+            body = body + '</table></center>'
+            (body, counter, cols)=gen_paper(body, counter, cols, 2, file)
+            
+        footerhtml=get_html_footer()
+        write_html(fn, headerhtml, footerhtml, body)
+                
+              
+    return (counter, html)     
+    
 def generate_sigplots(counter, html, cols):
     global vdict
     global symdict
@@ -550,6 +598,14 @@ def gen_sig(html, counter, cols):
     (counter, html)=generate_sigplots(counter, html, cols)
     html = html + '</table>'
     return (html, counter, cols)
+
+def gen_v4(html, counter, cols):
+    counter = 0
+    cols=4 #len(vdict.keys())
+    (counter, html)=generate_v4plots(counter, html, cols)
+    html = html + '</table>'
+    return (html, counter, cols)
+
 
 def gen_c2(html, counter, cols, recent, systemname):
     cols=4

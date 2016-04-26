@@ -284,10 +284,10 @@ if len(sys.argv)==1:
                     #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
-                    #'EURUSD',\
+                    'EURUSD',\
                     #'EURAUD',\
                     #'EURCAD',\
-                    'EURNZD',\
+                    #'EURNZD',\
                     #'AUDUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
@@ -689,7 +689,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #modes = smoothHurst(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=True)
     #pc = data.Close.pct_change().fillna(0)
     #zs=abs(pc[-1]-pc.mean())/pc.std()
-    modes = volatilityClassifier(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=showCharts,\
+    modes = volatilityClassifier(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=debug,\
                                                ticker=ticker, savePath=chartSavePath)
     mode = modes[-1]
     if i ==supportResistanceLB:
@@ -1241,14 +1241,15 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         updateDps = calcDPS(rank, finalDF[rank], PRT, windowLength, verbose=False,\
                                         asset=asset)
         dpsDF_final = dpsDF_final.append(updateDps)
+        #dpsDF_all2 = dpsDF_all2.append(updateDps)
         finalDF[rank].set_value(updateDps.index, updateDps.columns, updateDps.values)
     
     #mean reversion
     if mode==0:   
         #cycle
         mr=False
-        metric2='dpsRunName'
-        curve='finalBest'
+        metric2='dpsNetEquity'
+        curve='dpsNetEquity'
         #metric2=metric
         #curve='WorstCAR25 of reDPS B/W'
         if verbose:
@@ -1256,8 +1257,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     else:
         #trend - select from the worst
         mr=False
-        metric2='dpsRunName'
-        #curve='finalBest'        
+        metric2='dpsNetEquity'
+        curve='dpsNetEquity'        
         #metric2=metric
         #curve='WorstCAR25 of reDPS B/W'
         if verbose:

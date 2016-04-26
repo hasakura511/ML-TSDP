@@ -432,8 +432,8 @@ def generate_sig_html(signal, counter, html, cols, colspan):
     dataPath='./data/results/'
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
     for file in files:
-        if re.search(r'' + signal, file):        
-            filename=file
+        if re.search(r'' + signal, file):    
+            filename=file.rsplit('.',1)[0]
             if os.path.isfile('./data/results/' + filename + '.png'):
               (counter, html)=generate_html(filename, counter, html, cols)
     

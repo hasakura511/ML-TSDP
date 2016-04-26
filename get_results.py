@@ -970,8 +970,7 @@ def gen_file(filetype):
         recent=3
         filename='./data/results/v4.html'
         headertitle='V4'
-        html = html + '<h1>V4</h1><br><center>'
-        
+        html = html + '<h1>V4</h1><br><center>'      
         syslist=list()
         for sym in symdict.keys():
             if symdict.has_key(sym) and symdict[sym] != None and len(symdict[sym]) > 0 and re.search(r'v4', str(symdict[sym])):
@@ -980,8 +979,7 @@ def gen_file(filetype):
         headerhtml=get_html_header()
         footerhtml=get_html_footer()
         headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
-        write_html(filename, headerhtml, footerhtml, html)
-        
+        write_html(filename, headerhtml, footerhtml, html)   
         (html, counter, cols)=gen_v4(html, counter, cols)
     elif filetype == 'sig':
         counter=0

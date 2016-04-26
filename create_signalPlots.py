@@ -33,7 +33,7 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (8,7)
-versions = ['v1.3']
+versions = ['v1.3','v4']
 #versions = ['v1.3','v2.4']
 barSize='30m'
 #regime switching params
@@ -379,12 +379,16 @@ def calcEquity_signals(SST, title, **kwargs):
     #if pngPath != None:
     #    plt.savefig(pngPath+title+'.png', bbox_inches='tight')
     if pngPath != None and pngFilename != None:
-    
-        spstr=pngFilename.split('_')
         
+        spstr=pngFilename.split('_')
+        #print pngFilename, spstr
         if len(spstr) == 3:
             (ver, inst, mins)=spstr
-            (ver1, ver2)=ver.split('.')
+            #print '.' in ver
+            if '.' in ver:
+                (ver1, ver2)=ver.split('.')
+            else:
+                ver1 =ver
             pngFilename = ver1 + '_' + inst
             
         print 'Saving: ' + pngPath+pngFilename+'.png'
@@ -444,7 +448,7 @@ for pair in pairs:
         validSignalFiles[version]=[f for f in signalFiles if version in f and barSize in f]
     #for f in [sfile for sfilelist in validSignalFiles for sfile in sfilelist]:
     for version in validSignalFiles:
-        if version != 'v1':
+        if version != 'v4' and version != 'v1':
             for f in [sfile for sfile in validSignalFiles[version] if pair in sfile]:
 	      filename=str(signalPath)+str(f)
 	      #print filename
@@ -504,55 +508,59 @@ for pair in pairs:
                 signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()
                 print 'Loaded signals from', f
                 #if there is no prior index in the row, then it's a legacy file
-                if 'prior_index' in signalFile:
-                    #prior index is the key for valid signal rows
-                    sst = signalFile.sort_index()
-                    
-                    #remove rows with duplicate indices
-                    reindexed_sst = pd.DataFrame()
-                    for i,x in enumerate(sst.index):
-                        if i ==0:
-                            reindexed_sst = reindexed_sst.append(sst.iloc[i])
-                        elif x != reindexed_sst.index[-1]:
-                            reindexed_sst = reindexed_sst.append(sst.iloc[i])
-                        else:
-                            #case where last index was a dupe
-                            pass
-                    dataFile.index = dataFile.index.to_datetime()
-                    reindexed_sst.index = reindexed_sst.index.to_datetime()
-                    intersect = reindexed_sst.index.to_datetime()\
-                                            .intersection(dataFile.index.to_datetime())
-                                            
-                    dataSet = pd.concat([reindexed_sst,\
-                                    dataFile.ix[intersect[0]:]],join = 'outer',axis=1)
-                    dataSet['gainAhead'] = gainAhead(dataSet.Close)
-                    dataSet['signals'] = fixnans(dataSet.signals)
-                    dataSet['safef'] = fixnans(dataSet.safef)
-                    dataSet = dataSet[['signals','gainAhead','safef']][-lookback:].dropna()
-                    maxCT = max(reindexed_sst.cycleTime.fillna(0).round())
-                    title = version +'_maxLag_'+str(maxCT)+\
-                                ' '+ reindexed_sst.iloc[-1].system       
-                    equityCurve = calcEquity_signals(dataSet, title,\
-                                        leverage = dataSet.safef.values,\
-                                        equityCurveSavePath=equityCurveSavePath,\
-                                        figsize=size, showPlot=showPlot,\
-                                        pngPath=pngPath, pngFilename=f[:-4],\
-                                        verbose=verbose)
-                    csvFile=f[:-4]
-                    spstr=csvFile.split('_')
-        
-                    if len(spstr) == 3:
-                        (ver, inst, mins)=spstr
+                #if 'prior_index' in signalFile:
+                #prior index is the key for valid signal rows
+                sst = signalFile.sort_index()
+                
+                #remove rows with duplicate indices
+                reindexed_sst = pd.DataFrame()
+                for i,x in enumerate(sst.index):
+                    if i ==0:
+                        reindexed_sst = reindexed_sst.append(sst.iloc[i])
+                    elif x != reindexed_sst.index[-1]:
+                        reindexed_sst = reindexed_sst.append(sst.iloc[i])
+                    else:
+                        #case where last index was a dupe
+                        pass
+                dataFile.index = dataFile.index.to_datetime()
+                reindexed_sst.index = reindexed_sst.index.to_datetime()
+                intersect = reindexed_sst.index.to_datetime()\
+                                        .intersection(dataFile.index.to_datetime())
+                                        
+                dataSet = pd.concat([reindexed_sst,\
+                                dataFile.ix[intersect[0]:]],join = 'outer',axis=1)
+                dataSet['gainAhead'] = gainAhead(dataSet.Close)
+                dataSet['signals'] = fixnans(dataSet.signals)
+                dataSet['safef'] = fixnans(dataSet.safef)
+                dataSet = dataSet[['signals','gainAhead','safef']][-lookback:].dropna()
+                maxCT = max(reindexed_sst.cycleTime.fillna(0).round())
+                title = f[:-4] +'_maxLag_'+str(maxCT)+\
+                            ' '+ reindexed_sst.iloc[-1]['v4.0_system'] 
+                equityCurve = calcEquity_signals(dataSet, title,\
+                                    leverage = dataSet.safef.values,\
+                                    equityCurveSavePath=equityCurveSavePath,\
+                                    figsize=size, showPlot=showPlot,\
+                                    pngPath=pngPath, pngFilename=f[:-4],\
+                                    verbose=verbose)
+                csvFile=f[:-4]
+                spstr=csvFile.split('_')
+    
+                if len(spstr) == 3:
+                    (ver, inst, mins)=spstr
+                    if '.' in ver:
                         (ver1, ver2)=ver.split('.')
-                        csvFile = ver1 + '_' + inst
-                        
-                    print "Saving: " + equityCurveSavePath+csvFile +'.csv'
-                    equityCurve.to_csv(equityCurveSavePath+csvFile+'.csv')
+                    else:
+                        ver1 =ver
+                    #(ver1, ver2)=ver.split('.')
+                    csvFile = ver1 + '_' + inst
                     
-                    dataSets[title] = dataSet
-                    maxCTs[title] = maxCT
-                    numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
-                    comms[title] = equityCurve.commission.sum()
+                print "Saving: " + equityCurveSavePath+csvFile +'.csv'
+                equityCurve.to_csv(equityCurveSavePath+csvFile+'.csv')
+                
+                dataSets[title] = dataSet
+                maxCTs[title] = maxCT
+                numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
+                comms[title] = equityCurve.commission.sum()
 
 #set arbitrary start/enddates that exist
 startDate = dataSet.index[0]

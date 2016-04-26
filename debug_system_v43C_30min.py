@@ -331,7 +331,7 @@ else:
     
     showFinalChartOnly=True
     showIndicators = False
-    verbose=True
+    verbose=False
 
 
 

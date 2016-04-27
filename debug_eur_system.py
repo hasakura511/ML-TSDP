@@ -25,7 +25,7 @@ import time
 signalPath = './data/signals/'
 def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
-        if ver1+'_'+ ticker + '.csv' in files:
+        if 'v'+ver1+'_'+ ticker + '.csv' in files:
             signalFile=pd.read_csv(signalPath+ ver1+'_'+ ticker + '.csv', parse_dates=['dates'])
             offline = signalFile.iloc[-1].copy(deep=True)
             offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
@@ -40,7 +40,7 @@ def offlineMode(ticker, errorText, signalPath, ver1, ver2):
             signalFile=signalFile.append(offline)
             signalFile.to_csv(signalPath + ver1+'_'+ ticker + '.csv', index=False)
             
-        if ver2+'_'+ ticker + '.csv' in files:
+        if 'v'+ver2+'_'+ ticker + '.csv' in files:
             signalFile=pd.read_csv(signalPath+ ver2+'_'+ ticker + '.csv', parse_dates=['dates'])
             offline = signalFile.iloc[-1].copy(deep=True)
             offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]

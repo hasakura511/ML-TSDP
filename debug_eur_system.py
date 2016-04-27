@@ -68,6 +68,7 @@ bias='sellHold'
 volatility='0.1'
 offline=True
 scriptName= 'debug_system_v'+version_+'C_30min.py'
+#pairs=[]
 pairs=['EURCHF','EURUSD','USDCHF','EURCAD','GBPCAD']
 #pairsList=[pairs,pairs2,pairs3]
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
@@ -91,7 +92,7 @@ for pair in pairs:
         if offline:
             message = "Offline Mode: turned off in runsystem"
             offlineMode(pair, message, signalPath, version, version_)
-            logging.info(version+' '+pair+' '+message)
+            logging.info('v'+version+' '+pair+' '+message)
         else:
             subprocess.call(['python',scriptName,pair,bias,volatility],\
                                 stdout=f, stderr=ferr)
@@ -108,12 +109,14 @@ for pair in pairs:
         #f.close()
         logging.error("something bad happened", exc_info=True)
         #return
+logging.info(len(pairs)+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 ##################################
 #logging.basicConfig(filename='/logs/runsystem_v3_buy.log',level=logging.DEBUG)
+version = '3'
 version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
@@ -139,7 +142,7 @@ for pair in pairs:
         if offline:
             message = "Offline Mode: turned off in runsystem"
             offlineMode(pair, message, signalPath, version, version_)
-            logging.info(version+' '+pair+' '+message)
+            logging.info('v'+version+' '+pair+' '+message)
         else:
             subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
             
@@ -155,6 +158,7 @@ for pair in pairs:
         #f.close()
         logging.error("something bad happened", exc_info=True)
         #return
+logging.info(len(pairs)+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', version_, barSize, bias
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
@@ -162,6 +166,7 @@ print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 ##############################
 #logging.basicConfig(filename='/logs/runsystem_v3_sell.log',level=logging.DEBUG)
+version = '3'
 version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
@@ -187,7 +192,7 @@ for pair in pairs:
         
         if offline:
             message = "Offline Mode: turned off in runsystem"
-            offlineMode(pair, message, signalPath, version, version_)
+            offlineMode('v'+pair, message, signalPath, version, version_)
             logging.info(version+' '+pair+' '+message)
         else:
             subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
@@ -204,6 +209,7 @@ for pair in pairs:
         #f.close()
         logging.error("something bad happened", exc_info=True)
         #return
+logging.info(len(pairs)+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', version_, barSize, bias
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
@@ -243,7 +249,7 @@ for pair in pairs:
         if offline:
             message = "Offline Mode: turned off in runsystem"
             offlineMode(pair, message, signalPath, version, version_)
-            logging.info(version+' '+pair+' '+message)
+            logging.info('v'+version+' '+pair+' '+message)
         else:
             subprocess.call(['python',scriptName,pair,bias,volatility],\
                                 stdout=f, stderr=ferr)        
@@ -259,6 +265,7 @@ for pair in pairs:
         #f.close()
         logging.error("something bad happened", exc_info=True)
         #return
+logging.info(len(pairs)+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
@@ -298,7 +305,7 @@ for pair in pairs:
         if offline:
             message = "Offline Mode: turned off in runsystem"
             offlineMode(pair, message, signalPath, version, version_)
-            logging.info(version+' '+pair+' '+message)
+            logging.info('v'+version+' '+pair+' '+message)
         else:
             subprocess.call(['python',scriptName,pair,bias,volatility],\
                                 stdout=f, stderr=ferr)
@@ -315,6 +322,7 @@ for pair in pairs:
         #f.close()
         logging.error("something bad happened", exc_info=True)
         #return
+logging.info(len(pairs)+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

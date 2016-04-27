@@ -95,16 +95,45 @@ filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='30m'
 #barSizeSetting='1 min'
-currencyPairs = ['NZDJPY','CADJPY','CHFJPY','EURGBP',\
-                 'GBPJPY','EURCHF','AUDJPY',\
-                 'AUDUSD','EURUSD','GBPUSD','USDCAD',\
-                 'USDCHF','USDJPY','EURJPY','NZDUSD']
+currencyPairs =   [
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                'AUDUSD',\
+                'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
+                'EURNZD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
+                ]
 
         
 #no args -> debug.  else live mode arg 1 = pair, arg 2 = "0" to turn off
 if len(sys.argv)==1:
     debug=True
-    
+    #signal_types = ['buyHold']
+    signal_types = ['gainAhead','zigZag']
+    #signal_types = ['gainAhead','zigZag','buyHold','sellHold']
+    #signal_types = ['zigZag']
+    #signal_types = ['gainAhead']
     livePairs =  [
                     #'NZDJPY',\
                     #'CADJPY',\
@@ -113,14 +142,26 @@ if len(sys.argv)==1:
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
-                    #'AUDUSD',\
+                    #'EURCHF',\
+                    #'EURGBP',\
                     #'EURUSD',\
+                    #'EURAUD',\
+                    #'EURCAD',\
+                    #'EURNZD',\
+                    #'AUDUSD',\
                     #'GBPUSD',\
                     #'USDCAD',\
-                    'USDCHF',\
+                    #'USDCHF',\
                     #'NZDUSD',
-                    #'EURCHF',\
-                    #'EURGBP'\
+                    #'AUDCAD',\
+                    #'AUDCHF',\
+                    #'AUDNZD',\
+                    #'GBPAUD',\
+                    #'GBPCAD',\
+                    #'GBPNZD',\
+                    #'NZDCHF',\
+                    #'NZDCAD',\
+                    'CADCHF'
                     ]
                     
                     
@@ -148,9 +189,9 @@ if len(sys.argv)==1:
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/' 
     
 else:
-    print 'Live Mode', sys.argv[1], sys.argv[2]
+    print 'Live Mode', sys.argv[1], sys.argv[2], sys.argv[3]
     debug=False
-    
+    signal_types = [sys.argv[3]]
     #display
     showDist =  False
     showPDFCDF = False
@@ -186,31 +227,27 @@ for ticker in livePairs:
     currency=ticker[3:6]
 
     #Model Parameters
-    maxReadLines = 5000
+    maxReadLines = 500
     #dataSet length needs to be divisiable by each validation period! 
-    validationSetLength = 30
+    validationSetLength = 3
     #validationSetLength = 1200
     #validationPeriods = [50]
-    validationPeriods = [3,6,10] # min is 2
+    validationPeriods = [3] # min is 2
     #validationStartPoint = None
-    #signal_types = ['buyHold','sellHold']
-    #signal_types = ['gainAhead','zigZag']
-    signal_types = ['gainAhead','zigZag','buyHold','sellHold']
-    #signal_types = ['zigZag']
-    #signal_types = ['gainAhead']
+
     zz_steps = [0.002]
     #zz_steps = [0.009]
     #wfSteps=[1,30,60]
-    wfSteps=[1,15,30]
-    wf_is_periods = [25,250]
+    wfSteps=[1]
+    wf_is_periods = [25]
     #wf_is_periods = [250,500,1000]
     perturbDataPct = 0.0002
     longMemory =  False
     iterations=1
     input_signal = 1
-    #feature_selection = 'None'
+    feature_selection = 'None'
     #feature_selection = 'RFECV'
-    feature_selection = 'Univariate'
+    #feature_selection = 'Univariate'
     nfeatures = 10
     tox_adj_proportion = 0
     

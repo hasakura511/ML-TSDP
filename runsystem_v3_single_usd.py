@@ -24,6 +24,7 @@ import time
 logging.basicConfig(filename='/logs/runsystem_v3_usd.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
+bias = 'sellHold'
 debug=False
 #20160418
 pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
@@ -46,7 +47,7 @@ for pair in pairs:
         ferr=open ('/logs/' + pair + 'v3_err.log','a')
         ferr.write('Starting V3: ' + pair)
 
-        subprocess.call(['python','debug_system_v3.1C_30min_usd.py',pair,'1'], stdout=f, stderr=ferr)
+        subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
         f.close()
         ferr.close()
         signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]

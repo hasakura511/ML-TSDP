@@ -25,6 +25,7 @@ logging.basicConfig(filename='/logs/runsystem_v3_jpy.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
 debug=False
+bias = 'buyHold'
 pairs=['NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['EURCHF','EURGBP']
 #pairs=['AUDUSD','EURUSD','GBPUSD','USDCAD','NZDUSD','USDCHF']
@@ -49,7 +50,7 @@ for pair in pairs:
         ferr=open ('/logs/' + pair + 'v3_err.log','a')
         ferr.write('Starting V3: ' + pair)
 
-        subprocess.call(['python','debug_system_v3.1C_30min_jpy.py',pair,'1'], stdout=f, stderr=ferr)
+        subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
         f.close()
         ferr.close()
         signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]

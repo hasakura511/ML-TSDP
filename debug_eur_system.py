@@ -99,7 +99,7 @@ for pair in pairs:
         f.close()
         ferr.close()
         signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'_'+barSize+'.csv').iloc[-1]
-        logging.info(str(signal))
+        logging.info('Check signal:' +str(signal.signals))
         logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
                             dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
     except Exception as e:

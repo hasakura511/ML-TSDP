@@ -2,6 +2,8 @@ import socket
 import select
 import sys
 import pytz
+from os import listdir
+from os.path import isfile, join
 from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
@@ -58,6 +60,58 @@ def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         #sys.exit(errorText)
         
 logging.basicConfig(filename='/logs/runsystem_v3v4.log',level=logging.DEBUG)
+############OFFLINE##########
+version = '4'
+version_ = '43'
+barSize='30m'
+bias='sellHold'
+volatility='0.1'
+offline=True
+scriptName= 'debug_system_v'+version_+'C_30min.py'
+pairs=['EURCHF','EURUSD','USDCHF','EURCAD','GBPCAD']
+#pairsList=[pairs,pairs2,pairs3]
+#logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
+
+        
+#def runv4(pairs):
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info(str(dt.now())+' running v'+version_+' '+pair)
+        f=open ('/logs/' + pair + 'v'+version+ '.log','a')
+        print str(dt.now()), ' Starting v'+version_+': ' + pair
+        f.write(str(dt.now())+' Starting v'+version_+': ' + pair)
+
+        ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
+        ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
+
+
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info(version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python',scriptName,pair,bias,volatility],\
+                                stdout=f, stderr=ferr)
+        
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'_'+barSize+'.csv').iloc[-1]
+        logging.info(str(signal))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v4run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+
 ##################################
 #logging.basicConfig(filename='/logs/runsystem_v3_buy.log',level=logging.DEBUG)
 version_ = '3.1'
@@ -161,7 +215,7 @@ version_ = '43'
 barSize='30m'
 bias='buyHold'
 volatility='0.1'
-offline=True
+offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
@@ -215,9 +269,9 @@ version_ = '43'
 barSize='30m'
 bias='sellHold'
 volatility='0.1'
-offline=True
+offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF', 'AUDCHF','NZDCAD','USDCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
+pairs=['AUDUSD','NZDUSD','EURGBP','NZDCHF', 'AUDCHF','NZDCAD','USDCAD','AUDNZD','AUDCAD','AUDJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
 #pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']

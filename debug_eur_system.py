@@ -21,20 +21,6 @@ import logging
 import time
 #import websocket
 
-
-version = '4'
-version_ = '43'
-barSize='30m'
-bias='buyHold'
-volatility='0.1'
-scriptName= 'debug_system_v'+version_+'C_30min.py'
-#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
-pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
-#pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
-#pairs3=['USDJPY','GBPJPY','EURJPY','AUDJPY']
-#pairsList=[pairs,pairs2,pairs3]
-logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
-
 def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
         if ver1+'_'+ ticker + '.csv' in files:
@@ -71,6 +57,107 @@ def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         print errorText    
         #sys.exit(errorText)
         
+##################################
+logging.basicConfig(filename='/logs/runsystem_v3_buy.log',level=logging.DEBUG)
+version_ = '3.1'
+barSize='30m'
+bias = 'buyHold'
+debug=False
+pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
+
+#def runv3(pair):
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info('running v3'+pair)
+        f=open ('/logs/' + pair + 'v3.log','a')
+        print 'Starting v3: ' + pair
+        f.write('Starting v3: ' + pair)
+
+        ferr=open ('/logs/' + pair + 'v3_err.log','a')
+        ferr.write('Starting V3: ' + pair)
+
+        subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]
+        logging.info(str(signal))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v3run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed', version_, barSize, bias
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+
+
+##############################
+logging.basicConfig(filename='/logs/runsystem_v3_sell.log',level=logging.DEBUG)
+version_ = '3.1'
+barSize='30m'
+bias = 'buyHold'
+debug=False
+pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
+
+#def runv3(pair):
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info('running v3'+pair)
+        f=open ('/logs/' + pair + 'v3.log','a')
+        print 'Starting v3: ' + pair
+        f.write('Starting v3: ' + pair)
+
+        ferr=open ('/logs/' + pair + 'v3_err.log','a')
+        ferr.write('Starting V3: ' + pair)
+
+        subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]
+        logging.info(str(signal))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v3run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed', version_, barSize, bias
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+
+
+#################################################
+version = '4'
+version_ = '43'
+barSize='30m'
+bias='buyHold'
+volatility='0.1'
+scriptName= 'debug_system_v'+version_+'C_30min.py'
+pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
+#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
+#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
+#pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
+#pairs3=['USDJPY','GBPJPY','EURJPY','AUDJPY']
+#pairsList=[pairs,pairs2,pairs3]
+logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
+
+        
 #def runv4(pairs):
 #while 1:
 start_time = time.time()
@@ -106,6 +193,60 @@ for pair in pairs:
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+
+#################################################
+version = '4'
+version_ = '43'
+barSize='30m'
+bias='sellHold'
+volatility='0.1'
+scriptName= 'debug_system_v'+version_+'C_30min.py'
+pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF', 'AUDCHF','NZDCAD','USDCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
+#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
+#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
+#pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
+#pairs3=['USDJPY','GBPJPY','EURJPY','AUDJPY']
+#pairsList=[pairs,pairs2,pairs3]
+logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
+
+        
+#def runv4(pairs):
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info(str(dt.now())+' running v'+version_+' '+pair)
+        f=open ('/logs/' + pair + 'v'+version+ '.log','a')
+        print str(dt.now()), ' Starting v'+version_+': ' + pair
+        f.write(str(dt.now())+' Starting v'+version_+': ' + pair)
+
+        ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
+        ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
+
+        #subprocess.call(['python',scriptName,pair,bias,volatility],\
+        #                        stdout=f, stderr=ferr)
+        message = "Offline Mode: turned off in runsystem"
+        offlineMode(ticker, message, signalPath, version, version_)
+        logging.info(version+' '+ticker+' '+message)
+        
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'_'+barSize+'.csv').iloc[-1]
+        logging.info(str(signal))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v4run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+
+
 '''
 threads = []
 for list in pairsList:

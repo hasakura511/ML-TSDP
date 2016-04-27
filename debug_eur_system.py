@@ -20,7 +20,7 @@ import sys
 import logging
 import time
 #import websocket
-
+signalPath = './data/signals/'
 def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
         if ver1+'_'+ ticker + '.csv' in files:
@@ -57,12 +57,13 @@ def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         print errorText    
         #sys.exit(errorText)
         
+logging.basicConfig(filename='/logs/runsystem_v3v4.log',level=logging.DEBUG)
 ##################################
-logging.basicConfig(filename='/logs/runsystem_v3_buy.log',level=logging.DEBUG)
+#logging.basicConfig(filename='/logs/runsystem_v3_buy.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
-debug=False
+offline=False
 pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
@@ -80,8 +81,14 @@ for pair in pairs:
 
         ferr=open ('/logs/' + pair + 'v3_err.log','a')
         ferr.write('Starting V3: ' + pair)
-
-        subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
+        
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info(version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
+            
         f.close()
         ferr.close()
         signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]
@@ -100,11 +107,11 @@ print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 
 ##############################
-logging.basicConfig(filename='/logs/runsystem_v3_sell.log',level=logging.DEBUG)
+#logging.basicConfig(filename='/logs/runsystem_v3_sell.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
-debug=False
+offline=False
 pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
@@ -123,8 +130,14 @@ for pair in pairs:
 
         ferr=open ('/logs/' + pair + 'v3_err.log','a')
         ferr.write('Starting V3: ' + pair)
-
-        subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
+        
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info(version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
+            
         f.close()
         ferr.close()
         signal=pd.read_csv('./data/signals/v'+version_+'_'+pair+'_'+barSize+'.csv').iloc[-1]
@@ -148,6 +161,7 @@ version_ = '43'
 barSize='30m'
 bias='buyHold'
 volatility='0.1'
+offline=True
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
@@ -155,7 +169,7 @@ pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF','NZDJPY','CADJPY','
 #pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
 #pairs3=['USDJPY','GBPJPY','EURJPY','AUDJPY']
 #pairsList=[pairs,pairs2,pairs3]
-logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
+#logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
         
 #def runv4(pairs):
@@ -172,12 +186,13 @@ for pair in pairs:
         ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
         ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
 
-        #subprocess.call(['python',scriptName,pair,bias,volatility],\
-        #                        stdout=f, stderr=ferr)
-        message = "Offline Mode: turned off in runsystem"
-        offlineMode(ticker, message, signalPath, version, version_)
-        logging.info(version+' '+ticker+' '+message)
-        
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info(version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python',scriptName,pair,bias,volatility],\
+                                stdout=f, stderr=ferr)        
         f.close()
         ferr.close()
         signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'_'+barSize+'.csv').iloc[-1]
@@ -200,6 +215,7 @@ version_ = '43'
 barSize='30m'
 bias='sellHold'
 volatility='0.1'
+offline=True
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF', 'AUDCHF','NZDCAD','USDCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
@@ -207,7 +223,7 @@ pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF', 'AUDCHF','NZDCAD','USDCHF',
 #pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
 #pairs3=['USDJPY','GBPJPY','EURJPY','AUDJPY']
 #pairsList=[pairs,pairs2,pairs3]
-logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
+#logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
         
 #def runv4(pairs):
@@ -224,11 +240,14 @@ for pair in pairs:
         ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
         ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
 
-        #subprocess.call(['python',scriptName,pair,bias,volatility],\
-        #                        stdout=f, stderr=ferr)
-        message = "Offline Mode: turned off in runsystem"
-        offlineMode(ticker, message, signalPath, version, version_)
-        logging.info(version+' '+ticker+' '+message)
+
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info(version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python',scriptName,pair,bias,volatility],\
+                                stdout=f, stderr=ferr)
         
         f.close()
         ferr.close()

@@ -200,12 +200,12 @@ def reCalcEquity(sst, metric):
     
     return sst
     
-def createSignalFile(version, ticker, barSizeSetting, signalPath, sst, start_time, dataSet):
-    print version, 'Saving',ticker, 'Signals..'      
+def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst, start_time, dataSet):
+    print version_, 'Saving',ticker, 'Signals..'      
     timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)
     files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
-    #new version file
-    if version+'_'+ ticker+'_'+barSizeSetting+ '.csv' not in files:
+    #new version_ file
+    if version_+'_'+ ticker+'_'+barSizeSetting+ '.csv' not in files:
         #signalFile = sst.iloc[-2:]
         addLine = sst.iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
@@ -213,15 +213,34 @@ def createSignalFile(version, ticker, barSizeSetting, signalPath, sst, start_tim
         addLine.name = sst.iloc[-1].name
         signalFile = sst.iloc[-2:-1].append(addLine)
         signalFile.index.name = 'dates'
-        signalFile.to_csv(signalPath + version+'_'+ ticker+'_'+barSizeSetting+ '.csv', index=True)
+        signalFile.to_csv(signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index=True)
     else:        
-        signalFile=pd.read_csv(signalPath+ version+'_'+ ticker+'_'+barSizeSetting+ '.csv', index_col=['dates'])
+        signalFile=pd.read_csv(signalPath+ version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index_col=['dates'])
         addLine = sst.iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
         addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
         addLine.name = sst.iloc[-1].name
         signalFile = signalFile.append(addLine)
-        signalFile.to_csv(signalPath + version+'_'+ ticker+'_'+barSizeSetting+ '.csv', index=True)
+        signalFile.to_csv(signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index=True)
+        
+    #old version_ file
+    if version+'_'+ ticker+ '.csv' not in files:
+        #signalFile = sst.iloc[-2:]
+        addLine = sst.iloc[-1]
+        addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+        addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+        addLine.name = sst.iloc[-1].name
+        signalFile = sst.iloc[-2:-1].append(addLine)
+        signalFile.index.name = 'dates'
+        signalFile.to_csv(signalPath + version+'_'+ ticker+ '.csv', index=True)
+    else:        
+        signalFile=pd.read_csv(signalPath+ version+'_'+ ticker+ '.csv', index_col=['dates'])
+        addLine = sst.iloc[-1]
+        addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+        addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+        addLine.name = sst.iloc[-1].name
+        signalFile = signalFile.append(addLine)
+        signalFile.to_csv(signalPath + version+'_'+ ticker+ '.csv', index=True)
         
 #system parameters
 version = 'v4'
@@ -264,6 +283,7 @@ if len(sys.argv)==1:
     debug=True
     #gainAhead bias when 'choppy'
     bias = ['gainAhead']
+    #bias = ['zigZag']
     #bias=['sellHold']
     #bias=['buyHold']
     
@@ -284,9 +304,9 @@ if len(sys.argv)==1:
                     #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
-                    'EURUSD',\
+                    #'EURUSD',\
                     #'EURAUD',\
-                    #'EURCAD',\
+                    'EURCAD',\
                     #'EURNZD',\
                     #'AUDUSD',\
                     #'GBPUSD',\
@@ -558,7 +578,7 @@ inner_zz_std =2
 outer_zz_std=4
 if addAuxPairs ==True:
     #trend mode
-    shortTrendSignalTypes = ['zigZag']+bias
+    shortTrendSignalTypes = bias
     shortModel=short_models[0]
     shortTrendPipelines=[
                    #[shortModel],
@@ -566,7 +586,7 @@ if addAuxPairs ==True:
                    [fs_models[1],shortModel],
                     ]
                     
-    pv2e_SignalTypes =['zigZag']+bias
+    pv2e_SignalTypes =bias
     #pv2e_p2p_zz_std =long_zz_std
     pv2e_Model=auxPairs_models[0]
     pv2e_Pipelines=[
@@ -575,7 +595,7 @@ if addAuxPairs ==True:
                     #[fs_models[1],pv2e_p2pModel],
                     ]
 
-    pv3s_SignalTypes = ['zigZag']+bias
+    pv3s_SignalTypes = bias
     #pv3s_v2v_zz_std =long_zz_std
     pv3s_Model= auxPairs_models[0]               
     pv3s_Pipelines=[
@@ -585,7 +605,7 @@ if addAuxPairs ==True:
                     ]
 else:
     #trend mode
-    shortTrendSignalTypes = ['zigZag']+bias
+    shortTrendSignalTypes = bias
     shortModel=short_models[0]
     shortTrendPipelines=[
                    [shortModel],
@@ -593,7 +613,7 @@ else:
                    #[fs_models[1],shortModel],
                     ]
                     
-    pv2e_SignalTypes =['zigZag']+bias
+    pv2e_SignalTypes =bias
     #pv2e_p2p_zz_std =long_zz_std
     pv2e_Model=noAuxPairs_models[0]
     pv2e_Pipelines=[
@@ -602,7 +622,7 @@ else:
                     #[fs_models[1],pv2e_p2pModel],
                     ]
 
-    pv3s_SignalTypes = ['zigZag']+bias
+    pv3s_SignalTypes = bias
     #pv3s_v2v_zz_std =long_zz_std
     pv3s_Model= noAuxPairs_models[0]               
     pv3s_Pipelines=[
@@ -1241,37 +1261,45 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         updateDps = calcDPS(rank, finalDF[rank], PRT, windowLength, verbose=False,\
                                         asset=asset)
         dpsDF_final = dpsDF_final.append(updateDps)
-        #dpsDF_all2 = dpsDF_all2.append(updateDps)
         finalDF[rank].set_value(updateDps.index, updateDps.columns, updateDps.values)
-    
+    '''
     #mean reversion
     if mode==0:   
         #cycle
         mr=False
-        metric2='dpsNetEquity'
-        curve='dpsNetEquity'
+        metric2='dpsROC'
+        curve='dpsROC'
         #metric2=metric
         #curve='WorstCAR25 of reDPS B/W'
         if verbose:
             print 'Cycle mode - choosing signal from', curve
     else:
         #trend - select from the worst
-        mr=False
-        metric2='dpsNetEquity'
-        curve='dpsNetEquity'        
+        mr=True
+        metric2='dpsROC'
+        curve='dpsROC'        
         #metric2=metric
         #curve='WorstCAR25 of reDPS B/W'
         if verbose:
-            print 'Cycle mode - choosing signal from', curve
+            print 'Trend mode - choosing signal from', curve
 
-
-        
+        '''
+    mr=False
+    metric2='netEquity'
+    curve='netEquity'
+    
+    dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
+    
     if i == supportResistanceLB:
+        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
         signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
         signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
         signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
         signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
     else:
+        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
         signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0])
         index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
         signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
@@ -1400,7 +1428,7 @@ if useDPSsafef:
 else:
     sst['safef']=sst.nodpsSafef
     
-createSignalFile(version, ticker, barSizeSetting, signalPath, sst, start_time, dataSet)
+createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst, start_time, dataSet)
 
         
 

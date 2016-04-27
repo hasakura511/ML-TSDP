@@ -25,9 +25,10 @@ logging.basicConfig(filename='/logs/runsystem_v3_jpy.log',level=logging.DEBUG)
 version_ = '3.1'
 barSize='30m'
 debug=False
+pairs=['NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['EURCHF','EURGBP']
 #pairs=['AUDUSD','EURUSD','GBPUSD','USDCAD','NZDUSD','USDCHF']
-pairs=['NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
+#pairs=['NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
 #pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP','GBPJPY']
 #pairs=['EURCHF','AUDJPY','AUDUSD','EURUSD','GBPUSD']
 #pairs=['USDCAD','USDCHF','USDJPY','EURJPY','NZDUSD']

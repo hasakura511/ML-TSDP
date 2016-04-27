@@ -64,7 +64,7 @@ while 1:
 			logging.error("something bad happened", exc_info=True)
 			#return
 	logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-	print len(pairs), 'pairs completed'
+	print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
 	print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 '''
 threads = []

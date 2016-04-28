@@ -225,7 +225,7 @@ if __name__ == "__main__":
     #filterName = 'DF1'
     #data_type = 'ALL'
     barSizeSetting='30m'
-    currencyPairs =   [
+    pairs =   [
                     #'NZDJPY',\
                     #'CADJPY',\
                     #'CHFJPY',\

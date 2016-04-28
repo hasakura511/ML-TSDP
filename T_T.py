@@ -171,7 +171,7 @@ def runPair_v4(pair):
                 
         
     try:
-        with open ('/logs/'+version+'_'+ticker + 'onBar.log','a') as f:
+        with open ('/logs/'+ticker +version+ '.log','a') as f:
             orig_stdout = sys.stdout
             sys.stdout = f
             print 'Starting '+version+': ' + ticker

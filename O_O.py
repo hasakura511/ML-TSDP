@@ -79,7 +79,7 @@ while 1:
             #f.close()
             logging.error("something bad happened", exc_info=True)
             #return
-    logging.info(len(pairs)+' pairs completed v'+version_+' '+barSize+' '+bias)
+    logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
     logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
     print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'

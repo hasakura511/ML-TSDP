@@ -182,7 +182,7 @@ def runPair_v4(pair):
             signal=runv4(runData)
             print signal
             logging.info('v'+version+' '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
-            logging.info(signal.system)
+            #logging.info(signal.system)
             #subprocess.call(['python','debug_system_v4.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
             #ferr.close()
@@ -220,7 +220,7 @@ gotbar=dict()
 if __name__ == "__main__":
     #system parameters
     version = 'v4'
-    version_ = 'v4.0'
+    version_ = 'v4.3'
     asset = 'FX'
     #filterName = 'DF1'
     #data_type = 'ALL'

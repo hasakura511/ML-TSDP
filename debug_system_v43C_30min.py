@@ -303,11 +303,11 @@ if len(sys.argv)==1:
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
-                    'EURCHF',\
+                    #'EURCHF',\
                     #'EURGBP',\
                     #'EURUSD',\
                     #'EURAUD',\
-                    #'EURCAD',\
+                    'EURCAD',\
                     #'EURNZD',\
                     #'AUDUSD',\
                     #'GBPUSD',\
@@ -330,7 +330,7 @@ if len(sys.argv)==1:
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
     #display params
-    showCharts=False
+    showCharts=True
     showFinalChartOnly=True
     showIndicators = False
     verbose=True
@@ -366,7 +366,7 @@ supportResistanceLB = 90
 #for PCA/KBest
 nfeatures = 10
 #if major low/high most recent index. minDatapoints sets the minimum is period.
-minDatapoints = 2
+minDatapoints = 3
 #set to 1 for live
 #system selection metric
 #metric = 'CAR25'
@@ -703,6 +703,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     nrows = data.shape[0]
     data.index = data.index.to_datetime()
     pv_sorted = []
+    majorPeak=None
+    majorValley=None
     minorPeak=None
     minorValley=None
     zz_std=outer_zz_std
@@ -731,7 +733,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         #addAuxPairs = True
         
     #decrease stdev until there are three pivot points
-    while minorPeak ==None or minorValley == None:
+    while majorPeak ==None or majorValley == None or minorPeak ==None or minorValley == None:
         zz = zg(data.Close,data.Close.pct_change().std()*zz_std,\
                     -data.Close.pct_change().std()*zz_std)
                     

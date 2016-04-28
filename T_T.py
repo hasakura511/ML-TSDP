@@ -225,7 +225,7 @@ if __name__ == "__main__":
     #filterName = 'DF1'
     #data_type = 'ALL'
     barSizeSetting='30m'
-    pairs =   [
+    pairs =currencyPairs=livePairs=   [
                     #'NZDJPY',\
                     #'CADJPY',\
                     #'CHFJPY',\
@@ -271,7 +271,7 @@ if __name__ == "__main__":
         #auto ->threshold = 0.2
         volatilityThreshold=0.1
         validationSetLength =48
-        livePairs =  currencyPairs
+        #livePairs =  currencyPairs
         ticker =[
                     #'NZDJPY',\
                     #'CADJPY',\
@@ -312,7 +312,7 @@ if __name__ == "__main__":
         verbose=True
     else:
         debug=False
-        livePairs=currencyPairs
+        #livePairs=currencyPairs
         bias = ['gainAhead']
         volatilityThreshold=0.1
         validationSetLength =48

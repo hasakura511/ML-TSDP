@@ -293,7 +293,7 @@ if len(sys.argv)==1:
     #volatilityThreshold=-0.1
     #auto ->threshold = 0.2
     volatilityThreshold=0.1
-    
+    validationSetLength =48
     livePairs =  [
                     #'NZDJPY',\
                     #'CADJPY',\
@@ -302,11 +302,11 @@ if len(sys.argv)==1:
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
-                    #'EURCHF',\
+                    'EURCHF',\
                     #'EURGBP',\
                     #'EURUSD',\
                     #'EURAUD',\
-                    'EURCAD',\
+                    #'EURCAD',\
                     #'EURNZD',\
                     #'AUDUSD',\
                     #'GBPUSD',\
@@ -338,7 +338,7 @@ else:
     livePairs=[sys.argv[1]]
     bias=[sys.argv[2]]
     volatilityThreshold=float(sys.argv[3])
-
+    validationSetLength =int(sys.argv[4])
     ticker =livePairs[0]
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
@@ -367,9 +367,9 @@ nfeatures = 10
 #if major low/high most recent index. minDatapoints sets the minimum is period.
 minDatapoints = 2
 #set to 1 for live
-validationSetLength =48
 #system selection metric
-metric = 'CAR25'
+#metric = 'CAR25'
+metric = 'netEquity'
 #adds auxilary pair features
 addAuxPairs = False
 

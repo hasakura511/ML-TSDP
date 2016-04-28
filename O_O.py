@@ -31,6 +31,7 @@ barSize='30m'
 pairs=[sys.argv[1]]
 bias=sys.argv[2]
 volatility=sys.argv[3]
+validationSetLength =sys.argv[4]
 #bias='sellHold'
 #volatility='0.1'
 offline=False
@@ -64,7 +65,7 @@ while 1:
                 offlineMode(pair, message, signalPath, version, version_)
                 logging.info('v'+version+' '+pair+' '+message)
             else:
-                subprocess.call(['python',scriptName,pair,bias,volatility],\
+                subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength],\
                                     stdout=f, stderr=ferr)
             
             f.close()

@@ -66,6 +66,7 @@ version_ = '43'
 barSize='30m'
 bias='sellHold'
 volatility='0.1'
+validationSetLength ='1'
 offline=True
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=[]
@@ -94,7 +95,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility],\
+            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength],\
                                 stdout=f, stderr=ferr)
         
         f.close()
@@ -221,6 +222,7 @@ version_ = '43'
 barSize='30m'
 bias='buyHold'
 volatility='0.1'
+validationSetLength ='1'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
@@ -251,7 +253,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility],\
+            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength],\
                                 stdout=f, stderr=ferr)        
         f.close()
         ferr.close()
@@ -276,6 +278,7 @@ version_ = '43'
 barSize='30m'
 bias='sellHold'
 volatility='0.1'
+validationSetLength ='1'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['AUDUSD','NZDUSD','EURGBP','NZDCHF', 'AUDCHF','NZDCAD','USDCAD','AUDNZD','AUDCAD','AUDJPY']
@@ -307,7 +310,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility],\
+            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength],\
                                 stdout=f, stderr=ferr)
         
         f.close()

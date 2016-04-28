@@ -179,7 +179,7 @@ def runPair_v4(pair):
                 offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
             #f.write('Starting '+version+': ' + ticker)         
             #ferr.write('Starting '+version+': ' + ticker)
-            signal, dataSet=runv4(runData)
+            signal=runv4(runData)
             print signal
             logging.info('v'+version+' '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
             logging.info(signal.system)

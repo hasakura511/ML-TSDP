@@ -68,8 +68,8 @@ bias='sellHold'
 volatility='0.1'
 offline=True
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-#pairs=[]
-pairs=['EURCHF','EURUSD','USDCHF','EURCAD','GBPCAD']
+pairs=[]
+#pairs=['EURCHF','EURUSD','USDCHF','EURCAD','GBPCAD']
 #pairsList=[pairs,pairs2,pairs3]
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
@@ -110,7 +110,7 @@ for pair in pairs:
         logging.error("something bad happened", exc_info=True)
         #return
 logging.info(len(pairs)+' pairs completed v'+version_+' '+barSize+' '+bias)
-logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+logging.info('Offline Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 

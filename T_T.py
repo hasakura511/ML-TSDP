@@ -547,11 +547,7 @@ if __name__ == "__main__":
     
     if len(sys.argv) ==1:
         print 'syntax is python T_T.py single [debug]'
-    else:
-        if sys.argv[2] == 'debug':  
-            debug = True
-            logging.info( 'running debug mode...' )
-            
+    else:            
         if sys.argv[1] == 'single':  
             while 1:
                 start_time = time.time()

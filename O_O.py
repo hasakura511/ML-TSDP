@@ -43,7 +43,7 @@ scriptName= 'debug_system_v'+version_+'C_30min.py'
 #pairsList=[pairs,pairs2,pairs3]
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
-        
+logging.basicConfig(filename='/logs/runsystem_v'+version+pairs[0]+barSize+' '+bias+'.log',level=logging.DEBUG)
 #def runv4(pairs):
 while 1:
     start_time = time.time()

@@ -228,9 +228,9 @@ if __name__ == "__main__":
     pairs =currencyPairs=livePairs=[sys.argv[1]]
     barSizeSetting=sys.argv[2]
     bias = [sys.argv[3]]
-    volatilityThreshold=sys.argv[4]
-    supportResistanceLB = sys.argv[5]
-    validationSetLength =sys.argv[6]
+    volatilityThreshold=float(sys.argv[4])
+    supportResistanceLB = int(sys.argv[5])
+    validationSetLength =int(sys.argv[6])
     
     ticker =livePairs[0]
 

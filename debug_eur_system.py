@@ -23,7 +23,7 @@ import logging
 import time
 #import websocket
 
-start_time2 = time.time()
+start_time3 = time.time()
 signalPath = './data/signals/'
 def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
@@ -335,7 +335,7 @@ logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
-print 'Total Elapsed time: ', round(((time.time() - start_time2)/60),2), ' minutes'
+print 'Total Elapsed time: ', round(((time.time() - start_time3)/60),2), ' minutes'
 
 
 '''

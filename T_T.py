@@ -212,40 +212,40 @@ if __name__ == "__main__":
     #data_type = 'ALL'
     barSizeSetting='30m'
     currencyPairs =   [
-                    'NZDJPY',\
-                    'CADJPY',\
-                    'CHFJPY',\
-                    'EURJPY',\
-                    'GBPJPY',\
-                    'AUDJPY',\
-                    'USDJPY',\
-                    'AUDUSD',\
+                    #'NZDJPY',\
+                    #'CADJPY',\
+                    #'CHFJPY',\
+                    #'EURJPY',\
+                    #'GBPJPY',\
+                    #'AUDJPY',\
+                    #'USDJPY',\
+                    #'AUDUSD',\
                     'EURUSD',\
-                    'EURAUD',\
+                    #'EURAUD',\
                     'EURCAD',\
-                    'EURNZD',\
-                    'GBPUSD',\
-                    'USDCAD',\
+                    #'EURNZD',\
+                    #'GBPUSD',\
+                    #'USDCAD',\
                     'USDCHF',\
-                    'NZDUSD',
+                    #'NZDUSD',
                     'EURCHF',\
-                    'EURGBP',\
-                    'AUDCAD',\
-                    'AUDCHF',\
-                    'AUDNZD',\
-                    'GBPAUD',\
+                    #'EURGBP',\
+                    #'AUDCAD',\
+                    #'AUDCHF',\
+                    #'AUDNZD',\
+                    #'GBPAUD',\
                     'GBPCAD',\
-                    'GBPNZD',\
-                    'CADCHF',\
-                    'NZDCHF',\
-                    'NZDCAD'
+                    #'GBPNZD',\
+                    #'CADCHF',\
+                    #'NZDCHF',\
+                    #'NZDCAD'
                     ]
 
     if len(sys.argv)==1:
         debug=True
         #gainAhead bias when 'choppy'
-        #bias = ['gainAhead']
-        bias = ['zigZag']
+        bias = ['gainAhead']
+        #bias = ['zigZag']
         #bias = ['gainAhead','zigZag']
         #bias=['sellHold']
         #bias=['buyHold']
@@ -257,36 +257,36 @@ if __name__ == "__main__":
         #auto ->threshold = 0.2
         volatilityThreshold=0.1
         validationSetLength =48
-        livePairs =  [
-                        #'NZDJPY',\
-                        #'CADJPY',\
-                        #'CHFJPY',\
-                        #'EURJPY',\
-                        #'GBPJPY',\
-                        #'AUDJPY',\
-                        #'USDJPY',\
-                        #'EURCHF',\
-                        #'EURGBP',\
-                        'EURUSD',\
-                        #'EURAUD',\
-                        #'EURCAD',\
-                        #'EURNZD',\
-                        #'AUDUSD',\
-                        #'GBPUSD',\
-                        #'USDCAD',\
-                        #'USDCHF',\
-                        #'NZDUSD',
-                        #'AUDCAD',\
-                        #'AUDCHF',\
-                        #'AUDNZD',\
-                        #'GBPAUD',\
-                        #'GBPCAD',\
-                        #'GBPNZD',\
-                        #'NZDCHF',\
-                        #'NZDCAD',\
-                        #'CADCHF'
-                        ]
-        ticker =livePairs[0]
+        livePairs =  currencyPairs
+        ticker =[
+                    #'NZDJPY',\
+                    #'CADJPY',\
+                    #'CHFJPY',\
+                    #'EURJPY',\
+                    #'GBPJPY',\
+                    #'AUDJPY',\
+                    #'USDJPY',\
+                    #'AUDUSD',\
+                    'EURUSD',\
+                    #'EURAUD',\
+                    'EURCAD',\
+                    #'EURNZD',\
+                    #'GBPUSD',\
+                    #'USDCAD',\
+                    'USDCHF',\
+                    #'NZDUSD',
+                    'EURCHF',\
+                    #'EURGBP',\
+                    #'AUDCAD',\
+                    #'AUDCHF',\
+                    #'AUDNZD',\
+                    #'GBPAUD',\
+                    'GBPCAD',\
+                    #'GBPNZD',\
+                    #'CADCHF',\
+                    #'NZDCHF',\
+                    #'NZDCAD'
+                    ]
         dataPath = 'D:/ML-TSDP/data/from_IB/'
         signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
         #chartSavePath = None
@@ -298,15 +298,16 @@ if __name__ == "__main__":
         verbose=True
     else:
         debug=False
-        livePairs=[sys.argv[1]]
-        bias=[sys.argv[2]]
-        volatilityThreshold=float(sys.argv[3])
-        validationSetLength =int(sys.argv[4])
+        livePairs=currencyPairs
+        bias = ['gainAhead']
+        volatilityThreshold=0.1
+        validationSetLength =48
         ticker =livePairs[0]
         #symbol=ticker[0:3]
         #currency=ticker[3:6]
         signalPath = './data/signals/'
         dataPath = './data/from_IB/'
+        #this gets overwritten
         chartSavePath = './data/results/'+version+'_'+ticker
         
         #display params
@@ -530,22 +531,8 @@ if __name__ == "__main__":
     inner_zz_std =2
     outer_zz_std=4
     
-    if len(sys.argv)==1:          
-        for ticker in livePairs:
-            runData = {'version':version, 'version_':version_,'asset':asset,'asset':asset,\
-                            'barSizeSetting':barSizeSetting,'currencyPairs':currencyPairs,'debug':debug,'bias':bias,\
-                            'volatilityThreshold':volatilityThreshold, 'validationSetLength':validationSetLength,'livePairs':livePairs,\
-                            'ticker':ticker, 'dataPath':dataPath,'signalPath':signalPath,'chartSavePath':chartSavePath,\
-                            'showCharts':showCharts, 'showFinalChartOnly':showFinalChartOnly,'showIndicators':showIndicators,\
-                            'verbose':verbose, 'supportResistanceLB':supportResistanceLB,'nfeatures':nfeatures,\
-                            'minDatapoints' :minDatapoints, 'metric':metric, 'metric2' :metric2,\
-                            'addAuxPairs' :addAuxPairs, 'perturbData' :  perturbData, 'perturbDataPct' :perturbDataPct,\
-                            'useDPSsafef' :useDPSsafef, 'PRT' :  PRT, 'maxlb' :maxlb,'maxReadLines':maxReadLines,\
-                            'initialEquity':initialEquity,'nodpsSafef':nodpsSafef, 'fs_models':fs_models,\
-                            'short_models':short_models,'noAuxPairs_models':noAuxPairs_models,'auxPairs_models':auxPairs_models,\
-                            'outer_zz_std':outer_zz_std,'inner_zz_std':inner_zz_std}
-                            
-            signal = runv4(runData)
+    if len(sys.argv) ==1:
+        print 'syntax is python T_T.py single [debug]'
     else:
         if sys.argv[2] == 'debug':  
             debug = True

@@ -247,6 +247,7 @@ def runv4(runData):
     global showIndicators
     global showCharts
     globals().update(runData)
+    chartSavePath = './data/results/'+version+'_'+ticker
     
     if addAuxPairs ==True:
         #trend mode

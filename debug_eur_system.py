@@ -173,7 +173,7 @@ print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 version = '3'
 version_ = '3.1'
 barSize='30m'
-bias = 'buyHold'
+bias = 'sellHold'
 offline=False
 pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']

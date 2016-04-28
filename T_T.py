@@ -171,17 +171,17 @@ def runPair_v4(pair):
                 
         
     try:
-        with open ('/logs/v' + version+'_'+ticker + 'onBar.log','a') as f:
+        with open ('/logs/'+version+'_'+ticker + 'onBar.log','a') as f:
             orig_stdout = sys.stdout
             sys.stdout = f
-            print 'Starting v'+version+': ' + ticker
+            print 'Starting '+version+': ' + ticker
             if ticker not in livePairs:
                 offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
             #f.write('Starting '+version+': ' + ticker)         
             #ferr.write('Starting '+version+': ' + ticker)
             signal=runv4(runData)
             print signal
-            logging.info('v'+version+' '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
+            logging.info(version+' '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
             #logging.info(signal.system)
             #subprocess.call(['python','debug_system_v4.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()

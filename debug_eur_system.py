@@ -22,6 +22,8 @@ import sys
 import logging
 import time
 #import websocket
+
+start_time2 = time.time()
 signalPath = './data/signals/'
 def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
@@ -122,7 +124,8 @@ version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
 offline=False
-pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
+pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
 
@@ -172,7 +175,8 @@ version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
 offline=False
-pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
+pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
+#pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
@@ -225,7 +229,8 @@ volatility='0.1'
 validationSetLength ='1'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
+pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
 #pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
@@ -281,7 +286,8 @@ volatility='0.1'
 validationSetLength ='1'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-pairs=['AUDUSD','NZDUSD','EURGBP','NZDCHF', 'AUDCHF','NZDCAD','USDCAD','AUDNZD','AUDCAD','AUDJPY']
+pairs=['AUDUSD','NZDUSD','EURGBP','NZDCHF', 'AUDCHF','NZDCAD','USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
+#pairs=['AUDUSD','NZDUSD','EURGBP','NZDCHF', 'AUDCHF','NZDCAD','USDCAD','AUDNZD','AUDCAD','AUDJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
 #pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
 #pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
@@ -329,6 +335,7 @@ logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
 print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+print 'Total Elapsed time: ', round(((time.time() - start_time2)/60),2), ' minutes'
 
 
 '''

@@ -28,7 +28,21 @@ import os
 from pytz import timezone
 from dateutil.parser import parse
 
-
+from sklearn.grid_search import ParameterGrid
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest, chi2, f_classif
+#classification
+from sklearn.cross_validation import StratifiedShuffleSplit
+from sklearn.metrics import confusion_matrix
+from sklearn.linear_model import Perceptron, PassiveAggressiveClassifier, LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier,\
+                        BaggingClassifier, ExtraTreesClassifier, VotingClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.metrics import confusion_matrix
+from sklearn.svm import LinearSVC, SVC, NuSVC
+from sklearn.neighbors import RadiusNeighborsClassifier, KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
     
 
 

@@ -225,35 +225,7 @@ if __name__ == "__main__":
     #filterName = 'DF1'
     #data_type = 'ALL'
     barSizeSetting='30m'
-    pairs =currencyPairs=livePairs=   [
-                    #'NZDJPY',\
-                    #'CADJPY',\
-                    #'CHFJPY',\
-                    #'EURJPY',\
-                    #'GBPJPY',\
-                    #'AUDJPY',\
-                    #'USDJPY',\
-                    #'AUDUSD',\
-                    'EURUSD',\
-                    #'EURAUD',\
-                    'EURCAD',\
-                    #'EURNZD',\
-                    #'GBPUSD',\
-                    #'USDCAD',\
-                    'USDCHF',\
-                    #'NZDUSD',
-                    'EURCHF',\
-                    #'EURGBP',\
-                    #'AUDCAD',\
-                    #'AUDCHF',\
-                    #'AUDNZD',\
-                    #'GBPAUD',\
-                    'GBPCAD',\
-                    #'GBPNZD',\
-                    #'CADCHF',\
-                    #'NZDCHF',\
-                    #'NZDCAD'
-                    ]
+    pairs =currencyPairs=livePairs=['EURCAD','GBPCAD','EURUSD','USDCHF']
 
     if len(sys.argv)==1:
         debug=True

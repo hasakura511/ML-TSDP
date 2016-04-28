@@ -212,7 +212,7 @@ def runThreads():
 
 
 
-logging.basicConfig(filename='/logs/runsystem_v4onBar.log',level=logging.DEBUG)
+
 start_time = time.time()
 lastDate={}
 tickerId=1
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     validationSetLength =int(sys.argv[6])
     
     ticker =livePairs[0]
-
+    logging.basicConfig(filename='/logs/runsystem_'+ticker+'v4onBar.log',level=logging.DEBUG)
     
     signalPath = './data/signals/'
     dataPath = './data/from_IB/'

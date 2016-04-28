@@ -695,7 +695,7 @@ def runv4(runData):
                     reverse='normal'
                     y_train_ga = data_primer_ga_sig.iloc[-supportResistanceLB:].iloc[index].values
                     #reverse if choppy bias, short is and cycle (cycle peak bias)
-                    if bias[0]=='gainAhead' and (is_period=='wf_is_pv3s_v2v' or is_period=='wf_is_short') and mode==0:
+                    if is_period=='wf_is_short' and mode==0:
                         reverse='reversed'
                         y_train_ga = np.where(y_train_ga<0,1,-1)
 
@@ -740,7 +740,7 @@ def runv4(runData):
                 elif st == 'zigZag':
                     reverse='normal'
                     #reverse if choppy bias, short is and cycle (cycle peak bias)
-                    if bias[0]=='gainAhead' and (is_period=='wf_is_pv3s_v2v' or is_period=='wf_is_short') and mode==0:
+                    if is_period=='wf_is_short' and mode==0:
                         reverse='reversed'
                         y_train_zz = np.where(y_train_zz<0,1,-1)
                     #reverse if choppy bias, pv3s is and trend (cycle peak bias)

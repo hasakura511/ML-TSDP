@@ -100,7 +100,7 @@ def IBcommission(tradeAmount, asset):
     else:
         return commission
 
-def initSST(close, version_, systemName, initialEquity):
+def initSST(close, version_, st, initialEquity):
     savedShadowTrades = pd.DataFrame(index=close.index)
     savedShadowTrades.index.name = 'dates'
     #set to 0 for all signals to start at the same time. 
@@ -244,7 +244,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         
 #system parameters
 version = 'v4'
-version_ = 'v4.0'
+version_ = 'v4.3'
 asset = 'FX'
 filterName = 'DF1'
 data_type = 'ALL'
@@ -282,8 +282,9 @@ currencyPairs =   [
 if len(sys.argv)==1:
     debug=True
     #gainAhead bias when 'choppy'
-    bias = ['gainAhead']
-    #bias = ['zigZag']
+    #bias = ['gainAhead','zigZag']
+    #bias = ['gainAhead']
+    bias = ['zigZag']
     #bias=['sellHold']
     #bias=['buyHold']
     
@@ -292,7 +293,7 @@ if len(sys.argv)==1:
     #trendmode -> threshold = -0.1
     #volatilityThreshold=-0.1
     #auto ->threshold = 0.2
-    volatilityThreshold=0.1
+    volatilityThreshold=1.1
     validationSetLength =48
     livePairs =  [
                     #'NZDJPY',\
@@ -1022,7 +1023,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 reverse='normal'
                 y_train_ga = data_primer_ga_sig.iloc[-supportResistanceLB:].iloc[index].values
                 #reverse if choppy bias, short is and cycle (cycle peak bias)
-                if bias[0]=='gainAhead' and (is_period=='wf_is_pv3s_v2v' or is_period=='wf_is_short') and mode==0:
+                if is_period=='wf_is_short' and mode==0:
                     reverse='reversed'
                     y_train_ga = np.where(y_train_ga<0,1,-1)
 
@@ -1067,7 +1068,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             elif st == 'zigZag':
                 reverse='normal'
                 #reverse if choppy bias, short is and cycle (cycle peak bias)
-                if bias[0]=='gainAhead' and (is_period=='wf_is_pv3s_v2v' or is_period=='wf_is_short') and mode==0:
+                if is_period=='wf_is_short' and mode==0:
                     reverse='reversed'
                     y_train_zz = np.where(y_train_zz<0,1,-1)
                 #reverse if choppy bias, pv3s is and trend (cycle peak bias)
@@ -1296,11 +1297,11 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
         signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
         signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
-        signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
+        signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_all2.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
     else:
         #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
         #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-        signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0])
+        signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_all2.sort_values(by=metric2, ascending=mr).iloc[0])
         index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
         signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
         signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric2)

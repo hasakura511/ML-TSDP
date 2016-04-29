@@ -62,13 +62,14 @@ def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         #sys.exit(errorText)
         
 logging.basicConfig(filename='/logs/runsystem_v3v4.log',level=logging.DEBUG)
-############OFFLINE##########
+############v4 OFFLINE##########
 version = '4'
 version_ = '43'
 barSize='30m'
 bias='sellHold'
 volatility='0.1'
 validationSetLength ='1'
+useSignalsFrom='tripleFiltered'
 offline=True
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=[]
@@ -97,7 +98,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength],\
+            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength,useSignalsFrom],\
                                 stdout=f, stderr=ferr)
         
         f.close()
@@ -114,7 +115,57 @@ for pair in pairs:
         #return
 logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Offline Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
+print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName,useSignalsFrom
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+
+###############v3 OFFLINE###################
+#logging.basicConfig(filename='/logs/runsystem_v3_buy.log',level=logging.DEBUG)
+version = '3'
+version_ = '3.1'
+barSize='30m'
+bias = 'buyHold'
+offline=True
+pairs=[]
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
+#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
+
+#def runv3(pair):
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info('running v3'+pair)
+        f=open ('/logs/' + pair + 'v3.log','a')
+        print 'Starting v3: ' + pair
+        f.write('Starting v3: ' + pair)
+
+        ferr=open ('/logs/' + pair + 'v3_err.log','a')
+        ferr.write('Starting V3: ' + pair)
+        
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info('v'+version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python','debug_system_v3.1C_30min.py',pair,'1',bias], stdout=f, stderr=ferr)
+            
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'.csv').iloc[-1]
+        logging.info('Check signal:' +str(signal.signals))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v3run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
+logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed', version_, barSize, bias
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 ##################################
@@ -227,6 +278,7 @@ barSize='30m'
 bias='buyHold'
 volatility='0.1'
 validationSetLength ='1'
+useSignalsFrom='tripleFiltered'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['EURAUD','GBPUSD','CADCHF']
@@ -258,7 +310,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength],\
+            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength,useSignalsFrom],\
                                 stdout=f, stderr=ferr)        
         f.close()
         ferr.close()
@@ -274,7 +326,7 @@ for pair in pairs:
         #return
 logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
+print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName,useSignalsFrom
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 #################################################
@@ -284,6 +336,7 @@ barSize='30m'
 bias='sellHold'
 volatility='0.1'
 validationSetLength ='1'
+useSignalsFrom='tripleFiltered'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
 pairs=['AUDUSD','NZDUSD','EURGBP','NZDCHF', 'AUDCHF','NZDCAD','USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','EURNZD','GBPAUD','GBPNZD','EURCHF']
@@ -316,7 +369,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength],\
+            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength,useSignalsFrom],\
                                 stdout=f, stderr=ferr)
         
         f.close()
@@ -333,7 +386,7 @@ for pair in pairs:
         #return
 logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
+print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName, useSignalsFrom
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 print 'Total Elapsed time: ', round(((time.time() - start_time3)/60),2), ' minutes'
 

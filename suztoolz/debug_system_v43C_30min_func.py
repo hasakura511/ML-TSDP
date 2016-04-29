@@ -246,7 +246,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
         addLine.name = sst.iloc[-1].name
         signalFile = signalFile.append(addLine)
-         filename=signalPath + version+'_'+ ticker+ '.csv'
+        filename=signalPath + version+'_'+ ticker+ '.csv'
         print 'Saving', filename       
         signalFile.to_csv(filename, index=True)
 
@@ -1095,6 +1095,9 @@ def runv4(runData):
                                             data.Close.shape[0],threshold=volatilityThreshold,\
                                             showPlot=debug, ticker=ticker, savePath=chartSavePath+'_MODE2')
         if debug:
+            for x in signalSets:
+                for algo in signalSets[x]:
+                    signalSets[x][algo].to_csv('C:/users/hidemi/desktop/python/'+x+'_'+algo+'.csv')
             for x in DpsRankByMetricB:
                 DpsRankByMetricB[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
             for x in DpsRankByMetricW:
@@ -1103,8 +1106,12 @@ def runv4(runData):
                 finalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
             for x in signalDF:
                 signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv')
-
-    sst=signalDF['tripleFiltered'].copy(deep=True)
+                
+    for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
+        for k, v in d.iteritems():
+            signalDF.setdefault(k, []).append(v)
+            
+    sst=signalDF[useSignalsFrom].copy(deep=True)
 
     if useDPSsafef:
         sst['safef']=sst.dpsSafef
@@ -1162,7 +1169,7 @@ if __name__ == "__main__":
         #bias = ['gainAhead','zigZag']
         #bias=['sellHold']
         #bias=['buyHold']
-        
+        useSignalsFrom='tripleFiltered'
         #cycle mode->threshold=1.1
         #volatilityThreshold=1.1
         #trendmode -> threshold = -0.1
@@ -1215,6 +1222,7 @@ if __name__ == "__main__":
         bias=[sys.argv[2]]
         volatilityThreshold=float(sys.argv[3])
         validationSetLength =int(sys.argv[4])
+        useSignalsFrom=sys.argv[5]
         ticker =livePairs[0]
         #symbol=ticker[0:3]
         #currency=ticker[3:6]

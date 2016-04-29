@@ -166,7 +166,7 @@ def runPair_v4(pair):
                     'useDPSsafef' :useDPSsafef, 'PRT' :  PRT, 'maxlb' :maxlb,'maxReadLines':maxReadLines,\
                     'initialEquity':initialEquity,'nodpsSafef':nodpsSafef, 'fs_models':fs_models,\
                     'short_models':short_models,'noAuxPairs_models':noAuxPairs_models,'auxPairs_models':auxPairs_models,\
-                    'outer_zz_std':outer_zz_std,'inner_zz_std':inner_zz_std}
+                    'outer_zz_std':outer_zz_std,'inner_zz_std':inner_zz_std,'useSignalsFrom':useSignalsFrom}
                         
                 
         
@@ -231,6 +231,7 @@ if __name__ == "__main__":
     volatilityThreshold=float(sys.argv[4])
     supportResistanceLB = int(sys.argv[5])
     validationSetLength =int(sys.argv[6])
+    useSignalsFrom=sys.argv[7]
     
     ticker =livePairs[0]
     logging.basicConfig(filename='/logs/runsystem_'+ticker+'v4onBar.log',level=logging.DEBUG)

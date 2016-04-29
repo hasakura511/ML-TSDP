@@ -295,14 +295,15 @@ if len(sys.argv)==1:
     bias = ['zigZag']
     #bias=['sellHold']
     #bias=['buyHold']
-    
+    #useSignalsFrom='tripleFiltered'
+    useSignalsFrom='best_wf_is_short'
     #cycle mode->threshold=1.1
     #volatilityThreshold=1.1
     #trendmode -> threshold = -0.1
     #volatilityThreshold=-0.1
     #auto ->threshold = 0.2
     volatilityThreshold=1.1
-    validationSetLength =1
+    validationSetLength =48
     livePairs =  [
                     #'NZDJPY',\
                     #'CADJPY',\
@@ -313,9 +314,9 @@ if len(sys.argv)==1:
                     #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
-                    #'EURUSD',\
+                    'EURUSD',\
                     #'EURAUD',\
-                    'EURCAD',\
+                    #'EURCAD',\
                     #'EURNZD',\
                     #'AUDUSD',\
                     #'GBPUSD',\
@@ -338,7 +339,7 @@ if len(sys.argv)==1:
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
     #display params
-    showCharts=True
+    showCharts=False
     showFinalChartOnly=True
     showIndicators = False
     verbose=True
@@ -348,6 +349,7 @@ else:
     bias=[sys.argv[2]]
     volatilityThreshold=float(sys.argv[3])
     validationSetLength =int(sys.argv[4])
+    useSignalsFrom=sys.argv[5]
     ticker =livePairs[0]
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
@@ -1423,6 +1425,9 @@ if showCharts:
                                         data.Close.shape[0],threshold=volatilityThreshold,\
                                         showPlot=debug, ticker=ticker, savePath=chartSavePath+'_MODE2')
     if debug:
+        for x in signalSets:
+            for algo in signalSets[x]:
+                signalSets[x][algo].to_csv('C:/users/hidemi/desktop/python/'+x+'_'+algo+'.csv')
         for x in DpsRankByMetricB:
             DpsRankByMetricB[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
         for x in DpsRankByMetricW:
@@ -1432,7 +1437,11 @@ if showCharts:
         for x in signalDF:
             signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv')
 
-sst=signalDF['tripleFiltered'].copy(deep=True)
+for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
+    for k, v in d.iteritems():
+        signalDF.setdefault(k, []).append(v)
+        
+sst=signalDF[useSignalsFrom].copy(deep=True)
 
 if useDPSsafef:
     sst['safef']=sst.dpsSafef

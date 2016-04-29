@@ -1,4 +1,4 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-EURJPY,450,1461578407,,,125.20300,,forex,short,2016-04-25 06:00:07,1461578407,open,2016-04-25 05:56:51,125.16700,10000,,0,2,,,102001258,
-CHFJPY,-417,1461578407,,,114.11700,,forex,long,2016-04-25 06:00:07,1461578406,open,2016-04-25 05:56:53,114.08400,10000,,0,2,,,102001260,
-@ESM6,-50,1461877843,,,2074.25000,,future,short,2016-04-28 17:10:43,1461877843,open,2016-04-28 17:10:26,2073.75000,50,,0,2,,,102086289,
+EURJPY,563,1461578407,,,125.20300,,forex,short,2016-04-25 06:00:07,1461578407,open,2016-04-25 05:56:51,125.16700,10000,,0,2,,,102001258,
+@ESM6,-150,1461895828,,,2070.50000,,future,short,2016-04-28 22:10:28,1461895828,open,2016-04-28 22:10:22,2070.50000,50,,0,2,,,102088939,
+CHFJPY,-522,1461578407,,,114.11700,,forex,long,2016-04-25 06:00:07,1461578406,open,2016-04-25 05:56:53,114.08400,10000,,0,2,,,102001260,

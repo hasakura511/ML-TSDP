@@ -405,7 +405,7 @@ PRT['tailRiskPct'] = 95
 #rounds safef and safef cannot go below this number. if set to None, no rounding
 PRT['minSafef'] =1
 #no dps safef
-PRT['nodpsSafef'] =1
+PRT['nodpsSafef'] =2
 #dps max limit
 PRT['maxSafef'] = 2
 #safef=minSafef if CAR25 < threshold

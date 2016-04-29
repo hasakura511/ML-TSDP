@@ -295,8 +295,9 @@ if len(sys.argv)==1:
     bias = ['zigZag']
     #bias=['sellHold']
     #bias=['buyHold']
-    #useSignalsFrom='tripleFiltered'
-    useSignalsFrom='best_wf_is_short'
+    useSignalsFrom='tripleFiltered'
+    #useSignalsFrom='best_wf_is_short'
+    #useSignalsFrom='best_wf_is_all'
     #cycle mode->threshold=1.1
     #volatilityThreshold=1.1
     #trendmode -> threshold = -0.1
@@ -314,7 +315,7 @@ if len(sys.argv)==1:
                     #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
-                    'EURUSD',\
+                    #'EURUSD',\
                     #'EURAUD',\
                     #'EURCAD',\
                     #'EURNZD',\
@@ -327,7 +328,7 @@ if len(sys.argv)==1:
                     #'AUDCHF',\
                     #'AUDNZD',\
                     #'GBPAUD',\
-                    #'GBPCAD',\
+                    'GBPCAD',\
                     #'GBPNZD',\
                     #'NZDCHF',\
                     #'NZDCAD',\
@@ -1320,16 +1321,6 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     
             
     if showCharts:
-        zz.plot_pivots(l=8,w=8,\
-                            #startValley=(startValley, data2.Close[startValley]),\
-                            #startPeak=(startPeak, data2.Close[startPeak]),\
-                            #minorValley=(minorValley, data2.Close[minorValley]),\
-                            #minorPeak=(minorPeak, data2.Close[minorPeak]),\
-                            #shortStart=(shortStart, data2.Close[shortStart]),\
-                            cycleList=cycleList,mode=modePred[start:],\
-                            signals=signalDF,chartTitle=ticker+' metric '+curve+', bias '+bias[0]+', Signal addAuxPairs '+str(addAuxPairs),\
-                            savePath=chartSavePath+'_SIGNAL', debug=debug
-                            )
             
         zz.plot_pivots(l=8,w=8,\
                             #startValley=(startValley, data2.Close[startValley]),\
@@ -1439,8 +1430,22 @@ if showCharts:
 
 for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
     for k, v in d.iteritems():
-        signalDF.setdefault(k, []).append(v)
+        signalDF[k]=v
         
+if showCharts:
+    zz.plot_pivots(l=8,w=8,\
+                        #startValley=(startValley, data2.Close[startValley]),\
+                        #startPeak=(startPeak, data2.Close[startPeak]),\
+                        #minorValley=(minorValley, data2.Close[minorValley]),\
+                        #minorPeak=(minorPeak, data2.Close[minorPeak]),\
+                        #shortStart=(shortStart, data2.Close[shortStart]),\
+                        cycleList=cycleList,mode=modePred[start:],\
+                        signals={useSignalsFrom:signalDF[useSignalsFrom]},chartTitle=ticker+\
+                        ' '+useSignalsFrom+' metric '+curve+', bias '+bias[0]+\
+                        ', Signal addAuxPairs '+str(addAuxPairs),\
+                        savePath=chartSavePath+'_SIGNAL', debug=debug
+                        )
+                        
 sst=signalDF[useSignalsFrom].copy(deep=True)
 
 if useDPSsafef:

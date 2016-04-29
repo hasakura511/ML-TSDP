@@ -518,7 +518,7 @@ if __name__ == "__main__":
     outer_zz_std=4
     
     if len(sys.argv) ==1:
-        print 'syntax is python T_T.py single [debug]'
+        print 'syntax is python T_T.py single'
     else:            
         if sys.argv[1] == 'single':  
             while 1:

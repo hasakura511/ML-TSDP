@@ -213,7 +213,9 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         addLine.name = sst.iloc[-1].name
         signalFile = sst.iloc[-2:-1].append(addLine)
         signalFile.index.name = 'dates'
-        signalFile.to_csv(signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index=True)
+        filename = signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv'
+        print 'Saving', filename
+        signalFile.to_csv(filename, index=True)
     else:        
         signalFile=pd.read_csv(signalPath+ version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index_col=['dates'])
         addLine = sst.iloc[-1]
@@ -221,7 +223,9 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
         addLine.name = sst.iloc[-1].name
         signalFile = signalFile.append(addLine)
-        signalFile.to_csv(signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index=True)
+        filename = signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv'
+        print 'Saving', filename
+        signalFile.to_csv(filename, index=True)
         
     #old version_ file
     if version+'_'+ ticker+ '.csv' not in files:
@@ -232,7 +236,9 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         addLine.name = sst.iloc[-1].name
         signalFile = sst.iloc[-2:-1].append(addLine)
         signalFile.index.name = 'dates'
-        signalFile.to_csv(signalPath + version+'_'+ ticker+ '.csv', index=True)
+        filename=signalPath + version+'_'+ ticker+ '.csv'
+        print 'Saving', filename
+        signalFile.to_csv(filename, index=True)
     else:        
         signalFile=pd.read_csv(signalPath+ version+'_'+ ticker+ '.csv', index_col=['dates'])
         addLine = sst.iloc[-1]
@@ -240,7 +246,9 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
         addLine.name = sst.iloc[-1].name
         signalFile = signalFile.append(addLine)
-        signalFile.to_csv(signalPath + version+'_'+ ticker+ '.csv', index=True)
+        filename=signalPath + version+'_'+ ticker+ '.csv'
+        print 'Saving', filename
+        signalFile.to_csv(filename, index=True)
         
 #system parameters
 version = 'v4'
@@ -294,7 +302,7 @@ if len(sys.argv)==1:
     #volatilityThreshold=-0.1
     #auto ->threshold = 0.2
     volatilityThreshold=1.1
-    validationSetLength =48
+    validationSetLength =1
     livePairs =  [
                     #'NZDJPY',\
                     #'CADJPY',\
@@ -713,7 +721,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #pc = data.Close.pct_change().fillna(0)
     #zs=abs(pc[-1]-pc.mean())/pc.std()
     modes = volatilityClassifier(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=debug,\
-                                               ticker=ticker, savePath=chartSavePath)
+                                               ticker=ticker)
     mode = modes[-1]
     if i ==supportResistanceLB:
         modePred = pd.Series(data=-1, index=data.index, name='volatilityPrediction')

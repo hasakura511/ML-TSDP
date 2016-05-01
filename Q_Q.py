@@ -139,9 +139,11 @@ def onBar(bar, symbols):
         #print gotbar[bar['Date']]
         start_time2 = time.time()
         for sym in gotbar[bar['Date']]:
-            logging.info('')
-            logging.info(sym+' timenow: '+dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"))
-            runPair_v4([sym])
+            if sym.split('_')[1] in livePairs:
+                logging.info('')
+                logging.info(sym+' timenow: '+dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"))
+                runPair_v4([sym])
+                
         logging.info( 'All signals created for bar '+str(bar['Date']))
         logging.info('Runtime: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes' ) 
         logging.info('Last bar time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes\n' ) 
@@ -155,7 +157,7 @@ def onBar(bar, symbols):
                 
     
         
-def runPair_v4(pair):
+def runPair_v4(ticker):
     ticker = pair[0].split('_')[1]
     #version = 'v4'
     #version_ = 'v4.3C'
@@ -508,7 +510,7 @@ if __name__ == "__main__":
             start_time = time.time()
             logging.info( 'starting single thread mode for '+str(barSizeSetting)+' bars '+str(len(livePairs))+' pairs.')
             logging.info(str(livePairs) )
-            get_bars(livePairs,barSizeSetting+'_')
+            get_bars(currencyPairs,barSizeSetting+'_')
             #time.sleep(100)
 
     

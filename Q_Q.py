@@ -115,6 +115,7 @@ def onBar(bar, symbols):
     global start_time
     global gotbar
     global pairs
+
     bar = bar.iloc[-1]
     logging.info('received '+str(symbols)+str(bar))
     if not gotbar.has_key(bar['Date']):
@@ -128,8 +129,12 @@ def onBar(bar, symbols):
     #global SST
     #SST = SST.combine_first(bar).sort_index()
     #if debug:
-    
-    if len(gotbar[bar['Date']])==len(livePairs):
+    if addAuxPairs
+        numPairsToWaitFor = len(currencyPairs)
+    else:
+        numPairsToWaitFor =len(livePairs)
+        
+    if len(gotbar[bar['Date']])==numPairsToWaitFor:
     #if len([p for p in gotbar[bar['Date']] if p in livePairs]) == len(livePairs):
         #print gotbar[bar['Date']]
         start_time2 = time.time()
@@ -227,36 +232,42 @@ if __name__ == "__main__":
     asset = 'FX'
     #filterName = 'DF1'
     #data_type = 'ALL'
-    pairs =currencyPairs = [
-                    'NZDJPY',\
-                    'CADJPY',\
-                    'CHFJPY',\
-                    'EURJPY',\
-                    'GBPJPY',\
-                    'AUDJPY',\
-                    'USDJPY',\
-                    'AUDUSD',\
-                    'EURUSD',\
-                    'EURAUD',\
-                    'EURCAD',\
-                    'EURNZD',\
-                    'GBPUSD',\
-                    'USDCAD',\
-                    'USDCHF',\
-                    'NZDUSD',
-                    'EURCHF',\
-                    'EURGBP',\
-                    'AUDCAD',\
-                    'AUDCHF',\
-                    'AUDNZD',\
-                    'GBPAUD',\
-                    'GBPCAD',\
-                    'GBPNZD',\
-                    'GBPCHF',\
-                    'CADCHF',\
-                    'NZDCHF',\
-                    'NZDCAD'
-                    ]
+    #adds auxilary pair features
+    addAuxPairs = True
+    if addAuxPairs:
+        #pairs for onBar trigger, currencyPairs for loading
+        pairs =currencyPairs = [
+                        'NZDJPY',\
+                        'CADJPY',\
+                        'CHFJPY',\
+                        'EURJPY',\
+                        'GBPJPY',\
+                        'AUDJPY',\
+                        'USDJPY',\
+                        'AUDUSD',\
+                        'EURUSD',\
+                        'EURAUD',\
+                        'EURCAD',\
+                        'EURNZD',\
+                        'GBPUSD',\
+                        'USDCAD',\
+                        'USDCHF',\
+                        'NZDUSD',
+                        'EURCHF',\
+                        'EURGBP',\
+                        'AUDCAD',\
+                        'AUDCHF',\
+                        'AUDNZD',\
+                        'GBPAUD',\
+                        'GBPCAD',\
+                        'GBPNZD',\
+                        'GBPCHF',\
+                        'CADCHF',\
+                        'NZDCHF',\
+                        'NZDCAD'
+                        ]
+    else:
+        pairs =currencyPairs = [sys.argv[1]]
     
     livePairs=[sys.argv[1]]
     barSizeSetting=sys.argv[2]
@@ -281,21 +292,16 @@ if __name__ == "__main__":
     verbose=False
 
     #Model Parameters
-
-
-
     #for PCA/KBest
     nfeatures = 10
     #if major low/high most recent index. minDatapoints sets the minimum is period.
     minDatapoints = 3
-    #set to 1 for live
+
     #system selection metric
     #metric = 'CAR25'
     metric = 'CAR25'
     #metric for signal
     metric2='netEquity'
-    #adds auxilary pair features
-    addAuxPairs = True
 
     #robustness
     perturbData = False

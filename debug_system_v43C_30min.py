@@ -15,7 +15,7 @@ Additional bias can be added as a parameter.
 Major Parameters to be optemised:
 bar size
 support/resistance lookback
-volatilityThreshold
+adfPvalue
 AddAuxPairs & nfeatures
 
 
@@ -80,7 +80,7 @@ from suztoolz.display import displayRankedCharts
 from suztoolz.datatools.loadCurrencyPairs import loadCurrencyPairs
 from suztoolz.datatools.acPeriodogram import acPeriodogram
 from suztoolz.datatools.zigzag import zigzag as zg
-from suztoolz.datatools.volatilityClassifier import volatilityClassifier
+from suztoolz.datatools.mrClassifier import mrClassifier
 from suztoolz.position_sizing.calcDPS import calcDPS
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
 from sklearn.pipeline import Pipeline
@@ -299,11 +299,11 @@ if len(sys.argv)==1:
     #useSignalsFrom='best_wf_is_short'
     #useSignalsFrom='best_wf_is_all'
     #cycle mode->threshold=1.1
-    #volatilityThreshold=1.1
+    #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    #volatilityThreshold=-0.1
+    adfPvalue=-1
     #auto ->threshold = 0.2
-    volatilityThreshold=1.1
+    #adfPvalue=1.1
     validationSetLength =48
     livePairs =  [
                     #'NZDJPY',\
@@ -311,7 +311,7 @@ if len(sys.argv)==1:
                     #'CHFJPY',\
                     #'EURJPY',\
                     #'GBPJPY',\
-                    #'AUDJPY',\
+                    'AUDJPY',\
                     #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
@@ -328,13 +328,14 @@ if len(sys.argv)==1:
                     #'AUDCHF',\
                     #'AUDNZD',\
                     #'GBPAUD',\
-                    'GBPCAD',\
+                    #'GBPCAD',\
                     #'GBPNZD',\
                     #'NZDCHF',\
                     #'NZDCAD',\
                     #'CADCHF'
                     ]
     ticker =livePairs[0]
+    #dataPath =  'Z:/TSDP/data/from_IB/'
     dataPath = 'D:/ML-TSDP/data/from_IB/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
@@ -348,7 +349,7 @@ else:
     debug=False
     livePairs=[sys.argv[1]]
     bias=[sys.argv[2]]
-    volatilityThreshold=float(sys.argv[3])
+    adfPvalue=float(sys.argv[3])
     validationSetLength =int(sys.argv[4])
     useSignalsFrom=sys.argv[5]
     ticker =livePairs[0]
@@ -365,11 +366,6 @@ else:
     showIndicators = False
     verbose=False
 
-
-
-
-
-
 #Model Parameters
 supportResistanceLB = 90
 
@@ -380,10 +376,10 @@ nfeatures = 10
 minDatapoints = 3
 #set to 1 for live
 #system selection metric
-#metric = 'CAR25'
-metric = 'netEquity'
+metric = 'CAR25'
+#metric = 'netEquity'
 #adds auxilary pair features
-addAuxPairs = False
+addAuxPairs = True
 
 #robustness
 perturbData = False
@@ -574,12 +570,14 @@ auxPairs_models = [
                 #], voting='hard', weights=None)),
          ("VotingSoft", VotingClassifier(estimators=[\
              #("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
-             ("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
-             ("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
+             #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
+             #("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
              #("QDA", QuadraticDiscriminantAnalysis()),\
-             #("GNBayes",GaussianNB()),\
+             ("GNBayes",GaussianNB()),\
+             ("LDA", LinearDiscriminantAnalysis()), \
+             ("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=minDatapoints, weights='uniform')),\
              #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
-             ("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=True, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
+             #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=True, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
              #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=8, weights='distance')),\
              #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
              #("ETC", ExtraTreesClassifier(class_weight={1:1}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
@@ -593,9 +591,9 @@ if addAuxPairs ==True:
     shortTrendSignalTypes = bias
     shortModel=short_models[0]
     shortTrendPipelines=[
-                   #[shortModel],
+                   [shortModel],
                    #[fs_models[0],shortModel],
-                   [fs_models[1],shortModel],
+                   #[fs_models[1],shortModel],
                     ]
                     
     pv2e_SignalTypes =bias
@@ -603,7 +601,7 @@ if addAuxPairs ==True:
     pv2e_Model=auxPairs_models[0]
     pv2e_Pipelines=[
                     [pv2e_Model],
-                    #[fs_models[0],pv2e_Model],
+                    [fs_models[0],pv2e_Model],
                     #[fs_models[1],pv2e_p2pModel],
                     ]
 
@@ -612,7 +610,7 @@ if addAuxPairs ==True:
     pv3s_Model= auxPairs_models[0]               
     pv3s_Pipelines=[
                     [pv3s_Model],
-                    #[fs_models[0],pv3s_Model],
+                    [fs_models[0],pv3s_Model],
                     #[fs_models[1],pv3s_v2vModel],
                     ]
 else:
@@ -664,6 +662,8 @@ dataSet, auxPairsDict = loadCurrencyPairs(currencyPairs, dataPath,\
                                         signalPath, version, version_, maxReadLines,\
                                         perturbData=perturbData, perturbDataPct=perturbDataPct,\
                                         verbose=verbose, addAuxPairs=addAuxPairs)
+#account for data loss
+validationSetLength = dataSet.shape[0]-supportResistanceLB*2
 
 signalSets={
                 'wf_is_short':{},
@@ -720,10 +720,10 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     minorValley=None
     zz_std=outer_zz_std
     
-    #modes = smoothHurst(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=True)
+    #modes = smoothHurst(data.Close, data.shape[0]-1,threshold=adfPvalue, showPlot=True)
     #pc = data.Close.pct_change().fillna(0)
     #zs=abs(pc[-1]-pc.mean())/pc.std()
-    modes = volatilityClassifier(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=debug,\
+    modes = mrClassifier(data.Close, data.shape[0]-1,threshold=adfPvalue, showPlot=debug,\
                                                ticker=ticker)
     mode = modes[-1]
     if i ==supportResistanceLB:
@@ -945,10 +945,15 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                                                                 supportResistanceLB,lb)
         
         #volatility
-        dataSets[is_period][ticker+'_Pri_ATR_c'+str(is_cycle)+'_r'+str(lb)] = \
+        if is_cycle==supportResistanceLB:
+            #hot fix for insufficient lookback
+            is_cycle_atr=supportResistanceLB/2
+        else:
+            is_cycle_atr=is_cycle
+        dataSets[is_period][ticker+'_Pri_ATR_c'+str(is_cycle_atr)+'_r'+str(lb)] = \
                                                         roofingFilter(ATR(data_primer.High,
                                                         data_primer.Low,
-                                                        data_primer.Close,is_cycle),
+                                                        data_primer.Close,is_cycle_atr),
                                                         supportResistanceLB,lb)
 
 
@@ -965,6 +970,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             for pair in auxPairsDict:
                 auxPairdataSet = pd.DataFrame(index=data_primer.index)
                 closes=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
+                '''
                 highs=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
                 lows=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
                 auxPairdataSet[pair+'_Pri_RSI_c'+str(is_cycle)+'_r'+str(lb)] =\
@@ -980,6 +986,9 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 auxPairdataSet[pair+'_Pri_ATR_c'+str(is_cycle)+'_r'+str(lb)] =\
                                                                 roofingFilter(ATR(highs,lows,\
                                                         closes,is_cycle), supportResistanceLB,lb)
+                '''
+                auxPairdataSet[pair+'Pri_ROC_c'+str(is_cycle)] =\
+                                        ROC(closes,is_cycle)
                 dataSets[is_period] = pd.concat([dataSets[is_period], auxPairdataSet], axis=1)
                 #auxPairdataSet.iloc[-supportResistanceLB:].iloc[index].plot()
             
@@ -991,7 +1000,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 print '\n'+ticker+' '+is_period+' Low Volatility: Cycle Mode '+str(lastIndex)
             else:
                 print '\n'+ticker+' '+is_period+' High Volatility Trend Mode '+str(lastIndex)
-            print i,'cols',dataSets[is_period].shape[1],'nrows (lb)' ,lb,'ZZ Cycle',is_cycle,'AC Cycle',DominantCycle
+            print 'index',i,'cols',dataSets[is_period].shape[1],'nrows (lb)' ,lb,'ZZ Cycle',is_cycle,'AC Cycle',DominantCycle
             
         for st in signal_types:
             # ['gainAhead','zigZag','buyHold','sellHold']
@@ -1059,6 +1068,10 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                     #train/predict    
                     Pipeline(pipeline).fit(x_train, y_train_ga)
                     signal = Pipeline(pipeline).predict([x_test])
+                    #x_train2=np.append(x_train,[x_test],axis=0)
+                    #y_train_ga2=np.append(y_train_ga,signal)
+                    #Pipeline(pipeline).fit(x_train2, y_train_ga2)
+                    #signal2 = Pipeline(pipeline).predict([x_test])
                     col_name = st+'_'+pipeline[0][0]+'_f'+str(cols)+'_is'+str(lb)
                     #print signal,dataSet.ix[lastIndex].gainAhead,col_name
                     
@@ -1075,7 +1088,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                     signalSets[is_period][dictName].set_value(lastIndex,'nodpsComm',commission)
                     signalSets[is_period][dictName].set_value(lastIndex,'netEquity',lastEquity)
                     if verbose:
-                        print signal,dataSet.ix[lastIndex].gainAhead,col_name
+                        print signal, dataSet.ix[lastIndex].gainAhead,col_name
                         print 'prior signal', signalSets[is_period][dictName].signals[-2], signalSets[is_period][dictName].gainAhead[-2], netPNL, commission, lastEquity
 
             elif st == 'zigZag':
@@ -1138,13 +1151,13 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                            savePath=chartSavePath+'_TECH_'+is_period, debug=debug)
                                            
     dpsDF_all = pd.DataFrame()
-
+    windowLength = supportResistanceLB
     for is_period in signalSets:
         dpsDF = pd.DataFrame()
         
         for col in signalSets[is_period]:    
             #calcDPS
-            windowLength = windowLengths[is_period]
+            #windowLength = windowLengths[is_period]
             if PRT is not None and windowLength is not None:
                 dps = calcDPS(col, signalSets[is_period][col], PRT, windowLength, verbose=False,\
                                         asset=asset)
@@ -1202,9 +1215,9 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     dpsDF_BofB = pd.DataFrame()
     dpsDF_BofW = pd.DataFrame()
     
-    windowLength = int(np.array([windowLengths[x] for x in windowLengths]).mean())
+    #windowLength = int(np.array([windowLengths[x] for x in windowLengths]).mean())
     if verbose:
-        print '\nwindowLength  for final EC calc', windowLength,
+        print '\nwindowLength  for final EC calc', windowLength
     for rank in DpsRankByMetricB:
         DpsRankByMetricB[rank].index.name = 'dates'
         updateDps = calcDPS(rank, DpsRankByMetricB[rank], PRT, windowLength, verbose=False,\
@@ -1298,10 +1311,17 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             print 'Trend mode - choosing signal from', curve
 
         '''
+    #if mode==0:   
+    #    mr=True
+    #    metric2='netEquity'
+        #metric2='netEquity'
+    #    curve='lowest netEquity'
+    #else:
     mr=False
-    metric2='netEquity'
-    curve='netEquity'
-    
+    metric2='CAR25'
+    #metric2='netEquity'
+    curve='highest CAR25'
+    dpsDF_all2 = dpsDF_all2.append(dpsDF_all)
     dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
     
     if i == supportResistanceLB:
@@ -1310,15 +1330,17 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
         signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
         signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
-        signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_all2.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
+        signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
     else:
         #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
         #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-        signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_all2.sort_values(by=metric2, ascending=mr).iloc[0])
+        signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0])
         index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
         signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
         signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric2)
-    
+        
+    #print dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0]
+    #print signalDF['tripleFiltered'].iloc[-1]    
             
     if showCharts:
             
@@ -1412,8 +1434,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                         )
 if showCharts:
-    modes = volatilityClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
-                                        data.Close.shape[0],threshold=volatilityThreshold,\
+    modes = mrClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
+                                        data.Close.shape[0],threshold=adfPvalue,\
                                         showPlot=debug, ticker=ticker, savePath=chartSavePath+'_MODE2')
     if debug:
         for x in signalSets:

@@ -15,7 +15,7 @@ Additional bias can be added as a parameter.
 Major Parameters to be optemised:
 bar size
 support/resistance lookback
-volatilityThreshold
+adfPvalue
 AddAuxPairs & nfeatures
 
 
@@ -76,11 +76,10 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
                         roofingFilter, getCycleTime, saveParams
 
 from suztoolz.loops import calcEquity2, createBenchmark, createYearlyStats, findBestDPS
-from suztoolz.display import displayRankedCharts
 from suztoolz.datatools.loadCurrencyPairs import loadCurrencyPairs
 from suztoolz.datatools.acPeriodogram import acPeriodogram
 from suztoolz.datatools.zigzag import zigzag as zg
-from suztoolz.datatools.volatilityClassifier import volatilityClassifier
+from suztoolz.datatools.mrClassifier import mrClassifier
 from suztoolz.position_sizing.calcDPS import calcDPS
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
 from sklearn.pipeline import Pipeline
@@ -263,9 +262,9 @@ def runv4(runData):
         shortTrendSignalTypes = bias
         shortModel=short_models[0]
         shortTrendPipelines=[
-                       #[shortModel],
+                       [shortModel],
                        #[fs_models[0],shortModel],
-                       [fs_models[1],shortModel],
+                       #[fs_models[1],shortModel],
                         ]
                         
         pv2e_SignalTypes =bias
@@ -273,7 +272,7 @@ def runv4(runData):
         pv2e_Model=auxPairs_models[0]
         pv2e_Pipelines=[
                         [pv2e_Model],
-                        #[fs_models[0],pv2e_Model],
+                        [fs_models[0],pv2e_Model],
                         #[fs_models[1],pv2e_p2pModel],
                         ]
 
@@ -282,7 +281,7 @@ def runv4(runData):
         pv3s_Model= auxPairs_models[0]               
         pv3s_Pipelines=[
                         [pv3s_Model],
-                        #[fs_models[0],pv3s_Model],
+                        [fs_models[0],pv3s_Model],
                         #[fs_models[1],pv3s_v2vModel],
                         ]
     else:
@@ -334,7 +333,9 @@ def runv4(runData):
                                             signalPath, version, version_, maxReadLines,\
                                             perturbData=perturbData, perturbDataPct=perturbDataPct,\
                                             verbose=verbose, addAuxPairs=addAuxPairs)
-
+    #account for data loss
+    validationSetLength = dataSet.shape[0]-supportResistanceLB*2
+    
     signalSets={
                     'wf_is_short':{},
                     'wf_is_pv2e_p2p':{},
@@ -390,10 +391,10 @@ def runv4(runData):
         minorValley=None
         zz_std=outer_zz_std
         
-        #modes = smoothHurst(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=True)
+        #modes = smoothHurst(data.Close, data.shape[0]-1,threshold=adfPvalue, showPlot=True)
         #pc = data.Close.pct_change().fillna(0)
         #zs=abs(pc[-1]-pc.mean())/pc.std()
-        modes = volatilityClassifier(data.Close, data.shape[0]-1,threshold=volatilityThreshold, showPlot=debug,\
+        modes = mrClassifier(data.Close, data.shape[0]-1,threshold=adfPvalue, showPlot=debug,\
                                                    ticker=ticker)
         mode = modes[-1]
         if i ==supportResistanceLB:
@@ -615,6 +616,11 @@ def runv4(runData):
                                                                                     supportResistanceLB,lb)
             
             #volatility
+            if is_cycle==supportResistanceLB:
+                #hot fix for insufficient lookback
+                is_cycle_atr=supportResistanceLB/2
+            else:
+                is_cycle_atr=is_cycle
             dataSets[is_period][ticker+'_Pri_ATR_c'+str(is_cycle)+'_r'+str(lb)] = \
                                                             roofingFilter(ATR(data_primer.High,
                                                             data_primer.Low,
@@ -635,6 +641,7 @@ def runv4(runData):
                 for pair in auxPairsDict:
                     auxPairdataSet = pd.DataFrame(index=data_primer.index)
                     closes=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
+                    '''
                     highs=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
                     lows=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
                     auxPairdataSet[pair+'_Pri_RSI_c'+str(is_cycle)+'_r'+str(lb)] =\
@@ -650,6 +657,9 @@ def runv4(runData):
                     auxPairdataSet[pair+'_Pri_ATR_c'+str(is_cycle)+'_r'+str(lb)] =\
                                                                     roofingFilter(ATR(highs,lows,\
                                                             closes,is_cycle), supportResistanceLB,lb)
+                    '''
+                    auxPairdataSet[pair+'Pri_ROC_c'+str(is_cycle)] =\
+                                        ROC(closes,is_cycle)
                     dataSets[is_period] = pd.concat([dataSets[is_period], auxPairdataSet], axis=1)
                     #auxPairdataSet.iloc[-supportResistanceLB:].iloc[index].plot()
                 
@@ -661,7 +671,7 @@ def runv4(runData):
                     print '\n'+ticker+' '+is_period+' Low Volatility: Cycle Mode '+str(lastIndex)
                 else:
                     print '\n'+ticker+' '+is_period+' High Volatility Trend Mode '+str(lastIndex)
-                print i,'cols',dataSets[is_period].shape[1],'nrows (lb)' ,lb,'ZZ Cycle',is_cycle,'AC Cycle',DominantCycle
+                print 'index',i,'cols',dataSets[is_period].shape[1],'nrows (lb)' ,lb,'ZZ Cycle',is_cycle,'AC Cycle',DominantCycle
                 
             for st in signal_types:
                 # ['gainAhead','zigZag','buyHold','sellHold']
@@ -968,9 +978,15 @@ def runv4(runData):
                 print 'Trend mode - choosing signal from', curve
 
             '''
+        #if mode==0:   
+        #   mr=True
+        #    #metric2='netEquity'
+        #    curve='lowest '+metric2
+        #else:
         mr=False
-        curve=metric2
-        
+        #metric2='netEquity'
+        curve='highest '+metric2
+        dpsDF_all2 = dpsDF_all2.append(dpsDF_all)
         dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
         
         if i == supportResistanceLB:
@@ -979,15 +995,16 @@ def runv4(runData):
             signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
             signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
             signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
-            signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_all2.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
+            signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
         else:
             #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
             #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-            signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_all2.sort_values(by=metric2, ascending=mr).iloc[0])
+            signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0])
             index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
             signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
             signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric2)
-        
+        #print dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0]
+        #print signalDF['tripleFiltered'].iloc[-1]
                 
         if showCharts:                
             zz.plot_pivots(l=8,w=8,\
@@ -1080,8 +1097,8 @@ def runv4(runData):
                                             savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                             )
     if showCharts:
-        modes = volatilityClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
-                                            data.Close.shape[0],threshold=volatilityThreshold,\
+        modes = mrClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
+                                            data.Close.shape[0],threshold=adfPvalue,\
                                             showPlot=debug, ticker=ticker, savePath=chartSavePath+'_MODE2')
         if debug:
             for x in signalSets:
@@ -1174,11 +1191,11 @@ if __name__ == "__main__":
         #bias=['buyHold']
         useSignalsFrom='tripleFiltered'
         #cycle mode->threshold=1.1
-        #volatilityThreshold=1.1
+        #adfPvalue=1.1
         #trendmode -> threshold = -0.1
-        #volatilityThreshold=-0.1
+        #adfPvalue=-0.1
         #auto ->threshold = 0.2
-        volatilityThreshold=0.1
+        adfPvalue=-1
         validationSetLength =48
         livePairs =  [
                         #'NZDJPY',\
@@ -1192,7 +1209,7 @@ if __name__ == "__main__":
                         #'EURGBP',\
                         #'EURUSD',\
                         #'EURAUD',\
-                        'EURCAD',\
+                        #'EURCAD',\
                         #'EURNZD',\
                         #'AUDUSD',\
                         #'GBPUSD',\
@@ -1204,12 +1221,13 @@ if __name__ == "__main__":
                         #'AUDNZD',\
                         #'GBPAUD',\
                         #'GBPCAD',\
-                        #'GBPNZD',\
+                        'GBPNZD',\
                         #'NZDCHF',\
                         #'NZDCAD',\
                         #'CADCHF'
                         ]
         ticker =livePairs[0]
+        #dataPath =  'Z:/TSDP/data/from_IB/'
         dataPath = 'D:/ML-TSDP/data/from_IB/'
         signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
         #chartSavePath = None
@@ -1223,7 +1241,7 @@ if __name__ == "__main__":
         debug=False
         livePairs=[sys.argv[1]]
         bias=[sys.argv[2]]
-        volatilityThreshold=float(sys.argv[3])
+        adfPvalue=float(sys.argv[3])
         validationSetLength =int(sys.argv[4])
         useSignalsFrom=sys.argv[5]
         ticker =livePairs[0]
@@ -1250,12 +1268,12 @@ if __name__ == "__main__":
     minDatapoints = 2
     #set to 1 for live
     #system selection metric
-    #metric = 'CAR25'
-    metric = 'netEquity'
+    metric = 'CAR25'
+    #metric = 'netEquity'
     #metric for signal
-    metric2='netEquity'
+    metric2='CAR25'
     #adds auxilary pair features
-    addAuxPairs = False
+    addAuxPairs = True
 
     #robustness
     perturbData = False
@@ -1375,9 +1393,9 @@ if __name__ == "__main__":
                  #("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
                  #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
                  #("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
-                 ("QDA", QuadraticDiscriminantAnalysis()),\
+                 #("QDA", QuadraticDiscriminantAnalysis()),\
                  ("GNBayes",GaussianNB()),\
-                 #("LDA", LinearDiscriminantAnalysis()), \
+                 ("LDA", LinearDiscriminantAnalysis()), \
                  ("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=minDatapoints, weights='uniform')),\
                  #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
                  #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:500}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
@@ -1439,12 +1457,14 @@ if __name__ == "__main__":
                     #], voting='hard', weights=None)),
              ("VotingSoft", VotingClassifier(estimators=[\
                  #("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
-                 ("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
-                 ("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
+                 #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
+                 #("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
                  #("QDA", QuadraticDiscriminantAnalysis()),\
-                 #("GNBayes",GaussianNB()),\
+                 ("GNBayes",GaussianNB()),\
+                 ("LDA", LinearDiscriminantAnalysis()), \
+                 ("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=minDatapoints, weights='uniform')),\
                  #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
-                 ("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=True, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
+                 #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:1}, kernel='rbf', max_iter=-1, probability=True, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
                  #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=8, weights='distance')),\
                  #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
                  #("ETC", ExtraTreesClassifier(class_weight={1:1}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
@@ -1458,7 +1478,7 @@ if __name__ == "__main__":
         for ticker in livePairs:
             runData = {'version':version, 'version_':version_,'asset':asset,'asset':asset,\
                             'barSizeSetting':barSizeSetting,'currencyPairs':currencyPairs,'debug':debug,'bias':bias,\
-                            'volatilityThreshold':volatilityThreshold, 'validationSetLength':validationSetLength,'livePairs':livePairs,\
+                            'adfPvalue':adfPvalue, 'validationSetLength':validationSetLength,'livePairs':livePairs,\
                             'ticker':ticker, 'dataPath':dataPath,'signalPath':signalPath,'chartSavePath':chartSavePath,\
                             'showCharts':showCharts, 'showFinalChartOnly':showFinalChartOnly,'showIndicators':showIndicators,\
                             'verbose':verbose, 'supportResistanceLB':supportResistanceLB,'nfeatures':nfeatures,\

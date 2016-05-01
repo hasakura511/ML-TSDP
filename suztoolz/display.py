@@ -70,6 +70,67 @@ def offlineMode(ticker, errorText, signalPath, ver1, ver2):
         print errorText    
         #sys.exit(errorText)
         
+def describeDistribution2(qtC,ticker):
+    hold_days = 1
+    #qtC = dataSet.reset_index()['Close']
+    #qtP = dataSet.reset_index()['priceChange']
+    nrows = qtC.shape[0]
+    qtP=qtC.pct_change().fillna(0)
+    # ------------------------
+    #   Set up gainer and loser lists
+    gainer = np.zeros(nrows, dtype=int)
+    loser = np.zeros(nrows, dtype=int)
+    i_gainer = 0
+    i_loser = 0
+
+    for i in range(0,nrows-hold_days):
+        if (qtC[i+hold_days]>qtC[i]):
+            gainer[i_gainer] = i
+            i_gainer = i_gainer + 1
+        else:
+            loser[i_loser] = i
+            i_loser = i_loser + 1
+    number_gainers = i_gainer
+    number_losers = i_loser
+    print 'Issue:             ' + ticker
+    #print 'Dates:             ' + str(qtC.index[0])
+    #print '  to:              ' + str(qtC.index[-1])
+    print 'Rows:              ' + str(qtC.shape[0])
+    #print 'Cols:              ' + str(qtC.shape[1])
+    print 'Number Gainers:     %d ' % number_gainers
+    print 'Number Losers:      %d ' % number_losers
+    
+    hist, bins = np.histogram(qtP.values, bins=100)
+    width = 0.7 * (bins[1] - bins[0])
+    center = (bins[:-1] + bins[1:]) / 2
+    plt.bar(center, hist, align='center', width=width, color='r')
+    plt.title('____Price Distribution____')
+    plt.show()
+    kurt = kurtosis(qtP.values)
+    sk = skew(qtP.values)
+    print 'Mean: ', qtP.values.mean(), ' StDev: ',qtP.values.std()
+    print ' Kurtosis: ', kurt, ' Skew: ', sk
+
+
+    X2 = np.sort(qtP)
+    F2 = np.array(range(qtP.shape[0]), dtype=float)/qtP.shape[0]
+    plt.title( '____Cumulative Distribution____')
+    plt.plot(F2,X2, color='r')
+    plt.show()
+
+    tox  = getToxCDF(abs(qtP), display=True)
+
+    #entropy
+    ent = 0
+    hist = hist[np.nonzero(hist)].astype(float)
+    for i in hist/sum(hist):
+        ent -= i * math.log(i, len(hist))
+        #print i,ent
+    print '\nEntropy:              ', ent
+
+    #ADF, Hurst
+    adf_test(qtC)
+    
 def describeDistribution(qtC,qtP,ticker):
     hold_days = 1
     #qtC = dataSet.reset_index()['Close']

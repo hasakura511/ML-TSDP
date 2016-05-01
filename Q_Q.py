@@ -129,7 +129,7 @@ def onBar(bar, symbols):
     #global SST
     #SST = SST.combine_first(bar).sort_index()
     #if debug:
-    if addAuxPairs
+    if addAuxPairs:
         numPairsToWaitFor = len(currencyPairs)
     else:
         numPairsToWaitFor =len(livePairs)

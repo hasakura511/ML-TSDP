@@ -174,14 +174,16 @@ def runPair_v4(pair):
         with open ('/logs/'+ticker +version+ '.log','a') as f:
             orig_stdout = sys.stdout
             sys.stdout = f
-            print 'Starting '+version+': ' + ticker
+            print 'Starting '+version_+': ' + ticker
             if ticker not in livePairs:
                 offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
             #f.write('Starting '+version+': ' + ticker)         
             #ferr.write('Starting '+version+': ' + ticker)
             signal=runv4(runData)
             print signal
-            logging.info(version+' '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
+            logging.info(ticker+' '+barSizeSetting+' '+bias[0]+' '+str(adfPvalue)+' '+str(supportResistanceLB)+' '\
+                    +str(validationSetLength)+' '+useSignalsFrom)
+            logging.info(version_+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
             #logging.info(signal.system)
             #subprocess.call(['python','debug_system_v4.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
@@ -225,7 +227,38 @@ if __name__ == "__main__":
     asset = 'FX'
     #filterName = 'DF1'
     #data_type = 'ALL'
-    pairs =currencyPairs=livePairs=[sys.argv[1]]
+    pairs =currencyPairs = [
+                    'NZDJPY',\
+                    'CADJPY',\
+                    'CHFJPY',\
+                    'EURJPY',\
+                    'GBPJPY',\
+                    'AUDJPY',\
+                    'USDJPY',\
+                    'AUDUSD',\
+                    'EURUSD',\
+                    'EURAUD',\
+                    'EURCAD',\
+                    'EURNZD',\
+                    'GBPUSD',\
+                    'USDCAD',\
+                    'USDCHF',\
+                    'NZDUSD',
+                    'EURCHF',\
+                    'EURGBP',\
+                    'AUDCAD',\
+                    'AUDCHF',\
+                    'AUDNZD',\
+                    'GBPAUD',\
+                    'GBPCAD',\
+                    'GBPNZD',\
+                    'GBPCHF',\
+                    'CADCHF',\
+                    'NZDCHF',\
+                    'NZDCAD'
+                    ]
+    
+    livePairs=[sys.argv[1]]
     barSizeSetting=sys.argv[2]
     bias = [sys.argv[3]]
     adfPvalue=float(sys.argv[4])
@@ -254,15 +287,15 @@ if __name__ == "__main__":
     #for PCA/KBest
     nfeatures = 10
     #if major low/high most recent index. minDatapoints sets the minimum is period.
-    minDatapoints = 2
+    minDatapoints = 3
     #set to 1 for live
     #system selection metric
     #metric = 'CAR25'
     metric = 'CAR25'
     #metric for signal
-    metric2='CAR25'
+    metric2='netEquity'
     #adds auxilary pair features
-    addAuxPairs = False
+    addAuxPairs = True
 
     #robustness
     perturbData = False

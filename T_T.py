@@ -174,14 +174,16 @@ def runPair_v4(pair):
         with open ('/logs/'+ticker +version+ '.log','a') as f:
             orig_stdout = sys.stdout
             sys.stdout = f
-            print 'Starting '+version+': ' + ticker
+            print 'Starting '+version_+': ' + ticker
             if ticker not in livePairs:
                 offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
             #f.write('Starting '+version+': ' + ticker)         
             #ferr.write('Starting '+version+': ' + ticker)
             signal=runv4(runData)
             print signal
-            logging.info(version+' '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
+            logging.info(ticker+' '+barSizeSetting+' '+bias[0]+' '+str(adfPvalue)+' '+str(supportResistanceLB)+' '\
+                    +str(validationSetLength)+' '+useSignalsFrom)
+            logging.info(version_+' '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
             #logging.info(signal.system)
             #subprocess.call(['python','debug_system_v4.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
             #f.close()
@@ -225,7 +227,67 @@ if __name__ == "__main__":
     #filterName = 'DF1'
     #data_type = 'ALL'
     barSizeSetting='30m'
-    pairs =currencyPairs=livePairs=['EURCAD','GBPCAD','EURUSD','USDCHF']
+    pairs =currencyPairs = [
+                    'NZDJPY',\
+                    'CADJPY',\
+                    'CHFJPY',\
+                    'EURJPY',\
+                    'GBPJPY',\
+                    'AUDJPY',\
+                    'USDJPY',\
+                    'AUDUSD',\
+                    'EURUSD',\
+                    'EURAUD',\
+                    'EURCAD',\
+                    'EURNZD',\
+                    'GBPUSD',\
+                    'USDCAD',\
+                    'USDCHF',\
+                    'NZDUSD',
+                    'EURCHF',\
+                    'EURGBP',\
+                    'AUDCAD',\
+                    'AUDCHF',\
+                    'AUDNZD',\
+                    'GBPAUD',\
+                    'GBPCAD',\
+                    'GBPNZD',\
+                    'GBPCHF',\
+                    'CADCHF',\
+                    'NZDCHF',\
+                    'NZDCAD'
+                    ]
+    livePairs =  [
+                #'NZDJPY',\
+                #'CADJPY',\
+                #'CHFJPY',\
+                #'EURJPY',\
+                #'GBPJPY',\
+                #'AUDJPY',\
+                #'USDJPY',\
+                #'EURCHF',\
+                #'EURGBP',\
+                #'EURUSD',\
+                #'EURAUD',\
+                #'EURCAD',\
+                #'EURNZD',\
+                #'AUDUSD',\
+                #'GBPUSD',\
+                #'USDCAD',\
+                #'USDCHF',\
+                #'NZDUSD',
+                #'AUDCAD',\
+                #'AUDCHF',\
+                #'AUDNZD',\
+                #'GBPAUD',\
+                #'GBPCAD',\
+                #'GBPCHF',\
+                #'GBPNZD',\
+                #'NZDCHF',\
+                'NZDCAD',\
+                #'CADCHF'
+                ]
+    #livePairs=[sys.argv[1]]
 
     if len(sys.argv)==1:
         debug=True
@@ -241,7 +303,7 @@ if __name__ == "__main__":
         #trendmode -> threshold = -0.1
         #adfPvalue=-0.1
         #auto ->threshold = 0.2
-        adfPvalue=0.1
+        adfPvalue=0
         validationSetLength =48
         #livePairs =  currencyPairs
         ticker =[
@@ -285,8 +347,8 @@ if __name__ == "__main__":
     else:
         debug=False
         #livePairs=currencyPairs
-        bias = ['gainAhead']
-        adfPvalue=0.1
+        bias = ['zigZag']
+        adfPvalue=0
         validationSetLength =48
         ticker =livePairs[0]
         #symbol=ticker[0:3]
@@ -294,7 +356,7 @@ if __name__ == "__main__":
         signalPath = './data/signals/'
         dataPath = './data/from_IB/'
         #this gets overwritten
-        chartSavePath = './data/results/'+version+'_'+ticker
+        chartSavePath = './data/results/'
         
         #display params
         showCharts=False
@@ -310,15 +372,15 @@ if __name__ == "__main__":
     #for PCA/KBest
     nfeatures = 10
     #if major low/high most recent index. minDatapoints sets the minimum is period.
-    minDatapoints = 2
+    minDatapoints = 3
     #set to 1 for live
     #system selection metric
     #metric = 'CAR25'
-    metric = 'netEquity'
+    metric = 'CAR25'
     #metric for signal
     metric2='netEquity'
     #adds auxilary pair features
-    addAuxPairs = False
+    addAuxPairs = True
 
     #robustness
     perturbData = False

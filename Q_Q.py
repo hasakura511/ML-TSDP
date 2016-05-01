@@ -139,7 +139,7 @@ def onBar(bar, symbols):
         #print gotbar[bar['Date']]
         start_time2 = time.time()
         for sym in gotbar[bar['Date']]:
-            ticker = sym[0].split('_')[1]
+            ticker = sym.split('_')[1]
             if ticker in livePairs:
                 logging.info('')
                 logging.info(sym+' timenow: '+dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"))

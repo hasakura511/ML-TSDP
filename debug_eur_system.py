@@ -113,9 +113,9 @@ for pair in pairs:
         #f.close()
         logging.error("something bad happened", exc_info=True)
         #return
-logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
+logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+'OFFLINE')
 logging.info('Offline Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed', barSize, bias, adfPvalue, scriptName,useSignalsFrom
+print len(pairs), 'pairs completed', barSize, 'OFFLINE'
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 ###############v3 OFFLINE###################
@@ -163,9 +163,9 @@ for pair in pairs:
         #f.close()
         logging.error("something bad happened", exc_info=True)
         #return
-logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
+logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+'OFFLINE')
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed', version_, barSize, bias
+print len(pairs), 'pairs completed', version_, barSize, 'OFFLINE'
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 ##################################

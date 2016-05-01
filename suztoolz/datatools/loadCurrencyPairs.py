@@ -103,7 +103,7 @@ def loadCurrencyPairs(currencyPairs, dataPath, barSizeSetting, maxlb, ticker,\
                 data['Close'] = perturb_data(data['Close'].values,perturbDataPct)
                 
             if verbose:
-                print pair, currencyPairsDict2[pair].shape,'to',
+                print 'Dropping dupes:', pair, currencyPairsDict2[pair].shape,'to',
             currencyPairsDict2[pair] = data.drop_duplicates()
             if verbose:
                 print pair, currencyPairsDict2[pair].shape
@@ -118,13 +118,25 @@ def loadCurrencyPairs(currencyPairs, dataPath, barSizeSetting, maxlb, ticker,\
                     
         #align the index, at the end of the loop, dataSet should have an index that all pairs contain
         for pair in currencyPairsDict2:
-            if lastIndex in currencyPairsDict2[pair].index and pair != ticker:
-                print ticker,pair, [x for x in currencyPairsDict[ticker].index if x not in currencyPairsDict2[pair].index]
-                intersect =np.intersect1d(currencyPairsDict2[pair].index, dataSet.index)         
+            missingData=[x for x in currencyPairsDict[ticker].index if x not in currencyPairsDict2[pair].index]
+            print 'Missing data:',ticker,pair, missingData
+            
+            #forward fill missing data
+            if len(missingData)>0:
+                print 'Forward filling missing data..'
+                #print currencyPairsDict2[pair].ix[missingData]
+                currencyPairsDict2[pair]=currencyPairsDict2[pair].ix[currencyPairsDict[ticker].index].fillna(method='ffill')
+                #print currencyPairsDict2[pair].ix[missingData]
+
+                
+            if pair != ticker:
+                intersect =np.intersect1d(currencyPairsDict2[pair].index, dataSet.index)
                 dataSet = dataSet.ix[intersect]
         #align the other pairs.
-        for pair in currencyPairsDict2:            
-                currencyPairsDict2[pair] = currencyPairsDict2[pair].ix[dataSet.index]
+        for pair in currencyPairsDict2:
+            #print 'Reindex:',pair, currencyPairsDict2[pair].shape,
+            currencyPairsDict2[pair] = currencyPairsDict2[pair].ix[dataSet.index]
+            #print 'to', currencyPairsDict2[pair].shape
                 
         dataSet=currencyPairsDict2[ticker].copy(deep=True)
         print nrows-dataSet.shape[0], 'rows lost for', ticker   

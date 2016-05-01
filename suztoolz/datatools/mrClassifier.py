@@ -31,6 +31,7 @@ from suztoolz.display import describeDistribution2
 from suztoolz.transform import roofingFilter, softmax,\
             softmax_score
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
+import statsmodels.tsa.stattools as ts
 
 def garch(returns, verbose=False):
     am = arch.arch_model(returns*100)
@@ -84,9 +85,9 @@ def garch4(returns, verbose=False):
         print res.summary()
     return forecast
     
-def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePath=None):
-    if len(p)-bars <3:
-        bars=len(p)-3
+def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=None):
+    #if len(p)-bars <3:
+    #    bars=len(p)-3
     index = p.index
     index2=p.index[bars:]
     returns = p.pct_change().fillna(0)
@@ -96,8 +97,8 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
         p = p.values
         
     nrows=p.shape[0]
-    Dimen=np.zeros(nrows)
-    Hurst=np.zeros(nrows)
+    #Dimen=np.zeros(nrows)
+    #Hurst=np.zeros(nrows)
     #SmoothHurst=np.zeros(nrows)
     #gar=np.zeros(nrows)
     #gar[:bars]=garch(returns[:bars])
@@ -107,9 +108,9 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
     #gar3[:bars]=garch3(returns[:bars])
     #gar4=np.zeros(nrows)
     #gar4[:bars]=garch4(returns[:bars])
-
-    
-    SmoothGarch=np.zeros(nrows)
+    adfpv=np.zeros(nrows)
+    adfClass=np.zeros(nrows)
+    #SmoothGarch=np.zeros(nrows)
     #minmaxGarch=np.zeros(nrows)
     #minmaxGarch2=np.zeros(nrows)
     #minmaxGarch3=np.zeros(nrows)
@@ -146,11 +147,26 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
         #gar3[lb] = garch3(returns[:lb])[-1]
         #minmaxGarch3[lb] =minmax_scale(gar3[i:lb]) [-1]
         #gar4[lb] = garch4(returns[i:lb])[-1]
-        mmG=minmax_scale(garch4(returns[i:lb]))
+        #mmG=minmax_scale(garch4(returns[i:lb]))
         #minmaxGarch4[lb] =mmG[-1]
-        SmoothGarch[lb]=c1*(mmG[-1]+mmG[-2])/2\
-                        +c2*SmoothGarch[lb-1]\
-                        +c3*SmoothGarch[lb-2]
+        #SmoothGarch[lb]=c1*(mmG[-1]+mmG[-2])/2\
+        #                +c2*SmoothGarch[lb-1]\
+        #                +c3*SmoothGarch[lb-2]
+        adf = ts.adfuller(p[i:lb],1)
+        adfpv[lb]=adf[0]
+        #print "Test-Stat", adf[0]
+        #for key in adf[4]:
+        #    print "Critical Values:",key, adf[4][key],
+        #    if adf[0] < adf[4][key]:
+        #        print 'PASS'
+        #    else:
+        #        print 'FAIL'
+
+        if adf[0]<threshold:
+            adfClass[lb]=0
+        else:
+            adfClass[lb]=1
+
         #print gar4[lb], len(returns[i:lb]), minmaxGarch4[lb]
         
     #SmoothGarch= roofingFilter(gar,bars)
@@ -160,36 +176,37 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
     #softmaxGarch = softmax_score(gar)
     #print minmaxGarch
     #print gar4, minmaxGarch4
-                                
+    #SmoothGarch= roofingFilter(gar,bars)
     #to return
     #SmoothHG = np.maximum(SmoothHurst,minmaxGarch)
     #scaledVolatility = minmaxGarch
     #scaledVolatility2 = minmaxGarch2
     #scaledVolatility3 = minmaxGarch3
-    scaledVolatility4 = SmoothGarch
+    #scaledVolatility4 = SmoothGarch
     #scaledVolatility = np.minimum(SmoothHurst,SmoothGarch)
     #modes = np.where(scaledVolatility<threshold,0,1)
     #modes2 = np.where(scaledVolatility2<threshold,0,1)
     #modes3 = np.where(scaledVolatility3<threshold,0,1)
-    modes4 = np.where(scaledVolatility4<threshold,0,1)
+    #modes4 = np.where(scaledVolatility4<threshold,0,1)
     #modes = np.where(minmaxGarch<threshold,0,1)
     #mode2 = np.where(Hurst[bars:]<threshold,0,1)
-    
+    modes4=adfClass
     #mode = modes[bars:]
     #mode2 = modes2[bars:]
     #mode3 = modes3[bars:]
     mode4 = modes4[bars:]
+    adfpv= adfpv[bars:]
     p=p[bars:]
     index = index2
     nrows=p.shape[0]
     #print nrows, len(p)
     #Hurst=Hurst[bars:]
     #SmoothHurst=SmoothHurst[bars:]
-    SmoothGarch=SmoothGarch[bars:]
+    #SmoothGarch=SmoothGarch[bars:]
     #scaledVolatility=scaledVolatility[bars:]
     #scaledVolatility2=scaledVolatility2[bars:]
     #scaledVolatility3=scaledVolatility3[bars:]
-    scaledVolatility4=scaledVolatility4[bars:]
+    #scaledVolatility4=scaledVolatility4[bars:]
     #print gar, minmaxGarch, SmoothGarch
     #minmaxGarch=minmaxGarch[bars:]
     #gar=gar[bars:]
@@ -222,11 +239,12 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
     ax2.set_color_cycle(sorted(sns.color_palette("husl", 4)))
     #ax2.plot(np.arange(len(p)),Hurst,color='b', label='Hurst')
     #ax2.plot(np.arange(len(p)),SmoothHurst,color='b', label='smoothHurst')
-    ax2.plot(np.arange(len(p)),SmoothGarch, label='smoothGarch')
+    #ax2.plot(np.arange(len(p)),SmoothGarch, label='smoothGarch')
     #ax2.plot(np.arange(len(p)),scaledVolatility, label='scaledVolatility')
     #ax2.plot(np.arange(len(p)),scaledVolatility2, label='scaledVolatility2')
     #ax2.plot(np.arange(len(p)),scaledVolatility3, label='scaledVolatility3')
     #ax2.plot(np.arange(len(p)),scaledVolatility4, label='scaledVolatility4')
+    ax2.plot(np.arange(len(p)),adfpv, label='adf pvalue')
     t = np.zeros(len(p))
     t.fill(threshold)
     ax2.plot(np.arange(len(p)),t,color='k', label='threshold')
@@ -240,9 +258,9 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
     #ax2.plot(np.arange(nrows),dpsEquity, label='dps '+system, ls=next(linecycle))
     #ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
     if mode4[-1] ==0:
-        title = ticker+' Low Volatility: Cycle Mode '
+        title = ticker+' Mean Reverting: Cycle Mode '
     else:
-        title = ticker+' High Volatility Trend Mode '
+        title = ticker+' Non-Mean Reverting: Trend Mode '
     ax2.set_title(title+str(bars)+' bars, threshold '+str(threshold))
     ax.set_xlim(0, nrows)        
     ax2.set_xlim(0, nrows)       
@@ -292,12 +310,14 @@ if __name__ == "__main__":
     barSizeSetting='30m'
     bars=90
     validationLength=90
-    threshold=.1
+    threshold=-1
+    modeDict={}
     for pair in currencyPairs:    
         if barSizeSetting+'_'+pair+'.csv' in files:
-            dataSet = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)[-(bars+validationLength):]
+            dataSet = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)[-(bars*2+validationLength):]
             p=dataSet.Close
             p.index = p.index.to_datetime()
-            volatilityClassifier(p,bars,threshold=threshold, showPlot=True, ticker=pair)
+            modeDict[pair]=mrClassifier(p,bars,threshold=threshold, showPlot=True, ticker=pair)
+            
             #describeDistribution2(p[-validationLength:], pair)
             

@@ -92,13 +92,6 @@ def describeDistribution2(qtC,ticker):
             i_loser = i_loser + 1
     number_gainers = i_gainer
     number_losers = i_loser
-    print 'Issue:             ' + ticker
-    #print 'Dates:             ' + str(qtC.index[0])
-    #print '  to:              ' + str(qtC.index[-1])
-    print 'Rows:              ' + str(qtC.shape[0])
-    #print 'Cols:              ' + str(qtC.shape[1])
-    print 'Number Gainers:     %d ' % number_gainers
-    print 'Number Losers:      %d ' % number_losers
     
     hist, bins = np.histogram(qtP.values, bins=100)
     width = 0.7 * (bins[1] - bins[0])
@@ -108,17 +101,24 @@ def describeDistribution2(qtC,ticker):
     plt.show()
     kurt = kurtosis(qtP.values)
     sk = skew(qtP.values)
+    print 'Issue:', ticker,
+    #print 'Dates:             ' + str(qtC.index[0])
+    #print '  to:              ' + str(qtC.index[-1])
+    print 'Rows:', str(qtC.shape[0]),
+    #print 'Cols:              ' + str(qtC.shape[1])
+    print 'Number Gainers: ', number_gainers,
+    print 'Number Losers: ', number_losers
     print 'Mean: ', qtP.values.mean(), ' StDev: ',qtP.values.std()
     print ' Kurtosis: ', kurt, ' Skew: ', sk
 
 
-    X2 = np.sort(qtP)
-    F2 = np.array(range(qtP.shape[0]), dtype=float)/qtP.shape[0]
-    plt.title( '____Cumulative Distribution____')
-    plt.plot(F2,X2, color='r')
-    plt.show()
+    #X2 = np.sort(qtP)
+    #F2 = np.array(range(qtP.shape[0]), dtype=float)/qtP.shape[0]
+    #plt.title( '____Cumulative Distribution____')
+    #plt.plot(F2,X2, color='r')
+    #plt.show()
 
-    tox  = getToxCDF(abs(qtP), display=True)
+    #tox  = getToxCDF(abs(qtP), display=True)
 
     #entropy
     ent = 0
@@ -126,10 +126,8 @@ def describeDistribution2(qtC,ticker):
     for i in hist/sum(hist):
         ent -= i * math.log(i, len(hist))
         #print i,ent
-    print '\nEntropy:              ', ent
+    print 'Entropy: ', ent
 
-    #ADF, Hurst
-    adf_test(qtC)
     
 def describeDistribution(qtC,qtP,ticker):
     hold_days = 1
@@ -153,13 +151,6 @@ def describeDistribution(qtC,qtP,ticker):
             i_loser = i_loser + 1
     number_gainers = i_gainer
     number_losers = i_loser
-    print 'Issue:             ' + ticker
-    #print 'Dates:             ' + str(qtC.index[0])
-    #print '  to:              ' + str(qtC.index[-1])
-    print 'Rows:              ' + str(qtC.shape[0])
-    #print 'Cols:              ' + str(qtC.shape[1])
-    print 'Number Gainers:     %d ' % number_gainers
-    print 'Number Losers:      %d ' % number_losers
     
     hist, bins = np.histogram(qtP.values, bins=100)
     width = 0.7 * (bins[1] - bins[0])
@@ -167,6 +158,15 @@ def describeDistribution(qtC,qtP,ticker):
     plt.bar(center, hist, align='center', width=width, color='r')
     plt.title('____Price Distribution____')
     plt.show()
+    
+    print 'Issue:', ticker,
+    #print 'Dates:             ' + str(qtC.index[0])
+    #print '  to:              ' + str(qtC.index[-1])
+    print 'Rows:', str(qtC.shape[0]),
+    #print 'Cols:              ' + str(qtC.shape[1])
+    print 'Number Gainers: ', number_gainers,
+    print 'Number Losers: ', number_losers
+    
     kurt = kurtosis(qtP.values)
     sk = skew(qtP.values)
     print 'Mean: ', qtP.values.mean(), ' StDev: ',qtP.values.std()

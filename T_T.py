@@ -157,7 +157,7 @@ def runPair_v4(pair):
     runDPS = False
     runData = {'version':version, 'version_':version_,'asset':asset,'asset':asset,\
                     'barSizeSetting':barSizeSetting,'currencyPairs':currencyPairs,'debug':debug,'bias':bias,\
-                    'volatilityThreshold':volatilityThreshold, 'validationSetLength':validationSetLength,'livePairs':livePairs,\
+                    'adfPvalue':adfPvalue, 'validationSetLength':validationSetLength,'livePairs':livePairs,\
                     'ticker':ticker, 'dataPath':dataPath,'signalPath':signalPath,'chartSavePath':chartSavePath,\
                     'showCharts':showCharts, 'showFinalChartOnly':showFinalChartOnly,'showIndicators':showIndicators,\
                     'verbose':verbose, 'supportResistanceLB':supportResistanceLB,'nfeatures':nfeatures,\
@@ -237,11 +237,11 @@ if __name__ == "__main__":
         #bias=['buyHold']
         
         #cycle mode->threshold=1.1
-        #volatilityThreshold=1.1
+        #adfPvalue=1.1
         #trendmode -> threshold = -0.1
-        #volatilityThreshold=-0.1
+        #adfPvalue=-0.1
         #auto ->threshold = 0.2
-        volatilityThreshold=0.1
+        adfPvalue=0.1
         validationSetLength =48
         #livePairs =  currencyPairs
         ticker =[
@@ -286,7 +286,7 @@ if __name__ == "__main__":
         debug=False
         #livePairs=currencyPairs
         bias = ['gainAhead']
-        volatilityThreshold=0.1
+        adfPvalue=0.1
         validationSetLength =48
         ticker =livePairs[0]
         #symbol=ticker[0:3]

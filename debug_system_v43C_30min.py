@@ -301,7 +301,7 @@ if len(sys.argv)==1:
     #cycle mode->threshold=1.1
     #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    adfPvalue=-1
+    adfPvalue=-3
     #auto ->threshold = 0.2
     #adfPvalue=1.1
     validationSetLength =48
@@ -311,7 +311,7 @@ if len(sys.argv)==1:
                     #'CHFJPY',\
                     #'EURJPY',\
                     #'GBPJPY',\
-                    'AUDJPY',\
+                    #'AUDJPY',\
                     #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
@@ -326,7 +326,7 @@ if len(sys.argv)==1:
                     #'NZDUSD',
                     #'AUDCAD',\
                     #'AUDCHF',\
-                    #'AUDNZD',\
+                    'AUDNZD',\
                     #'GBPAUD',\
                     #'GBPCAD',\
                     #'GBPNZD',\
@@ -376,8 +376,8 @@ nfeatures = 10
 minDatapoints = 3
 #set to 1 for live
 #system selection metric
-metric = 'CAR25'
-#metric = 'netEquity'
+#metric = 'CAR25'
+metric = 'netEquity'
 #adds auxilary pair features
 addAuxPairs = True
 
@@ -1151,13 +1151,16 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                            savePath=chartSavePath+'_TECH_'+is_period, debug=debug)
                                            
     dpsDF_all = pd.DataFrame()
-    windowLength = supportResistanceLB
+    #set to lb for stability
+    #windowLength = supportResistanceLB
     for is_period in signalSets:
         dpsDF = pd.DataFrame()
         
         for col in signalSets[is_period]:    
             #calcDPS
-            #windowLength = windowLengths[is_period]
+            windowLength = windowLengths[is_period]
+            if verbose:
+                print 'Using window length',windowLength, 'for', is_period
             if PRT is not None and windowLength is not None:
                 dps = calcDPS(col, signalSets[is_period][col], PRT, windowLength, verbose=False,\
                                         asset=asset)
@@ -1216,6 +1219,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     dpsDF_BofW = pd.DataFrame()
     
     #windowLength = int(np.array([windowLengths[x] for x in windowLengths]).mean())
+    windowLength = supportResistanceLB
     if verbose:
         print '\nwindowLength  for final EC calc', windowLength
     for rank in DpsRankByMetricB:
@@ -1323,21 +1327,36 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     curve='highest CAR25'
     dpsDF_all2 = dpsDF_all2.append(dpsDF_all)
     dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
-    
-    if i == supportResistanceLB:
-        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
-        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-        signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
-        signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
-        signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
-        signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
+    if mode ==0:
+        if i == supportResistanceLB:
+            #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+            #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+            signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
+            signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
+            signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
+            signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
+        else:
+            #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+            #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+            signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0])
+            index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
+            signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
+            signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric2)
     else:
-        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
-        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-        signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_final.sort_values(by=metric2, ascending=mr).iloc[0])
-        index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
-        signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric2)
+        if i == supportResistanceLB:
+            #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+            #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+            signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
+            signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
+            signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
+            signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
+        else:
+            #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+            #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+            signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0])
+            index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
+            signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
+            signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric2)
         
     #print dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0]
     #print signalDF['tripleFiltered'].iloc[-1]    

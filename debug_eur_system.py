@@ -67,7 +67,7 @@ version = '4'
 version_ = '43'
 barSize='30m'
 bias='sellHold'
-volatility='0.1'
+adfPvalue='-3'
 validationSetLength ='1'
 useSignalsFrom='tripleFiltered'
 offline=True
@@ -98,7 +98,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength,useSignalsFrom],\
+            subprocess.call(['python',scriptName,pair,bias,adfPvalue,validationSetLength,useSignalsFrom],\
                                 stdout=f, stderr=ferr)
         
         f.close()
@@ -115,7 +115,7 @@ for pair in pairs:
         #return
 logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Offline Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName,useSignalsFrom
+print len(pairs), 'pairs completed', barSize, bias, adfPvalue, scriptName,useSignalsFrom
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 ###############v3 OFFLINE###################
@@ -275,7 +275,7 @@ version = '4'
 version_ = '43'
 barSize='30m'
 bias='buyHold'
-volatility='0.1'
+adfPvalue='-3'
 validationSetLength ='1'
 useSignalsFrom='tripleFiltered'
 offline=False
@@ -309,7 +309,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength,useSignalsFrom],\
+            subprocess.call(['python',scriptName,pair,bias,adfPvalue,validationSetLength,useSignalsFrom],\
                                 stdout=f, stderr=ferr)        
         f.close()
         ferr.close()
@@ -325,7 +325,7 @@ for pair in pairs:
         #return
 logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName,useSignalsFrom
+print len(pairs), 'pairs completed', barSize, bias, adfPvalue, scriptName,useSignalsFrom
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
 #################################################
@@ -333,7 +333,7 @@ version = '4'
 version_ = '43'
 barSize='30m'
 bias='sellHold'
-volatility='0.1'
+adfPvalue='-3'
 validationSetLength ='1'
 useSignalsFrom='tripleFiltered'
 offline=False
@@ -367,7 +367,7 @@ for pair in pairs:
             offlineMode(pair, message, signalPath, version, version_)
             logging.info('v'+version+' '+pair+' '+message)
         else:
-            subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength,useSignalsFrom],\
+            subprocess.call(['python',scriptName,pair,bias,adfPvalue,validationSetLength,useSignalsFrom],\
                                 stdout=f, stderr=ferr)
         
         f.close()
@@ -384,7 +384,7 @@ for pair in pairs:
         #return
 logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
 logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName, useSignalsFrom
+print len(pairs), 'pairs completed', barSize, bias, adfPvalue, scriptName, useSignalsFrom
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 print 'Total Elapsed time: ', round(((time.time() - start_time3)/60),2), ' minutes'
 

@@ -157,7 +157,7 @@ def runPair_v4(pair):
     runDPS = False
     runData = {'version':version, 'version_':version_,'asset':asset,'asset':asset,\
                     'barSizeSetting':barSizeSetting,'currencyPairs':currencyPairs,'debug':debug,'bias':bias,\
-                    'volatilityThreshold':volatilityThreshold, 'validationSetLength':validationSetLength,'livePairs':livePairs,\
+                    'adfPvalue':adfPvalue, 'validationSetLength':validationSetLength,'livePairs':livePairs,\
                     'ticker':ticker, 'dataPath':dataPath,'signalPath':signalPath,'chartSavePath':chartSavePath,\
                     'showCharts':showCharts, 'showFinalChartOnly':showFinalChartOnly,'showIndicators':showIndicators,\
                     'verbose':verbose, 'supportResistanceLB':supportResistanceLB,'nfeatures':nfeatures,\
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     pairs =currencyPairs=livePairs=[sys.argv[1]]
     barSizeSetting=sys.argv[2]
     bias = [sys.argv[3]]
-    volatilityThreshold=float(sys.argv[4])
+    adfPvalue=float(sys.argv[4])
     supportResistanceLB = int(sys.argv[5])
     validationSetLength =int(sys.argv[6])
     useSignalsFrom=sys.argv[7]
@@ -258,9 +258,9 @@ if __name__ == "__main__":
     #set to 1 for live
     #system selection metric
     #metric = 'CAR25'
-    metric = 'netEquity'
+    metric = 'CAR25'
     #metric for signal
-    metric2='netEquity'
+    metric2='CAR25'
     #adds auxilary pair features
     addAuxPairs = False
 

@@ -1197,6 +1197,7 @@ if __name__ == "__main__":
                     'GBPAUD',\
                     'GBPCAD',\
                     'GBPNZD',\
+                    'GBPCHF',\
                     'CADCHF',\
                     'NZDCHF',\
                     'NZDCAD'
@@ -1242,6 +1243,7 @@ if __name__ == "__main__":
                         #'AUDNZD',\
                         #'GBPAUD',\
                         #'GBPCAD',\
+                        #'GBPCHF',\
                         'GBPNZD',\
                         #'NZDCHF',\
                         #'NZDCAD',\

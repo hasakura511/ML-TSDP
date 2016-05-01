@@ -302,6 +302,7 @@ if __name__ == "__main__":
                 'AUDCHF',\
                 'AUDNZD',\
                 'GBPCAD',\
+                'GBPCHF',\
                 'CADCHF',\
                 'NZDCHF',\
                 'NZDCAD'

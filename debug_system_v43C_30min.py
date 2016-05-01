@@ -282,6 +282,7 @@ currencyPairs =   [
                 'GBPAUD',\
                 'GBPCAD',\
                 'GBPNZD',\
+                'GBPCHF',\
                 'CADCHF',\
                 'NZDCHF',\
                 'NZDCAD'
@@ -330,6 +331,7 @@ if len(sys.argv)==1:
                     #'GBPAUD',\
                     #'GBPCAD',\
                     #'GBPNZD',\
+                    #'GBPCHF',\
                     #'NZDCHF',\
                     #'NZDCAD',\
                     #'CADCHF'
@@ -340,6 +342,10 @@ if len(sys.argv)==1:
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
+    
+    #adds auxilary pair features
+    addAuxPairs = True
+    
     #display params
     showCharts=False
     showFinalChartOnly=True
@@ -359,9 +365,11 @@ else:
     dataPath = './data/from_IB/'
     chartSavePath = './data/results/'+version+'_'+ticker
     
+    #adds auxilary pair features
+    addAuxPairs = False
+    
     #display params
     showCharts=False
-    
     showFinalChartOnly=True
     showIndicators = False
     verbose=False
@@ -381,8 +389,6 @@ minDatapoints = 3
 metric = 'CAR25'
 #metric to use to choose from best worst curves for triple filtered cycle mode
 metric2='netEquity'
-#adds auxilary pair features
-addAuxPairs = True
 
 #robustness
 perturbData = False

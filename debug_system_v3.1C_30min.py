@@ -120,6 +120,7 @@ currencyPairs =   [
                 'GBPAUD',\
                 'GBPCAD',\
                 'GBPNZD',\
+                'GBPCHF',\
                 'CADCHF',\
                 'NZDCHF',\
                 'NZDCAD'
@@ -159,6 +160,7 @@ if len(sys.argv)==1:
                     #'GBPAUD',\
                     #'GBPCAD',\
                     #'GBPNZD',\
+                    #'GBPCHF',\
                     #'NZDCHF',\
                     #'NZDCAD',\
                     'CADCHF'

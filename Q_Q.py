@@ -139,10 +139,11 @@ def onBar(bar, symbols):
         #print gotbar[bar['Date']]
         start_time2 = time.time()
         for sym in gotbar[bar['Date']]:
-            if sym.split('_')[1] in livePairs:
+            ticker = sym[0].split('_')[1]
+            if ticker in livePairs:
                 logging.info('')
                 logging.info(sym+' timenow: '+dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z"))
-                runPair_v4([sym])
+                runPair_v4(ticker)
                 
         logging.info( 'All signals created for bar '+str(bar['Date']))
         logging.info('Runtime: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes' ) 
@@ -158,7 +159,7 @@ def onBar(bar, symbols):
     
         
 def runPair_v4(ticker):
-    ticker = pair[0].split('_')[1]
+    #ticker = pair[0].split('_')[1]
     #version = 'v4'
     #version_ = 'v4.3C'
     runDPS = False

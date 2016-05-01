@@ -175,10 +175,8 @@ version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
 offline=False
-pairs=['EURAUD','GBPUSD','GBPCAD','CADCHF','AUDUSD','NZDUSD','EURGBP','EURUSD','EURCAD','EURNZD','GBPAUD','GBPNZD']
-#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
-#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
-#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
+pairs=['EURAUD','GBPUSD','GBPCAD','NZDUSD','EURGBP',\
+            'EURUSD','EURCAD','EURNZD','GBPAUD','NZDCAD']
 
 #def runv3(pair):
 #while 1:
@@ -226,10 +224,10 @@ version_ = '3.1'
 barSize='30m'
 bias = 'sellHold'
 offline=False
-pairs=['NZDCHF','AUDCHF','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']#pairs=['AUDUSD','NZDUSD','EURGBP','EURUSD','NZDCHF','AUDCHF','EURCAD','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY']
-#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
-#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
-#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
+pairs=['NZDCHF','AUDCHF','USDCHF','EURCHF',\
+            'USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY',\
+            'CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY',\
+            'AUDUSD','CADCHF','GBPCHF','GBPNZD']
 
 #def runv3(pair):
 #while 1:
@@ -280,12 +278,8 @@ validationSetLength ='1'
 useSignalsFrom='tripleFiltered'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-pairs=['EURAUD','GBPUSD','GBPCAD','CADCHF','AUDUSD','NZDUSD','EURGBP','EURUSD','EURCAD','EURNZD','GBPAUD','GBPNZD']
-#pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
-#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
-#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
-#pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
-#pairs3=['USDJPY','GBPJPY','EURJPY','AUDJPY']
+pairs=['EURAUD','GBPUSD','GBPCAD','NZDUSD','EURGBP',\
+            'EURUSD','EURCAD','EURNZD','GBPAUD','NZDCAD']
 #pairsList=[pairs,pairs2,pairs3]
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
@@ -338,12 +332,11 @@ validationSetLength ='1'
 useSignalsFrom='tripleFiltered'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-pairs=['NZDCHF','AUDCHF','NZDCAD','USDCHF','EURCHF','USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']#pairs=['AUDUSD','NZDUSD','EURGBP','NZDCHF', 'AUDCHF','NZDCAD','USDCAD','AUDNZD','AUDCAD','AUDJPY']
-#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
-#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
-#pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
-#pairs3=['USDJPY','GBPJPY','EURJPY','AUDJPY']
-#pairsList=[pairs,pairs2,pairs3]
+pairs=['NZDCHF','AUDCHF','USDCHF','EURCHF',\
+            'USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY',\
+            'CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY',\
+            'AUDUSD','CADCHF','GBPCHF','GBPNZD']
+            
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
         

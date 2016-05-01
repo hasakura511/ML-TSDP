@@ -991,8 +991,8 @@ def runv4(runData):
         #dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
         
         if mode ==0:
-            mr=False
-            curve='highest '+metric2
+            mr=True
+            curve='lowest '+metric2
             if i == supportResistanceLB:
                 #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
                 #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
@@ -1217,7 +1217,7 @@ if __name__ == "__main__":
         #trendmode -> threshold = -0.1
         #adfPvalue=-0.1
         #auto ->threshold = 0.2
-        adfPvalue=-1
+        adfPvalue=0
         validationSetLength =48
         livePairs =  [
                         #'NZDJPY',\
@@ -1244,9 +1244,9 @@ if __name__ == "__main__":
                         #'GBPAUD',\
                         #'GBPCAD',\
                         #'GBPCHF',\
-                        'GBPNZD',\
+                        #'GBPNZD',\
                         #'NZDCHF',\
-                        #'NZDCAD',\
+                        'NZDCAD',\
                         #'CADCHF'
                         ]
         ticker =livePairs[0]

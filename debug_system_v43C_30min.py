@@ -302,7 +302,7 @@ if len(sys.argv)==1:
     #cycle mode->threshold=1.1
     #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    adfPvalue=-1
+    adfPvalue=0
     #auto ->threshold = 0.2
     #adfPvalue=1.1
     validationSetLength =48
@@ -314,7 +314,7 @@ if len(sys.argv)==1:
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
-                    'EURCHF',\
+                    #'EURCHF',\
                     #'EURGBP',\
                     #'EURUSD',\
                     #'EURAUD',\
@@ -333,7 +333,7 @@ if len(sys.argv)==1:
                     #'GBPNZD',\
                     #'GBPCHF',\
                     #'NZDCHF',\
-                    #'NZDCAD',\
+                    'NZDCAD',\
                     #'CADCHF'
                     ]
     ticker =livePairs[0]
@@ -996,6 +996,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                                                 roofingFilter(ATR(highs,lows,\
                                                         closes,is_cycle), supportResistanceLB,lb)
                 '''
+                if sum(np.isnan(ROC(closes,is_cycle)))>0:
+                    sys.exit()
                 auxPairdataSet[pair+'Pri_ROC_c'+str(is_cycle)] =\
                                         ROC(closes,is_cycle)
                 dataSets[is_period] = pd.concat([dataSets[is_period], auxPairdataSet], axis=1)
@@ -1335,8 +1337,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #dpsDF_all2 = dpsDF_all2.append(dpsDF_all)
     #dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
     if mode ==0:
-        mr=False
-        curve='highest '+metric2
+        mr=True
+        curve='lowest '+metric2
         if i == supportResistanceLB:
             #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
             #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity

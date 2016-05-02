@@ -22,65 +22,228 @@ import sys
 import logging
 import time
 #import websocket
+offlinePairs=[]
+buyHold=['GBPJPY', 'GBPUSD', 'GBPAUD', 'GBPCAD', 'GBPNZD', 'GBPCHF', 'CADJPY', 'CADCHF', 'EURJPY', 'EURUSD', 'EURAUD', 'EURNZD', 'EURCHF', 'CHFJPY', 'NZDJPY', 'NZDUSD', 'USDJPY']
+ 
+sellHold=['EURGBP', 'EURCAD', 'USDCAD', 'AUDCAD', 'NZDCAD', 'USDCHF', 'AUDCHF', 'NZDCHF', 'AUDNZD', 'AUDUSD', 'AUDJPY']
+
+ 
+start_time3 = time.time()
 signalPath = './data/signals/'
+def offlineMode(ticker, errorText, signalPath, ver1, ver2):
+        files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
+        if 'v'+ver1+'_'+ ticker + '.csv' in files:
+            signalFile=pd.read_csv(signalPath+ 'v'+ver1+'_'+ ticker + '.csv', parse_dates=['dates'])
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = errorText
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + 'v'+ver1+'_'+ ticker + '.csv', index=False)
+            
+        if 'v'+ver2+'_'+ ticker + '.csv' in files:
+            signalFile=pd.read_csv(signalPath+ 'v'+ver2+'_'+ ticker + '.csv', parse_dates=['dates'])
+            offline = signalFile.iloc[-1].copy(deep=True)
+            offline.dates = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.signals = 0
+            offline.gainAhead =0
+            offline.prior_index=0
+            offline.safef=0
+            offline.CAR25=0
+            offline.dd95 = 0
+            offline.ddTol=0
+            offline.system = errorText
+            offline.timestamp = str(pd.to_datetime(dt.now(timezone('US/Eastern')).replace(second=0, microsecond=0)))[:-6]
+            offline.cycleTime = 0
+            signalFile=signalFile.append(offline)
+            signalFile.to_csv(signalPath + 'v'+ver2+'_'+ ticker + '.csv', index=False)
+        print errorText    
+        #sys.exit(errorText)
+        
+logging.basicConfig(filename='/logs/runsystem_v3v4.log',level=logging.DEBUG)
+############v4 OFFLINE##########
+version = '4'
+version_ = '43'
+barSize='30m'
+bias='sellHold'
+adfPvalue='-3'
+validationSetLength ='1'
+useSignalsFrom='tripleFiltered'
+offline=True
+scriptName= 'debug_system_v'+version_+'C_30min.py'
+pairs=offlinePairs
+#pairs=['EURCHF','EURUSD','USDCHF','EURCAD','GBPCAD']
+#pairsList=[pairs,pairs2,pairs3]
+#logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
+
+        
+#def runv4(pairs):
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info(str(dt.now())+' running v'+version_+' '+pair)
+        f=open ('/logs/' + pair + 'v'+version+ '.log','a')
+        print str(dt.now()), ' Starting v'+version_+': ' + pair
+        f.write(str(dt.now())+' Starting v'+version_+': ' + pair)
+
+        ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
+        ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
+
+
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info('v'+version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python',scriptName,pair,bias,adfPvalue,validationSetLength,useSignalsFrom],\
+                                stdout=f, stderr=ferr)
+        
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'.csv').iloc[-1]
+        logging.info('Check signal:' +str(signal.signals))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v4run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+'OFFLINE')
+logging.info('Offline Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed', barSize, 'OFFLINE'
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+
 
 #################################################
 version = '4'
 version_ = '43'
 barSize='30m'
-pairs=[sys.argv[1]]
-bias=sys.argv[2]
-volatility=sys.argv[3]
-validationSetLength =sys.argv[4]
-#bias='sellHold'
-#volatility='0.1'
+bias='buyHold'
+adfPvalue='-3'
+validationSetLength ='1'
+useSignalsFrom='tripleFiltered'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-#pairs=['AUDUSD','NZDUSD','EURGBP','NZDCHF', 'AUDCHF','NZDCAD','USDCAD','AUDNZD','AUDCAD','AUDJPY']
-#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY','AUDJPY']
-#pairs=['GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD']
-#pairs2=['CADCHF','AUDNZD','NZDJPY','CADJPY','CHFJPY']
-#pairs3=['USDJPY','GBPJPY','EURJPY','AUDJPY']
+pairs=buyHold
+
 #pairsList=[pairs,pairs2,pairs3]
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
-logging.basicConfig(filename='/logs/runsystem_v'+version+pairs[0]+barSize+' '+bias+'.log',level=logging.DEBUG)
+        
 #def runv4(pairs):
-while 1:
-    start_time = time.time()
-    for pair in pairs:
-        try:
-            start_time2 = time.time()
-            logging.info(str(dt.now())+' running v'+version_+' '+pair)
-            f=open ('/logs/' + pair + 'v'+version+ '.log','a')
-            print str(dt.now()), ' Starting v'+version_+': ' + pair
-            f.write(str(dt.now())+' Starting v'+version_+': ' + pair)
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info(str(dt.now())+' running v'+version_+' '+pair)
+        f=open ('/logs/' + pair + 'v'+version+ '.log','a')
+        print str(dt.now()), ' Starting v'+version_+': ' + pair
+        f.write(str(dt.now())+' Starting v'+version_+': ' + pair)
 
-            ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
-            ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
+        ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
+        ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
 
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info('v'+version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python',scriptName,pair,bias,adfPvalue,validationSetLength,useSignalsFrom],\
+                                stdout=f, stderr=ferr)        
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'.csv').iloc[-1]
+        logging.info(str(signal))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v4run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
+logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed', barSize, bias, adfPvalue, scriptName,useSignalsFrom
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
-            if offline:
-                message = "Offline Mode: turned off in runsystem"
-                offlineMode(pair, message, signalPath, version, version_)
-                logging.info('v'+version+' '+pair+' '+message)
-            else:
-                subprocess.call(['python',scriptName,pair,bias,volatility,validationSetLength],\
-                                    stdout=f, stderr=ferr)
+#################################################
+version = '4'
+version_ = '43'
+barSize='30m'
+bias='sellHold'
+adfPvalue='-3'
+validationSetLength ='1'
+useSignalsFrom='tripleFiltered'
+offline=False
+scriptName= 'debug_system_v'+version_+'C_30min.py'
+pairs=sellHold
             
-            f.close()
-            ferr.close()
-            signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'.csv').iloc[-1]
-            logging.info(str(signal))
-            logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
-                                dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
-        except Exception as e:
-            #f=open ('./debug/v4run' + pair + '.log','a')
-            #f.write(e)
-            #f.close()
-            logging.error("something bad happened", exc_info=True)
-            #return
-    logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
-    logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
-    print len(pairs), 'pairs completed', barSize, bias, volatility, scriptName
-    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+#logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
+
+        
+#def runv4(pairs):
+#while 1:
+start_time = time.time()
+for pair in pairs:
+    try:
+        start_time2 = time.time()
+        logging.info(str(dt.now())+' running v'+version_+' '+pair)
+        f=open ('/logs/' + pair + 'v'+version+ '.log','a')
+        print str(dt.now()), ' Starting v'+version_+': ' + pair
+        f.write(str(dt.now())+' Starting v'+version_+': ' + pair)
+
+        ferr=open ('/logs/' + pair + 'v'+version+'_err.log','a')
+        ferr.write( str(dt.now())+' Starting v'+version_+': ' + pair)
+
+
+        if offline:
+            message = "Offline Mode: turned off in runsystem"
+            offlineMode(pair, message, signalPath, version, version_)
+            logging.info('v'+version+' '+pair+' '+message)
+        else:
+            subprocess.call(['python',scriptName,pair,bias,adfPvalue,validationSetLength,useSignalsFrom],\
+                                stdout=f, stderr=ferr)
+        
+        f.close()
+        ferr.close()
+        signal=pd.read_csv('./data/signals/v'+version+'_'+pair+'.csv').iloc[-1]
+        logging.info(str(signal))
+        logging.info('Elapsed time: '+str(round(((time.time() - start_time2)/60),2))+ ' minutes. Time now '+\
+                            dt.now(timezone('US/Eastern')).strftime("%Y%m%d %H:%M:%S %Z")) 
+    except Exception as e:
+        #f=open ('./debug/v4run' + pair + '.log','a')
+        #f.write(e)
+        #f.close()
+        logging.error("something bad happened", exc_info=True)
+        #return
+logging.info(str(len(pairs))+' pairs completed v'+version_+' '+barSize+' '+bias)
+logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' minutes' ) 
+print len(pairs), 'pairs completed', barSize, bias, adfPvalue, scriptName, useSignalsFrom
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+print 'Total Elapsed time: ', round(((time.time() - start_time3)/60),2), ' minutes'
+
+
+'''
+threads = []
+for list in pairsList:
+	logging.info(str(list))
+	sig_thread = threading.Thread(target=runv4, args=list)
+	sig_thread.daemon=True
+	threads.append(sig_thread)
+	sig_thread.start()
+while 1:
+	time.sleep(100)
+'''
+	

@@ -22,10 +22,63 @@ import sys
 import logging
 import time
 #import websocket
+'''
+import copy
+currencyPairs =   [
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                'AUDUSD',\
+                'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
+                'EURNZD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'GBPCHF',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
+                ]
+ranking = ['AUD','EUR','NZD','CHF','GBP','CAD','USD','JPY']
+buyHold=[]
+sellHold=[]
+cplist = copy.deepcopy(currencyPairs)
+for currency in ranking:
+    for i,pair in enumerate(cplist):
+        #print pair
+        if pair not in buyHold and pair not in sellHold:
+            if currency in pair[0:3]:
+                #print i,'bh',pair
+                buyHold.append(pair)
+                #cplist.remove(pair)
+            elif currency in pair[3:6]:
+                #print i,'sh',pair
+                sellHold.append(pair)
+                #cplist.remove(pair)
+            #else:
+                #print i,currency,pair
+print 'buyHold',len(buyHold),buyHold
+print 'sellHold',len(sellHold),sellHold
+'''
+
 offlinePairs=[]
-buyHold=['GBPJPY', 'GBPUSD', 'GBPAUD', 'GBPCAD', 'GBPNZD', 'GBPCHF', 'CADJPY', 'CADCHF', 'EURJPY', 'EURUSD', 'EURAUD', 'EURNZD', 'EURCHF', 'CHFJPY', 'NZDJPY', 'NZDUSD', 'USDJPY']
- 
-sellHold=['EURGBP', 'EURCAD', 'USDCAD', 'AUDCAD', 'NZDCAD', 'USDCHF', 'AUDCHF', 'NZDCHF', 'AUDNZD', 'AUDUSD', 'AUDJPY']
+buyHold=['AUDJPY', 'AUDUSD', 'AUDCAD', 'AUDCHF', 'AUDNZD', 'EURJPY', 'EURUSD', 'EURCAD', 'EURNZD', 'EURCHF', 'EURGBP', 'NZDJPY', 'NZDUSD', 'NZDCHF', 'NZDCAD', 'CHFJPY', 'GBPJPY', 'GBPUSD', 'GBPCAD', 'CADJPY', 'USDJPY']
+sellHold=['EURAUD', 'GBPAUD', 'GBPNZD', 'USDCHF', 'GBPCHF', 'CADCHF', 'USDCAD']
 
  
 start_time3 = time.time()

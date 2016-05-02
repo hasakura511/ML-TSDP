@@ -259,37 +259,38 @@ data_type = 'ALL'
 barSizeSetting='30m'
 
 pairs =  [
-                'NZDJPY',\
-                'CADJPY',\
-                'CHFJPY',\
-                'EURJPY',\
-                'GBPJPY',\
-                'AUDJPY',\
-                'USDJPY',\
-                'AUDUSD',\
-                'EURUSD',\
-                'EURAUD',\
-                'EURCAD',\
-                'EURNZD',\
-                'GBPUSD',\
-                'USDCAD',\
-                'USDCHF',\
-                'NZDUSD',
-                'EURCHF',\
-                'EURGBP',\
-                'AUDCAD',\
-                'AUDCHF',\
-                'AUDNZD',\
-                'GBPAUD',\
-                'GBPCAD',\
-                'GBPNZD',\
-                'CADCHF',\
-                'NZDCHF',\
-                'NZDCAD'
-                ]
+            'NZDJPY',\
+            'CADJPY',\
+            'CHFJPY',\
+            'EURJPY',\
+            'GBPJPY',\
+            'AUDJPY',\
+            'USDJPY',\
+            'AUDUSD',\
+            'EURUSD',\
+            'EURAUD',\
+            'EURCAD',\
+            'EURNZD',\
+            'GBPUSD',\
+            'USDCAD',\
+            'USDCHF',\
+            'NZDUSD',
+            'EURCHF',\
+            'EURGBP',\
+            'AUDCAD',\
+            'AUDCHF',\
+            'AUDNZD',\
+            'GBPAUD',\
+            'GBPCAD',\
+            'GBPNZD',\
+            'GBPCHF',\
+            'CADCHF',\
+            'NZDCHF',\
+            'NZDCAD'
+            ]
                  
 if len(sys.argv)==1:          
-    livePairs =    [
+    livePairs = [
                 'NZDJPY',\
                 'CADJPY',\
                 'CHFJPY',\
@@ -314,6 +315,7 @@ if len(sys.argv)==1:
                 'GBPAUD',\
                 'GBPCAD',\
                 'GBPNZD',\
+                'GBPCHF',\
                 'CADCHF',\
                 'NZDCHF',\
                 'NZDCAD'
@@ -371,6 +373,7 @@ else:
                 'GBPAUD',\
                 'GBPCAD',\
                 'GBPNZD',\
+                'GBPCHF',\
                 'CADCHF',\
                 'NZDCHF',\
                 'NZDCAD'

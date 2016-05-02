@@ -63,6 +63,7 @@ pairs=[
                 'GBPAUD',\
                 'GBPCAD',\
                 'GBPNZD',\
+                'GBPCHF',\
                 'CADCHF',\
                 'NZDCHF',\
                 'NZDCAD'

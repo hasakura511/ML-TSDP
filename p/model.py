@@ -342,14 +342,22 @@ def get_signal(lookback, portfolio, argv):
         symbol = '#S&P500_M6'
         if len(argv) > 4:
             symbol=argv[4]
-        interval=['30m_','idx_','BTCUSD_']        
-        file=interval[0] + symbol
+        interval=['30m_#GER30_M6.csv',
+                    '30m_#UK100_M6.csv',
+                    '30m_#JPN225_M6.csv',
+                    '30m_#US$indx_M6.csv',
+                    '30m_#NAS100_M6.csv',
+                    '30m_#DJ30_M6.csv',
+                    '30m_#EUR50_M6.csv',
+                    '30m_#FRA40_M6.csv',
+                    '30m_#SWI20_M6.csv']
+        file='30m_' + symbol
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #date = datetime.datetime(2016,04,15,22,30,00)  
         start_test = date - datetime.timedelta(days=3)  
         start_period = start_test - datetime.timedelta(days=1500)
-        path_datasets= np.array(['./data/from_MT4/fut/','./p/data/','./data/from_MT4/','./data/from_MT4/usstocks/'])
+        path_datasets= np.array(['./data/from_MT4/fut/'])
         name = './p/data/' + file + '.csv'
         qty=200
         folds=10
@@ -359,8 +367,35 @@ def get_signal(lookback, portfolio, argv):
         symbol = '#USSPX500'
         if len(argv) > 4:
             symbol=argv[4]
-        interval=['30m_']
-        file=interval[0] + symbol
+        interval=['30m_#AUS200.csv',
+                    '30m_#Belgium20.csv',
+                    '30m_#ChinaA50.csv',
+                    '30m_#ChinaHShar.csv',
+                    '30m_#Denmark20.csv',
+                    '30m_#Euro50.csv',
+                    '30m_#Finland25.csv',
+                    '30m_#France120.csv',
+                    '30m_#France40.csv',
+                    '30m_#Germany30.csv',
+                    '30m_#Germany50.csv',
+                    '30m_#GerTech30.csv',
+                    '30m_#Greece25.csv',
+                    '30m_#Holland25.csv',
+                    '30m_#HongKong50.csv',
+                    '30m_#Hungary12.csv',
+                    '30m_#Japan225.csv',
+                    '30m_#Nordic40.csv',
+                    '30m_#Poland20.csv',
+                    '30m_#Portugal20.csv',
+                    '30m_#Spain35.csv',
+                    '30m_#Sweden30.csv',
+                    '30m_#Swiss20.csv',
+                    '30m_#UK_Mid250.csv',
+                    '30m_#UK100.csv',
+                    '30m_#US30.csv',
+                    '30m_#USNDAQ100.csv',
+                    '30m_#USSPX500.csv']
+        file='30m_' + symbol
         bar=bars.get_bar(symbol)
         date=parse(bar.index[-1])
         start_test = date - datetime.timedelta(days=3)

@@ -1485,6 +1485,10 @@ if showCharts:
 for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
     for k, v in d.iteritems():
         signalDF[k]=v
+
+for is_period in signalSets:
+    for k,v in signalSets[is_period].iteritems():
+        signalDF[is_period+'_'+k]=v
         
 if showCharts:
     zz.plot_pivots(l=8,w=8,\

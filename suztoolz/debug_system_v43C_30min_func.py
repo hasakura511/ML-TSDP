@@ -1138,6 +1138,10 @@ def runv4(runData):
         for k, v in d.iteritems():
             signalDF[k]=v
             
+    for is_period in signalSets:
+        for k,v in signalSets[is_period].iteritems():
+            signalDF[is_period+'_'+k]=v
+            
     if showCharts:
         zz.plot_pivots(l=8,w=8,\
                             #startValley=(startValley, data2.Close[startValley]),\
@@ -1255,6 +1259,10 @@ if __name__ == "__main__":
         signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
         #chartSavePath = None
         chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
+        
+        #adds auxilary pair features
+        addAuxPairs = True
+        
         #display params
         showCharts=False
         showFinalChartOnly=True
@@ -1274,9 +1282,11 @@ if __name__ == "__main__":
         dataPath = './data/from_IB/'
         chartSavePath = './data/results/'+version+'_'+ticker
         
+        #adds auxilary pair features
+        addAuxPairs = False
+        
         #display params
         showCharts=False
-        
         showFinalChartOnly=True
         showIndicators = False
         verbose=False
@@ -1288,15 +1298,14 @@ if __name__ == "__main__":
     #for PCA/KBest
     nfeatures = 10
     #if major low/high most recent index. minDatapoints sets the minimum is period.
-    minDatapoints = 2
+    minDatapoints = 3
     #set to 1 for live
     #system selection metric
     #metric = 'CAR25'
     metric = 'CAR25'
     #metric for signal
     metric2='netEquity'
-    #adds auxilary pair features
-    addAuxPairs = True
+
 
     #robustness
     perturbData = False
@@ -1318,7 +1327,7 @@ if __name__ == "__main__":
     #rounds safef and safef cannot go below this number. if set to None, no rounding
     PRT['minSafef'] =1
     #no dps safef
-    PRT['nodpsSafef'] =1
+    PRT['nodpsSafef'] =2
     #dps max limit
     PRT['maxSafef'] = 2
     #safef=minSafef if CAR25 < threshold

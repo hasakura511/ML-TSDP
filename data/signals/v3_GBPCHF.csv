@@ -1,0 +1,4 @@
+dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system
+2016-04-29 15:30:00,-1.0,-0.000174826422338,448.0,1.0,,,,bothGBPCHF_30m_ALL_DF1_None_i0_fcst1_SH1
+2016-04-29 16:00:00,-1.0,0.00055668756624,449.0,1.0,,,,bothGBPCHF_30m_ALL_DF1_None_i0_fcst1_SH1
+2016-04-29 16:30:00,-1.0,0.0,450.0,1.0,,,,bothGBPCHF_30m_ALL_DF1_None_i0_fcst1_SH1

@@ -23,10 +23,8 @@ import logging
 import time
 #import websocket
 offlinePairs=[]
-buyHold=['NZDJPY', 'NZDUSD', 'NZDCHF', 'NZDCAD', 'CADJPY', 'CADCHF', 'EURJPY', 'EURUSD', 'EURAUD', 'EURCHF', 'EURGBP', 'CHFJPY', 'USDJPY', 'AUDJPY']
- 
-sellHold=['EURNZD', 'AUDNZD', 'GBPNZD', 'EURCAD', 'USDCAD', 'AUDCAD', 'GBPCAD', 'USDCHF', 'AUDCHF', 'GBPCHF', 'AUDUSD', 'GBPUSD', 'GBPAUD', 'GBPJPY']
-
+buyHold=['AUDJPY', 'AUDUSD', 'AUDCAD', 'AUDCHF', 'AUDNZD', 'GBPJPY', 'GBPUSD', 'GBPCAD', 'GBPNZD', 'GBPCHF', 'NZDJPY', 'NZDUSD', 'NZDCHF', 'NZDCAD', 'CADJPY', 'CADCHF', 'EURJPY', 'EURUSD', 'EURCHF', 'CHFJPY', 'USDJPY']
+sellHold=['EURAUD', 'GBPAUD', 'EURGBP', 'EURNZD', 'EURCAD', 'USDCAD', 'USDCHF']
  
 start_time3 = time.time()
 signalPath = './data/signals/'

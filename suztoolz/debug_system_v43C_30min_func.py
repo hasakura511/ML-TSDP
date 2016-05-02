@@ -429,12 +429,15 @@ def runv4(runData):
                     minorPeak = peaksSorted[0]
                     plist=[peak for peak in peaksSorted if abs(minorPeak-peak) > minDatapoints]
                     if len(plist)>0:
-                        majorPeak = plist[0]
+                        #find closest peak to ensure single cycle
+                        idx = (np.abs(np.array(plist)-minorPeak)).argmin()
+                        majorPeak = plist[idx]
                 else:
                     majorPeak = peaksSorted[0]
                     plist=[peak for peak in peaksSorted if abs(majorPeak-peak) > minDatapoints]
                     if len(plist)>0:
-                        minorPeak = plist[0]
+                        idx = (np.abs(np.array(plist)-majorPeak)).argmin()
+                        minorPeak = plist[idx]
             #peaksSorted=data2.Close.iloc[peaks].sort_values(ascending=False).index
             #startPeak = peaksSorted[0]
             #minorPeak = [peak for peak in peaksSorted if abs(startPeak-peak) > minDatapoints][0]
@@ -446,13 +449,16 @@ def runv4(runData):
                 if mode==0:
                     minorValley = valleysSorted[0]
                     vlist = [valley for valley in valleysSorted if abs(minorValley-valley) > minDatapoints]
-                    if len(vlist)>0:                
-                        majorValley = vlist[0]   
+                    if len(vlist)>0:
+                        #find closest valley to ensure single cycle
+                        idx = (np.abs(np.array(vlist)-minorValley)).argmin()
+                        majorValley = vlist[idx]
                 else:
                     majorValley = valleysSorted[0]
                     vlist = [valley for valley in valleysSorted if abs(majorValley-valley) > minDatapoints]
                     if len(vlist)>0:
-                        minorValley = vlist[0]   
+                        idx = (np.abs(np.array(vlist)-majorValley)).argmin()
+                        minorValley = vlist[idx]    
             #valleysSorted = data2.Close.iloc[valleys].sort_values(ascending=True).index
             #startValley = valleysSorted[0]
             #minorValley = [valley for valley in valleysSorted if abs(startValley-valley) > minDatapoints][0]
@@ -1327,7 +1333,7 @@ if __name__ == "__main__":
     #rounds safef and safef cannot go below this number. if set to None, no rounding
     PRT['minSafef'] =1
     #no dps safef
-    PRT['nodpsSafef'] =2
+    PRT['nodpsSafef'] =1
     #dps max limit
     PRT['maxSafef'] = 2
     #safef=minSafef if CAR25 < threshold

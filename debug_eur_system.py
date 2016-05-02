@@ -22,7 +22,37 @@ import sys
 import logging
 import time
 #import websocket
-
+offlinePairs=[]
+buyHold=['NZDJPY',
+     'NZDUSD',
+     'NZDCHF',
+     'NZDCAD',
+     'CADJPY',
+     'CADCHF',
+     'EURJPY',
+     'EURUSD',
+     'EURAUD',
+     'EURCHF',
+     'EURGBP',
+     'CHFJPY',
+     'USDJPY']
+ 
+sellHold=['EURNZD',
+     'AUDNZD',
+     'GBPNZD',
+     'EURCAD',
+     'USDCAD',
+     'AUDCAD',
+     'GBPCAD',
+     'USDCHF',
+     'AUDCHF',
+     'GBPCHF',
+     'AUDUSD',
+     'GBPUSD',
+     'GBPJPY',
+     'AUDJPY',
+     'GBPAUD']
+ 
 start_time3 = time.time()
 signalPath = './data/signals/'
 def offlineMode(ticker, errorText, signalPath, ver1, ver2):
@@ -72,7 +102,7 @@ validationSetLength ='1'
 useSignalsFrom='tripleFiltered'
 offline=True
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-pairs=[]
+pairs=offlinePairs
 #pairs=['EURCHF','EURUSD','USDCHF','EURCAD','GBPCAD']
 #pairsList=[pairs,pairs2,pairs3]
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
@@ -125,7 +155,7 @@ version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
 offline=True
-pairs=[]
+pairs=offlinePairs
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF','NZDJPY','CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','CADCHF']
 #pairs=['EURAUD','EURNZD','GBPUSD','GBPNZD','GBPCAD','GBPAUD','AUDCAD','CADCHF','AUDNZD']
@@ -175,8 +205,7 @@ version_ = '3.1'
 barSize='30m'
 bias = 'buyHold'
 offline=False
-pairs=['EURAUD','GBPUSD','GBPCAD','NZDUSD','EURGBP',\
-            'EURUSD','EURCAD','EURNZD','GBPAUD','NZDCAD']
+pairs=buyHold
 
 #def runv3(pair):
 #while 1:
@@ -224,10 +253,7 @@ version_ = '3.1'
 barSize='30m'
 bias = 'sellHold'
 offline=False
-pairs=['NZDCHF','AUDCHF','USDCHF','EURCHF',\
-            'USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY',\
-            'CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY',\
-            'AUDUSD','CADCHF','GBPCHF','GBPNZD']
+pairs=sellHold
 
 #def runv3(pair):
 #while 1:
@@ -278,8 +304,8 @@ validationSetLength ='1'
 useSignalsFrom='tripleFiltered'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-pairs=['EURAUD','GBPUSD','GBPCAD','NZDUSD','EURGBP',\
-            'EURUSD','EURCAD','EURNZD','GBPAUD','NZDCAD']
+pairs=buyHold
+
 #pairsList=[pairs,pairs2,pairs3]
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 
@@ -332,10 +358,7 @@ validationSetLength ='1'
 useSignalsFrom='tripleFiltered'
 offline=False
 scriptName= 'debug_system_v'+version_+'C_30min.py'
-pairs=['NZDCHF','AUDCHF','USDCHF','EURCHF',\
-            'USDCAD','AUDNZD','AUDCAD','AUDJPY','NZDJPY',\
-            'CADJPY','CHFJPY','USDJPY','GBPJPY','EURJPY',\
-            'AUDUSD','CADCHF','GBPCHF','GBPNZD']
+pairs=sellHold
             
 #logging.basicConfig(filename='/logs/runsystem_v'+version+'_'+bias+'.log',level=logging.DEBUG)
 

@@ -314,7 +314,7 @@ if len(sys.argv)==1:
                     #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
-                    #'EURCHF',\
+                    'EURCHF',\
                     #'EURGBP',\
                     #'EURUSD',\
                     #'EURAUD',\
@@ -333,7 +333,7 @@ if len(sys.argv)==1:
                     #'GBPNZD',\
                     #'GBPCHF',\
                     #'NZDCHF',\
-                    'NZDCAD',\
+                    #'NZDCAD',\
                     #'CADCHF'
                     ]
     ticker =livePairs[0]
@@ -347,7 +347,7 @@ if len(sys.argv)==1:
     addAuxPairs = True
     
     #display params
-    showCharts=False
+    showCharts=True
     showFinalChartOnly=True
     showIndicators = False
     verbose=True
@@ -410,7 +410,7 @@ PRT['tailRiskPct'] = 95
 #rounds safef and safef cannot go below this number. if set to None, no rounding
 PRT['minSafef'] =1
 #no dps safef
-PRT['nodpsSafef'] =2
+PRT['nodpsSafef'] =1
 #dps max limit
 PRT['maxSafef'] = 2
 #safef=minSafef if CAR25 < threshold
@@ -767,12 +767,15 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 minorPeak = peaksSorted[0]
                 plist=[peak for peak in peaksSorted if abs(minorPeak-peak) > minDatapoints]
                 if len(plist)>0:
-                    majorPeak = plist[0]
+                    #find closest peak to ensure single cycle
+                    idx = (np.abs(np.array(plist)-minorPeak)).argmin()
+                    majorPeak = plist[idx]
             else:
                 majorPeak = peaksSorted[0]
                 plist=[peak for peak in peaksSorted if abs(majorPeak-peak) > minDatapoints]
                 if len(plist)>0:
-                    minorPeak = plist[0]
+                    idx = (np.abs(np.array(plist)-majorPeak)).argmin()
+                    minorPeak = plist[idx]
         #peaksSorted=data2.Close.iloc[peaks].sort_values(ascending=False).index
         #startPeak = peaksSorted[0]
         #minorPeak = [peak for peak in peaksSorted if abs(startPeak-peak) > minDatapoints][0]
@@ -784,13 +787,16 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             if mode==0:
                 minorValley = valleysSorted[0]
                 vlist = [valley for valley in valleysSorted if abs(minorValley-valley) > minDatapoints]
-                if len(vlist)>0:                
-                    majorValley = vlist[0]   
+                if len(vlist)>0:
+                    #find closest valley to ensure single cycle
+                    idx = (np.abs(np.array(vlist)-minorValley)).argmin()
+                    majorValley = vlist[idx]
             else:
                 majorValley = valleysSorted[0]
                 vlist = [valley for valley in valleysSorted if abs(majorValley-valley) > minDatapoints]
                 if len(vlist)>0:
-                    minorValley = vlist[0]   
+                    idx = (np.abs(np.array(vlist)-majorValley)).argmin()
+                    minorValley = vlist[idx]   
         #valleysSorted = data2.Close.iloc[valleys].sort_values(ascending=True).index
         #startValley = valleysSorted[0]
         #minorValley = [valley for valley in valleysSorted if abs(startValley-valley) > minDatapoints][0]
@@ -857,7 +863,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         pipelines=shortTrendPipelines
         train_index.append((is_period,y_train_zz,index,pipelines,signal_types))
         
-        pv2=3
+        pv2=2
         if pv_sorted[-pv2] in peaks:
             startPeak=pv_sorted[-pv2]
             #-1 to exclude last index for y_train
@@ -879,7 +885,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             pipelines=pv2e_Pipelines
             train_index.append((is_period,y_train_zz,index,pipelines,signal_types))
         
-        pv3=4
+        pv3=3
         if pv_sorted[-pv3] in peaks:
             startPeak=pv_sorted[-pv3]
             #+1 because range starts from 0 index

@@ -217,11 +217,11 @@ class zigzag(object):
         fig.autofmt_xdate()
         if startPeak is not None and startValley is not None:
             ax.annotate('peak start', startPeak,
-            xytext=(-70, 0), textcoords='offset points',
+            xytext=(0, 20), textcoords='offset points',
             arrowprops=dict(facecolor='green', shrink=0.05),
             )
             ax.annotate('valley start', startValley,
-            xytext=(-70, 0), textcoords='offset points',
+            xytext=(0, -20), textcoords='offset points',
             arrowprops=dict(facecolor='red', shrink=0.05),
             )
         if majorPeak is not None and majorValley is not None:

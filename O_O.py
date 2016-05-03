@@ -77,8 +77,8 @@ print 'sellHold',len(sellHold),sellHold
 '''
 
 offlinePairs=[]
-buyHold=['AUDJPY', 'AUDUSD', 'AUDCAD', 'AUDCHF', 'AUDNZD', 'EURJPY', 'EURUSD', 'EURCAD', 'EURNZD', 'EURCHF', 'EURGBP', 'NZDJPY', 'NZDUSD', 'NZDCHF', 'NZDCAD', 'CHFJPY', 'GBPJPY', 'GBPUSD', 'GBPCAD', 'CADJPY', 'USDJPY']
-sellHold=['EURAUD', 'GBPAUD', 'GBPNZD', 'USDCHF', 'GBPCHF', 'CADCHF', 'USDCAD']
+buyHold=['GBPJPY', 'GBPUSD', 'GBPAUD', 'GBPCAD', 'GBPNZD', 'GBPCHF', 'CADCHF', 'EURUSD', 'EURAUD', 'EURNZD', 'EURCHF']
+sellHold=['EURGBP', 'NZDJPY', 'CADJPY', 'CHFJPY', 'EURJPY', 'AUDJPY', 'USDJPY', 'EURCAD', 'USDCAD', 'AUDCAD', 'NZDCAD', 'USDCHF', 'AUDCHF', 'NZDCHF', 'AUDUSD', 'NZDUSD', 'AUDNZD']
 
  
 start_time3 = time.time()

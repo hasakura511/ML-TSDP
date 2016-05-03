@@ -65,8 +65,12 @@ else:
              sysfile='s101_ESM'
          if sys.argv[1]=='7':
              sysfile='s101_ES'
+             if len(sys.argv) > 4:
+                 sysfile='s101_' + sys.argv[4]
          if sys.argv[1]=='8':
              sysfile='s101_SPY'
+             if len(sys.argv) > 4:
+                 sysfile='s101_' + sys.argv[4]
          if sys.argv[1]=='2':
              sysfile='s101_EURJPY'
              if len(sys.argv) > 4:

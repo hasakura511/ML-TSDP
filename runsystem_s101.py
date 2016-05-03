@@ -29,8 +29,49 @@ pairs=['NZDJPY','CADJPY','CHFJPY','EURGBP',\
                  'GBPJPY','EURCHF','AUDJPY',\
                  'AUDUSD','EURUSD','GBPUSD','USDCAD',\
                  'USDCHF','USDJPY','EURJPY','NZDUSD']
-                
-def runv2(pair):
+
+
+idxes=['#AUS200',
+        '#Belgium20',
+        '#ChinaA50',
+        '#ChinaHShar',
+        '#Denmark20',
+        '#Euro50',
+        '#Finland25',
+        '#France120',
+        '#France40',
+        '#Germany30',
+        '#Germany50',
+        '#GerTech30',
+        '#Greece25',
+        '#Holland25',
+        '#HongKong50',
+        '#Hungary12',
+        '#Japan225',
+        '#Nordic40',
+        '#Poland20',
+        '#Portugal20',
+        '#Spain35',
+        '#Sweden30',
+        '#Swiss20',
+        '#UK_Mid250',
+        '#UK100',
+        '#US30',
+        '#USNDAQ100',
+        '#USSPX500']
+
+futidxes=['#GER30_M6',
+            '#UK100_M6',
+            '#JPN225_M6',
+            '#US$indx_M6',
+            '#NAS100_M6',
+            '#DJ30_M6',
+            '#EUR50_M6',
+            '#FRA40_M6',
+            '#SWI20_M6']
+                                   
+                    
+def runv2(system, pair, blend):
       #while 1:
       try:
             f=open ('/logs/s101v2' + pair + 'v2.log','a')
@@ -39,9 +80,10 @@ def runv2(pair):
             
             ferr=open ('/logs/s101' + pair + 'v2_err.log','a')
             ferr.write('Starting s101: ' + pair)
-            subprocess.call(['python','system_s101.py','2','2','0',pair,'1'], stdout=f, stderr=ferr)
-            
-            subprocess.call(['python','system_s101.py','9','2','0',pair], stdout=f, stderr=ferr)
+            if blend:
+                subprocess.call(['python','system_s101.py', system,'2','0',pair,'1'], stdout=f, stderr=ferr)
+            else:
+                subprocess.call(['python','system_s101.py', system,'2','0',pair], stdout=f, stderr=ferr)
             f.close()
             ferr.close()
       except Exception as e:
@@ -52,11 +94,27 @@ def runv2(pair):
       return
 
 threads = []
-for pair in pairs:
-	sig_thread = threading.Thread(target=runv2, args=[pair])
-	sig_thread.daemon=True
-	threads.append(sig_thread)
+for symbol in idxes:
+     sig_thread = threading.Thread(target=runv2, args=['8',symbol,False])
+     sig_thread.daemon=True
+     threads.append(sig_thread)
 [t.start() for t in threads]
 [t.join() for t in threads]
+threads = []
+for symbol in futidxes:
+     sig_thread = threading.Thread(target=runv2, args=['7',symbol,False])
+     sig_thread.daemon=True
+     threads.append(sig_thread)
+[t.start() for t in threads]
+[t.join() for t in threads]
+threads = []
+for pair in pairs:
+     sig_thread = threading.Thread(target=runv2, args=['2',pair,True])
+     sig_thread = threading.Thread(target=runv2, args=['9',pair,False])
+     sig_thread.daemon=True
+     threads.append(sig_thread)
+[t.start() for t in threads]
+[t.join() for t in threads]
+threads = []
 
 	

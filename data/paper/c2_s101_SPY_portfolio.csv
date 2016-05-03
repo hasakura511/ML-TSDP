@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#S&P500_M6,open,short,2.0,0.0,2075.5,0.0,-4.151,0.0,4.151,8.0,,,,,#S&P500_M6,,20160502 16:39:23 EST,20160502 16:39:23 EST,-2.0,USD,,,100466.833,3243250.0,100500.0
+#S&P500_M6,open,long,2.0,0.0,2075.0,0.0,-4.15,0.0,4.15,8.0,,,,,#S&P500_M6,,20160503 02:38:50 EST,20160503 02:38:50 EST,2.0,USD,,,100466.834,3243300.0,100500.0

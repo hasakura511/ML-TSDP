@@ -414,7 +414,7 @@ print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 print 'Total Elapsed time: ', round(((time.time() - start_time3)/60),2), ' minutes'
 
 
-
+'''
 threads = []
 for list in pairsList:
 	logging.info(str(list))
@@ -425,4 +425,4 @@ for list in pairsList:
 while 1:
 	time.sleep(100)
 
-	
+'''

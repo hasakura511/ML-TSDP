@@ -383,11 +383,18 @@ if len(sys.argv)==1:
     verbose=True
 else:
     debug=False
-    liveFutures=[sys.argv[1]]
-    bias=['gainAhead','zigZag']
-    adfPvalue=0
-    validationSetLength =90
-    useSignalsFrom='tripleFiltered'
+    if len(sys.argv)==1:
+        liveFutures=[sys.argv[1]]
+        bias=['gainAhead','zigZag']
+        adfPvalue=0
+        validationSetLength =90
+        useSignalsFrom='tripleFiltered'
+    else:
+        liveFutures=[sys.argv[1]]
+        bias=[sys.argv[2]]
+        adfPvalue=float(sys.argv[3])
+        validationSetLength =int(sys.argv[4])
+        useSignalsFrom=sys.argv[5]
     ticker =liveFutures[0]
     #symbol=ticker[0:3]
     #currency=ticker[3:6]

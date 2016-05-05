@@ -289,11 +289,16 @@ class zigzag(object):
                 dpsEquity = signals[system][-nrows:].dpsNetEquity
                 nodpsComm=round(signals[system][-nrows:].nodpsComm.sum(),0)
                 dpsComm=round(signals[system][-nrows:].dpsCommission.sum(),0)
+                signal=signals[system].signals[-1]
+                nodpsSafef=signals[system].nodpsSafef[-1]
+                dpsSafef=signals[system].dpsSafef[-1]
                 #print system, chartTitle, nodpsEquity, dpsEquity
                 ax2.plot(np.arange(nrows),nodpsEquity, label=system+' noDpsComm: '\
-                                +str(nodpsComm), ls=next(linecycle))
+                                +str(nodpsComm)+' Sig: '+str(signal)+' Safef: '+str(nodpsSafef),\
+                                ls=next(linecycle))
                 ax2.plot(np.arange(nrows),dpsEquity, label='dps '+system+ ' dpsComm: '\
-                            +str(dpsComm), ls=next(linecycle))
+                            +str(dpsComm)+' Sig: '+str(signal)+' Safef: '+str(dpsSafef),\
+                            ls=next(linecycle))
 
                     
             handles, labels = ax2.get_legend_handles_labels()

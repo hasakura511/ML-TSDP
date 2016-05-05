@@ -396,7 +396,7 @@ else:
     chartSavePath = './data/results/'+version+'_'+ticker
     
     #adds auxilary pair features
-    addAux = False
+    addAux = True
     
     #display params
     showCharts=False

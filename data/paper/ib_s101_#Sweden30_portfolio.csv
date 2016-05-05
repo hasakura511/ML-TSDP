@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Sweden30,#Sweden30,,2.0,2.0,1337.51,1337.51,0.0,2.67502,0.0,-505.34004,-500.0,Paper,USD,
+#Sweden30,#Sweden30,,-2.0,-2.0,1332.51,1332.51,0.0,2.66502,0.0,-2013.3451,-2000.0,Paper,USD,

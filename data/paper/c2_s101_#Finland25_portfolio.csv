@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Finland25,open,long,2.0,0.0,3102.56,0.0,-6.20512,0.0,6.20512,8.0,,,,,#Finland25,,20160505 00:42:08 EST,20160505 00:42:08 EST,2.0,USD,,,94350.40704,3859136.0,94400.0
+#Finland25,open,long,2.0,0.0,3102.56,0.0,-6.20512,0.0,6.20512,12.0,,,,,#Finland25,,20160505 02:35:13 EST,20160505 02:35:13 EST,2.0,USD,,,91125.61856,5098560.0,91200.0

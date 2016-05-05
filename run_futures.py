@@ -383,7 +383,7 @@ if len(sys.argv)==1:
     verbose=True
 else:
     debug=False
-    if len(sys.argv)==1:
+    if len(sys.argv)==2:
         liveFutures=[sys.argv[1]]
         bias=['gainAhead','zigZag']
         adfPvalue=0

@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#SWI20_M6,#SWI20_M6,,-2.0,-2.0,7804.0,7804.0,-780400.0,15.608,0.0,-15.608,0.0,Paper,USD,
+#SWI20_M6,#SWI20_M6,,-2.0,-2.0,7804.0,7804.0,0.0,15.608,0.0,-3278.072,-3200.0,Paper,USD,

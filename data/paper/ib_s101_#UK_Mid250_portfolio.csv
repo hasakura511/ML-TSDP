@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#UK_Mid250,#UK_Mid250,,-2.0,-2.0,16732.29,16732.29,-1673229.0,33.46458,0.0,-33.46458,0.0,Paper,USD,
+#UK_Mid250,#UK_Mid250,,2.0,2.0,16751.8,16751.8,0.0,33.5036,0.0,-2017.96818,-1951.0,Paper,USD,

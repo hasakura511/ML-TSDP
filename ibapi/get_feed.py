@@ -124,6 +124,7 @@ def cache_bar_csv(dataPath, barSizeSetting, symfilter=''):
         if contract.secType == 'CASH':
             symbol = contract.symbol + contract.currency
             pair=symbol
+            print pair
             if len(symfilter) == 0 or pair == symfilter:
                 logging.info( 'Reading Existing Data For ' + symbol )
                 interval=duration_to_interval(barSizeSetting)
@@ -170,8 +171,7 @@ def get_bar_feed(dataPath, whatToShow, barSizeSetting, symfilter=''):
                 logging.info(  'Subscribing Realtime Bar to ' + pair  )
                 interval=duration_to_interval(barSizeSetting)
                 filename=dataPath+interval+'_'+pair+'.csv'
-                tickerId=get_TickerId(pair)
-            
+                tickerId=get_TickerId(pair)          
                 get_realtimebar(contract, tickerId, whatToShow, prepData[pair], filename)
                 logging.info( 'Done Subscribing to ' + pair  )
             

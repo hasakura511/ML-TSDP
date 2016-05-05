@@ -30,10 +30,11 @@ from itertools import cycle
 
 
 
-def acPeriodogram(p,bars=48):
+def acPeriodogram(data,bars=48):
+    p=data.Close
     nrows=p.shape[0]
     index = p.index
-    col_names = ['AC_Rev']+['AC_lag'+str(i) for i in range(1,bars)]
+    col_names = ['KeyRev']+['AC_lag'+str(i) for i in range(1,bars)]
     X_train= pd.DataFrame(data=np.zeros([nrows,bars]), index=p.index,\
                             columns=col_names)
     #if lb <3:
@@ -107,19 +108,27 @@ def acPeriodogram(p,bars=48):
                 Corr2[Lag,1]=Corr2[Lag-1,0]
             Corr[Lag] = pd.Series(filt[:i]).autocorr(lag=Lag)
             Corr2[Lag,0]=.5*(Corr[Lag]+1)
-            
+        '''
         SumDeltas=0
         for Lag in range(3,bars):
             if (Corr2[Lag,0]>.5 and Corr2[Lag,1]<.5) or (Corr2[Lag,0]<.5 and Corr2[Lag,1]>.5):
                 #print SumDeltas
                 SumDeltas=SumDeltas+1
         #print i, SumDeltas
-        '''
-        Reversal=0
-        if SumDeltas>bars/2:
-            Reversal=1
-        '''
+        
+        #Reversal=0
+        #if SumDeltas>bars/2:
+        #    Reversal=1
         Corr[0]=SumDeltas/float(bars)
+        '''
+        #print data.index[i]
+        if data.iloc[i].Open>data.iloc[i-1].Close and data.iloc[i].Close<data.iloc[i-1].Low:
+            #print data.iloc[i].Open,'>' ,data.iloc[i-1].Close, 'and', data.iloc[i].Close,'<',data.iloc[i-1].Low
+            Corr[0]=-1
+        elif data.iloc[i].Open<data.iloc[i-1].Close and data.iloc[i].Close>data.iloc[i-1].High:
+            Corr[0]=1
+        else:
+            Corr[0]=0
         
         rad370=math.radians(370)
         for Period in range(10,bars):
@@ -193,26 +202,26 @@ if __name__ == "__main__":
              #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
              #("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
              #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
-             ("ETC", ExtraTreesClassifier(class_weight={1:1}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
+             #("ETC", ExtraTreesClassifier(class_weight={1:1}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
              #("RF", RandomForestClassifier(class_weight={1:500}, n_estimators=10, criterion='gini',max_depth=3, min_samples_split=2, min_samples_leaf=1, max_features='auto', bootstrap=True, oob_score=False, n_jobs=1, random_state=None, verbose=0))\
              #("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=5, weights='uniform')),\
              #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=15, weights='distance')),\
              #("rNeighbors-uniform", RadiusNeighborsClassifier(radius=8, weights='uniform')),\
              #("rNeighbors-distance", RadiusNeighborsClassifier(radius=10, weights='distance')),\
-             #("VotingHard", VotingClassifier(estimators=[\
+             ("VotingHard", VotingClassifier(estimators=[\
              #    ("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
                  #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
              #    ("GBC", GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3, init=None, random_state=None, max_features=None, verbose=0, max_leaf_nodes=None, warm_start=False, presort='auto')),\
              #    ("QDA", QuadraticDiscriminantAnalysis()),\
-                 #("GNBayes",GaussianNB()),\
-                 #("LDA", LinearDiscriminantAnalysis()), \
-                 #("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=5, weights='uniform')),\
+                 ("GNBayes",GaussianNB()),\
+                 ("LDA", LinearDiscriminantAnalysis()), \
+                 ("kNeighbors-uniform", KNeighborsClassifier(n_neighbors=5, weights='uniform')),\
                  #("MLPC", Classifier([Layer("Sigmoid", units=150), Layer("Softmax")],learning_rate=0.001, n_iter=25, verbose=True)),\
                  #("rbfSVM", SVC(C=1, gamma=.01, cache_size=200, class_weight={1:500}, kernel='rbf', max_iter=-1, probability=False, random_state=None, shrinking=True, tol=0.001, verbose=False)), \
                  #("kNeighbors-distance", KNeighborsClassifier(n_neighbors=8, weights='distance')),\
                  #("Bagging",BaggingClassifier(base_estimator=dt_stump, n_estimators=10, max_samples=1.0, max_features=1.0, bootstrap=True, bootstrap_features=False, oob_score=False, warm_start=False, n_jobs=1, random_state=None, verbose=0)),\
                  #("ETC", ExtraTreesClassifier(class_weight={1:500}, n_estimators=10, criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features='auto', max_leaf_nodes=None, bootstrap=False, oob_score=False, n_jobs=1, random_state=None, verbose=0, warm_start=False)),\
-              #     ], voting='hard', weights=None)),
+                   ], voting='hard', weights=None)),
              #("VotingSoft", VotingClassifier(estimators=[\
                  #("ada_discrete", AdaBoostClassifier(base_estimator=dt_stump, learning_rate=1, n_estimators=400, algorithm="SAMME")),\
                  #("ada_real", AdaBoostClassifier(base_estimator=dt_stump,learning_rate=1,n_estimators=180,algorithm="SAMME.R")),\
@@ -229,7 +238,7 @@ if __name__ == "__main__":
     iterations =10
     #model = SVC()
     model = models[0][1]
-    DominantCycle, x_train = acPeriodogram(p,bars=9)
+    DominantCycle, x_train = acPeriodogram(data,bars=9)
     y_train=pd.Series(data=np.where(gainAhead[x_train.index].values>0,1,-1), index=x_train.index)
 
     dy = np.zeros_like(y_train)

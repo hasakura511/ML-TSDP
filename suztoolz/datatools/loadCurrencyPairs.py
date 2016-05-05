@@ -118,7 +118,7 @@ def loadCurrencyPairs(currencyPairs, dataPath, barSizeSetting, maxlb, ticker,\
                     
         #align the index, at the end of the loop, dataSet should have an index that all pairs contain
         for pair in currencyPairsDict2:
-            missingData=[x for x in currencyPairsDict[ticker].index if x not in currencyPairsDict2[pair].index]
+            missingData=currencyPairsDict2[ticker].index.sym_diff(currencyPairsDict2[pair].index)
             print 'Missing data:',ticker,pair, missingData
             
             #forward fill missing data
@@ -126,8 +126,11 @@ def loadCurrencyPairs(currencyPairs, dataPath, barSizeSetting, maxlb, ticker,\
                 print 'Forward filling missing data..'
                 #print currencyPairsDict2[pair].ix[missingData]
                 currencyPairsDict2[pair]=currencyPairsDict2[pair].ix[currencyPairsDict[ticker].index].fillna(method='ffill')
+                currencyPairsDict2[ticker]=currencyPairsDict2[ticker].ix[currencyPairsDict[pair].index].fillna(method='ffill')
                 #print currencyPairsDict2[pair].ix[missingData]
-
+                #first index not forwardfillable
+                currencyPairsDict2[pair]=currencyPairsDict2[pair].dropna()        
+                currencyPairsDict2[ticker]=currencyPairsDict2[ticker].dropna()
                 
             if pair != ticker:
                 intersect =np.intersect1d(currencyPairsDict2[pair].index, dataSet.index)
@@ -140,7 +143,7 @@ def loadCurrencyPairs(currencyPairs, dataPath, barSizeSetting, maxlb, ticker,\
                 
         dataSet=currencyPairsDict2[ticker].copy(deep=True)
         print nrows-dataSet.shape[0], 'rows lost for', ticker   
-        
+        print currencyPairsDict[ticker].index.sym_diff(dataSet.index)
         
         currencyPairsDict3 ={}
         for pair in currencyPairsDict2:

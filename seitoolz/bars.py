@@ -119,6 +119,31 @@ def get_contracts():
     return symList.values()  
 
 
+def get_cash_contracts():
+    symList=dict()
+    
+    systemdata=pd.read_csv('./data/systems/system.csv')
+    print systemdata.columns
+    systemdata=systemdata.reset_index()
+    for i in systemdata.index:
+        #print 'Read: ',i
+        system=systemdata.ix[i]
+        #print system
+        contract = Contract()
+        symbol=system['ibsym']
+        if system['ibtype'] == 'CASH':
+            symbol=system['ibsym']+system['ibcur']
+            if system['ibtype'] != 'BITCOIN':
+                    contract.symbol = system['ibsym']
+                    contract.secType = system['ibtype']
+                    contract.exchange = system['ibexch']
+                    contract.currency = system['ibcur']
+                    if system['ibtype'] == 'FUT':
+                            contract.localSymbol= system['iblocalsym']
+                    symList[symbol]=contract
+              
+    return symList.values()  
+
 
 def create_bars(currencyPairs, interval='30m'):
     try:

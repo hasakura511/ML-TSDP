@@ -28,29 +28,33 @@ def get_history(contracts):
             logging.error("something bad happened", exc_info=True)
     
     while 1:
-        dataSet=pd.read_csv('./data/systems/restore_hist.csv', index_col=0)
-        for date in dataSet.index:
-            try:
+        try:
+            dataSet=pd.read_csv('./data/systems/restore_hist.csv', index_col=0)
+            for date in dataSet.index:
+            
                 eastern=timezone('US/Eastern')
                 #timestamp
-                date=parse(str(date)).replace(tzinfo=eastern)
+                mydate=parse(str(date)).replace(tzinfo=eastern)
                 for contract in contracts:
-                  
-                        histdata = feed.get_bar_hist_date(date, dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
+                        print mydate, contract.symbol, contract.currency
+                        histdata = feed.get_bar_hist_date(mydate, dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
+                        print histdata                        
                         bars.proc_history(contract, histdata, interval)
-            except Exception as e:
+            dataSet=pd.DataFrame({}, columns=['Date']).set_index('Date')
+            dataSet.to_csv('./data/systems/restore_hist.csv')
+            
+        except Exception as e:
                 logging.error("something bad happened", exc_info=True)
-        dataSet=pd.DataFrame({}, columns=['Date']).set_index('Date')
-        dataSet.to_csv('./data/systems/restore_hist.csv')
-        time.sleep(600)    
+        
+        time.sleep(10)    
          
 def start_proc():
     global interval
     
-    contracts=bars.get_contracts()
+    contracts=bars.get_cash_contracts()
     pairs=bars.get_symbols()
     threads = []
-    
+    #get_history(contracts)
     t1 = threading.Thread(target=get_history, args=[contracts])
     t1.daemon=True
     threads.append(t1)

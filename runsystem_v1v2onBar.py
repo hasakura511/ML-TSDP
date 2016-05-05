@@ -137,6 +137,7 @@ def onBar(bar, symbols):
     
         
 def runPair_v1(pair):
+    offline=True
     ticker = pair[0].split('_')[1]
     version = 'v1'
     version_ = 'v1.3C'
@@ -149,31 +150,45 @@ def runPair_v1(pair):
                 'barSizeSetting':barSizeSetting,'currencyPairs':pairs, 'perturbData':perturbData,\
                 'modelPath':modelPath,'loadModel':loadModel}
                 
-        
-    try:
-        with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
-            orig_stdout = sys.stdout
-            sys.stdout = f
-            print 'Starting '+version+': ' + ticker
-            if ticker not in livePairs:
-                offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
-            #f.write('Starting '+version+': ' + ticker)         
-            #ferr.write('Starting '+version+': ' + ticker)
-            signal, dataSet=runv2(runData)
-            print signal
-            logging.info('v1 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
-            logging.info(signal.system)
-            #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
-            #f.close()
-            #ferr.close()
+    if offline:
+        try:
+            with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
+                orig_stdout = sys.stdout
+                sys.stdout = f
+                message = "Offline Mode: turned off in runsystem"
+                offlineMode(ticker, message, signalPath, version, version_)
+                logging.info(version+' '+ticker+' '+message)
+            sys.stdout = orig_stdout
+        except Exception as e:
+                 #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
+                 #ferr.write(e)
+                 #ferr.close()
+                 logging.error("something bad happened", exc_info=True)
+    else:
+        try:
+            with open ('/logs/' + version+'_'+ticker + 'onBar.log','a') as f:
+                orig_stdout = sys.stdout
+                sys.stdout = f
+                print 'Starting '+version+': ' + ticker
+                if ticker not in livePairs:
+                    offlineMode(ticker, "Offline Mode: turned off in runsystem", signalPath, version, version_)
+                #f.write('Starting '+version+': ' + ticker)         
+                #ferr.write('Starting '+version+': ' + ticker)
+                signal, dataSet=runv2(runData)
+                print signal
+                logging.info('v1 '+' signal '+str(signal.signals)+ ' safef '+str(signal.safef)+' CAR25 '+str(signal.CAR25))
+                logging.info(signal.system)
+                #subprocess.call(['python','debug_system_v1.3C_30min.py',ticker,'1'], stdout=f, stderr=ferr)
+                #f.close()
+                #ferr.close()
 
-        sys.stdout = orig_stdout
-        runPair_v2(pair, dataSet)
-    except Exception as e:
-        	 #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
-        	 #ferr.write(e)
-        	 #ferr.close()
-        	 logging.error("something bad happened", exc_info=True)
+            sys.stdout = orig_stdout
+            runPair_v2(pair, dataSet)
+        except Exception as e:
+                 #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
+                 #ferr.write(e)
+                 #ferr.close()
+                 logging.error("something bad happened", exc_info=True)
  
 def runPair_v2(pair, dataSet):
     offline=True

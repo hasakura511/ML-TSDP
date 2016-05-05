@@ -159,6 +159,7 @@ def runPair_v1(pair):
                 offlineMode(ticker, message, signalPath, version, version_)
                 logging.info(version+' '+ticker+' '+message)
             sys.stdout = orig_stdout
+            runPair_v2(pair, dataSet)
         except Exception as e:
                  #ferr=open ('/logs/' + version+'_'+ticker + 'onBar_err.log','a')
                  #ferr.write(e)

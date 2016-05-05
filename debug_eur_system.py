@@ -22,9 +22,43 @@ import sys
 import logging
 import time
 #import websocket
-offlinePairs=[]
-buyHold=['NZDJPY', 'NZDUSD', 'NZDCHF', 'NZDCAD', 'AUDJPY', 'AUDUSD', 'AUDCAD', 'AUDCHF', 'EURJPY', 'EURUSD', 'EURCAD', 'EURCHF', 'EURGBP', 'GBPUSD', 'GBPCAD', 'USDCAD']
-sellHold=['EURNZD', 'AUDNZD', 'GBPNZD', 'EURAUD', 'GBPAUD', 'CADJPY', 'CHFJPY', 'GBPJPY', 'USDJPY', 'USDCHF', 'GBPCHF', 'CADCHF']
+
+
+offlinePairs=[
+                'NZDJPY',\
+                'CADJPY',\
+                'CHFJPY',\
+                'EURJPY',\
+                'GBPJPY',\
+                'AUDJPY',\
+                'USDJPY',\
+                'AUDUSD',\
+                'EURUSD',\
+                'EURAUD',\
+                'EURCAD',\
+                'EURNZD',\
+                'GBPUSD',\
+                'USDCAD',\
+                'USDCHF',\
+                'NZDUSD',
+                'EURCHF',\
+                'EURGBP',\
+                'AUDCAD',\
+                'AUDCHF',\
+                'AUDNZD',\
+                'GBPAUD',\
+                'GBPCAD',\
+                'GBPNZD',\
+                'GBPCHF',\
+                'CADCHF',\
+                'NZDCHF',\
+                'NZDCAD'
+                ]
+buyHold=sellHold=[]
+
+#offlinePairs=[]
+#buyHold=['NZDJPY', 'NZDUSD', 'NZDCHF', 'NZDCAD', 'AUDJPY', 'AUDUSD', 'AUDCAD', 'AUDCHF', 'EURJPY', 'EURUSD', 'EURCAD', 'EURCHF', 'EURGBP', 'GBPUSD', 'GBPCAD', 'USDCAD']
+#sellHold=['EURNZD', 'AUDNZD', 'GBPNZD', 'EURAUD', 'GBPAUD', 'CADJPY', 'CHFJPY', 'GBPJPY', 'USDJPY', 'USDCHF', 'GBPCHF', 'CADCHF']
  
 start_time3 = time.time()
 signalPath = './data/signals/'
@@ -212,7 +246,7 @@ logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' min
 print len(pairs), 'pairs completed', version_, barSize, bias
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
-'''
+
 ############v4 OFFLINE##########
 version = '4'
 version_ = '43'
@@ -390,5 +424,5 @@ for list in pairsList:
 	sig_thread.start()
 while 1:
 	time.sleep(100)
-'''
+
 	

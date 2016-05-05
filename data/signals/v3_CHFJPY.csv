@@ -2136,3 +2136,5 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-05-02 09:00:00,1.0,0.0,452.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_None_i0_fcst1_BH1,-18.9165,20160502 08:41:05 EDT
 2016-05-02 18:30:00,1.0,0.0,452.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_None_i0_fcst1_BH1,-0.985766666667,20160502 18:29:00 EDT
 2016-05-03 01:00:00,-1.0,0.0,452.0,1.0,,,,bothCHFJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-1.72556666667,20160503 00:58:16 EDT
+2016-05-04 21:34:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-1.72556666667,20160503 00:58:16 EDT
+2016-05-04 21:36:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-1.72556666667,20160503 00:58:16 EDT

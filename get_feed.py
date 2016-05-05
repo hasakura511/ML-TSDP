@@ -15,7 +15,7 @@ Created on Tue Mar 08 20:10:29 2016
 1 hour - 500 datapoint per request
 @author: Hidemi
 """
-logging.basicConfig(filename='/logs/get_1m_feed.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/get_feed_1m.log',level=logging.DEBUG)
 
 dataPath = './data/from_IB/'
 minDataPoints = 10000

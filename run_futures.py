@@ -399,7 +399,7 @@ else:
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
     signalPath = './data/signals/'
-    dataPath = './data/from_IB/'
+    dataPath = './data/tickerData/'
     chartSavePath = './data/results/'+version+'_'+ticker
     
     #adds auxilary pair features

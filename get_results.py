@@ -572,7 +572,7 @@ for i in systemdata.index:
         filename=system['System']
         if os.path.isfile('./data/results/' + filename + '.png'):
             systems[system['System']]=1
-            (ver, sym)=filename.split('_')
+            (ver, sym)=filename.rsplit('_',1)
             if not symdict.has_key(sym):
                 symdict[sym]=list()
             symdict[sym].append(filename)
@@ -948,18 +948,42 @@ def gen_file(filetype):
     genstrat=''
     if len(sys.argv)>2:
 	   genstrat=sys.argv[2]
-    
+    if filetype == 'create':
+        headertitle=genstrat
+        filename='./data/results/' + genstrat + '.html'
+        dataSet=pd.read_csv('./data/results/index.csv', index_col='name')
+        dataSet.loc[genstrat]=genstrat + '.html'
+        dataSet.to_csv('./data/results/index.csv')
+        headerhtml=get_html_header()
+        footerhtml=get_html_footer()
+        headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
+        html=''
+        dataPath='./data/results/'
+        files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+        counter=0
+        cols=4
+        if len(sys.argv)>3:
+	       cols=int(sys.argv[3])
+        html='<center><h1>' + genstrat + '</h1></center><br><center>'
+        html=html + '<table>'
+        for file in files:
+            if re.search(genstrat, file) and re.search(r'.png',file):
+                name=file.rsplit('.',1)[0]
+                print name
+                (counter, html)=generate_html(name, counter, html, cols) 
+        html=html + '</table>'
+        write_html(filename, headerhtml, footerhtml, html)
+        filetype='index'
+        
     if filetype == 'index':
+        html=''
         headertitle='Systems'
         filename='./data/results/index.html'
-        html = html + '<li><a href=sig.html>Signals</a></li>'
-        html = html + '<li><a href=v4.html>V4</a></li>'
-        html = html + '<li><a href=c2.html>C2</a></li>'
-        html = html + '<li><a href=c2_2.html>Recent C2</a></li>'
-        html = html + '<li><a href=ib.html>IB</a></li>'
-        html = html + '<li><a href=paper.html>Paper</a></li>'
-        html = html + '<li><a href=paper2.html>Recent Paper</a></li>'
-        html = html + '<li><a href=btc.html>BTC</a></li>'
+        dataSet=pd.read_csv('./data/results/index.csv')
+        for i in dataSet.index:
+            rec=dataSet.ix[i]
+            html = html + '<li><a href=' + rec['html'] + '>' + rec['name'] + '</a></li>'
+        
         headerhtml=get_html_header()
         footerhtml=get_html_footer()
         headerhtml = re.sub('Index', headertitle, headerhtml.rstrip())
@@ -1126,7 +1150,7 @@ def write_html(filename, headerhtml, footerhtml, body):
     f.write(body)
     f.write(footerhtml)
     f.close() 
-types=['index','sig','c2','c2_2','ib','paper','paper2','btc','v4']
+types=['index','sig','c2','c2_2','ib','paper','paper2','btc','v4','create']
 def start_resgen():
     #Prep
     threads = []

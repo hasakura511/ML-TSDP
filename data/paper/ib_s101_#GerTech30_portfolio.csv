@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#GerTech30,#GerTech30,,2.0,2.0,1618.5,1618.5,0.0,3.237,0.0,-1216.173,-1200.0,Paper,USD,
+#GerTech30,#GerTech30,,-2.0,-2.0,1615.5,1615.5,0.0,3.231,0.0,-2125.872,-2100.0,Paper,USD,

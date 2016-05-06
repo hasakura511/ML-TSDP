@@ -211,24 +211,25 @@ def calcDPS(signal_type, sst, PRT, windowLength, **kwargs):
             #print 'dd95-ddtol', abs(ddTolerance-dd95)
     
             if safef > maxLeverage:
-                safef = maxLeverage
+                #safef = maxLeverage
                 #print '\n DD95: %.3f ddTol: %.3f ' % (dd95,ddTolerance), "safef > maxLeverage" 
                 done = True
             elif (abs(ddTolerance - dd95) < accuracy_tolerance):
                 #print 'dd95-ddtol', abs(ddTolerance-dd95), 'accuracy_tolerance', accuracy_tolerance
                 #print '\n DD95: %.3f ddTol: %.3f ' % (dd95,ddTolerance), "Close enough" 
                 done = True
-        #threshold check
+                
+        #while done
         if CAR25 > threshold:
             #print safef, CAR25, dd95
-            safef_ser[i] = safef
+            safef_ser[i] = maxLeverage
             CAR25_ser[i] = CAR25
             dd95_ser[i] = dd95
-            (dpsPNL_ser[i], dpsCommission_ser[i], dpsEquity_ser[i])= calcEquityLast(i, sst, safef)
+            (dpsPNL_ser[i], dpsCommission_ser[i], dpsEquity_ser[i])= calcEquityLast(i, sst, maxLeverage)
             dpsRunName_ser[i] = dpsRunName
 
         else:
-            #dont trade
+            #minSafef
             safef_ser[i] = minSafef
             CAR25_ser[i] = CAR25
             dd95_ser[i] = threshold

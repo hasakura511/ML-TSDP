@@ -183,7 +183,7 @@ def reCalcEquity(sst, metric):
         elif (sst.signals.iloc[i-1]*sst.dpsSafef.iloc[i-1] > 0):
             dpsNetEquity[i]= (1+sst.gainAhead.iloc[i-1]*sst.dpsSafef.iloc[i-1])*dpsNetEquity[i-1]
         else:
-            dpsNetEquity[i] = sst.netEquity[i-1]
+            dpsNetEquity[i] = sst.dpsNetEquity[i-1]
         
         positionChg = abs(sst.signals[i]*sst.dpsSafef.iloc[i]-sst.signals[i-1]*sst.dpsSafef.iloc[i-1])
         if positionChg !=0:
@@ -311,16 +311,16 @@ if len(sys.argv)==1:
     #bias = ['zigZag']
     #bias=['sellHold']
     #bias=['buyHold']
-    useSignalsFrom='tripleFiltered'
+    useSignalsFrom='highest_CAR25'
     #useSignalsFrom='best_wf_is_short'
     #useSignalsFrom='best_wf_is_all'
     #cycle mode->threshold=1.1
     #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    adfPvalue=-6
+    adfPvalue=0
     #auto ->threshold = 0.2
     #adfPvalue=1.1
-    validationSetLength =90
+    validationSetLength =48
     liveFutures =  [
                     #'AD',
                     #'BO',
@@ -328,7 +328,7 @@ if len(sys.argv)==1:
                     #'C',
                     #'CC',
                     #'CD',
-                    'CL',
+                    #'CL',
                     #'CT',
                     #'DX',
                     #'EC',
@@ -364,7 +364,7 @@ if len(sys.argv)==1:
                     #'US',
                     #'W',
                     #'XX',
-                    #'YM'
+                    'YM'
                     ]
     ticker =liveFutures[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
@@ -388,7 +388,7 @@ else:
         bias=['gainAhead','zigZag']
         adfPvalue=0
         validationSetLength =90
-        useSignalsFrom='tripleFiltered'
+        useSignalsFrom='highest_CAR25'
     else:
         liveFutures=[sys.argv[1]]
         bias=[sys.argv[2]]
@@ -399,7 +399,7 @@ else:
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
     signalPath = './data/signals/'
-    dataPath = './data/tickerData/'
+    dataPath = './data/from_IB/'
     chartSavePath = './data/results/'+version+'_'+ticker
     
     #adds auxilary pair features
@@ -425,7 +425,9 @@ minDatapoints = 3
 #metric to rank best/worst curves for 2nd stage cycle mode and triple filtered for trend mode 
 metric = 'CAR25'
 #metric to use to choose from best worst curves for triple filtered cycle mode
-metric2='netEquity'
+metric2='netPNL'
+metric3='netEquity'
+
 
 #robustness
 perturbData = False
@@ -445,11 +447,11 @@ PRT['horizon'] = 50
 PRT['DD95_limit'] = 0.01
 PRT['tailRiskPct'] = 95
 #rounds safef and safef cannot go below this number. if set to None, no rounding
-PRT['minSafef'] =1
+PRT['minSafef'] =1.0
 #no dps safef
-PRT['nodpsSafef'] =1
+PRT['nodpsSafef'] =1.0
 #dps max limit
-PRT['maxSafef'] = 2
+PRT['maxSafef'] = 2.0
 #safef=minSafef if CAR25 < threshold
 PRT['CAR25_threshold'] = 0
 #PRT['CAR25_threshold'] = -np.inf
@@ -1085,7 +1087,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 reverse='normal'
                 y_train_ga = data_primer_ga_sig.iloc[-supportResistanceLB:].iloc[index].values
                 #reverse if choppy bias, short is and cycle (cycle peak bias)
-                if is_period=='wf_is_short' and mode==0:
+                if mode==0:
                     reverse='reversed'
                     y_train_ga = np.where(y_train_ga<0,1,-1)
 
@@ -1134,9 +1136,10 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             elif st == 'zigZag':
                 reverse='normal'
                 #reverse if choppy bias, short is and cycle (cycle peak bias)
-                if is_period=='wf_is_short' and mode==0:
-                    reverse='reversed'
-                    y_train_zz = np.where(y_train_zz<0,1,-1)
+                #if is_period=='wf_is_short' and mode==0:
+                #    reverse='reversed'
+                #    y_train_zz = np.where(y_train_zz<0,1,-1)
+                
                 #reverse if choppy bias, pv3s is and trend (cycle peak bias)
                 #if bias[0]=='gainAhead' and is_period=='wf_is_pv3s_v2v' and mode==1:
                 #    reverse='reversed'
@@ -1214,40 +1217,44 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             #append last dps result for ranking
             dpsDF = dpsDF.append(dps)
             dpsDF_all = dpsDF_all.append(dps)
-            
-        #save top ranks by is period
+        
+        #rank is periods (level 1) by metric 2
         if i == supportResistanceLB:
             DpsRankByMetricB['best_'+is_period] = signalSets[is_period]\
-                                                            [dpsDF.sort_values(by=metric, ascending=False).iloc[0]\
+                                                            [dpsDF.sort_values(by=metric2, ascending=False).iloc[0]\
                                                             ['signalType']].copy(deep=True)
            
             DpsRankByMetricW['worst_'+is_period]= signalSets[is_period]\
-                                                            [dpsDF.sort_values(by=metric, ascending=False).iloc[-1]\
+                                                            [dpsDF.sort_values(by=metric2, ascending=False).iloc[-1]\
                                                             ['signalType']].copy(deep=True)           
         else:
             #print dpsDF
             #best CAR25
-            DpsRankByMetricB['best_'+is_period]=DpsRankByMetricB['best_'+is_period].append(dpsDF.sort_values(by=metric, ascending=False).iloc[0])
+            DpsRankByMetricB['best_'+is_period]=DpsRankByMetricB['best_'+is_period]\
+                                        .append(dpsDF.sort_values(by=metric2, ascending=False).iloc[0])
             #worstCAR25
-            DpsRankByMetricW['worst_'+is_period]=DpsRankByMetricW['worst_'+is_period].append(dpsDF.sort_values(by=metric, ascending=False).iloc[-1])
+            DpsRankByMetricW['worst_'+is_period]=DpsRankByMetricW['worst_'+is_period]\
+                                        .append(dpsDF.sort_values(by=metric2, ascending=False).iloc[-1])
             #best model
         
-    #total ranking    
+    #rank ALL is periods (level 1) by metric 2, add to DF
     if i == supportResistanceLB:
-        is_period = dpsDF_all.sort_values(by=metric, ascending=False).iloc[0]['is_period']
-        signalType = dpsDF_all.sort_values(by=metric, ascending=False).iloc[0]['signalType']
+        is_period = dpsDF_all.sort_values(by=metric2, ascending=False).iloc[0]['is_period']
+        signalType = dpsDF_all.sort_values(by=metric2, ascending=False).iloc[0]['signalType']
         DpsRankByMetricB['best_wf_is_all'] = signalSets[is_period][signalType].copy(deep=True)
         
-        is_period = dpsDF_all.sort_values(by=metric, ascending=False).iloc[-1]['is_period']
-        signalType = dpsDF_all.sort_values(by=metric, ascending=False).iloc[-1]['signalType']
+        is_period = dpsDF_all.sort_values(by=metric2, ascending=False).iloc[-1]['is_period']
+        signalType = dpsDF_all.sort_values(by=metric2, ascending=False).iloc[-1]['signalType']
         DpsRankByMetricW['worst_wf_is_all']= signalSets[is_period][signalType].copy(deep=True)
         
     else:
         #print dpsDF
         #best CAR25
-        DpsRankByMetricB['best_wf_is_all']=DpsRankByMetricB['best_wf_is_all'].append(dpsDF_all.sort_values(by=metric, ascending=False).iloc[0])
+        DpsRankByMetricB['best_wf_is_all']=DpsRankByMetricB['best_wf_is_all']\
+                            .append(dpsDF_all.sort_values(by=metric2, ascending=False).iloc[0])
         #worstCAR25
-        DpsRankByMetricW['worst_wf_is_all']=DpsRankByMetricW['worst_wf_is_all'].append(dpsDF_all.sort_values(by=metric, ascending=False).iloc[-1])
+        DpsRankByMetricW['worst_wf_is_all']=DpsRankByMetricW['worst_wf_is_all']\
+                            .append(dpsDF_all.sort_values(by=metric2, ascending=False).iloc[-1])
         #best model    
         
 
@@ -1258,6 +1265,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     dpsDF_BofB = pd.DataFrame()
     dpsDF_BofW = pd.DataFrame()
     
+    #recalc DPS and equity for level 2
     #windowLength = int(np.array([windowLengths[x] for x in windowLengths]).mean())
     windowLength = supportResistanceLB
     if verbose:
@@ -1266,67 +1274,73 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         DpsRankByMetricB[rank].index.name = 'dates'
         updateDps = calcDPS(rank, DpsRankByMetricB[rank], PRT, windowLength, verbose=False,\
                                         asset=asset)
-        dpsDF_all2 = dpsDF_all2.append(updateDps)
-        dpsDF_BofB = dpsDF_BofB.append(updateDps)
+        #dpsDF_all2 = dpsDF_all2.append(updateDps)
+        #dpsDF_BofB = dpsDF_BofB.append(updateDps)
         DpsRankByMetricB[rank].set_value(updateDps.index, updateDps.columns, updateDps.values)
         index2 = DpsRankByMetricB[rank].index.intersection(data_primer_ga.index)
         DpsRankByMetricB[rank].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        DpsRankByMetricB[rank]=reCalcEquity(DpsRankByMetricB[rank], metric)
+        DpsRankByMetricB[rank]=reCalcEquity(DpsRankByMetricB[rank], metric2)
+        dpsDF_all2 = dpsDF_all2.append(DpsRankByMetricB[rank].iloc[-1])
+        dpsDF_BofB = dpsDF_BofB.append(DpsRankByMetricB[rank].iloc[-1])
 
     for rank in DpsRankByMetricW:
         DpsRankByMetricW[rank].index.name = 'dates'
         updateDps = calcDPS(rank, DpsRankByMetricW[rank], PRT, windowLength, verbose=False,\
                                         asset=asset)
-        dpsDF_all2 = dpsDF_all2.append(updateDps)
-        dpsDF_BofW = dpsDF_BofW.append(updateDps)
+        #dpsDF_all2 = dpsDF_all2.append(updateDps)
+        #dpsDF_BofW = dpsDF_BofW.append(updateDps)
         DpsRankByMetricW[rank].set_value(updateDps.index, updateDps.columns, updateDps.values)
         index2 = DpsRankByMetricW[rank].index.intersection(data_primer_ga.index)
         DpsRankByMetricW[rank].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        DpsRankByMetricW[rank]=reCalcEquity(DpsRankByMetricW[rank], metric)
-    
+        DpsRankByMetricW[rank]=reCalcEquity(DpsRankByMetricW[rank], metric2)
+        dpsDF_all2 = dpsDF_all2.append(DpsRankByMetricW[rank].iloc[-1])
+        dpsDF_BofW = dpsDF_BofW.append(DpsRankByMetricW[rank].iloc[-1])
+        
+    #rank level 2 B/W by metric 3 
     if i == supportResistanceLB:
         finalDF['finalBest']=pd.DataFrame(index=data.index)
         finalDF['finalBest'].set_value(finalDF['finalBest'].index,'dpsNetEquity',initialEquity)
         finalDF['finalBest'].set_value(finalDF['finalBest'].index,'netEquity',initialEquity)
-        finalDF['finalBest']=finalDF['finalBest'][:-1].append(dpsDF_all2.sort_values(by=metric, ascending=False).iloc[0]).fillna(0)
+        finalDF['finalBest']=finalDF['finalBest'][:-1].append(dpsDF_all2.sort_values(by=metric3, ascending=False).iloc[0]).fillna(0)
 
         finalDF['finalWorst']=pd.DataFrame(index=data.index)
         finalDF['finalWorst'].set_value(finalDF['finalWorst'].index,'dpsNetEquity',initialEquity)
         finalDF['finalWorst'].set_value(finalDF['finalWorst'].index,'netEquity',initialEquity)
-        finalDF['finalWorst']=finalDF['finalWorst'][:-1].append(dpsDF_all2.sort_values(by=metric, ascending=True).iloc[0]).fillna(0)
+        finalDF['finalWorst']=finalDF['finalWorst'][:-1].append(dpsDF_all2.sort_values(by=metric3, ascending=True).iloc[0]).fillna(0)
         
         finalDF['finalBestOfBest']=pd.DataFrame(index=data.index)
         finalDF['finalBestOfBest'].set_value(finalDF['finalBestOfBest'].index,'dpsNetEquity',initialEquity)
         finalDF['finalBestOfBest'].set_value(finalDF['finalBestOfBest'].index,'netEquity',initialEquity)
-        finalDF['finalBestOfBest']=finalDF['finalBestOfBest'][:-1].append(dpsDF_BofB.sort_values(by=metric, ascending=False).iloc[0]).fillna(0)
+        finalDF['finalBestOfBest']=finalDF['finalBestOfBest'][:-1].append(dpsDF_BofB.sort_values(by=metric3, ascending=False).iloc[0]).fillna(0)
 
         finalDF['finalBestOfWorst']=pd.DataFrame(index=data.index)
         finalDF['finalBestOfWorst'].set_value(finalDF['finalBestOfWorst'].index,'dpsNetEquity',initialEquity)
         finalDF['finalBestOfWorst'].set_value(finalDF['finalBestOfWorst'].index,'netEquity',initialEquity)
-        finalDF['finalBestOfWorst']=finalDF['finalBestOfWorst'][:-1].append(dpsDF_BofW.sort_values(by=metric, ascending=False).iloc[0]).fillna(0)
+        finalDF['finalBestOfWorst']=finalDF['finalBestOfWorst'][:-1].append(dpsDF_BofW.sort_values(by=metric3, ascending=False).iloc[0]).fillna(0)
 
     else:
-        finalDF['finalBest']=finalDF['finalBest'].append(dpsDF_all2.sort_values(by=metric, ascending=False).iloc[0])
+        finalDF['finalBest']=finalDF['finalBest'].append(dpsDF_all2.sort_values(by=metric3, ascending=False).iloc[0])
         index2 = finalDF['finalBest'].index.intersection(data_primer_ga.index)
         finalDF['finalBest'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        finalDF['finalBest']=reCalcEquity(finalDF['finalBest'], metric)
+        finalDF['finalBest']=reCalcEquity(finalDF['finalBest'], metric3)
         
-        finalDF['finalWorst']=finalDF['finalWorst'].append(dpsDF_all2.sort_values(by=metric, ascending=True).iloc[0])
+        finalDF['finalWorst']=finalDF['finalWorst'].append(dpsDF_all2.sort_values(by=metric3, ascending=True).iloc[0])
         index2 = finalDF['finalWorst'].index.intersection(data_primer_ga.index)
         finalDF['finalWorst'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        finalDF['finalWorst']=reCalcEquity(finalDF['finalWorst'], metric)
+        finalDF['finalWorst']=reCalcEquity(finalDF['finalWorst'], metric3)
 
-        finalDF['finalBestOfBest']=finalDF['finalBestOfBest'].append(dpsDF_BofB.sort_values(by=metric, ascending=False).iloc[0])
+        finalDF['finalBestOfBest']=finalDF['finalBestOfBest'].append(dpsDF_BofB.sort_values(by=metric3, ascending=False).iloc[0])
         index2 = finalDF['finalBestOfBest'].index.intersection(data_primer_ga.index)
         finalDF['finalBestOfBest'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        finalDF['finalBestOfBest']=reCalcEquity(finalDF['finalBestOfBest'], metric)
+        finalDF['finalBestOfBest']=reCalcEquity(finalDF['finalBestOfBest'], metric3)
         
-        finalDF['finalBestOfWorst']=finalDF['finalBestOfWorst'].append(dpsDF_BofW.sort_values(by=metric, ascending=False).iloc[0])
+        finalDF['finalBestOfWorst']=finalDF['finalBestOfWorst'].append(dpsDF_BofW.sort_values(by=metric3, ascending=False).iloc[0])
         index2 = finalDF['finalBestOfWorst'].index.intersection(data_primer_ga.index)
         finalDF['finalBestOfWorst'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        finalDF['finalBestOfWorst']=reCalcEquity(finalDF['finalBestOfWorst'], metric)
+        finalDF['finalBestOfWorst']=reCalcEquity(finalDF['finalBestOfWorst'], metric3)
         
     dpsDF_final = pd.DataFrame()
+    #recalc dps for level 3
     for rank in finalDF:
         finalDF[rank].index.name = 'dates'
         updateDps = calcDPS(rank, finalDF[rank], PRT, windowLength, verbose=False,\
@@ -1365,6 +1379,70 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     
     #dpsDF_all2 = dpsDF_all2.append(dpsDF_all)
     #dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
+    #level1
+    #dpsDF_all
+    #level2
+    #dpsDF_all2
+    #level3
+    #dpsDF_final
+
+    if i == supportResistanceLB:
+        mr=False
+        curve='highest_'+metric
+        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+        signalDF[curve]=pd.DataFrame(index=data.index)
+        signalDF[curve].set_value(signalDF[curve].index,'dpsNetEquity',initialEquity)
+        signalDF[curve].set_value(signalDF[curve].index,'netEquity',initialEquity)
+        signalDF[curve]=signalDF[curve][:-1].append(dpsDF_all.sort_values(by=metric, ascending=mr).iloc[0]).fillna(0)
+    else:
+        mr=False
+        curve='highest_'+metric
+        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+        signalDF[curve]=signalDF[curve].append(dpsDF_all.sort_values(by=metric, ascending=mr).iloc[0])
+        index2 = signalDF[curve].index.intersection(data_primer_ga.index)
+        signalDF[curve].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
+        signalDF[curve]=reCalcEquity(signalDF[curve], metric)
+        
+    if i == supportResistanceLB:
+        mr=False
+        curve='highest_'+metric2
+        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+        signalDF[curve]=pd.DataFrame(index=data.index)
+        signalDF[curve].set_value(signalDF[curve].index,'dpsNetEquity',initialEquity)
+        signalDF[curve].set_value(signalDF[curve].index,'netEquity',initialEquity)
+        signalDF[curve]=signalDF[curve][:-1].append(dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
+    else:
+        mr=False
+        curve='highest_'+metric2
+        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+        signalDF[curve]=signalDF[curve].append(dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0])
+        index2 = signalDF[curve].index.intersection(data_primer_ga.index)
+        signalDF[curve].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
+        signalDF[curve]=reCalcEquity(signalDF[curve], metric2)
+        
+    if i == supportResistanceLB:
+        mr=False
+        curve='highest_'+metric3
+        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+        signalDF[curve]=pd.DataFrame(index=data.index)
+        signalDF[curve].set_value(signalDF[curve].index,'dpsNetEquity',initialEquity)
+        signalDF[curve].set_value(signalDF[curve].index,'netEquity',initialEquity)
+        signalDF[curve]=signalDF[curve][:-1].append(dpsDF_all.sort_values(by=metric3, ascending=mr).iloc[0]).fillna(0)
+    else:
+        mr=False
+        curve='highest_'+metric3
+        #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
+        #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
+        signalDF[curve]=signalDF[curve].append(dpsDF_all.sort_values(by=metric3, ascending=mr).iloc[0])
+        index2 = signalDF[curve].index.intersection(data_primer_ga.index)
+        signalDF[curve].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
+        signalDF[curve]=reCalcEquity(signalDF[curve], metric3)
+    '''
     if mode ==0:
         mr=True
         curve='lowest '+metric2
@@ -1399,7 +1477,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
             signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
             signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric)
-        
+    '''
     #print dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0]
     #print signalDF['tripleFiltered'].iloc[-1]    
             
@@ -1412,7 +1490,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                             #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                             #shortStart=(shortStart, data2.Close[shortStart]),\
                             cycleList=cycleList,mode=modePred[start:],\
-                            signals=finalDF,chartTitle=ticker+' reDPS of B/W by '+metric+' final curves',\
+                            signals=finalDF,chartTitle=ticker+' WF by B/W by '+metric3,\
                             savePath=chartSavePath+'_FINAL', debug=debug
                             )
                             
@@ -1425,7 +1503,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricB,chartTitle=ticker+' Best Rank '+metric,\
+                                signals=DpsRankByMetricB,chartTitle=ticker+' WF by Best  '+metric2,\
                                 savePath=chartSavePath+'_BRANK', debug=debug
                                 )
                                 
@@ -1436,7 +1514,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricW,chartTitle=ticker+' Worst Rank '+metric,\
+                                signals=DpsRankByMetricW,chartTitle=ticker+' WF by Worst '+metric2,\
                                 savePath=chartSavePath+'_WRANK', debug=debug
                                 )    
         else:
@@ -1448,7 +1526,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricB,chartTitle=ticker+' Best Rank '+metric,\
+                                signals=DpsRankByMetricB,chartTitle=ticker+' WF by Best '+metric2,\
                                 savePath=chartSavePath+'_BRANK', debug=debug
                                 )
                                 
@@ -1459,7 +1537,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricW,chartTitle=ticker+' Worst Rank '+metric,\
+                                signals=DpsRankByMetricW,chartTitle=ticker+' WF by Worst '+metric2,\
                                 savePath=chartSavePath+'_WRANK', debug=debug
                                 )       
                             
@@ -1511,14 +1589,7 @@ if showCharts:
         for x in signalDF:
             signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'.csv')
 
-for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
-    for k, v in d.iteritems():
-        signalDF[k]=v
-
-for is_period in signalSets:
-    for k,v in signalSets[is_period].iteritems():
-        signalDF[is_period+'_'+k]=v
-        
+   
 if showCharts:
     zz.plot_pivots(l=8,w=8,\
                         #startValley=(startValley, data2.Close[startValley]),\
@@ -1527,12 +1598,20 @@ if showCharts:
                         #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                         #shortStart=(shortStart, data2.Close[shortStart]),\
                         cycleList=cycleList,mode=modePred[start:],\
-                        signals={useSignalsFrom:signalDF[useSignalsFrom]},chartTitle=ticker+\
-                        ' '+useSignalsFrom+' metric '+curve+', bias '+bias[0]+\
-                        ', Signal addAux '+str(addAux),\
+                        #signals={useSignalsFrom:signalDF[useSignalsFrom]},
+                        signals=signalDF,\
+                        chartTitle=ticker+' WF Level 1 by Metrics addAux '+str(addAux),\
                         savePath=chartSavePath+'_SIGNAL', debug=debug
                         )
                         
+for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
+    for k, v in d.iteritems():
+        signalDF[k]=v
+
+for is_period in signalSets:
+    for k,v in signalSets[is_period].iteritems():
+        signalDF[is_period+'_'+k]=v
+        
 sst=signalDF[useSignalsFrom].copy(deep=True)
 
 if useDPSsafef:

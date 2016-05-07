@@ -293,6 +293,7 @@ auxFutures =  [
                     'RU',
                     'S',
                     'SB',
+					'SF',
                     'SI',
                     'SM',
                     'TU',
@@ -387,7 +388,7 @@ else:
         liveFutures=[sys.argv[1]]
         bias=['gainAhead','zigZag']
         adfPvalue=0
-        validationSetLength =90
+        validationSetLength =180
         useSignalsFrom='highest_CAR25'
     else:
         liveFutures=[sys.argv[1]]
@@ -412,13 +413,13 @@ else:
     verbose=False
 
 #Model Parameters
-supportResistanceLB = 90
+supportResistanceLB = 180
 
 
 #for PCA/KBest
 nfeatures = 10
 #if major low/high most recent index. minDatapoints sets the minimum is period.
-minDatapoints = 3
+minDatapoints = 2
 #set to 1 for live
 #system selection metric
 #metric = 'CAR25'

@@ -26,7 +26,7 @@ logging.basicConfig(filename='/logs/runresult.log',level=logging.DEBUG)
 debug=False
 
 files=[['get_results.py',['sig'],3000],
-       ['get_results.py',['v4'],3800],
+       #['get_results.py',['v4'],3800],
        ['get_results.py',['c2'],2500],
        ['get_results.py',['c2_2'],2800],
        ['get_results.py',['ib'],3600],

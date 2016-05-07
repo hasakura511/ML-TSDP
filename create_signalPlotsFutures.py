@@ -74,6 +74,7 @@ futures= [
                     'RU',
                     'S',
                     'SB',
+					'SF',
                     'SI',
                     'SM',
                     'TU',

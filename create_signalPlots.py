@@ -33,56 +33,72 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (8,7)
-versions = ['v1.3','v4.3']
+versions = ['v4.3']
 #versions = ['v1.3','v2.4']
-barSize='30m'
+barSize='1D'
 #regime switching params
 lookback = 90
-pairs=[
-                'NZDJPY',\
-                'CADJPY',\
-                'CHFJPY',\
-                'EURJPY',\
-                'GBPJPY',\
-                'AUDJPY',\
-                'USDJPY',\
-                'AUDUSD',\
-                'EURUSD',\
-                'EURAUD',\
-                'EURCAD',\
-                'EURNZD',\
-                'GBPUSD',\
-                'USDCAD',\
-                'USDCHF',\
-                'NZDUSD',
-                'EURCHF',\
-                'EURGBP',\
-                'AUDCAD',\
-                'AUDCHF',\
-                'AUDNZD',\
-                'GBPAUD',\
-                'GBPCAD',\
-                'GBPNZD',\
-                'GBPCHF',\
-                'CADCHF',\
-                'NZDCHF',\
-                'NZDCAD'
-                ]
+futures= [
+                    'AD',
+                    'BO',
+                    'BP',
+                    'C',
+                    'CC',
+                    'CD',
+                    'CL',
+                    'CT',
+                    'DX',
+                    'EC',
+                    'ED',
+                    'ES',
+                    'FC',
+                    'FV',
+                    'GC',
+                    'HG',
+                    'HO',
+                    'JY',
+                    'KC',
+                    'LB',
+                    'LC',
+                    'LN',
+                    'MD',
+                    'MP',
+                    'NG',
+                    'NQ',
+                    'NR',
+                    'O',
+                    'OJ',
+                    'PA',
+                    'PL',
+                    'RB',
+                    'RU',
+                    'S',
+                    'SB',
+					'SF',
+                    'SI',
+                    'SM',
+                    'TU',
+                    'TY',
+                    'US',
+                    'W',
+                    'XX',
+                    'YM'
+                    ]
                 
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
     signalPath = './data/signals/'
-    dataPath = './data/from_IB/'
+    dataPath = './data/tickerData/'
     equityCurveSavePath = './data/signalPlots/'
     pngPath = './data/results/'
     showPlot = False
     verbose = False
 else:
-    signalPath = 'D:/ML-TSDP/data/signals/' 
-    #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    #signalPath = 'D:/ML-TSDP/data/signals/' 
+    signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
-    dataPath = 'D:/ML-TSDP/data/from_IB/'
-    bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
+    dataPath = 'D:/data/tickerData/'
+    #bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     equityCurveSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
 
     pngPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
@@ -434,15 +450,19 @@ def calcEquity_signals(SST, title, **kwargs):
     
 signalFiles = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
 dataFiles = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-#pairs = [x.replace(barSize,'').replace('.csv','').replace('_','') for x in dataFiles if barSize in x]
+#contracts = [x.replace(barSize,'').replace('.csv','').replace('_','') for x in dataFiles if barSize in x]
 dataSets = {}
 maxCTs = {}
 numTrades = {}
 comms = {}
-for pair in pairs:
-    dataFilename = [f for f in dataFiles if pair in f and barSize in f][0]
-    dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
-    print 'Loaded data from', str(dataPath) + str(dataFilename)
+for contract in futures:
+    #dataFilename = [f for f in dataFiles if contract in f][0]
+    #dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
+    dataFile = pd.read_csv(dataPath+'F_'+contract+'.txt', index_col=0)
+    dataFile = dataFile.drop([' P',' R', ' RINFO'],axis=1)
+    dataFile.index = pd.to_datetime(dataFile.index,format='%Y%m%d')
+    dataFile.columns = ['Open','High','Low','Close','Volume','OI']
+    print 'Loaded data from', str(dataPath) + str('F_'+contract)
     
     validSignalFiles = {}
     for version in versions: 
@@ -450,7 +470,7 @@ for pair in pairs:
     #for f in [sfile for sfilelist in validSignalFiles for sfile in sfilelist]:
     for version in validSignalFiles:
         if version == 'v1.3':
-            for f in [sfile for sfile in validSignalFiles[version] if pair in sfile]:
+            for f in [sfile for sfile in validSignalFiles[version] if contract in sfile]:
 	      filename=str(signalPath)+str(f)
 	      #print filename
 	      if os.path.isfile(filename):
@@ -505,8 +525,9 @@ for pair in pairs:
                     numTrades[title] = sum((dataSet.signals * dataSet.safef).round().diff().fillna(0).values !=0)
                     comms[title] = equityCurve.commission.sum()
         else:
-            for f in [sfile for sfile in validSignalFiles[version] if pair in sfile]:
+            for f in [sfile for sfile in validSignalFiles[version] if contract in sfile]:
                 signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()
+                signalFile.index = pd.to_datetime(signalFile.index,format='%Y-%m-%d')
                 print 'Loaded signals from', f
                 #if there is no prior index in the row, then it's a legacy file
                 #if 'prior_index' in signalFile:

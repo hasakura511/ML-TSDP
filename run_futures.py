@@ -398,7 +398,7 @@ else:
         liveFutures=[sys.argv[1]]
         bias=['gainAhead','zigZag']
         adfPvalue=0
-        validationSetLength =48
+        validationSetLength =180
         useSignalsFrom='highest_CAR25'
     else:
         liveFutures=[sys.argv[1]]

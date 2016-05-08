@@ -356,7 +356,6 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
         #print DATE, len(DATE), CLOSE[:,0],len(CLOSE[:,0])
         dataSets = loadDatasets(symbols, file, parameters)
         
-        
         # skip if data missing
         #for dataset in dataSets:
             #dataset=dataset.replace([np.inf, -np.inf], np.nan)

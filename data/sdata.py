@@ -4,10 +4,11 @@ import numpy
 
 ##### Do not change this function definition #####
 def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, exposure, equity, settings):
+    #print DATE, OPEN, HIGH, LOW, CLOSE, VOL, exposure, equity, settings
     nMarkets=CLOSE.shape[1]
     pos=numpy.ones((1,nMarkets))
     pos=pos/numpy.sum(abs(pos))
-
+    #print pos
     return pos, settings
 
 
@@ -34,7 +35,7 @@ def mySettings():
         'F_DX','F_EC','F_ED','F_ES','F_FC','F_FV','F_GC','F_HG','F_HO','F_JY',\
         'F_KC','F_LB','F_LC','F_LN','F_MD','F_MP','F_NG','F_NQ','F_NR','F_O',\
         'F_OJ','F_PA','F_PL','F_RB','F_RU','F_S','F_SB','F_SF','F_SI','F_SM',\
-        'F_TU','F_TY','F_US','F_W','F_XX','F_YM']
+        'F_TU','F_TY','F_US','F_W','F_XX','F_YM','F_AX', 'F_CA', 'F_DT', 'F_UB', 'F_UZ']
 
     settings['lookback']= 500
     settings['budget']= 10**6

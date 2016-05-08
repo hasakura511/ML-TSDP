@@ -43,7 +43,12 @@ futures =  [
 				'US',
 				'W',
 				'XX',
-				'YM'
+				'YM',
+				'AX',
+				'CA',
+				'DT',
+				'UB',
+				'UZ'
 				]
 
 version='v4'

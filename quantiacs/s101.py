@@ -13,9 +13,9 @@ from sklearn.qda import QDA
 import talib as ta
 from dateutil.parser import parse
 import logging
-
 #import keras as k
 #import tensorflow as tf
+hasTrain=False
 
 def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure, equity, settings):
     try:
@@ -239,6 +239,7 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
             #    model = cPickle.load(fin)        
                 
             return model.predict(X_test), model.score(X_test, y_test)
+            
         
         def dataPrep(maxdelta, maxlag, fout, cut, start_test, dataSets, parameters):
             lags = range(2, maxlag) 
@@ -257,7 +258,6 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
             print 'Number of NaN after temporal shifting: ', count_missing(finance)
             print 'Size of data frame after feature creation: ', finance.shape
             
-            
             X_train, y_train, X_test, y_test  = prepareDataForClassification(finance, start_test)
             return (X_train, y_train, X_test, y_test)
             
@@ -271,9 +271,10 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
             #return res
             return sum(np.array(res))
         
-        def loadDatasets(symlist, fout, parameters):
+        def loadDatasets(symlist, fout, parameters, start_test):
             interval=parameters[1]
             symbol_dict=dict()
+        
             for symbol in symlist:
                 fsym=symbol
                 if fsym != fout:
@@ -282,10 +283,10 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
                     print sym
             symbols, names = np.array(list(symbol_dict.items())).T
             
-            out =  get_quote(symlist, fout, 'Out', True, parameters)
+            out =  get_quote(symlist, fout, 'Out', True, parameters, start_test)
             data = list()
             for symbol in symbols:
-                dataFrame=get_quote(symlist, symbol, symbol, True, parameters)
+                dataFrame=get_quote(symlist, symbol, symbol, True, parameters, start_test)
                 if dataFrame.shape[0]>0:
                     data.append(dataFrame)
                 
@@ -294,13 +295,9 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
             dataSet.extend(data)
             return dataSet
         
-        def get_quote(symbols, sym, colname, addParam, parameters):
-            if not settings.has_key('quotecache'):
-                settings['quotecache']=dict()
-            quotes=settings['quotecache']
+        def get_quote(symbols, sym, colname, addParam, parameters, start_test):
             idx=symbols.index(sym)
-            if not quotes.has_key(sym):
-                print 'Creating Quote ' + sym
+            if start_test == None:
                 dataSet=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Vol','Oi','P','R','Rinfo'])
                 dataSet['Date']=DATE
                 dataSet['Date']=[parse(str(x)) for x in dataSet['Date']]
@@ -314,31 +311,25 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
                 dataSet['R']=R[:,idx]
                 dataSet['Rinfo']=RINFO[:,idx]
                 dataSet=dataSet.set_index('Date')
-                quotes[sym]=dataSet
-                settings['quotecache']=quotes
             else:
-                print 'Loading Quote from Cache ' + sym
-                quote=quotes[sym]
-                dataSet=quote.reset_index().iloc[-1].copy()
-                dataSet['Date']=DATE[-1]
-                dataSet['Date']=parse(str(dataSet['Date']))
-                dataSet['Open']=OPEN[-1,idx]
-                dataSet['High']=HIGH[-1,idx]
-                dataSet['Low']=LOW[-1,idx]
-                dataSet['Close']=CLOSE[-1,idx]
-                dataSet['Vol']=VOL[-1,idx]
-                dataSet['Oi']=OI[-1,idx]
-                dataSet['P']=P[-1,idx]
-                dataSet['R']=R[-1,idx]
-                dataSet['Rinfo']=RINFO[-1,idx]
-                quote=quote.reset_index().append(dataSet).set_index('Date').sort_index()
-                quotes[sym]=quote
-                settings['quotecache']=quotes
-            dataSet=settings['quotecache'][sym]
+                lb=-10
+                
+                dataSet=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Vol','Oi','P','R','Rinfo'])
+                dataSet['Date']=DATE[lb:-1]
+                dataSet['Date']=[parse(str(x)) for x in dataSet['Date']]
+                dataSet['Open']=OPEN[lb:-1,idx]
+                dataSet['High']=HIGH[lb:-1,idx]
+                dataSet['Low']=LOW[lb:-1,idx]
+                dataSet['Close']=CLOSE[lb:-1,idx]
+                dataSet['Vol']=VOL[lb:-1,idx]
+                dataSet['Oi']=OI[lb:-1,idx]
+                dataSet['P']=P[lb:-1,idx]
+                dataSet['R']=R[lb:-1,idx]
+                dataSet['Rinfo']=RINFO[lb:-1,idx]
+                dataSet=dataSet.set_index('Date')
+                
             dataSet.index=pd.to_datetime(dataSet.index)
-            dataSet=dataSet.sort_index()    
-            #if parameters[2] > 0:
-            #    dataSet=dataSet.iloc[:-parameters[2]].sort_index().copy();
+            dataSet=dataSet.sort_index()
                 
             if addParam:
                 
@@ -373,36 +364,25 @@ def myTradingSystem(DATE, OPEN, HIGH, LOW, CLOSE, VOL, OI, P, R, RINFO, exposure
         file='F_ES'
         bestModel=''
         lookback=1
-        daysToEvaluate=10
+        daysToEvaluate=100
         start_period = parse(str(DATE[0]))
-        start_test = parse(str(DATE[-1])) - datetime.timedelta(days=lookback*2+1)  
+        start_test = parse(str(DATE[-1])) - datetime.timedelta(days=lookback*2+14)  
         end_period = parse(str(DATE[-1]))
         interval='F_'
         parameters=list()
-        parameters.append(bestModel)    
+        parameters.append(bestModel)
         parameters.append(interval)
         parameters.append(lookback)
         symbols=settings['markets']
         nMarkets=CLOSE.shape[1]
         pos=np.zeros((1,nMarkets))
-        # skip until recent date
-        if not end_period > datetime.datetime.now() - datetime.timedelta(days=daysToEvaluate) or not settings.has_key('markets') or not symbols or len(symbols)==0:
-            return pos, settings
-        #print DATE, len(DATE), CLOSE[:,0],len(CLOSE[:,0])
-        dataSets = loadDatasets(symbols, file, parameters)
         
-        
-        # skip if data missing
-        #for dataset in dataSets:
-            #dataset=dataset.replace([np.inf, -np.inf], np.nan)
-            #.dropna(subset=dataSet.columns, how="all")
-        #    dataset=dataset.replace([np.inf, -np.inf], np.nan)
-        #    dataset=dataset.fillna(method='pad')
-        #    dataset=dataset.fillna(method='bfill')
-        #    print 'Missing Data: ', count_missing(dataset)
-            #if sum(np.array(count_missing(dataSet))) > 0:
-            #    return pos, settings
-        
+        global hasTrain
+        if hasTrain:
+            dataSets = loadDatasets(symbols, file, parameters, start_test)
+        else:
+            dataSets = loadDatasets(symbols, file, parameters, None)
+            hasTrain=True
         bData=dataSets
         
         # start prediction
@@ -458,7 +438,7 @@ def mySettings():
     'F_TY', 'F_US', 'F_W', 'F_YM']
 
     settings['lookback']= 6000
-    settings['budget']= 1000000
+    settings['budget']= 250000
     settings['slippage']= 0.05
     #settings['participation']= 1
     #settings['beginInSample']='20160401'

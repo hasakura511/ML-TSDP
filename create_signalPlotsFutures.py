@@ -82,7 +82,12 @@ futures= [
                     'US',
                     'W',
                     'XX',
-                    'YM'
+                    'YM',
+                    'AX',
+                    'CA',
+                    'DT',
+                    'UB',
+                    'UZ'
                     ]
                 
 if len(sys.argv) > 1:

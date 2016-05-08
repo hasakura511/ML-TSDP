@@ -293,6 +293,7 @@ auxFutures =  [
                     'RU',
                     'S',
                     'SB',
+                    'SF',
                     'SI',
                     'SM',
                     'TU',
@@ -300,7 +301,12 @@ auxFutures =  [
                     'US',
                     'W',
                     'XX',
-                    'YM'
+                    'YM',
+                    'AX',
+                    'CA',
+                    'DT',
+                    'UB',
+                    'UZ'
                     ]
 
 if len(sys.argv)==1:
@@ -320,7 +326,7 @@ if len(sys.argv)==1:
     adfPvalue=0
     #auto ->threshold = 0.2
     #adfPvalue=1.1
-    validationSetLength =48
+    validationSetLength =180
     liveFutures =  [
                     #'AD',
                     #'BO',
@@ -364,7 +370,12 @@ if len(sys.argv)==1:
                     #'US',
                     #'W',
                     #'XX',
-                    'YM'
+                    #'YM',
+                    #'AX',
+                    #'CA',
+                    #'DT',
+                    #'UB',
+                    'UZ'
                     ]
     ticker =liveFutures[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
@@ -377,7 +388,7 @@ if len(sys.argv)==1:
     addAux = True
     
     #display params
-    showCharts=False
+    showCharts=True
     showFinalChartOnly=True
     showIndicators = False
     verbose=True
@@ -387,7 +398,7 @@ else:
         liveFutures=[sys.argv[1]]
         bias=['gainAhead','zigZag']
         adfPvalue=0
-        validationSetLength =90
+        validationSetLength =48
         useSignalsFrom='highest_CAR25'
     else:
         liveFutures=[sys.argv[1]]
@@ -412,7 +423,7 @@ else:
     verbose=False
 
 #Model Parameters
-supportResistanceLB = 90
+supportResistanceLB = 180
 
 
 #for PCA/KBest
@@ -744,7 +755,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         if showCharts==False and showFinalChartOnly == True:
             showCharts=True
             showIndicators=True
-            
+    
+    
     #maxlb is 2x support resistance lookback.  the first half is used to prime indicators
     data_primer = dataSet[start:maxlb+start]
     data_primer.index = data_primer.index.to_datetime()
@@ -760,6 +772,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                     
     #set the data to move one bar at a time. 
     data = dataSet[i:i+supportResistanceLB]
+    contractExpiry = str(data.iloc[data.R.nonzero()].R.iloc[-1])
     nrows = data.shape[0]
     data.index = data.index.to_datetime()
     pv_sorted = []
@@ -773,7 +786,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #pc = data.Close.pct_change().fillna(0)
     #zs=abs(pc[-1]-pc.mean())/pc.std()
     modes = mrClassifier(data.Close, data.shape[0]-1,threshold=adfPvalue, showPlot=debug,\
-                                               ticker=ticker)
+                                               ticker=ticker+contractExpiry)
     mode = modes[-1]
     if i ==supportResistanceLB:
         modePred = pd.Series(data=-1, index=data.index, name='volatilityPrediction')
@@ -1490,7 +1503,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                             #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                             #shortStart=(shortStart, data2.Close[shortStart]),\
                             cycleList=cycleList,mode=modePred[start:],\
-                            signals=finalDF,chartTitle=ticker+' WF by B/W by '+metric3,\
+                            signals=finalDF,chartTitle=ticker+contractExpiry+' WF by B/W by '+metric3,\
                             savePath=chartSavePath+'_FINAL', debug=debug
                             )
                             
@@ -1503,7 +1516,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricB,chartTitle=ticker+' WF by Best  '+metric2,\
+                                signals=DpsRankByMetricB,chartTitle=ticker+contractExpiry+' WF by Best  '+metric2,\
                                 savePath=chartSavePath+'_BRANK', debug=debug
                                 )
                                 
@@ -1514,7 +1527,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricW,chartTitle=ticker+' WF by Worst '+metric2,\
+                                signals=DpsRankByMetricW,chartTitle=ticker+contractExpiry+' WF by Worst '+metric2,\
                                 savePath=chartSavePath+'_WRANK', debug=debug
                                 )    
         else:
@@ -1526,7 +1539,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricB,chartTitle=ticker+' WF by Best '+metric2,\
+                                signals=DpsRankByMetricB,chartTitle=ticker+contractExpiry+' WF by Best '+metric2,\
                                 savePath=chartSavePath+'_BRANK', debug=debug
                                 )
                                 
@@ -1537,7 +1550,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricW,chartTitle=ticker+' WF by Worst '+metric2,\
+                                signals=DpsRankByMetricW,chartTitle=ticker+contractExpiry+' WF by Worst '+metric2,\
                                 savePath=chartSavePath+'_WRANK', debug=debug
                                 )       
                             
@@ -1558,7 +1571,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=signalSets[is_period],chartTitle=ticker+' '+is_period,\
+                                signals=signalSets[is_period],chartTitle=ticker+contractExpiry+' '+is_period,\
                                 savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                 )
             else:
@@ -1569,13 +1582,13 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                         shortStart=(shortStart, data2.Close[shortStart]),\
                                         cycleList=cycleList,mode=modePred[start:],\
-                                        signals=signalSets[is_period],chartTitle=ticker+' '+is_period,\
+                                        signals=signalSets[is_period],chartTitle=ticker+contractExpiry+' '+is_period,\
                                         savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                         )
 if showCharts:
     modes = mrClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
                                         data.Close.shape[0],threshold=adfPvalue,\
-                                        showPlot=debug, ticker=ticker, savePath=chartSavePath+'_MODE2')
+                                        showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE2')
     if debug:
         for x in signalSets:
             for algo in signalSets[x]:
@@ -1600,7 +1613,7 @@ if showCharts:
                         cycleList=cycleList,mode=modePred[start:],\
                         #signals={useSignalsFrom:signalDF[useSignalsFrom]},
                         signals=signalDF,\
-                        chartTitle=ticker+' WF Level 1 by Metrics addAux '+str(addAux),\
+                        chartTitle=ticker+contractExpiry+' WF Level 1 by Metrics addAux '+str(addAux),\
                         savePath=chartSavePath+'_SIGNAL', debug=debug
                         )
                         

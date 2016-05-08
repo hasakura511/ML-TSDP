@@ -38,57 +38,8 @@ versions = ['v4.3']
 barSize='1D'
 #regime switching params
 lookback = 90
-futures= [
-                    'AD',
-                    'BO',
-                    'BP',
-                    'C',
-                    'CC',
-                    'CD',
-                    'CL',
-                    'CT',
-                    'DX',
-                    'EC',
-                    'ED',
-                    'ES',
-                    'FC',
-                    'FV',
-                    'GC',
-                    'HG',
-                    'HO',
-                    'JY',
-                    'KC',
-                    'LB',
-                    'LC',
-                    'LN',
-                    'MD',
-                    'MP',
-                    'NG',
-                    'NQ',
-                    'NR',
-                    'O',
-                    'OJ',
-                    'PA',
-                    'PL',
-                    'RB',
-                    'RU',
-                    'S',
-                    'SB',
-					'SF',
-                    'SI',
-                    'SM',
-                    'TU',
-                    'TY',
-                    'US',
-                    'W',
-                    'XX',
-                    'YM',
-                    'AX',
-                    'CA',
-                    'DT',
-                    'UB',
-                    'UZ'
-                    ]
+with open('./data/futures.txt') as f:
+    futures = f.read().splitlines()
                 
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
@@ -464,9 +415,9 @@ for contract in futures:
     #dataFilename = [f for f in dataFiles if contract in f][0]
     #dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
     dataFile = pd.read_csv(dataPath+'F_'+contract+'.txt', index_col=0)
-    dataFile = dataFile.drop([' P',' R', ' RINFO'],axis=1)
+    #dataFile = dataFile.drop([' P',' R', ' RINFO'],axis=1)
     dataFile.index = pd.to_datetime(dataFile.index,format='%Y%m%d')
-    dataFile.columns = ['Open','High','Low','Close','Volume','OI']
+    #dataFile.columns = ['Open','High','Low','Close','Volume','OI']
     print 'Loaded data from', str(dataPath) + str('F_'+contract)
     
     validSignalFiles = {}

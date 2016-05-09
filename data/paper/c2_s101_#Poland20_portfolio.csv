@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Poland20,open,long,2.0,0.0,1856.8,0.0,-3.7136,0.0,3.7136,61.0,,,,,#Poland20,,20160509 05:18:45 EST,20160509 05:18:45 EST,2.0,USD,,,77799.97348,12979966.0,78027.0
+#Poland20,open,short,2.0,0.0,1858.35,0.0,-3.7167,0.0,3.7167,61.0,,,,,#Poland20,,20160509 07:35:23 EST,20160509 07:35:23 EST,-2.0,USD,,,77799.97038,12979811.0,78027.0

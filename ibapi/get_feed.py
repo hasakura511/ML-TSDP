@@ -184,6 +184,8 @@ def duration_to_interval(duration):
         return '10m'
     elif duration == '1 hour':
         return '1h'
+    elif duration == '1 day':
+        return '1d'
         
 def interval_to_ibhist_duration(interval):
     durationStr='1 D'
@@ -198,6 +200,9 @@ def interval_to_ibhist_duration(interval):
         durationStr='10 D'
         barSizeSetting='10 mins'
     elif interval == '1h':
+        durationStr='30 D'
+        barSizeSetting='1 hour'
+    elif interval == '1d':
         durationStr='30 D'
         barSizeSetting='1 hour'
     whatToShow='MIDPOINT'

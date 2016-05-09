@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Belgium20,#Belgium20,,-2.0,-2.0,3357.1,3357.1,0.0,6.7142,0.0,-1586.8792,-1560.0,Paper,USD,
+#Belgium20,#Belgium20,,2.0,2.0,3357.8,3357.8,0.0,6.7156,0.0,-1663.5948,-1630.0,Paper,USD,

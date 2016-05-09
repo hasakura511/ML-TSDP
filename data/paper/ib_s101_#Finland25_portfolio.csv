@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Finland25,#Finland25,,2.0,2.0,3102.86,3102.86,0.0,6.20572,0.0,-104520.90922,-103584.0,Paper,USD,
+#Finland25,#Finland25,,-2.0,-2.0,3096.2,3096.2,0.0,6.1924,0.0,-105193.10162,-104250.0,Paper,USD,

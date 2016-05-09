@@ -2,6 +2,7 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import numpy as np
 import pandas as pd
 import time
+import urllib
 import matplotlib
 import matplotlib.ticker as tick
 import matplotlib.dates as mdates
@@ -489,6 +490,7 @@ def generate_sig_html(signal, counter, html, cols, colspan):
     
 def generate_html(filename, counter, html, cols, colspan=False):
     if os.path.isfile('./data/results/' + filename + '.png'):
+        filename=urllib.quote(filename)
         height=300
         width=300
         if counter == 0 or colspan:
@@ -496,6 +498,7 @@ def generate_html(filename, counter, html, cols, colspan=False):
         html = html + '<td '
         if colspan:
             html=html + 'colspan=' + str(cols)
+            
         html = html + '><center><a href="' + filename + '.png">'
         html = html + '<img src="' + filename + '.png"  width=' + str(width) + ' height=' + str(height) + '></a></center></td>'
         counter = counter + 1
@@ -747,9 +750,9 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
         html = html + '<tr><td><li><a href="' 
         if type == 'signal' or type == 'v4':
-            html = html +  type + '_' + systemname.split('_')[1]   
+            html = html +  type + '_' + urllib.quote(systemname.split('_')[1])
         else:
-            html = html +  type + '_' + systemname + str(recent) 
+            html = html +  type + '_' + urllib.quote(systemname + str(recent))
         if c2bal > 0:
             color='green'
         else:
@@ -768,11 +771,11 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         html = html + '<td><li><a href="' 
         
         if type == 'signal' or type == 'v4':
-            html = html +  type + '_' + systemname.split('_')[1]   
+            html = html +  type + '_' + urllib.quote(systemname.split('_')[1])
         elif type == 'c2' or type == 'c2_2':
-            html = html + 'paper' + '_' + systemname + str(recent) 
+            html = html + 'paper' + '_' + urllib.quote(systemname) + str(recent)
         else:
-            html = html + type + '_' + systemname + str(recent) 
+            html = html + type + '_' + urllib.quote(systemname) + str(recent) 
         html = html + '.html">'
         html = html + str(ibstart) + '</a></li></td>'
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibbal,2), grouping=True ) + '</td>'
@@ -794,8 +797,8 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
     logging.info ('C2: ' + systemname)
     #C2 Paper
     if os.path.isfile('./data/paper/c2_' + systemname + '_trades.csv'):
-            logging.info ('C2:' + systemname)
-            try:
+        logging.info ('C2:' + systemname)
+        try:
                 logging.info ('C2:' + systemname)
                 html = html + '<center><table>'
                 counter=0
@@ -835,7 +838,7 @@ def gen_paper(html, counter, cols, recent, systemname, interval='1 min_'):
                 (counter, html)=generate_plots(data, 'paper_' + systemname + '_c2_Close'+str(recent), systemname + " Close Price", 'Close', counter, html, cols, recent)        
                 html = html + '</center></table><br>'
                 
-            except Exception as e:
+        except Exception as e:
                       logging.error("get_paper", exc_info=True)
                       counter = 0
    
@@ -1091,7 +1094,8 @@ def gen_file(filetype):
                 cols=4
                 logging.info(systemname)
                 fn='./data/results/paper_' + systemname + str(recent) + '.html'
-                html = html + '<li><a href="' + 'paper_' + systemname + str(recent) + '.html">'
+                print fn
+                html = html + '<li><a href="' + 'paper_' + urllib.quote(systemname) + str(recent) + '.html">'
                 html = html + systemname + '</a></li>'
                 
                 if len(genstrat) == 0 or genstrat == systemname:
@@ -1145,6 +1149,7 @@ def get_html_footer():
     return footerhtml
 
 def write_html(filename, headerhtml, footerhtml, body):
+    print 'File: ' + filename
     f = open(filename, 'w')
     f.write(headerhtml)
     f.write(body)

@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Sweden30,open,short,2.0,0.0,1306.62,0.0,-2.61324,0.0,2.61324,78.0,,,,,#Sweden30,,20160507 22:52:07 EST,20160507 22:52:07 EST,-2.0,USD,,,63761.73886,12001733.0,63967.0
+#Sweden30,open,long,2.0,0.0,1335.74,0.0,-2.67148,0.0,2.67148,105.0,,,,,#Sweden30,,20160509 05:51:44 EST,20160509 05:51:44 EST,2.0,USD,,,47778.9349,15536107.0,48055.0

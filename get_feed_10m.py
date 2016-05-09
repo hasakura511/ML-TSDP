@@ -17,7 +17,8 @@ def get_history(contracts):
     (durationStr, barSizeSetting, whatToShow)=feed.interval_to_ibhist_duration(interval)
     feed.cache_bar_csv(dataPath, barSizeSetting)
     for contract in contracts:
-        histdata = feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
+        pair=contract.symbol + contract.currency
+        histdata = feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, pair)
         bars.proc_history(contract, histdata, interval)
         
 def start_proc():

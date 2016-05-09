@@ -95,6 +95,7 @@ def runv2(system, pair, blend):
 
 threads = []
 for symbol in idxes:
+     sig_thread = threading.Thread(target=runv2, args=['8',symbol,True])
      sig_thread = threading.Thread(target=runv2, args=['8',symbol,False])
      sig_thread.daemon=True
      threads.append(sig_thread)
@@ -102,6 +103,7 @@ for symbol in idxes:
 [t.join() for t in threads]
 threads = []
 for symbol in futidxes:
+     sig_thread = threading.Thread(target=runv2, args=['7',symbol,True])
      sig_thread = threading.Thread(target=runv2, args=['7',symbol,False])
      sig_thread.daemon=True
      threads.append(sig_thread)

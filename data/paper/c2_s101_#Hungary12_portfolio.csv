@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Hungary12,open,short,2.0,0.0,26523.57,0.0,-53.04714,0.0,53.04714,19.0,,,,,#Hungary12,,20160509 06:24:57 EST,20160509 06:24:57 EST,-2.0,USD,,,-109474.2079,46705681.0,-108474.0
+#Hungary12,open,long,2.0,0.0,26612.84,0.0,-53.22568,0.0,53.22568,20.0,,,,,#Hungary12,,20160509 06:39:14 EST,20160509 06:39:14 EST,2.0,USD,,,-118454.61212,49358038.0,-117401.0

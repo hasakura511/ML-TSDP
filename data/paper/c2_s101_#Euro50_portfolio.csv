@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Euro50,open,short,2.0,0.0,2953.0,0.0,-5.906,0.0,5.906,75.0,,,,,#Euro50,,20160507 22:51:43 EST,20160507 22:51:43 EST,-2.0,USD,,,86585.926,23613100.0,87030.0
+#Euro50,open,long,2.0,0.0,2981.4,0.0,-5.9628,0.0,5.9628,97.0,,,,,#Euro50,,20160509 05:04:23 EST,20160509 05:04:23 EST,2.0,USD,,,81795.823,30112570.0,82370.0

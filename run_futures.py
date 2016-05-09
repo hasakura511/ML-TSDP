@@ -326,7 +326,7 @@ if len(sys.argv)==1:
     adfPvalue=0
     #auto ->threshold = 0.2
     #adfPvalue=1.1
-    validationSetLength =180
+    validationSetLength =48
     liveFutures =  [
                     #'AD',
                     #'BO',
@@ -398,7 +398,7 @@ else:
         liveFutures=[sys.argv[1]]
         bias=['gainAhead','zigZag']
         adfPvalue=0
-        validationSetLength =180
+        validationSetLength =90
         useSignalsFrom='highest_CAR25'
     else:
         liveFutures=[sys.argv[1]]

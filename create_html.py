@@ -1,55 +1,8 @@
 import subprocess
 
-futures =  [
-				'AD',
-				'BO',
-				'BP',
-				'C',
-				'CC',
-				'CD',
-				'CL',
-				'CT',
-				'DX',
-				'EC',
-				'ED',
-				'ES',
-				'FC',
-				'FV',
-				'GC',
-				'HG',
-				'HO',
-				'JY',
-				'KC',
-				'LB',
-				'LC',
-				'LN',
-				'MD',
-				'MP',
-				'NG',
-				'NQ',
-				'NR',
-				'O',
-				'OJ',
-				'PA',
-				'PL',
-				'RB',
-				'RU',
-				'S',
-				'SB',
-				'SI',
-				'SM',
-				'TU',
-				'TY',
-				'US',
-				'W',
-				'XX',
-				'YM',
-				'AX',
-				'CA',
-				'DT',
-				'UB',
-				'UZ'
-				]
+with open('./data/futures.txt') as f:
+    futures = f.read().splitlines()
+
 
 version='v4'
 f=open ('/logs/'  + 'createhtml.log','a')

@@ -22,7 +22,8 @@ def get_history(contracts):
     feed.cache_bar_csv(dataPath, barSizeSetting)
     for contract in contracts:
         try:
-            histdata = feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
+            pair=contract.symbol + contract.currency
+            histdata = feed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, pair)
             bars.proc_history(contract, histdata, interval)
         except Exception as e:
             logging.error("something bad happened", exc_info=True)
@@ -31,13 +32,15 @@ def get_history(contracts):
         try:
             dataSet=pd.read_csv('./data/systems/restore_hist.csv', index_col=0)
             for date in dataSet.index:
-            
+                logging.info( 'Processing ' + str(date))
                 eastern=timezone('US/Eastern')
                 #timestamp
                 mydate=parse(str(date)).replace(tzinfo=eastern)
+                logging.info('Date: ' + str(mydate))
                 for contract in contracts:
-                        print mydate, contract.symbol, contract.currency
-                        histdata = feed.get_bar_hist_date(mydate, dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symfilter='')
+                        pair=contract.symbol + contract.currency
+                        logging.info(str(mydate) + ',' + contract.symbol + ',' + contract.currency)
+                        histdata = feed.get_bar_hist_date(mydate, dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, pair)
                         print histdata                        
                         bars.proc_history(contract, histdata, interval)
             dataSet=pd.DataFrame({}, columns=['Date']).set_index('Date')

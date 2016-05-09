@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#FRA40_M6,open,short,2.0,0.0,4250.0,0.0,-8.5,0.0,8.5,27.0,,,,,#FRA40_M6,,20160507 22:45:48 EST,20160507 22:45:48 EST,-2.0,USD,,,89170.915,12604250.0,89400.0
+#FRA40_M6,open,short,2.0,0.0,4272.5,0.0,-8.545,0.0,8.545,32.0,,,,,#FRA40_M6,,20160509 04:37:14 EST,20160509 04:37:14 EST,-2.0,USD,,,89778.321,14729450.0,90050.0

@@ -83,7 +83,7 @@ else:
 if refresh:
     print 'Refreshing Data..'
     for j in range(nMarkets):
-        path = os.path.join(dataPath, +'F_'+marketList[j]+'.txt')
+        path = os.path.join(dataPath, 'F_'+marketList[j]+'.txt')
 
         # check to see if market data is present. If not (or refresh is true), download data from quantiacs.
 

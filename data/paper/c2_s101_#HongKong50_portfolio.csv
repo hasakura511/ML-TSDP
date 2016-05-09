@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#HongKong50,open,long,2.0,0.0,20200.51,0.0,-40.40102,0.0,40.40102,38.0,,,,,#HongKong50,,20160509 08:46:09 EST,20160509 08:46:09 EST,2.0,USD,,,90268.97124,74561336.0,91801.0
+#HongKong50,open,short,2.0,0.0,20151.5,0.0,-40.303,0.0,40.303,39.0,,,,,#HongKong50,,20160509 09:34:11 EST,20160509 09:34:11 EST,-2.0,USD,,,85327.76626,76581387.0,86900.0

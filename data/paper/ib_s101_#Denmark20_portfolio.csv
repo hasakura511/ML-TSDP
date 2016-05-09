@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Denmark20,#Denmark20,,2.0,2.0,957.34,957.34,0.0,2.0,0.0,-11534.0,-11426.0,Paper,USD,
+#Denmark20,#Denmark20,,-2.0,-2.0,953.88,953.88,0.0,2.0,0.0,-11882.0,-11772.0,Paper,USD,

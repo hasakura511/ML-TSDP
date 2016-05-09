@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Portugal20,open,long,2.0,0.0,4987.7,0.0,-9.9754,0.0,9.9754,82.0,,,,,#Portugal20,,20160509 08:23:12 EST,20160509 08:23:12 EST,2.0,USD,,,14858.7208,42066420.0,15680.0
+#Portugal20,open,short,2.0,0.0,4957.8,0.0,-9.9156,0.0,9.9156,83.0,,,,,#Portugal20,,20160509 09:56:21 EST,20160509 09:56:21 EST,-2.0,USD,,,11858.865,42565190.0,12690.0

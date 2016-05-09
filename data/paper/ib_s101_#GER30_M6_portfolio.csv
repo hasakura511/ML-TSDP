@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#GER30_M6,#GER30_M6,,-2.0,-2.0,10052.0,10052.0,0.0,20.104,0.0,-4122.176,-3250.0,Paper,USD,
+#GER30_M6,#GER30_M6,,2.0,2.0,10018.0,10018.0,0.0,20.036,0.0,-742.212,150.0,Paper,USD,

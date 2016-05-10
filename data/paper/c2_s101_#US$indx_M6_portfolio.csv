@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#US$indx_M6,open,short,2.0,0.0,94.13,0.0,-2.0,0.0,2.0,36.0,,,,,#US$indx_M6,,20160509 16:03:20 EST,20160509 16:03:20 EST,-2.0,USD,,,99989.0,2318876.5,100061.0
+#US$indx_M6,open,long,2.0,0.0,94.14,0.0,-2.0,0.0,2.0,43.0,,,,,#US$indx_M6,,20160510 04:03:18 EST,20160510 04:03:18 EST,2.0,USD,,,99956.0,2384801.5,100042.0

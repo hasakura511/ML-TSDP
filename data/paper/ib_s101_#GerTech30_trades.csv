@@ -1,3 +1,5 @@
 permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
 1,Paper,Paper,3.2404,USD,GLOBEX,1.0,,,1.0,1620.2,2.0,0.0,-293.2404,SLD,#GerTech30,USD,20160509 14:04:24 EST,,-290.0,99706.7596,2162020.0,99706.7596,1623.1,99710.0,99710.0,-293.2404
 2,Paper,Paper,3.2404,USD,GLOBEX,2.0,,,1.0,1620.2,2.0,0.0,-303.2404,SLD,#GerTech30,USD,20160509 16:19:12 EST,,-300.0,99403.5192,2324040.0,99403.5192,1623.2,99410.0,99410.0,-303.2404
+3,Paper,Paper,3.2404,USD,GLOBEX,3.0,,,1.0,1620.2,2.0,0.0,-303.2404,SLD,#GerTech30,USD,20160509 18:37:32 EST,,-300.0,99100.2788,2486060.0,99100.2788,1623.2,99110.0,99110.0,-303.2404
+4,Paper,Paper,3.2404,USD,GLOBEX,4.0,,,1.0,1620.2,2.0,0.0,-303.2404,SLD,#GerTech30,USD,20160509 22:01:33 EST,,-300.0,98797.0384,2648080.0,98797.0384,1623.2,98810.0,98810.0,-303.2404

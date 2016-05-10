@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Swiss20,open,short,2.0,0.0,7834.7,0.0,-15.6694,0.0,15.6694,88.0,,,,,#Swiss20,,20160509 15:53:13 EST,20160509 15:53:13 EST,-2.0,USD,,,33561.64222,88600949.0,35325.0
+#Swiss20,open,long,2.0,0.0,7948.3,0.0,-15.8966,0.0,15.8966,93.0,,,,,#Swiss20,,20160510 05:47:49 EST,20160510 05:47:49 EST,2.0,USD,,,38322.45382,92537649.0,40165.0

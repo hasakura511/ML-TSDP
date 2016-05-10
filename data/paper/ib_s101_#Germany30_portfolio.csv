@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Germany30,#Germany30,,-2.0,-2.0,10024.12,10024.12,0.0,20.04824,0.0,-16921.90704,-13328.0,Paper,USD,
+#Germany30,#Germany30,,2.0,2.0,10058.05,10058.05,0.0,20.1161,0.0,-23531.41514,-19797.0,Paper,USD,

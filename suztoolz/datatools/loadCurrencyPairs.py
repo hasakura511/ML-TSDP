@@ -139,6 +139,7 @@ def loadCurrencyPairs(currencyPairs, dataPath, barSizeSetting, maxlb, ticker,\
         for pair in currencyPairsDict2:
             #print 'Reindex:',pair, currencyPairsDict2[pair].shape,
             currencyPairsDict2[pair] = currencyPairsDict2[pair].ix[dataSet.index]
+            currencyPairsDict2[pair] = currencyPairsDict2[pair].fillna(method='ffill')
             #print 'to', currencyPairsDict2[pair].shape
                 
         dataSet=currencyPairsDict2[ticker].copy(deep=True)

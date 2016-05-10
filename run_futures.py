@@ -257,57 +257,8 @@ asset = 'FX'
 filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='1D'
-auxFutures =  [
-                    'AD',
-                    'BO',
-                    'BP',
-                    'C',
-                    'CC',
-                    'CD',
-                    'CL',
-                    'CT',
-                    'DX',
-                    'EC',
-                    'ED',
-                    'ES',
-                    'FC',
-                    'FV',
-                    'GC',
-                    'HG',
-                    'HO',
-                    'JY',
-                    'KC',
-                    'LB',
-                    'LC',
-                    'LN',
-                    'MD',
-                    'MP',
-                    'NG',
-                    'NQ',
-                    'NR',
-                    'O',
-                    'OJ',
-                    'PA',
-                    'PL',
-                    'RB',
-                    'RU',
-                    'S',
-                    'SB',
-					'SF',
-                    'SI',
-                    'SM',
-                    'TU',
-                    'TY',
-                    'US',
-                    'W',
-                    'XX',
-                    'YM',
-                    'AX',
-                    'CA',
-                    'DT',
-                    'UB',
-                    'UZ'
-                    ]
+with open('./data/futures.txt') as f:
+    auxFutures = f.read().splitlines()
 
 if len(sys.argv)==1:
     debug=True
@@ -326,12 +277,15 @@ if len(sys.argv)==1:
     adfPvalue=0
     #auto ->threshold = 0.2
     #adfPvalue=1.1
-    validationSetLength =48
+    
+    #Model Parameters
+    supportResistanceLB = 90
+    validationSetLength =45
     liveFutures =  [
                     #'AD',
                     #'BO',
                     #'BP',
-                    #'C',
+                    'C',
                     #'CC',
                     #'CD',
                     #'CL',
@@ -375,7 +329,7 @@ if len(sys.argv)==1:
                     #'CA',
                     #'DT',
                     #'UB',
-                    'UZ'
+                    #'UZ'
                     ]
     ticker =liveFutures[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
@@ -390,22 +344,30 @@ if len(sys.argv)==1:
     #display params
     showCharts=True
     showFinalChartOnly=True
-    showIndicators = False
+    showIndicators = True
     verbose=True
 else:
     debug=False
     if len(sys.argv)==2:
         liveFutures=[sys.argv[1]]
+        #Model Parameters
+        supportResistanceLB = 180
         bias=['gainAhead','zigZag']
         adfPvalue=0
         validationSetLength =90
         useSignalsFrom='highest_CAR25'
     else:
         liveFutures=[sys.argv[1]]
-        bias=[sys.argv[2]]
-        adfPvalue=float(sys.argv[3])
-        validationSetLength =int(sys.argv[4])
-        useSignalsFrom=sys.argv[5]
+        #Model Parameters
+        supportResistanceLB = int(sys.argv[2])
+        bias=['gainAhead','zigZag']
+        adfPvalue=0
+        validationSetLength =90
+        useSignalsFrom='highest_CAR25'
+        #bias=[sys.argv[2]]
+        #adfPvalue=float(sys.argv[3])
+        #validationSetLength =int(sys.argv[4])
+        #useSignalsFrom=sys.argv[5]
     ticker =liveFutures[0]
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
@@ -422,22 +384,21 @@ else:
     showIndicators = False
     verbose=False
 
-#Model Parameters
-supportResistanceLB = 180
+
 
 
 #for PCA/KBest
 nfeatures = 10
 #if major low/high most recent index. minDatapoints sets the minimum is period.
-minDatapoints = 2
+minDatapoints = 3
 #set to 1 for live
 #system selection metric
 #metric = 'CAR25'
 #metric to rank best/worst curves for 2nd stage cycle mode and triple filtered for trend mode 
-metric = 'CAR25'
+metric = 'netEquity'
 #metric to use to choose from best worst curves for triple filtered cycle mode
-metric2='netPNL'
-metric3='netEquity'
+metric2='CAR25'
+metric3='netPNL'
 
 
 #robustness
@@ -864,7 +825,9 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         
     halfCycles = np.diff(pv_sorted).tolist()
     cycleList = [[halfCycles[j], (x,data2.Close[x])] for j,x in \
-                                                enumerate(sorted(valleys+peaks)[1:])]
+                                                enumerate(pv_sorted[1:])]
+    cycleList.append([supportResistanceLB-pv_sorted[-1],\
+                                            (supportResistanceLB, data2.Close.iloc[-1])])
     #zz.plot_pivots(cycleList=cycleList)
     #shBars = average(np.array(halfCycles)*2)
 
@@ -984,13 +947,14 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             #if len(index)-minDatapoints<3:
             #    break
         
-        #x2 for full cycle length
-        is_cycle=average(np.array(inner_halfCycles)*2)
+        #average halfCycle
+        is_cycle=average(np.array(inner_halfCycles))
         #correlation < 2 creates inf
         if is_cycle < 2:
             is_cycle =2
             
-        windowLengths[is_period] = is_cycle
+        #x2 for full cycle length
+        windowLengths[is_period] = is_cycle*2
 
         #short indicators
         dataSets[is_period][ticker+'_Pri_RSI_c'+str(1.5)] =\

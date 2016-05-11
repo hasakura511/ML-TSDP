@@ -148,9 +148,9 @@ def generate_sigplots(counter, html, cols):
             
         footerhtml=get_html_footer()
         write_html(fn, headerhtml, footerhtml, body)
-                
-              
+                          
     return (counter, html)     
+
     
 def generate_paper_c2_plot(systemname, dateCol, initialEquity):
     filename='./data/paper/c2_' + systemname + '_account.csv'
@@ -501,6 +501,25 @@ def generate_html(filename, counter, html, cols, colspan=False):
             
         html = html + '><center><a href="' + filename + '.png">'
         html = html + '<img src="' + filename + '.png"  width=' + str(width) + ' height=' + str(height) + '></a></center></td>'
+        counter = counter + 1
+        if counter >= cols or colspan:
+            html = html + '</tr>'
+            counter=0
+    return (counter, html)
+
+def generate_link(filename, counter, html, cols, colspan=False):
+    if os.path.isfile('./data/results/' + filename + '.html'):
+        filename=urllib.quote(filename)
+        height=300
+        width=300
+        if counter == 0 or colspan:
+            html = html + '<tr>'
+        html = html + '<td '
+        if colspan:
+            html=html + 'colspan=' + str(cols)
+            
+        html = html + '><center><a href="' + filename + '.html">'
+        html = html + filename + '</a></center></td>'
         counter = counter + 1
         if counter >= cols or colspan:
             html = html + '</tr>'
@@ -970,10 +989,18 @@ def gen_file(filetype):
         html='<center><h1>' + genstrat + '</h1></center><br><center>'
         html=html + '<table>'
         for file in files:
-            if re.search(genstrat, file) and re.search(r'.png',file):
-                name=file.rsplit('.',1)[0]
-                print name
-                (counter, html)=generate_html(name, counter, html, cols) 
+            if re.search(genstrat, file):
+                if re.search(r'.png',file):
+                    name=file.rsplit('.',1)[0]
+                    print name
+                    (counter, html)=generate_html(name, counter, html, cols) 
+                if re.search(r'_1.html', file) \
+                    or re.search(r'_3.html', file) \
+                    or re.search(r'_4.html', file):
+                    name=file.rsplit('.',1)[0]
+                    print name
+                    (counter, html)=generate_link(name, counter, html, cols) 
+               
         html=html + '</table>'
         write_html(filename, headerhtml, footerhtml, html)
         filetype='index'

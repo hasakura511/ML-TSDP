@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Greece25,open,short,2.0,0.0,175.6,0.0,-2.0,0.0,2.0,65.0,,,,,#Greece25,,20160510 20:12:33 EST,20160510 20:12:33 EST,-2.0,USD,,,89271.0,3079451.0,89401.0
+#Greece25,open,long,2.0,0.0,178.6,0.0,-2.0,0.0,2.0,68.0,,,,,#Greece25,,20160510 22:20:43 EST,20160510 22:20:43 EST,2.0,USD,,,88365.0,3132431.0,88501.0

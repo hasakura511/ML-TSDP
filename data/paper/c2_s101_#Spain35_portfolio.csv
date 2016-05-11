@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Spain35,open,long,2.0,0.0,8786.0,0.0,-17.572,0.0,17.572,105.0,,,,,#Spain35,,20160510 18:37:11 EST,20160510 18:37:11 EST,2.0,USD,,,-63705.23214,91954407.0,-61871.0
+#Spain35,open,short,2.0,0.0,8776.0,0.0,-17.552,0.0,17.552,106.0,,,,,#Spain35,,20160510 22:03:35 EST,20160510 22:03:35 EST,-2.0,USD,,,-64722.76414,92833007.0,-62871.0

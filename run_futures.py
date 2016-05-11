@@ -342,16 +342,16 @@ if len(sys.argv)==1:
     addAux = True
     
     #display params
-    showCharts=True
+    showCharts=False
     showFinalChartOnly=True
-    showIndicators = True
+    showIndicators = False
     verbose=True
 else:
     debug=False
     if len(sys.argv)==2:
         liveFutures=[sys.argv[1]]
         #Model Parameters
-        supportResistanceLB = 180
+        supportResistanceLB = 90
         bias=['gainAhead','zigZag']
         adfPvalue=0
         validationSetLength =90
@@ -393,12 +393,13 @@ nfeatures = 10
 minDatapoints = 3
 #set to 1 for live
 #system selection metric
-#metric = 'CAR25'
-#metric to rank best/worst curves for 2nd stage cycle mode and triple filtered for trend mode 
-metric = 'netEquity'
-#metric to use to choose from best worst curves for triple filtered cycle mode
-metric2='CAR25'
-metric3='netPNL'
+
+#no post filter goes to 'level1'
+metric = 'netPNL'
+#'level1' filter
+metric2='dpsNetEquity'
+#'level2' filter
+metric3='CAR25'
 
 
 #robustness
@@ -928,7 +929,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     
 
 
-    windowLengths={}
+    #windowLengths={}
     for is_period, y_train_zz, index, pipelines, signal_types in train_index:
         lb = len(index)
 
@@ -948,51 +949,55 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             #    break
         
         #average halfCycle
-        is_cycle=average(np.array(inner_halfCycles))
+        avgHalfCycle=average(np.array(inner_halfCycles))
+        
         #correlation < 2 creates inf
-        if is_cycle < 2:
-            is_cycle =2
+        if avgHalfCycle < 2:
+            avgHalfCycle =2
             
-        #x2 for full cycle length
-        windowLengths[is_period] = is_cycle*2
+        #short is last half cycle to idnetify current market sync. 
+        if is_period=='wf_is_short':
+            windowLength = inner_halfCycles[-1]
+        
+        #windowLengths[is_period] = lastHalfCycle
 
         #short indicators
         dataSets[is_period][ticker+'_Pri_RSI_c'+str(1.5)] =\
                                             RSI(data_primer.Close,1.5)
-        #dataSets[is_period]['Pri_KE_c'+str(is_cycle)+'_r'+str(lb)] = roofingFilter(kaufman_efficiency(data_primer.Close,\
-        #                                                    is_cycle),
+        #dataSets[is_period]['Pri_KE_c'+str(avgHalfCycle)+'_r'+str(lb)] = roofingFilter(kaufman_efficiency(data_primer.Close,\
+        #                                                    avgHalfCycle),
         #                                                    supportResistanceLB,lb)
-        #dataSets[is_period]['Pri_DPO_c'+str(is_cycle)+'_r'+str(lb)] = zScore(DPO(data_primer.Close,\
-        #                                                        is_cycle),lb)
-        #dataSets[is_period]['ZS_priceChange_c'+str(is_cycle)+'_r'+str(lb)] = zScore(priceChange(\
+        #dataSets[is_period]['Pri_DPO_c'+str(avgHalfCycle)+'_r'+str(lb)] = zScore(DPO(data_primer.Close,\
+        #                                                        avgHalfCycle),lb)
+        #dataSets[is_period]['ZS_priceChange_c'+str(avgHalfCycle)+'_r'+str(lb)] = zScore(priceChange(\
         #                            data_primer.Close),lb)
-        #dataSets[is_period]['mean_pc_c'+str(is_cycle)+'_r'+str(lb)] = priceChange(data_primer.Close-\
+        #dataSets[is_period]['mean_pc_c'+str(avgHalfCycle)+'_r'+str(lb)] = priceChange(data_primer.Close-\
         #                                        pd.rolling_mean(priceChange(\
         #                                    data_primer.Close),lb))
         
         #long indicators
-        #dataSets[is_period]['Pri_ROC_c'+str(is_cycle)+'_r'+str(lb)] = ROC(data_primer.Close,supportResistanceLB)
+        #dataSets[is_period]['Pri_ROC_c'+str(avgHalfCycle)+'_r'+str(lb)] = ROC(data_primer.Close,supportResistanceLB)
         dataSets[is_period][ticker+'_Pri_rStoch_r'+str(lb)] = \
                                                                     roofingFilter(data_primer.Close,\
                                                                                 supportResistanceLB,lb)
         
         #volatility
-        if is_cycle==supportResistanceLB:
+        if avgHalfCycle==supportResistanceLB:
             #hot fix for insufficient lookback
-            is_cycle_atr=supportResistanceLB/2
+            avgHalfCycle_atr=supportResistanceLB/2
         else:
-            is_cycle_atr=is_cycle
-        dataSets[is_period][ticker+'_Pri_ATR_c'+str(is_cycle_atr)+'_r'+str(lb)] = \
+            avgHalfCycle_atr=avgHalfCycle
+        dataSets[is_period][ticker+'_Pri_ATR_c'+str(avgHalfCycle_atr)+'_r'+str(lb)] = \
                                                         roofingFilter(ATR(data_primer.High,
                                                         data_primer.Low,
-                                                        data_primer.Close,is_cycle_atr),
+                                                        data_primer.Close,avgHalfCycle_atr),
                                                         supportResistanceLB,lb)
 
 
         #correlations
-        dataSets[is_period][ticker+'_Pri_autoCor1_c'+str(is_cycle)+'_r'+str(lb)] =\
+        dataSets[is_period][ticker+'_Pri_autoCor1_c'+str(avgHalfCycle)+'_r'+str(lb)] =\
                                                 roofingFilter(autocorrel(data_primer.Close*100,\
-                                                                            is_cycle,period=1),
+                                                                            avgHalfCycle,period=1),
                                                                     supportResistanceLB,lb)
 
         
@@ -1004,14 +1009,14 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 ratio=auxFuturesDict[contract]['closes'].iloc[:,0].ix[data_primer.index]/\
                             auxFuturesDict[contract]['closes'].iloc[:,1].ix[data_primer.index]
                 #relative strength ratio
-                roc=ROC(ratio,is_cycle)
+                roc=ROC(ratio,avgHalfCycle)
                 if sum(np.isnan(roc))>0:
                     sys.exit()
-                auxFuturesDataset[contract+'_Ratio_ROC_c'+str(is_cycle)] =roc
+                auxFuturesDataset[contract+'_Ratio_ROC_c'+str(avgHalfCycle)] =roc
                 dataSets[is_period] = pd.concat([dataSets[is_period], auxFuturesDataset], axis=1)
                 #auxFuturesDataset.iloc[-supportResistanceLB:].iloc[index].plot()
             
-        DominantCycle, acp = acPeriodogram(data_primer,bars=is_cycle)
+        DominantCycle, acp = acPeriodogram(data_primer,bars=avgHalfCycle)
         dataSets[is_period] = pd.concat([dataSets[is_period], acp], axis=1)
         lastIndex = dataSets[is_period].index[-1]
         if verbose:
@@ -1019,7 +1024,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 print '\n'+ticker+' '+is_period+' Low Volatility: Cycle Mode '+str(lastIndex)
             else:
                 print '\n'+ticker+' '+is_period+' High Volatility Trend Mode '+str(lastIndex)
-            print 'index',i,'cols',dataSets[is_period].shape[1],'nrows (lb)' ,lb,'ZZ Cycle',is_cycle,'AC Cycle',DominantCycle
+            print 'index',i,'cols',dataSets[is_period].shape[1],'nrows (lb)' ,lb,'ZZ Cycle',avgHalfCycle,'AC Cycle',DominantCycle
             
         for st in signal_types:
             # ['gainAhead','zigZag','buyHold','sellHold']
@@ -1178,7 +1183,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         
         for col in signalSets[is_period]:    
             #calcDPS
-            windowLength = windowLengths[is_period]
+            #windowLength = windowLengths[is_period]
             if verbose:
                 print 'Using window length',windowLength, 'for', is_period
             if PRT is not None and windowLength is not None:

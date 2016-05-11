@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Spain35,#Spain35,,2.0,2.0,8786.0,8786.0,0.0,17.572,0.0,-139744.8643,-137963.0,Paper,USD,
+#Spain35,#Spain35,,-2.0,-2.0,8776.0,8776.0,0.0,17.552,0.0,-140762.4163,-138963.0,Paper,USD,

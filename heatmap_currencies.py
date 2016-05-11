@@ -94,6 +94,7 @@ for currency in ranking:
             #else:
                 #print i,currency,pair
 offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
+print data.index[0],'to',data.index[-1]
 print 'buyHold',len(buyHold),buyHold
 print 'sellHold',len(sellHold),sellHold
 print 'offline',len(offline),offline

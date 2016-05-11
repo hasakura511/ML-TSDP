@@ -95,37 +95,10 @@ filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='30m'
 #barSizeSetting='1 min'
-currencyPairs =   [
-                'NZDJPY',\
-                'CADJPY',\
-                'CHFJPY',\
-                'EURJPY',\
-                'GBPJPY',\
-                'AUDJPY',\
-                'USDJPY',\
-                'AUDUSD',\
-                'EURUSD',\
-                'EURAUD',\
-                'EURCAD',\
-                'EURNZD',\
-                'GBPUSD',\
-                'USDCAD',\
-                'USDCHF',\
-                'NZDUSD',
-                'EURCHF',\
-                'EURGBP',\
-                'AUDCAD',\
-                'AUDCHF',\
-                'AUDNZD',\
-                'GBPAUD',\
-                'GBPCAD',\
-                'GBPNZD',\
-                'GBPCHF',\
-                'CADCHF',\
-                'NZDCHF',\
-                'NZDCAD'
-                ]
+pairPath='./data/'
 
+with open(pairPath+'currencies.txt') as f:
+    currencyPairs = f.read().splitlines()
         
 #no args -> debug.  else live mode arg 1 = pair, arg 2 = "0" to turn off
 if len(sys.argv)==1:

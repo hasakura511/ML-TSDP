@@ -38,36 +38,9 @@ versions = ['v1.3','v4.3']
 barSize='30m'
 #regime switching params
 lookback = 90
-pairs=[
-                'NZDJPY',\
-                'CADJPY',\
-                'CHFJPY',\
-                'EURJPY',\
-                'GBPJPY',\
-                'AUDJPY',\
-                'USDJPY',\
-                'AUDUSD',\
-                'EURUSD',\
-                'EURAUD',\
-                'EURCAD',\
-                'EURNZD',\
-                'GBPUSD',\
-                'USDCAD',\
-                'USDCHF',\
-                'NZDUSD',
-                'EURCHF',\
-                'EURGBP',\
-                'AUDCAD',\
-                'AUDCHF',\
-                'AUDNZD',\
-                'GBPAUD',\
-                'GBPCAD',\
-                'GBPNZD',\
-                'GBPCHF',\
-                'CADCHF',\
-                'NZDCHF',\
-                'NZDCAD'
-                ]
+
+with open(pairPath+'currencies.txt') as f:
+    pairs = f.read().splitlines()
                 
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'

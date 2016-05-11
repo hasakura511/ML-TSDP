@@ -23,38 +23,13 @@ import logging
 import time
 #import websocket
 
-
-offlinePairs=[
-                'NZDJPY',\
-                'CADJPY',\
-                'CHFJPY',\
-                'EURJPY',\
-                'GBPJPY',\
-                'AUDJPY',\
-                'USDJPY',\
-                'AUDUSD',\
-                'EURUSD',\
-                'EURAUD',\
-                'EURCAD',\
-                'EURNZD',\
-                'GBPUSD',\
-                'USDCAD',\
-                'USDCHF',\
-                'NZDUSD',
-                'EURCHF',\
-                'EURGBP',\
-                'AUDCAD',\
-                'AUDCHF',\
-                'AUDNZD',\
-                'GBPAUD',\
-                'GBPCAD',\
-                'GBPNZD',\
-                'GBPCHF',\
-                'CADCHF',\
-                'NZDCHF',\
-                'NZDCAD'
-                ]
-buyHold=sellHold=[]
+pairPath='./data/'
+with open(pairPath+'buyHold_currencies.txt') as f:
+    buyHold = f.read().splitlines()
+with open(pairPath+'sellHold_currencies.txt') as f:
+    sellHold = f.read().splitlines()
+with open(pairPath+'offline_currencies.txt') as f:
+    offlinePairs = f.read().splitlines()
 
 #offlinePairs=[]
 #buyHold=['NZDJPY', 'NZDUSD', 'NZDCHF', 'NZDCAD', 'AUDJPY', 'AUDUSD', 'AUDCAD', 'AUDCHF', 'EURJPY', 'EURUSD', 'EURCAD', 'EURCHF', 'EURGBP', 'GBPUSD', 'GBPCAD', 'USDCAD']
@@ -246,7 +221,7 @@ logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' min
 print len(pairs), 'pairs completed', version_, barSize, bias
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 
-
+'''
 ############v4 OFFLINE##########
 version = '4'
 version_ = '43'
@@ -412,7 +387,7 @@ logging.info('Cycle time: '+str(round(((time.time() - start_time)/60),2))+ ' min
 print len(pairs), 'pairs completed', barSize, bias, adfPvalue, scriptName, useSignalsFrom
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
 print 'Total Elapsed time: ', round(((time.time() - start_time3)/60),2), ' minutes'
-
+'''
 
 '''
 threads = []

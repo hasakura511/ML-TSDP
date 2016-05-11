@@ -273,39 +273,14 @@ gotbar=dict()
 filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='30m'
+pairPath='./data/'
 
-pairs =  [
-            'NZDJPY',\
-            'CADJPY',\
-            'CHFJPY',\
-            'EURJPY',\
-            'GBPJPY',\
-            'AUDJPY',\
-            'USDJPY',\
-            'AUDUSD',\
-            'EURUSD',\
-            'EURAUD',\
-            'EURCAD',\
-            'EURNZD',\
-            'GBPUSD',\
-            'USDCAD',\
-            'USDCHF',\
-            'NZDUSD',
-            'EURCHF',\
-            'EURGBP',\
-            'AUDCAD',\
-            'AUDCHF',\
-            'AUDNZD',\
-            'GBPAUD',\
-            'GBPCAD',\
-            'GBPNZD',\
-            'GBPCHF',\
-            'CADCHF',\
-            'NZDCHF',\
-            'NZDCAD'
-            ]
+with open(pairPath+'currencies.txt') as f:
+    pairs =livePairs = f.read().splitlines()
+        
                  
-if len(sys.argv)==1:          
+if len(sys.argv)==1:
+    '''
     livePairs = [
                 'NZDJPY',\
                 'CADJPY',\
@@ -336,6 +311,7 @@ if len(sys.argv)==1:
                 'NZDCHF',\
                 'NZDCAD'
                 ]
+    '''
     #settings
     debug=True
     showDist =  False
@@ -364,6 +340,7 @@ if len(sys.argv)==1:
     
     
 else:
+    '''
     livePairs = [
                 'NZDJPY',\
                 'CADJPY',\
@@ -394,6 +371,7 @@ else:
                 'NZDCHF',\
                 'NZDCAD'
                 ]
+    '''
     #settings
     debug=False
     showDist =  False

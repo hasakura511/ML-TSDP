@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#HongKong50,#HongKong50,,-2.0,-2.0,20054.01,20054.01,0.0,40.10802,0.0,-49956.93378,-48668.0,Paper,USD,
+#HongKong50,#HongKong50,,2.0,2.0,20003.51,20003.51,0.0,40.00702,0.0,-50107.42688,-48618.0,Paper,USD,

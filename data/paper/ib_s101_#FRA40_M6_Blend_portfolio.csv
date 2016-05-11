@@ -1,1 +1,2 @@
-symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
+#FRA40_M6,#FRA40_M6,,-2.0,-2.0,4252.0,4252.0,-425200.0,8.504,0.0,-8.504,0.0,Paper,USD,

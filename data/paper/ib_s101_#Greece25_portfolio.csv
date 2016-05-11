@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Greece25,#Greece25,,2.0,2.0,178.6,178.6,0.0,2.0,0.0,-12841.0,-12699.0,Paper,USD,
+#Greece25,#Greece25,,-2.0,-2.0,174.9,174.9,0.0,2.0,0.0,-15721.0,-15553.0,Paper,USD,

@@ -351,7 +351,7 @@ else:
     if len(sys.argv)==2:
         liveFutures=[sys.argv[1]]
         #Model Parameters
-        supportResistanceLB = 90
+        supportResistanceLB = 180
         bias=['gainAhead','zigZag']
         adfPvalue=0
         validationSetLength =90

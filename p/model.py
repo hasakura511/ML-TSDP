@@ -409,7 +409,7 @@ def get_signal(lookback, portfolio, argv):
         name = './p/data/' + file + '.csv'
         qty=200
         folds=10
-        print 'Starting s101 for: ',symbol    
+        print 'Starting s101 for: ',symbol
     elif len(argv) > 1 and argv[1] == '9':
         ############## idx ##############    
         symbol = 'EURJPY'

@@ -1,1 +1,2 @@
-symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency
+symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
+#Hungary12,#Hungary12,,-2.0,-2.0,26696.96,26696.96,-2669696.0,53.39392,0.0,-53.39392,0.0,Paper,USD,

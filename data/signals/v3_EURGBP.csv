@@ -4117,3 +4117,4 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-05-03 01:00:00,1.0,0.0,452.0,1.0,,,,bothEURGBP_30m_ALL_DF1_None_i0_fcst1_BH1,-6.7625,20160503 00:53:14 EDT
 2016-05-04 21:34:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-6.7625,20160503 00:53:14 EDT
 2016-05-04 21:36:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-6.7625,20160503 00:53:14 EDT
+2016-05-11 07:00:00,1.0,0.0,465.0,1.0,,,,bothEURGBP_30m_ALL_DF1_None_i0_fcst1_BH1,-440.80805,20160510 23:39:11 EDT

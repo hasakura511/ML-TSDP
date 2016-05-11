@@ -33,13 +33,13 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (8,7)
-versions = ['v1.3','v4.3']
-#versions = ['v1.3','v2.4']
+#versions = ['v1.3','v4.3']
+versions = ['v3.1']
 barSize='30m'
 #regime switching params
 lookback = 90
 
-with open(pairPath+'currencies.txt') as f:
+with open('./data/currencies.txt') as f:
     pairs = f.read().splitlines()
                 
 if len(sys.argv) > 1:
@@ -422,7 +422,7 @@ for pair in pairs:
         validSignalFiles[version]=[f for f in signalFiles if version in f and barSize in f]
     #for f in [sfile for sfilelist in validSignalFiles for sfile in sfilelist]:
     for version in validSignalFiles:
-        if version == 'v1.3':
+        if version == 'v3.1':
             for f in [sfile for sfile in validSignalFiles[version] if pair in sfile]:
 	      filename=str(signalPath)+str(f)
 	      #print filename

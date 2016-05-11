@@ -53,7 +53,7 @@ cMatrix=cMatrix.sort_values(by='Avg', ascending=False)
 rankByMean=cMatrix['Avg']
 
 with open(savePath+'currencies_1.html','w') as f:
-    f.write(str(data.index[0])+' to '+str(data.index[-1]))
+    f.write(str(startDate)+' to '+str(data.index[-1]))
     
 cMatrix.to_html(savePath+'currencies_4.html')
 
@@ -61,6 +61,7 @@ cMatrix.to_html(savePath+'currencies_4.html')
 #print cMatrix
 fig,ax = plt.subplots(figsize=(8,8))
 sns.heatmap(ax=ax,data=cMatrix)
+ax.set_title(str(startDate)+' to '+str(data.index[-1]))
 #plt.pcolor(cMatrix)
 #plt.yticks(np.arange(0.5, len(cMatrix.index), 1), cMatrix.index)
 #plt.xticks(np.arange(0.5, len(cMatrix.columns), 1), cMatrix.columns)
@@ -69,7 +70,7 @@ if savePath != None:
     fig.savefig(savePath+'currencies_2.png', bbox_inches='tight')
     
 if len(sys.argv)==1:
-    print data.index[0],'to',data.index[-1]
+    #print startDate,'to',data.index[-1]
     plt.show()
     print 'Overall Rank'
     print rankByMean
@@ -94,7 +95,7 @@ for currency in ranking:
             #else:
                 #print i,currency,pair
 offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
-print data.index[0],'to',data.index[-1]
+print startDate,'to',data.index[-1]
 print 'buyHold',len(buyHold),buyHold
 print 'sellHold',len(sellHold),sellHold
 print 'offline',len(offline),offline

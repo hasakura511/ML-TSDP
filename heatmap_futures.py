@@ -55,7 +55,8 @@ with open(savePath+'futures_1.html','w') as f:
 futuresMatrix.to_html(savePath+'futures_4.html')
 
 #print futuresMatrix
-fig,ax = plt.subplots(figsize=(8,8))
+fig,ax = plt.subplots(figsize=(13,13))
+ax.set_title(str(data.index[0])+' to '+str(data.index[-1]))
 sns.heatmap(ax=ax,data=futuresMatrix)
 #plt.pcolor(futuresMatrix)
 #plt.yticks(np.arange(0.5, len(futuresMatrix.index), 1), futuresMatrix.index)
@@ -63,8 +64,10 @@ sns.heatmap(ax=ax,data=futuresMatrix)
 if savePath != None:
     print 'Saving '+savePath+'futures_2.png'
     fig.savefig(savePath+'futures_2.png', bbox_inches='tight')
- 
-plt.show()
+    
+if len(sys.argv)==1:
+    print data.index[0],'to',data.index[-1]
+    plt.show()
 #print rankByMean
 
 '''

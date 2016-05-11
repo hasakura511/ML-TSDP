@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#France40,open,short,2.0,0.0,4350.25,0.0,-8.7005,0.0,8.7005,184.0,,,,,#France40,,20160510 20:12:30 EST,20160510 20:12:30 EST,-2.0,USD,,,40949.60896,80899502.0,42545.0
+#France40,open,long,2.0,0.0,4352.45,0.0,-8.7049,0.0,8.7049,185.0,,,,,#France40,,20160510 20:27:18 EST,20160510 20:27:18 EST,2.0,USD,,,40720.89966,81334527.0,42325.0

@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Nordic40,#Nordic40,,2.0,2.0,1427.43,1427.43,0.0,2.85486,0.0,-26927.31692,-26633.0,Paper,USD,
+#Nordic40,#Nordic40,,-2.0,-2.0,1424.43,1424.43,0.0,2.84886,0.0,-27230.16578,-26933.0,Paper,USD,

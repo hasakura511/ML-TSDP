@@ -278,8 +278,8 @@ if len(sys.argv)==1:
     #adfPvalue=1.1
     
     #Model Parameters
-    supportResistanceLB = 90
-    validationSetLength =90
+    supportResistanceLB = 60
+    validationSetLength =60
     liveFutures =  [
                     #'AD',
                     #'BO',
@@ -307,7 +307,7 @@ if len(sys.argv)==1:
                     #'MP',
                     #'NG',
                     #'NQ',
-                    #'NR',
+                    'NR',
                     #'O',
                     #'OJ',
                     #'PA',
@@ -315,7 +315,7 @@ if len(sys.argv)==1:
                     #'RB',
                     #'RU',
                     #'S',
-                    'SB',
+                    #'SB',
                     #'SI',
                     #'SM',
                     #'TU',
@@ -360,9 +360,10 @@ else:
         liveFutures=[sys.argv[1]]
         #Model Parameters
         supportResistanceLB = int(sys.argv[2])
+        validationSetLength = int(sys.argv[3])
         bias=['gainAhead','zigZag']
         adfPvalue=0
-        validationSetLength =90
+        
         #useSignalsFrom='highest_level3_netEquity'
         #bias=[sys.argv[2]]
         #adfPvalue=float(sys.argv[3])

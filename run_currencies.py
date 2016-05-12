@@ -326,7 +326,7 @@ if len(sys.argv)==1:
 else:
     debug=False
     if len(sys.argv)==2:
-        liveFutures=[sys.argv[1]]
+        livePairs=[sys.argv[1]]
         #Model Parameters
         supportResistanceLB = 90
         bias=['gainAhead','zigZag']
@@ -334,12 +334,13 @@ else:
         validationSetLength =90
         #useSignalsFrom='highest_level3_netEquity'
     else:
-        liveFutures=[sys.argv[1]]
+        livePairs=[sys.argv[1]]
         #Model Parameters
         supportResistanceLB = int(sys.argv[2])
+        validationSetLength =int(sys.argv[3])
         bias=['gainAhead','zigZag']
         adfPvalue=0
-        validationSetLength =90
+        
         #useSignalsFrom='highest_level3_netEquity'
         #bias=[sys.argv[2]]
         #adfPvalue=float(sys.argv[3])

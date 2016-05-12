@@ -279,7 +279,7 @@ if len(sys.argv)==1:
     
     #Model Parameters
     supportResistanceLB = 90
-    validationSetLength =45
+    validationSetLength =90
     liveFutures =  [
                     #'AD',
                     #'BO',
@@ -302,7 +302,7 @@ if len(sys.argv)==1:
                     #'KC',
                     #'LB',
                     #'LC',
-                    'LN',
+                    #'LN',
                     #'MD',
                     #'MP',
                     #'NG',
@@ -315,7 +315,7 @@ if len(sys.argv)==1:
                     #'RB',
                     #'RU',
                     #'S',
-                    #'SB',
+                    'SB',
                     #'SI',
                     #'SM',
                     #'TU',
@@ -332,7 +332,8 @@ if len(sys.argv)==1:
                     ]
     ticker =liveFutures[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
-    dataPath = 'D:/data/tickerData/'
+    #dataPath = 'D:/data/tickerData/'
+    dataPath = 'D:/ML-TSDP/data/tickerData/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
@@ -359,7 +360,7 @@ else:
         liveFutures=[sys.argv[1]]
         #Model Parameters
         supportResistanceLB = int(sys.argv[2])
-        bias=['gainAhead','zigZag']+[sys.argv[3]]
+        bias=['gainAhead','zigZag']
         adfPvalue=0
         validationSetLength =90
         #useSignalsFrom='highest_level3_netEquity'
@@ -733,7 +734,13 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                     
     #set the data to move one bar at a time. 
     data = dataSet[i:i+supportResistanceLB]
-    contractExpiry = str(data.iloc[data.R.nonzero()].R.iloc[-1])
+    if len(data.iloc[data.R.nonzero()]) == 0:
+        #no expiry info in the lookback
+        if start==0:
+            contractExpiry=''
+    else:
+        contractExpiry = str(data.iloc[data.R.nonzero()].R.iloc[-1])
+        
     nrows = data.shape[0]
     data.index = data.index.to_datetime()
     pv_sorted = []

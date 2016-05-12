@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Belgium20,open,short,2.0,0.0,3356.5,0.0,-6.713,0.0,6.713,138.0,,,,,#Belgium20,,20160511 06:27:06 EST,20160511 06:27:06 EST,-2.0,USD,,,31623.3964,47658880.0,32550.0
+#Belgium20,open,short,2.0,0.0,3389.7,0.0,-6.7794,0.0,6.7794,144.0,,,,,#Belgium20,,20160512 05:13:44 EST,20160512 05:13:44 EST,-2.0,USD,,,33232.9882,49672650.0,34200.0

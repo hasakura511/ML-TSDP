@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-GBPJPY,GBP,,-20000.0,-20000.0,156.923,156.923,0.0,2.0,-9.92,-62.76,-50.76,Paper,JPY,-7.92
+GBPJPY,GBP,,20000.0,20000.0,157.63,157.63,-28373.4,2.0,-9.92,-2.0,0.0,Paper,JPY,-7.92

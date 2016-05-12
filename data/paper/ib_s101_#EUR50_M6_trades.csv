@@ -1,0 +1,2 @@
+permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
+1,Paper,Paper,5.902,USD,GLOBEX,1.0,,,1.0,2951.0,2.0,0.0,994.098,SLD,#EUR50_M6,USD,20160512 06:51:28 EST,,1000.0,100994.098,2295100.0,100994.098,2941.0,101000.0,101000.0,994.098

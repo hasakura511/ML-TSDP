@@ -1375,7 +1375,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #dpsDF_all2
     #level3
     #dpsDF_final
-
+    '''
     if i == supportResistanceLB:
         mr=False
         curve='highest_level1_'+metric
@@ -1432,6 +1432,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         index2 = signalDF[curve].index.intersection(data_primer_ga.index)
         signalDF[curve].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
         signalDF[curve]=reCalcEquity(signalDF[curve], metric)
+    '''
     '''
     if mode ==0:
         mr=True

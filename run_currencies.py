@@ -285,7 +285,7 @@ if len(sys.argv)==1:
                     #'EURJPY',\
                     #'GBPJPY',\
                     #'AUDJPY',\
-                    'USDJPY',\
+                    #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
                     #'EURUSD',\
@@ -297,7 +297,7 @@ if len(sys.argv)==1:
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
-                    #'AUDCAD',\
+                    'AUDCAD',\
                     #'AUDCHF',\
                     #'AUDNZD',\
                     #'GBPAUD',\
@@ -319,7 +319,7 @@ if len(sys.argv)==1:
     addAuxPairs = True
     
     #display params
-    showCharts=True
+    showCharts=False
     showFinalChartOnly=True
     showIndicators = False
     verbose=True
@@ -1345,6 +1345,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     
     #dpsDF_all2 = dpsDF_all2.append(dpsDF_all)
     #dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
+    '''
     if i == supportResistanceLB:
         mr=False
         curve='highest_level1_'+metric
@@ -1401,6 +1402,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         index2 = signalDF[curve].index.intersection(data_primer_ga.index)
         signalDF[curve].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
         signalDF[curve]=reCalcEquity(signalDF[curve], metric)
+    '''
         
     #print dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0]
     #print signalDF['tripleFiltered'].iloc[-1]    

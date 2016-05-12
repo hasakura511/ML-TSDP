@@ -32,7 +32,6 @@ import arch
 from os import listdir
 from os.path import isfile, join
 
-from datetime import datetime
 import matplotlib.pyplot as plt
 #from pandas.io.dataSet import DataReader
 import random
@@ -268,7 +267,7 @@ if len(sys.argv)==1:
     #bias = ['zigZag']
     #bias=['sellHold']
     #bias=['buyHold']
-    useSignalsFrom='highest_CAR25'
+    #useSignalsFrom='highest_level3_netEquity'
     #useSignalsFrom='best_wf_is_short'
     #useSignalsFrom='best_wf_is_all'
     #cycle mode->threshold=1.1
@@ -285,7 +284,7 @@ if len(sys.argv)==1:
                     #'AD',
                     #'BO',
                     #'BP',
-                    'C',
+                    #'C',
                     #'CC',
                     #'CD',
                     #'CL',
@@ -317,7 +316,7 @@ if len(sys.argv)==1:
                     #'RU',
                     #'S',
                     #'SB',
-                    #'SI',
+                    'SI',
                     #'SM',
                     #'TU',
                     #'TY',
@@ -351,19 +350,19 @@ else:
     if len(sys.argv)==2:
         liveFutures=[sys.argv[1]]
         #Model Parameters
-        supportResistanceLB = 180
+        supportResistanceLB = 90
         bias=['gainAhead','zigZag']
         adfPvalue=0
         validationSetLength =90
-        useSignalsFrom='highest_CAR25'
+        #useSignalsFrom='highest_level3_netEquity'
     else:
         liveFutures=[sys.argv[1]]
         #Model Parameters
         supportResistanceLB = int(sys.argv[2])
-        bias=['gainAhead','zigZag']
+        bias=['gainAhead','zigZag']+[sys.argv[3]]
         adfPvalue=0
         validationSetLength =90
-        useSignalsFrom='highest_CAR25'
+        #useSignalsFrom='highest_level3_netEquity'
         #bias=[sys.argv[2]]
         #adfPvalue=float(sys.argv[3])
         #validationSetLength =int(sys.argv[4])
@@ -395,11 +394,11 @@ minDatapoints = 3
 #system selection metric
 
 #no post filter goes to 'level1'
-metric = 'netPNL'
+metric = 'netEquity'
 #'level1' filter
-metric2='dpsNetEquity'
+metric2='netEquity'
 #'level2' filter
-metric3='CAR25'
+metric3='netEquity'
 
 
 #robustness
@@ -1359,8 +1358,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #else:
     #metric2='netEquity'
     
-    #dpsDF_all2 = dpsDF_all2.append(dpsDF_all)
-    #dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
+    #dpsDF_final = dpsDF_all2.append(dpsDF_all2)
+    #dpsDF_final = dpsDF_all2.append(dpsDF_final)
     #level1
     #dpsDF_all
     #level2
@@ -1370,7 +1369,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
 
     if i == supportResistanceLB:
         mr=False
-        curve='highest_'+metric
+        curve='highest_level1_'+metric
         #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
         #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
         signalDF[curve]=pd.DataFrame(index=data.index)
@@ -1379,7 +1378,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         signalDF[curve]=signalDF[curve][:-1].append(dpsDF_all.sort_values(by=metric, ascending=mr).iloc[0]).fillna(0)
     else:
         mr=False
-        curve='highest_'+metric
+        curve='highest_level1_'+metric
         #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
         #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
         signalDF[curve]=signalDF[curve].append(dpsDF_all.sort_values(by=metric, ascending=mr).iloc[0])
@@ -1389,41 +1388,41 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         
     if i == supportResistanceLB:
         mr=False
-        curve='highest_'+metric2
+        curve='highest_level2_'+metric
         #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
         #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
         signalDF[curve]=pd.DataFrame(index=data.index)
         signalDF[curve].set_value(signalDF[curve].index,'dpsNetEquity',initialEquity)
         signalDF[curve].set_value(signalDF[curve].index,'netEquity',initialEquity)
-        signalDF[curve]=signalDF[curve][:-1].append(dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
+        signalDF[curve]=signalDF[curve][:-1].append(dpsDF_all2.sort_values(by=metric, ascending=mr).iloc[0]).fillna(0)
     else:
         mr=False
-        curve='highest_'+metric2
+        curve='highest_level2_'+metric
         #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
         #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-        signalDF[curve]=signalDF[curve].append(dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0])
+        signalDF[curve]=signalDF[curve].append(dpsDF_all2.sort_values(by=metric, ascending=mr).iloc[0])
         index2 = signalDF[curve].index.intersection(data_primer_ga.index)
         signalDF[curve].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        signalDF[curve]=reCalcEquity(signalDF[curve], metric2)
+        signalDF[curve]=reCalcEquity(signalDF[curve], metric)
         
     if i == supportResistanceLB:
         mr=False
-        curve='highest_'+metric3
+        curve='highest_level3_'+metric
         #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
         #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
         signalDF[curve]=pd.DataFrame(index=data.index)
         signalDF[curve].set_value(signalDF[curve].index,'dpsNetEquity',initialEquity)
         signalDF[curve].set_value(signalDF[curve].index,'netEquity',initialEquity)
-        signalDF[curve]=signalDF[curve][:-1].append(dpsDF_all.sort_values(by=metric3, ascending=mr).iloc[0]).fillna(0)
+        signalDF[curve]=signalDF[curve][:-1].append(dpsDF_final.sort_values(by=metric, ascending=mr).iloc[0]).fillna(0)
     else:
         mr=False
-        curve='highest_'+metric3
+        curve='highest_level3_'+metric
         #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
         #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-        signalDF[curve]=signalDF[curve].append(dpsDF_all.sort_values(by=metric3, ascending=mr).iloc[0])
+        signalDF[curve]=signalDF[curve].append(dpsDF_final.sort_values(by=metric, ascending=mr).iloc[0])
         index2 = signalDF[curve].index.intersection(data_primer_ga.index)
         signalDF[curve].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-        signalDF[curve]=reCalcEquity(signalDF[curve], metric3)
+        signalDF[curve]=reCalcEquity(signalDF[curve], metric)
     '''
     if mode ==0:
         mr=True
@@ -1582,7 +1581,7 @@ if showCharts:
                         cycleList=cycleList,mode=modePred[start:],\
                         #signals={useSignalsFrom:signalDF[useSignalsFrom]},
                         signals=signalDF,\
-                        chartTitle=ticker+contractExpiry+' WF Level 1 by Metrics addAux '+str(addAux),\
+                        chartTitle=ticker+contractExpiry+' WF by Metrics addAux '+str(addAux),\
                         savePath=chartSavePath+'_SIGNAL', debug=debug
                         )
                         
@@ -1594,8 +1593,18 @@ for is_period in signalSets:
     for k,v in signalSets[is_period].iteritems():
         signalDF[is_period+'_'+k]=v
         
-sst=signalDF[useSignalsFrom].copy(deep=True)
-
+ne=0
+for k,v, in signalDF.iteritems():
+    if ne==0:
+        ne=signalDF[k].netEquity[-1]
+        maxk=k
+    else:
+        if signalDF[k].netEquity[-1]>ne:
+            ne=signalDF[k].netEquity[-1]
+            maxk=k
+            
+sst=signalDF[maxk].copy(deep=True)
+print signalDF[maxk].iloc[-1]
 if useDPSsafef:
     sst['safef']=sst.dpsSafef
 else:

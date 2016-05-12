@@ -72,8 +72,7 @@ if savePath != None:
 if len(sys.argv)==1:
     #print startDate,'to',data.index[-1]
     plt.show()
-    print 'Overall Rank'
-    print rankByMean
+
 
 ranking = rankByMean.index
 buyHold=[]
@@ -96,6 +95,7 @@ for currency in ranking:
                 #print i,currency,pair
 offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
 print startDate,'to',data.index[-1]
+print 'Overall Rank',rankByMean
 print 'buyHold',len(buyHold),buyHold
 print 'sellHold',len(sellHold),sellHold
 print 'offline',len(offline),offline

@@ -302,7 +302,7 @@ if len(sys.argv)==1:
                     #'KC',
                     #'LB',
                     #'LC',
-                    #'LN',
+                    'LN',
                     #'MD',
                     #'MP',
                     #'NG',
@@ -316,7 +316,7 @@ if len(sys.argv)==1:
                     #'RU',
                     #'S',
                     #'SB',
-                    'SI',
+                    #'SI',
                     #'SM',
                     #'TU',
                     #'TY',
@@ -1571,19 +1571,7 @@ if showCharts:
             signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'.csv')
 
    
-if showCharts:
-    zz.plot_pivots(l=8,w=8,\
-                        #startValley=(startValley, data2.Close[startValley]),\
-                        #startPeak=(startPeak, data2.Close[startPeak]),\
-                        #minorValley=(minorValley, data2.Close[minorValley]),\
-                        #minorPeak=(minorPeak, data2.Close[minorPeak]),\
-                        #shortStart=(shortStart, data2.Close[shortStart]),\
-                        cycleList=cycleList,mode=modePred[start:],\
-                        #signals={useSignalsFrom:signalDF[useSignalsFrom]},
-                        signals=signalDF,\
-                        chartTitle=ticker+contractExpiry+' WF by Metrics addAux '+str(addAux),\
-                        savePath=chartSavePath+'_SIGNAL', debug=debug
-                        )
+
                         
 for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
     for k, v in d.iteritems():
@@ -1605,6 +1593,20 @@ for k,v, in signalDF.iteritems():
             
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
+if showCharts:
+    zz.plot_pivots(l=8,w=8,\
+                        #startValley=(startValley, data2.Close[startValley]),\
+                        #startPeak=(startPeak, data2.Close[startPeak]),\
+                        #minorValley=(minorValley, data2.Close[minorValley]),\
+                        #minorPeak=(minorPeak, data2.Close[minorPeak]),\
+                        #shortStart=(shortStart, data2.Close[shortStart]),\
+                        cycleList=cycleList,mode=modePred[start:],\
+                        signals={maxk:signalDF[maxk]},
+                        #signals=signalDF,\
+                        chartTitle=ticker+contractExpiry+' SIGNAL '+maxk+\
+                                        ' addAux '+str(addAux),\
+                        savePath=chartSavePath+'_SIGNAL', debug=debug
+                        )
 if useDPSsafef:
     sst['safef']=sst.dpsSafef
 else:

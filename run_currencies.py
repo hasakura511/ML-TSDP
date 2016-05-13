@@ -257,11 +257,14 @@ asset = 'FX'
 filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='1d'
-
+startDate=datetime.date(2016,5,2)
+endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+validationSetLength = np.busday_count(startDate, endDate)
 
 if len(sys.argv)==1:
     debug=True
-    supportResistanceLB=45
+    supportResistanceLB=25
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag']
     #bias = ['gainAhead']
@@ -277,7 +280,10 @@ if len(sys.argv)==1:
     adfPvalue=0
     #auto ->threshold = 0.2
     #adfPvalue=1.1
-    validationSetLength =45
+    
+
+    
+    #validationSetLength =25
     livePairs =  [
                     #'NZDJPY',\
                     #'CADJPY',\
@@ -293,7 +299,7 @@ if len(sys.argv)==1:
                     #'EURCAD',\
                     #'EURNZD',\
                     #'AUDUSD',\
-                    #'GBPUSD',\
+                    'GBPUSD',\
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
@@ -306,7 +312,7 @@ if len(sys.argv)==1:
                     #'GBPCHF',\
                     #'NZDCHF',\
                     #'NZDCAD',\
-                    'CADCHF'
+                    #'CADCHF'
                     ]
     ticker =livePairs[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
@@ -328,16 +334,16 @@ else:
     if len(sys.argv)==2:
         livePairs=[sys.argv[1]]
         #Model Parameters
-        supportResistanceLB = 45
+        supportResistanceLB = 25
         bias=['gainAhead','zigZag']
         adfPvalue=0
-        validationSetLength =45
+        #validationSetLength =45
         #useSignalsFrom='highest_level3_netEquity'
     else:
         livePairs=[sys.argv[1]]
         #Model Parameters
         supportResistanceLB = int(sys.argv[2])
-        validationSetLength =int(sys.argv[3])
+        #validationSetLength =int(sys.argv[3])
         bias=['gainAhead','zigZag']
         adfPvalue=0
         

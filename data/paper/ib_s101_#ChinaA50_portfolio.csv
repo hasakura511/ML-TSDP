@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#ChinaA50,#ChinaA50,,-2.0,-2.0,9367.5,9367.5,0.0,18.735,0.0,-3696.1466,-3640.0,Paper,USD,
+#ChinaA50,#ChinaA50,,2.0,2.0,9392.5,9392.5,0.0,18.785,0.0,-6214.9316,-6140.0,Paper,USD,

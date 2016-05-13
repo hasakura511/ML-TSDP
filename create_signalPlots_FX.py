@@ -37,7 +37,7 @@ size = (8,7)
 versions = ['v3.1']
 barSize='30m'
 #regime switching params
-lookback = 90
+lookback = 30
 
 with open('./data/currencies.txt') as f:
     pairs = f.read().splitlines()

@@ -261,7 +261,7 @@ barSizeSetting='1d'
 
 if len(sys.argv)==1:
     debug=True
-    supportResistanceLB=90
+    supportResistanceLB=45
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag']
     #bias = ['gainAhead']
@@ -277,7 +277,7 @@ if len(sys.argv)==1:
     adfPvalue=0
     #auto ->threshold = 0.2
     #adfPvalue=1.1
-    validationSetLength =48
+    validationSetLength =45
     livePairs =  [
                     #'NZDJPY',\
                     #'CADJPY',\
@@ -297,7 +297,7 @@ if len(sys.argv)==1:
                     #'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
-                    'AUDCAD',\
+                    #'AUDCAD',\
                     #'AUDCHF',\
                     #'AUDNZD',\
                     #'GBPAUD',\
@@ -306,7 +306,7 @@ if len(sys.argv)==1:
                     #'GBPCHF',\
                     #'NZDCHF',\
                     #'NZDCAD',\
-                    #'CADCHF'
+                    'CADCHF'
                     ]
     ticker =livePairs[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
@@ -328,10 +328,10 @@ else:
     if len(sys.argv)==2:
         livePairs=[sys.argv[1]]
         #Model Parameters
-        supportResistanceLB = 90
+        supportResistanceLB = 45
         bias=['gainAhead','zigZag']
         adfPvalue=0
-        validationSetLength =90
+        validationSetLength =45
         #useSignalsFrom='highest_level3_netEquity'
     else:
         livePairs=[sys.argv[1]]

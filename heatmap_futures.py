@@ -49,8 +49,8 @@ for contract in futures:
 futuresMatrix=futuresMatrix.sort_values(by='Avg', ascending=False)
 #rankByMean=futuresMatrix['Avg'].sort_values(ascending=False)
 
-with open(savePath+'futures_1.html','w') as f:
-    f.write(str(data.index[0])+' to '+str(data.index[-1]))
+#with open(savePath+'futures_1.html','w') as f:
+#    f.write(str(data.index[0])+' to '+str(data.index[-1]))
     
 futuresMatrix.to_html(savePath+'futures_4.html')
 

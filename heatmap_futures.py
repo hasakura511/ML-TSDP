@@ -52,7 +52,7 @@ futuresMatrix=futuresMatrix.sort_values(by='Avg', ascending=False)
 #with open(savePath+'futures_1.html','w') as f:
 #    f.write(str(data.index[0])+' to '+str(data.index[-1]))
     
-futuresMatrix.to_html(savePath+'futures_4.html')
+futuresMatrix.to_html(savePath+'futures_3.html')
 
 #print futuresMatrix
 fig,ax = plt.subplots(figsize=(13,13))

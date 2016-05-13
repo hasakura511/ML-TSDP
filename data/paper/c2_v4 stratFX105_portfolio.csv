@@ -1,2 +1,5 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
 @ESM6,open,short,1.0,0.0,2065.300049,0.0,-2.065300049,0.0,2.065300049,75.0,,,,,@ESM6,,20160505 02:27:44 EST,20160505 02:27:44 EST,-1.0,USD,,,96111.553085,1945096.53418,96417.618385
+GBPCHF,open,long,5.0,0.0,1.40288,0.0,-2.0,0.0,2.0,75.0,,,,,GBPCHF,,20160513 00:30:08 EST,20160513 00:30:08 EST,5.0,CHF,,,96111.618385,1976400.80703,96417.618385
+AUDCAD,open,long,5.0,0.0,0.93818,0.0,-2.0,0.0,2.0,75.0,,,,,AUDCAD,,20160513 00:52:16 EST,20160513 00:52:16 EST,5.0,CAD,,,96111.618385,2011383.17193,96417.618385
+AUDCHF,open,short,5.0,0.0,0.70893,0.0,-2.0,0.0,2.0,75.0,,,,,AUDCHF,,20160513 02:50:53 EST,20160513 02:50:53 EST,-5.0,CHF,,,96111.618385,2011996.97228,96417.618385

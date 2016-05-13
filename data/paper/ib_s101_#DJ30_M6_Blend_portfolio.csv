@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#DJ30_M6,#DJ30_M6,,2.0,2.0,17668.0,17668.0,0.0,35.336,0.0,2746.076,3100.0,Paper,USD,
+#DJ30_M6,#DJ30_M6,,2.0,2.0,17601.0,17601.0,0.0,35.202,0.0,-1894.854,-1400.0,Paper,USD,

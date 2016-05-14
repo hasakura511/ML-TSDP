@@ -257,15 +257,16 @@ asset = 'FX'
 filterName = 'DF1'
 data_type = 'ALL'
 barSizeSetting='1d'
-startDate=datetime.date(2016,5,3)
-endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
-endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-validationSetLength = np.busday_count(startDate, endDate)
-supportResistanceLB = max(validationSetLength,25)
+
 
 if len(sys.argv)==1:
     debug=True
     supportResistanceLB=25
+    startDate=datetime.date(2016,4,28)
+    endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+    validationSetLength = np.busday_count(startDate, endDate)
+    supportResistanceLB = max(validationSetLength,25)
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag','buyHold','sellHold']
     #bias = ['gainAhead','zigZag','buyHold','sellHold']
@@ -291,7 +292,7 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    #'GBPJPY',\
+                    'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
                     #'EURCHF',\
@@ -310,7 +311,7 @@ if len(sys.argv)==1:
                     #'AUDNZD',\
                     #'GBPAUD',\
                     #'GBPCAD',\
-                    'GBPNZD',\
+                    #'GBPNZD',\
                     #'GBPCHF',\
                     #'NZDCHF',\
                     #'NZDCAD',\
@@ -335,18 +336,29 @@ else:
     debug=False
     if len(sys.argv)==2:
         livePairs=[sys.argv[1]]
+        startDate=datetime.date(2016,5,3)
+        endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+        validationSetLength = np.busday_count(startDate, endDate)
+        supportResistanceLB = max(validationSetLength,25)
         #Model Parameters
         #supportResistanceLB = 25
-        bias=['gainAhead','zigZag']
+        bias=['gainAhead','zigZag','buyHold','sellHold']
         adfPvalue=0
         #validationSetLength =45
         #useSignalsFrom='highest_level3_netEquity'
     else:
         livePairs=[sys.argv[1]]
-        #Model Parameters
+        sdate=sys.argv[2]
+        startDate=datetime.date(int(sdate[0:4]),int(sdate[4:6]),int(sdate[6:8]))
+        endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+        validationSetLength = np.busday_count(startDate, endDate)
         supportResistanceLB = max(validationSetLength,int(sys.argv[2]))
+        #Model Parameters
+        #supportResistanceLB = max(validationSetLength,int(sys.argv[2]))
         #validationSetLength =int(sys.argv[3])
-        bias=['gainAhead','zigZag']
+        bias=['gainAhead','zigZag','buyHold','sellHold']
         adfPvalue=0
         
         #useSignalsFrom='highest_level3_netEquity'

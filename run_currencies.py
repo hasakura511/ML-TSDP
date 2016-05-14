@@ -261,12 +261,12 @@ barSizeSetting='1d'
 
 if len(sys.argv)==1:
     debug=True
-    supportResistanceLB=25
-    startDate=datetime.date(2016,4,28)
+    supportResistanceLB=50
+    startDate=datetime.date(2016,4,19)
     endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     validationSetLength = np.busday_count(startDate, endDate)
-    supportResistanceLB = max(validationSetLength,25)
+    supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag','buyHold','sellHold']
     #bias = ['gainAhead','zigZag','buyHold','sellHold']
@@ -292,7 +292,7 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    'GBPJPY',\
+                    #'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
                     #'EURCHF',\
@@ -313,9 +313,9 @@ if len(sys.argv)==1:
                     #'GBPCAD',\
                     #'GBPNZD',\
                     #'GBPCHF',\
-                    #'NZDCHF',\
-                    #'NZDCAD',\
                     #'CADCHF'
+                    'NZDCHF',\
+                    #'NZDCAD',\
                     ]
     ticker =livePairs[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
@@ -354,7 +354,7 @@ else:
         endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
         endDate = datetime.date(endDate.year, endDate.month, endDate.day)
         validationSetLength = np.busday_count(startDate, endDate)
-        supportResistanceLB = max(validationSetLength,int(sys.argv[2]))
+        supportResistanceLB = max(validationSetLength,int(sys.argv[3]))
         #Model Parameters
         #supportResistanceLB = max(validationSetLength,int(sys.argv[2]))
         #validationSetLength =int(sys.argv[3])
@@ -1566,8 +1566,8 @@ if showCharts:
                         cycleList=cycleList,mode=modePred[start:],\
                         signals={maxk:signalDF[maxk]},
                         #signals=signalDF,\
-                        chartTitle=ticker+' SIGNAL '+maxk+\
-                                        ' addAux '+str(addAuxPairs),\
+                        chartTitle=ticker+' vStart '+str(startDate)\
+                        +' SIGNAL '  + maxk,\
                         savePath=chartSavePath+'_SIGNAL', debug=debug
                         )
 if useDPSsafef:

@@ -698,6 +698,7 @@ eqrank.set_index('System')
 def gen_eq_rank(systems, recent, html, type='paper'):
     global eqrank
     for systemname in systems:
+     try:
       if type != 'v4' or (type == 'v4' and re.search(r'v4', systemname)):
         print "Ranking " + systemname
         if type == 'paper' or type == 'signal' or type == 'btcv1' or type=='v4':
@@ -747,7 +748,8 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         ibstart=data['Date'][0]
         ibend=data['Date'][-1]
         eqrank.ix[systemname]=[systemname, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end]
-     
+     except Exception as e:
+        logging.error("gen_eq", exc_info=True)
     eqrank=eqrank.sort_values(by=['C2_Bal','C2_MM'], ascending=False)    
     html = html + '<center><table>'
     html = html + '<tr><td><h3>System</h3></td>'
@@ -766,6 +768,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
     html = html + '</tr>'
     locale.setlocale( locale.LC_ALL, '' )
     for systemname in eqrank.index:
+     try:
         (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
         html = html + '<tr><td><li><a href="' 
         if type == 'signal' or type == 'v4':
@@ -803,6 +806,8 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         html = html + '<td style="color: ' + color + ';">' + locale.currency(round(ibpmm,2), grouping=True ) + '</td>'
         html = html + '<td>' + str(ibend) + '</td>'
         html = html + '</tr>'
+     except Exception as e:
+        logging.error("gen_eq", exc_info=True)
     html = html + '</table></center>'
 
     eqrank.to_csv('./data/results/' + type + '_eq_recent' + str(recent) +'.csv')

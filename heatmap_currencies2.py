@@ -23,7 +23,7 @@ lookback=1
 currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
 #currencies = ['EUR', 'GBP', 'JPY', 'USD']
 barSizeSetting='1d'
-for i in range(8,0,-lookback):
+for i in range(7,-1,-lookback):
     #startDate=dt(2016, 5, i,0,00)
     cMatrix=pd.DataFrame()
     for currency in currencies:
@@ -33,19 +33,22 @@ for i in range(8,0,-lookback):
         pairList =[pair for pair in pairList if pair[0:3] in currencies and pair[3:6] in currencies]
         #files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
         for pair in pairList:    
-            data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)[-(i+2):-(i-lookback+1)]
-            #data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)
-            data.index = data.index.to_datetime()
+            #print -(i+1), -(1-lookback+1)
+			if i ==0:
+				data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)[-(i+2):]
+			else:
+				data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)[-(i+2):-(i-lookback+1)]
+			data.index = data.index.to_datetime()
             #lookback=data.ix[startDate:].shape[0]
-            if currency in pair[0:3]:
-                #print pair[3:6],currency,data.Close.pct_change(periods=lookback)[-1]*100
-                #cMatrix.set_value(pair[3:6],currency,-data.Close.pct_change(periods=lookback)[-1]*100)
-                cMatrix.set_value(pair[3:6],currency,-data.Close.pct_change(periods=lookback)[-1]*100)
-            else:
-                #print pair[0:3],currency,-data.Close.pct_change(periods=lookback)[-1]*100
-                #pair2=pair[3:6]+pair[0:3]
-                #cMatrix.set_value(pair[0:3], currency,data.Close.pct_change(periods=lookback)[-1]*100)
-                cMatrix.set_value(pair[0:3], currency,data.Close.pct_change(periods=lookback)[-1]*100)
+			if currency in pair[0:3]:
+				#print pair[3:6],currency,data.Close.pct_change(periods=lookback)[-1]*100
+				#cMatrix.set_value(pair[3:6],currency,-data.Close.pct_change(periods=lookback)[-1]*100)
+				cMatrix.set_value(pair[3:6],currency,-data.Close.pct_change(periods=lookback)[-1]*100)
+			else:
+				#print pair[0:3],currency,-data.Close.pct_change(periods=lookback)[-1]*100
+				#pair2=pair[3:6]+pair[0:3]
+				#cMatrix.set_value(pair[0:3], currency,data.Close.pct_change(periods=lookback)[-1]*100)
+				cMatrix.set_value(pair[0:3], currency,data.Close.pct_change(periods=lookback)[-1]*100)
                 
     for currency in currencies:
         cMatrix.set_value(currency,'Avg',cMatrix.ix[currency].dropna().mean())
@@ -69,8 +72,8 @@ for i in range(8,0,-lookback):
     #plt.yticks(np.arange(0.5, len(cMatrix.index), 1), cMatrix.index)
     #plt.xticks(np.arange(0.5, len(cMatrix.columns), 1), cMatrix.columns)
     if savePath != None:
-        print 'Saving '+savePath+'currencies_'+str(i+1)+'.png'
-        fig.savefig(savePath+'currencies_'+str(i+1)+'.png', bbox_inches='tight')
+        print 'Saving '+savePath+'currencies_'+str(i+2)+'.png'
+        fig.savefig(savePath+'currencies_'+str(i+2)+'.png', bbox_inches='tight')
         
     if len(sys.argv)==1:
         #print startDate,'to',data.index[-1]

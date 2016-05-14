@@ -100,7 +100,12 @@ def start_trade(systems, commissiondata):
                     print        " Commission Pct: " + str(commission_pct*100) + "% Commission Cash: " + str(commission_cash)
                     print        " IB Signal: " + str(system_ibpos_qty)
                     print        " C2 Signal: " + str(system_c2pos_qty)
-                pricefeed=pd.DataFrame([[ask, bid, float(system['c2mult']), float(system['ibmult']), exchange, secType, commission_pct, commission_cash]], columns=['Ask','Bid','C2Mult','IBMult','Exchange','Type','Commission_Pct','Commission_Cash'])
+                
+                pricefeed=pd.DataFrame([[ask, bid, float(system['c2mult']), \
+                                         float(system['ibmult']), exchange, secType, \
+                                        commission_pct, commission_cash]], \
+                                        columns=['Ask','Bid','C2Mult','IBMult','Exchange', \
+                                        'Type','Commission_Pct','Commission_Cash'])
                 if ask > 0 and bid > 0:
                     print "Symbol: ", system['c2sym'], " Ask: ", str(ask), " Bid: ", str(bid)
                     eastern=timezone('US/Eastern')
@@ -110,6 +115,7 @@ def start_trade(systems, commissiondata):
                     adj_size(model, system['System'],system['Name'],pricefeed,\
                     str(system['c2id']),system['c2api'],system['c2qty'],system['c2sym'],system['c2type'], system['c2submit'], \
                         system['ibqty'],system['ibsym'],system['ibcur'],system['ibexch'],system['ibtype'],system['ibsubmit'], date)
+                
                 #time.sleep(1)
                 system['last_trade']=get_timestamp()
                 systems.loc[symbol]=system
@@ -120,7 +126,7 @@ def start_trade(systems, commissiondata):
 
 def start_systems():
         threads = []
-        systemList=dict()  
+        systemList=dict()
         systemdata=pd.read_csv('./data/systems/system.csv')
         systemdata=systemdata.reset_index()
         for i in systemdata.index:
@@ -136,15 +142,21 @@ def start_systems():
         commissiondata=commissiondata.reset_index()
         commissiondata['key']=commissiondata['Symbol']  + commissiondata['Currency'] + commissiondata['Exchange']
         commissiondata=commissiondata.set_index('key')
+        count=0
         for systemname in systemList.keys():
            systems=systemList[systemname]
            systems['last_trade']=0
            systems['key']=systems['c2sym']
            systems=systems.set_index('key')
+           #start_trade(systems,commissiondata)
            sig_thread = threading.Thread(target=start_trade, args=[systems,commissiondata])
            sig_thread.daemon=True
            threads.append(sig_thread)
            sig_thread.start()
+           if count > 5:
+               [t.join() for t in threads]
+               threads = []
+           count=count + 1
         #while 1:
         #    time.sleep(100)
         [t.join() for t in threads]

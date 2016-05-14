@@ -34,7 +34,7 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 start_time = time.time()
 size = (8,7)
 #versions = ['v1.3','v4.3']
-versions = ['v3.1']
+versions = ['v4.3']
 barSize='30m'
 #regime switching params
 lookback = 30

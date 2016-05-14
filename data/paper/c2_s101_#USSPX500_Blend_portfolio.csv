@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#USSPX500,open,short,2.0,0.0,2065.15,0.0,-4.1303,0.0,4.1303,4.0,,,,,#USSPX500,,20160512 02:53:58 EST,20160512 02:53:58 EST,-2.0,USD,,,100788.43854,2415043.0,100805.0
+#USSPX500,open,long,2.0,0.0,2047.17,0.0,-4.09434,0.0,4.09434,7.0,,,,,#USSPX500,,20160513 20:13:28 EST,20160513 20:13:28 EST,2.0,USD,,,101600.1593,3032601.0,101629.0

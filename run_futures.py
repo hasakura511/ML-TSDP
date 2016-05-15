@@ -6,15 +6,13 @@ The premise for this system is that there is an insample period in the recent hi
 that is in sync with the future market out of sample period.  This insample period can be 
 using various methods. More than one in-sample period can be used for prediction.
 
-The system starts with a high/low volatility prediction. If the volatility is high,
-then the system makes predictions with a bias toward a new trend. If the volatility is low,
-the system makes predictions with a bias toward a recurring cycle. 
 
 Additional bias can be added as a parameter. 
 
 Major Parameters to be optemised:
 bar size
 support/resistance lookback
+validation length
 adfPvalue
 AddAuxPairs & nfeatures
 
@@ -261,6 +259,12 @@ with open('./data/futures.txt') as f:
 
 if len(sys.argv)==1:
     debug=True
+    supportResistanceLB=90
+    startDate=datetime.date(2016,4,18)
+    endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+    validationSetLength = np.busday_count(startDate, endDate)
+    supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag']
     #bias = ['gainAhead']
@@ -273,16 +277,16 @@ if len(sys.argv)==1:
     #cycle mode->threshold=1.1
     #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    adfPvalue=0
+    adfPvalue=3
     #auto ->threshold = 0.2
     #adfPvalue=1.1
     
     #Model Parameters
-    supportResistanceLB = 60
-    validationSetLength =60
+    #supportResistanceLB = 180
+    #validationSetLength = 90
     liveFutures =  [
                     #'AD',
-                    #'BO',
+                    'BO',
                     #'BP',
                     #'C',
                     #'CC',
@@ -307,7 +311,7 @@ if len(sys.argv)==1:
                     #'MP',
                     #'NG',
                     #'NQ',
-                    'NR',
+                    #'NR',
                     #'O',
                     #'OJ',
                     #'PA',
@@ -316,6 +320,7 @@ if len(sys.argv)==1:
                     #'RU',
                     #'S',
                     #'SB',
+                    #'SF',
                     #'SI',
                     #'SM',
                     #'TU',
@@ -351,18 +356,31 @@ else:
     if len(sys.argv)==2:
         liveFutures=[sys.argv[1]]
         #Model Parameters
+        startDate=None
+        validationSetLength = 90
         supportResistanceLB = 90
+        #supportResistanceLB = 90
         bias=['gainAhead','zigZag']
-        adfPvalue=0
-        validationSetLength =90
+        adfPvalue=3
+        #validationSetLength =90
         #useSignalsFrom='highest_level3_netEquity'
     else:
         liveFutures=[sys.argv[1]]
+        if len(sys.argv[2])==8:
+            sdate=sys.argv[2]
+            startDate=datetime.date(int(sdate[0:4]),int(sdate[4:6]),int(sdate[6:8]))
+            endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+            endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+            validationSetLength = np.busday_count(startDate, endDate)
+            supportResistanceLB = max(validationSetLength,int(sys.argv[3]))
+        else:
+            supportResistanceLB = int(sys.argv[2])
+            validationSetLength = int(sys.argv[3])
         #Model Parameters
-        supportResistanceLB = int(sys.argv[2])
-        validationSetLength = int(sys.argv[3])
+        #supportResistanceLB = int(sys.argv[2])
+        #validationSetLength = int(sys.argv[3])
         bias=['gainAhead','zigZag']
-        adfPvalue=0
+        adfPvalue=3
         
         #useSignalsFrom='highest_level3_netEquity'
         #bias=[sys.argv[2]]
@@ -1604,6 +1622,9 @@ for k,v, in signalDF.iteritems():
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
 if showCharts:
+    if startDate == None:
+        sdate=data.index[0].to_datetime()
+        startDate = datetime.date(sdate.year, sdate.month, sdate.day)
     zz.plot_pivots(l=8,w=8,\
                         #startValley=(startValley, data2.Close[startValley]),\
                         #startPeak=(startPeak, data2.Close[startPeak]),\
@@ -1613,8 +1634,8 @@ if showCharts:
                         cycleList=cycleList,mode=modePred[start:],\
                         signals={maxk:signalDF[maxk]},
                         #signals=signalDF,\
-                        chartTitle=ticker+contractExpiry+' SIGNAL '+maxk+\
-                                        ' addAux '+str(addAux),\
+                        chartTitle=ticker+contractExpiry+' vStart '+str(startDate)\
+                        +' SIGNAL '+maxk,\
                         savePath=chartSavePath+'_SIGNAL', debug=debug
                         )
 if useDPSsafef:

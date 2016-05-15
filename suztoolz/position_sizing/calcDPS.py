@@ -77,7 +77,8 @@ def calcDPS(signal_type, sst, PRT, windowLength, **kwargs):
         
     #updated: -1 short, 0 flat, 1 long
     if windowLength <=1:
-        print 'windowLength needs to be >1 adjusting to 1.5'
+        if verbose:
+            print 'windowLength needs to be >1 adjusting to 1.5'
         windowLength = 1.5
         
     windowLength = float(windowLength)

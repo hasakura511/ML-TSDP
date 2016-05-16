@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#NAS100_M6,#NAS100_M6,,-2.0,-2.0,4321.75,4321.75,0.0,8.6435,0.0,-10340.0925,-9300.0,Paper,USD,
+#NAS100_M6,#NAS100_M6,,2.0,2.0,4373.25,4373.25,0.0,8.7465,0.0,-12333.498,-11250.0,Paper,USD,

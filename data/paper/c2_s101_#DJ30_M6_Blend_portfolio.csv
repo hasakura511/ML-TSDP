@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#DJ30_M6,open,long,2.0,0.0,17528.0,0.0,-35.056,0.0,35.056,20.0,,,,,#DJ30_M6,,20160516 00:18:29 EST,20160516 00:18:29 EST,2.0,USD,,,108959.734,35507700.0,109700.0
+#DJ30_M6,open,long,2.0,0.0,17689.0,0.0,-35.378,0.0,35.378,30.0,,,,,#DJ30_M6,,20160516 14:59:02 EST,20160516 14:59:02 EST,2.0,USD,,,93707.93,53065700.0,94800.0

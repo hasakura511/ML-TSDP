@@ -1,8 +1,3 @@
 system,action,qty
-v3_USDCHF,1.0,1.0
-v3_USDCAD,1.0,1.0
-v3_EURJPY,1.0,1.0
-v3_GBPUSD,-1.0,-1.0
-v3_USDJPY,1.0,1.0
-v3_EURUSD,-1.0,-1.0
-v3_AUDUSD,-1.0,-1.0
+s105_EU_EURJPY,0.0,0.0
+s105_EU_USDJPY,0.0,0.0

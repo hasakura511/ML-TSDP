@@ -210,10 +210,11 @@ def runPairs():
         if savePath != None:
             logging.info( 'Saving '+savePath+'currencies_'+str(i+2)+'.png')
             fig.savefig(savePath+'currencies_'+str(i+2)+'.png', bbox_inches='tight')
-            
+		
         if debug:
             #logging.info( startDate,'to',data.index[-1]
             plt.show()
+        plt.close()
 
 
         ranking = rankByMean.index
@@ -236,12 +237,13 @@ def runPairs():
                     #else:
                         #logging.info( i,currency,pair
         offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
+        
     if verbose:
         logging.info( str(startDate)+' to '+str(data.index[-1]))
         logging.info( 'Overall Rank\n'+str(rankByMean))
-        logging.info( 'buyHold ',str(len(buyHold)),str(buyHold))
-        logging.info( 'sellHold ',str(len(sellHold)),str(sellHold))
-        logging.info( 'offline '+str(len(offline)),str(offline))
+        logging.info( 'buyHold '+str(len(buyHold))+str(buyHold))
+        logging.info( 'sellHold '+str(len(sellHold))+str(sellHold))
+        logging.info( 'offline '+str(len(offline))+str(offline))
         
     nsig=0
     for ticker in buyHold:

@@ -54,26 +54,26 @@ def refreshData(contract,data):
 
         
 def ratioAdjust(data):
-    #data2=data.copy(deep=True)
-    nrows = data.shape[0]
-    data['OP']=np.insert((data[' OPEN'][1:].values-data[' OPEN'][:-1].values-data[' RINFO'][1:].values)/data[' OPEN'][:-1].values,0,0)
-    data['HP']=np.insert((data[' HIGH'][1:].values-data[' HIGH'][:-1].values-data[' RINFO'][1:].values)/data[' HIGH'][:-1].values,0,0)
-    data['LP']=np.insert((data[' LOW'][1:].values-data[' LOW'][:-1].values-data[' RINFO'][1:].values)/data[' LOW'][:-1].values,0,0)
-    data['CP']=np.insert((data[' CLOSE'][1:].values-data[' CLOSE'][:-1].values-data[' RINFO'][1:].values)/data[' CLOSE'][:-1].values,0,0)
+    data2=data.copy(deep=True)
+    nrows = data2.shape[0]
+    data2['OP']=np.insert((data2[' OPEN'][1:].values-data2[' OPEN'][:-1].values-data2[' RINFO'][1:].values)/data2[' OPEN'][:-1].values,0,0)
+    data2['HP']=np.insert((data2[' HIGH'][1:].values-data2[' HIGH'][:-1].values-data2[' RINFO'][1:].values)/data2[' HIGH'][:-1].values,0,0)
+    data2['LP']=np.insert((data2[' LOW'][1:].values-data2[' LOW'][:-1].values-data2[' RINFO'][1:].values)/data2[' LOW'][:-1].values,0,0)
+    data2['CP']=np.insert((data2[' CLOSE'][1:].values-data2[' CLOSE'][:-1].values-data2[' RINFO'][1:].values)/data2[' CLOSE'][:-1].values,0,0)
 
-    for i in range(0,data.shape[0]):
+    for i in range(0,data2.shape[0]):
         if i==0:
-            data.set_value(data.index[i],'RO',data[' OPEN'].iloc[i])
-            data.set_value(data.index[i],'RH',data[' HIGH'].iloc[i])
-            data.set_value(data.index[i],'RL',data[' LOW'].iloc[i])
-            data.set_value(data.index[i],'RC',data[' CLOSE'].iloc[i])
+            data2.set_value(data2.index[i],'RO',data2[' OPEN'].iloc[i])
+            data2.set_value(data2.index[i],'RH',data2[' HIGH'].iloc[i])
+            data2.set_value(data2.index[i],'RL',data2[' LOW'].iloc[i])
+            data2.set_value(data2.index[i],'RC',data2[' CLOSE'].iloc[i])
         else:
-            data.set_value(data.index[i],'RO',round(data.iloc[i-1]['RO']*(1+data.iloc[i]['OP'])))
-            data.set_value(data.index[i],'RH',round(data.iloc[i-1]['RH']*(1+data.iloc[i]['HP'])))
-            data.set_value(data.index[i],'RL',round(data.iloc[i-1]['RL']*(1+data.iloc[i]['LP'])))
-            data.set_value(data.index[i],'RC',round(data.iloc[i-1]['RC']*(1+data.iloc[i]['CP'])))
-    #data.to_csv('C:/users/hidemi/desktop/python/debug.csv')
-    return pd.concat([data[['DATE','RO', 'RH', 'RL', 'RC']],data[[' VOL', ' OI', ' P', ' R',' RINFO']]],axis=1)
+            data2.set_value(data2.index[i],'RO',round(data2.iloc[i-1]['RO']*(1+data2.iloc[i]['OP'])))
+            data2.set_value(data2.index[i],'RH',round(data2.iloc[i-1]['RH']*(1+data2.iloc[i]['HP'])))
+            data2.set_value(data2.index[i],'RL',round(data2.iloc[i-1]['RL']*(1+data2.iloc[i]['LP'])))
+            data2.set_value(data2.index[i],'RC',round(data2.iloc[i-1]['RC']*(1+data2.iloc[i]['CP'])))
+    #data2.to_csv('C:/users/hidemi/desktop/python/debug.csv')
+    return pd.concat([data2[['DATE','RO', 'RH', 'RL', 'RC']],data2[[' VOL', ' OI', ' P', ' R',' RINFO']]],axis=1)
 
 minDataPoints=500
 today=int(sys.argv[1])

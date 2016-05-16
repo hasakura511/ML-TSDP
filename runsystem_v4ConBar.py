@@ -216,27 +216,48 @@ def runPairs():
             plt.show()
         plt.close()
 
+    #reverse mode
+    bars=2
+    modeDict={}
+    for pair in currencyPairs:
+        data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)
+        modeDict[pair] = np.corrcoef(data.Close[-bars:],data.Close[-bars-1:-bars+1])[1][0]
+        
+        
+    #mode =0
+    #for pair in modeDict:
+    #    print pair, modeDict[pair]
+        #mode +=modeDict[pair]
+    #print 'Avg mode', mode/len(modeDict)
 
-        ranking = rankByMean.index
-        buyHold=[]
-        sellHold=[]
+    ranking = rankByMean.index
+    buyHold=[]
+    sellHold=[]
 
-        cplist = copy.deepcopy(currencyPairs)
-        for currency in ranking:
-            for i,pair in enumerate(cplist):
-                #logging.info( pair
-                if pair not in buyHold and pair not in sellHold:
-                    if currency in pair[0:3]:
-                        #logging.info( i,'bh',pair
+    cplist = copy.deepcopy(currencyPairs)
+    for currency in ranking:
+        for i,pair in enumerate(cplist):
+            #print pair
+            if pair not in buyHold and pair not in sellHold:
+                if currency in pair[0:3]:
+                    #print i,'bh',pair
+                    if modeDict[pair] > 0:
                         buyHold.append(pair)
-                        #cplist.remove(pair)
-                    elif currency in pair[3:6]:
-                        #logging.info( i,'sh',pair
+                    else:
+                        logging.info('Reversing '+pair+' '+str(modeDict[pair]))
                         sellHold.append(pair)
-                        #cplist.remove(pair)
-                    #else:
-                        #logging.info( i,currency,pair
-        offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
+                    #cplist.remove(pair)
+                elif currency in pair[3:6]:
+                    #print i,'sh',pair
+                    if modeDict[pair] > 0:
+                        sellHold.append(pair)
+                    else:
+                        logging.info('Reversing '+pair+' '+str(modeDict[pair]))
+                        buyHold.append(pair)
+                    #cplist.remove(pair)
+                #else:
+                    #print i,currency,pair
+    offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
         
     if verbose:
         logging.info( str(startDate)+' to '+str(data.index[-1]))

@@ -155,10 +155,14 @@ def runPairs():
     version='v4'
     verbose=True
     lookback=1
+    buy=[]
+    sell=[]
     currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
+    currencies = [x for x in currencies if x not in buy+sell]
+    
     #currencies = ['EUR', 'GBP', 'JPY', 'USD']
     #barSizeSetting='10m'
-    for i in range(0,-1,-lookback):
+    for i in range(1,-1,-lookback):
         #startDate=dt(2016, 5, i,0,00)
         cMatrix=pd.DataFrame()
         for currency in currencies:
@@ -194,9 +198,9 @@ def runPairs():
         '''
         with open(savePath+'currencies_1.html','w') as f:
             f.write(str(startDate)+' to '+str(data.index[-1]))
-            
-        cMatrix.to_html(savePath+'currencies_4.html')
-        '''
+        '''  
+        
+        
         #logging.info( data.index[0],'to',data.index[-1]
         #logging.info( cMatrix
         fig,ax = plt.subplots(figsize=(8,8))
@@ -210,64 +214,158 @@ def runPairs():
         if savePath != None:
             logging.info( 'Saving '+savePath+'currencies_'+str(i+2)+'.png')
             fig.savefig(savePath+'currencies_'+str(i+2)+'.png', bbox_inches='tight')
+            logging.info( 'Saving '+savePath+'currencies_'+str(i+4)+'.html')
+            cMatrix.to_html(savePath+'currencies_'+str(i+4)+'.html')
+            #cMatrix.to_html(savePath+'currencies_4.html')
 		
         if debug:
             #logging.info( startDate,'to',data.index[-1]
             plt.show()
         plt.close()
-
+    
     #reverse mode
-    bars=2
+    bars=3
     modeDict={}
     for pair in currencyPairs:
         data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)
         #logging.info( pair+str(data.Close[-bars:]))
         #logging.info(pair+str(data.Close[-bars-1:-bars+1]))
-        mode = np.corrcoef(data.Close[-bars:],data.Close[-bars-1:-bars+1])[1][0]
+        mode = np.corrcoef(data.Close[-bars:],data.Close[-bars-1:-1])[1][0]
         if np.isnan(mode):
             mode=-1
         modeDict[pair] = mode
+    
+    
+    mode ={}
+    for curr in currencies:
+        mode[curr]=0
         
+    for pair in modeDict:
+        #logging.info(pair+str(modeDict[pair]))
+        mode[pair[0:3]] +=modeDict[pair]
+        mode[pair[3:6]] +=modeDict[pair]
         
-    #mode =0
-    #for pair in modeDict:
-    #    print pair, modeDict[pair]
-        #mode +=modeDict[pair]
-    #print 'Avg mode', mode/len(modeDict)
-
+    modeRank = pd.Series()
+    for curr in mode:
+        logging.info(curr+str(mode[curr]))
+        modeRank[curr]=mode[curr]
+    modeRank=list(modeRank.sort_values(ascending=False).index)
+    logging.info(str(modeRank))
     ranking = list(rankByMean.index)
+    '''
+    if mode[ranking[0]]>0:
+        logging.info('Trend. Avg mode '+ ranking[0]+str(mode[ranking[0]]))
+        buy.append(ranking[0])
+    else:
+        logging.info('MR mode '+ ranking[0]+str(mode[ranking[0]]))
+        sell.append(ranking[0])
+        
+    if mode[ranking[-1]]>0:
+        logging.info('Trend. Avg mode '+ ranking[-1]+str(mode[ranking[-1]]))
+        buy.append(ranking[-1])
+    else:
+        logging.info('MR mode '+ ranking[-1]+str(mode[ranking[-1]]))
+        sell.append(ranking[-1])
+    '''    
+    for i,curr in enumerate([ranking[0],ranking[-1]]):
+        #<0 mode reversion
+        if mode[curr]>0:
+            logging.info('Trend. mode '+ curr+str(mode[curr]))
+            if i==0:
+                buy.append(curr)
+            else:
+                sell.append(curr)
+        else:
+            logging.info('MR mode '+ curr+str(mode[curr]))
+            if i==0:
+                sell.append(curr)
+            else:
+                buy.append(curr)
+            
+    for i,curr in enumerate([ranking[1],ranking[-2]]):
+        #>0 mode reversion
+        if mode[curr]<0:
+            logging.info('MR. mode '+ curr+str(mode[curr]))
+            if i==0:
+                buy.append(curr)
+            else:
+                sell.append(curr)
+        else:
+            logging.info('Trend mode '+ curr+str(mode[curr]))
+            if i==0:
+                sell.append(curr)
+            else:
+                buy.append(curr)
+    '''
+    #avgMode=mode/len(modeDict)
+    if avgMode<0:
+        logging.info('Mean Reversion. Avg mode '+ str(avgMode))
+        ranking = list(rankByMean.index)
+        buy = [ranking[1]]
+        sell = [ranking[-2]]
+        ranking = [ranking[0],ranking[-1]]
+    else:
+        logging.info('Trend. Avg mode '+ str(avgMode))
+        ranking = list(rankByMean.index)
+        buy = [ranking[0]]
+        sell = [ranking[-1]]
+        ranking = [ranking[-2],ranking[-3]]
+     '''   
+    #ranking = [x for x in ranking if x not in buy+sell]
     #ranking.reverse()
     buyHold=[]
     sellHold=[]
     offline=[]
     cplist = copy.deepcopy(currencyPairs)
+    for currency in buy:
+        for i,pair in enumerate(pairs):
+            #print pair
+            if pair not in buyHold and pair not in sellHold and pair not in offline:
+                if currency in pair[0:3]:
+                    buyHold.append(pair) 
+                elif currency in pair[3:6]:
+                    sellHold.append(pair)
+                    
+    for currency in sell:
+        for i,pair in enumerate(pairs):
+            #print pair
+            if pair not in buyHold and pair not in sellHold and pair not in offline:
+                if currency in pair[0:3]:
+                    sellHold.append(pair) 
+                elif currency in pair[3:6]:
+                    buyHold.append(pair)
+    '''                
     for currency in ranking:
         for i,pair in enumerate(cplist):
             #print pair
             if pair not in buyHold and pair not in sellHold and pair not in offline:
                 if currency in pair[0:3]:
                     #print i,'bh',pair
-                    if modeDict[pair] > 0:
-                        buyHold.append(pair)
-                    else:
-                        logging.info('Offline '+pair+' '+str(modeDict[pair]))
-                        offline.append(pair)
+                    #if modeDict[pair] > 0:
+                    #buyHold.append(pair)
+                    sellHold.append(pair)
+                    #else:
+                        #logging.info('Offline '+pair+' '+str(modeDict[pair]))
+                        #offline.append(pair)
                     #cplist.remove(pair)
                 elif currency in pair[3:6]:
                     #print i,'sh',pair
-                    if modeDict[pair] > 0:
-                        sellHold.append(pair)
-                    else:
-                        logging.info('Offline '+pair+' '+str(modeDict[pair]))
-                        offline.append(pair)
+                    #if modeDict[pair] > 0:
+                    buyHold.append(pair)
+                    #sellHold.append(pair)
+                    #else:
+                        #logging.info('Offline '+pair+' '+str(modeDict[pair]))
+                        #offline.append(pair)
                     #cplist.remove(pair)
                 #else:
                     #print i,currency,pair
-    #offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
+    '''
+    offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
         
     if verbose:
         logging.info( str(startDate)+' to '+str(data.index[-1]))
         logging.info( 'Overall Rank\n'+str(rankByMean))
+        logging.info( 'buy '+str(buy)+' sell' +str(sell) + ' modeRank '+str(modeRank))
         logging.info( 'buyHold '+str(len(buyHold))+str(buyHold))
         logging.info( 'sellHold '+str(len(sellHold))+str(sellHold))
         logging.info( 'offline '+str(len(offline))+str(offline))
@@ -321,6 +419,7 @@ def runPairs():
         #logging.info( 'Saving', filename
         signalFile.to_csv(filename, index=True)
     logging.info( str(nsig)+'signals saved')
+    subprocess.call(['python', 'proc_signal_v2.py'])  
     
 def runPair_v1(pair):
     offline=True

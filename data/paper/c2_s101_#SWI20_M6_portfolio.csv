@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#SWI20_M6,open,short,2.0,0.0,7839.0,0.0,-15.678,0.0,15.678,89.0,,,,,#SWI20_M6,,20160515 19:37:11 EST,20160515 19:37:11 EST,-2.0,USD,,,49012.906,69786900.0,50400.0
+#SWI20_M6,open,long,2.0,0.0,7946.0,0.0,-15.892,0.0,15.892,104.0,,,,,#SWI20_M6,,20160518 18:40:58 EST,20160518 18:40:58 EST,2.0,USD,,,51075.17,81652300.0,52700.0

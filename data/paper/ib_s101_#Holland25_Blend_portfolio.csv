@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#Holland25,#Holland25,,2.0,2.0,432.17,432.17,0.0,2.0,0.0,-539.0,-517.0,Paper,USD,
+#Holland25,#Holland25,,-2.0,-2.0,433.84,433.84,0.0,2.0,0.0,42.0,74.0,Paper,USD,

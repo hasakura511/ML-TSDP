@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#ChinaHShar,open,long,2.0,0.0,8322.9,0.0,-16.6458,0.0,16.6458,162.0,,,,,#ChinaHShar,,20160516 09:41:52 EST,20160516 09:41:52 EST,2.0,USD,,,-106383.63932,137267386.0,-103645.0
+#ChinaHShar,open,long,2.0,0.0,8297.91,0.0,-16.59582,0.0,16.59582,172.0,,,,,#ChinaHShar,,20160518 18:41:12 EST,20160518 18:41:12 EST,2.0,USD,,,-124049.2515,145602993.0,-121144.0

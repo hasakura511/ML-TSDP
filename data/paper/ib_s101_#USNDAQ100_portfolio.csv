@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#USNDAQ100,#USNDAQ100,,2.0,2.0,4328.15,4328.15,0.0,8.6563,0.0,-13361.09456,-12838.0,Paper,USD,
+#USNDAQ100,#USNDAQ100,,2.0,2.0,4347.89,4347.89,0.0,8.69578,0.0,-9708.50308,-9168.0,Paper,USD,

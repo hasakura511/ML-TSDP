@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#UK_Mid250,open,long,2.0,0.0,16707.46,0.0,-33.41492,0.0,33.41492,192.0,,,,,#UK_Mid250,,20160516 17:31:08 EST,20160516 17:31:08 EST,2.0,USD,,,-224331.16062,320366539.0,-217897.0
+#UK_Mid250,open,long,2.0,0.0,16879.07,0.0,-33.75814,0.0,33.75814,198.0,,,,,#UK_Mid250,,20160518 18:14:11 EST,20160518 18:14:11 EST,2.0,USD,,,-223334.54818,330451595.0,-216698.0

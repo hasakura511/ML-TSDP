@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Holland25,open,long,2.0,0.0,432.15,0.0,-2.0,0.0,2.0,112.0,,,,,#Holland25,,20160516 09:40:09 EST,20160516 09:40:09 EST,2.0,USD,,,95682.0,6762345.0,95906.0
+#Holland25,open,long,2.0,0.0,434.05,0.0,-2.0,0.0,2.0,123.0,,,,,#Holland25,,20160518 18:47:15 EST,20160518 18:47:15 EST,2.0,USD,,,96188.0,7280559.0,96436.0

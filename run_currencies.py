@@ -6,9 +6,6 @@ The premise for this system is that there is an insample period in the recent hi
 that is in sync with the future market out of sample period.  This insample period can be 
 using various methods. More than one in-sample period can be used for prediction.
 
-The system starts with a high/low volatility prediction. If the volatility is high,
-then the system makes predictions with a bias toward a new trend. If the volatility is low,
-the system makes predictions with a bias toward a recurring cycle. 
 
 Additional bias can be added as a parameter. 
 
@@ -262,7 +259,7 @@ barSizeSetting='1d'
 if len(sys.argv)==1:
     debug=True
     supportResistanceLB=50
-    startDate=datetime.date(2016,4,19)
+    startDate=datetime.date(2016,5,2)
     endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     validationSetLength = np.busday_count(startDate, endDate)
@@ -297,7 +294,7 @@ if len(sys.argv)==1:
                     #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
-                    #'EURUSD',\
+                    'EURUSD',\
                     #'EURAUD',\
                     #'EURCAD',\
                     #'EURNZD',\
@@ -314,7 +311,7 @@ if len(sys.argv)==1:
                     #'GBPNZD',\
                     #'GBPCHF',\
                     #'CADCHF'
-                    'NZDCHF',\
+                    #'NZDCHF',\
                     #'NZDCAD',\
                     ]
     ticker =livePairs[0]
@@ -336,11 +333,11 @@ else:
     debug=False
     if len(sys.argv)==2:
         livePairs=[sys.argv[1]]
-        startDate=datetime.date(2016,5,3)
-        endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
-        endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-        validationSetLength = np.busday_count(startDate, endDate)
-        supportResistanceLB = max(validationSetLength,25)
+        startDate=None
+        #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+        validationSetLength = 3
+        supportResistanceLB = max(validationSetLength,50)
         #Model Parameters
         #supportResistanceLB = 25
         bias=['gainAhead','zigZag','buyHold','sellHold']
@@ -1556,7 +1553,12 @@ for k,v, in signalDF.iteritems():
             
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
+
 if showCharts:
+    if startDate == None:
+        sdate=data.index[0].to_datetime()
+        startDate = datetime.date(sdate.year, sdate.month, sdate.day)
+
     zz.plot_pivots(l=8,w=8,\
                         #startValley=(startValley, data2.Close[startValley]),\
                         #startPeak=(startPeak, data2.Close[startPeak]),\

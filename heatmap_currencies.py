@@ -20,7 +20,7 @@ with open(pairPath+'currencies.txt') as f:
     currencyPairs = f.read().splitlines()
     
 #lookback=130
-startDate=dt(2016, 5, 2,0,30)
+startDate=dt(2016, 5, 17,0,0)
 currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
 #currencies = ['EUR', 'GBP', 'JPY', 'USD']
 
@@ -51,12 +51,12 @@ for currency in currencies:
     cMatrix.set_value(currency,'Avg',cMatrix.ix[currency].dropna().mean())
 cMatrix=cMatrix.sort_values(by='Avg', ascending=False)
 rankByMean=cMatrix['Avg']
-
+'''
 with open(savePath+'currencies_1.html','w') as f:
     f.write(str(startDate)+' to '+str(data.index[-1]))
     
 cMatrix.to_html(savePath+'currencies_4.html')
-
+'''
 #print data.index[0],'to',data.index[-1]
 #print cMatrix
 fig,ax = plt.subplots(figsize=(8,8))

@@ -3886,3 +3886,4 @@ dates,signals,gainAhead,prior_index,safef,CAR25,dd95,ddTol,system,cycleTime,time
 2016-05-04 21:36:00,0.0,0.0,0.0,0.0,0.0,0.0,0.0,Offline Mode: turned off in runsystem,-11.1879,20160503 00:48:48 EDT
 2016-05-11 07:00:00,-1.0,0.0,452.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-435.734133333,20160510 23:44:15 EDT
 2016-05-11 08:30:00,-1.0,0.0,452.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-427.243566667,20160511 01:22:45 EDT
+2016-05-19 07:00:00,-1.0,0.0,450.0,1.0,,,,bothAUDJPY_30m_ALL_DF1_None_i0_fcst1_SH1,-443.5022,20160518 23:36:29 EDT

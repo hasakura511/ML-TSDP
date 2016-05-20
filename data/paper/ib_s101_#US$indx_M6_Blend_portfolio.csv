@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#US$indx_M6,#US$indx_M6,,2.0,2.0,95.16,95.16,0.0,2.0,0.0,-352.0,-224.0,Paper,USD,
+#US$indx_M6,#US$indx_M6,,-2.0,-2.0,95.295,95.295,0.0,2.0,0.0,-406.5,-248.5,Paper,USD,

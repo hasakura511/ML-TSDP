@@ -148,7 +148,8 @@ def start_systems():
            systems['last_trade']=0
            systems['key']=systems['c2sym']
            systems=systems.set_index('key')
-           #start_trade(systems,commissiondata)
+           start_trade(systems,commissiondata)
+           '''
            sig_thread = threading.Thread(target=start_trade, args=[systems,commissiondata])
            sig_thread.daemon=True
            threads.append(sig_thread)
@@ -156,10 +157,10 @@ def start_systems():
            if count > 5:
                [t.join() for t in threads]
                threads = []
+           '''
            count=count + 1
-        #while 1:
-        #    time.sleep(100)
-        [t.join() for t in threads]
+        
+        #[t.join() for t in threads]
          
 start_systems()
     

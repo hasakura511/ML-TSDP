@@ -1,3 +1,0 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,underlying
-101793170,-475,1460509532,,,2055.00000,,future,short,2016-04-12 21:05:32,1460509532,open,2016-04-12 21:05:11,2055.00000,50,,0,1,,@ESM6,,
-101792573,-50,1460505629,2016-04-12 21:05:07,1460509507,2055,,future,long,2016-04-12 20:00:29,1460505629,closed,2016-04-12 20:00:10,2056.00000,50,,1,1,,@ESM6,,

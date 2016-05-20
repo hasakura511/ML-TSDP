@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#GER30_M6,open,short,2.0,0.0,9926.5,0.0,-19.853,0.0,19.853,105.0,,,,,#GER30_M6,,20160518 17:51:36 EST,20160518 17:51:36 EST,-2.0,USD,,,29259.651,104532150.0,31350.0
+#GER30_M6,open,long,2.0,0.0,9899.0,0.0,-19.798,0.0,19.798,122.0,,,,,#GER30_M6,,20160520 10:08:27 EST,20160520 10:08:27 EST,2.0,USD,,,19875.206,121259900.0,22300.0

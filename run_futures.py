@@ -266,7 +266,8 @@ if len(sys.argv)==1:
     validationSetLength = np.busday_count(startDate, endDate)
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
-    bias = ['gainAhead','zigZag']
+    bias=['gainAhead','zigZag','buyHold','sellHold']
+    #bias = ['gainAhead','zigZag']
     #bias = ['gainAhead']
     #bias = ['zigZag']
     #bias=['sellHold']
@@ -360,11 +361,13 @@ else:
         validationSetLength = 90
         supportResistanceLB = 90
         #supportResistanceLB = 90
-        bias=['gainAhead','zigZag']
+        #bias=['gainAhead','zigZag']
+        bias=['gainAhead','zigZag','buyHold','sellHold']
         adfPvalue=3
         #validationSetLength =90
         #useSignalsFrom='highest_level3_netEquity'
     else:
+        startDate=None
         liveFutures=[sys.argv[1]]
         if len(sys.argv[2])==8:
             sdate=sys.argv[2]
@@ -379,7 +382,8 @@ else:
         #Model Parameters
         #supportResistanceLB = int(sys.argv[2])
         #validationSetLength = int(sys.argv[3])
-        bias=['gainAhead','zigZag']
+        bias=['gainAhead','zigZag','buyHold','sellHold']
+        #bias=['gainAhead','zigZag']
         adfPvalue=3
         
         #useSignalsFrom='highest_level3_netEquity'

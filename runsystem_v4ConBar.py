@@ -143,10 +143,10 @@ def onBar(bar, symbols):
                 
     
 def runPairs():
-
+    allOff=False
     debug=False
     savePath = './data/results/'
-    dataPath = './data/from_IB/'
+    dataPath = './data/from_MT4/'
     signalPath = './data/signals/'
     pairPath='./data/'
 
@@ -155,14 +155,15 @@ def runPairs():
     version='v4'
     verbose=True
     lookback=1
-    buy=[]
+    buy=['NZD']
     sell=[]
+    off=[]
     currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
-    currencies = [x for x in currencies if x not in buy+sell]
-    
+    currencies = [x for x in currencies if x not in buy+sell+off]
+    #currencies=[]
     #currencies = ['EUR', 'GBP', 'JPY', 'USD']
     #barSizeSetting='10m'
-    for i in range(1,-1,-lookback):
+    for i in range(lookback,-lookback,-lookback):
         #startDate=dt(2016, 5, i,0,00)
         cMatrix=pd.DataFrame()
         for currency in currencies:
@@ -224,7 +225,7 @@ def runPairs():
         plt.close()
     
     #reverse mode
-    bars=3
+    bars=lookback*3
     modeDict={}
     for pair in currencyPairs:
         data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)
@@ -242,8 +243,10 @@ def runPairs():
         
     for pair in modeDict:
         #logging.info(pair+str(modeDict[pair]))
-        mode[pair[0:3]] +=modeDict[pair]
-        mode[pair[3:6]] +=modeDict[pair]
+        if pair[0:3] in currencies:
+            mode[pair[0:3]] +=modeDict[pair]
+        if pair[3:6] in currencies:
+            mode[pair[3:6]] +=modeDict[pair]
         
     modeRank = pd.Series()
     for curr in mode:
@@ -270,13 +273,13 @@ def runPairs():
     for i,curr in enumerate([ranking[0],ranking[-1]]):
         #<0 mode reversion
         if mode[curr]>0:
-            logging.info('Trend. mode '+ curr+str(mode[curr]))
+            logging.info(curr+' Trend. mode '+str(mode[curr]))
             if i==0:
                 buy.append(curr)
             else:
                 sell.append(curr)
         else:
-            logging.info('MR mode '+ curr+str(mode[curr]))
+            logging.info(curr+' MR mode '+str(mode[curr]))
             if i==0:
                 sell.append(curr)
             else:
@@ -285,13 +288,13 @@ def runPairs():
     for i,curr in enumerate([ranking[1],ranking[-2]]):
         #>0 mode reversion
         if mode[curr]<0:
-            logging.info('MR. mode '+ curr+str(mode[curr]))
+            logging.info(curr+' MR. mode '+str(mode[curr]))
             if i==0:
                 buy.append(curr)
             else:
                 sell.append(curr)
         else:
-            logging.info('Trend mode '+ curr+str(mode[curr]))
+            logging.info(curr +' Trend mode '+str(mode[curr]))
             if i==0:
                 sell.append(curr)
             else:
@@ -361,6 +364,11 @@ def runPairs():
                     #print i,currency,pair
     '''
     offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
+    
+    if allOff:
+        buyHold=[]
+        sellHold=[]
+        offline=currencyPairs
         
     if verbose:
         logging.info( str(startDate)+' to '+str(data.index[-1]))
@@ -557,7 +565,7 @@ gotbar=dict()
 
 #filterName = 'DF1'
 #data_type = 'ALL'
-barSizeSetting='30m'
+barSizeSetting='1d'
 pairPath='./data/'
 
 with open(pairPath+'currencies.txt') as f:
@@ -672,7 +680,7 @@ else:
     scorePath = None
     equityStatsSavePath = None
     signalPath = './data/signals/'
-    dataPath = './data/from_IB/'
+    dataPath = './data/from_MT4/'
     modelPath = './data/models/'
     bestParamsPath =  './data/params/'
     chartSavePath = './data/results/' 

@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-@ESM6,open,long,1.0,0.0,2065.300049,0.0,-2.065300049,0.0,2.065300049,2.0,,,,,@ESM6,,20160514 05:45:16 EST,20160514 05:45:16 EST,1.0,USD,,,99995.8694,2000000.0,100000.0
+@ESM6,open,long,1.0,0.0,2065.300049,0.0,-2.065300049,0.0,2.065300049,4.0,,,,,@ESM6,,20160519 09:03:53 EST,20160519 09:03:53 EST,1.0,USD,,,99991.7388,2206530.0049,100000.0

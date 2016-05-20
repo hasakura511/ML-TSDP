@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Germany50,open,short,2.0,0.0,20110.0,0.0,-40.22,0.0,40.22,114.0,,,,,#Germany50,,20160518 13:19:52 EST,20160518 13:19:52 EST,-2.0,USD,,,-150976.078,226781900.0,-146400.0
+#Germany50,open,short,2.0,0.0,20244.0,0.0,-40.488,0.0,40.488,120.0,,,,,#Germany50,,20160520 11:50:49 EST,20160520 11:50:49 EST,-2.0,USD,,,-134016.744,238788400.0,-129200.0

@@ -259,13 +259,14 @@ with open('./data/futures.txt') as f:
 
 if len(sys.argv)==1:
     debug=True
-    supportResistanceLB=90
-    startDate=datetime.date(2016,4,18)
+    supportResistanceLB=60
+    startDate=datetime.date(2016,4,20)
     endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     validationSetLength = np.busday_count(startDate, endDate)
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
+    
     bias=['gainAhead','zigZag','buyHold','sellHold']
     #bias = ['gainAhead','zigZag']
     #bias = ['gainAhead']
@@ -287,7 +288,7 @@ if len(sys.argv)==1:
     #validationSetLength = 90
     liveFutures =  [
                     #'AD',
-                    'BO',
+                    #'BO',
                     #'BP',
                     #'C',
                     #'CC',
@@ -308,7 +309,7 @@ if len(sys.argv)==1:
                     #'LB',
                     #'LC',
                     #'LN',
-                    #'MD',
+                    'MD',
                     #'MP',
                     #'NG',
                     #'NQ',
@@ -382,8 +383,8 @@ else:
         #Model Parameters
         #supportResistanceLB = int(sys.argv[2])
         #validationSetLength = int(sys.argv[3])
-        bias=['gainAhead','zigZag','buyHold','sellHold']
         #bias=['gainAhead','zigZag']
+        bias=['gainAhead','zigZag','buyHold','sellHold']
         adfPvalue=3
         
         #useSignalsFrom='highest_level3_netEquity'
@@ -1030,7 +1031,15 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                                                             avgHalfCycle,period=1),
                                                                     supportResistanceLB,lb)
 
-        
+        #volume
+        dataSets[is_period][ticker+'_Volume_c'+str(avgHalfCycle)+'_r'+str(lb)] =\
+                                                roofingFilter(volumeSpike(data_primer.Volume, avgHalfCycle),
+                                                                    supportResistanceLB,lb)
+        #open interest
+        #dataSets[is_period][ticker+'_OI_c'+str(avgHalfCycle)+'_r'+str(lb)] =\
+        #                                        roofingFilter(volumeSpike(data_primer.OI, avgHalfCycle),
+        #                                                            supportResistanceLB,lb)
+                                                                    
         indicator_df = dataSets[is_period].iloc[-supportResistanceLB:].iloc[index]
 
         if addAux:

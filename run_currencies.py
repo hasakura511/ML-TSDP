@@ -12,7 +12,6 @@ Additional bias can be added as a parameter.
 Major Parameters to be optemised:
 bar size
 support/resistance lookback
-validation length
 adfPvalue
 AddAuxPairs & nfeatures
 
@@ -30,6 +29,7 @@ import arch
 from os import listdir
 from os.path import isfile, join
 
+from datetime import datetime
 import matplotlib.pyplot as plt
 #from pandas.io.dataSet import DataReader
 import random
@@ -74,7 +74,7 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
 
 from suztoolz.loops import calcEquity2, createBenchmark, createYearlyStats, findBestDPS
 from suztoolz.display import displayRankedCharts
-from suztoolz.datatools.loadFutures import loadFutures
+from suztoolz.datatools.loadCurrencyPairs import loadCurrencyPairs
 from suztoolz.datatools.acPeriodogram import acPeriodogram
 from suztoolz.datatools.zigzag import zigzag as zg
 from suztoolz.datatools.mrClassifier import mrClassifier
@@ -180,7 +180,7 @@ def reCalcEquity(sst, metric):
         elif (sst.signals.iloc[i-1]*sst.dpsSafef.iloc[i-1] > 0):
             dpsNetEquity[i]= (1+sst.gainAhead.iloc[i-1]*sst.dpsSafef.iloc[i-1])*dpsNetEquity[i-1]
         else:
-            dpsNetEquity[i] = sst.dpsNetEquity[i-1]
+            dpsNetEquity[i] = sst.netEquity[i-1]
         
         positionChg = abs(sst.signals[i]*sst.dpsSafef.iloc[i]-sst.signals[i-1]*sst.dpsSafef.iloc[i-1])
         if positionChg !=0:
@@ -253,100 +253,76 @@ version_ = 'v4.3'
 asset = 'FX'
 filterName = 'DF1'
 data_type = 'ALL'
-barSizeSetting='1D'
-with open('./data/futures.txt') as f:
-    auxFutures = f.read().splitlines()
+barSizeSetting='1d'
+
 
 if len(sys.argv)==1:
     debug=True
-    supportResistanceLB=60
-    startDate=datetime.date(2016,4,20)
+    supportResistanceLB=50
+    startDate=datetime.date(2016,5,2)
     endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     validationSetLength = np.busday_count(startDate, endDate)
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
-    
-    bias=['gainAhead','zigZag','buyHold','sellHold']
-    #bias = ['gainAhead','zigZag']
+    bias = ['gainAhead','zigZag','buyHold','sellHold']
+    #bias = ['gainAhead','zigZag','buyHold','sellHold']
     #bias = ['gainAhead']
     #bias = ['zigZag']
     #bias=['sellHold']
     #bias=['buyHold']
-    #useSignalsFrom='highest_level3_netEquity'
+    #useSignalsFrom='tripleFiltered'
     #useSignalsFrom='best_wf_is_short'
     #useSignalsFrom='best_wf_is_all'
     #cycle mode->threshold=1.1
     #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    adfPvalue=3
+    adfPvalue=0
     #auto ->threshold = 0.2
     #adfPvalue=1.1
     
-    #Model Parameters
-    #supportResistanceLB = 180
-    #validationSetLength = 90
-    liveFutures =  [
-                    #'AD',
-                    #'BO',
-                    #'BP',
-                    #'C',
-                    #'CC',
-                    #'CD',
-                    #'CL',
-                    #'CT',
-                    #'DX',
-                    #'EC',
-                    #'ED',
-                    #'ES',
-                    #'FC',
-                    #'FV',
-                    #'GC',
-                    #'HG',
-                    #'HO',
-                    #'JY',
-                    #'KC',
-                    #'LB',
-                    #'LC',
-                    #'LN',
-                    'MD',
-                    #'MP',
-                    #'NG',
-                    #'NQ',
-                    #'NR',
-                    #'O',
-                    #'OJ',
-                    #'PA',
-                    #'PL',
-                    #'RB',
-                    #'RU',
-                    #'S',
-                    #'SB',
-                    #'SF',
-                    #'SI',
-                    #'SM',
-                    #'TU',
-                    #'TY',
-                    #'US',
-                    #'W',
-                    #'XX',
-                    #'YM',
-                    #'AX',
-                    #'CA',
-                    #'DT',
-                    #'UB',
-                    #'UZ'
+
+    
+    #validationSetLength =25
+    livePairs =  [
+                    #'NZDJPY',\
+                    #'CADJPY',\
+                    #'CHFJPY',\
+                    #'EURJPY',\
+                    #'GBPJPY',\
+                    #'AUDJPY',\
+                    #'USDJPY',\
+                    #'EURCHF',\
+                    #'EURGBP',\
+                    'EURUSD',\
+                    #'EURAUD',\
+                    #'EURCAD',\
+                    #'EURNZD',\
+                    #'AUDUSD',\
+                    #'GBPUSD',\
+                    #'USDCAD',\
+                    #'USDCHF',\
+                    #'NZDUSD',
+                    #'AUDCAD',\
+                    #'AUDCHF',\
+                    #'AUDNZD',\
+                    #'GBPAUD',\
+                    #'GBPCAD',\
+                    #'GBPNZD',\
+                    #'GBPCHF',\
+                    #'CADCHF'
+                    #'NZDCHF',\
+                    #'NZDCAD',\
                     ]
-    ticker =liveFutures[0]
+    ticker =livePairs[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
-    #dataPath = 'D:/data/tickerData/'
-    dataPath = 'D:/ML-TSDP/data/tickerData/'
+    dataPath = 'D:/ML-TSDP/data/from_MT4/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
-    
+    pairPath='D:/ML-TSDP/data/'
     #adds auxilary pair features
-    addAux = True
+    addAuxPairs = True
     
     #display params
     showCharts=False
@@ -356,51 +332,48 @@ if len(sys.argv)==1:
 else:
     debug=False
     if len(sys.argv)==2:
-        liveFutures=[sys.argv[1]]
-        #Model Parameters
+        livePairs=[sys.argv[1]]
         startDate=None
-        validationSetLength = 90
-        supportResistanceLB = 90
-        #supportResistanceLB = 90
-        #bias=['gainAhead','zigZag']
+        #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+        validationSetLength = 50
+        supportResistanceLB = max(validationSetLength,50)
+        #Model Parameters
+        #supportResistanceLB = 25
         bias=['gainAhead','zigZag','buyHold','sellHold']
-        adfPvalue=3
-        #validationSetLength =90
+        adfPvalue=0
+        #validationSetLength =45
         #useSignalsFrom='highest_level3_netEquity'
     else:
-        startDate=None
-        liveFutures=[sys.argv[1]]
-        if len(sys.argv[2])==8:
-            sdate=sys.argv[2]
-            startDate=datetime.date(int(sdate[0:4]),int(sdate[4:6]),int(sdate[6:8]))
-            endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
-            endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-            validationSetLength = np.busday_count(startDate, endDate)
-            supportResistanceLB = max(validationSetLength,int(sys.argv[3]))
-        else:
-            supportResistanceLB = int(sys.argv[2])
-            validationSetLength = int(sys.argv[3])
+        livePairs=[sys.argv[1]]
+        sdate=sys.argv[2]
+        startDate=datetime.date(int(sdate[0:4]),int(sdate[4:6]),int(sdate[6:8]))
+        endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+        validationSetLength = np.busday_count(startDate, endDate)
+        supportResistanceLB = max(validationSetLength,int(sys.argv[3]))
         #Model Parameters
-        #supportResistanceLB = int(sys.argv[2])
-        #validationSetLength = int(sys.argv[3])
-        #bias=['gainAhead','zigZag']
+        #supportResistanceLB = max(validationSetLength,int(sys.argv[2]))
+        #validationSetLength =int(sys.argv[3])
         bias=['gainAhead','zigZag','buyHold','sellHold']
-        adfPvalue=3
+        adfPvalue=0
         
         #useSignalsFrom='highest_level3_netEquity'
         #bias=[sys.argv[2]]
         #adfPvalue=float(sys.argv[3])
         #validationSetLength =int(sys.argv[4])
         #useSignalsFrom=sys.argv[5]
-    ticker =liveFutures[0]
+        
+    #useSignalsFrom=sys.argv[5]
+    ticker =livePairs[0]
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
     signalPath = './data/signals/'
-    dataPath = './data/tickerData/'
+    dataPath = './data/from_MT4/'
     chartSavePath = './data/results/'+version+'_'+ticker
-    
+    pairPath='./data/'
     #adds auxilary pair features
-    addAux = True
+    addAuxPairs = True
     
     #display params
     showCharts=False
@@ -410,6 +383,8 @@ else:
 
 
 
+with open(pairPath+'currencies.txt') as f:
+    currencyPairs = f.read().splitlines()
 
 #for PCA/KBest
 nfeatures = 10
@@ -417,14 +392,12 @@ nfeatures = 10
 minDatapoints = 3
 #set to 1 for live
 #system selection metric
-
 #no post filter goes to 'level1'
 metric = 'netEquity'
 #'level1' filter
 metric2='netEquity'
 #'level2' filter
 metric3='netEquity'
-
 
 #robustness
 perturbData = False
@@ -631,13 +604,13 @@ auxPairs_models = [
 
 inner_zz_std =2
 outer_zz_std=4
-if addAux ==True:
+if addAuxPairs ==True:
     #trend mode
     shortTrendSignalTypes = bias
     shortModel=short_models[0]
     shortTrendPipelines=[
                    [shortModel],
-                   [fs_models[0],shortModel],
+                   #[fs_models[0],shortModel],
                    #[fs_models[1],shortModel],
                     ]
                     
@@ -702,12 +675,11 @@ v2vModel= pv3s_Model
 v2vPipelines=pv3s_Pipelines
 
 
-dataSet, auxFuturesDict = loadFutures(auxFutures, dataPath,\
+dataSet, auxPairsDict = loadCurrencyPairs(currencyPairs, dataPath,\
                                         barSizeSetting, maxlb, ticker,\
                                         signalPath, version, version_, maxReadLines,\
                                         perturbData=perturbData, perturbDataPct=perturbDataPct,\
-                                        verbose=verbose, addAux=addAux)
-
+                                        verbose=verbose, addAuxPairs=addAuxPairs)
 #account for data loss
 validationSetLength = dataSet.shape[0]-supportResistanceLB*2
 
@@ -741,8 +713,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         if showCharts==False and showFinalChartOnly == True:
             showCharts=True
             showIndicators=True
-    
-    
+            
     #maxlb is 2x support resistance lookback.  the first half is used to prime indicators
     data_primer = dataSet[start:maxlb+start]
     data_primer.index = data_primer.index.to_datetime()
@@ -758,13 +729,6 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                     
     #set the data to move one bar at a time. 
     data = dataSet[i:i+supportResistanceLB]
-    if len(data.iloc[data.R.nonzero()]) == 0:
-        #no expiry info in the lookback
-        if start==0:
-            contractExpiry=''
-    else:
-        contractExpiry = str(data.iloc[data.R.nonzero()].R.iloc[-1])
-        
     nrows = data.shape[0]
     data.index = data.index.to_datetime()
     pv_sorted = []
@@ -778,7 +742,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #pc = data.Close.pct_change().fillna(0)
     #zs=abs(pc[-1]-pc.mean())/pc.std()
     modes = mrClassifier(data.Close, data.shape[0]-1,threshold=adfPvalue, showPlot=debug,\
-                                               ticker=ticker+contractExpiry)
+                                               ticker=ticker)
     mode = modes[-1]
     if i ==supportResistanceLB:
         modePred = pd.Series(data=-1, index=data.index, name='adfPrediction')
@@ -790,12 +754,12 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         #sort by small peaks
         reversePeaks = True
         reverseValleys = False
-        #addAux = False
+        #addAuxPairs = False
     else:
         #sort by large peaks
         reversePeaks = False
         reverseValleys = True
-        #addAux = True
+        #addAuxPairs = True
         
     #decrease stdev until there are three pivot points
     while majorPeak ==None or majorValley == None or minorPeak ==None or minorValley == None:
@@ -978,19 +942,17 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             #if len(index)-minDatapoints<3:
             #    break
         
-        #average halfCycle
+        #x2 for full cycle length
         avgHalfCycle=average(np.array(inner_halfCycles))
-        
         #correlation < 2 creates inf
         if avgHalfCycle < 2:
             avgHalfCycle =2
             
+        #windowLengths[is_period] = avgHalfCycle
         #short is last half cycle to idnetify current market sync. 
         if is_period=='wf_is_short':
             windowLength = inner_halfCycles[-1]
-        
-        #windowLengths[is_period] = lastHalfCycle
-
+            
         #short indicators
         dataSets[is_period][ticker+'_Pri_RSI_c'+str(1.5)] =\
                                             RSI(data_primer.Close,1.5)
@@ -1031,29 +993,36 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                                                             avgHalfCycle,period=1),
                                                                     supportResistanceLB,lb)
 
-        #volume
-        dataSets[is_period][ticker+'_Volume_c'+str(avgHalfCycle)+'_r'+str(lb)] =\
-                                                roofingFilter(volumeSpike(data_primer.Volume, avgHalfCycle),
-                                                                    supportResistanceLB,lb)
-        #open interest
-        #dataSets[is_period][ticker+'_OI_c'+str(avgHalfCycle)+'_r'+str(lb)] =\
-        #                                        roofingFilter(volumeSpike(data_primer.OI, avgHalfCycle),
-        #                                                            supportResistanceLB,lb)
-                                                                    
+        
         indicator_df = dataSets[is_period].iloc[-supportResistanceLB:].iloc[index]
 
-        if addAux:
-            for contract in auxFuturesDict:
-                auxFuturesDataset = pd.DataFrame(index=data_primer.index)
-                ratio=auxFuturesDict[contract]['closes'].iloc[:,0].ix[data_primer.index]/\
-                            auxFuturesDict[contract]['closes'].iloc[:,1].ix[data_primer.index]
-                #relative strength ratio
-                roc=ROC(ratio,avgHalfCycle)
-                if sum(np.isnan(roc))>0:
+        if addAuxPairs:
+            for pair in auxPairsDict:
+                auxPairdataSet = pd.DataFrame(index=data_primer.index)
+                closes=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
+                '''
+                highs=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
+                lows=auxPairsDict[pair]['closes'].iloc[:,1][:maxlb]
+                auxPairdataSet[pair+'_Pri_RSI_c'+str(avgHalfCycle)+'_r'+str(lb)] =\
+                                                RSI(closes,avgHalfCycle)
+                auxPairdataSet[pair+'_Pri_Corr1_c'+str(avgHalfCycle)+'_r'+str(lb)] = \
+                                                roofingFilter(pd.Series(pd.rolling_corr(\
+                                                data_primer.Close.shift(1).values*100,\
+                                                closes.values*100, window=avgHalfCycle))\
+                                                .replace([np.inf, -np.inf, np.nan],[1.0,-1.0,0]).values,\
+                                                supportResistanceLB,lb)
+                auxPairdataSet[pair+'_Pri_rStoch_c'+str(avgHalfCycle)+'_r'+str(lb)] =\
+                                        roofingFilter(closes,supportResistanceLB,lb)
+                auxPairdataSet[pair+'_Pri_ATR_c'+str(avgHalfCycle)+'_r'+str(lb)] =\
+                                                                roofingFilter(ATR(highs,lows,\
+                                                        closes,avgHalfCycle), supportResistanceLB,lb)
+                '''
+                if sum(np.isnan(ROC(closes,avgHalfCycle)))>0:
                     sys.exit()
-                auxFuturesDataset[contract+'_Ratio_ROC_c'+str(avgHalfCycle)] =roc
-                dataSets[is_period] = pd.concat([dataSets[is_period], auxFuturesDataset], axis=1)
-                #auxFuturesDataset.iloc[-supportResistanceLB:].iloc[index].plot()
+                auxPairdataSet[pair+'Pri_ROC_c'+str(avgHalfCycle)] =\
+                                        ROC(closes,avgHalfCycle)
+                dataSets[is_period] = pd.concat([dataSets[is_period], auxPairdataSet], axis=1)
+                #auxPairdataSet.iloc[-supportResistanceLB:].iloc[index].plot()
             
         DominantCycle, acp = acPeriodogram(data_primer,bars=avgHalfCycle)
         dataSets[is_period] = pd.concat([dataSets[is_period], acp], axis=1)
@@ -1108,6 +1077,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 reverse='normal'
                 y_train_ga = data_primer_ga_sig.iloc[-supportResistanceLB:].iloc[index].values
                 #reverse if choppy bias, short is and cycle (cycle peak bias)
+                #if is_period=='wf_is_short' and mode==0:
                 if mode==0:
                     reverse='reversed'
                     y_train_ga = np.where(y_train_ga<0,1,-1)
@@ -1160,7 +1130,6 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 #if is_period=='wf_is_short' and mode==0:
                 #    reverse='reversed'
                 #    y_train_zz = np.where(y_train_zz<0,1,-1)
-                
                 #reverse if choppy bias, pv3s is and trend (cycle peak bias)
                 #if bias[0]=='gainAhead' and is_period=='wf_is_pv3s_v2v' and mode==1:
                 #    reverse='reversed'
@@ -1238,8 +1207,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             #append last dps result for ranking
             dpsDF = dpsDF.append(dps)
             dpsDF_all = dpsDF_all.append(dps)
-        
-        #rank is periods (level 1) by metric 2
+            
+        #save top ranks by is period
         if i == supportResistanceLB:
             DpsRankByMetricB['best_'+is_period] = signalSets[is_period]\
                                                             [dpsDF.sort_values(by=metric2, ascending=False).iloc[0]\
@@ -1251,14 +1220,12 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         else:
             #print dpsDF
             #best CAR25
-            DpsRankByMetricB['best_'+is_period]=DpsRankByMetricB['best_'+is_period]\
-                                        .append(dpsDF.sort_values(by=metric2, ascending=False).iloc[0])
+            DpsRankByMetricB['best_'+is_period]=DpsRankByMetricB['best_'+is_period].append(dpsDF.sort_values(by=metric2, ascending=False).iloc[0])
             #worstCAR25
-            DpsRankByMetricW['worst_'+is_period]=DpsRankByMetricW['worst_'+is_period]\
-                                        .append(dpsDF.sort_values(by=metric2, ascending=False).iloc[-1])
+            DpsRankByMetricW['worst_'+is_period]=DpsRankByMetricW['worst_'+is_period].append(dpsDF.sort_values(by=metric2, ascending=False).iloc[-1])
             #best model
         
-    #rank ALL is periods (level 1) by metric 2, add to DF
+    #total ranking    
     if i == supportResistanceLB:
         is_period = dpsDF_all.sort_values(by=metric2, ascending=False).iloc[0]['is_period']
         signalType = dpsDF_all.sort_values(by=metric2, ascending=False).iloc[0]['signalType']
@@ -1271,11 +1238,9 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     else:
         #print dpsDF
         #best CAR25
-        DpsRankByMetricB['best_wf_is_all']=DpsRankByMetricB['best_wf_is_all']\
-                            .append(dpsDF_all.sort_values(by=metric2, ascending=False).iloc[0])
+        DpsRankByMetricB['best_wf_is_all']=DpsRankByMetricB['best_wf_is_all'].append(dpsDF_all.sort_values(by=metric2, ascending=False).iloc[0])
         #worstCAR25
-        DpsRankByMetricW['worst_wf_is_all']=DpsRankByMetricW['worst_wf_is_all']\
-                            .append(dpsDF_all.sort_values(by=metric2, ascending=False).iloc[-1])
+        DpsRankByMetricW['worst_wf_is_all']=DpsRankByMetricW['worst_wf_is_all'].append(dpsDF_all.sort_values(by=metric2, ascending=False).iloc[-1])
         #best model    
         
 
@@ -1286,7 +1251,6 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     dpsDF_BofB = pd.DataFrame()
     dpsDF_BofW = pd.DataFrame()
     
-    #recalc DPS and equity for level 2
     #windowLength = int(np.array([windowLengths[x] for x in windowLengths]).mean())
     windowLength = supportResistanceLB
     if verbose:
@@ -1316,8 +1280,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         DpsRankByMetricW[rank]=reCalcEquity(DpsRankByMetricW[rank], metric2)
         dpsDF_all2 = dpsDF_all2.append(DpsRankByMetricW[rank].iloc[-1])
         dpsDF_BofW = dpsDF_BofW.append(DpsRankByMetricW[rank].iloc[-1])
-        
-    #rank level 2 B/W by metric 3 
+    
     if i == supportResistanceLB:
         finalDF['finalBest']=pd.DataFrame(index=data.index)
         finalDF['finalBest'].set_value(finalDF['finalBest'].index,'dpsNetEquity',initialEquity)
@@ -1361,7 +1324,6 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         finalDF['finalBestOfWorst']=reCalcEquity(finalDF['finalBestOfWorst'], metric3)
         
     dpsDF_final = pd.DataFrame()
-    #recalc dps for level 3
     for rank in finalDF:
         finalDF[rank].index.name = 'dates'
         updateDps = calcDPS(rank, finalDF[rank], PRT, windowLength, verbose=False,\
@@ -1398,14 +1360,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #else:
     #metric2='netEquity'
     
-    #dpsDF_final = dpsDF_all2.append(dpsDF_all2)
-    #dpsDF_final = dpsDF_all2.append(dpsDF_final)
-    #level1
-    #dpsDF_all
-    #level2
-    #dpsDF_all2
-    #level3
-    #dpsDF_final
+    #dpsDF_all2 = dpsDF_all2.append(dpsDF_all)
+    #dpsDF_all2 = dpsDF_all2.append(dpsDF_final)
     '''
     if i == supportResistanceLB:
         mr=False
@@ -1464,42 +1420,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         signalDF[curve].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
         signalDF[curve]=reCalcEquity(signalDF[curve], metric)
     '''
-    '''
-    if mode ==0:
-        mr=True
-        curve='lowest '+metric2
-        if i == supportResistanceLB:
-            #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
-            #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-            signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
-            signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
-            signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
-            signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_all2.sort_values(by=metric2, ascending=mr).iloc[0]).fillna(0)
-        else:
-            #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
-            #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-            signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_all2.sort_values(by=metric2, ascending=mr).iloc[0])
-            index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
-            signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-            signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric2)
-    else:
-        mr=False
-        curve='highest '+metric
-        if i == supportResistanceLB:
-            #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
-            #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-            signalDF['tripleFiltered']=pd.DataFrame(index=data.index)
-            signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'dpsNetEquity',initialEquity)
-            signalDF['tripleFiltered'].set_value(signalDF['tripleFiltered'].index,'netEquity',initialEquity)
-            signalDF['tripleFiltered']=signalDF['tripleFiltered'][:-1].append(dpsDF_all.sort_values(by=metric, ascending=mr).iloc[0]).fillna(0)
-        else:
-            #dpsDF_final['nodpsROC']=dpsDF_final.netPNL/dpsDF_final.netEquity
-            #dpsDF_final['dpsROC']=dpsDF_final.dpsNetPNL/dpsDF_final.dpsNetEquity
-            signalDF['tripleFiltered']=signalDF['tripleFiltered'].append(dpsDF_all.sort_values(by=metric, ascending=mr).iloc[0])
-            index2 = signalDF['tripleFiltered'].index.intersection(data_primer_ga.index)
-            signalDF['tripleFiltered'].set_value(index2,'gainAhead',data_primer_ga.ix[index2].values) 
-            signalDF['tripleFiltered']=reCalcEquity(signalDF['tripleFiltered'], metric)
-    '''
+        
     #print dpsDF_all.sort_values(by=metric2, ascending=mr).iloc[0]
     #print signalDF['tripleFiltered'].iloc[-1]    
             
@@ -1512,7 +1433,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                             #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                             #shortStart=(shortStart, data2.Close[shortStart]),\
                             cycleList=cycleList,mode=modePred[start:],\
-                            signals=finalDF,chartTitle=ticker+contractExpiry+' WF by B/W by '+metric3,\
+                            signals=finalDF,chartTitle=ticker+' WF by B/W by '+metric3,\
                             savePath=chartSavePath+'_FINAL', debug=debug
                             )
                             
@@ -1525,7 +1446,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricB,chartTitle=ticker+contractExpiry+' WF by Best  '+metric2,\
+                                signals=DpsRankByMetricB,chartTitle=ticker+' WF by Best  '+metric2,\
                                 savePath=chartSavePath+'_BRANK', debug=debug
                                 )
                                 
@@ -1536,7 +1457,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricW,chartTitle=ticker+contractExpiry+' WF by Worst '+metric2,\
+                                signals=DpsRankByMetricW,chartTitle=ticker+' WF by Worst '+metric2,\
                                 savePath=chartSavePath+'_WRANK', debug=debug
                                 )    
         else:
@@ -1548,7 +1469,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricB,chartTitle=ticker+contractExpiry+' WF by Best '+metric2,\
+                                signals=DpsRankByMetricB,chartTitle=ticker+' WF by Best '+metric2,\
                                 savePath=chartSavePath+'_BRANK', debug=debug
                                 )
                                 
@@ -1559,7 +1480,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=DpsRankByMetricW,chartTitle=ticker+contractExpiry+' WF by Worst '+metric2,\
+                                signals=DpsRankByMetricW,chartTitle=ticker+' WF by Worst '+metric2,\
                                 savePath=chartSavePath+'_WRANK', debug=debug
                                 )       
                             
@@ -1580,7 +1501,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
-                                signals=signalSets[is_period],chartTitle=ticker+contractExpiry+' '+is_period,\
+                                signals=signalSets[is_period],chartTitle=ticker+' '+is_period,\
                                 savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                 )
             else:
@@ -1591,27 +1512,25 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         #minorPeak=(minorPeak, data2.Close[minorPeak]),\
                                         shortStart=(shortStart, data2.Close[shortStart]),\
                                         cycleList=cycleList,mode=modePred[start:],\
-                                        signals=signalSets[is_period],chartTitle=ticker+contractExpiry+' '+is_period,\
+                                        signals=signalSets[is_period],chartTitle=ticker+' '+is_period,\
                                         savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                         )
 if showCharts:
     modes = mrClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
                                         data.Close.shape[0],threshold=adfPvalue,\
-                                        showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE2')
+                                        showPlot=debug, ticker=ticker, savePath=chartSavePath+'_MODE2')
     if debug:
         for x in signalSets:
             for algo in signalSets[x]:
-                signalSets[x][algo].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'_'+algo+'.csv')
+                signalSets[x][algo].to_csv('C:/users/hidemi/desktop/python/'+x+'_'+algo+'.csv')
         for x in DpsRankByMetricB:
-            DpsRankByMetricB[x].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'.csv') 
+            DpsRankByMetricB[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
         for x in DpsRankByMetricW:
-            DpsRankByMetricW[x].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'.csv') 
+            DpsRankByMetricW[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
         for x in finalDF:
-            finalDF[x].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'.csv') 
+            finalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv') 
         for x in signalDF:
-            signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'.csv')
-
-   
+            signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv')
 
 '''
 for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
@@ -1634,10 +1553,12 @@ for k,v, in signalDF.iteritems():
             
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
+
 if showCharts:
     if startDate == None:
-        sdate=data.index[0].to_datetime()
+        sdate=data.index[-validationSetLength].to_datetime()
         startDate = datetime.date(sdate.year, sdate.month, sdate.day)
+
     zz.plot_pivots(l=8,w=8,\
                         #startValley=(startValley, data2.Close[startValley]),\
                         #startPeak=(startPeak, data2.Close[startPeak]),\
@@ -1647,8 +1568,8 @@ if showCharts:
                         cycleList=cycleList,mode=modePred[start:],\
                         signals={maxk:signalDF[maxk]},
                         #signals=signalDF,\
-                        chartTitle=ticker+contractExpiry+' vStart '+str(startDate)\
-                        +' SIGNAL '+maxk,\
+                        chartTitle=ticker+' vStart '+str(startDate)\
+                        +' SIGNAL '  + maxk,\
                         savePath=chartSavePath+'_SIGNAL', debug=debug
                         )
 if useDPSsafef:

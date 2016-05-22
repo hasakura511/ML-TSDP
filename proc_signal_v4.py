@@ -70,7 +70,7 @@ def start_systems():
       threads = []        
       systemList=dict()
         
-      systemdata=pd.read_csv('./data/systems/system_+'sys.argv[1]+'.csv')
+      systemdata=pd.read_csv('./data/systems/system_'+sys.argv[1]+'.csv')
       systemdata=systemdata.reset_index()
       for i in systemdata.index:
           system=systemdata.ix[i]

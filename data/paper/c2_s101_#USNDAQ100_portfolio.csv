@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#USNDAQ100,open,short,2.0,0.0,4336.57,0.0,-8.67314,0.0,8.67314,122.0,,,,,#USNDAQ100,,20160520 04:01:12 EST,20160520 04:01:12 EST,-2.0,USD,,,92120.45374,54509999.0,93188.0
+#USNDAQ100,open,long,2.0,0.0,4364.11,0.0,-8.72822,0.0,8.72822,123.0,,,,,#USNDAQ100,,20160520 22:58:45 EST,20160520 22:58:45 EST,2.0,USD,,,89357.67044,54943656.0,90434.0

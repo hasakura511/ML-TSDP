@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Japan225,open,long,2.0,0.0,16735.0,0.0,-33.47,0.0,33.47,141.0,,,,,#Japan225,,20160520 16:05:37 EST,20160520 16:05:37 EST,2.0,USD,,,-46591.646,233235300.0,-41900.0
+#Japan225,open,long,2.0,0.0,16735.0,0.0,-33.47,0.0,33.47,147.0,,,,,#Japan225,,20160521 12:14:56 EST,20160521 12:14:56 EST,2.0,USD,,,-53392.4,243273000.0,-48500.0

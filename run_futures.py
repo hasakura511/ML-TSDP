@@ -1648,7 +1648,7 @@ if showCharts:
                         signals={maxk:signalDF[maxk]},
                         #signals=signalDF,\
                         chartTitle=ticker+contractExpiry+' vStart '+str(startDate)\
-                        +' SIGNAL '+maxk,\
+                        +' lb'+str(supportResistanceLB)+' SIGNAL '+maxk,\
                         savePath=chartSavePath+'_SIGNAL', debug=debug
                         )
 if useDPSsafef:

@@ -214,36 +214,56 @@ class zigzag(object):
         ax.xaxis.set_major_locator(mondays)
         ax.xaxis.set_minor_locator(alldays)
         ax.xaxis.set_major_formatter(weekFormatter)
-        
-        candlestick_ohlc(ax, self.candlesticks, width=0.6, colorup='g')
-        plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
-        ax.xaxis_date()
-        ax.autoscale_view()
         dates = [x[0] for x in self.candlesticks]
         dates = np.asarray(dates)
+        
+        #volume
+        volume = [x[5] for x in self.candlesticks]
+        volume = np.asarray(volume)
+        ax.fill_between(dates,0, volume, facecolor='#0079a3', alpha=0.4)
+        #scale the x-axis tight
+        #ax.set_xlim(min(dates),max(dates))
+        # the y-ticks for the bar were too dense, keep only every third one
+        yticks = ax.get_yticks()
+        ax.set_yticks(yticks[::2])
+        ax.yaxis.set_label_position("left")
+        ax.set_ylabel('Volume', size=12)
+        ax.grid(True)
+        plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+        #price candles
+        ax2p=ax.twinx()
+        candlestick_ohlc(ax2p, self.candlesticks, width=0.6, colorup='g')
+        
+        ax2p.xaxis_date()
+        ax2p.autoscale_view()
+
         sma=pd.rolling_mean(self.prices,5)
         bbu=sma+pd.rolling_std(self.prices,5)
         bbl=sma-pd.rolling_std(self.prices,5)
-        #plt.rc('lines', linewidth=1)
-        ax.plot(dates,sma,'k:',label='SMA5', linewidth=1.5)
-        ax.plot(dates,bbu,'k-.',label='BBU', linewidth=1.5)
-        ax.plot(dates,bbl,'k-.',label='BBL', linewidth=1.5)
-        handles, labels = ax.get_legend_handles_labels()
-        lgd = ax.legend(handles, labels, loc='best',prop={'size':10})
+        runs=pd.DataFrame(np.where(self.prices<sma,-1,1),columns=['col'])
+        runs['block'] = (runs['col'] != runs['col'].shift(1)).astype(int).cumsum()
+        runs['count'] = runs.groupby('block').transform(lambda x: range(1, len(x) + 1))
         
-        ax2v=ax.twinx()
-
-        volume = [x[5] for x in self.candlesticks]
-        volume = np.asarray(volume)
-        ax2v.fill_between(dates,0, volume, facecolor='#0079a3', alpha=0.4)
-        #scale the x-axis tight
-        #ax2v.set_xlim(min(dates),max(dates))
-        # the y-ticks for the bar were too dense, keep only every third one
-        yticks = ax2v.get_yticks()
-        ax2v.set_yticks(yticks[::2])
-        ax2v.yaxis.set_label_position("right")
-        ax2v.set_ylabel('Volume', size=l)
-        ax2v.grid(True)
+        #plt.rc('lines', linewidth=1)
+        ax2p.plot(dates,sma,'k:',label='SMA5', linewidth=1.5)
+        ax2p.plot(dates,bbu,'k-.',label='BBU', linewidth=1.5)
+        ax2p.plot(dates,bbl,'k-.',label='BBL', linewidth=1.5)
+        handles, labels = ax2p.get_legend_handles_labels()
+        lgd = ax2p.legend(handles, labels, loc='best',prop={'size':10})
+        ax2p.yaxis.set_label_position("right")
+        ax2p.set_ylabel('Price', size=12)
+        #print runs['count']
+        for i,count in enumerate(runs['count']):
+            if runs['col'][i]<0:
+                xytext=(-3,-20)
+            else:
+                xytext=(-3,20)
+                
+            ax2p.annotate(str(count), (dates[i], self.prices[i]),
+                         xytext=xytext, textcoords='offset points',
+                         size='medium')
+                
+        #indicators
         ax3 = plt.subplot2grid((2,1), (1,0), rowspan=1, colspan=1)
 
         def format_date(x, pos=None):

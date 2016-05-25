@@ -1,3 +1,3 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-EURJPY,open,long,4.0,0.0,122.612,0.0,-2.0,0.0,2.0,5.0,,,,,EURJPY,,20160524 05:23:02 EST,20160524 05:23:02 EST,4.0,JPY,-5.24000000001,-3.24000000001,99791.2,1954739.72,99809.2
-CHFJPY,open,short,4.0,0.0,110.558,0.0,-2.0,0.0,2.0,6.0,,,,,CHFJPY,,20160524 05:23:04 EST,20160524 05:23:04 EST,-4.0,JPY,1.96,3.96,99789.2,1914938.84,99809.2
+EURJPY,open,long,4.0,2.0,122.612,123.042,73.4,77.4,4.0,5.0,20160525 13:37:52 EST,20160525 13:37:52 EST,20160525 13:37:52 EST,,EURJPY,,20160524 05:23:02 EST,20160524 05:23:02 EST,-2.0,JPY,75.4,77.4,99864.6,1937086.4,99886.6
+CHFJPY,open,short,4.0,2.0,110.558,111.233,-125.5,-121.5,4.0,6.0,20160525 13:37:54 EST,20160525 13:37:54 EST,20160525 13:37:54 EST,,CHFJPY,,20160524 05:23:04 EST,20160524 05:23:04 EST,2.0,JPY,119.5,121.5,99741.1,1957108.34,99765.1

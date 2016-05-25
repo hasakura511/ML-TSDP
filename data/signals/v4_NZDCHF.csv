@@ -355,3 +355,5 @@ dates,dpsNetEquity,netEquity,CAR25,dd95,ddTol,dpsCommission,dpsNetPNL,dpsRunName
 2016.05.23 00:00,,,,,,,,,,,,,,,,1.0,,,1.0,,20160523 07:04:34 ,
 2016.05.24 00:00,,,,,,,,,,,,,,,,1.0,,,1.0,,20160523 22:01:13 ,
 2016-05-24 00:00:00,103473.32,108187.78,0.00804574158906,0.0047745045262,0.0029488391231,0.0,-238.79,both_gainAhead_PCA10_VotingSoft DPS wl10.0 maxL2 dd95_0.003 thres_0.0,2.0,0.0,wf_is_pv3s_v2v,-124.69,0.0,1.0,gainAhead_PCA10_VotingSoft,1.0,,,1.0,-134.5757,20160523 21:45:25 EDT,gainAhead_PCA10_f10_is11
+2016-05-25 00:00:00,114368.7,110134.35,0.0348850119263,0.00172623498945,0.00309276856414,0.0,531.01,both_gainAhead_VotingSoft DPS wl11.0 maxL2 dd95_0.003 thres_0.0,2.0,0.0,wf_is_pv2e_p2p,256.27,0.0,1.0,gainAhead_VotingSoft,1.0,,,1.0,-206.095383333,20160524 20:33:54 EDT,gainAhead_VotingSoft_f23_is16
+2016-05-25 00:00:00,114055.5,109950.36,0.0291172660634,0.00194204763261,0.00309276856414,0.0,149.86,both_gainAhead_VotingSoft DPS wl11.0 maxL2 dd95_0.003 thres_0.0,2.0,0.0,wf_is_pv2e_p2p,72.28,0.0,1.0,gainAhead_VotingSoft,1.0,,,1.0,140.350366667,20160525 02:20:21 EDT,gainAhead_VotingSoft_f23_is16

@@ -82,8 +82,8 @@ def generate_v4plots(counter, html, cols):
             counter=0
             body = body + '<h1>Signal - ' + file + '</h1><br><center><table>'
             for ver in vd:
-                v=ver.split('.')[0]
-                v2=file.split('_')[0]
+                v=ver.rsplit('.',1)[0]
+                v2=file.rsplit('_',1)[0]
                 if v == v2:
                     if os.path.isfile('./data/results/' + ver + '.png'):
                         (counter, body)=generate_html(ver, counter, body, cols)
@@ -118,36 +118,41 @@ def generate_sigplots(counter, html, cols):
 
     syms=symdict.keys()
     syms.sort()
+    genstrat=''
+    if len(sys.argv)>2:
+	   genstrat=sys.argv[2]
     for sym in syms:
-        filename=sym
-        fn='./data/results/signal_' + filename + '.html'
-        #html = html + '<li><a href="' + 'signal_' + filename + '.html">'
-        #html = html + filename + '</a></li>'
-                
-        headerhtml=get_html_header()                
-        headerhtml = re.sub('Index', filename, headerhtml.rstrip())
-        headerhtml = headerhtml 
-        counter=0
-        body=' '
-        files=symdict[sym]
-        files.sort()
-         
-        for file in files:
+        if len(genstrat) == 0 or genstrat == sym:
+            filename=sym
+            fn='./data/results/signal_' + filename + '.html'
+            #html = html + '<li><a href="' + 'signal_' + filename + '.html">'
+            #html = html + filename + '</a></li>'
+                    
+            headerhtml=get_html_header()                
+            headerhtml = re.sub('Index', filename, headerhtml.rstrip())
+            headerhtml = headerhtml 
             counter=0
-            body = body + '<h1>Signal - ' + file + '</h1><br><center><table>'
-            for ver in vd:
-                v=ver.split('.')[0]
-                v2=file.split('_')[0]
-                if v == v2:
-                    if os.path.isfile('./data/results/' + ver + '.png'):
-                        (counter, body)=generate_html(ver, counter, body, cols)
+            body=' '
+            files=symdict[sym]
+            files.sort()
+             
+            for file in files:
+                counter=0
+                body = body + '<h1>Signal - ' + file + '</h1><br><center><table>'
+                for ver in vd:
+                    v=ver.rsplit('.',1)[0]
+                    v2=file.rsplit('_',1)[0]
+                    if v == v2:
+                        if os.path.isfile('./data/results/' + ver + '.png'):
+                            (counter, body)=generate_html(ver, counter, body, cols)
+                    
+                (counter, body)=generate_sig_html(file, counter, body, cols, True)
+                body = body + '</table></center>'
+                (body, counter, cols)=gen_paper(body, counter, cols, 2, file)
                 
-            (counter, body)=generate_sig_html(file, counter, body, cols, True)
-            body = body + '</table></center>'
-            (body, counter, cols)=gen_paper(body, counter, cols, 2, file)
+            footerhtml=get_html_footer()
+            write_html(fn, headerhtml, footerhtml, body)
             
-        footerhtml=get_html_footer()
-        write_html(fn, headerhtml, footerhtml, body)
                           
     return (counter, html)     
 
@@ -772,7 +777,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         (system, ibbal, ibppnl, ibmm, ibpmm, ibstart, ibend, c2bal, c2ppnl, c2mm, c2pmm, c2start, c2end)=eqrank.ix[systemname]
         html = html + '<tr><td><li><a href="' 
         if type == 'signal' or type == 'v4':
-            html = html +  type + '_' + urllib.quote(systemname.split('_')[1])
+            html = html +  type + '_' + urllib.quote(systemname.rsplit('_',1)[1])
         else:
             html = html +  type + '_' + urllib.quote(systemname + str(recent))
         if c2bal > 0:
@@ -793,7 +798,7 @@ def gen_eq_rank(systems, recent, html, type='paper'):
         html = html + '<td><li><a href="' 
         
         if type == 'signal' or type == 'v4':
-            html = html +  type + '_' + urllib.quote(systemname.split('_')[1])
+            html = html +  type + '_' + urllib.quote(systemname.rsplit('_',1)[1])
         elif type == 'c2' or type == 'c2_2':
             html = html + 'paper' + '_' + urllib.quote(systemname) + str(recent)
         else:
@@ -1187,6 +1192,7 @@ def write_html(filename, headerhtml, footerhtml, body):
     f.write(body)
     f.write(footerhtml)
     f.close() 
+    
 types=['index','sig','c2','c2_2','ib','paper','paper2','btc','v4','create']
 def start_resgen():
     #Prep

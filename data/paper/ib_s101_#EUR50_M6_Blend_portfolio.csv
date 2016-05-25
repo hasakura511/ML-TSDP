@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#EUR50_M6,#EUR50_M6,,2.0,2.0,2920.0,2920.0,0.0,5.84,0.0,-12867.75,-12500.0,Paper,USD,
+#EUR50_M6,#EUR50_M6,,2.0,2.0,3051.0,3051.0,-305100.0,6.102,0.0,-6.102,0.0,Paper,USD,

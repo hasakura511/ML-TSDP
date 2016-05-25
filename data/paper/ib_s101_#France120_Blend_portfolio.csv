@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#France120,#France120,,2.0,2.0,3411.34,3411.34,0.0,6.82268,0.0,-4457.21212,-4293.0,Paper,USD,
+#France120,#France120,,-2.0,-2.0,3548.24,3548.24,-354824.0,7.09648,0.0,-7.09648,0.0,Paper,USD,

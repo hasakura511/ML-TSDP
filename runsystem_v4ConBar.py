@@ -155,8 +155,8 @@ def runPairs():
     version='v3'
     verbose=True
     lookback=1
-    buy=['USD','NZD']
-    sell=['JPY']
+    buy=[]
+    sell=[]
     off=[]
     currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
     currencies = [x for x in currencies if x not in buy+sell+off]
@@ -366,8 +366,8 @@ def runPairs():
     offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
     
     if allOff:
-        buyHold=['USDJPY','USDCAD','USDCHF','EURGBP','EURAUD','GBPAUD','GBPCAD']
-        sellHold=['AUDJPY','CADJPY','AUDUSD','EURUSD','NZDUSD']
+        buyHold=['GBPAUD']
+        sellHold=['AUDJPY','CADJPY','EURUSD','EURCHF','EURGBP','EURNZD','EURCAD']
         #offline=currencyPairs
         offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
         
@@ -427,6 +427,13 @@ def runPairs():
         filename=signalPath + version+'_'+ ticker+ '.csv'
         #logging.info( 'Saving', filename
         signalFile.to_csv(filename, index=True)
+        
+    lastPrices=pd.DataFrame()
+    for pair in sorted(currencyPairs):
+        data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0).iloc[-1]
+        lastPrices.set_value(pair,data.name,data.Close)
+    lastPrices.to_csv(pairPath+'lastCurrencyPrices.csv')
+    
     logging.info( str(nsig)+'signals saved')
     subprocess.call(['python', 'proc_signal_v2.py','1','v1stratFX105'])  
     

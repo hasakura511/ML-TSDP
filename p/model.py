@@ -242,7 +242,8 @@ def get_signal(lookback, portfolio, argv):
     name = './p/data/' + file + '.csv'
     folds=10
     interval=['30m_']
-    
+    if len(argv) > 5:
+            playSafe=argv[5]
     if len(argv) > 1 and argv[1] == '1':
         ############## idx ##############    
         symbol = '^GSPC'
@@ -262,8 +263,7 @@ def get_signal(lookback, portfolio, argv):
         symbol = 'EURJPY'
         if len(argv) > 4:
             symbol=argv[4]
-        if len(argv) > 5:
-            playSafe=argv[5]
+        
         algolist=['RF','KNN','SVM','ADA','QDA','GBayes','Voting', 'LDA'] #'GTB','BNB','ET','SGD'
         interval=['30m_']     
         file=interval[0] + symbol
@@ -338,6 +338,8 @@ def get_signal(lookback, portfolio, argv):
         folds=10
         print 'Starting s101 for: ',symbol
     elif len(argv) > 1 and argv[1] == '7':
+        algolist=['BNB','ADA','KNN','ET'] #'GTB','BNB','ET','SGD'
+        
         #symbol = '^GSPC'
         symbol = '#S&P500_M6'
         if len(argv) > 4:
@@ -352,10 +354,11 @@ def get_signal(lookback, portfolio, argv):
                     '30m_#FRA40_M6.csv',
                     '30m_#SWI20_M6.csv']
         file='30m_' + symbol
+        print 'Processing Symbol ', file
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #date = datetime.datetime(2016,04,15,22,30,00)  
-        start_test = date - datetime.timedelta(days=3)  
+        start_test = date - datetime.timedelta(days=30)  
         start_period = start_test - datetime.timedelta(days=1500)
         path_datasets= np.array(['./data/from_MT4/fut/'])
         name = './p/data/' + file + '.csv'
@@ -364,6 +367,8 @@ def get_signal(lookback, portfolio, argv):
         print 'Starting s101 for: ',symbol
     elif len(argv) > 1 and argv[1] == '8':
         #symbol = '^GSPC'
+        algolist=['KNN','GBayes','Voting','BNB'] #'GTB','BNB','ET','SGD'
+        
         symbol = '#USSPX500'
         if len(argv) > 4:
             symbol=argv[4]
@@ -398,7 +403,7 @@ def get_signal(lookback, portfolio, argv):
         file='30m_' + symbol
         bar=bars.get_bar(symbol)
         date=parse(bar.index[-1])
-        start_test = date - datetime.timedelta(days=3)
+        start_test = date - datetime.timedelta(days=30)
         start_period = start_test - datetime.timedelta(hours=1000)
         path_datasets= np.array(['./data/from_MT4/',
                                  #'./data/from_MT4/fut/',
@@ -507,8 +512,8 @@ def next_signal(lookback, portfolio, argv):
         print algo, '#',count, ' Accuracy: ', accuracy ,'% Returns: $', equity, \
             ' Accuracy W. Returns: $', accWR, ' Next Signal: ', nextSignal[algo], ''
             
-        if playSafe == '1' and accuracy >=99 and accWR >= 0:
-            if accuracy > accurateModelRate or (accuracy == accurateModelRate and accWR > accurateModelWR):
+        if playSafe == '1' and accuracy >=98 and accWR >= 0:
+            if accuracy >= accurateModelRate or (accuracy == accurateModelRate and accWR >= accurateModelWR):
                 accurateModel=algo
                 accurateModelRate=accuracy
                 accurateModelWR=accWR

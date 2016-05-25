@@ -454,3 +454,4 @@ dates,dpsNetEquity,netEquity,CAR25,dd95,ddTol,dpsCommission,dpsNetPNL,dpsRunName
 2016.05.23 00:00,,,,,,,,,,,,,,,,1.0,,,1.0,,20160523 07:04:34 ,
 2016.05.24 00:00,,,,,,,,,,,,,,,,0.0,,,0.0,,20160523 22:01:14 ,
 2016-05-25 00:00:00,107638.73,104169.05,0.000517439477665,0.0,0.00114208048144,0.0,52.99,both_gainAhead_VotingSoft DPS wl1.5 maxL2 dd95_0.001 thres_0.0,2.0,0.0,wf_is_pv3s_v2v,25.65,0.0,1.0,gainAhead_VotingSoft,1.0,,,1.0,-222.222783333,20160524 20:17:46 EDT,gainAhead_VotingSoft_f27_is24
+2016-05-25 00:00:00,107627.69,104078.57,-0.00189618890619,0.0,0.00114208048144,2.15259686041,-136.33,both_gainAhead_VotingSoft DPS wl1.5 maxL2 dd95_0.001 thres_0.0,1.0,0.0,wf_is_pv3s_v2v,-64.83,0.0,1.0,gainAhead_VotingSoft,1.0,,,1.0,124.227083333,20160525 02:04:13 EDT,gainAhead_VotingSoft_f27_is24

@@ -1,4 +1,12 @@
+AD
 BO
+BP
+C
+CC
+CD
+CL
+CT
+DX
 EC
 ED
 ES
@@ -34,6 +42,8 @@ US
 W
 XX
 YM
+AX
 CA
+DT
 UB
 UZ

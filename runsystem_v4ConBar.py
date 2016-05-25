@@ -143,7 +143,7 @@ def onBar(bar, symbols):
                 
     
 def runPairs():
-    allOff=False
+    allOff=True
     debug=False
     savePath = './data/results/'
     dataPath = './data/from_MT4/'
@@ -152,11 +152,11 @@ def runPairs():
 
     with open(pairPath+'currencies.txt') as f:
         currencyPairs = f.read().splitlines()
-    version='v4'
+    version='v3'
     verbose=True
     lookback=1
-    buy=['NZD']
-    sell=[]
+    buy=['USD','NZD']
+    sell=['JPY']
     off=[]
     currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
     currencies = [x for x in currencies if x not in buy+sell+off]
@@ -366,9 +366,10 @@ def runPairs():
     offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
     
     if allOff:
-        buyHold=[]
-        sellHold=[]
-        offline=currencyPairs
+        buyHold=['USDJPY','USDCAD','USDCHF','EURGBP','EURAUD','GBPAUD','GBPCAD']
+        sellHold=['AUDJPY','CADJPY','AUDUSD','EURUSD','NZDUSD']
+        #offline=currencyPairs
+        offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
         
     if verbose:
         logging.info( str(startDate)+' to '+str(data.index[-1]))
@@ -427,7 +428,7 @@ def runPairs():
         #logging.info( 'Saving', filename
         signalFile.to_csv(filename, index=True)
     logging.info( str(nsig)+'signals saved')
-    subprocess.call(['python', 'proc_signal_v2.py'])  
+    subprocess.call(['python', 'proc_signal_v2.py','1','v1stratFX105'])  
     
 def runPair_v1(pair):
     offline=True

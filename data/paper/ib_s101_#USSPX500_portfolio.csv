@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#USSPX500,#USSPX500,,2.0,2.0,2048.11,2048.11,0.0,4.09622,0.0,-28340.5104,-27579.0,Paper,USD,
+#USSPX500,#USSPX500,,-2.0,-2.0,2059.47,2059.47,0.0,4.11894,0.0,-27092.83066,-26319.0,Paper,USD,

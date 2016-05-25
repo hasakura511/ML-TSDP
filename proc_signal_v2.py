@@ -74,6 +74,7 @@ def start_systems():
       systemdata=systemdata.reset_index()
       for i in systemdata.index:
           system=systemdata.ix[i]
+          #print system, sys.argv[2]
           if len(sys.argv) < 2 or (len(sys.argv[2]) > 0 and sys.argv[2] == system['Name']):
               if systemList.has_key(system['Name']):
                   systemList[system['Name']]=systemList[system['Name']].append(system)

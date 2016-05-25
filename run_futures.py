@@ -76,7 +76,7 @@ from suztoolz.loops import calcEquity2, createBenchmark, createYearlyStats, find
 from suztoolz.display import displayRankedCharts
 from suztoolz.datatools.loadFutures import loadFutures
 from suztoolz.datatools.acPeriodogram import acPeriodogram
-from suztoolz.datatools.zigzag import zigzag as zg
+from suztoolz.datatools.zigzag2 import zigzag as zg
 from suztoolz.datatools.mrClassifier import mrClassifier
 from suztoolz.position_sizing.calcDPS import calcDPS
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
@@ -349,9 +349,9 @@ if len(sys.argv)==1:
     addAux = True
     
     #display params
-    showCharts=False
+    showCharts=True
     showFinalChartOnly=True
-    showIndicators = False
+    showIndicators = True
     verbose=True
 else:
     debug=False
@@ -799,7 +799,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         
     #decrease stdev until there are three pivot points
     while majorPeak ==None or majorValley == None or minorPeak ==None or minorValley == None:
-        zz = zg(data.Close,data.Close.pct_change().std()*zz_std,\
+        zz = zg(data,data.Close.pct_change().std()*zz_std,\
                     -data.Close.pct_change().std()*zz_std)
                     
         #data2 has integer index
@@ -967,7 +967,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         zz_std = inner_zz_std
         while len(inner_pv_sorted)<3 and zz_std>0.5:
             #print len(inner_pv_sorted),
-            zz_inner=zg(data.iloc[index].Close,data.iloc[index].Close.pct_change().std()*zz_std,\
+            zz_inner=zg(data.iloc[index],data.iloc[index].Close.pct_change().std()*zz_std,\
                     -data.iloc[index].Close.pct_change().std()*zz_std)
             inner_peaks = [x for x  in np.where(zz_inner.peak_valley_pivots()==1)[0]]
             inner_valleys = [x for x  in np.where(zz_inner.peak_valley_pivots()==-1)[0]]

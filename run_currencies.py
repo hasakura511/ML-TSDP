@@ -325,9 +325,9 @@ if len(sys.argv)==1:
     addAuxPairs = True
     
     #display params
-    showCharts=True
+    showCharts=False
     showFinalChartOnly=True
-    showIndicators = True
+    showIndicators = False
     verbose=True
 else:
     debug=False
@@ -1532,13 +1532,14 @@ if showCharts:
         for x in signalDF:
             signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv')
 
-'''
+
 for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
     for k, v in d.iteritems():
         signalDF[k]=v
-'''
+
 for is_period in signalSets:
     for k,v in signalSets[is_period].iteritems():
+    #for k,v in DpsRankByMetricW.iteritems():
         signalDF[is_period+'_'+k]=v
         
 ne=0

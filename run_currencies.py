@@ -259,7 +259,7 @@ barSizeSetting='1d'
 if len(sys.argv)==1:
     debug=True
     supportResistanceLB=50
-    startDate=datetime.date(2016,5,2)
+    startDate=datetime.date(2016,4,20)
     endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     validationSetLength = np.busday_count(startDate, endDate)
@@ -294,13 +294,13 @@ if len(sys.argv)==1:
                     #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
-                    'EURUSD',\
+                    #'EURUSD',\
                     #'EURAUD',\
                     #'EURCAD',\
                     #'EURNZD',\
                     #'AUDUSD',\
                     #'GBPUSD',\
-                    #'USDCAD',\
+                    'USDCAD',\
                     #'USDCHF',\
                     #'NZDUSD',
                     #'AUDCAD',\
@@ -336,7 +336,7 @@ else:
         startDate=None
         #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
         #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-        validationSetLength = 50
+        validationSetLength = 25
         supportResistanceLB = max(validationSetLength,50)
         #Model Parameters
         #supportResistanceLB = 25

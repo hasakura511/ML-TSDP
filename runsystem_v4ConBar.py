@@ -366,8 +366,8 @@ def runPairs():
     offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
     
     if allOff:
-        buyHold=['GBPAUD']
-        sellHold=['AUDJPY','CADJPY','EURUSD','EURCHF','EURGBP','EURNZD','EURCAD']
+        buyHold=['EURCAD','USDCAD','GBPUSD','EURUSD','AUDCAD']
+        sellHold= ['NZDCAD','EURGBP']
         #offline=currencyPairs
         offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
         

@@ -1,3 +1,4 @@
 permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
 1,Paper,Paper,8.65378,USD,GLOBEX,1.0,,,1.0,4326.89,2.0,0.0,-184.65378,SLD,#USNDAQ100,USD,20160508 06:03:46 EST,,-176.0,99815.34622,2432689.0,99815.34622,4328.65,99824.0,99824.0,-184.65378
 2,Paper,Paper,8.65378,USD,GLOBEX,2.0,,,1.0,4326.89,2.0,0.0,-184.65378,SLD,#USNDAQ100,USD,20160509 03:43:19 EST,,-176.0,99630.69244,2865378.0,99630.69244,4328.65,99648.0,99648.0,-184.65378
+3,Paper,Paper,9.01634,USD,GLOBEX,3.0,,,1.0,4508.17,2.0,0.0,-1074.01634,BOT,#USNDAQ100,USD,20160527 12:07:30 EST,,-1065.0,98556.6761,3316195.0,98556.6761,4497.52,98583.0,98583.0,-1074.01634

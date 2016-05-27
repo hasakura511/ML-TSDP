@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Denmark20,open,short,2.0,0.0,998.29,0.0,-2.0,0.0,2.0,114.0,,,,,#Denmark20,,20160525 09:33:22 EST,20160525 09:33:22 EST,-2.0,USD,,,74948.0,12657737.0,75176.0
+#Denmark20,open,short,2.0,0.0,996.65,0.0,-2.0,0.0,2.0,120.0,,,,,#Denmark20,,20160527 08:01:22 EST,20160527 08:01:22 EST,-2.0,USD,,,73913.99946,13255702.0,74154.0

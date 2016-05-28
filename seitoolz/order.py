@@ -41,28 +41,37 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, 
         
         if system_c2pos_qty > c2_pos_qty:
             c2quant=system_c2pos_qty - c2_pos_qty
+            isrev=False
+            psigid=0
             if c2_pos_qty < 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 logging.info( 'BTC: ' + str(qty) )
-                place_c2order('BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
+                psigid=place_c2order('BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
+                isrev=True                
                 c2quant = c2quant - qty
-                sleep(2)
-            
+                
             if c2quant > 0:
                 logging.info( 'BTO: ' + str(c2quant) )
-                place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+                if isrev:
+                    place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
+                else:
+                    place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
         if system_c2pos_qty < c2_pos_qty:
             c2quant=c2_pos_qty - system_c2pos_qty   
-            
+            isrev=False
+            psigid=0
             if c2_pos_qty > 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 logging.info( 'STC: ' + str(qty) )
-                place_c2order('STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
+                psigid=place_c2order('STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 c2quant = c2quant - qty
-                sleep(2)
+
             if c2quant > 0:
                 logging.info( 'STO: ' + str(c2quant) )
-                place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+                if isrev:
+                    place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
+                else:
+                    place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
    
     if ibsubmit:
         ib_pos_qty=get_ib_pos(ibsym, ibcurrency)

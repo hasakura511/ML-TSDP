@@ -260,7 +260,7 @@ with open('./data/futures.txt') as f:
 if len(sys.argv)==1:
     debug=True
     supportResistanceLB=60
-    startDate=datetime.date(2016,4,20)
+    startDate=datetime.date(2016,3,31)
     endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     validationSetLength = np.busday_count(startDate, endDate)
@@ -299,7 +299,7 @@ if len(sys.argv)==1:
                     #'EC',
                     #'ED',
                     #'ES',
-                    #'FC',
+                    'FC',
                     #'FV',
                     #'GC',
                     #'HG',
@@ -309,7 +309,7 @@ if len(sys.argv)==1:
                     #'LB',
                     #'LC',
                     #'LN',
-                    'MD',
+                    #'MD',
                     #'MP',
                     #'NG',
                     #'NQ',
@@ -349,13 +349,13 @@ if len(sys.argv)==1:
     addAux = True
     
     #display params
-    showCharts=True
+    showCharts=False
     showFinalChartOnly=True
-    showIndicators = True
+    showIndicators = False
     verbose=True
 else:
     debug=False
-    if len(sys.argv)==2:
+    if len(sys.argv)==3:
         liveFutures=[sys.argv[1]]
         #Model Parameters
         startDate=None
@@ -363,7 +363,14 @@ else:
         supportResistanceLB = 90
         #supportResistanceLB = 90
         #bias=['gainAhead','zigZag']
-        bias=['gainAhead','zigZag','buyHold','sellHold']
+       
+        if sys.argv[2] == '1':
+            bias=['buyHold']
+        elif sys.argv[2] == '-1':
+            bias=['sellHold']
+        else:
+            bias=['gainAhead','zigZag','buyHold','sellHold']
+
         adfPvalue=3
         #validationSetLength =90
         #useSignalsFrom='highest_level3_netEquity'
@@ -1213,7 +1220,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
             zz_inner.plot_pivots(l=8,w=8, cycleList=cycleList2,mode=modePred.ix[data.iloc[index].index],\
                                            indicators=indicator_df, chartTitle=ticker+' '+is_period,\
                                            savePath=chartSavePath+'_TECH_'+is_period, debug=debug)
-                                           
+                                               
     dpsDF_all = pd.DataFrame()
     #set to lb for stability
     #windowLength = supportResistanceLB

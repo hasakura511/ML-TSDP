@@ -355,7 +355,14 @@ else:
         #Model Parameters
         #supportResistanceLB = max(validationSetLength,int(sys.argv[2]))
         #validationSetLength =int(sys.argv[3])
-        bias=['gainAhead','zigZag','buyHold','sellHold']
+        
+        if sys.argv[4] == '1':
+            bias=['buyHold']
+        elif sys.argv[4] == '-1':
+            bias=['sellHold']
+        else:
+            bias=['gainAhead','zigZag','buyHold','sellHold']
+            
         adfPvalue=0
         
         #useSignalsFrom='highest_level3_netEquity'

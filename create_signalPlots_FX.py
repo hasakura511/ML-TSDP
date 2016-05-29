@@ -35,7 +35,7 @@ start_time = time.time()
 size = (8,7)
 #versions = ['v1.3','v4.3']
 versions = ['v4.3']
-barSize='30m'
+barSize='1d'
 #regime switching params
 lookback = 30
 
@@ -45,7 +45,7 @@ with open('./data/currencies.txt') as f:
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
     signalPath = './data/signals/'
-    dataPath = './data/from_IB/'
+    dataPath = './data/from_MT4/'
     equityCurveSavePath = './data/signalPlots/'
     pngPath = './data/results/'
     showPlot = False
@@ -54,7 +54,7 @@ else:
     signalPath = 'D:/ML-TSDP/data/signals/' 
     #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
-    dataPath = 'D:/ML-TSDP/data/from_IB/'
+    dataPath = 'D:/ML-TSDP/data/from_MT4/'
     bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     equityCurveSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
 
@@ -485,17 +485,20 @@ for pair in pairs:
                 #if 'prior_index' in signalFile:
                 #prior index is the key for valid signal rows
                 sst = signalFile.sort_index()
-                
+                sst.index = sst.index.to_datetime()
+                    
                 #remove rows with duplicate indices
                 reindexed_sst = pd.DataFrame()
                 for i,x in enumerate(sst.index):
                     if i ==0:
                         reindexed_sst = reindexed_sst.append(sst.iloc[i])
-                    elif x != reindexed_sst.index[-1]:
+                    elif x == reindexed_sst.index[-1]:
+                        reindexed_sst = reindexed_sst.drop(reindexed_sst.index[-1])
                         reindexed_sst = reindexed_sst.append(sst.iloc[i])
                     else:
-                        #case where last index was a dupe
-                        pass
+                        #case where last index is new
+                        reindexed_sst = reindexed_sst.append(sst.iloc[i])
+                        
                 dataFile.index = dataFile.index.to_datetime()
                 reindexed_sst.index = reindexed_sst.index.to_datetime()
                 intersect = reindexed_sst.index.to_datetime()\

@@ -490,17 +490,20 @@ for contract in futures:
                 #if 'prior_index' in signalFile:
                 #prior index is the key for valid signal rows
                 sst = signalFile.sort_index()
+                sst.index = sst.index.to_datetime()
                 
                 #remove rows with duplicate indices
                 reindexed_sst = pd.DataFrame()
                 for i,x in enumerate(sst.index):
                     if i ==0:
                         reindexed_sst = reindexed_sst.append(sst.iloc[i])
-                    elif x != reindexed_sst.index[-1]:
+                    elif x == reindexed_sst.index[-1]:
+                        reindexed_sst = reindexed_sst.drop(reindexed_sst.index[-1])
                         reindexed_sst = reindexed_sst.append(sst.iloc[i])
                     else:
-                        #case where last index was a dupe
-                        pass
+                        #case where last index is new
+                        reindexed_sst = reindexed_sst.append(sst.iloc[i])
+                        
                 dataFile.index = dataFile.index.to_datetime()
                 reindexed_sst.index = reindexed_sst.index.to_datetime()
                 intersect = reindexed_sst.index.to_datetime()\

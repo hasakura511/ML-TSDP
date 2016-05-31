@@ -380,7 +380,7 @@ class zigzag(object):
 
                     
             handles, labels = ax4.get_legend_handles_labels()
-            lgd2 = ax4.legend(handles, labels, loc='best',prop={'size':10})
+            lgd2 = ax4.legend(handles, labels, loc='lower left',prop={'size':10})
             ax4.set_xlim(0, nrows)
             #ax4.get_xaxis().get_major_formatter().set_useOffset(False)
             #ax4.get_xaxis().get_major_formatter().set_scientific(False)

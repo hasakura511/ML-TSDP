@@ -303,7 +303,7 @@ class zigzag(object):
 
                     
             handles, labels = ax2.get_legend_handles_labels()
-            lgd2 = ax2.legend(handles, labels, loc='best',prop={'size':10})
+            lgd2 = ax2.legend(handles, labels, loc='lower left',prop={'size':10})
             ax2.set_xlim(0, nrows)
             #ax2.get_xaxis().get_major_formatter().set_useOffset(False)
             #ax2.get_xaxis().get_major_formatter().set_scientific(False)

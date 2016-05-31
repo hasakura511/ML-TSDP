@@ -259,7 +259,7 @@ barSizeSetting='1d'
 if len(sys.argv)==1:
     debug=True
     supportResistanceLB=50
-    startDate=datetime.date(2016,4,20)
+    startDate=datetime.date(2016,5,10)
     endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     validationSetLength = np.busday_count(startDate, endDate)
@@ -277,7 +277,7 @@ if len(sys.argv)==1:
     #cycle mode->threshold=1.1
     #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    adfPvalue=0
+    adfPvalue=1
     #auto ->threshold = 0.2
     #adfPvalue=1.1
     
@@ -300,9 +300,9 @@ if len(sys.argv)==1:
                     #'EURNZD',\
                     #'AUDUSD',\
                     #'GBPUSD',\
-                    'USDCAD',\
+                    #'USDCAD',\
                     #'USDCHF',\
-                    #'NZDUSD',
+                    'NZDUSD',
                     #'AUDCAD',\
                     #'AUDCHF',\
                     #'AUDNZD',\
@@ -341,7 +341,7 @@ else:
         #Model Parameters
         #supportResistanceLB = 25
         bias=['gainAhead','zigZag','buyHold','sellHold']
-        adfPvalue=0
+        adfPvalue=1
         #validationSetLength =45
         #useSignalsFrom='highest_level3_netEquity'
     else:
@@ -363,7 +363,7 @@ else:
         else:
             bias=['gainAhead','zigZag','buyHold','sellHold']
             
-        adfPvalue=0
+        adfPvalue=1
         
         #useSignalsFrom='highest_level3_netEquity'
         #bias=[sys.argv[2]]

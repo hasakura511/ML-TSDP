@@ -730,6 +730,40 @@ def ATR(ph,pl,pc,lb):
         trAvg[i] = trAvg[i] / pc[i]    
     return(trAvg)
     
+def ATR2(ph,pl,pc,lb):
+    #not as %of close
+    # Average True Range technical indicator.
+    # ph, pl, pc are the series high, low, and close.
+    # lb, the lookback period.  An integer number of bars.
+    # True range is computed as a fraction of the closing price.
+    # Return is a numpy array of floating point values.
+    # Values are non-negative, with a minimum of 0.0.
+
+    nrows = pc.shape[0]
+    th = np.zeros(nrows)
+    tl = np.zeros(nrows)
+    tc = np.zeros(nrows)
+    tr = np.zeros(nrows)
+    trAvg = np.zeros(nrows)
+    
+    for i in range(1,nrows):
+        if ph[i] > pc[i-1]:
+            th[i] = ph[i]
+        else:
+            th[i] = pc[i-1]
+        if pl[i] < pc[i-1]:
+            tl[i] = pl[i]
+        else:
+            tl[i] = pc[i-1]
+        tr[i] = th[i] - tl[i]
+    for i in range(lb,nrows):
+        trAvg[i] = tr[i]            
+        for j in range(1,lb-1):
+            trAvg[i] = trAvg[i] + tr[i-j]
+        trAvg[i] = trAvg[i] / lb
+        trAvg[i] = trAvg[i]
+    return(trAvg)
+    
 #  ----------------------------------
 
 def priceChange(p):

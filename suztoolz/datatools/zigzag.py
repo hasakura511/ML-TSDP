@@ -28,7 +28,8 @@ import matplotlib.ticker as tick
 from cycler import cycler
 import seaborn as sns
 from itertools import cycle
-from  suztoolz.position_sizing.calcDPS import calcDPS
+from matplotlib.finance import candlestick_ohlc
+
 mpl.rcParams["axes.formatter.useoffset"] = False
 class zigzag(object):
     '''

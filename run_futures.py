@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-v4.0
+v4
 premise:
 The premise for this system is that there is an insample period in the recent history
 that is in sync with the future market out of sample period.  This insample period can be 
@@ -74,7 +74,7 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
 
 from suztoolz.loops import calcEquity2, createBenchmark, createYearlyStats, findBestDPS
 from suztoolz.display import displayRankedCharts
-from suztoolz.datatools.loadFutures import loadFutures
+from suztoolz.datatools.loadFuturesCSI import loadFutures
 from suztoolz.datatools.acPeriodogram import acPeriodogram
 from suztoolz.datatools.zigzag2 import zigzag as zg
 from suztoolz.datatools.mrClassifier import mrClassifier
@@ -251,11 +251,9 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
 version = 'v4'
 version_ = 'v4.3'
 asset = 'FX'
-filterName = 'DF1'
-data_type = 'ALL'
+#filterName = 'DF1'
+#data_type = 'ALL'
 barSizeSetting='1D'
-with open('./data/futures.txt') as f:
-    auxFutures = f.read().splitlines()
 
 if len(sys.argv)==1:
     debug=True
@@ -287,60 +285,90 @@ if len(sys.argv)==1:
     #supportResistanceLB = 180
     #validationSetLength = 90
     liveFutures =  [
-                    #'AD',
-                    #'BO',
-                    #'BP',
-                    #'C',
-                    #'CC',
-                    #'CD',
-                    #'CL',
-                    #'CT',
-                    #'DX',
-                    #'EC',
-                    #'ED',
-                    #'ES',
-                    'FC',
-                    #'FV',
-                    #'GC',
-                    #'HG',
-                    #'HO',
-                    #'JY',
-                    #'KC',
-                    #'LB',
-                    #'LC',
-                    #'LN',
-                    #'MD',
-                    #'MP',
-                    #'NG',
-                    #'NQ',
-                    #'NR',
-                    #'O',
-                    #'OJ',
-                    #'PA',
-                    #'PL',
-                    #'RB',
-                    #'RU',
-                    #'S',
-                    #'SB',
-                    #'SF',
-                    #'SI',
-                    #'SM',
-                    #'TU',
-                    #'TY',
-                    #'US',
-                    #'W',
-                    #'XX',
-                    #'YM',
-                    #'AX',
-                    #'CA',
-                    #'DT',
-                    #'UB',
-                    #'UZ'
-                    ]
+                         #'AC',
+                         #'AD',
+                         #'AEX',
+                         #'BO',
+                         #'BP',
+                         #'C',
+                         #'CC',
+                         #'CD',
+                         #'CGB',
+                         #'CL',
+                         #'CT',
+                         #'CU',
+                         #'DX',
+                         #'EBL',
+                         #'EBM',
+                         #'EBS',
+                         #'ED',
+                         #'EMD',
+                         #'ES',
+                         #'FCH',
+                         #'FC',
+                         #'FDX',
+                         #'FEI',
+                         #'FFI',
+                         #'FLG',
+                         #'FSS',
+                         #'FV',
+                         #'GC',
+                         #'HCM',
+                         #'HG',
+                         #'HIC',
+                         #'HO',
+                         #'JY',
+                         #'KC',
+                         #'KW',
+                         #'LB',
+                         #'LCO',
+                         #'LC',
+                         #'LGO',
+                         #'LH',
+                         #'LRC',
+                         #'LSU',
+                         #'MEM',
+                         #'MFX',
+                         #'MP',
+                         #'MW',
+                         #'NE',
+                         #'NG',
+                         #'NIY',
+                         #'NQ',
+                         #'O',
+                         #'OJ',
+                         #'PA',
+                         #'PL',
+                         #'RB',
+                         #'RR',
+                         #'RS',
+                         #'S',
+                         #'SB',
+                         #'SF',
+                         #'SI',
+                         #'SIN',
+                         #'SJB',
+                         #'SM',
+                         #'SMI',
+                         #'SSG',
+                         #'STW',
+                         #'SXE',
+                         #'TF',
+                         #'TU',
+                         #'TY',
+                         #'US',
+                         #'VX',
+                         #'W',
+                         #'YA',
+                         #'YB',
+                         #'YM',
+                         #'YT2',
+                         'YT3'
+                         ]
     ticker =liveFutures[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
     #dataPath = 'D:/data/tickerData/'
-    dataPath = 'D:/ML-TSDP/data/tickerData/'
+    dataPath = 'D:/ML-TSDP/data/csidata/v4futures/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
@@ -403,7 +431,7 @@ else:
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
     signalPath = './data/signals/'
-    dataPath = './data/tickerData/'
+    dataPath = './data/csidata/v4futures/'
     chartSavePath = './data/results/'+version+'_'+ticker
     
     #adds auxilary pair features
@@ -415,6 +443,9 @@ else:
     showIndicators = False
     verbose=False
 
+#aux futures
+files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+auxFutures = [x.split('_')[0] for x in files]
 
 
 

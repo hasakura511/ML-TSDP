@@ -95,18 +95,21 @@ def loadFutures(auxFutures, dataPath, barSizeSetting, maxlb, ticker,\
     if addAux:    
         for contract in auxFutures:    
             #if 'F_'+contract+'.txt' in files and (ticker[0:3] in contract or ticker[3:6] in contract):
-            filename = [f for f in files if contract in f][0]
-            data = pd.read_csv(dataPath+filename, index_col=0)
+            filename = contract+'_B.CSV'
+            data = pd.read_csv(dataPath+filename, index_col=0, header=None)
+            
             #data = data.drop([' P',' R', ' RINFO'],axis=1)
             #data = ratioAdjust(data)
             data.index = pd.to_datetime(data.index,format='%Y%m%d')
             data.columns = ['Open','High','Low','Close','Volume','OI','R']
+            data.index.name = 'Dates'
             #contract = ''.join([i for i in contract if not i.isdigit()])
             if 'YT' not in contract:
                 contract = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
             else:
                 contract=contract.split('_')[0]
-                
+            #print contract
+            
             if data.shape[0] < maxlb:
                 if contract == ticker:
                     message =  'Not enough data to create indicators: #rows\
@@ -200,14 +203,19 @@ def loadFutures(auxFutures, dataPath, barSizeSetting, maxlb, ticker,\
                     
         return dataSet, futuresDict3
     else:
-        #futuresDict = {}
-        #files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-        #if ticker+'_B.csv' in files:
-        filename = [f for f in files if ticker in f][0]
-        data = pd.read_csv(dataPath+filename, index_col=0)
+        filenames = [f for f in files if ticker in f.split('_')[0]]
+        if len(filenames)>1:
+            if ticker+'_B.CSV' in filenames:
+                filename= ticker+'_B.CSV'
+            elif ticker+'2_B.CSV' in filenames:
+                filename= ticker+'2_B.CSV'
+        else:
+            filename=filenames[0]
+        data = pd.read_csv(dataPath+filename, index_col=0, header=None)
         #data = ratioAdjust(data)
         #data = data.drop([' P',' R', ' RINFO'],axis=1)
         data.index = pd.to_datetime(data.index,format='%Y%m%d')
+        data.index.name = 'Dates'
         data.columns = ['Open','High','Low','Close','Volume','OI','R']
         if data.shape[0] < maxlb:
             message =  'Not enough data to create indicators: #rows\

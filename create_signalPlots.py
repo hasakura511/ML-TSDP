@@ -354,6 +354,10 @@ def calcEquity_signals(SST, title, **kwargs):
     if pngPath != None and pngFilename != None:
         
         spstr=pngFilename.split('_')
+        if len(spstr) ==1:
+            FR=spstr[0]
+        else:
+            FR=spstr[1]
         #print pngFilename, spstr
         if len(spstr) == 3:
             (ver, inst, mins)=spstr
@@ -366,8 +370,8 @@ def calcEquity_signals(SST, title, **kwargs):
             
         print 'Saving: ' + pngPath+pngFilename+'.png'
         plt.savefig(pngPath+pngFilename+'.png', bbox_inches='tight')
-        print 'Saving: ' + pngPath+spstr[1]+'_FUTURES_RESULTS.png'
-        plt.savefig(pngPath+spstr[1]+'_FUTURES_RESULTS.png', bbox_inches='tight')
+        print 'Saving: ' + pngPath+FR+'_FUTURES_RESULTS.png'
+        plt.savefig(pngPath+FR+'_FUTURES_RESULTS.png', bbox_inches='tight')
         
     if showPlot:
         plt.show()

@@ -3,6 +3,7 @@ import pandas as pd
 import time
 import os
 import json
+import logging
 from pandas.io.json import json_normalize
 from time import gmtime, strftime, time, localtime, sleep
 
@@ -30,14 +31,19 @@ def get_dps_model_pos(systems):
     for system in systems:
         filename='./data/signals/' + system + '.csv'
         if os.path.isfile(filename):
-            data = pd.read_csv(filename, index_col='dates').iloc[-1]
-            signals=data['signals'];
-            safef=data['safef'];
-            qty=safef*signals
-            #signal=signals[-1];
-            qty=round(qty)
-            signal=qty
-            pos=pos.append(pd.DataFrame([[system, signal, qty]], columns=['system','action','qty']))
+            try:
+                data = pd.read_csv(filename, index_col='dates').iloc[-1]
+                signals=data['signals'];
+                safef=data['safef'];
+                qty=safef*signals
+                #signal=signals[-1];
+                qty=round(qty)
+                signal=qty
+                pos=pos.append(pd.DataFrame([[system, signal, qty]], columns=['system','action','qty']))
+            except Exception as e:
+                print 'Error processing: ', filename
+                os.remove(filename);
+                logging.error("something bad happened", exc_info=True)
         else:
             pos=pos.append(pd.DataFrame([[system, 0, 0]], columns=['system','action','qty']))
         #pos=pos.append({'sym':system, 'action':signal, 'qty':qty}, ignore_index=True)

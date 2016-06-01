@@ -264,13 +264,13 @@ def get_signal(lookback, portfolio, argv):
         if len(argv) > 4:
             symbol=argv[4]
         
-        algolist=['RF','KNN','SVM','ADA','QDA','GBayes','Voting', 'LDA'] #'GTB','BNB','ET','SGD'
+        #algolist=['RF','KNN','SVM','ADA','QDA','GBayes','Voting', 'LDA'] #'GTB','BNB','ET','SGD'
         interval=['30m_']     
         file=interval[0] + symbol
         bar=bars.get_bar(file)
         date=parse(bar.index[-1])
         #start_period = datetime.datetime(2015,12,15)  
-        start_test = date - datetime.timedelta(days=3)  
+        start_test = date - datetime.timedelta(days=30)  
         start_period = start_test - datetime.timedelta(hours=2000)
         path_datasets=np.array(['./data/from_IB/'])
         name = './p/data/' + file + '.csv'
@@ -338,7 +338,7 @@ def get_signal(lookback, portfolio, argv):
         folds=10
         print 'Starting s101 for: ',symbol
     elif len(argv) > 1 and argv[1] == '7':
-        algolist=['BNB','ADA','KNN','ET'] #'GTB','BNB','ET','SGD'
+        #algolist=['BNB','ADA','KNN','ET'] #'GTB','BNB','ET','SGD'
         
         #symbol = '^GSPC'
         symbol = '#S&P500_M6'
@@ -367,7 +367,7 @@ def get_signal(lookback, portfolio, argv):
         print 'Starting s101 for: ',symbol
     elif len(argv) > 1 and argv[1] == '8':
         #symbol = '^GSPC'
-        algolist=['KNN','GBayes','Voting','BNB'] #'GTB','BNB','ET','SGD'
+        #algolist=['KNN','GBayes','Voting','BNB'] #'GTB','BNB','ET','SGD'
         
         symbol = '#USSPX500'
         if len(argv) > 4:
@@ -519,12 +519,11 @@ def next_signal(lookback, portfolio, argv):
                 accurateModelWR=accWR
         count = count - 1
         
-    if revlowperf:
-        (ranking, accurateModel, accurateModelRate, accurateModelWR)=backtest_revsignals(lookback, portfolio, bars, portfolioData, returns, ranking, bestalgo)
+    (ranking, accurateModel, accurateModelRate, accurateModelWR)=backtest_blend(lookback, portfolio, bars, portfolioData, returns, ranking, bestalgo)
     
     # Get Best Model
     (bestModel,bestAccuracy) =ranking[-1]
-    if playSafe == '1' and accurateModelRate > 0:
+    if playSafe == '1':
         bestModel=accurateModel
         bestAccuracy=accurateModelRate
     print 'Best Model: ',bestModel,' Next Signal:',nextSignal[bestModel]
@@ -566,6 +565,7 @@ def get_blend(signals):
     bpred[bpred==0]=-1
     algos=signals.keys()
     for algo in algos:
+        print 'Blend with: ', algo
         # Replace 0 with -1 for trading
         (prediction, accuracy)=signals[algo]
         prediction=np.array(prediction)
@@ -577,6 +577,7 @@ def get_blend(signals):
 
 def get_bt_signals(bars, bestalgo, updates):
     global sighist
+    global lastSignal
     algos=bestalgo.keys()
     print 'BT New Algos: ',updates
     print 'BT Algos: ', algos
@@ -602,7 +603,7 @@ def get_bt_signals(bars, bestalgo, updates):
          
         # replace the zeros with -1 (new encoding for Down day)
         #signals.ix[signals[algo] == 0, algo] = -1
-        signals[algo+'_pos'] = signals[algo].diff()  
+        signals[algo+'_pos'] = signals[algo].diff()
     return (signals, algos)
 
 def get_nextSignal(bestalgo, updates):
@@ -628,6 +629,89 @@ def get_nextSignal(bestalgo, updates):
         logging.info(algo + ' Next Signal: ' + str(nextSignal[algo]))
     print 'Best Model: ',bestModel, ' Accuracy: ', signals[bestModel][1]
 
+def backtest_blend(lookback, portfolio, bars, portfolioData, returns, ranking, bestalgo):
+    global nextSignal
+    global lastSignal
+    global start_period
+    global start_test
+    global symbol
+    global file
+    global path_datasets
+    global name
+    global folds
+    global bestModel
+    global interval
+    global dataSets
+    global sighist
+    global qty
+    global algolist
+    bestModelFile='./p/params/bestModel.pickle'
+    
+    parameters=list()
+    parameters.append(bestModelFile)    
+    parameters.append(interval)
+    parameters.append(lookback)
+    accurateModel=''
+    accurateModelRate=0
+    accurateModelWR=0
+    updates=list()
+    count=len(ranking)
+    for [algo,accWR] in ranking:
+        equity=returns[algo]
+        accuracy= round(portfolioData[algo]['accuracy'][-1],2)*100
+        #print algo, '#',count, ' Accuracy: ', accuracy ,'% Returns: $', equity, \
+        #    ' Accuracy W. Returns: $', accWR, ' Next Signal: ', nextSignal[algo], ''
+        # Reverse inaccurate signal to get accurate signal
+        [ba, bwr]=ranking[-1]
+        if accWR < 0  or accWR < bwr*0.5:
+            (prediction,acc)=bestalgo[algo]
+            c=np.array(prediction)
+            c[c==1]=2
+            c[c<0]=1
+            c[c==2]=-1
+            accuracy=100-accuracy
+            del bestalgo[algo]
+            print 'Taking out ', algo
+            #algo=algo+'Rev'
+            #bestalgo[algo]=(c,accuracy)
+            #updates.append(algo)
+            
+        count = count - 1
+        
+    # Generate new blend
+    blendalgo=file+'_Blend2'
+    #del bestalgo[blendalgo]
+    
+    bestalgo[blendalgo]=get_blend(bestalgo)
+    #sighist[blendalgo]=np.array(sighist[blendalgo][0])[:-1]
+    #bestalgo[blendalgo]=sighist[blendalgo]
+    #nextSignal[blendalgo]=sighist[blendalgo][0][-1]
+    updates.append(blendalgo)
+    
+    #Update next signals
+    get_nextSignal(bestalgo, updates)
+    
+    #Backtest again
+    (signals, algos)=get_bt_signals(bars, bestalgo, updates)
+    portfolio.setInit(symbol, bars, signals, algos, nextSignal, lastSignal, parameters, 0, qty)
+    (portfolioData, returns, ranking)=portfolio.backtest_portfolio()
+    
+    #Rank Backtest Result
+    count=len(ranking)
+    for [algo,accWR] in ranking:
+        equity=returns[algo]
+        accuracy= round(portfolioData[algo]['accuracy'][-1],2)*100
+        print algo, '#',count, ' Accuracy: ', accuracy ,'% Returns: $', equity, \
+            ' Accuracy W. Returns: $', accWR, ' Next Signal: ', nextSignal[algo], ''
+            
+        if playSafe == '1' and ((accuracy >=98 and accWR >= 0) or re.search(r'Blend', algo)):
+            #if accuracy > accurateModelRate or (accuracy == accurateModelRate and accWR > accurateModelWR):
+            accurateModel=algo
+            accurateModelRate=accuracy
+            accurateModelWR=accWR
+        count = count - 1
+    return (ranking, accurateModel, accurateModelRate, accurateModelWR)
+    
 def backtest_revsignals(lookback, portfolio, bars, portfolioData, returns, ranking, bestalgo):
     global nextSignal
     global lastSignal

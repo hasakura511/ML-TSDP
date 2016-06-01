@@ -64,6 +64,7 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, 
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 logging.info( 'STC: ' + str(qty) )
                 psigid=place_c2order('STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
+                isrev=True 
                 c2quant = c2quant - qty
 
             if c2quant > 0:

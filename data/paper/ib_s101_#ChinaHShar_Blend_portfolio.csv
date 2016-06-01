@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#ChinaHShar,#ChinaHShar,,-2.0,-2.0,8579.65,8579.65,0.0,17.1593,0.0,-14387.7186,-14302.0,Paper,USD,
+#ChinaHShar,#ChinaHShar,,2.0,2.0,8706.14,8706.14,-870614.0,17.41228,0.0,-17.41228,0.0,Paper,USD,

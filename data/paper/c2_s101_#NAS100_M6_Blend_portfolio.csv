@@ -1,2 +1,2 @@
 symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#NAS100_M6,open,short,2.0,0.0,4512.75,0.0,-9.0255,0.0,9.0255,109.0,,,,,#NAS100_M6,,20160528 09:14:42 EST,20160528 09:14:42 EST,-2.0,USD,,,98485.9905,49297925.0,99450.0
+#NAS100_M6,open,long,2.0,0.0,4525.25,0.0,-9.0505,0.0,9.0505,7.0,,,,,#NAS100_M6,,20160531 21:20:33 EST,20160531 21:20:33 EST,2.0,USD,,,100861.704,4259750.0,100925.0

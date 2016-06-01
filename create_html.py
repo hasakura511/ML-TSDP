@@ -11,7 +11,7 @@ f.write('Starting createhtml: ' )
 
 ferr=open ('/logs/createhtml_err.log','a')
 ferr.write('Starting createhtml: ' )
-subprocess.call(['python','create_signalPlotsFutures.py','1'], stdout=f, stderr=ferr)
+subprocess.call(['python','create_signalPlots.py','1'], stdout=f, stderr=ferr)
 for contract in futures:
 	subprocess.call(['python','get_results.py','create',version+'_'+contract,'2'], stdout=f, stderr=ferr)
 	

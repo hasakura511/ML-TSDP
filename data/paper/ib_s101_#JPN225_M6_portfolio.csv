@@ -1,2 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
-#JPN225_M6,#JPN225_M6,,-2.0,-2.0,16910.0,16910.0,-1691000.0,33.82,0.0,-33.82,0.0,Paper,USD,
+#JPN225_M6,#JPN225_M6,,2.0,2.0,17110.0,17110.0,-1711000.0,34.22,0.0,-34.22,0.0,Paper,USD,

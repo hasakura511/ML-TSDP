@@ -1,2 +1,0 @@
-permid,account,clientid,commission,commission_currency,exchange,execid,expiry,level_0,orderid,price,qty,openqty,realized_PnL,side,symbol,symbol_currency,times,yield_redemption_date,PurePL,balance,margin_available,mark_to_mkt,openprice,pure_mark_to_mkt,purebalance,real_pnl
-1,Paper,Paper,18.7218,USD,GLOBEX,1.0,,,1.0,9360.9,2.0,0.0,-2518.7218,BOT,#ChinaA50,USD,20160511 19:18:40 EST,,-2500.0,97481.2782,2936090.0,97481.2782,9335.9,97500.0,97500.0,-2518.7218

@@ -23,7 +23,7 @@ lookback=1
 currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
 #currencies = ['EUR', 'GBP', 'JPY', 'USD']
 barSizeSetting='1d'
-for i in range(7,-1,-lookback):
+for i in range(2,-1,-lookback):
     #startDate=dt(2016, 5, i,0,00)
     cMatrix=pd.DataFrame()
     for currency in currencies:

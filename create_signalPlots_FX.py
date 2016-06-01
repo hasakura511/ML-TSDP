@@ -367,6 +367,7 @@ def calcEquity_signals(SST, title, **kwargs):
             
         print 'Saving: ' + pngPath+pngFilename+'.png'
         plt.savefig(pngPath+pngFilename+'.png', bbox_inches='tight')
+        plt.savefig(pngPath+pngFilename+'_FX_RESULTS.png', bbox_inches='tight')
         
     if showPlot:
         plt.show()
@@ -648,7 +649,7 @@ for title in eCurves_bySystem:
         (ver, inst, mins)=spstr
         (ver1, ver2)=ver.split('.')
         dI_title = ver1 + '_' + inst
-    print 'Saving: ' + equityCurveSavePath+dI_title+'.csv'    
+    print 'Saving: ' + equityCurveSavePath+dI_title+'_FX.csv'    
     eCurves[title2].to_csv(equityCurveSavePath+dI_title+'.csv')
     
     #print 'Validation Period from %s to %s' % (str(equityCons.index[0]), str(equityCons.index[-1]))

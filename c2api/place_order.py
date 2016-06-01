@@ -1,16 +1,20 @@
 import requests
 from time import gmtime, strftime, time, localtime, sleep
 import logging
+import pandas as pd
 
-sigid=1000
+data=pd.read_csv('./data/c2api/sigid.csv').iloc[-1]
+sigid=int(data['sigid'])
 
 def place_order(action, quant, sym, type, systemid, submit,apikey, parentsig=None):
+    global sigid
     if submit == False:
         return 0;
     url = 'https://collective2.com/world/apiv2/submitSignal'
     
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
-    sigid=sigid+1
+    sigid=int(sigid)+1
+    
     data = { 
     		"apikey":   apikey, # "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
     		"systemid": systemid, 
@@ -25,7 +29,9 @@ def place_order(action, quant, sym, type, systemid, submit,apikey, parentsig=Non
                "conditionalupon": parentsig
     		} 
     	}
-    
+    logging.info( 'sigid is: ' + str( sigid ))
+    dataf=pd.DataFrame([[sigid]], columns=['sigid'])
+    dataf.to_csv('./data/c2api/sigid.csv')    
     params={}
     
     r=requests.post(url, params=params, json=data);

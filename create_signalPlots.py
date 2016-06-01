@@ -52,12 +52,11 @@ if len(sys.argv) > 1:
     verbose = False
 else:
     #signalPath = 'D:/ML-TSDP/data/signals/' 
-    signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    signalPath = 'D:/ML-TSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
     dataPath = 'D:/ML-TSDP/data/csidata/v4futures/'
     #bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     equityCurveSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
-
     pngPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
     showPlot = True
     verbose = True

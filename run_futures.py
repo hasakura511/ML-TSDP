@@ -362,8 +362,8 @@ if len(sys.argv)==1:
                          #'YA',
                          #'YB',
                          #'YM',
-                         #'YT2',
-                         'YT3'
+                         'YT2',
+                         #'YT3'
                          ]
     ticker =liveFutures[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
@@ -1020,7 +1020,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         avgHalfCycle=average(np.array(inner_halfCycles))
         
         #correlation < 2 creates inf
-        if avgHalfCycle < 2:
+        if avgHalfCycle < 2 or is_period=='wf_is_short':
             avgHalfCycle =2
             
         #short is last half cycle to idnetify current market sync. 

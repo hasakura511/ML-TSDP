@@ -952,7 +952,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         #x2 for full cycle length
         avgHalfCycle=average(np.array(inner_halfCycles))
         #correlation < 2 creates inf
-        if avgHalfCycle < 2:
+        if avgHalfCycle < 2 or is_period=='wf_is_short':
             avgHalfCycle =2
             
         #windowLengths[is_period] = avgHalfCycle

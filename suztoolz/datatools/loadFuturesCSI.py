@@ -102,6 +102,11 @@ def loadFutures(auxFutures, dataPath, barSizeSetting, maxlb, ticker,\
             data.index = pd.to_datetime(data.index,format='%Y%m%d')
             data.columns = ['Open','High','Low','Close','Volume','OI','R']
             #contract = ''.join([i for i in contract if not i.isdigit()])
+            if 'YT' not in contract:
+                contract = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
+            else:
+                contract=contract.split('_')[0]
+                
             if data.shape[0] < maxlb:
                 if contract == ticker:
                     message =  'Not enough data to create indicators: #rows\

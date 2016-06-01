@@ -336,7 +336,7 @@ else:
         startDate=None
         #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
         #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-        validationSetLength = 25
+        validationSetLength = 3
         supportResistanceLB = max(validationSetLength,50)
         #Model Parameters
         #supportResistanceLB = 25

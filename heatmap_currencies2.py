@@ -106,7 +106,12 @@ for i in range(2,-1,-lookback):
         print 'buyHold',len(buyHold),buyHold
         print 'sellHold',len(sellHold),sellHold
         print 'offline',len(offline),offline
-
+        
+lastPrices=pd.DataFrame()
+for pair in sorted(currencyPairs):
+    data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0).iloc[-1]
+    lastPrices.set_value(pair,data.name,data.Close)
+lastPrices.to_csv(pairPath+'lastCurrencyPrices.csv')
 '''
 with open(pairPath+'buyHold_currencies.txt','w') as f:
     for pair in buyHold:

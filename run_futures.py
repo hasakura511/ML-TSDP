@@ -305,7 +305,7 @@ if len(sys.argv)==1:
                          #'EMD',
                          #'ES',
                          #'FCH',
-                         #'FC',
+                         'FC',
                          #'FDX',
                          #'FEI',
                          #'FFI',
@@ -362,7 +362,7 @@ if len(sys.argv)==1:
                          #'YA',
                          #'YB',
                          #'YM',
-                         'YT2',
+                         #'YT2',
                          #'YT3'
                          ]
     ticker =liveFutures[0]
@@ -387,8 +387,8 @@ else:
         liveFutures=[sys.argv[1]]
         #Model Parameters
         startDate=None
-        validationSetLength = 90
-        supportResistanceLB = 90
+        validationSetLength = 3
+        supportResistanceLB = 60
         #supportResistanceLB = 90
         #bias=['gainAhead','zigZag']
        
@@ -413,8 +413,8 @@ else:
             validationSetLength = np.busday_count(startDate, endDate)
             supportResistanceLB = max(validationSetLength,int(sys.argv[3]))
         else:
-            supportResistanceLB = int(sys.argv[2])
-            validationSetLength = int(sys.argv[3])
+            validationSetLength = int(sys.argv[2])
+            supportResistanceLB = int(sys.argv[3])
         #Model Parameters
         #supportResistanceLB = int(sys.argv[2])
         #validationSetLength = int(sys.argv[3])
@@ -796,12 +796,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                     
     #set the data to move one bar at a time. 
     data = dataSet[i:i+supportResistanceLB]
-    if len(data.iloc[data.R.nonzero()]) == 0:
-        #no expiry info in the lookback
-        if start==0:
-            contractExpiry=''
-    else:
-        contractExpiry = str(data.iloc[data.R.nonzero()].R.iloc[-1])
+    contractExpiry = str(data.R.iloc[-1])
         
     nrows = data.shape[0]
     data.index = data.index.to_datetime()
@@ -1674,7 +1669,7 @@ sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
 if showCharts:
     if startDate == None:
-        sdate=data.index[0].to_datetime()
+        sdate=data.index[-validationSetLength].to_datetime()
         startDate = datetime.date(sdate.year, sdate.month, sdate.day)
     zz.plot_pivots(l=8,w=8,\
                         #startValley=(startValley, data2.Close[startValley]),\

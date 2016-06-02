@@ -258,10 +258,12 @@ barSizeSetting='1D'
 if len(sys.argv)==1:
     debug=True
     supportResistanceLB=60
-    startDate=datetime.date(2016,3,31)
-    endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
-    endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-    validationSetLength = np.busday_count(startDate, endDate)
+    #startDate=datetime.date(2016,3,31)
+    #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+    #validationSetLength = np.busday_count(startDate, endDate)
+    startDate=None
+    validationSetLength = 10
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
     
@@ -387,7 +389,7 @@ else:
         liveFutures=[sys.argv[1]]
         #Model Parameters
         startDate=None
-        validationSetLength = 3
+        validationSetLength = 10
         supportResistanceLB = 60
         #supportResistanceLB = 90
         #bias=['gainAhead','zigZag']
@@ -397,7 +399,7 @@ else:
         elif sys.argv[2] == '-1':
             bias=['sellHold']
         else:
-            bias=['gainAhead','zigZag','buyHold','sellHold']
+            bias=['gainAhead','zigZag']
 
         adfPvalue=3
         #validationSetLength =90

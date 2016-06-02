@@ -36,9 +36,11 @@ refresh=False
 if len(sys.argv)==1:
     dataPath='D:/ML-TSDP/data/csidata/v4futures/'
     savePath='D:/ML-TSDP/data/'
+    signalPath = 'D:/ML-TSDP/data/signals/' 
 else:
     dataPath='./data/csidata/v4futures/'
     savePath='./data/'
+    signalPath = './data/signals/' 
     
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 marketList = [x.split('_')[0] for x in files]
@@ -53,3 +55,18 @@ for sym in marketList:
 futuresDF=futuresDF.sort_index()
 print futuresDF
 futuresDF.to_csv(savePath+'futuresATR.csv')
+
+signalDF=pd.DataFrame()
+for contract in marketList:
+    if 'YT' not in contract:
+        sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
+    else:
+        sym=contract
+    signalFilename='v4_'+sym+'.csv'
+    print signalFilename
+    data = pd.read_csv(signalPath+signalFilename, index_col=0, header=None)
+    signalDF.set_value(sym,data.Date.iloc[-1],data.signals.iloc[-1])
+    
+signalDF=signalDF.sort_index()
+print signalDF
+signalDF.to_csv(savePath+'futuresSignals.csv')

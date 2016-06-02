@@ -496,8 +496,8 @@ def generate_sig_html(signal, counter, html, cols, colspan):
 def generate_html(filename, counter, html, cols, colspan=False):
     if os.path.isfile('./data/results/' + filename + '.png'):
         filename=urllib.quote(filename)
-        height=300
-        width=300
+        height=600
+        width=450
         if counter == 0 or colspan:
             html = html + '<tr>'
         html = html + '<td '

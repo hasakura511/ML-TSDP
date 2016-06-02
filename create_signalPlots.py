@@ -420,9 +420,10 @@ comms = {}
 for contract in dataFiles:
     #dataFilename = [f for f in dataFiles if contract in f][0]
     #dataFile = pd.read_csv(str(dataPath) + str(dataFilename), index_col='Date').drop_duplicates()
-    dataFile = pd.read_csv(dataPath+contract, index_col=0)
+    dataFile = pd.read_csv(dataPath+contract, index_col=0, header=None)
     #dataFile = dataFile.drop([' P',' R', ' RINFO'],axis=1)
     dataFile.index = pd.to_datetime(dataFile.index,format='%Y%m%d')
+    dataFile.index.name = 'Dates'
     #dataFile.columns = ['Open','High','Low','Close','Volume','OI']
     dataFile.columns = ['Open','High','Low','Close','Volume','OI','R']
     print 'Loaded data from', str(dataPath) + str(contract)
@@ -588,8 +589,8 @@ for title in eCurves_bySystem:
                             pd.Series(data=1, name='signals', index = dateIndexes[dI_title])],\
                             axis=1)
     #add cycletime
-    hoursTraded = (dateIndexes[dI_title][-1]-dateIndexes[dI_title][0]).total_seconds()/60.0/60.0
-    avgTrades = float(totalTrades_bySystem[dI_title])/float(title.split()[0])/hoursTraded
+    #hoursTraded = (dateIndexes[dI_title][-1]-dateIndexes[dI_title][0]).total_seconds()/60.0/60.0
+    #avgTrades = float(totalTrades_bySystem[dI_title])/float(title.split()[0])/hoursTraded
     title2 = title+' maxLag'+str(maxCT_bySystem[dI_title])
     #print '\n\n'
     eCurves[title2] = calcEquity_signals(equityCons,title2,\
@@ -598,7 +599,7 @@ for title in eCurves_bySystem:
                                     pngPath=pngPath, verbose=False, pngFilename=dI_title,\
                                     figsize=size, showPlot=showPlot, 
                                     totalTrades= totalTrades_bySystem[dI_title],
-                                    totalAvgTrades=avgTrades,
+                                    #totalAvgTrades=avgTrades,
                                     totalCommissions =  totalComms_bySystem[dI_title])
                                     
     spstr=dI_title.split('_')

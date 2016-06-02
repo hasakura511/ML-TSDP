@@ -1,1 +1,2 @@
 symbol,sym,exp,qty,openqty,price,openprice,value,avg_cost,unr_pnl,real_pnl,PurePL,accountid,currency,pure_unr_pnl
+#Swiss20,#Swiss20,,2.0,2.0,8204.3,8204.3,-820430.0,16.4086,0.0,-16.4086,0.0,Paper,USD,

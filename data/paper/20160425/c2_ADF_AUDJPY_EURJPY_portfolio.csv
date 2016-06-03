@@ -1,3 +1,0 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-AUDJPY,open,long,200000.0,0.0,82.0165,0.0,-2.8869808,0.0,2.8869808,4.0,,,,,AUDJPY,,20160408 12:25:00 EST,20160408 12:25:00 EST,200000.0,JPY,-231.6824048,-228.8,100611.079646,1748333.64,100635.14
-EURJPY,open,short,100000.0,0.0,123.6355,0.0,-2.1759848,0.0,2.1759848,5.0,,,,,EURJPY,,20160408 12:25:00 EST,20160408 12:25:00 EST,-100000.0,JPY,40.5031616,42.68,100824.307676,1748333.64,100852.72

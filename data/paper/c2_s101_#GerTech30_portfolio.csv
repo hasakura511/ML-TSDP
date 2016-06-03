@@ -1,2 +1,0 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#GerTech30,open,long,2.0,0.0,1701.3,0.0,-3.4026,0.0,3.4026,167.0,,,,,#GerTech30,,20160602 11:59:18 EST,20160602 11:59:18 EST,2.0,USD,,,41024.9784,28910820.0,41570.0

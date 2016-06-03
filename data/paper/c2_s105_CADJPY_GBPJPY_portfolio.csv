@@ -1,3 +1,0 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-CADJPY,open,long,2.0,0.0,87.635,0.0,-2.0,0.0,2.0,1.0,,,,,CADJPY,,20160425 07:05:18 EST,20160425 07:05:18 EST,2.0,JPY,0.16,2.16,99998.0,1984225.7,100000.0
-GBPJPY,open,short,2.0,0.0,160.668,0.0,-2.0,0.0,2.0,2.0,,,,,GBPJPY,,20160425 07:08:42 EST,20160425 07:08:42 EST,-2.0,JPY,-1.1,0.899999999999,99996.0,1955305.46,100000.0

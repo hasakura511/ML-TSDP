@@ -1,2 +1,0 @@
-symbol,open_or_closed,long_or_short,quant_opened,quant_closed,opening_price_VWAP,closing_price_VWAP,PL,PurePL,commission,trade_id,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,expir,instrument,markToMarket_time,openVWAP_timestamp,openedWhen,qty,currency,unr_pnl,pure_unr_pnl,balance,margin_available,purebalance
-#Nordic40,open,long,2.0,0.0,1470.33,0.0,-2.94066,0.0,2.94066,48.0,,,,,#Nordic40,,20160602 11:12:36 EST,20160602 11:12:36 EST,2.0,USD,,,89078.19596,8596136.0,89216.0

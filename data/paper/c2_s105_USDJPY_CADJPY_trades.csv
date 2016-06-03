@@ -1,3 +1,0 @@
-trade_id,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol,symbol_description,PurePL,qty,currency,balance,commission,margin_available,mark_to_mkt,pure_mark_to_mkt,purebalance
-1.0,-2.0,,,,0.0,,USDJPY,long,,20160425 07:05:17 EST,open,20160425 07:05:17 EST,111.084,,,0.0,2.0,,USDJPY,,0.0,2.0,JPY,99998.0,2.0,1980004.88,99996.9,100000.9,100000.0
-2.0,-2.0,,,,0.0,,CADJPY,short,,20160425 07:08:53 EST,open,20160425 07:08:53 EST,87.647,,,0.0,2.0,,CADJPY,,0.0,-2.0,JPY,99996.0,2.0,1964228.42,99995.78,100003.78,100000.0

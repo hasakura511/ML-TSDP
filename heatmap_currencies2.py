@@ -26,6 +26,7 @@ barSizeSetting='1d'
 for i in range(2,-1,-lookback):
     #startDate=dt(2016, 5, i,0,00)
     cMatrix=pd.DataFrame()
+    #cMatrix2=pd.DataFrame()
     for currency in currencies:
         #lookback=i
         #cMatrix[currency]=pd.DataFrame()

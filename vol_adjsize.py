@@ -37,8 +37,8 @@ refresh=False
 
 if len(sys.argv)==1:
     dataPath='D:/ML-TSDP/data/csidata/v4futures/'
-    savePath='D:/ML-TSDP/data/'
-    savePath2 ='D:/ML-TSDP/data/'
+    savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     signalPath = 'D:/ML-TSDP/data/signals/' 
 else:
     dataPath='./data/csidata/v4futures/'
@@ -81,15 +81,35 @@ sns.heatmap(ax=ax,data=corrDF)
 plt.yticks(rotation=0) 
 plt.xticks(rotation=90) 
 corrDF.to_html(savePath2+'futures_3.html')
-#plt.pcolor(futuresMatrix)
-#plt.yticks(np.arange(0.5, len(futuresMatrix.index), 1), futuresMatrix.index)
-#plt.xticks(np.arange(0.5, len(futuresMatrix.columns), 1), futuresMatrix.columns)
+
 if savePath != None:
     print 'Saving '+savePath2+'futures_3.png'
     fig.savefig(savePath2+'futures_3.png', bbox_inches='tight')
+    
 if len(sys.argv)==1:
     print data.index[0],'to',data.index[-1]
     plt.show()
+plt.close()
+
+for col in corrDF:
+    plt.figure(figsize=(8,10))
+    corrDF[col].sort_values().plot.barh(color='r')
+    plt.axvline(0, color='k')
+    plt.title(col+' Correlation'+str(lookback))
+    plt.xlim(-1,1)
+    plt.xticks(np.arange(-1,1.25,.25))
+    plt.grid(True)
+    filename='v4_'+col+'_CORREL'+'.png'
+    if savePath2 != None:
+        print 'Saving '+savePath2+filename
+        plt.savefig(savePath2+filename, bbox_inches='tight')
+    
+    if len(sys.argv)==1:
+        #print data.index[0],'to',data.index[-1]
+        plt.show()
+    plt.close()
+
+
     
 for contract in marketList:
     if 'YT' not in contract:

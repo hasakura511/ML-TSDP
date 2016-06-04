@@ -1,6 +1,6 @@
 import subprocess
 
-with open('./data/futures.txt') as f:
+with open('./data/futures2.txt') as f:
     futures = f.read().splitlines()
 
 

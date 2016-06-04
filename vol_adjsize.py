@@ -95,7 +95,7 @@ for col in corrDF:
     plt.figure(figsize=(8,10))
     corrDF[col].sort_values().plot.barh(color='r')
     plt.axvline(0, color='k')
-    plt.title(col+' Correlation'+str(lookback))
+    plt.title(col+' '+str(lookback)+' Day Correlation '+str(data.index[0])+' to '+str(data.index[-1]))
     plt.xlim(-1,1)
     plt.xticks(np.arange(-1,1.25,.25))
     plt.grid(True)

@@ -24,7 +24,7 @@ def place_order(action, quant, sym, type, systemid, submit,apikey, parentsig=Non
     	   		"symbol": sym, 
     	   		"typeofsymbol": type, 
     	   		"market": 1, 	#"limit": 31.05, 
-    	   		"duration": "GTC", 
+    	   		"duration": "DAY", 
                "signalid": sigid,
                "conditionalupon": parentsig
     		} 

@@ -17,4 +17,3 @@ for pair in currencyPairs:
 	
 f.close()
 ferr.close()
-		

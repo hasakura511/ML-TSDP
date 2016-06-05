@@ -1013,7 +1013,7 @@ def gen_file(filetype):
                
         html=html + '</table>'
         write_html(filename, headerhtml, footerhtml, html)
-        filetype='index'
+        #filetype='index'
         
     if filetype == 'index':
         html=''

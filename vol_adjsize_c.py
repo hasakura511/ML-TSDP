@@ -58,7 +58,8 @@ with open(pairPath+'currencies.txt') as f:
 currenciesDF=pd.DataFrame()
 corrDF=pd.DataFrame()
 for pair in currencyPairs:
-    data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)[-lookback-1:]
+    #end at -1 to ignore  new day. 
+    data = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)[-lookback-2:-1]
     
     #data.index = pd.to_datetime(data.index,format='%Y%m%d')
     #data.columns = ['Open','High','Low','Close','Volume','OI','R']
@@ -73,7 +74,7 @@ for pair in currencyPairs:
     currenciesDF.set_value(pair,'Close'+str(data.index[-1]),data.Close[-1])
     currenciesDF.set_value(pair,'ATR'+str(lookback),atr[-1])
     currenciesDF.set_value(pair,'PC'+str(data.index[-1]),pc[-1])
-    currenciesDF.set_value(pair,'ACT'+str(data.index[-2]),priorSig)
+    currenciesDF.set_value(pair,'ACT'+str(data.index[-1]),priorSig)
 
 #corrDF.to_csv(savePath+'currenciesPCcsv')
 #corrDF.corr().to_csv(savePath+'currenciesCorr.csv')
@@ -86,7 +87,7 @@ plt.xticks(rotation=90)
 corrDF.to_html(savePath2+'currencies_5.html')
 
 if savePath != None:
-    print 'Saving '+savePath2+'currencies_3.png'
+    print 'Saving '+savePath2+'currencies_4.png'
     fig.savefig(savePath2+'currencies_4.png', bbox_inches='tight')
     
 if len(sys.argv)==1:

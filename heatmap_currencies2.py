@@ -23,7 +23,7 @@ lookback=1
 currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
 #currencies = ['EUR', 'GBP', 'JPY', 'USD']
 barSizeSetting='1d'
-for i in range(2,-1,-lookback):
+for i in range(1,-1,-lookback):
     #startDate=dt(2016, 5, i,0,00)
     cMatrix=pd.DataFrame()
     #cMatrix2=pd.DataFrame()
@@ -53,8 +53,8 @@ for i in range(2,-1,-lookback):
                 
     for currency in currencies:
         cMatrix.set_value(currency,'Avg',cMatrix.ix[currency].dropna().mean())
-    #cMatrix=cMatrix.sort_values(by='Avg', ascending=False).fillna(0)
-    cMatrix=cMatrix.fillna(0)
+    cMatrix=cMatrix.sort_values(by='Avg', ascending=False).fillna(0)
+    #cMatrix=cMatrix.fillna(0)
     rankByMean=cMatrix['Avg']
     '''
     with open(savePath+'currencies_1.html','w') as f:

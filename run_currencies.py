@@ -253,16 +253,18 @@ version_ = 'v4.3'
 asset = 'FX'
 filterName = 'DF1'
 data_type = 'ALL'
-barSizeSetting='1d'
+barSizeSetting='4h'
 
 
 if len(sys.argv)==1:
     debug=True
     supportResistanceLB=50
-    startDate=datetime.date(2016,5,10)
-    endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
-    endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-    validationSetLength = np.busday_count(startDate, endDate)
+    startDate=None
+    #startDate=datetime.date(2016,5,10)
+    #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+    #validationSetLength = np.busday_count(startDate, endDate)
+    validationSetLength = 6
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag','buyHold','sellHold']
@@ -289,7 +291,7 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    #'GBPJPY',\
+                    'GBPJPY',\
                     #'AUDJPY',\
                     #'USDJPY',\
                     #'EURCHF',\
@@ -302,7 +304,7 @@ if len(sys.argv)==1:
                     #'GBPUSD',\
                     #'USDCAD',\
                     #'USDCHF',\
-                    'NZDUSD',
+                    #'NZDUSD',
                     #'AUDCAD',\
                     #'AUDCHF',\
                     #'AUDNZD',\
@@ -336,7 +338,7 @@ else:
         startDate=None
         #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
         #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-        validationSetLength = 3
+        validationSetLength = 6
         supportResistanceLB = max(validationSetLength,50)
         #Model Parameters
         #supportResistanceLB = 25
@@ -1188,7 +1190,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         enumerate(sorted(inner_valleys+inner_peaks)[1:])]
             zz_inner.plot_pivots(l=8,w=8, cycleList=cycleList2,mode=modePred.ix[data.iloc[index].index],\
                                            indicators=indicator_df, chartTitle=ticker+' '+is_period,\
-                                           savePath=chartSavePath+'_TECH_'+is_period, debug=debug)
+                                           savePath=chartSavePath+'_TECH_'+is_period, debug=debug,\
+                                           barsize=barSizeSetting)
                                            
     dpsDF_all = pd.DataFrame()
     #set to lb for stability
@@ -1441,7 +1444,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                             #shortStart=(shortStart, data2.Close[shortStart]),\
                             cycleList=cycleList,mode=modePred[start:],\
                             signals=finalDF,chartTitle=ticker+' WF by B/W by '+metric3,\
-                            savePath=chartSavePath+'_FINAL', debug=debug
+                            savePath=chartSavePath+'_FINAL', debug=debug,\
+                            barsize=barSizeSetting
                             )
                             
         if mode==0:
@@ -1454,7 +1458,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=DpsRankByMetricB,chartTitle=ticker+' WF by Best  '+metric2,\
-                                savePath=chartSavePath+'_BRANK', debug=debug
+                                savePath=chartSavePath+'_BRANK', debug=debug,\
+                                barsize=barSizeSetting
                                 )
                                 
             zz.plot_pivots(l=8,w=8,\
@@ -1465,7 +1470,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=DpsRankByMetricW,chartTitle=ticker+' WF by Worst '+metric2,\
-                                savePath=chartSavePath+'_WRANK', debug=debug
+                                savePath=chartSavePath+'_WRANK', debug=debug,\
+                                barsize=barSizeSetting
                                 )    
         else:
         #trend mode
@@ -1477,7 +1483,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=DpsRankByMetricB,chartTitle=ticker+' WF by Best '+metric2,\
-                                savePath=chartSavePath+'_BRANK', debug=debug
+                                savePath=chartSavePath+'_BRANK', debug=debug,\
+                                barsize=barSizeSetting
                                 )
                                 
             zz.plot_pivots(l=8,w=8,\
@@ -1488,7 +1495,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=DpsRankByMetricW,chartTitle=ticker+' WF by Worst '+metric2,\
-                                savePath=chartSavePath+'_WRANK', debug=debug
+                                savePath=chartSavePath+'_WRANK', debug=debug,\
+                                barsize=barSizeSetting
                                 )       
                             
         for is_period in signalSets:
@@ -1509,7 +1517,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                 shortStart=(shortStart, data2.Close[shortStart]),\
                                 cycleList=cycleList,mode=modePred[start:],\
                                 signals=signalSets[is_period],chartTitle=ticker+' '+is_period,\
-                                savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
+                                savePath=chartSavePath+'_ODDS_'+is_period, debug=debug,\
+                                barsize=barSizeSetting
                                 )
             else:
                 zz.plot_pivots(l=8,w=8,\
@@ -1520,7 +1529,8 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         shortStart=(shortStart, data2.Close[shortStart]),\
                                         cycleList=cycleList,mode=modePred[start:],\
                                         signals=signalSets[is_period],chartTitle=ticker+' '+is_period,\
-                                        savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
+                                        savePath=chartSavePath+'_ODDS_'+is_period, debug=debug,\
+                                        barsize=barSizeSetting
                                         )
 if showCharts:
     modes = mrClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
@@ -1578,7 +1588,8 @@ if showCharts:
                         #signals=signalDF,\
                         chartTitle=ticker+' vStart '+str(startDate)\
                         +' lb'+str(supportResistanceLB) +' SIGNAL '  + maxk,\
-                        savePath=chartSavePath+'_SIGNAL', debug=debug
+                        savePath=chartSavePath+'_SIGNAL', debug=debug,\
+                        barsize=barSizeSetting
                         )
 if useDPSsafef:
     sst['safef']=sst.dpsSafef

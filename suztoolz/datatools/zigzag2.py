@@ -33,7 +33,7 @@ from matplotlib.finance import volume_overlay3
 from matplotlib.dates import num2date
 from matplotlib.dates import date2num
 from matplotlib.dates import DateFormatter, WeekdayLocator,\
-                                            DayLocator, MONDAY
+                                            DayLocator, MONDAY, HourLocator
 import matplotlib.mlab as mlab
 
 mpl.rcParams["axes.formatter.useoffset"] = False
@@ -198,22 +198,38 @@ class zigzag(object):
         mode = kwargs.get('mode',None)
         savePath = kwargs.get('savePath',None)
         debug = kwargs.get('debug',True)
-        
-        mondays = WeekdayLocator(MONDAY)        # major ticks on the mondays
-        alldays = DayLocator()              # minor ticks on the days
-        weekFormatter = DateFormatter('%b %d %Y')  # e.g., Jan 12
-        dayFormatter = DateFormatter('%d')      # e.g., 12
+        barsize=kwargs.get('barsize',None)
         
         fig = plt.figure(figsize=(w,l*2))
         #ax = fig.add_subplot(111)
         ax=plt.subplot2grid((2,1), (0,0), rowspan=1, colspan=1)
         plt.title(chartTitle)
+        
+        if barsize==None:
+            width=0.6
+            major = WeekdayLocator(MONDAY)        # major ticks on the mondays
+            minor = DayLocator()              # minor ticks on the days
+            majorFormat = DateFormatter('%b %d %Y')  # e.g., Jan 12
+            minorFormat = DateFormatter('%d')      # e.g., 12
+        else:
+            #major = WeekdayLocator(MONDAY)        # major ticks on the mondays
+            width=0.1
+            minor = HourLocator(byhour=range(4,24,4))
+            major = DayLocator()              # minor ticks on the days
+            majorFormat = DateFormatter('%b %d %Y')  # e.g., Jan 12
+            if len(self.prices)<30:
+                
+                minorFormat = DateFormatter('%H:%M')      
+                ax.xaxis.set_minor_formatter(minorFormat)
+                
+            
+
         #plt.ylabel(ticker)
         #fig, ax = plt.subplots()
         fig.subplots_adjust(bottom=0.2)
-        ax.xaxis.set_major_locator(mondays)
-        ax.xaxis.set_minor_locator(alldays)
-        ax.xaxis.set_major_formatter(weekFormatter)
+        ax.xaxis.set_major_locator(major)
+        ax.xaxis.set_minor_locator(minor)
+        ax.xaxis.set_major_formatter(majorFormat)
         dates = [x[0] for x in self.candlesticks]
         dates = np.asarray(dates)
         
@@ -230,9 +246,10 @@ class zigzag(object):
         ax.set_ylabel('Volume', size=12)
         ax.grid(True)
         plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+        plt.setp(ax.xaxis.get_minorticklabels(), rotation=45, horizontalalignment='right')
         #price candles
         ax2p=ax.twinx()
-        candlestick_ohlc(ax2p, self.candlesticks, width=0.6, colorup='g')
+        candlestick_ohlc(ax2p, self.candlesticks, width=width, colorup='g')
         
         ax2p.xaxis_date()
         ax2p.autoscale_view()

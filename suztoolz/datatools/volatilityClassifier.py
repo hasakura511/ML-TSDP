@@ -146,7 +146,7 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
         #gar3[lb] = garch3(returns[:lb])[-1]
         #minmaxGarch3[lb] =minmax_scale(gar3[i:lb]) [-1]
         #gar4[lb] = garch4(returns[i:lb])[-1]
-        mmG=minmax_scale(garch4(returns[i:lb]))
+        mmG=minmax_scale(garch(returns[i:lb]))
         #minmaxGarch4[lb] =mmG[-1]
         SmoothGarch[lb]=c1*(mmG[-1]+mmG[-2])/2\
                         +c2*SmoothGarch[lb-1]\
@@ -258,7 +258,7 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
 
 if __name__ == "__main__":
     #dataPath = 'Z:/TSDP/data/from_IB/'
-    dataPath = 'D:/ML-TSDP/data/from_IB/'
+    dataPath = 'D:/ML-TSDP/data/from_MT4/'
     currencyPairs =   [
                 'NZDJPY',\
                 'CADJPY',\
@@ -289,10 +289,10 @@ if __name__ == "__main__":
                 'NZDCAD'
                 ]
     files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-    barSizeSetting='30m'
-    bars=90
-    validationLength=90
-    threshold=.1
+    barSizeSetting='1d'
+    bars=60
+    validationLength=60
+    threshold=1
     for pair in currencyPairs:    
         if barSizeSetting+'_'+pair+'.csv' in files:
             dataSet = pd.read_csv(dataPath+barSizeSetting+'_'+pair+'.csv', index_col=0)[-(bars+validationLength):]

@@ -264,7 +264,7 @@ if len(sys.argv)==1:
     #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     #validationSetLength = np.busday_count(startDate, endDate)
-    validationSetLength = 6
+    validationSetLength = 4
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag','buyHold','sellHold']
@@ -338,7 +338,7 @@ else:
         startDate=None
         #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
         #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-        validationSetLength = 6
+        validationSetLength = 4
         supportResistanceLB = max(validationSetLength,50)
         #Model Parameters
         #supportResistanceLB = 25

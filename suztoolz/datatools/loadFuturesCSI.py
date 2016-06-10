@@ -101,7 +101,7 @@ def loadFutures(auxFutures, dataPath, barSizeSetting, maxlb, ticker,\
             #data = data.drop([' P',' R', ' RINFO'],axis=1)
             #data = ratioAdjust(data)
             data.index = pd.to_datetime(data.index,format='%Y%m%d')
-            data.columns = ['Open','High','Low','Close','Volume','OI','R']
+            data.columns = ['Open','High','Low','Close','Volume','OI','R','S']
             data.index.name = 'Dates'
             #contract = ''.join([i for i in contract if not i.isdigit()])
             if 'YT' not in contract:
@@ -216,7 +216,7 @@ def loadFutures(auxFutures, dataPath, barSizeSetting, maxlb, ticker,\
         #data = data.drop([' P',' R', ' RINFO'],axis=1)
         data.index = pd.to_datetime(data.index,format='%Y%m%d')
         data.index.name = 'Dates'
-        data.columns = ['Open','High','Low','Close','Volume','OI','R']
+        data.columns = ['Open','High','Low','Close','Volume','OI','R','S']
         if data.shape[0] < maxlb:
             message =  'Not enough data to create indicators: #rows\
                 is less than max lookback of '+str(maxlb)

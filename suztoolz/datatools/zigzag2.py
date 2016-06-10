@@ -351,8 +351,8 @@ class zigzag(object):
         if indicators is not None:
             #ax3.plot(np.arange(len(self.prices)), self.prices, 'ko', alpha=0.5)
             plt.rc('lines', linewidth=1)
-            plt.rc('axes', prop_cycle=(cycler('color', ['r', 'g', 'b', 'm','c']) +
-                                       cycler('linestyle', ['-', '--', ':', '-.','-'])))
+            plt.rc('axes', prop_cycle=(cycler('color', ['r', 'g', 'b', 'm','y','c']) +
+                                       cycler('linestyle', ['-', '-', '-', '-.','--',':'])))
             ax4=ax3.twinx()
             ax4.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
             

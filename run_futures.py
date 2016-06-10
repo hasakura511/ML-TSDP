@@ -307,7 +307,7 @@ if len(sys.argv)==1:
                          #'EMD',
                          #'ES',
                          #'FCH',
-                         'FC',
+                         #'FC',
                          #'FDX',
                          #'FEI',
                          #'FFI',
@@ -349,7 +349,7 @@ if len(sys.argv)==1:
                          #'SF',
                          #'SI',
                          #'SIN',
-                         #'SJB',
+                         'SJB',
                          #'SM',
                          #'SMI',
                          #'SSG',
@@ -370,7 +370,7 @@ if len(sys.argv)==1:
     ticker =liveFutures[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'
     #dataPath = 'D:/data/tickerData/'
-    dataPath = 'D:/ML-TSDP/data/csidata/v4futures/'
+    dataPath = 'D:/ML-TSDP/data/csidata/v4futures2/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
@@ -433,7 +433,7 @@ else:
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
     signalPath = './data/signals/'
-    dataPath = './data/csidata/v4futures/'
+    dataPath = './data/csidata/v4futures2/'
     chartSavePath = './data/results/'+version+'_'+ticker
     
     #adds auxilary pair features
@@ -1045,6 +1045,10 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         dataSets[is_period][ticker+'_Pri_rStoch_r'+str(lb)] = \
                                                                     roofingFilter(data_primer.Close,\
                                                                                 supportResistanceLB,lb)
+        #shifted seasonality
+        dataSets[is_period][ticker+'_Pri_Seasonality_r'+str(lb)] = \
+                                                            roofingFilter(data_primer.S,\
+                                                                        supportResistanceLB,lb)
         
         #volatility
         if avgHalfCycle==supportResistanceLB:
@@ -1630,9 +1634,11 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                         )
 if showCharts:
-    modes = mrClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
-                                        data.Close.shape[0],threshold=adfPvalue,\
-                                        showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE2')
+    modes = mrClassifier(\
+                                    #dataSet.Close[-(supportResistanceLB+validationSetLength):],\
+                                    dataSet.Close,\
+                                    data.Close.shape[0],threshold=adfPvalue,\
+                                    showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE2')
     if debug:
         for x in signalSets:
             for algo in signalSets[x]:

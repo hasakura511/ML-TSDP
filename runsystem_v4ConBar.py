@@ -145,7 +145,8 @@ def onBar(bar, symbols):
 def runPairs():
     allOff=True
     debug=False
-    savePath = './data/results/'
+    #savePath = './data/results/'
+    savePath=None
     dataPath = './data/from_MT4/'
     signalPath = './data/signals/'
     pairPath='./data/'
@@ -366,9 +367,8 @@ def runPairs():
     offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
     
     if allOff:
-        buyHold=['USDJPY','CADJPY','CHFJPY','EURJPY','GBPJPY','AUDJPY', 'USDCHF', 'USDCAD','GBPUSD',\
-                            'NZDCHF', 'NZDCAD']
-        sellHold= ['NZDJPY','AUDUSD', 'EURUSD', 'NZDUSD', 'AUDNZD', 'GBPNZD', 'EURNZD']
+        buyHold=['NZDCAD', 'NZDCHF', 'NZDJPY', 'NZDUSD', 'AUDJPY', 'AUDCHF', 'AUDUSD', 'AUDCAD', 'EURCAD', 'EURJPY', 'EURCHF', 'EURGBP', 'EURUSD', 'CADCHF', 'CADJPY', 'USDCHF']
+        sellHold= ['AUDNZD', 'GBPNZD', 'EURNZD', 'GBPAUD', 'EURAUD', 'GBPCAD', 'USDCAD', 'GBPJPY', 'CHFJPY', 'USDJPY', 'GBPUSD', 'GBPCHF']
         #offline=currencyPairs
         offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
         

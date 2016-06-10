@@ -51,6 +51,7 @@ import seitoolz.bars as bars
 logging.basicConfig(filename='/logs/system_adf.log',level=logging.DEBUG)
 
 pairs=[]
+
 pparams=dict()
 
 if len(sys.argv) > 1 and sys.argv[1] == 's105_EURJPY_CADJPY':
@@ -207,7 +208,9 @@ elif len(sys.argv) > 1 and sys.argv[1] == 'stratADF':
            ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
 else:
     pairs=[['./data/from_IB/BTCUSD_bitfinexUSD.csv', 'BTCUSD_bitfinexUSD', [10, 'USD', 'bitfinexUSD', 's105_bitfinexUSD']],
-       ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
+           ['./data/from_IB/BTCUSD_bitstampUSD.csv', 'BTCUSD_bitstampUSD', [10, 'USD', 'bitstampUSD', 's105_bitstampUSD']]]
+
+
 
 def prep_pair(sym1, sym2, param1, param2):
         global pos
@@ -229,25 +232,22 @@ def prep_pair(sym1, sym2, param1, param2):
                 timestamp=time.mktime(priceHist['timestamp'].timetuple())
                 bar1=astrat.getBar(priceHist[sym1], sym1, int(timestamp))
                 bar2=astrat.getBar(priceHist[sym2], sym2, int(timestamp))
-                signals=astrat.procBar(bar1, bar2, pos[symPair], False)
+                astrat.procBar(bar1, bar2, pos[symPair], False)
                 #proc_signals(signals, params, symPair, timestamp)
-                
-                
             except Exception as e:
                  logging.error('prep_pair', exc_info=True)
                 
 
 def proc_pair(sym1, sym2, param1, param2):
-    while 1:
+        #while 1:
         try:
             proc_onBar(sym1, sym2, param1, param2)
-            time.sleep(20)
+            #time.sleep(20)
         except Exception as e:
             logging.error("proc_pair", exc_info=True)
+
                 
 def proc_onBar(sym1, sym2, param1, param2):
-        
-                
         symPair=sym1+sym2
         
         params=dict()
@@ -281,6 +281,7 @@ def proc_onBar(sym1, sym2, param1, param2):
             
         except Exception as e:
             logging.error("proc_onBar", exc_info=True)
+
                 
 def get_entryState():
     global pairs
@@ -306,6 +307,7 @@ def get_entryState():
                 astrat.updateEntry(symPair, entryState, exitState)
         except Exception as e:
             logging.error("get_entryState", exc_info=True)
+
 
 def proc_signals(signals, params, symPair, timestamp):
     global pos
@@ -344,6 +346,7 @@ def start_bar():
     tickers=np.array(pairs,dtype=object)[:,1]
     bars.get_last_bars(tickers, 'Close', onBar)
 
+
 def onBar(bar, symbols):
     try:
         global SST
@@ -373,10 +376,13 @@ def onBar(bar, symbols):
         #            proc_onBar(sym1,sym2,mult1,mult2)
     except Exception as e:
         logging.error("onBar", exc_info=True)
+
+
     
 def get_bar(sym):
     global SST
     return SST.iloc[-1][sym]
+
     
 def start_prep():
     global pairs
@@ -395,11 +401,15 @@ def start_prep():
                 pparams[sym1+sym2]=[sym1,sym2,mult1,mult2]
                 pparams[sym2+sym1]=[sym1,sym2,mult1,mult2]
                 
-                sig_thread = threading.Thread(target=prep_pair, args=[sym1, sym2, mult1, mult2])
-                sig_thread.daemon=True
-                threads.append(sig_thread)
-    [t.start() for t in threads]
-    [t.join() for t in threads]
+                prep_pair(sym1, sym2, mult1, mult2)
+                #sig_thread = threading.Thread(target=prep_pair, args=[sym1, sym2, mult1, mult2])
+                #sig_thread.daemon=True
+                #threads.append(sig_thread)
+                
+                
+    #[t.start() for t in threads]
+    #[t.join() for t in threads]
+    
     #threads=[]
     #seen=dict()
    

@@ -169,8 +169,8 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
     #plt.style.use('ggplot')
     l=kwargs.get('l',8)
     w=kwargs.get('w',8)
-    lb=kwargs.get('lb',260)
-    zzstd=kwargs.get('zzstd',3)
+    lb=kwargs.get('lb',270)
+    zzstd=kwargs.get('zzstd',3.5)
     zs_window=kwargs.get('zs_window',60)
     rc_window=kwargs.get('rc_window',10)
     savePath = kwargs.get('savePath',None)
@@ -276,7 +276,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax.xaxis.set_major_locator(major)
             ax.xaxis.set_minor_locator(minor)   
             ax.plot(data.index, data.Close, 'b:', alpha=0.5, label=str(currRun)+' Close')
-            ax.plot(data.index[zzp_pivots != 0], data.Close[zzp_pivots != 0], color='lightblue',ls='-',\
+            ax.plot(data.index[zzp_pivots != 0], data.Close[zzp_pivots != 0], alpha=0.4, color='c',ls='-',\
                         label=str(pivotDate)+' Bias '+str(seaBias))
 
             ax.yaxis.set_label_position("left")
@@ -292,9 +292,9 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #top axis 2
             ax2p=ax.twinx()
             ax2p.plot(data.index, data.S, 'g:', alpha=0.5, label=str(currSea)+' Seasonality')
-            ax2p.plot(data.index[zzs_pivots != 0], data.S[zzs_pivots != 0], color='green',ls='-', label=str(nextSea)+' ZZ Seasonality')
-            ax2p.axhline(nextSea, color='violet', alpha=0.8)
-            ax2p.axhline(currSea, color='pink', alpha=0.8)
+            ax2p.plot(data.index[zzs_pivots != 0], data.S[zzs_pivots != 0], alpha=0.8, color='green',ls='-', label=str(nextSea)+' ZZ Seasonality')
+            ax2p.axhline(nextSea, color='magenta', alpha=0.6)
+            ax2p.axhline(currSea, color='violet', alpha=0.8)
             #ax2p.scatter(np.arange(lb)[zzs_pivots == 1], data.S[zzs_pivots == 1], color='g')
             #ax2p.scatter(np.arange(lb)[zzs_pivots == -1], data.S[zzs_pivots == -1], color='r')
             #ax2p.set_xlim(0, lb)
@@ -349,7 +349,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #bottom axis 2
             ax4=ax3.twinx()
             #ax4.plot(data.index, zs_spread, 'k-', alpha=0.5, label='ZS Spread lb'+str(zs_window))
-            ax4.fill_between(data.index, zs_spread, color='#0079a3', alpha=0.6, label=str(round(zs_spread[-1],2))+' ZS Spread lb'+str(zs_window)) 
+            ax4.fill_between(data.index, zs_spread, color='#0079a3', alpha=0.4, label=str(round(zs_spread[-1],2))+' ZS Spread lb'+str(zs_window)) 
             ax4.yaxis.set_label_position("right")
             ax4.set_ylabel('Spread', size=12)
             ax4.set_ylim((np.floor(min(zs_spread.fillna(0))),np.ceil(max(zs_spread.fillna(0)))))

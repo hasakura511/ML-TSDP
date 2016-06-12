@@ -275,7 +275,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax.xaxis.set_minor_locator(minor)   
             ax.plot(data.index, data.Close, 'b:', alpha=0.5, label='Close')
             ax.plot(data.index[zzp_pivots != 0], data.Close[zzp_pivots != 0], color='lightblue',ls='-',\
-                        label='Last ' +str(currRun)+', Bias '+str(seaBias))
+                        label='Last ' +str(currRun)+', '+str(pivotDate)+' Bias '+str(seaBias))
 
             ax.yaxis.set_label_position("left")
             ax.set_ylabel('Price', size=12)

@@ -46,7 +46,7 @@ if len(sys.argv)==1:
     
 else:
     showPlots=False
-    dataPath='./data/csidata/v4futures/'
+    dataPath='./data/csidata/v4futures2/'
     savePath='./data/'
     signalPath = './data/signals/' 
     savePath2 = './data/results/'

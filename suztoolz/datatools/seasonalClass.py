@@ -273,9 +273,9 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
             ax.xaxis.set_major_locator(major)
             ax.xaxis.set_minor_locator(minor)   
-            ax.plot(data.index, data.Close, 'b:', alpha=0.5, label='Close')
+            ax.plot(data.index, data.Close, 'b:', alpha=0.5, label=str(currRun)+' Close')
             ax.plot(data.index[zzp_pivots != 0], data.Close[zzp_pivots != 0], color='lightblue',ls='-',\
-                        label='Last ' +str(currRun)+', '+str(pivotDate)+' Bias '+str(seaBias))
+                        label=str(pivotDate)+' Bias '+str(seaBias))
 
             ax.yaxis.set_label_position("left")
             ax.set_ylabel('Price', size=12)
@@ -291,8 +291,8 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax2p=ax.twinx()
             ax2p.plot(data.index, data.S, 'g:', alpha=0.5, label=str(currSea)+' Seasonality')
             ax2p.plot(data.index[zzs_pivots != 0], data.S[zzs_pivots != 0], color='green',ls='-', label=str(nextSea)+' ZZ Seasonality')
-            ax2p.axhline(nextSea, color='violet')
-            ax2p.axhline(currSea, color='pink')
+            ax2p.axhline(nextSea, color='orange', alpha=0.5)
+            ax2p.axhline(currSea, color='yellow', alpha=0.5)
             #ax2p.scatter(np.arange(lb)[zzs_pivots == 1], data.S[zzs_pivots == 1], color='g')
             #ax2p.scatter(np.arange(lb)[zzs_pivots == -1], data.S[zzs_pivots == -1], color='r')
             #ax2p.set_xlim(0, lb)
@@ -326,8 +326,8 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax3.xaxis.set_major_locator(major)
             ax3.xaxis.set_minor_locator(minor)
             #ax3.plot(data.index, np.nan_to_num(corr), 'r:', alpha=0.5)
-            ax3.plot(data.index, corr, 'r:', alpha=0.5, label=str(round(corr.iloc[-1],2))+' Correlation lb'+str(rc_window)+' lag1')
-            ax3.scatter(correlated, corr.ix[correlated], color='k', alpha=0.6, label=str(int((float(len(correlated))/lb)*100))+'% Correlated')
+            ax3.plot(data.index, corr, 'k:', alpha=0.5, label=str(round(corr.iloc[-1],2))+' Correlation lb'+str(rc_window)+' lag1')
+            ax3.scatter(correlated, corr.ix[correlated], color='g', alpha=0.6, label=str(int((float(len(correlated))/lb)*100))+'% Correlated')
             ax3.scatter(anticorrelated, corr.ix[anticorrelated], color='r', alpha=0.6, label=str(int((float(len(anticorrelated))/lb)*100))+'% Anti-Correlated')
             ax3.yaxis.set_label_position("left")
             ax3.set_ylabel('Correlation', size=12)
@@ -340,18 +340,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #annotate last index
             ax3.annotate(data.Close.index[-1].strftime("%Y-%m-%d %H:%M"),\
                         xy=(0.78, 0.025), ha='left', va='top', xycoords='axes fraction', fontsize=12)        
-            #annotate runs
-            for i in runs[mask].index:
-                if not np.isnan(corr[i]):
-                    if runs['normal'][i]<0:
-                        xytext=(2,-2)
-                        color='r'
-                    else:
-                        xytext=(2,-2)
-                        color='k'
-                    #print runs['count'][i], (data.index[i], corr[i])
-                    ax3.annotate(str(runs['count'][i]), (data.index[i], corr[i]),\
-                                 xytext=xytext, textcoords='offset points',color=color, size='medium')
+
             
             plt.setp(ax3.get_xticklabels(), rotation=45, horizontalalignment='right')
             
@@ -368,7 +357,18 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax4.legend(handles, labels, loc='lower right',prop={'size':10})
             ax4.set_xlim(data.index[0],data.index[-1])
             
-
+            #annotate runs
+            for i in runs[mask].index:
+                if not np.isnan(corr[i]):
+                    if runs['normal'][i]<0:
+                        xytext=(2,-2)
+                        color='r'
+                    else:
+                        xytext=(2,-2)
+                        color='k'
+                    #print runs['count'][i], (data.index[i], corr[i])
+                    ax3.annotate(str(runs['count'][i]), (data.index[i], corr[i]),\
+                                 xytext=xytext, textcoords='offset points',color=color, size='medium')
             #save/show plots
             if debug:
                 plt.show()

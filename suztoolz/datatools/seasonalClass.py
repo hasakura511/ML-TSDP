@@ -245,10 +245,12 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
                             +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
             currentDate=data.index[-1].to_datetime().month*100+data.index[-1].to_datetime().day
-            while pivotDate<currentDate:
+            #print i,pivotDate,currentDate, not currentDate<pivotDate
+            while not currentDate<pivotDate:
                 i+=1
                 pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
                                 +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
+                #print i,pivotDate,currentDate
             nextSea=round(data.S.iloc[np.nonzero(zzs_pivots)[0][i]],2)
             
             currSea=round(data.S[-1],2)
@@ -291,8 +293,8 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax2p=ax.twinx()
             ax2p.plot(data.index, data.S, 'g:', alpha=0.5, label=str(currSea)+' Seasonality')
             ax2p.plot(data.index[zzs_pivots != 0], data.S[zzs_pivots != 0], color='green',ls='-', label=str(nextSea)+' ZZ Seasonality')
-            ax2p.axhline(nextSea, color='orange', alpha=0.5)
-            ax2p.axhline(currSea, color='yellow', alpha=0.5)
+            ax2p.axhline(nextSea, color='violet', alpha=0.8)
+            ax2p.axhline(currSea, color='pink', alpha=0.8)
             #ax2p.scatter(np.arange(lb)[zzs_pivots == 1], data.S[zzs_pivots == 1], color='g')
             #ax2p.scatter(np.arange(lb)[zzs_pivots == -1], data.S[zzs_pivots == -1], color='r')
             #ax2p.set_xlim(0, lb)
@@ -383,8 +385,8 @@ if __name__ == "__main__":
     version = 'v4'
     liveFutures =  [
                          #'AC',
-                         'AD',
-                         #'AEX',
+                         #'AD',
+                         'AEX',
                          #'BO',
                          #'BP',
                          #'C',

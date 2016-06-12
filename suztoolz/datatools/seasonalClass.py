@@ -239,11 +239,18 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #anticorrelated = data.index[(runs['count']==1) & (runs['normal'] ==-1)]
             anticorrelated = data.index[runs['normal'] ==-1]
             currRun = runs['normal'].iloc[-1]*runs['count'].iloc[-1]
-            if np.nonzero(zzs_pivots)[0][1] <15:
-                pivot=2
-            else:
-                pivot=1
-            nextSea=round(data.S.iloc[np.nonzero(zzs_pivots)[0][pivot]],2)
+            
+            #find next seasonal pivot
+            i=1
+            pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
+                            +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
+            currentDate=data.index[-1].to_datetime().month*100+data.index[-1].to_datetime().day
+            while pivotDate<currentDate:
+                i+=1
+                pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
+                                +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
+            nextSea=round(data.S.iloc[np.nonzero(zzs_pivots)[0][i]],2)
+            
             currSea=round(data.S[-1],2)
             if nextSea>currSea:
                 seaBias=1
@@ -376,7 +383,7 @@ if __name__ == "__main__":
     version = 'v4'
     liveFutures =  [
                          #'AC',
-                         #'AD',
+                         'AD',
                          #'AEX',
                          #'BO',
                          #'BP',
@@ -453,7 +460,7 @@ if __name__ == "__main__":
                          #'YB',
                          #'YM',
                          #'YT2',
-                         'YT3'
+                         #'YT3'
                          ]
     ticker=liveFutures[0]
     #dataPath =  'Z:/TSDP/data/from_IB/'

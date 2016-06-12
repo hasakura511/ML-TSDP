@@ -240,11 +240,11 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             anticorrelated = data.index[runs['normal'] ==-1]
             currRun = runs['normal'].iloc[-1]*runs['count'].iloc[-1]
             
-            #find next seasonal pivot
+            #find next seasonal pivot, +5 for to lookahead of weekend/larger lookforward bias
             i=1
             pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
                             +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
-            currentDate=data.index[-1].to_datetime().month*100+data.index[-1].to_datetime().day
+            currentDate=data.index[-1].to_datetime().month*100+data.index[-1].to_datetime().day+5
             #print i,pivotDate,currentDate, not currentDate<pivotDate
             while not currentDate<pivotDate:
                 i+=1
@@ -259,7 +259,8 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             else:
                 seaBias=-1
             #ax3
-            corr = pd.rolling_corr(data.Close.pct_change().dropna().values, data.S.pct_change().shift(-1).dropna().values,window=rc_window) 
+            corr = pd.rolling_corr(data.Close.pct_change().dropna().values,\
+                                            data.S.pct_change().shift(-1).dropna().values,window=rc_window) 
             corr=pd.ewma(pd.Series(np.insert(corr,0,np.nan), index=data.index),com=0.5)
             #ax4 spread
             res = ols(y=data2.Close, x=data2.S)
@@ -292,7 +293,8 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #top axis 2
             ax2p=ax.twinx()
             ax2p.plot(data.index, data.S, 'g:', alpha=0.5, label=str(currSea)+' Seasonality')
-            ax2p.plot(data.index[zzs_pivots != 0], data.S[zzs_pivots != 0], alpha=0.8, color='green',ls='-', label=str(nextSea)+' ZZ Seasonality')
+            ax2p.plot(data.index[zzs_pivots != 0], data.S[zzs_pivots != 0], alpha=0.8, color='green',ls='-',\
+                                label=str(nextSea)+' ZZ'+str(zzstd)+' Seasonality')
             ax2p.axhline(nextSea, color='magenta', alpha=0.6)
             ax2p.axhline(currSea, color='violet', alpha=0.8)
             #ax2p.scatter(np.arange(lb)[zzs_pivots == 1], data.S[zzs_pivots == 1], color='g')
@@ -329,8 +331,10 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax3.xaxis.set_minor_locator(minor)
             #ax3.plot(data.index, np.nan_to_num(corr), 'r:', alpha=0.5)
             ax3.plot(data.index, corr, 'k:', alpha=0.5, label=str(round(corr.iloc[-1],2))+' Correlation lb'+str(rc_window)+' lag1')
-            ax3.scatter(correlated, corr.ix[correlated], color='g', alpha=0.6, label=str(int((float(len(correlated))/lb)*100))+'% Correlated')
-            ax3.scatter(anticorrelated, corr.ix[anticorrelated], color='r', alpha=0.6, label=str(int((float(len(anticorrelated))/lb)*100))+'% Anti-Correlated')
+            ax3.scatter(correlated, corr.ix[correlated], color='g', alpha=0.6,\
+                            label=str(int((float(len(correlated))/lb)*100))+'% Correlated')
+            ax3.scatter(anticorrelated, corr.ix[anticorrelated], color='r', alpha=0.6,\
+                            label=str(int((float(len(anticorrelated))/lb)*100))+'% Anti-Correlated')
             ax3.yaxis.set_label_position("left")
             ax3.set_ylabel('Correlation', size=12)
             ax3.set_title(ticker+' Spread & Correlation')
@@ -349,7 +353,8 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #bottom axis 2
             ax4=ax3.twinx()
             #ax4.plot(data.index, zs_spread, 'k-', alpha=0.5, label='ZS Spread lb'+str(zs_window))
-            ax4.fill_between(data.index, zs_spread, color='#0079a3', alpha=0.4, label=str(round(zs_spread[-1],2))+' ZS Spread lb'+str(zs_window)) 
+            ax4.fill_between(data.index, zs_spread, color='#0079a3', alpha=0.4,\
+                                    label=str(round(zs_spread[-1],2))+' ZS Spread lb'+str(zs_window)) 
             ax4.yaxis.set_label_position("right")
             ax4.set_ylabel('Spread', size=12)
             ax4.set_ylim((np.floor(min(zs_spread.fillna(0))),np.ceil(max(zs_spread.fillna(0)))))
@@ -386,7 +391,7 @@ if __name__ == "__main__":
     liveFutures =  [
                          #'AC',
                          #'AD',
-                         'AEX',
+                         #'AEX',
                          #'BO',
                          #'BP',
                          #'C',
@@ -396,7 +401,7 @@ if __name__ == "__main__":
                          #'CL',
                          #'CT',
                          #'CU',
-                         #'DX',
+                         'DX',
                          #'EBL',
                          #'EBM',
                          #'EBS',

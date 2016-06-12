@@ -78,6 +78,7 @@ from suztoolz.datatools.loadFuturesCSI import loadFutures
 from suztoolz.datatools.acPeriodogram import acPeriodogram
 from suztoolz.datatools.zigzag2 import zigzag as zg
 from suztoolz.datatools.mrClassifier import mrClassifier
+from suztoolz.datatools.seasonalClass import seasonalClassifier
 from suztoolz.position_sizing.calcDPS import calcDPS
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
 from sklearn.pipeline import Pipeline
@@ -349,10 +350,10 @@ if len(sys.argv)==1:
                          #'SF',
                          #'SI',
                          #'SIN',
-                         'SJB',
+                         #'SJB',
                          #'SM',
                          #'SMI',
-                         #'SSG',
+                         'SSG',
                          #'STW',
                          #'SXE',
                          #'TF',
@@ -1045,7 +1046,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
         dataSets[is_period][ticker+'_Pri_rStoch_r'+str(lb)] = \
                                                                     roofingFilter(data_primer.Close,\
                                                                                 supportResistanceLB,lb)
-        #shifted seasonality
+        #seasonality
         dataSets[is_period][ticker+'_Pri_Seasonality_r'+str(lb)] = \
                                                             roofingFilter(data_primer.S,\
                                                                         supportResistanceLB,lb)
@@ -1634,12 +1635,15 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         savePath=chartSavePath+'_ODDS_'+is_period, debug=debug
                                         )
 if showCharts:
+    
     modes = mrClassifier(\
                                     #dataSet.Close[-(supportResistanceLB+validationSetLength):],\
                                     dataSet.Close,\
                                     data.Close.shape[0],threshold=adfPvalue,\
                                     showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE2')
+    
     if debug:
+        seaBias = seasonalClassifier(ticker, dataPath, savePath=chartSavePath+'_SEA',debug=debug)
         for x in signalSets:
             for algo in signalSets[x]:
                 signalSets[x][algo].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'_'+algo+'.csv')

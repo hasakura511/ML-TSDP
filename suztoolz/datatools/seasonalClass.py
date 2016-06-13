@@ -243,7 +243,6 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             
             #uses the seasonality rather than the price because the last zzpivot for the price may change in the future
             i=-2
-            
             #validationStartDate=data.index[np.nonzero(zzs_pivots)[0]][i]
             validationStartDate=data.index[np.nonzero(zzp_pivots)[0]][i]
             validationLength=len(data.ix[validationStartDate:])
@@ -257,8 +256,20 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
                 #print 'sea',data.index[np.nonzero(zzs_pivots)[0]],len(data.ix[data.index[np.nonzero(zzs_pivots)[0]][i]:]), validationStartDate
                 #print 'price',data.index[np.nonzero(zzp_pivots)[0]],validationLength, validationStartDate
                 #validationStartDate=data.index[np.nonzero(zzs_pivots)[0]][i]
+            i=-2
+            validationStartDate2=data.index[np.nonzero(zzs_pivots)[0]][i]
+            validationLength2=len(data.ix[validationStartDate2:])
 
+            while  validationLength2<minValidationLength:
+                i-=1
+                validationStartDate2=data.index[np.nonzero(zzs_pivots)[0]][i]
+                validationLength2=len(data.ix[validationStartDate2:])
             
+            #print validationStartDate, validationStartDate2, validationLength, validationLength2
+            #print validationStartDate> validationStartDate2, validationLength> validationLength2
+            if validationLength> validationLength2:
+                validationStartDate =validationStartDate2
+                validationLength=validationLength2
             #find next seasonal pivot, +5 for to lookahead of weekend/larger lookforward bias
             i=1
             pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
@@ -298,11 +309,17 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax.plot(data.index, data.Close, 'b:', alpha=0.5, label=str(currRun)+' Close')
             ax.plot(data.index[zzp_pivots != 0], data.Close[zzp_pivots != 0], alpha=0.4, color='c',ls='-',\
                         label=str(pivotDate)+' Bias '+str(seaBias))
+            #v start
             ax.annotate('', (data.index[-validationLength], data.Close.iloc[-validationLength]),
                              arrowprops=dict(facecolor='magenta', shrink=0.03), xytext=(-20,0), textcoords='offset points',
                              size='medium', alpha=0.6)
-            ax.annotate(validationStartDate.strftime("%Y-%m-%d %H:%M"),\
-                        xy=(0.78, 0.025), ha='left', va='top', xycoords='axes fraction', fontsize=12)        
+            #lb
+            ax.annotate('', (data.index[-zs_window], data.Close.iloc[-zs_window]),
+                             arrowprops=dict(facecolor='violet', shrink=0.03), xytext=(-20,0), textcoords='offset points',
+                             size='medium', alpha=0.6)
+            ax.annotate(data.index[-zs_window].strftime("%Y-%m-%d %H:%M /")+\
+                            validationStartDate.strftime(" %Y-%m-%d %H:%M"),\
+                            xy=(0.56, 0.025), ha='left', va='top', xycoords='axes fraction', fontsize=12)        
             ax.yaxis.set_label_position("left")
             ax.set_ylabel('Price', size=12)
             ax.set_title(ticker+' Price vs. Seasonality')
@@ -434,7 +451,7 @@ if __name__ == "__main__":
                          #'FCH',
                          #'FC',
                          #'FDX',
-                         #'FEI',
+                         'FEI',
                          #'FFI',
                          #'FLG',
                          #'FSS',
@@ -478,7 +495,7 @@ if __name__ == "__main__":
                          #'SM',
                          #'SMI',
                          #'SSG',
-                         'STW',
+                         #'STW',
                          #'SXE',
                          #'TF',
                          #'TU',

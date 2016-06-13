@@ -87,8 +87,9 @@ for i,contract in enumerate(marketList):
     else:
         sym=contract
     #seasonality
-    seaBias, currRun, date = seasonalClassifier(sym, dataPath, savePath=savePath2+version+'_'+sym+'_MODE2',\
+    seaBias, currRun, date,vStart = seasonalClassifier(sym, dataPath, savePath=savePath2+version+'_'+sym+'_MODE2',\
                                                 debug=showPlots)
+    futuresDF.set_value(sym,'vSTART',vStart)
     futuresDF.set_value(sym,'LastSEA',seaBias)
     futuresDF.set_value(sym,'SEA'+str(date),seaBias)
     futuresDF.set_value(sym,'LastSRUN',currRun)

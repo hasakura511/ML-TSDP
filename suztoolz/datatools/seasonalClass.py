@@ -170,9 +170,10 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
     l=kwargs.get('l',8)
     w=kwargs.get('w',8)
     lb=kwargs.get('lb',270)
-    zzstd=kwargs.get('zzstd',3.5)
+    zzstd=kwargs.get('zzstd',3)
     zs_window=kwargs.get('zs_window',60)
     rc_window=kwargs.get('rc_window',10)
+    minValidationLength=kwargs.get('minValidationLength',15)
     savePath = kwargs.get('savePath',None)
     #atrPath = kwargs.get('atrPath', './data/futuresATR.csv')
     debug = kwargs.get('debug',False)
@@ -240,11 +241,29 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             anticorrelated = data.index[runs['normal'] ==-1]
             currRun = runs['normal'].iloc[-1]*runs['count'].iloc[-1]
             
+            #uses the seasonality rather than the price because the last zzpivot for the price may change in the future
+            i=-2
+            
+            #validationStartDate=data.index[np.nonzero(zzs_pivots)[0]][i]
+            validationStartDate=data.index[np.nonzero(zzp_pivots)[0]][i]
+            validationLength=len(data.ix[validationStartDate:])
+            #print 'sea',data.index[np.nonzero(zzs_pivots)[0]],len(data.ix[data.index[np.nonzero(zzs_pivots)[0]][i]:]), validationStartDate
+            #print 'price',data.index[np.nonzero(zzp_pivots)[0]],len(data.ix[data.index[np.nonzero(zzp_pivots)[0]][i]:]), validationStartDate
+            while  validationLength<minValidationLength:
+                i-=1
+                validationStartDate=data.index[np.nonzero(zzp_pivots)[0]][i]
+                validationLength=len(data.ix[validationStartDate:])
+                #print 'price',data.index[np.nonzero(zzp_pivots)[0]],len(data.ix[data.index[np.nonzero(zzp_pivots)[0]][i]:])
+                #print 'sea',data.index[np.nonzero(zzs_pivots)[0]],len(data.ix[data.index[np.nonzero(zzs_pivots)[0]][i]:]), validationStartDate
+                #print 'price',data.index[np.nonzero(zzp_pivots)[0]],validationLength, validationStartDate
+                #validationStartDate=data.index[np.nonzero(zzs_pivots)[0]][i]
+
+            
             #find next seasonal pivot, +5 for to lookahead of weekend/larger lookforward bias
             i=1
             pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
                             +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
-            currentDate=data.index[-1].to_datetime().month*100+data.index[-1].to_datetime().day+5
+            currentDate=data.index[-1].to_datetime().month*100+data.index[-1].to_datetime().day+3
             #print i,pivotDate,currentDate, not currentDate<pivotDate
             while not currentDate<pivotDate:
                 i+=1
@@ -279,7 +298,11 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax.plot(data.index, data.Close, 'b:', alpha=0.5, label=str(currRun)+' Close')
             ax.plot(data.index[zzp_pivots != 0], data.Close[zzp_pivots != 0], alpha=0.4, color='c',ls='-',\
                         label=str(pivotDate)+' Bias '+str(seaBias))
-
+            ax.annotate('', (data.index[-validationLength], data.Close.iloc[-validationLength]),
+                             arrowprops=dict(facecolor='magenta', shrink=0.03), xytext=(-20,0), textcoords='offset points',
+                             size='medium', alpha=0.6)
+            ax.annotate(validationStartDate.strftime("%Y-%m-%d %H:%M"),\
+                        xy=(0.78, 0.025), ha='left', va='top', xycoords='axes fraction', fontsize=12)        
             ax.yaxis.set_label_position("left")
             ax.set_ylabel('Price', size=12)
             ax.set_title(ticker+' Price vs. Seasonality')
@@ -288,7 +311,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #ax.scatter(correlated, data.Close.ix[correlated], color='k', label=str(int((float(len(correlated))/lb)*100))+'% Correlated')
             #ax.scatter(anticorrelated, data.Close.ix[anticorrelated], color='r', label=str(int((float(len(anticorrelated))/lb)*100))+'% Anti-Correlated')
             handles, labels = ax.get_legend_handles_labels()
-            ax.legend(handles, labels, loc='lower right',prop={'size':10})
+            ax.legend(handles, labels, loc='lower right',prop={'size':10}, bbox_to_anchor=(1, .97))
             
             #top axis 2
             ax2p=ax.twinx()
@@ -316,7 +339,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
                              xytext=xytext, textcoords='offset points',color=color,
                              size='medium')
             handles, labels = ax2p.get_legend_handles_labels()
-            ax2p.legend(handles, labels, loc='lower left',prop={'size':10})
+            ax2p.legend(handles, labels, loc='lower left',prop={'size':10}, bbox_to_anchor=(0, .97))
             ax2p.yaxis.set_label_position("right")
             ax2p.set_ylabel('Seasonality', size=12)
             ax2p.grid(which='major', linestyle='--', color='white') 
@@ -341,7 +364,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax3.set_ylim((-1,1))
             #ax3.axhline(0, color='white')
             handles, labels = ax3.get_legend_handles_labels()
-            ax3.legend(handles, labels, loc='lower left',prop={'size':10})
+            ax3.legend(handles, labels, loc='lower left',prop={'size':10}, bbox_to_anchor=(0, .94))
 
             #annotate last index
             ax3.annotate(data.Close.index[-1].strftime("%Y-%m-%d %H:%M"),\
@@ -361,7 +384,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #ax4.grid(which='major', linestyle='--', color='white') 
             align_yaxis(ax3, 0, ax4, 0)
             handles, labels = ax4.get_legend_handles_labels()
-            ax4.legend(handles, labels, loc='lower right',prop={'size':10})
+            ax4.legend(handles, labels, loc='lower right',prop={'size':10}, bbox_to_anchor=(1, .97))
             ax4.set_xlim(data.index[0],data.index[-1])
             
             #annotate runs
@@ -384,7 +407,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
                 fig.savefig(savePath+'.png', bbox_inches='tight')
                 
             plt.close()
-    return seaBias, currRun, data.Close.index[-1]
+    return seaBias, currRun, data.Close.index[-1], validationStartDate
 
 if __name__ == "__main__":
     version = 'v4'
@@ -401,7 +424,7 @@ if __name__ == "__main__":
                          #'CL',
                          #'CT',
                          #'CU',
-                         'DX',
+                         #'DX',
                          #'EBL',
                          #'EBM',
                          #'EBS',
@@ -455,7 +478,7 @@ if __name__ == "__main__":
                          #'SM',
                          #'SMI',
                          #'SSG',
-                         #'STW',
+                         'STW',
                          #'SXE',
                          #'TF',
                          #'TU',

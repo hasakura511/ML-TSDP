@@ -264,7 +264,7 @@ if len(sys.argv)==1:
     #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     #validationSetLength = np.busday_count(startDate, endDate)
-    validationSetLength = 4
+    validationSetLength = 3
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag','buyHold','sellHold']
@@ -1549,11 +1549,12 @@ if showCharts:
         for x in signalDF:
             signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+x+'.csv')
 
-
+#all
+'''
 for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
     for k, v in d.iteritems():
         signalDF[k]=v
-
+        
 for is_period in signalSets:
     for k,v in signalSets[is_period].iteritems():
     #for k,v in DpsRankByMetricW.iteritems():
@@ -1568,7 +1569,22 @@ for k,v, in signalDF.iteritems():
         if signalDF[k].netEquity[-1]>ne:
             ne=signalDF[k].netEquity[-1]
             maxk=k
-            
+'''
+
+#worst
+for d in [DpsRankByMetricW]:
+    for k, v in d.iteritems():
+        signalDF[k]=v
+ne=0
+for k,v, in signalDF.iteritems():
+    if ne==0:
+        ne=signalDF[k].netEquity[-1]
+        maxk=k
+    else:
+        if signalDF[k].netEquity[-1]<ne:
+            ne=signalDF[k].netEquity[-1]
+            maxk=k
+
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
 

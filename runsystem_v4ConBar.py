@@ -159,7 +159,7 @@ def runPairs():
     buy=[]
     sell=[]
     off=[]
-    currencies = ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'JPY', 'NZD', 'USD']
+    currencies = ['NZD', 'JPY', 'CAD',  'AUD', 'USD', 'CHF', 'EUR', 'GBP']
     currencies = [x for x in currencies if x not in buy+sell+off]
     #currencies=[]
     #currencies = ['EUR', 'GBP', 'JPY', 'USD']
@@ -367,8 +367,8 @@ def runPairs():
     offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
     
     if allOff:
-        buyHold=['NZDCAD', 'NZDCHF', 'NZDJPY', 'NZDUSD', 'AUDJPY', 'AUDCHF', 'AUDUSD', 'AUDCAD', 'EURCAD', 'EURJPY', 'EURCHF', 'EURGBP', 'EURUSD', 'CADCHF', 'CADJPY', 'USDCHF']
-        sellHold= ['AUDNZD', 'GBPNZD', 'EURNZD', 'GBPAUD', 'EURAUD', 'GBPCAD', 'USDCAD', 'GBPJPY', 'CHFJPY', 'USDJPY', 'GBPUSD', 'GBPCHF']
+        buyHold=['NZDCAD', 'NZDCHF', 'NZDJPY', 'NZDUSD', 'CADCHF', 'AUDCHF', 'AUDUSD', 'USDCHF', 'EURGBP']
+        sellHold= ['AUDNZD', 'GBPNZD', 'EURNZD', 'AUDJPY', 'GBPJPY', 'EURJPY', 'CADJPY', 'CHFJPY', 'USDJPY', 'AUDCAD', 'GBPCAD', 'EURCAD', 'USDCAD', 'GBPAUD', 'EURAUD', 'GBPUSD', 'EURUSD', 'GBPCHF', 'EURCHF']
         #offline=currencyPairs
         offline=[pair for pair in currencyPairs if pair not in buyHold+sellHold]
         

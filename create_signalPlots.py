@@ -33,7 +33,7 @@ sns.color_palette("Set1", n_colors=8, desat=.5)
 
 start_time = time.time()
 size = (8,7)
-versions = ['v4.3']
+versions = ['v4.4']
 #versions = ['v1.3','v2.4']
 barSize='1D'
 #regime switching params
@@ -45,7 +45,7 @@ lookback = 90
 if len(sys.argv) > 1:
     bestParamsPath = './data/params/'
     signalPath = './data/signals/'
-    dataPath = './data/csidata/v4futures/'
+    dataPath = './data/csidata/v4futures2/'
     equityCurveSavePath = './data/signalPlots/'
     pngPath = './data/results/'
     showPlot = False
@@ -54,7 +54,7 @@ else:
     #signalPath = 'D:/ML-TSDP/data/signals/' 
     signalPath = 'D:/ML-TSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
-    dataPath = 'D:/ML-TSDP/data/csidata/v4futures/'
+    dataPath = 'D:/ML-TSDP/data/csidata/v4futures2/'
     #bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     equityCurveSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
     pngPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
@@ -425,7 +425,7 @@ for contract in dataFiles:
     dataFile.index = pd.to_datetime(dataFile.index,format='%Y%m%d')
     dataFile.index.name = 'Dates'
     #dataFile.columns = ['Open','High','Low','Close','Volume','OI']
-    dataFile.columns = ['Open','High','Low','Close','Volume','OI','R']
+    dataFile.columns = ['Open','High','Low','Close','Volume','OI','R','S']
     print 'Loaded data from', str(dataPath) + str(contract)
     if 'YT' not in contract:
         contract = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
@@ -436,8 +436,8 @@ for contract in dataFiles:
         validSignalFiles[version]=[f for f in signalFiles if version in f and barSize in f]
     #for f in [sfile for sfilelist in validSignalFiles for sfile in sfilelist]:
     for version in validSignalFiles:
-        for f in [sfile for sfile in validSignalFiles[version] if contract in sfile]:
-            signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()
+        for f in [sfile for sfile in validSignalFiles[version] if version+'_'+contract+'_'+barSize+'.csv' == sfile]:
+            signalFile = pd.read_csv(str(signalPath)+str(f), index_col='dates').drop_duplicates()[1:]
             signalFile.index = pd.to_datetime(signalFile.index,format='%Y-%m-%d')
             print 'Loaded signals from', f
             #if there is no prior index in the row, then it's a legacy file

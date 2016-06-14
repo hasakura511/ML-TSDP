@@ -11,12 +11,12 @@ with open('./data/futures.txt') as f:
     futures = f.read().splitlines()
     
 if len(sys.argv)==1:
-    dataPath ='D:/ML-TSDP/data/csidata/v4futures/'
+    dataPath ='D:/ML-TSDP/data/csidata/v4futures2/'
     savePath =  'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     #pairPath='D:/ML-TSDP/data/csidata/v4futures/'
 else:
     savePath = './data/results/'
-    dataPath = './data/csidata/v4futures/'
+    dataPath = './data/csidata/v4futures2/'
     #pairPath='./data/'
     
 lookback=1
@@ -33,7 +33,7 @@ for contract in auxFutures:
     #data = data.drop([' P',' R', ' RINFO'],axis=1)
     #data = ratioAdjust(data)
     data.index = pd.to_datetime(data.index,format='%Y%m%d')
-    data.columns = ['Open','High','Low','Close','Volume','OI','R']
+    data.columns = ['Open','High','Low','Close','Volume','OI','R','S']
     data.index.name = 'Dates'
     #contract = ''.join([i for i in contract if not i.isdigit()])
     if 'YT' not in contract:
@@ -45,7 +45,7 @@ for contract in auxFutures:
         filename = contract2+'_B.CSV'
         data2 = pd.read_csv(dataPath+filename, index_col=0, header=None)[-(lookback+1):]    
         data2.index = pd.to_datetime(data2.index,format='%Y%m%d')
-        data2.columns = ['Open','High','Low','Close','Volume','OI','R']
+        data2.columns = ['Open','High','Low','Close','Volume','OI','R','S']
         data2.index.name = 'Dates'
         #contract = ''.join([i for i in contract if not i.isdigit()])
         if 'YT' not in contract2:

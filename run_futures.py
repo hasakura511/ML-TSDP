@@ -258,34 +258,7 @@ barSizeSetting='1D'
 
 if len(sys.argv)==1:
     debug=True
-    supportResistanceLB=60
-    #startDate=datetime.date(2016,3,31)
-    #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
-    #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-    #validationSetLength = np.busday_count(startDate, endDate)
-    startDate=None
-    validationSetLength = 10
-    supportResistanceLB = max(validationSetLength,supportResistanceLB)
-    #gainAhead bias when 'choppy'
-    
-    bias=['gainAhead','zigZag','buyHold','sellHold']
-    #bias = ['gainAhead','zigZag']
-    #bias = ['gainAhead']
-    #bias = ['zigZag']
-    #bias=['sellHold']
-    #bias=['buyHold']
-    #useSignalsFrom='highest_level3_netEquity'
-    #useSignalsFrom='best_wf_is_short'
-    #useSignalsFrom='best_wf_is_all'
-    #cycle mode->threshold=1.1
-    #adfPvalue=1.1
-    #trendmode -> threshold = -0.1
-    adfPvalue=3
-    #auto ->threshold = 0.2
-    #adfPvalue=1.1
-    
-    #Model Parameters
-    #supportResistanceLB = 180
+
     #validationSetLength = 90
     liveFutures =  [
                          #'AC',
@@ -353,8 +326,8 @@ if len(sys.argv)==1:
                          #'SJB',
                          #'SM',
                          #'SMI',
-                         'SSG',
-                         #'STW',
+                         #'SSG',
+                         'STW',
                          #'SXE',
                          #'TF',
                          #'TU',
@@ -375,10 +348,35 @@ if len(sys.argv)==1:
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
+    vsfile =pd.read_csv('Z:/TSDP/data/futuresATR.csv', index_col=0)
+    startDate_dt=dt.strptime(vsfile.ix[ticker].vSTART, '%Y-%m-%d')
     
+    #Model Parameters
+    supportResistanceLB=60
+    #startDate=datetime.date(2016,4,18)
+    startDate=datetime.date(startDate_dt.year, startDate_dt.month, startDate_dt.day)
+    endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+    validationSetLength = np.busday_count(startDate, endDate)
+    #startDate=None
+    #validationSetLength = 29
+    #supportResistanceLB = max(validationSetLength,supportResistanceLB)
+    
+    bias=['gainAhead','zigZag','buyHold','sellHold']
+    #bias = ['gainAhead','zigZag']
+    #bias = ['gainAhead']
+    #bias = ['zigZag']
+    #bias=['sellHold']
+    #bias=['buyHold']
+    #cycle mode->threshold=1.1
+    #adfPvalue=1.1
+    #trendmode -> threshold = -0.1
+    adfPvalue=3
+    #auto ->threshold = 0.2
+    #adfPvalue=1.1
+        
     #adds auxilary pair features
-    addAux = True
-    
+    addAux = True    
     #display params
     showCharts=False
     showFinalChartOnly=True
@@ -389,11 +387,19 @@ else:
     if len(sys.argv)==3:
         liveFutures=[sys.argv[1]]
         #Model Parameters
-        startDate=None
-        validationSetLength = 10
-        supportResistanceLB = 60
-        #supportResistanceLB = 90
-        #bias=['gainAhead','zigZag']
+        #startDate=None
+        #validationSetLength = 10
+        vsfile =pd.read_csv('./data/futuresATR.csv', index_col=0)
+        startDate_dt=dt.strptime(vsfile.ix[ticker].vSTART, '%Y-%m-%d')
+        
+        #Model Parameters
+        supportResistanceLB=60
+        #startDate=datetime.date(2016,4,18)
+        startDate=datetime.date(startDate_dt.year, startDate_dt.month, startDate_dt.day)
+        endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        endDate = datetime.date(endDate.year, endDate.month, endDate.day)
+        validationSetLength = np.busday_count(startDate, endDate)
+
        
         if sys.argv[2] == '1':
             bias=['buyHold']
@@ -401,10 +407,10 @@ else:
             bias=['sellHold']
         else:
             bias=['gainAhead','zigZag']
+            #load seasonal vsl,srlb
 
         adfPvalue=3
-        #validationSetLength =90
-        #useSignalsFrom='highest_level3_netEquity'
+
     else:
         startDate=None
         liveFutures=[sys.argv[1]]
@@ -1680,9 +1686,9 @@ for k,v, in signalDF.iteritems():
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
 if showCharts:
-    if startDate == None:
-        sdate=data.index[-validationSetLength].to_datetime()
-        startDate = datetime.date(sdate.year, sdate.month, sdate.day)
+    #if startDate == None:
+    sdate=data.index[-validationSetLength-1].to_datetime()
+    startDate = datetime.date(sdate.year, sdate.month, sdate.day)
     zz.plot_pivots(l=8,w=8,\
                         #startValley=(startValley, data2.Close[startValley]),\
                         #startPeak=(startPeak, data2.Close[startPeak]),\

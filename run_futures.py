@@ -250,7 +250,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         
 #system parameters
 version = 'v4'
-version_ = 'v4.3'
+version_ = 'v4.4'
 asset = 'FX'
 #filterName = 'DF1'
 #data_type = 'ALL'
@@ -385,7 +385,7 @@ if len(sys.argv)==1:
 else:
     debug=False
     if len(sys.argv)==3:
-        liveFutures=[sys.argv[1]]
+        ticker=sys.argv[1]
         #Model Parameters
         #startDate=None
         #validationSetLength = 10
@@ -413,7 +413,7 @@ else:
 
     else:
         startDate=None
-        liveFutures=[sys.argv[1]]
+        ticker=sys.argv[1]
         if len(sys.argv[2])==8:
             sdate=sys.argv[2]
             startDate=datetime.date(int(sdate[0:4]),int(sdate[4:6]),int(sdate[6:8]))
@@ -436,7 +436,7 @@ else:
         #adfPvalue=float(sys.argv[3])
         #validationSetLength =int(sys.argv[4])
         #useSignalsFrom=sys.argv[5]
-    ticker =liveFutures[0]
+    #ticker =liveFutures[0]
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
     signalPath = './data/signals/'

@@ -327,7 +327,7 @@ if len(sys.argv)==1:
                          #'SM',
                          #'SMI',
                          #'SSG',
-                         'STW',
+                         #'STW',
                          #'SXE',
                          #'TF',
                          #'TU',
@@ -335,7 +335,7 @@ if len(sys.argv)==1:
                          #'US',
                          #'VX',
                          #'W',
-                         #'YA',
+                         'YA',
                          #'YB',
                          #'YM',
                          #'YT2',
@@ -503,7 +503,8 @@ PRT['CAR25_threshold'] = 0
 
 #needs 2x srlookback to prime indicators. 
 maxlb = supportResistanceLB*2
-maxReadLines = validationSetLength+maxlb
+#maxReadLines = validationSetLength+maxlb
+maxReadLines = 500
 initialEquity=PRT['initial_equity']
 nodpsSafef=PRT['nodpsSafef']
 #model selection
@@ -756,7 +757,9 @@ dataSet, auxFuturesDict = loadFutures(auxFutures, dataPath,\
                                         verbose=verbose, addAux=addAux)
 
 #account for data loss
-validationSetLength = dataSet.shape[0]-supportResistanceLB*2
+#validationSetLength = dataSet.shape[0]-supportResistanceLB*2
+validationSetLength = dataSet.ix[startDate:].shape[0]-1
+dataSet=dataSet.iloc[-(maxlb+validationSetLength):]
 
 signalSets={
                 'wf_is_short':{},

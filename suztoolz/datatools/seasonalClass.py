@@ -328,7 +328,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #ax.scatter(correlated, data.Close.ix[correlated], color='k', label=str(int((float(len(correlated))/lb)*100))+'% Correlated')
             #ax.scatter(anticorrelated, data.Close.ix[anticorrelated], color='r', label=str(int((float(len(anticorrelated))/lb)*100))+'% Anti-Correlated')
             handles, labels = ax.get_legend_handles_labels()
-            ax.legend(handles, labels, loc='lower right',prop={'size':10}, bbox_to_anchor=(1, .97))
+            ax.legend(handles, labels, loc='lower right',prop={'size':10}, bbox_to_anchor=(1, .975))
             
             #top axis 2
             ax2p=ax.twinx()
@@ -430,7 +430,7 @@ if __name__ == "__main__":
     version = 'v4'
     liveFutures =  [
                          #'AC',
-                         #'AD',
+                         'AD',
                          #'AEX',
                          #'BO',
                          #'BP',
@@ -451,7 +451,7 @@ if __name__ == "__main__":
                          #'FCH',
                          #'FC',
                          #'FDX',
-                         'FEI',
+                         #'FEI',
                          #'FFI',
                          #'FLG',
                          #'FSS',

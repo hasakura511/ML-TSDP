@@ -142,6 +142,7 @@ for i,contract in enumerate(marketList):
     #print signalFilename
     data = pd.read_csv(signalPath+signalFilename, index_col=0)
     futuresDF.set_value(sym,'LastSIG',data.signals.iloc[-1])
+    futuresDF.set_value(sym,'LastSAFEf',data.dpsSafef.iloc[-1])
     futuresDF.set_value(sym,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
 

@@ -1649,7 +1649,7 @@ if showCharts:
                                     #dataSet.Close[-(supportResistanceLB+validationSetLength):],\
                                     dataSet.Close,\
                                     data.Close.shape[0],threshold=adfPvalue,\
-                                    showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE2')
+                                    showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE3')
     
     if debug:
         seaBias = seasonalClassifier(ticker, dataPath, savePath=chartSavePath+'_SEA',debug=debug)

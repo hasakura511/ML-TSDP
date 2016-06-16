@@ -29,7 +29,7 @@ from suztoolz.transform import ATR2
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-barSizeSetting='1d'
+barSizeSetting='4h'
 tradingEquity=1000000
 riskPerTrade=0.01
 riskEquity=tradingEquity*riskPerTrade

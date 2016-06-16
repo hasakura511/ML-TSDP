@@ -1581,7 +1581,7 @@ for k,v, in signalDF.iteritems():
         ne=signalDF[k].netEquity[-1]
         maxk=k
     else:
-        if signalDF[k].netEquity[-1]<ne:
+        if signalDF[k].netEquity[-1]>ne:
             ne=signalDF[k].netEquity[-1]
             maxk=k
 

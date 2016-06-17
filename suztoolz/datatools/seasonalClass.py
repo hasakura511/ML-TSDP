@@ -173,7 +173,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
     zzstd=kwargs.get('zzstd',3)
     zs_window=kwargs.get('zs_window',60)
     rc_window=kwargs.get('rc_window',10)
-    minValidationLength=kwargs.get('minValidationLength',15)
+    minValidationLength=kwargs.get('minValidationLength',10)
     savePath = kwargs.get('savePath',None)
     #atrPath = kwargs.get('atrPath', './data/futuresATR.csv')
     debug = kwargs.get('debug',False)

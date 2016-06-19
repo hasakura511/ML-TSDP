@@ -264,7 +264,7 @@ if len(sys.argv)==1:
     #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     #validationSetLength = np.busday_count(startDate, endDate)
-    validationSetLength = 3
+    validationSetLength = 4
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag','buyHold','sellHold']
@@ -279,7 +279,7 @@ if len(sys.argv)==1:
     #cycle mode->threshold=1.1
     #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    adfPvalue=1
+    adfPvalue=-1
     #auto ->threshold = 0.2
     #adfPvalue=1.1
     
@@ -291,9 +291,9 @@ if len(sys.argv)==1:
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
-                    'GBPJPY',\
+                    #'GBPJPY',\
                     #'AUDJPY',\
-                    #'USDJPY',\
+                    'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
                     #'EURUSD',\
@@ -343,7 +343,7 @@ else:
         #Model Parameters
         #supportResistanceLB = 25
         bias=['gainAhead','zigZag','buyHold','sellHold']
-        adfPvalue=1
+        adfPvalue=-1
         #validationSetLength =45
         #useSignalsFrom='highest_level3_netEquity'
     else:
@@ -365,7 +365,7 @@ else:
         else:
             bias=['gainAhead','zigZag','buyHold','sellHold']
             
-        adfPvalue=1
+        adfPvalue=-1
         
         #useSignalsFrom='highest_level3_netEquity'
         #bias=[sys.argv[2]]
@@ -750,7 +750,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
     #modes = smoothHurst(data.Close, data.shape[0]-1,threshold=adfPvalue, showPlot=True)
     #pc = data.Close.pct_change().fillna(0)
     #zs=abs(pc[-1]-pc.mean())/pc.std()
-    modes = mrClassifier(data.Close, data.shape[0]-1,threshold=adfPvalue, showPlot=debug,\
+    modes = mrClassifier(data.Close, data.shape[0]/2-1,threshold=adfPvalue, showPlot=debug,\
                                                ticker=ticker)
     mode = modes[-1]
     if i ==supportResistanceLB:
@@ -1534,7 +1534,7 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         )
 if showCharts:
     modes = mrClassifier(dataSet.Close[-(supportResistanceLB+validationSetLength):],\
-                                        data.Close.shape[0],threshold=adfPvalue,\
+                                        data.Close.shape[0]/2,threshold=adfPvalue,\
                                         showPlot=debug, ticker=ticker, savePath=chartSavePath+'_MODE2')
     if debug:
         for x in signalSets:
@@ -1571,19 +1571,35 @@ for k,v, in signalDF.iteritems():
             maxk=k
 '''
 
-#worst
-for d in [DpsRankByMetricW]:
-    for k, v in d.iteritems():
-        signalDF[k]=v
-ne=0
-for k,v, in signalDF.iteritems():
-    if ne==0:
-        ne=signalDF[k].netEquity[-1]
-        maxk=k
-    else:
-        if signalDF[k].netEquity[-1]<ne:
+if mode ==0:
+    #best-trend
+    for is_period in signalSets:
+        for k,v in signalSets[is_period].iteritems():
+            signalDF[is_period+'_'+k]=v
+            
+    ne=0
+    for k,v, in signalDF.iteritems():
+        if ne==0:
             ne=signalDF[k].netEquity[-1]
             maxk=k
+        else:
+            if signalDF[k].netEquity[-1]>ne:
+                ne=signalDF[k].netEquity[-1]
+                maxk=k
+else:
+    #worst-ct
+    for d in [DpsRankByMetricW]:
+        for k, v in d.iteritems():
+            signalDF[k]=v
+    ne=0
+    for k,v, in signalDF.iteritems():
+        if ne==0:
+            ne=signalDF[k].netEquity[-1]
+            maxk=k
+        else:
+            if signalDF[k].netEquity[-1]<ne:
+                ne=signalDF[k].netEquity[-1]
+                maxk=k
 
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
@@ -1607,6 +1623,7 @@ if showCharts:
                         savePath=chartSavePath+'_SIGNAL', debug=debug,\
                         barsize=barSizeSetting
                         )
+                        
 if useDPSsafef:
     sst['safef']=sst.dpsSafef
 else:

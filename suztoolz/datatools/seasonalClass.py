@@ -170,10 +170,11 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
     l=kwargs.get('l',8)
     w=kwargs.get('w',8)
     lb=kwargs.get('lb',270)
-    zzstd=kwargs.get('zzstd',3)
+    zzpstd=kwargs.get('zzpstd',2)
+    zzsstd=kwargs.get('zzsstd',3)
     zs_window=kwargs.get('zs_window',60)
     rc_window=kwargs.get('rc_window',10)
-    minValidationLength=kwargs.get('minValidationLength',10)
+    minValidationLength=kwargs.get('minValidationLength',5)
     savePath = kwargs.get('savePath',None)
     #atrPath = kwargs.get('atrPath', './data/futuresATR.csv')
     debug = kwargs.get('debug',False)
@@ -225,11 +226,11 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             
            #data points
             pstd=data.Close.pct_change().std()
-            zzp = zigzag(data.Close.values,pstd*zzstd,pstd*-zzstd)
+            zzp = zigzag(data.Close.values,pstd*zzpstd,pstd*-zzpstd)
             zzp_pivots=zzp.peak_valley_pivots()
             
             sstd=data.S.pct_change().std()
-            zzs = zigzag(data.S.values,sstd*zzstd,sstd*-zzstd)
+            zzs = zigzag(data.S.values,sstd*zzsstd,sstd*-zzsstd)
             zzs_pivots=zzs.peak_valley_pivots()
             
             runs=pd.DataFrame(np.where(zzp.pivots_to_modes()==zzs.pivots_to_modes(),1,-1),columns=['normal'])
@@ -306,7 +307,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
             ax.xaxis.set_major_locator(major)
             ax.xaxis.set_minor_locator(minor)   
-            ax.plot(data.index, data.Close, 'b:', alpha=0.5, label=str(currRun)+' Close')
+            ax.plot(data.index, data.Close, 'b:', alpha=0.5, label=str(currRun)+' Close'+str(zzpstd))
             ax.plot(data.index[zzp_pivots != 0], data.Close[zzp_pivots != 0], alpha=0.4, color='c',ls='-',\
                         label=str(pivotDate)+' Bias '+str(seaBias))
             #v start
@@ -334,7 +335,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             ax2p=ax.twinx()
             ax2p.plot(data.index, data.S, 'g:', alpha=0.5, label=str(currSea)+' Seasonality')
             ax2p.plot(data.index[zzs_pivots != 0], data.S[zzs_pivots != 0], alpha=0.8, color='green',ls='-',\
-                                label=str(nextSea)+' ZZ'+str(zzstd)+' Seasonality')
+                                label=str(nextSea)+' ZZ'+str(zzsstd)+' Seasonality')
             ax2p.axhline(nextSea, color='magenta', alpha=0.6)
             ax2p.axhline(currSea, color='violet', alpha=0.8)
             #ax2p.scatter(np.arange(lb)[zzs_pivots == 1], data.S[zzs_pivots == 1], color='g')
@@ -430,7 +431,7 @@ if __name__ == "__main__":
     version = 'v4'
     liveFutures =  [
                          #'AC',
-                         'AD',
+                         #'AD',
                          #'AEX',
                          #'BO',
                          #'BP',
@@ -505,7 +506,7 @@ if __name__ == "__main__":
                          #'W',
                          #'YA',
                          #'YB',
-                         #'YM',
+                         'YM',
                          #'YT2',
                          #'YT3'
                          ]

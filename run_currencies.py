@@ -1588,9 +1588,10 @@ if mode ==0:
                 maxk=k
 else:
     #worst-ct
-    for d in [DpsRankByMetricW]:
-        for k, v in d.iteritems():
-            signalDF[k]=v
+    for is_period in signalSets:
+        for k,v in signalSets[is_period].iteritems():
+            signalDF[is_period+'_'+k]=v
+            
     ne=0
     for k,v, in signalDF.iteritems():
         if ne==0:

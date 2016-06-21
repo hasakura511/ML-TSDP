@@ -97,9 +97,9 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
         p = p.values
         
     nrows=p.shape[0]
-    #Dimen=np.zeros(nrows)
-    #Hurst=np.zeros(nrows)
-    #SmoothHurst=np.zeros(nrows)
+    Dimen=np.zeros(nrows)
+    Hurst=np.zeros(nrows)
+    SmoothHurst=np.zeros(nrows)
     #gar=np.zeros(nrows)
     #gar[:bars]=garch(returns[:bars])
     #gar2=np.zeros(nrows)
@@ -126,7 +126,7 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
     c1 = 1-c2-c3
 
     for i,lb in enumerate(range(bars, nrows)):
-        '''
+        
         #print i,lb
         N3 = (max(p[i:lb]) - min(p[i:lb]))/float(bars)
         N2 = (max(p[i:lb-bars/2]) - min(p[i:lb-bars/2]))/float(bars/2)
@@ -139,7 +139,7 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
         #print Hurst
         SmoothHurst[lb]=c1*(Hurst[lb]+Hurst[lb-1])/2+c2*SmoothHurst[lb-1]\
                                 +c3*SmoothHurst[lb-2]
-        '''
+        
         #gar[lb] = garch(returns[:lb])[-1]
         #minmaxGarch[lb] =minmax_scale(gar[i:lb]) [-1]
         #gar2[lb] = garch2(returns[:lb])[-1]
@@ -175,8 +175,10 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
     #softmaxGarch = softmax(gar,bars,1)
     #softmaxGarch = softmax_score(gar)
     #print minmaxGarch
-    #print gar4, minmaxGarch4
-    #SmoothGarch= roofingFilter(gar,bars)
+    SmoothHurst= roofingFilter(SmoothHurst[bars:],bars)
+    SmoothADF= roofingFilter(adfpv[bars:],bars)
+    #print SmoothHurst, SmoothHurst.shape
+    #print adfpv[bars:], '\n', SmoothADF[bars:], SmoothADF[bars:].shape
     #to return
     #SmoothHG = np.maximum(SmoothHurst,minmaxGarch)
     #scaledVolatility = minmaxGarch
@@ -187,16 +189,18 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
     #modes = np.where(scaledVolatility<threshold,0,1)
     #modes2 = np.where(scaledVolatility2<threshold,0,1)
     #modes3 = np.where(scaledVolatility3<threshold,0,1)
-    #modes4 = np.where(scaledVolatility4<threshold,0,1)
+    modes4 = np.where((SmoothADF<threshold) & (SmoothADF>(1-threshold)),0,1)
     #modes = np.where(minmaxGarch<threshold,0,1)
     #mode2 = np.where(Hurst[bars:]<threshold,0,1)
-    modes4=adfClass
+    #modes4=adfClass
     #mode = modes[bars:]
     #mode2 = modes2[bars:]
     #mode3 = modes3[bars:]
     mode4 = modes4[bars:]
-    adfpv= adfpv[bars:]
-    p=p[bars:]
+    #adfpv= adfpv[bars*2:]
+    SmoothADF = SmoothADF[bars:]
+    SmoothHurst=SmoothHurst[bars:]
+    p=p[bars*2:]
     index = index2
     nrows=p.shape[0]
     #print nrows, len(p)
@@ -220,8 +224,8 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
     ax = fig.add_subplot(111, xlim=(0, len(p)), ylim=(p.min()*0.99, p.max()*1.01))
     #print bars, len(p),p
     ax.plot(np.arange(len(p)), p, 'r-', alpha=0.5)
-    ax.scatter(np.arange(len(p))[mode4 == 0], p[mode4 == 0], color='g', label='0 CycleMode')
-    ax.scatter(np.arange(len(p))[mode4 == 1], p[mode4 == 1], color='r', label='1 TrendMode')
+    ax.scatter(np.arange(len(p))[mode4 == 0], p[mode4 == 0], color='g', label='0 TrendMode')
+    ax.scatter(np.arange(len(p))[mode4 == 1], p[mode4 == 1], color='r', label='1 Counter-TrendMode')
 
     handles, labels = ax.get_legend_handles_labels()
     lgd2 = ax.legend(handles, labels, loc='upper right',prop={'size':10})
@@ -238,16 +242,21 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
     #same color to dashed and non-dashed
     ax2.set_color_cycle(sorted(sns.color_palette("husl", 4)))
     #ax2.plot(np.arange(len(p)),Hurst,color='b', label='Hurst')
-    #ax2.plot(np.arange(len(p)),SmoothHurst,color='b', label='smoothHurst')
+    #print len(p), len(SmoothADF)
+    ax2.plot(np.arange(len(p)),SmoothADF,color='b', label='SmoothADF')
+    ax2.plot(np.arange(len(p)),SmoothHurst,color='y', label='SmoothHurst')
     #ax2.plot(np.arange(len(p)),SmoothGarch, label='smoothGarch')
     #ax2.plot(np.arange(len(p)),scaledVolatility, label='scaledVolatility')
     #ax2.plot(np.arange(len(p)),scaledVolatility2, label='scaledVolatility2')
     #ax2.plot(np.arange(len(p)),scaledVolatility3, label='scaledVolatility3')
     #ax2.plot(np.arange(len(p)),scaledVolatility4, label='scaledVolatility4')
-    ax2.plot(np.arange(len(p)),adfpv, label='adf pvalue')
+    #ax2.plot(np.arange(len(p)),adfpv, label='adf pvalue')
     t = np.zeros(len(p))
     t.fill(threshold)
-    ax2.plot(np.arange(len(p)),t,color='k', label='threshold')
+    ax2.plot(np.arange(len(p)),t,color='k', label='threshold'+str(threshold))
+    t2 = np.zeros(len(p))
+    t2.fill(1-threshold)
+    ax2.plot(np.arange(len(p)),t2,color='k', label='threshold'+str(1-threshold))
     #ax2.plot(np.arange(len(p)),minmaxGarch,color='c', label='minmaxGarch')
     #ax2.plot(np.arange(len(p)),gar,color='b', label='Garch')
     handles, labels = ax2.get_legend_handles_labels()
@@ -276,13 +285,13 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
 
 if __name__ == "__main__":
     asset='FUT'
-    bars=25
-    validationLength=50
-    threshold=-1
+    bars=60
+    validationLength=60
+    threshold=0.8
     modeDict={}
     if asset=='FX':
         #dataPath = 'Z:/TSDP/data/from_IB/'
-        dataPath = 'D:/ML-TSDP/data/from_MT4/'
+        dataPath = 'D:/ML-TSDP/data/from_IB/'
         currencyPairs =   [
                     'NZDJPY',\
                     'CADJPY',\
@@ -314,7 +323,7 @@ if __name__ == "__main__":
                     'NZDCAD'
                     ]
         files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-        barSizeSetting='4h'
+        barSizeSetting='30m'
 
         for pair in currencyPairs:    
             if barSizeSetting+'_'+pair+'.csv' in files:

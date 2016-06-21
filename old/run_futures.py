@@ -78,7 +78,6 @@ from suztoolz.datatools.loadFuturesCSI import loadFutures
 from suztoolz.datatools.acPeriodogram import acPeriodogram
 from suztoolz.datatools.zigzag2 import zigzag as zg
 from suztoolz.datatools.mrClassifier import mrClassifier
-from suztoolz.datatools.mrClassifier3 import mrClassifier as mrClassifier3
 from suztoolz.datatools.seasonalClass import seasonalClassifier
 from suztoolz.position_sizing.calcDPS import calcDPS
 from sklearn.preprocessing import scale, robust_scale, minmax_scale
@@ -262,7 +261,7 @@ if len(sys.argv)==1:
 
     #validationSetLength = 90
     liveFutures =  [
-                         'AC',
+                         #'AC',
                          #'AD',
                          #'AEX',
                          #'BO',
@@ -336,7 +335,7 @@ if len(sys.argv)==1:
                          #'US',
                          #'VX',
                          #'W',
-                         #'YA',
+                         'YA',
                          #'YB',
                          #'YM',
                          #'YT2',
@@ -1646,13 +1645,11 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                                         )
 if showCharts:
     
-    #modes = mrClassifier(\
-    #                                #dataSet.Close[-(supportResistanceLB+validationSetLength):],\
-    #                                dataSet.Close,\
-    #                                data.Close.shape[0],threshold=adfPvalue,\
-    #                                showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE3')
-    modes = mrClassifier3(dataSet.Close, data.shape[0],threshold=0.8, showPlot=debug,\
-                                               savePath=chartSavePath+'_MODE3', ticker=ticker+contractExpiry)
+    modes = mrClassifier(\
+                                    #dataSet.Close[-(supportResistanceLB+validationSetLength):],\
+                                    dataSet.Close,\
+                                    data.Close.shape[0],threshold=adfPvalue,\
+                                    showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE3')
     
     if debug:
         seaBias = seasonalClassifier(ticker, dataPath, savePath=chartSavePath+'_SEA',debug=debug)
@@ -1675,37 +1672,20 @@ for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
     for k, v in d.iteritems():
         signalDF[k]=v
 '''
-if modes[-1] ==0:
-    #trend
-    for is_period in signalSets:
-        for k,v in signalSets[is_period].iteritems():
-            signalDF[is_period+'_'+k]=v
-            
-    ne=0
-    for k,v, in signalDF.iteritems():
-        if ne==0:
+for is_period in signalSets:
+    for k,v in signalSets[is_period].iteritems():
+        signalDF[is_period+'_'+k]=v
+        
+ne=0
+for k,v, in signalDF.iteritems():
+    if ne==0:
+        ne=signalDF[k].netEquity[-1]
+        maxk=k
+    else:
+        if signalDF[k].netEquity[-1]>ne:
             ne=signalDF[k].netEquity[-1]
             maxk=k
-        else:
-            if signalDF[k].netEquity[-1]>ne:
-                ne=signalDF[k].netEquity[-1]
-                maxk=k
-else:
-    #counter-trend
-    for is_period in signalSets:
-        for k,v in signalSets[is_period].iteritems():
-            signalDF[is_period+'_'+k]=v
             
-    ne=0
-    for k,v, in signalDF.iteritems():
-        if ne==0:
-            ne=signalDF[k].netEquity[-1]
-            maxk=k
-        else:
-            if signalDF[k].netEquity[-1]<ne:
-                ne=signalDF[k].netEquity[-1]
-                maxk=k
-                
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]
 if showCharts:

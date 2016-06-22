@@ -36,7 +36,101 @@ riskPerTrade=0.01
 riskEquity=tradingEquity*riskPerTrade
 lookback=20
 refresh=False
-
+c2contracts = {
+                    'AC':'@AC',
+                    'AD':'@AD',
+                    'AEX':'AEX',
+                    'BO':'@BO',
+                    'BP':'@BP',
+                    'C':'@C',
+                    'CC':'@CC',
+                    'CD':'@CD',
+                    'CGB':'CB',
+                    'CL':'QCL',
+                    'CT':'@CT',
+                    'CU':'@EU',
+                    'DX':'@DX',
+                    'EBL':'BD',
+                    'EBM':'BL',
+                    'EBS':'EZ',
+                    'ED':'@ED',
+                    'EMD':'@EMD',
+                    'ES':'@ES',
+                    'FC':'@GF',
+                    'FCH':'MT',
+                    'FDX':'DXM',
+                    'FEI':'IE',
+                    'FFI':'LF',
+                    'FLG':'LG',
+                    'FSS':'LL',
+                    'FV':'@FV',
+                    'GC':'QGC',
+                    'HCM':'HHI',
+                    'HG':'QHG',
+                    'HIC':'HSI',
+                    'HO':'QHO',
+                    'JY':'@JY',
+                    'KC':'@KC',
+                    'KW':'@KW',
+                    'LB':'@LB',
+                    'LC':'@LE',
+                    'LCO':'EB',
+                    'LGO':'GAS',
+                    'LH':'@HE',
+                    'LRC':'LRC',
+                    'LSU':'QW',
+                    'MEM':'@MME',
+                    'MFX':'IB',
+                    'MP':'@PX',
+                    'MW':'@MW',
+                    'NE':'@NE',
+                    'NG':'QNG',
+                    'NIY':'@NKD',
+                    'NQ':'@NQ',
+                    'O':'@O',
+                    'OJ':'@OJ',
+                    'PA':'QPA',
+                    'PL':'QPL',
+                    'RB':'QRB',
+                    'RR':'@RR',
+                    'RS':'@RS',
+                    'S':'@S',
+                    'SB':'@SB',
+                    'SF':'@SF',
+                    'SI':'QSI',
+                    'SIN':'IN',
+                    'SJB':'BB',
+                    'SM':'@SM',
+                    'SMI':'SW',
+                    'SSG':'SS',
+                    'STW':'TW',
+                    'SXE':'EX',
+                    'TF':'@TFS',
+                    'TU':'@TU',
+                    'TY':'@TY',
+                    'US':'@US',
+                    'VX':'@VX',
+                    'W':'@W',
+                    'YA':'AP',
+                    'YB':'HBS',
+                    'YM':'@YM',
+                    'YT2':'HTS',
+                    'YT3':'HXS'
+                    }
+months = {
+                1:'F',
+                2:'G',
+                3:'H',
+                4:'J',
+                5:'K',
+                6:'M',
+                7:'N',
+                8:'Q',
+                9:'U',
+                10:'V',
+                11:'X',
+                12:'Z'
+                }
 if len(sys.argv)==1:
     showPlots=False
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
@@ -65,12 +159,17 @@ for i,contract in enumerate(marketList):
     atr=ATR2(data.High.values,data.Low.values,data.Close.values,lookback)
     pc=data.Close.pct_change()
     priorSig=np.where(pc<0,-1,1)[-1]
+
     #print pc
     #print sym, atr,data.tail()
     if 'YT' not in contract:
         sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
     else:
         sym=contract
+    contractYear=str(data.R[-1])[3]
+    contractMonth=str(data.R[-1])[-2:]
+    contractName=c2contracts[sym]+months[int(contractMonth)]+contractYear
+    print sym, data.R[-1], contractName
     #signalFilename='v4_'+sym+'.csv'
     corrDF[sym]=pc
     futuresDF.set_value(sym,'LastClose',data.Close[-1])
@@ -78,6 +177,8 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
     futuresDF.set_value(sym,'ACT',priorSig)
     futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
+    futuresDF.set_value(sym,'Contract',contractName)
+    
 
     
 for i,contract in enumerate(marketList):

@@ -257,6 +257,7 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
     t2 = np.zeros(len(p))
     t2.fill(1-threshold)
     ax2.plot(np.arange(len(p)),t2,color='k', label='threshold'+str(1-threshold))
+    ax2.set_ylim(-0.1,1.1)
     #ax2.plot(np.arange(len(p)),minmaxGarch,color='c', label='minmaxGarch')
     #ax2.plot(np.arange(len(p)),gar,color='b', label='Garch')
     handles, labels = ax2.get_legend_handles_labels()

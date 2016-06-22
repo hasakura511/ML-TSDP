@@ -264,7 +264,7 @@ if len(sys.argv)==1:
     #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
     #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
     #validationSetLength = np.busday_count(startDate, endDate)
-    validationSetLength = 4
+    validationSetLength = 7
     supportResistanceLB = max(validationSetLength,supportResistanceLB)
     #gainAhead bias when 'choppy'
     bias = ['gainAhead','zigZag','buyHold','sellHold']
@@ -279,7 +279,7 @@ if len(sys.argv)==1:
     #cycle mode->threshold=1.1
     #adfPvalue=1.1
     #trendmode -> threshold = -0.1
-    adfPvalue=-1
+    adfPvalue=3
     #auto ->threshold = 0.2
     #adfPvalue=1.1
     
@@ -287,13 +287,13 @@ if len(sys.argv)==1:
     
     #validationSetLength =25
     livePairs =  [
-                    #'NZDJPY',\
+                    'NZDJPY',\
                     #'CADJPY',\
                     #'CHFJPY',\
                     #'EURJPY',\
                     #'GBPJPY',\
                     #'AUDJPY',\
-                    'USDJPY',\
+                    #'USDJPY',\
                     #'EURCHF',\
                     #'EURGBP',\
                     #'EURUSD',\
@@ -338,12 +338,12 @@ else:
         startDate=None
         #endDate = dt.today().replace(hour=0, minute=0, second=0, microsecond=0)
         #endDate = datetime.date(endDate.year, endDate.month, endDate.day)
-        validationSetLength = 4
+        validationSetLength = 7
         supportResistanceLB = max(validationSetLength,50)
         #Model Parameters
         #supportResistanceLB = 25
         bias=['gainAhead','zigZag','buyHold','sellHold']
-        adfPvalue=-1
+        adfPvalue=3
         #validationSetLength =45
         #useSignalsFrom='highest_level3_netEquity'
     else:
@@ -365,7 +365,7 @@ else:
         else:
             bias=['gainAhead','zigZag','buyHold','sellHold']
             
-        adfPvalue=-1
+        adfPvalue=3
         
         #useSignalsFrom='highest_level3_netEquity'
         #bias=[sys.argv[2]]
@@ -1570,7 +1570,7 @@ for k,v, in signalDF.iteritems():
             ne=signalDF[k].netEquity[-1]
             maxk=k
 '''
-
+'''
 if mode ==0:
     #best-trend
     for is_period in signalSets:
@@ -1587,20 +1587,21 @@ if mode ==0:
                 ne=signalDF[k].netEquity[-1]
                 maxk=k
 else:
-    #worst-ct
-    for is_period in signalSets:
-        for k,v in signalSets[is_period].iteritems():
-            signalDF[is_period+'_'+k]=v
-            
-    ne=0
-    for k,v, in signalDF.iteritems():
-        if ne==0:
+'''
+#worst-ct
+for is_period in signalSets:
+    for k,v in signalSets[is_period].iteritems():
+        signalDF[is_period+'_'+k]=v
+        
+ne=0
+for k,v, in signalDF.iteritems():
+    if ne==0:
+        ne=signalDF[k].netEquity[-1]
+        maxk=k
+    else:
+        if signalDF[k].netEquity[-1]<ne:
             ne=signalDF[k].netEquity[-1]
             maxk=k
-        else:
-            if signalDF[k].netEquity[-1]<ne:
-                ne=signalDF[k].netEquity[-1]
-                maxk=k
 
 sst=signalDF[maxk].copy(deep=True)
 print signalDF[maxk].iloc[-1]

@@ -169,15 +169,16 @@ for i,contract in enumerate(marketList):
     contractYear=str(data.R[-1])[3]
     contractMonth=str(data.R[-1])[-2:]
     contractName=c2contracts[sym]+months[int(contractMonth)]+contractYear
-    print sym, data.R[-1], contractName
+    #print sym, data.R[-1], contractName
     #signalFilename='v4_'+sym+'.csv'
     corrDF[sym]=pc
+    futuresDF.set_value(sym,'Contract',contractName)
     futuresDF.set_value(sym,'LastClose',data.Close[-1])
     futuresDF.set_value(sym,'ATR'+str(lookback),atr[-1])
     futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
     futuresDF.set_value(sym,'ACT',priorSig)
     futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
-    futuresDF.set_value(sym,'Contract',contractName)
+    
     
 
     

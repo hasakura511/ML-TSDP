@@ -407,7 +407,7 @@ else:
         elif sys.argv[2] == '-1':
             bias=['sellHold']
         else:
-            bias=['gainAhead','zigZag']
+            bias=['gainAhead','zigZag','buyHold','sellHold']
             #load seasonal vsl,srlb
 
         adfPvalue=3

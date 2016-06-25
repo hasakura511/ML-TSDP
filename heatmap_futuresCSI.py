@@ -6,7 +6,10 @@ import sys
 import numpy as np 
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import datetime as dt
+import time
 
+start_time = time.time()
 with open('./data/futures.txt') as f:
     futures = f.read().splitlines()
     
@@ -109,3 +112,4 @@ for contract in ranking:
 print 'buyHold',len(buyHold),buyHold
 print 'sellHold',len(sellHold),sellHold
 '''
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

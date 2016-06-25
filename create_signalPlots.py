@@ -626,7 +626,5 @@ for title in eCurves_bySystem:
 #    print priceChange(eCurves_bySystem[x][-10:])
 #    print dateIndexes[x].shape    
 
-print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
-            
-            
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

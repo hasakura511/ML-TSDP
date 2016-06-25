@@ -6,6 +6,8 @@ from os.path import isfile, join
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime as dt
+import time
+start_time = time.time()
 
 if len(sys.argv)==1:
     dataPath = 'D:/ML-TSDP/data/from_MT4/'
@@ -126,3 +128,4 @@ with open(pairPath+'offline_currencies.txt','w') as f:
     for pair in offline:
       f.write("%s\n" % pair)
 '''
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

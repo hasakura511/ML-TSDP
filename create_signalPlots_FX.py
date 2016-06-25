@@ -28,6 +28,7 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
                         volumeSpike, softmax_score, create_indicators, ratio, perturb_data,\
                         roofingFilter
 import seaborn as sns
+
 sns.set_style("darkgrid", {"axes.facecolor": ".9"})
 sns.color_palette("Set1", n_colors=8, desat=.5)
 
@@ -667,8 +668,4 @@ for title in eCurves_bySystem:
 #    print eCurves_bySystem[x][-10:]
 #    print priceChange(eCurves_bySystem[x][-10:])
 #    print dateIndexes[x].shape    
-
-print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
-            
-            
-
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

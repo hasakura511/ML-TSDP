@@ -18,6 +18,7 @@ import urllib2
 import webbrowser
 import re
 import datetime
+from datetime import datetime as dt
 import time
 import inspect
 import os
@@ -28,7 +29,7 @@ from copy import deepcopy
 from suztoolz.transform import ATR2
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+start_time = time.time()
 barSizeSetting='4h'
 tradingEquity=1000000
 riskPerTrade=0.01
@@ -129,3 +130,4 @@ currenciesDF.to_csv(savePath+'currenciesATR.csv')
 #signalDF=signalDF.sort_index()
 #print signalDF
 #signalDF.to_csv(savePath+'currenciesSignals.csv')
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

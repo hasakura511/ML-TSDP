@@ -18,6 +18,7 @@ import urllib2
 import webbrowser
 import re
 import datetime
+from datetime import datetime as dt
 import time
 import inspect
 import os
@@ -255,4 +256,4 @@ futuresDF.to_csv(savePath+'futuresATR.csv')
 #signalDF=signalDF.sort_index()
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')
-print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

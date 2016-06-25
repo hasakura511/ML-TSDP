@@ -408,7 +408,6 @@ else:
             bias=['sellHold']
         else:
             bias=['gainAhead','zigZag','buyHold','sellHold']
-            #load seasonal vsl,srlb
 
         adfPvalue=3
 
@@ -1731,7 +1730,4 @@ else:
     sst['safef']=sst.nodpsSafef
     
 createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst, start_time, dataSet)
-
-        
-
-print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes'
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

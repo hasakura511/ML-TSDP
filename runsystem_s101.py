@@ -60,15 +60,15 @@ idxes=['#AUS200',
         '#USNDAQ100',
         '#USSPX500']
 
-futidxes=['#GER30_M6',
-            '#UK100_M6',
-            '#JPN225_M6',
-            '#US$indx_M6',
-            '#NAS100_M6',
-            '#DJ30_M6',
-            '#EUR50_M6',
-            '#FRA40_M6',
-            '#SWI20_M6']
+futidxes=['#GER30_U6',
+            '#UK100_U6',
+            '#JPN225_U6',
+            '#US$indx_U6',
+            '#NAS100_U6',
+            '#DJ30_U6',
+            '#EUR50_U6',
+            '#FRA40_U6',
+            '#SWI20_U6']
                                    
                     
 def runv2(system, pair, blend):

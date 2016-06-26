@@ -4,6 +4,7 @@ import subprocess
 import numpy as np
 import pandas as pd
 import time
+from datetime import datetime as dt
 from ibapi.place_order import place_order as place_iborder
 from c2api.place_order import place_order as place_c2order
 import json
@@ -42,6 +43,7 @@ def start_trade(systems):
         global debug
         if debug:
            print "Starting " + str(systems.iloc[0]['Name'])
+           print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
            logging.info("Starting " + str(systems.iloc[0]['Name']))
         try:
             model=get_models(systems)

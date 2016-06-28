@@ -249,7 +249,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         
 #system parameters
 version = 'v4'
-version_ = 'v4.3'
+version_ = 'v4.5'
 asset = 'FX'
 filterName = 'DF1'
 data_type = 'ALL'

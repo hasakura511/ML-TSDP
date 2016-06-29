@@ -256,13 +256,14 @@ asset = 'FX'
 #filterName = 'DF1'
 #data_type = 'ALL'
 barSizeSetting='1D'
+mrThreshold = 0.5
 
 if len(sys.argv)==1:
     debug=True
 
     #validationSetLength = 90
     liveFutures =  [
-                         'AC',
+                         #'AC',
                          #'AD',
                          #'AEX',
                          #'BO',
@@ -272,7 +273,7 @@ if len(sys.argv)==1:
                          #'CD',
                          #'CGB',
                          #'CL',
-                         #'CT',
+                        # 'CT',
                          #'CU',
                          #'DX',
                          #'EBL',
@@ -319,7 +320,7 @@ if len(sys.argv)==1:
                          #'RB',
                          #'RR',
                          #'RS',
-                         #'S',
+                         'S',
                          #'SB',
                          #'SF',
                          #'SI',
@@ -1097,10 +1098,12 @@ for start,i in enumerate(range(supportResistanceLB,stop-supportResistanceLB+1)):
                 ratio=auxFuturesDict[contract]['closes'].iloc[:,0].ix[data_primer.index]/\
                             auxFuturesDict[contract]['closes'].iloc[:,1].ix[data_primer.index]
                 #relative strength ratio
-                roc=ROC(ratio,avgHalfCycle)
+                #roc=ROC(ratio,avgHalfCycle)
+                roc=ROC(ratio,1)
                 if sum(np.isnan(roc))>0:
                     sys.exit()
-                auxFuturesDataset[contract+'_Ratio_ROC_c'+str(avgHalfCycle)] =roc
+                #auxFuturesDataset[contract+'_Ratio_ROC_c'+str(avgHalfCycle)] =roc
+                auxFuturesDataset[contract+'_Ratio_ROC_c'+str(1)] =roc
                 dataSets[is_period] = pd.concat([dataSets[is_period], auxFuturesDataset], axis=1)
                 #auxFuturesDataset.iloc[-supportResistanceLB:].iloc[index].plot()
             
@@ -1650,7 +1653,7 @@ if showCharts:
     #                                dataSet.Close,\
     #                                data.Close.shape[0],threshold=adfPvalue,\
     #                                showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE3')
-    modes = mrClassifier3(dataSet.Close, data.shape[0],threshold=0.8, showPlot=debug,\
+    modes = mrClassifier3(dataSet.Close, data.shape[0],threshold=mrThreshold, showPlot=debug,\
                                                savePath=chartSavePath+'_MODE3', ticker=ticker+contractExpiry)
     
     if debug:

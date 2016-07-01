@@ -29,7 +29,7 @@ if len(sys.argv) > 1:
     #signalPath = './data/signals/'
     #dataPath = './data/csidata/v4futures2/'
     equityCurveSavePath = './data/signalPlots/'
-    savePath== './data/results/'
+    savePath= './data/results/'
     #pngPath = './data/results/'
     #showPlot = False
     #verbose = False
@@ -56,8 +56,10 @@ for f in dataFiles:
     df = pd.read_csv(equityCurveSavePath+f, index_col=0)
     df.index.name='dates'
     #print df
-    futuresRank.set_value(sym,df.index[-1],df.equity[-1])
-futuresRank = futuresRank.sort_values(by=futuresRank.columns[0], ascending=False)
+    pctChg=(df.equity[-1]-df.equity[0])/df.equity[0]
+    futuresRank.set_value(sym,str(df.index[0])+' to '+str(df.index[-1]),pctChg)
+futuresRank.index.name='Symbol'
+futuresRank = futuresRank.sort_values(by=futuresRank.columns[0], ascending=False).reset_index()
 print 'Saving', savePath+'fRank.html'
 futuresRank.to_html(savePath+'fRank.html')
 print futuresRank

@@ -4,3 +4,4 @@ cd \cygwin64\media\sf_python\tsdp
 \anaconda2\python vol_adjsize.py 1 >> \logs\daily_futures.log
 \anaconda2\python heatmap_futuresCSI.py 1 >> \logs\daily_futures.log
 \anaconda2\python create_signalPlots.py 1 >> \logs\daily_futures.log
+\anaconda2\python instRanking.py 1 >> \logs\daily_futures.log

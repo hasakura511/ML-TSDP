@@ -248,7 +248,32 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'LastSAFEf',data.dpsSafef.iloc[-1])
     futuresDF.set_value(sym,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
+for i,contract in enumerate(marketList):
+    #print i,
+    if 'YT' not in contract:
+        sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
+    else:
+        sym=contract
+    signalFilename='0.5_'+sym+'_1D.csv'
+    #print signalFilename
+    data = pd.read_csv(signalPath+signalFilename, index_col=0)
+    futuresDF.set_value(sym,'0.5LastSIG',data.signals.iloc[-1])
+    futuresDF.set_value(sym,'0.5LastSAFEf',data.dpsSafef.iloc[-1])
+    futuresDF.set_value(sym,'0.5SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
+for i,contract in enumerate(marketList):
+    #print i,
+    if 'YT' not in contract:
+        sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
+    else:
+        sym=contract
+    signalFilename='1_'+sym+'_1D.csv'
+    #print signalFilename
+    data = pd.read_csv(signalPath+signalFilename, index_col=0)
+    futuresDF.set_value(sym,'1LastSIG',data.signals.iloc[-1])
+    futuresDF.set_value(sym,'1LastSAFEf',data.dpsSafef.iloc[-1])
+    futuresDF.set_value(sym,'1SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    
 futuresDF=futuresDF.sort_index()
 print futuresDF
 futuresDF.to_csv(savePath+'futuresATR.csv')

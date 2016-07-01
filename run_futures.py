@@ -199,7 +199,7 @@ def reCalcEquity(sst, metric):
     
     return sst
     
-def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst, start_time, dataSet):
+def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst, start_time, dataSet, mrThreshold):
     print version_, 'Saving',ticker, 'Signals..'      
     timenow, lastBartime, cycleTime = getCycleTime(start_time, dataSet)
     files = [ f for f in listdir(signalPath) if isfile(join(signalPath,f)) ]
@@ -208,7 +208,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         #signalFile = sst.iloc[-2:]
         addLine = sst.iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
-        addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+        addLine = addLine.append(pd.Series(data=mrThreshold, index=['mrThreshold']))
         addLine.name = sst.iloc[-1].name
         signalFile = sst.iloc[-2:-1].append(addLine)
         signalFile.index.name = 'dates'
@@ -219,7 +219,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         signalFile=pd.read_csv(signalPath+ version_+'_'+ ticker+'_'+barSizeSetting+ '.csv', index_col=['dates'])
         addLine = sst.iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
-        addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+        addLine = addLine.append(pd.Series(data=mrThreshold, index=['mrThreshold']))
         addLine.name = sst.iloc[-1].name
         signalFile = signalFile.append(addLine)
         filename = signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv'
@@ -231,7 +231,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         #signalFile = sst.iloc[-2:]
         addLine = sst.iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
-        addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+        addLine = addLine.append(pd.Series(data=mrThreshold, index=['mrThreshold']))
         addLine.name = sst.iloc[-1].name
         signalFile = sst.iloc[-2:-1].append(addLine)
         signalFile.index.name = 'dates'
@@ -242,7 +242,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         signalFile=pd.read_csv(signalPath+ version+'_'+ ticker+ '.csv', index_col=['dates'])
         addLine = sst.iloc[-1]
         addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
-        addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+        addLine = addLine.append(pd.Series(data=mrThreshold, index=['mrThreshold']))
         addLine.name = sst.iloc[-1].name
         signalFile = signalFile.append(addLine)
         filename=signalPath + version+'_'+ ticker+ '.csv'
@@ -256,7 +256,7 @@ asset = 'FX'
 #filterName = 'DF1'
 #data_type = 'ALL'
 barSizeSetting='1D'
-mrThreshold = 0.8
+mrThresholds = [1, .5, 0.75]
 
 if len(sys.argv)==1:
     debug=True
@@ -273,7 +273,7 @@ if len(sys.argv)==1:
                          #'CD',
                          #'CGB',
                          #'CL',
-                        # 'CT',
+                         #'CT',
                          #'CU',
                          #'DX',
                          #'EBL',
@@ -760,6 +760,7 @@ dataSet, auxFuturesDict = loadFutures(auxFutures, dataPath,\
 #account for data loss
 #validationSetLength = dataSet.shape[0]-supportResistanceLB*2
 validationSetLength = dataSet.ix[startDate:].shape[0]-1
+dataSet2= dataSet.copy()
 dataSet=dataSet.iloc[-(maxlb+validationSetLength):]
 
 signalSets={
@@ -1653,8 +1654,7 @@ if showCharts:
     #                                dataSet.Close,\
     #                                data.Close.shape[0],threshold=adfPvalue,\
     #                                showPlot=debug, ticker=ticker+contractExpiry, savePath=chartSavePath+'_MODE3')
-    modes = mrClassifier3(dataSet.Close, data.shape[0],threshold=mrThreshold, showPlot=debug,\
-                                               savePath=chartSavePath+'_MODE3', ticker=ticker+contractExpiry)
+
     
     if debug:
         seaBias = seasonalClassifier(ticker, dataPath, savePath=chartSavePath+'_SEA',debug=debug)
@@ -1670,67 +1670,75 @@ if showCharts:
         for x in signalDF:
             signalDF[x].to_csv('C:/users/hidemi/desktop/python/'+ticker+'_'+x+'.csv')
 
-   
 
-'''
-for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
-    for k, v in d.iteritems():
-        signalDF[k]=v
-'''
-if modes[-1] ==0:
-    #trend
-    for is_period in signalSets:
-        for k,v in signalSets[is_period].iteritems():
-            signalDF[is_period+'_'+k]=v
-            
-    ne=0
-    for k,v, in signalDF.iteritems():
-        if ne==0:
-            ne=signalDF[k].netEquity[-1]
-            maxk=k
-        else:
-            if signalDF[k].netEquity[-1]>ne:
-                ne=signalDF[k].netEquity[-1]
-                maxk=k
-else:
-    #counter-trend
-    for is_period in signalSets:
-        for k,v in signalSets[is_period].iteritems():
-            signalDF[is_period+'_'+k]=v
-            
-    ne=0
-    for k,v, in signalDF.iteritems():
-        if ne==0:
-            ne=signalDF[k].netEquity[-1]
-            maxk=k
-        else:
-            if signalDF[k].netEquity[-1]<ne:
-                ne=signalDF[k].netEquity[-1]
-                maxk=k
+for i,mrThreshold in enumerate(mrThresholds):
+    if i == len(mrThresholds)-1:
+        ver2=version_
+    else:
+        ver2=str(mrThreshold)
+        
+    modes = mrClassifier3(dataSet.Close, data.shape[0],threshold=mrThreshold, showPlot=debug,\
+                                               savePath=chartSavePath+'_MODE3', ticker=ticker+contractExpiry)
+    '''
+    for d in [DpsRankByMetricB, DpsRankByMetricW, finalDF]:
+        for k, v in d.iteritems():
+            signalDF[k]=v
+    '''
+    if modes[-1] ==0:
+        #trend
+        for is_period in signalSets:
+            for k,v in signalSets[is_period].iteritems():
+                signalDF[is_period+'_'+k]=v
                 
-sst=signalDF[maxk].copy(deep=True)
-print signalDF[maxk].iloc[-1]
-if showCharts:
-    #if startDate == None:
-    sdate=data.index[-validationSetLength-1].to_datetime()
-    startDate = datetime.date(sdate.year, sdate.month, sdate.day)
-    zz.plot_pivots(l=8,w=8,\
-                        #startValley=(startValley, data2.Close[startValley]),\
-                        #startPeak=(startPeak, data2.Close[startPeak]),\
-                        #minorValley=(minorValley, data2.Close[minorValley]),\
-                        #minorPeak=(minorPeak, data2.Close[minorPeak]),\
-                        #shortStart=(shortStart, data2.Close[shortStart]),\
-                        cycleList=cycleList,mode=modePred[start:],\
-                        signals={maxk:signalDF[maxk]},
-                        #signals=signalDF,\
-                        chartTitle=ticker+contractExpiry+' vStart '+str(startDate)\
-                        +' lb'+str(supportResistanceLB)+' SIGNAL '+maxk,\
-                        savePath=chartSavePath+'_SIGNAL', debug=debug
-                        )
-if useDPSsafef:
-    sst['safef']=sst.dpsSafef
-else:
-    sst['safef']=sst.nodpsSafef
+        ne=0
+        for k,v, in signalDF.iteritems():
+            if ne==0:
+                ne=signalDF[k].netEquity[-1]
+                maxk=k
+            else:
+                if signalDF[k].netEquity[-1]>ne:
+                    ne=signalDF[k].netEquity[-1]
+                    maxk=k
+    else:
+        #counter-trend
+        for is_period in signalSets:
+            for k,v in signalSets[is_period].iteritems():
+                signalDF[is_period+'_'+k]=v
+                
+        ne=0
+        for k,v, in signalDF.iteritems():
+            if ne==0:
+                ne=signalDF[k].netEquity[-1]
+                maxk=k
+            else:
+                if signalDF[k].netEquity[-1]<ne:
+                    ne=signalDF[k].netEquity[-1]
+                    maxk=k
+                    
+    sst=signalDF[maxk].copy(deep=True)
+    print signalDF[maxk].iloc[-1]
+    if showCharts:
+        #if startDate == None:
+        sdate=data.index[-validationSetLength-1].to_datetime()
+        startDate = datetime.date(sdate.year, sdate.month, sdate.day)
+        zz.plot_pivots(l=8,w=8,\
+                            #startValley=(startValley, data2.Close[startValley]),\
+                            #startPeak=(startPeak, data2.Close[startPeak]),\
+                            #minorValley=(minorValley, data2.Close[minorValley]),\
+                            #minorPeak=(minorPeak, data2.Close[minorPeak]),\
+                            #shortStart=(shortStart, data2.Close[shortStart]),\
+                            cycleList=cycleList,mode=modePred[start:],\
+                            signals={maxk:signalDF[maxk]},
+                            #signals=signalDF,\
+                            chartTitle=ticker+contractExpiry+' vStart '+str(startDate)\
+                            +' lb'+str(supportResistanceLB)+' SIGNAL '+maxk,\
+                            savePath=chartSavePath+'_SIGNAL', debug=debug
+                            )
+    if useDPSsafef:
+        sst['safef']=sst.dpsSafef
+    else:
+        sst['safef']=sst.nodpsSafef
+        
+    createSignalFile(version, ver2, ticker, barSizeSetting, signalPath, sst, start_time, dataSet, mrThreshold)
     
-createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst, start_time, dataSet)
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

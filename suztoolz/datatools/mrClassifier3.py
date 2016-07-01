@@ -89,7 +89,7 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
     #if len(p)-bars <3:
     #    bars=len(p)-3
     index = p.index
-    index2=p.index[bars:]
+    index2=p.index[bars*2:]
     returns = p.pct_change().fillna(0)
 
     #print rfGarch.shape, p.shape
@@ -202,6 +202,7 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
     SmoothHurst=SmoothHurst[bars:]
     p=p[bars*2:]
     index = index2
+    #print index, index.shape
     nrows=p.shape[0]
     #print nrows, len(p)
     #Hurst=Hurst[bars:]

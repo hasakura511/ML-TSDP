@@ -24,7 +24,7 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
 import seaborn as sns
 
 version = 'v4'
-lookback=20
+
 if len(sys.argv) > 1:
     #bestParamsPath = './data/params/'
     #signalPath = './data/signals/'
@@ -53,10 +53,15 @@ print len(dataFiles), dataFiles
 
 futuresRank=pd.DataFrame()
 for f in dataFiles:
+    lookback=10
     sym = f.split('_')[1].split('.')[0]
     df = pd.read_csv(equityCurveSavePath+f, index_col=0)
     df.index.name='dates'
     #print df
+    nrows=df.shape[0]
+    if nrows <lookback:
+        lookback= nrows
+        
     pctChg=(df.equity[-1]-df.equity[-lookback])/df.equity[-lookback]
     futuresRank.set_value(sym,str(df.index[-lookback])+' to '+str(df.index[-1]),pctChg)
 futuresRank.index.name='Symbol'

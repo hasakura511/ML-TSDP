@@ -1,3 +1,4 @@
 dates,CAR25,dd95,ddTol,dpsCommission,dpsNetEquity,dpsNetPNL,dpsRunName,dpsSafef,gainAhead,is_period,netEquity,netPNL,nodpsComm,nodpsSafef,signalType,signals,v4.4_system,safef,mrThreshold,timestamp
 2016-06-29,0.20357235037,0.0,0.00114208048144,2.0,52575.79,3628.53,both_gainAhead_GNBayes DPS wl1.5 maxL2 dd95_0.001 thres_0.0,2.0,-0.0286123032904,wf_is_short,52576.72,3630.45,0.0,1.0,gainAhead_GNBayes,-1.0,gainAhead_GNBayes_f86_is4,1.0,,
 2016-06-30,0.118028480047,0.000110996700088,0.00131876094679,4.44675351187,55579.97,3004.18,both_gainAhead_GNBayes DPS wl2.0 maxL2 dd95_0.001 thres_0.0,2.0,0.0,wf_is_short,54078.9,1502.18,2.16324244235,1.0,gainAhead_GNBayes,1.0,gainAhead_GNBayes_f86_is3,1.0,0.5,20160701 00:17:36 EDT
+2016-07-01 00:00:00,-0.00528915447893,0.0,0.00161514570617,0.0,70930.23,-845.67,both_buyHold DPS wl3.0 maxL2 dd95_0.002 thres_0.0,1.0,0.0,wf_is_short,70928.82,-845.65,0.0,1.0,buyHold,1.0,buyHold,1.0,0.5,20160701 20:54:38 EDT

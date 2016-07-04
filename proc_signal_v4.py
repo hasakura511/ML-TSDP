@@ -17,7 +17,7 @@ import logging
 import sys
 import threading
 
-logging.basicConfig(filename='/logs/proc_signal_v2.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/proc_signal_v4.log',level=logging.DEBUG)
 start_time = time.time()
 debug=False
 signalPath = './data/signals/'
@@ -70,16 +70,17 @@ def start_systems():
       threads = []        
       systemList=dict()
         
-      systemdata=pd.read_csv('./data/systems/system_'+sys.argv[1]+'.csv')
+      systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'.csv')
       systemdata=systemdata.reset_index()
       for i in systemdata.index:
           system=systemdata.ix[i]
-          #if len(sys.argv) < 2 or (len(sys.argv[2]) > 0 and sys.argv[2] == system['Name']):
-          if systemList.has_key(system['Name']):
-              systemList[system['Name']]=systemList[system['Name']].append(system)
-          else:
-              systemList[system['Name']]=pd.DataFrame()
-              systemList[system['Name']]=systemList[system['Name']].append(system)
+          #print system, sys.argv[2]
+          if len(sys.argv) < 2 or (len(sys.argv[2]) > 0 and sys.argv[2] == system['Name']):
+              if systemList.has_key(system['Name']):
+                  systemList[system['Name']]=systemList[system['Name']].append(system)
+              else:
+                  systemList[system['Name']]=pd.DataFrame()
+                  systemList[system['Name']]=systemList[system['Name']].append(system)
               
       for systemname in systemList.keys():
            systems=systemList[systemname]

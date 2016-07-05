@@ -339,7 +339,7 @@ futuresDF=futuresDF.sort_index()
 print futuresDF
 print 'Saving', savePath+'futuresATR.csv'
 futuresDF.to_csv(savePath+'futuresATR.csv')
-futuresDF.to_csv(savePath+'futuresATR_'+dt.now().strftime("%Y%m%d%H%M")+'.csv')
+futuresDF.to_csv(savePath2+'futuresATR_'+dt.now().strftime("%Y%m%d%H%M")+'.csv')
 
 #system file update
 system = pd.read_csv(systemPath+systemFilename)

@@ -24,7 +24,88 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
 import seaborn as sns
 
 version = 'v4'
-
+groups  = {
+        'AC':'energy',
+        'AD':'currency',
+        'AEX':'index',
+        'BO':'grain',
+        'BP':'currency',
+        'C':'grain',
+        'CC':'soft',
+        'CD':'currency',
+        'CGB':'rates',
+        'CL':'energy',
+        'CT':'soft',
+        'CU':'currency',
+        'DX':'currency',
+        'EBL':'rates',
+        'EBM':'rates',
+        'EBS':'rates',
+        'ED':'rates',
+        'EMD':'index',
+        'ES':'index',
+        'FC':'meat',
+        'FCH':'index',
+        'FDX':'index',
+        'FEI':'rates',
+        'FFI':'index',
+        'FLG':'rates',
+        'FSS':'rates',
+        'FV':'rates',
+        'GC':'metal',
+        'HCM':'index',
+        'HG':'metal',
+        'HIC':'index',
+        'HO':'energy',
+        'JY':'currency',
+        'KC':'soft',
+        'KW':'grain',
+        'LB':'soft',
+        'LC':'meat',
+        'LCO':'energy',
+        'LGO':'energy',
+        'LH':'meat',
+        'LRC':'soft',
+        'LSU':'soft',
+        'MEM':'index',
+        'MFX':'index',
+        'MP':'currency',
+        'MW':'grain',
+        'NE':'currency',
+        'NG':'energy',
+        'NIY':'index',
+        'NQ':'index',
+        'O':'grain',
+        'OJ':'soft',
+        'PA':'metal',
+        'PL':'metal',
+        'RB':'energy',
+        'RR':'grain',
+        'RS':'grain',
+        'S':'grain',
+        'SB':'soft',
+        'SF':'currency',
+        'SI':'metal',
+        'SIN':'index',
+        'SJB':'rates',
+        'SM':'grain',
+        'SMI':'index',
+        'SSG':'index',
+        'STW':'index',
+        'SXE':'index',
+        'TF':'index',
+        'TU':'rates',
+        'TY':'rates',
+        'US':'rates',
+        'VX':'index',
+        'W':'grain',
+        'YA':'index',
+        'YB':'rates',
+        'YM':'index',
+        'YT2':'rates',
+        'YT3':'rates',
+        }
+        
 if len(sys.argv) > 1:
     #bestParamsPath = './data/params/'
     #signalPath = './data/signals/'
@@ -63,6 +144,8 @@ for f in dataFiles:
         lookback= nrows
         
     pctChg=(df.equity[-1]-df.equity[-lookback])/df.equity[-lookback]
+    futuresRank.set_value(sym,'G/L Last '+str(lookback),pctChg)
+    futuresRank.set_value(sym,'group',groups[sym])
     futuresRank.set_value(sym,str(df.index[-lookback])+' to '+str(df.index[-1]),pctChg)
 futuresRank.index.name='Symbol'
 futuresRank = futuresRank.sort_values(by=futuresRank.columns[0], ascending=False).reset_index()

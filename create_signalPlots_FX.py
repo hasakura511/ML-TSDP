@@ -44,7 +44,7 @@ with open('./data/currencies.txt') as f:
     pairs = f.read().splitlines()
                 
 if len(sys.argv) > 1:
-    bestParamsPath = './data/params/'
+    #bestParamsPath = './data/params/'
     signalPath = './data/signals/'
     dataPath = './data/from_MT4/'
     equityCurveSavePath = './data/signalPlots/'
@@ -56,7 +56,7 @@ else:
     #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #dataPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/from_IB/'
     dataPath = 'D:/ML-TSDP/data/from_MT4/'
-    bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
+    #bestParamsPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/params/' 
     equityCurveSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 
 
     pngPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signalPlots/' 

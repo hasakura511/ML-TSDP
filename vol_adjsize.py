@@ -38,7 +38,10 @@ lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
 systemFilename='system_v4futures.csv'
-safefAdjustment=0.25
+#range (-1 to 1) postive for counter-trend negative for trend i.e.
+#-1 would 0 safef ==1 and double safef==2
+#1 would 0 safef ==2 and double safef==1
+safefAdjustment=0
 
 if len(sys.argv)==1:
     showPlots=False

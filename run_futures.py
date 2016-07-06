@@ -256,7 +256,7 @@ asset = 'FX'
 #filterName = 'DF1'
 #data_type = 'ALL'
 barSizeSetting='1D'
-mrThresholds = [1, .5, 0.75]
+mrThresholds = [1, .5, 0.75, .5]
 
 if len(sys.argv)==1:
     debug=True

@@ -322,6 +322,28 @@ for i,contract in enumerate(marketList):
         sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
     else:
         sym=contract
+    signalFilename='0.75_'+sym+'_1D.csv'
+    #print signalFilename
+    data = pd.read_csv(signalPath+signalFilename, index_col=0)
+    if sym in offline:
+        adjQty=0
+    else:
+        if data.dpsSafef.iloc[-1] ==1:
+            adjQty = int(round(futuresDF.ix[sym].QTY*(1+safefAdjustment)))
+        else:
+            adjQty = int(round(futuresDF.ix[sym].QTY*(1-safefAdjustment)))
+            
+    futuresDF.set_value(sym,'0.75LastSIG',data.signals.iloc[-1])
+    futuresDF.set_value(sym,'0.75LastSAFEf',data.dpsSafef.iloc[-1])
+    futuresDF.set_value(sym,'0.75finalQTY',adjQty)
+    futuresDF.set_value(sym,'0.75SIG'+str(data.index[-1]),data.signals.iloc[-1])
+
+for i,contract in enumerate(marketList):
+    #print i,
+    if 'YT' not in contract:
+        sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
+    else:
+        sym=contract
     signalFilename='1_'+sym+'_1D.csv'
     #print signalFilename
     data = pd.read_csv(signalPath+signalFilename, index_col=0)

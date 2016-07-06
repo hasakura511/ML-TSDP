@@ -31,13 +31,14 @@ auxFutures = [x.split('_')[0] for x in files]
 for contract in auxFutures:    
     #if 'F_'+contract+'.txt' in files and (ticker[0:3] in contract or ticker[3:6] in contract):
     filename = contract+'_B.CSV'
-    data = pd.read_csv(dataPath+filename, index_col=0, header=None)[-(lookback+1):]
+    data = pd.read_csv(dataPath+filename, index_col=0, header=None)[-(lookback+10):]
     
     #data = data.drop([' P',' R', ' RINFO'],axis=1)
     #data = ratioAdjust(data)
     data.index = pd.to_datetime(data.index,format='%Y%m%d')
     data.columns = ['Open','High','Low','Close','Volume','OI','R','S']
     data.index.name = 'Dates'
+    #print contract, data,'\n'
     #contract = ''.join([i for i in contract if not i.isdigit()])
     if 'YT' not in contract:
         contract = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
@@ -46,7 +47,7 @@ for contract in auxFutures:
 
     for contract2 in auxFutures:
         filename = contract2+'_B.CSV'
-        data2 = pd.read_csv(dataPath+filename, index_col=0, header=None)[-(lookback+1):]    
+        data2 = pd.read_csv(dataPath+filename, index_col=0, header=None)[-(lookback+10):]    
         data2.index = pd.to_datetime(data2.index,format='%Y%m%d')
         data2.columns = ['Open','High','Low','Close','Volume','OI','R','S']
         data2.index.name = 'Dates'
@@ -55,7 +56,19 @@ for contract in auxFutures:
             contract2 = ''.join([i for i in contract2.split('_')[0] if not i.isdigit()])
         else:
             contract2=contract2.split('_')[0]
-        futuresMatrix.set_value(contract,contract2,(data.Close/data2.Close).pct_change(periods=lookback)[-1]*100)
+        
+        union=data.index.union(data2.index)
+        #print 'Missing data:',contract,contract2, union
+        
+        #forward fill missing data
+        data=data.ix[union].fillna(method='ffill')
+        data2=data2.ix[union].fillna(method='ffill')
+            
+        change=(data.Close/data2.Close).pct_change(periods=lookback)[-1]*100
+        #print contract, data, '\n', contract2, data2
+        #print change, '\n\n'
+        futuresMatrix.set_value(contract,contract2,change)
+    #print contract, data,'\n'
 
 for contract in auxFutures:
     if 'YT' not in contract:

@@ -104,7 +104,7 @@ fxRank = fxRank.sort_values(by=fxRank.columns[0], ascending=False).reset_index()
 print 'Saving', savePath+'fxRank.html'
 fxRank.to_html(savePath+'fxRank.html')
 print fxRank
-offlineSymbols = fxRank[fxRank['G/L Last '+str(lookback)]<0].Symbol
+offlineSymbols = fxRank[fxRank['G/L Last '+str(lookback)]>0].Symbol
 for sym in offlineSymbols:
     qty[sym]=0
     

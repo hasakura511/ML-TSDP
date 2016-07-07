@@ -38,6 +38,7 @@ lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
 systemFilename='system_v4futures.csv'
+systemFilename2='system_v4mini.csv'
 #range (-1 to 1) postive for counter-trend negative for trend i.e.
 #-1 would 0 safef ==1 and double safef==2
 #1 would 0 safef ==2 and double safef==1
@@ -381,7 +382,8 @@ for sys in system.System:
     
 print 'Saving', systemPath+systemFilename
 system.to_csv(systemPath+systemFilename, index=False)
-    
+print 'Saving', systemPath+systemFilename2
+system.to_csv(systemPath+systemFilename2, index=False)
 #signalDF=signalDF.sort_index()
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')

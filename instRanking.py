@@ -173,10 +173,18 @@ print futuresRank.ix[:,0:5]
 
 if filter:
     #filter off un/profitable contracts
-    print '\nOffline:'
-    offlineSymbols = sorted(futuresRank[futuresRank['G/L Last']<0].Symbol.values)
+    onlineSymbols=[]
+    for i,g in enumerate(futuresRank.group.unique()):
+        online= futuresRank[futuresRank.group ==g].iloc[0]
+        print 1, online[0:3]
+        onlineSymbols.append(online.Symbol)
+    print '\nOnline:', len(onlineSymbols), onlineSymbols
+    #offlineSymbols = sorted(futuresRank[futuresRank['G/L Last']<0].Symbol.values)
+    offlineSymbols = [x for x in futuresRank.Symbol.values if x not in onlineSymbols]
+    print '\nOffline:', len(offlineSymbols), onlineSymbols
+    print 'Total:', len(onlineSymbols) + len(offlineSymbols)
     system = pd.read_csv(systemPath+systemFilename)
-    print offlineSymbols
+    
     for sys in system.System:
         sym=sys.split('_')[1]
         #print sym

@@ -24,7 +24,7 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
                         roofingFilter
 import seaborn as sns
 
-filter=False
+filter=True
 start_time = time.time()
 version = 'v4'
 groups  = {
@@ -108,7 +108,7 @@ groups  = {
         'YT2':'rates',
         'YT3':'rates',
         }
-systemFilename='system_v4futures.csv'
+systemFilename='system_v4mini.csv'
 
 if len(sys.argv) > 1:
     #bestParamsPath = './data/params/'

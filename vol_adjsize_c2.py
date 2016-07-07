@@ -90,8 +90,8 @@ currenciesDF=pd.DataFrame()
 corrDF=pd.DataFrame()
 for pair in currencyPairs:
     #end at -1 to ignore  new day. 
-    data = pd.read_csv(dataPath+cDictCSI[pair], index_col=0)[-lookback-2:-1]
-    
+    data = pd.read_csv(dataPath+cDictCSI[pair], index_col=0)[-lookback-1:]
+    #print pair, data.index[-1]
     data.index = pd.to_datetime(data.index,format='%Y%m%d')
     data.columns = ['Open','High','Low','Close','S']
     data.index.name = 'Dates'

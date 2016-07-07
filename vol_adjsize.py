@@ -61,7 +61,7 @@ else:
 
 fxRates=pd.read_csv(savePath+currencyFile, index_col=0)
 for i,col in enumerate(fxRates.columns):
-    if 'Close' in col:
+    if 'Last' in col:
         fxRates = fxRates[fxRates.columns[i]]
         break
         
@@ -201,6 +201,7 @@ for i,contract in enumerate(marketList):
     contractYear=str(data.R[-1])[3]
     contractMonth=str(data.R[-1])[-2:]
     contractName=c2contractSpec[sym][0]+months[int(contractMonth)]+contractYear
+    #print sym, atr[-1], c2contractSpec[sym][2], c2contractSpec[sym][1]
     usdATR = atr[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
     qty = int(math.ceil(riskEquity/usdATR))
     #print sym, data.R[-1], contractName

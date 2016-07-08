@@ -102,8 +102,10 @@ for pair in currencyPairs:
     #print pair, atr,data.tail()
     #signalFilename='v4_'+pair+'.csv'
     corrDF[pair]=pc
-    currenciesDF.set_value(pair,'Close'+str(data.index[-1]),data.Close.iloc[-1])
+    
+    currenciesDF.set_value(pair,'Last',data.Close.iloc[-1])
     currenciesDF.set_value(pair,'ATR'+str(lookback),atr[-1])
+    currenciesDF.set_value(pair,'Close'+str(data.index[-1]),data.Close.iloc[-1])
     currenciesDF.set_value(pair,'PC'+str(data.index[-1]),pc.iloc[-1])
     currenciesDF.set_value(pair,'ACT'+str(data.index[-1]),priorSig)
 currenciesDF.index.name=data.index[-1]

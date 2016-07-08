@@ -27,6 +27,7 @@ import seaborn as sns
 filter=True
 start_time = time.time()
 version = 'v4'
+offline = ['AC','CGB','EBS','ED','FEI','FSS','YB']
 groups  = {
         'AC':'energy',
         'AD':'currency',
@@ -175,13 +176,19 @@ if filter:
     #filter off un/profitable contracts
     onlineSymbols=[]
     for i,g in enumerate(futuresRank.group.unique()):
-        online= futuresRank[futuresRank.group ==g].iloc[0]
-        print 1, online[0:3]
-        onlineSymbols.append(online.Symbol)
+        
+        for sym in futuresRank[futuresRank.group ==g].Symbol.values:
+            if sym not in offline:
+                #print sym
+                online= futuresRank[futuresRank.group ==g][futuresRank.Symbol==sym].iloc[:,0:5]
+                onlineSymbols.append(online.Symbol.values[0])
+                break
+        print i+1, online
+        
     print '\nOnline:', len(onlineSymbols), onlineSymbols
     #offlineSymbols = sorted(futuresRank[futuresRank['G/L Last']<0].Symbol.values)
     offlineSymbols = [x for x in futuresRank.Symbol.values if x not in onlineSymbols]
-    print '\nOffline:', len(offlineSymbols), onlineSymbols
+    print '\nOffline:', len(offlineSymbols), offlineSymbols
     print 'Total:', len(onlineSymbols) + len(offlineSymbols)
     system = pd.read_csv(systemPath+systemFilename)
     

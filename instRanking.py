@@ -200,7 +200,7 @@ if filter:
             print sys, sym, system.ix[idx].c2qty,
             system.set_value(idx,'c2qty',0)
             print system.ix[idx].c2qty
-            
+    system.Name=systemFilename.split('_')[1][:-4]
     print 'Saving', systemPath+systemFilename
     system.to_csv(systemPath+systemFilename, index=False)
         

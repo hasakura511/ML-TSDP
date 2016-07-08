@@ -27,6 +27,8 @@ import seaborn as sns
 filter=True
 start_time = time.time()
 version = 'v4'
+systemFilename='system_v4mini.csv'
+c2id=101533256
 offline = ['AC','CGB','EBS','ED','FEI','FSS','YB']
 groups  = {
         'AC':'energy',
@@ -109,7 +111,7 @@ groups  = {
         'YT2':'rates',
         'YT3':'rates',
         }
-systemFilename='system_v4mini.csv'
+
 
 if len(sys.argv) > 1:
     #bestParamsPath = './data/params/'
@@ -201,6 +203,7 @@ if filter:
             system.set_value(idx,'c2qty',0)
             print system.ix[idx].c2qty
     system.Name=systemFilename.split('_')[1][:-4]
+    system.c2id=c2id
     print 'Saving', systemPath+systemFilename
     system.to_csv(systemPath+systemFilename, index=False)
         

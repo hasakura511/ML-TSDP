@@ -169,7 +169,8 @@ for f in dataFiles:
         futuresRank.set_value(sym,'LastDate',df.index[-1])
         futuresRank.set_value(sym,str(lookback)+' '+str(df.index[-lookback])+' to '+str(df.index[-1]),pctChg)
 futuresRank.index.name='Symbol'
-futuresRank = futuresRank.sort_values(by=futuresRank.columns[0], ascending=False).reset_index()
+#Ascending=False rank by best, True rank by worst.
+futuresRank = futuresRank.sort_values(by=futuresRank.columns[0], ascending=True).reset_index()
 print '\nSaving', savePath+'fRank.html'
 futuresRank.to_html(savePath+'fRank.html')
 print futuresRank.ix[:,0:5]
@@ -184,6 +185,7 @@ if filter:
                 #print sym
                 online= futuresRank[futuresRank.group ==g][futuresRank.Symbol==sym].iloc[:,0:5]
                 onlineSymbols.append(online.Symbol.values[0])
+                
                 break
         print i+1, online
         

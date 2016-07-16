@@ -225,8 +225,8 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         filename = signalPath + version_+'_'+ ticker+'_'+barSizeSetting+ '.csv'
         print 'Saving', filename
         signalFile.to_csv(filename, index=True)
-        
-    #old version_ file
+    
+    #create old version_ file if it dosent exist
     if version+'_'+ ticker+ '.csv' not in files:
         #signalFile = sst.iloc[-2:]
         addLine = sst.iloc[-1]
@@ -238,6 +238,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         filename=signalPath + version+'_'+ ticker+ '.csv'
         print 'Saving', filename
         signalFile.to_csv(filename, index=True)
+    '''
     else:        
         signalFile=pd.read_csv(signalPath+ version+'_'+ ticker+ '.csv', index_col=['dates'])
         addLine = sst.iloc[-1]
@@ -248,6 +249,7 @@ def createSignalFile(version, version_, ticker, barSizeSetting, signalPath, sst,
         filename=signalPath + version+'_'+ ticker+ '.csv'
         print 'Saving', filename
         signalFile.to_csv(filename, index=True)
+    '''
         
 #system parameters
 version = 'v4'
@@ -256,7 +258,7 @@ asset = 'FX'
 #filterName = 'DF1'
 #data_type = 'ALL'
 barSizeSetting='1D'
-mrThresholds = [1, .5, 0.75, .5]
+mrThresholds = [1, .5, 0.75]
 
 if len(sys.argv)==1:
     debug=True
@@ -1672,10 +1674,10 @@ if showCharts:
 
 
 for i,mrThreshold in enumerate(mrThresholds):
-    if i == len(mrThresholds)-1:
-        ver2=version_
-    else:
-        ver2=str(mrThreshold)
+    #if i == len(mrThresholds)-1:
+    #    ver2=version_
+    #else:
+    #    ver2=str(mrThreshold)
         
     modes = mrClassifier3(dataSet.Close, data.shape[0],threshold=mrThreshold, showPlot=debug,\
                                                savePath=chartSavePath+'_MODE3', ticker=ticker+contractExpiry)
@@ -1739,6 +1741,6 @@ for i,mrThreshold in enumerate(mrThresholds):
     else:
         sst['safef']=sst.nodpsSafef
         
-    createSignalFile(version, ver2, ticker, barSizeSetting, signalPath, sst, start_time, dataSet, mrThreshold)
+    createSignalFile(version, str(mrThreshold), ticker, barSizeSetting, signalPath, sst, start_time, dataSet, mrThreshold)
     
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

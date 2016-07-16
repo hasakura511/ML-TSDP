@@ -47,20 +47,24 @@ safefAdjustment=0
 if len(sys.argv)==1:
     showPlots=False
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
+    dataPath2='D:/ML-TSDP/data/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     signalPath = 'D:/ML-TSDP/data/signals/' 
+    signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
     
 else:
     showPlots=False
     dataPath='./data/csidata/v4futures2/'
+    dataPath2='./data/'
     savePath='./data/'
     signalPath = './data/signals/' 
+    signalSavePath = './data/signals/' 
     savePath2 = './data/results/'
     systemPath =  './data/systems/'
 
-fxRates=pd.read_csv(savePath+currencyFile, index_col=0)
+fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
 for i,col in enumerate(fxRates.columns):
     if 'Last' in col:
         fxRates = fxRates[fxRates.columns[i]]
@@ -80,87 +84,87 @@ fxDict={
     'SGD':1.34,
     'USD':1,
     }
-
+#csisym:[c2sym,usdFXrate,multiplier,riskON signal]
 c2contractSpec = {
-    'AC':['@AC',fxDict['USD'],29000],
-    'AD':['@AD',fxDict['USD'],100000],
-    'AEX':['AEX',fxDict['EUR'],200],
-    'BO':['@BO',fxDict['USD'],600],
-    'BP':['@BP',fxDict['USD'],62500],
-    'C':['@C',fxDict['USD'],50],
-    'CC':['@CC',fxDict['USD'],10],
-    'CD':['@CD',fxDict['USD'],100000],
-    'CGB':['CB',fxDict['CAD'],1000],
-    'CL':['QCL',fxDict['USD'],1000],
-    'CT':['@CT',fxDict['USD'],500],
-    'CU':['@EU',fxDict['USD'],125000],
-    'DX':['@DX',fxDict['USD'],1000],
-    'EBL':['BD',fxDict['EUR'],1000],
-    'EBM':['BL',fxDict['EUR'],1000],
-    'EBS':['EZ',fxDict['EUR'],1000],
-    'ED':['@ED',fxDict['USD'],2500],
-    'EMD':['@EMD',fxDict['USD'],100],
-    'ES':['@ES',fxDict['USD'],50],
-    'FC':['@GF',fxDict['USD'],500],
-    'FCH':['MT',fxDict['EUR'],10],
-    'FDX':['DXM',fxDict['EUR'],5],
-    'FEI':['IE',fxDict['EUR'],2500],
-    'FFI':['LF',fxDict['GBP'],10],
-    'FLG':['LG',fxDict['GBP'],1000],
-    'FSS':['LL',fxDict['GBP'],1250],
-    'FV':['@FV',fxDict['USD'],1000],
-    'GC':['QGC',fxDict['USD'],100],
-    'HCM':['HHI',fxDict['HKD'],50],
-    'HG':['QHG',fxDict['USD'],250],
-    'HIC':['HSI',fxDict['HKD'],50],
-    'HO':['QHO',fxDict['USD'],42000],
-    'JY':['@JY',fxDict['USD'],125000],
-    'KC':['@KC',fxDict['USD'],375],
-    'KW':['@KW',fxDict['USD'],50],
-    'LB':['@LB',fxDict['USD'],110],
-    'LC':['@LE',fxDict['USD'],400],
-    'LCO':['EB',fxDict['USD'],1000],
-    'LGO':['GAS',fxDict['USD'],100],
-    'LH':['@HE',fxDict['USD'],400],
-    'LRC':['LRC',fxDict['USD'],10],
-    'LSU':['QW',fxDict['USD'],50],
-    'MEM':['@MME',fxDict['USD'],50],
-    'MFX':['IB',fxDict['EUR'],10],
-    'MP':['@PX',fxDict['USD'],500000],
-    'MW':['@MW',fxDict['USD'],50],
-    'NE':['@NE',fxDict['USD'],100000],
-    'NG':['QNG',fxDict['USD'],10000],
-    'NIY':['@NKD',fxDict['JPY'],500],
-    'NQ':['@NQ',fxDict['USD'],20],
-    'O':['@O',fxDict['USD'],50],
-    'OJ':['@OJ',fxDict['USD'],150],
-    'PA':['QPA',fxDict['USD'],100],
-    'PL':['QPL',fxDict['USD'],50],
-    'RB':['QRB',fxDict['USD'],42000],
-    'RR':['@RR',fxDict['USD'],2000],
-    'RS':['@RS',fxDict['CAD'],20],
-    'S':['@S',fxDict['USD'],50],
-    'SB':['@SB',fxDict['USD'],1120],
-    'SF':['@SF',fxDict['USD'],125000],
-    'SI':['QSI',fxDict['USD'],50],
-    'SIN':['IN',fxDict['USD'],2],
-    'SJB':['BB',fxDict['JPY'],100000],
-    'SM':['@SM',fxDict['USD'],100],
-    'SMI':['SW',fxDict['CHF'],10],
-    'SSG':['SS',fxDict['SGD'],200],
-    'STW':['TW',fxDict['USD'],100],
-    'SXE':['EX',fxDict['EUR'],10],
-    'TF':['@TFS',fxDict['USD'],100],
-    'TU':['@TU',fxDict['USD'],2000],
-    'TY':['@TY',fxDict['USD'],1000],
-    'US':['@US',fxDict['USD'],1000],
-    'VX':['@VX',fxDict['USD'],1000],
-    'W':['@W',fxDict['USD'],50],
-    'YA':['AP',fxDict['AUD'],25],
-    'YB':['HBS',fxDict['AUD'],2400],
-    'YM':['@YM',fxDict['USD'],5],
-    'YT2':['HTS',fxDict['AUD'],2800],
-    'YT3':['HXS',fxDict['AUD'],8000],
+    'AC':['@AC',fxDict['USD'],29000,1],
+    'AD':['@AD',fxDict['USD'],100000,1],
+    'AEX':['AEX',fxDict['EUR'],200,1],
+    'BO':['@BO',fxDict['USD'],600,1],
+    'BP':['@BP',fxDict['USD'],62500,1],
+    'C':['@C',fxDict['USD'],50,1],
+    'CC':['@CC',fxDict['USD'],10,1],
+    'CD':['@CD',fxDict['USD'],100000,1],
+    'CGB':['CB',fxDict['CAD'],1000,-1],
+    'CL':['QCL',fxDict['USD'],1000,1],
+    'CT':['@CT',fxDict['USD'],500,1],
+    'CU':['@EU',fxDict['USD'],125000,1],
+    'DX':['@DX',fxDict['USD'],1000,-1],
+    'EBL':['BD',fxDict['EUR'],1000,-1],
+    'EBM':['BL',fxDict['EUR'],1000,-1],
+    'EBS':['EZ',fxDict['EUR'],1000,-1],
+    'ED':['@ED',fxDict['USD'],2500,-1],
+    'EMD':['@EMD',fxDict['USD'],100,1],
+    'ES':['@ES',fxDict['USD'],50,1],
+    'FC':['@GF',fxDict['USD'],500,1],
+    'FCH':['MT',fxDict['EUR'],10,1],
+    'FDX':['DXM',fxDict['EUR'],5,1],
+    'FEI':['IE',fxDict['EUR'],2500,-1],
+    'FFI':['LF',fxDict['GBP'],10,1],
+    'FLG':['LG',fxDict['GBP'],1000,-1],
+    'FSS':['LL',fxDict['GBP'],1250,-1],
+    'FV':['@FV',fxDict['USD'],1000,-1],
+    'GC':['QGC',fxDict['USD'],100,-1],
+    'HCM':['HHI',fxDict['HKD'],50,1],
+    'HG':['QHG',fxDict['USD'],250,1],
+    'HIC':['HSI',fxDict['HKD'],50,1],
+    'HO':['QHO',fxDict['USD'],42000,1],
+    'JY':['@JY',fxDict['USD'],125000,-1],
+    'KC':['@KC',fxDict['USD'],375,1],
+    'KW':['@KW',fxDict['USD'],50,1],
+    'LB':['@LB',fxDict['USD'],110,1],
+    'LC':['@LE',fxDict['USD'],400,1],
+    'LCO':['EB',fxDict['USD'],1000,1],
+    'LGO':['GAS',fxDict['USD'],100,1],
+    'LH':['@HE',fxDict['USD'],400,1],
+    'LRC':['LRC',fxDict['USD'],10,1],
+    'LSU':['QW',fxDict['USD'],50,1],
+    'MEM':['@MME',fxDict['USD'],50,1],
+    'MFX':['IB',fxDict['EUR'],10,1],
+    'MP':['@PX',fxDict['USD'],500000,1],
+    'MW':['@MW',fxDict['USD'],50,1],
+    'NE':['@NE',fxDict['USD'],100000,1],
+    'NG':['QNG',fxDict['USD'],10000,1],
+    'NIY':['@NKD',fxDict['JPY'],500,1],
+    'NQ':['@NQ',fxDict['USD'],20,1],
+    'O':['@O',fxDict['USD'],50,1],
+    'OJ':['@OJ',fxDict['USD'],150,1],
+    'PA':['QPA',fxDict['USD'],100,1],
+    'PL':['QPL',fxDict['USD'],50,-1],
+    'RB':['QRB',fxDict['USD'],42000,1],
+    'RR':['@RR',fxDict['USD'],2000,1],
+    'RS':['@RS',fxDict['CAD'],20,1],
+    'S':['@S',fxDict['USD'],50,1],
+    'SB':['@SB',fxDict['USD'],1120,1],
+    'SF':['@SF',fxDict['USD'],125000,1],
+    'SI':['QSI',fxDict['USD'],50,-1],
+    'SIN':['IN',fxDict['USD'],2,1],
+    'SJB':['BB',fxDict['JPY'],100000,-1],
+    'SM':['@SM',fxDict['USD'],100,1],
+    'SMI':['SW',fxDict['CHF'],10,1],
+    'SSG':['SS',fxDict['SGD'],200,1],
+    'STW':['TW',fxDict['USD'],100,1],
+    'SXE':['EX',fxDict['EUR'],10,1],
+    'TF':['@TFS',fxDict['USD'],100,1],
+    'TU':['@TU',fxDict['USD'],2000,-1],
+    'TY':['@TY',fxDict['USD'],1000,-1],
+    'US':['@US',fxDict['USD'],1000,-1],
+    'VX':['@VX',fxDict['USD'],1000,-1],
+    'W':['@W',fxDict['USD'],50,1],
+    'YA':['AP',fxDict['AUD'],25,1],
+    'YB':['HBS',fxDict['AUD'],2400,-1],
+    'YM':['@YM',fxDict['USD'],5,1],
+    'YT2':['HTS',fxDict['AUD'],2800,-1],
+    'YT3':['HXS',fxDict['AUD'],8000,-1],
                     }
 months = {
                 1:'F',
@@ -184,6 +188,7 @@ marketList = [x.split('_')[0] for x in files]
   
 futuresDF=pd.DataFrame()
 corrDF=pd.DataFrame()
+
 for i,contract in enumerate(marketList):
     data = pd.read_csv(dataPath+contract+'_B.csv', index_col=0, header=None)[-lookback-1:]
     data.index = pd.to_datetime(data.index,format='%Y%m%d')
@@ -192,7 +197,11 @@ for i,contract in enumerate(marketList):
     atr=ATR2(data.High.values,data.Low.values,data.Close.values,lookback)
     pc=data.Close.pct_change()
     priorSig=np.where(pc<0,-1,1)[-1]
-
+    if i==0:
+        lastDate = data.index[-1]
+    else:
+        if data.index[-1]> lastDate:
+            lastDate=data.index[-1]
     #print pc
     #print sym, atr,data.tail()
     if 'YT' not in contract:
@@ -204,6 +213,7 @@ for i,contract in enumerate(marketList):
     contractName=c2contractSpec[sym][0]+months[int(contractMonth)]+contractYear
     #print sym, atr[-1], c2contractSpec[sym][2], c2contractSpec[sym][1]
     usdATR = atr[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
+    cValue = data.Close[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
     qty = int(math.ceil(riskEquity/usdATR))
     #print sym, data.R[-1], contractName
     #signalFilename='v4_'+sym+'.csv'
@@ -215,8 +225,10 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'ACT',priorSig)
     futuresDF.set_value(sym,'usdATR',usdATR)
     futuresDF.set_value(sym,'QTY',qty)
+    futuresDF.set_value(sym,'contractValue',cValue)
     futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
-    
+    futuresDF.set_value(sym,'RiskOn',c2contractSpec[sym][3])
+futuresDF.index.name = lastDate
     
 
     
@@ -245,7 +257,7 @@ plt.yticks(rotation=0)
 plt.xticks(rotation=90) 
 corrDF.to_html(savePath2+'futures_3.html')
 
-if savePath != None:
+if savePath2 != None:
     print 'Saving '+savePath2+'futures_3.png'
     fig.savefig(savePath2+'futures_3.png', bbox_inches='tight')
     
@@ -262,7 +274,7 @@ for i,col in enumerate(corrDF):
     plt.xlim(-1,1)
     plt.xticks(np.arange(-1,1.25,.25))
     plt.grid(True)
-    filename='v4_'+col+'_CORREL'+'.png'
+    filename=version+'_'+col+'_CORREL'+'.png'
     if savePath2 != None:
         print i+1,'Saving '+savePath2+filename
         plt.savefig(savePath2+filename, bbox_inches='tight')
@@ -272,16 +284,18 @@ for i,col in enumerate(corrDF):
         plt.show()
     plt.close()
 
-for i,contract in enumerate(marketList):
+for i2,contract in enumerate(marketList):
     #print i,
     if 'YT' not in contract:
         sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
     else:
         sym=contract
-    signalFilename='v4_'+sym+'.csv'
+    signalFilename=version+'_'+sym+'.csv'
 
     #print signalFilename
     data = pd.read_csv(signalPath+signalFilename, index_col=0)
+
+            
     if sym in offline:
         adjQty=0
     else:
@@ -296,7 +310,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
    
 
-for i,contract in enumerate(marketList):
+for i2,contract in enumerate(marketList):
     #print i,
     if 'YT' not in contract:
         sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
@@ -305,6 +319,13 @@ for i,contract in enumerate(marketList):
     signalFilename='0.5_'+sym+'_1D.csv'
     #print signalFilename
     data = pd.read_csv(signalPath+signalFilename, index_col=0)
+    data.index = pd.to_datetime(data.index,format='%Y-%m-%d')
+    if i2==0:
+        sigDate = data.index[-1]
+    else:
+        if data.index[-1]> sigDate:
+            sigDate=data.index[-1]
+            
     if sym in offline:
         adjQty=0
     else:
@@ -318,7 +339,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'0.5finalQTY',adjQty)
     futuresDF.set_value(sym,'0.5SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
-for i,contract in enumerate(marketList):
+for i2,contract in enumerate(marketList):
     #print i,
     if 'YT' not in contract:
         sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
@@ -340,7 +361,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'0.75finalQTY',adjQty)
     futuresDF.set_value(sym,'0.75SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
-for i,contract in enumerate(marketList):
+for i2,contract in enumerate(marketList):
     #print i,
     if 'YT' not in contract:
         sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
@@ -363,10 +384,16 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'1SIG'+str(data.index[-1]),data.signals.iloc[-1])
     
 futuresDF=futuresDF.sort_index()
-print futuresDF
+columns = futuresDF.columns.tolist()
+start_idx =columns.index('ACT')+1
+nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
+new_order = columns[:start_idx]+nextColOrder
+new_order =  new_order+[x for x in columns if x not in new_order]
+futuresDF = futuresDF[new_order]
+print futuresDF.iloc[:,:4]
 print 'Saving', savePath+'futuresATR.csv'
 futuresDF.to_csv(savePath+'futuresATR.csv')
-futuresDF.to_csv(savePath2+'futuresATR_'+dt.now().strftime("%Y%m%d%H%M")+'.csv')
+
 
 #system file update
 system = pd.read_csv(systemPath+systemFilename)
@@ -387,4 +414,58 @@ system.to_csv(systemPath+systemFilename2, index=False)
 #signalDF=signalDF.sort_index()
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')
+
+c2system='0.5LastSIG'
+c2safef=1
+signals = ['LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','AntiSEA','AdjSEA','Voting','RiskOn','RiskOff']
+votingCols = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','AdjSEA']
+
+if lastDate > sigDate:
+    totalsDF = pd.DataFrame()
+    #1bi. Run v4size(to update vlookback)
+    #calc the previous day's results.
+    futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
+    futuresDF['AdjSEA'] = np.where(futuresDF.LastSRUN <0, futuresDF.LastSEA*-1, futuresDF.LastSEA)
+    futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
+    futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
+    pctChgCol = [x for x in columns if 'PC' in x][0]
+    chgValue = futuresDF[pctChgCol]* futuresDF.contractValue
+    for sig in signals:
+        futuresDF['PNL_'+sig]=chgValue*futuresDF[sig]
+    totals =futuresDF[[x for x in futuresDF if 'PNL' in x]].sum()
+    for i,value in enumerate(totals):
+        totalsDF.set_value(lastDate, totals.index[i], value)
+    files = [ f for f in listdir(savePath) if isfile(join(savePath,f)) ]
+    filename = 'futuresScenarios.csv'
+    if filename not in files:
+        print 'Saving', savePath+filename
+        totalsDF.to_csv(savePath+filename)
+    else:
+        pd.read_csv(savePath+filename, index_col=0).append(totalsDF).to_csv(savePath+filename)
+        
+    filename='futuresATR_'+lastDate.strftime("%Y%m%d%H%M")+'.csv'
+    print 'Saving', savePath2+filename
+    futuresDF.to_csv(savePath2+filename)
+else:
+
+    #1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR
+    #save signals to v4_ signal files for order processing
+    nsig=0
+    for ticker in futuresDF.index:
+        nsig+=1
+        signalFile=pd.read_csv(signalSavePath+ version+'_'+ ticker+ '.csv', index_col=['dates'])
+        #addLine = signalFile.iloc[-1]
+        #addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+        #addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+        #addLine.name = sst.iloc[-1].name
+        addLine = pd.Series(name=lastDate)
+        addLine['signals']=futuresDF.ix[ticker][c2system]
+        addLine['safef']=c2safef
+        addLine['timestamp']=dt.now().strftime("%Y%m%d %H:%M:%S %Z")
+        signalFile = signalFile.append(addLine)
+        filename=signalSavePath + version+'_'+ ticker+ '.csv'
+        print 'Saving...',  filename
+        signalFile.to_csv(filename, index=True)
+    print nsig, 'files updated'
+    
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

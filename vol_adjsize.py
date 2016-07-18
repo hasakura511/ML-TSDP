@@ -197,7 +197,8 @@ for i,contract in enumerate(marketList):
     data.index.name = 'Dates'
     atr=ATR2(data.High.values,data.Low.values,data.Close.values,lookback)
     pc=data.Close.pct_change()
-    priorSig=np.where(pc<0,-1,1)[-1]
+    act=np.where(pc<0,-1,1)
+    
     if i==0:
         lastDate = data.index[-1]
     else:
@@ -223,7 +224,8 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'LastClose',data.Close[-1])
     futuresDF.set_value(sym,'ATR'+str(lookback),atr[-1])
     futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
-    futuresDF.set_value(sym,'ACT',priorSig)
+    futuresDF.set_value(sym,'ACT',act[-1])
+    futuresDF.set_value(sym,'prevACT',act[-2])
     futuresDF.set_value(sym,'usdATR',usdATR)
     futuresDF.set_value(sym,'QTY',qty)
     futuresDF.set_value(sym,'contractValue',cValue)
@@ -419,8 +421,8 @@ system.to_csv(systemPath+systemFilename2, index=False)
 
 c2system='0.5LastSIG'
 c2safef=1
-signals = ['LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','AntiSEA','AdjSEA','Voting','RiskOn','RiskOff']
-votingCols = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','AdjSEA']
+signals = ['ACT','LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','AntiSEA','AdjSEA','Voting','prevACT','RiskOn','RiskOff']
+votingCols = ['ACT','0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','AdjSEA','prevACT']
 
 if lastDate > sigDate:
     #1bi. Run v4size(to update vlookback)
@@ -435,7 +437,7 @@ if lastDate > sigDate:
     pctChgCol = [x for x in columns if 'PC' in x][0]
     futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue
     for sig in signals:
-        futuresDF['PNL_'+sig]=futuresDF['chgValue']*futuresDF[sig]
+        futuresDF['PNL_'+sig]=futuresDF['chgValue']*futuresDF[sig]*futuresDF.finalQTY
         totalsDF.set_value(lastDate, 'ACC_'+sig, sum(futuresDF[sig]==futuresDF.ACT)/float(nrows))
         totalsDF.set_value(lastDate, 'L%_'+sig, sum(futuresDF[sig]==1)/float(nrows))
     totals =futuresDF[[x for x in futuresDF if 'PNL' in x]].sum()

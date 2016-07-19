@@ -50,7 +50,10 @@ if len(sys.argv)==1:
     dataPath2='D:/ML-TSDP/data/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    signalPath = 'D:/ML-TSDP/data/signals/' 
+    #test last=old
+    #signalPath = 'D:/ML-TSDP/data/signals/' 
+    #test last>old
+    signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
     
@@ -186,7 +189,8 @@ months = {
     
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 marketList = [x.split('_')[0] for x in files]
-  
+futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+oldDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
 futuresDF=pd.DataFrame()
 corrDF=pd.DataFrame()
 
@@ -250,43 +254,48 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'SEA'+str(date),seaBias)
     futuresDF.set_value(sym,'LastSRUN',currRun)
     futuresDF.set_value(sym,'SRUN'+str(date),currRun)
-    
-#corrDF.to_csv(savePath+'futuresPCcsv')
-#corrDF.corr().to_csv(savePath+'futuresCorr.csv')
-corrDF=corrDF.corr()
-fig,ax = plt.subplots(figsize=(13,13))
-ax.set_title('Correlation '+str(data.index[0])+' to '+str(data.index[-1]))
-sns.heatmap(ax=ax,data=corrDF)
-plt.yticks(rotation=0) 
-plt.xticks(rotation=90) 
-corrDF.to_html(savePath2+'futures_3.html')
 
-if savePath2 != None:
-    print 'Saving '+savePath2+'futures_3.png'
-    fig.savefig(savePath2+'futures_3.png', bbox_inches='tight')
-    
-if len(sys.argv)==1 and showPlots:
-    #print data.index[0],'to',data.index[-1]
-    plt.show()
-plt.close()
+#save last seasonal signal for pnl processing
+#update correl charts
+if lastDate >oldDate:
+    futuresDF['prevSEA']=futuresDF_old.LastSEA
+    futuresDF['prevSRUN']=futuresDF_old.LastSRUN
+    #corrDF.to_csv(savePath+'futuresPCcsv')
+    #corrDF.corr().to_csv(savePath+'futuresCorr.csv')
+    corrDF=corrDF.corr()
+    fig,ax = plt.subplots(figsize=(13,13))
+    ax.set_title('Correlation '+str(data.index[0])+' to '+str(data.index[-1]))
+    sns.heatmap(ax=ax,data=corrDF)
+    plt.yticks(rotation=0) 
+    plt.xticks(rotation=90) 
+    corrDF.to_html(savePath2+'futures_3.html')
 
-for i,col in enumerate(corrDF):
-    plt.figure(figsize=(8,10))
-    corrDF[col].sort_values().plot.barh(color='r')
-    plt.axvline(0, color='k')
-    plt.title(col+' '+str(lookback)+' Day Correlation '+str(data.index[0])+' to '+str(data.index[-1]))
-    plt.xlim(-1,1)
-    plt.xticks(np.arange(-1,1.25,.25))
-    plt.grid(True)
-    filename=version+'_'+col+'_CORREL'+'.png'
     if savePath2 != None:
-        print i+1,'Saving '+savePath2+filename
-        plt.savefig(savePath2+filename, bbox_inches='tight')
-    
+        print 'Saving '+savePath2+'futures_3.png'
+        fig.savefig(savePath2+'futures_3.png', bbox_inches='tight')
+        
     if len(sys.argv)==1 and showPlots:
         #print data.index[0],'to',data.index[-1]
         plt.show()
     plt.close()
+
+    for i,col in enumerate(corrDF):
+        plt.figure(figsize=(8,10))
+        corrDF[col].sort_values().plot.barh(color='r')
+        plt.axvline(0, color='k')
+        plt.title(col+' '+str(lookback)+' Day Correlation '+str(data.index[0])+' to '+str(data.index[-1]))
+        plt.xlim(-1,1)
+        plt.xticks(np.arange(-1,1.25,.25))
+        plt.grid(True)
+        filename=version+'_'+col+'_CORREL'+'.png'
+        if savePath2 != None:
+            print i+1,'Saving '+savePath2+filename
+            plt.savefig(savePath2+filename, bbox_inches='tight')
+        
+        if len(sys.argv)==1 and showPlots:
+            #print data.index[0],'to',data.index[-1]
+            plt.show()
+        plt.close()
 
 for i2,contract in enumerate(marketList):
     #print i,
@@ -419,10 +428,10 @@ system.to_csv(systemPath+systemFilename2, index=False)
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
-c2system='0.5LastSIG'
+c2system='Voting'
 c2safef=1
-signals = ['ACT','LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','AntiSEA','AdjSEA','Voting','prevACT','RiskOn','RiskOff']
-votingCols = ['ACT','0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','AdjSEA','prevACT']
+signals = ['ACT','LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','prevSEA','AntiSEA','AdjSEA','Voting','prevACT','AntiPrevACT','RiskOn','RiskOff']
+votingCols = ['0.5LastSIG','1LastSIG','AdjSEA']
 
 if lastDate > sigDate:
     #1bi. Run v4size(to update vlookback)
@@ -430,8 +439,9 @@ if lastDate > sigDate:
     nrows=futuresDF.shape[0]
     totalsDF = pd.DataFrame()
 
-    futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
-    futuresDF['AdjSEA'] = np.where(futuresDF.LastSRUN <0, futuresDF.LastSEA*-1, futuresDF.LastSEA)
+    futuresDF['AntiSEA'] = np.where(futuresDF.prevSEA==1,-1,1)
+    futuresDF['AntiPrevACT'] = np.where(futuresDF.prevACT==1,-1,1)
+    futuresDF['AdjSEA'] = np.where(futuresDF.prevSRUN <0, futuresDF.prevSEA*-1, futuresDF.prevSEA)
     futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     pctChgCol = [x for x in columns if 'PC' in x][0]
@@ -479,6 +489,12 @@ if lastDate > sigDate:
     print 'Saving', savePath2+filename
     futuresDF.to_csv(savePath2+filename)
 else:
+    futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
+    futuresDF['prevACT'] = futuresDF.ACT
+    futuresDF['AntiPrevACT'] = np.where(futuresDF.ACT==1,-1,1)
+    futuresDF['AdjSEA'] = np.where(futuresDF.LastSRUN <0, futuresDF.LastSEA*-1, futuresDF.LastSEA)
+    futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
+    futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     print 'Saving signals from', c2system
     #1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR
     #save signals to v4_ signal files for order processing

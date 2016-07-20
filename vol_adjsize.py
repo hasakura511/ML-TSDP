@@ -312,13 +312,13 @@ for i2,contract in enumerate(marketList):
     if sym in offline:
         adjQty=0
     else:
-        if data.dpsSafef.iloc[-1] ==1:
+        if data.safef.iloc[-1] ==1:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1+safefAdjustment)))
         else:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1-safefAdjustment)))
         
     futuresDF.set_value(sym,'LastSIG',data.signals.iloc[-1])
-    futuresDF.set_value(sym,'LastSAFEf',data.dpsSafef.iloc[-1])
+    futuresDF.set_value(sym,'LastSAFEf',data.safef.iloc[-1])
     futuresDF.set_value(sym,'finalQTY',adjQty)
     futuresDF.set_value(sym,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
    
@@ -404,8 +404,7 @@ new_order = columns[:start_idx]+nextColOrder
 new_order =  new_order+[x for x in columns if x not in new_order]
 futuresDF = futuresDF[new_order]
 print futuresDF.iloc[:,:4]
-print 'Saving', savePath+'futuresATR.csv'
-futuresDF.to_csv(savePath+'futuresATR.csv')
+
 
 
 #system file update
@@ -488,6 +487,8 @@ if lastDate > sigDate:
     filename='futuresATR_'+lastDate.strftime("%Y%m%d%H%M")+'.csv'
     print 'Saving', savePath2+filename
     futuresDF.to_csv(savePath2+filename)
+    print 'Saving', savePath+'futuresATR_Results.csv'
+    futuresDF.to_csv(savePath+'futuresATR_Results.csv')
 else:
     futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
     futuresDF['prevACT'] = futuresDF.ACT
@@ -515,5 +516,10 @@ else:
         print 'Saving...',  addLine['signals'], addLine['safef'], filename
         signalFile.to_csv(filename, index=True)
     print nsig, 'files updated'
+    print 'Saving', savePath+'futuresATR_Signals.csv'
+    futuresDF.to_csv(savePath+'futuresATR_Signals.csv')
     
+print 'Saving', savePath+'futuresATR.csv'
+futuresDF.to_csv(savePath+'futuresATR.csv')
+
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

@@ -8,6 +8,7 @@ import time
 import logging
 import os
 
+
 def get_exec(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/requestTrades'
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
@@ -20,6 +21,7 @@ def get_exec(systemid, apikey):
     print r.text
     logging.info(r.text)
     return r.text
+
 
 def get_exec_open(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/requestTradesOpen'
@@ -35,6 +37,7 @@ def get_exec_open(systemid, apikey):
     print r.text
     logging.info(r.text)
     return r.text
+
 
 def get_c2pos():
     c2list=get_c2_list()
@@ -61,6 +64,8 @@ def get_c2livepos(systemid, apikey, systemname):
             dataSet=dataSet[dataSet.index == ''].copy()
             dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
             return dataSet
+        
+        
         
 def get_c2pos_from_csv(systemname):
     dataSet = pd.read_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv', index_col='symbol')
@@ -103,6 +108,7 @@ def get_c2_pos(systemname, c2sym):
         if c2_pos_side == 'short':
             c2_pos_qty=-abs(c2_pos_qty)
         return c2_pos_qty
+    
 #place_order('BTO','1','EURUSD','forex')
 def get_c2_list():
     dpsList=dict()

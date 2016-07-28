@@ -429,7 +429,7 @@ system.to_csv(systemPath+systemFilename2, index=False)
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
-c2system='Voting2'
+c2system='Voting4'
 c2safef=1
 signals = ['ACT','LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','prevSEA','AntiSEA','AdjSEA',\
                 'Voting','Voting2','Voting3','prevACT','AntiPrevACT','RiskOn','RiskOff']

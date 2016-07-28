@@ -45,6 +45,7 @@ systemFilename2='system_v4mini.csv'
 safefAdjustment=0
 
 if len(sys.argv)==1:
+    debug=True
     showPlots=False
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
     dataPath2='D:/ML-TSDP/data/'
@@ -53,11 +54,12 @@ if len(sys.argv)==1:
     #test last=old
     #signalPath = 'D:/ML-TSDP/data/signals/' 
     #test last>old
-    signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    signalPath ='D:/ML-TSDP/data/signals/'
     signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
     
 else:
+    debug=False
     showPlots=False
     dataPath='./data/csidata/v4futures2/'
     dataPath2='./data/'
@@ -434,9 +436,11 @@ signals = ['ACT','LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','prevSEA','Ant
 
 
 if lastDate > sigDate:
-    votingCols = ['0.5LastSIG','1LastSIG','AdjSEA']
+    votingCols = ['prevACT','1LastSIG','AntiSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
     voting3Cols = ['0.75LastSIG','AntiPrevACT','prevSEA']
+    voting4Cols=['Voting','Voting2','Voting3']
+    #voting4Cols= votingCols+voting2Cols+voting3Cols
     #1bi. Run v4size(to update vlookback)
     #calc the previous day's results.
     nrows=futuresDF.shape[0]
@@ -448,6 +452,7 @@ if lastDate > sigDate:
     futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
     futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     pctChgCol = [x for x in columns if 'PC' in x][0]
     futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue
@@ -496,9 +501,12 @@ if lastDate > sigDate:
     print 'Saving', savePath+'futuresATR_Results.csv'
     futuresDF.to_csv(savePath+'futuresATR_Results.csv')
 else:
-    votingCols = ['0.5LastSIG','1LastSIG','AdjSEA']
+    votingCols = ['prevACT','1LastSIG','AntiSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
     voting3Cols = ['0.75LastSIG','AntiPrevACT','LastSEA']
+    voting4Cols=['Voting','Voting2','Voting3']
+    #voting4Cols= votingCols+voting2Cols+voting3Cols
+    
     futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
     futuresDF['prevACT'] = futuresDF.ACT
     futuresDF['AntiPrevACT'] = np.where(futuresDF.ACT==1,-1,1)
@@ -506,10 +514,12 @@ else:
     futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
     futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     print 'Saving signals from', c2system
     #1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR
     #save signals to v4_ signal files for order processing
+
     nsig=0
     for ticker in futuresDF.index:
         nsig+=1
@@ -527,6 +537,7 @@ else:
         print 'Saving...',  addLine['signals'], addLine['safef'], filename
         signalFile.to_csv(filename, index=True)
     print nsig, 'files updated'
+        
     print 'Saving', savePath+'futuresATR_Signals.csv'
     futuresDF.to_csv(savePath+'futuresATR_Signals.csv')
     

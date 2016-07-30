@@ -429,10 +429,10 @@ system.to_csv(systemPath+systemFilename2, index=False)
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
-c2system='Voting4'
+c2system='AdjSEA'
 c2safef=1
 signals = ['ACT','LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
-                'Voting','Voting2','Voting3','prevACT','AntiPrevACT','RiskOn','RiskOff']
+                'Voting','Voting2','Voting3','Voting4','prevACT','AntiPrevACT','RiskOn','RiskOff']
 
 
 if lastDate > sigDate:

@@ -48,12 +48,15 @@ if len(sys.argv)==1:
     debug=True
     showPlots=False
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
-    dataPath2='D:/ML-TSDP/data/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    
+    
     #test last=old
-    #signalPath = 'D:/ML-TSDP/data/signals/' 
+    dataPath2=savePath2
     #test last>old
+    #dataPath2='D:/ML-TSDP/data/'
+    
     signalPath ='D:/ML-TSDP/data/signals/'
     signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
@@ -501,6 +504,24 @@ if lastDate > sigDate:
     futuresDF.to_csv(savePath2+filename)
     print 'Saving', savePath+'futuresATR_Results.csv'
     futuresDF.to_csv(savePath+'futuresATR_Results.csv')
+    
+    filename='futuresL_History.csv'
+    cols=['L%_currency',
+             'L%_energy',
+             'L%_grain',
+             'L%_index',
+             'L%_meat',
+             'L%_metal',
+             'L%_prevACT',
+             'L%_rates',
+             'L%_soft']
+    if filename not in files:
+        print 'Saving', savePath+filename
+        totalsDF[cols].to_csv(savePath+filename)
+    else:
+        print 'Saving', savePath+filename
+        pd.read_csv(savePath+filename, index_col=0).append(totalsDF[cols]).to_csv(savePath+filename)
+        
 else:
     votingCols =['Anti1LastSIG','AntiPrevACT','AdjSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']

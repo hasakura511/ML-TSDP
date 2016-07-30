@@ -51,11 +51,12 @@ if len(sys.argv)==1:
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     
+    #test last>old
+    #dataPath2=savePath2
+    #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     
     #test last=old
-    dataPath2=savePath2
-    #test last>old
-    #dataPath2='D:/ML-TSDP/data/'
+    dataPath2='D:/ML-TSDP/data/'
     
     signalPath ='D:/ML-TSDP/data/signals/'
     signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 

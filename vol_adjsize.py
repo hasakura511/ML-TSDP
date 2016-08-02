@@ -195,7 +195,9 @@ months = {
     
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 marketList = [x.split('_')[0] for x in files]
-futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+#futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
+
 oldDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
 futuresDF=pd.DataFrame()
 corrDF=pd.DataFrame()
@@ -235,7 +237,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'ATR'+str(lookback),atr[-1])
     futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
     futuresDF.set_value(sym,'ACT',act[-1])
-    futuresDF.set_value(sym,'prevACT',act[-2])
+    #futuresDF.set_value(sym,'prevACT',act[-2])
     futuresDF.set_value(sym,'usdATR',usdATR)
     futuresDF.set_value(sym,'QTY',qty)
     futuresDF.set_value(sym,'contractValue',cValue)
@@ -243,7 +245,8 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'RiskOn',c2contractSpec[sym][3])
     futuresDF.set_value(sym,'group',c2contractSpec[sym][4])
 futuresDF.index.name = lastDate
-    
+
+
 
     
 for i,contract in enumerate(marketList):
@@ -264,6 +267,7 @@ for i,contract in enumerate(marketList):
 #save last seasonal signal for pnl processing
 #update correl charts
 if lastDate >oldDate:
+    futuresDF['prevACT']=futuresDF_old['prevACT']
     futuresDF['prevSEA']=futuresDF_old.LastSEA
     futuresDF['prevSRUN']=futuresDF_old.LastSRUN
     #corrDF.to_csv(savePath+'futuresPCcsv')
@@ -513,7 +517,7 @@ if lastDate > sigDate:
              'L%_index',
              'L%_meat',
              'L%_metal',
-             'L%_prevACT',
+             'L%_ACT',
              'L%_rates',
              'L%_soft']
     if filename not in files:

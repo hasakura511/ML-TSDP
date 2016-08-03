@@ -195,8 +195,8 @@ months = {
     
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 marketList = [x.split('_')[0] for x in files]
-#futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
-futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
+futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+#futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 
 oldDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
 futuresDF=pd.DataFrame()

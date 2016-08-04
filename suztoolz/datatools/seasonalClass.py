@@ -170,7 +170,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
     l=kwargs.get('l',8)
     w=kwargs.get('w',8)
     lb=kwargs.get('lb',270)
-    zzpstd=kwargs.get('zzpstd',2)
+    zzpstd=kwargs.get('zzpstd',1.5)
     zzsstd=kwargs.get('zzsstd',3)
     zs_window=kwargs.get('zs_window',60)
     rc_window=kwargs.get('rc_window',10)
@@ -307,9 +307,9 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
             ax.xaxis.set_major_locator(major)
             ax.xaxis.set_minor_locator(minor)   
-            ax.plot(data.index, data.Close, 'b:', alpha=0.5, label=str(currRun)+' Close'+str(zzpstd))
+            ax.plot(data.index, data.Close, 'b:', alpha=0.5, label=str(pivotDate)+' Bias '+str(seaBias))
             ax.plot(data.index[zzp_pivots != 0], data.Close[zzp_pivots != 0], alpha=0.4, color='c',ls='-',\
-                        label=str(pivotDate)+' Bias '+str(seaBias))
+                        label='SRUN'+str(currRun)+' ZZ'+str(zzpstd))
             #v start
             ax.annotate('', (data.index[-validationLength], data.Close.iloc[-validationLength]),
                              arrowprops=dict(facecolor='magenta', shrink=0.03), xytext=(-20,0), textcoords='offset points',
@@ -448,7 +448,7 @@ if __name__ == "__main__":
                          #'EBS',
                          #'ED',
                          #'EMD',
-                         #'ES',
+                         'ES',
                          #'FCH',
                          #'FC',
                          #'FDX',

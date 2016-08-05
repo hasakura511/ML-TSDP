@@ -437,10 +437,10 @@ system.to_csv(systemPath+systemFilename2, index=False)
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
-c2system='Voting'
+c2system='Voting5'
 c2safef=1
 signals = ['ACT','LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
-                'Voting','Voting2','Voting3','Voting4','prevACT','AntiPrevACT','RiskOn','RiskOff']
+                'Voting','Voting2','Voting3','Voting4','Voting5','prevACT','AntiPrevACT','RiskOn','RiskOff']
 
 
 if lastDate > sigDate:
@@ -448,6 +448,7 @@ if lastDate > sigDate:
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
     voting3Cols = ['0.75LastSIG','AntiPrevACT','prevSEA']
     voting4Cols=['Voting','Voting2','Voting3']
+    voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
     #1bi. Run v4size(to update vlookback)
     #calc the previous day's results.
@@ -462,6 +463,7 @@ if lastDate > sigDate:
     futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting5']=np.where(futuresDF[voting5Cols].sum(axis=1)<0,-1,1)
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     pctChgCol = [x for x in columns if 'PC' in x][0]
     futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue
@@ -532,6 +534,7 @@ else:
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
     voting3Cols = ['0.75LastSIG','AntiPrevACT','LastSEA']
     voting4Cols=['Voting','Voting2','Voting3']
+    voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
     futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
     futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
@@ -543,6 +546,7 @@ else:
     futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting5']=np.where(futuresDF[voting5Cols].sum(axis=1)<0,-1,1)
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     print 'Saving signals from', c2system
     #1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR

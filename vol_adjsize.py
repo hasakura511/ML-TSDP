@@ -439,14 +439,16 @@ system.to_csv(systemPath+systemFilename2, index=False)
 
 c2system='Voting5'
 c2safef=1
-signals = ['ACT','LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
-                'Voting','Voting2','Voting3','Voting4','Voting5','prevACT','AntiPrevACT','RiskOn','RiskOff']
+signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff',\
+                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG',\
+                'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
+                'Voting','Voting2','Voting3','Voting4','Voting5']
 
 
 if lastDate > sigDate:
     votingCols = ['Anti1LastSIG','AntiPrevACT','AdjSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
-    voting3Cols = ['0.75LastSIG','AntiPrevACT','prevSEA']
+    voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','prevSEA']
     voting4Cols=['Voting','Voting2','Voting3']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
@@ -455,6 +457,7 @@ if lastDate > sigDate:
     nrows=futuresDF.shape[0]
     totalsDF = pd.DataFrame()
     futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
+    futuresDF['Anti0.75LastSIG'] = np.where(futuresDF['0.75LastSIG']==1,-1,1)
     futuresDF['AntiSEA'] = np.where(futuresDF.prevSEA==1,-1,1)
     futuresDF['AntiPrevACT'] = np.where(futuresDF.prevACT==1,-1,1)
     futuresDF['AdjSEA'] = np.where(futuresDF.prevSRUN <0, futuresDF.prevSEA*-1, futuresDF.prevSEA)
@@ -532,11 +535,12 @@ if lastDate > sigDate:
 else:
     votingCols =['Anti1LastSIG','AntiPrevACT','AdjSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
-    voting3Cols = ['0.75LastSIG','AntiPrevACT','LastSEA']
+    voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','LastSEA']
     voting4Cols=['Voting','Voting2','Voting3']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
     futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
+    futuresDF['Anti0.75LastSIG'] = np.where(futuresDF['0.75LastSIG']==1,-1,1)
     futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
     futuresDF['prevACT'] = futuresDF.ACT
     futuresDF['AntiPrevACT'] = np.where(futuresDF.ACT==1,-1,1)

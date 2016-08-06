@@ -446,9 +446,9 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff',\
 
 
 if lastDate > sigDate:
-    votingCols = ['Anti1LastSIG','AntiPrevACT','AdjSEA']
+    votingCols = ['1LastSIG','prevACT','AntiSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
-    voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','prevSEA']
+    voting3Cols = ['0.75LastSIG','AntiPrevACT','AntiSEA']
     voting4Cols=['Voting','Voting2','Voting3']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
@@ -469,7 +469,8 @@ if lastDate > sigDate:
     futuresDF['Voting5']=np.where(futuresDF[voting5Cols].sum(axis=1)<0,-1,1)
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     pctChgCol = [x for x in columns if 'PC' in x][0]
-    futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue
+    futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue*futuresDF.finalQTY
+    cv_online = futuresDF['chgValue'].drop(offline,axis=0)
     for sig in signals:
         futuresDF['PNL_'+sig]=futuresDF['chgValue']*futuresDF[sig]*futuresDF.finalQTY
         totalsDF.set_value(lastDate, 'ACC_'+sig, sum(futuresDF[sig]==futuresDF.ACT)/float(nrows))
@@ -478,18 +479,25 @@ if lastDate > sigDate:
     for i,value in enumerate(totals):
         totalsDF.set_value(lastDate, totals.index[i], value)
         
-    bygroup = pd.concat([abs(futuresDF['chgValue']), futuresDF['group']],axis=1).groupby(['group'])
+    bygroup = pd.concat([abs(futuresDF['chgValue']), futuresDF['group']],axis=1).drop(offline, axis=0).groupby(['group'])
     volByGroupByContract = bygroup.sum()/bygroup.count()
-    bygroup2 = pd.concat([futuresDF['chgValue'], futuresDF['group']],axis=1).groupby(['group'])
+    bygroup2 = pd.concat([futuresDF['chgValue'], futuresDF['group']],axis=1).drop(offline, axis=0).groupby(['group'])
     chgByGroupByContract = bygroup2.sum()/bygroup2.count()
-    bygroup3 = pd.concat([futuresDF['ACT']==1, futuresDF['group']],axis=1).groupby(['group'])
+    bygroup3 = pd.concat([futuresDF['ACT']==1, futuresDF['group']],axis=1).drop(offline, axis=0).groupby(['group'])
     longPerByGroup = bygroup3.sum()/bygroup3.count()
+    
+    totalsDF.set_value(lastDate, 'Vol_All', abs(cv_online).sum()/cv_online.count())
     for i,value in enumerate(volByGroupByContract['chgValue']):
         totalsDF.set_value(lastDate, 'Vol_'+volByGroupByContract.index[i], value)
+    
+    totalsDF.set_value(lastDate, 'Chg_All', cv_online.sum()/cv_online.count())
     for i,value in enumerate(chgByGroupByContract['chgValue']):
         totalsDF.set_value(lastDate, 'Chg_'+chgByGroupByContract.index[i], value)
+    
+    totalsDF.set_value(lastDate, 'L%_All', sum(futuresDF.ACT.drop(offline, axis=0)==1)/float(cv_online.count()))
     for i,value in enumerate(longPerByGroup['ACT']):
         totalsDF.set_value(lastDate, 'L%_'+longPerByGroup.index[i], value)
+    
     print totalsDF.sort_index().transpose()
     
     filename='futuresResults_'+lastDate.strftime("%Y%m%d%H%M")+'.csv'
@@ -533,9 +541,9 @@ if lastDate > sigDate:
         pd.read_csv(savePath+filename, index_col=0).append(totalsDF[cols]).to_csv(savePath+filename)
         
 else:
-    votingCols =['Anti1LastSIG','AntiPrevACT','AdjSEA']
+    votingCols =['1LastSIG','prevACT','AntiSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
-    voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','LastSEA']
+    voting3Cols = ['0.75LastSIG','AntiPrevACT','AntiSEA']
     voting4Cols=['Voting','Voting2','Voting3']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols

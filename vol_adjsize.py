@@ -474,7 +474,7 @@ if lastDate > sigDate:
     futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue*futuresDF.finalQTY
     cv_online = futuresDF['chgValue'].drop(offline,axis=0)
     for sig in signals:
-        futuresDF['PNL_'+sig]=futuresDF['chgValue']*futuresDF[sig]*futuresDF.finalQTY
+        futuresDF['PNL_'+sig]=futuresDF['chgValue']*futuresDF[sig]
         totalsDF.set_value(lastDate, 'ACC_'+sig, sum(futuresDF[sig]==futuresDF.ACT)/float(nrows))
         totalsDF.set_value(lastDate, 'L%_'+sig, sum(futuresDF[sig]==1)/float(nrows))
     totals =futuresDF[[x for x in futuresDF if 'PNL' in x]].sum()

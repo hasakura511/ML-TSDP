@@ -24,12 +24,17 @@ from suztoolz.transform import RSI, ROC, zScore, softmax, DPO, numberZeros,\
                         roofingFilter
 import seaborn as sns
 
-filter=True
+filter=False
 start_time = time.time()
 version = 'v4'
 systemFilename='system_v4mini.csv'
 c2id=101533256
-offline = ['AC','CGB','EBS','ED','FEI','FSS','YB']
+#offline = ['AC','CGB','EBS','ED','FEI','FSS','YB']
+offline =  [
+                    'AC','CGB','EBS','ED','FEI','FSS','YB',\
+                    'AEX','EBL','EBM','FC','FCH','FDX','FFI','FLG','HCM',\
+                    'KW','LC','LH','LRC','LSU','MFX','MW','OJ','SMI','SXE'
+                    ]
 groups  = {
         'AC':'energy',
         'AD':'currency',
@@ -176,6 +181,7 @@ futuresRank.to_html(savePath+'fRank.html')
 print futuresRank.ix[:,0:5]
 
 if filter:
+    print "\nRanking filter is ON.."
     #filter off un/profitable contracts
     onlineSymbols=[]
     for i,g in enumerate(futuresRank.group.unique()):
@@ -208,7 +214,26 @@ if filter:
     system.c2id=c2id
     print 'Saving', systemPath+systemFilename
     system.to_csv(systemPath+systemFilename, index=False)
-        
+else:
+    print "\nRanking filter is OFF.."
+    print '\nOffline:', len(offline), offline
+    online=[x for x in groups.keys() if x not in offline]
+    print '\nOnline:', len(online), online
+    print 'Total:', len(online) + len(offline)
+    system = pd.read_csv(systemPath+systemFilename)
+    
+    for sys in system.System:
+        sym=sys.split('_')[1]
+        #print sym
+        if sym in offline:
+            idx=system[system.System==sys].index[0]
+            print sys, sym, system.ix[idx].c2qty,
+            system.set_value(idx,'c2qty',0)
+            print system.ix[idx].c2qty
+    system.Name=systemFilename.split('_')[1][:-4]
+    system.c2id=c2id
+    print 'Saving', systemPath+systemFilename
+    system.to_csv(systemPath+systemFilename, index=False)
 #signalDF=signalDF.sort_index()
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')

@@ -34,6 +34,7 @@ from suztoolz.datatools.seasonalClass import seasonalClassifier
 start_time = time.time()
 version='v4'
 riskEquity=2000
+riskEquity_mini=500
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
@@ -80,6 +81,11 @@ for i,col in enumerate(fxRates.columns):
         break
         
 offline = ['AC','CGB','EBS','ED','FEI','FSS','YB']
+offline_mini = [
+                    'AC','CGB','EBS','ED','FEI','FSS','YB',\
+                    'AEX','EBL','EBM','FC','FCH','FDX','FFI','FLG','HCM',\
+                    'KW','LC','LH','LRC','LSU','MFX','MW','OJ','SMI','SXE'
+                    ]
 
 fxDict={
     'AUD':1/fxRates.ix['AUDUSD'],
@@ -229,6 +235,7 @@ for i,contract in enumerate(marketList):
     usdATR = atr[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
     cValue = data.Close[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
     qty = int(math.ceil(riskEquity/usdATR))
+    qty_mini = int(math.ceil(riskEquity_mini/usdATR))
     #print sym, data.R[-1], contractName
     #signalFilename='v4_'+sym+'.csv'
     corrDF[sym]=pc
@@ -240,6 +247,7 @@ for i,contract in enumerate(marketList):
     #futuresDF.set_value(sym,'prevACT',act[-2])
     futuresDF.set_value(sym,'usdATR',usdATR)
     futuresDF.set_value(sym,'QTY',qty)
+    futuresDF.set_value(sym,'QTY_MINI',qty_mini)
     futuresDF.set_value(sym,'contractValue',cValue)
     futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
     futuresDF.set_value(sym,'RiskOn',c2contractSpec[sym][3])
@@ -419,6 +427,7 @@ print futuresDF.iloc[:,:4]
 
 #system file update
 system = pd.read_csv(systemPath+systemFilename)
+system_mini = pd.read_csv(systemPath+systemFilename2)
 
 for sys in system.System:
     sym=sys.split('_')[1]
@@ -428,11 +437,23 @@ for sys in system.System:
     print system.ix[idx].c2qty, system.ix[idx].c2sym,
     system.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
     print system.ix[idx].c2sym
+
+for sys in system_mini.System:
+    sym=sys.split('_')[1]
+    idx=system_mini[system_mini.System==sys].index[0]
+    print 'MINI', sys, sym, system_mini.ix[idx].c2qty,
+    if sym in offline_mini:
+        system_mini.set_value(idx,'c2qty',0)
+    else:
+        system_mini.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MINI']))
+    print system_mini.ix[idx].c2qty, system_mini.ix[idx].c2sym,
+    system_mini.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
+    print system_mini.ix[idx].c2sym
     
 print 'Saving', systemPath+systemFilename
 system.to_csv(systemPath+systemFilename, index=False)
 print 'Saving', systemPath+systemFilename2
-system.to_csv(systemPath+systemFilename2, index=False)
+system_mini.to_csv(systemPath+systemFilename2, index=False)
 #signalDF=signalDF.sort_index()
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')

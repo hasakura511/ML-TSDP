@@ -81,11 +81,8 @@ for i,col in enumerate(fxRates.columns):
         break
         
 offline = ['AC','CGB','EBS','ED','FEI','FSS','YB']
-offline_mini = [
-                    'AC','CGB','EBS','ED','FEI','FSS','YB',\
-                    'AEX','EBL','EBM','FC','FCH','FDX','FFI','FLG','HCM',\
-                    'KW','LC','LH','LRC','LSU','MFX','MW','OJ','SMI','SXE'
-                    ]
+offline_mini = ['AC','AEX','CGB','DX','EBL','EBM','EBS','ED','EMD','ES','FC','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','HO','KC','KW','LB','LC','LCO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','O','OJ','S','SF','SI','SM','SMI','SSG','SXE','TF','TU','TY','VX','YA','YB','YM','YT2']
+
 
 fxDict={
     'AUD':1/fxRates.ix['AUDUSD'],

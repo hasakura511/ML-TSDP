@@ -30,11 +30,9 @@ version = 'v4'
 systemFilename='system_v4mini.csv'
 c2id=101533256
 #offline = ['AC','CGB','EBS','ED','FEI','FSS','YB']
-offline =  [
-                    'AC','CGB','EBS','ED','FEI','FSS','YB',\
-                    'AEX','EBL','EBM','FC','FCH','FDX','FFI','FLG','HCM',\
-                    'KW','LC','LH','LRC','LSU','MFX','MW','OJ','SMI','SXE'
-                    ]
+offline  = ['AC','AEX','CGB','DX','EBL','EBM','EBS','ED','EMD','ES','FC','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','HO','KC','KW','LB','LC','LCO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','O','OJ','S','SF','SI','SM','SMI','SSG','SXE','TF','TU','TY','VX','YA','YB','YM','YT2']
+
+
 groups  = {
         'AC':'energy',
         'AD':'currency',

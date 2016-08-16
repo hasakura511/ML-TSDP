@@ -35,11 +35,16 @@ start_time = time.time()
 version='v4'
 riskEquity=2000
 riskEquity_mini=500
+riskEquity_micro=250
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
 systemFilename='system_v4futures.csv'
 systemFilename2='system_v4mini.csv'
+systemFilename3='system_v4micro.csv'
+c2id_macro=102324563
+c2id_mini=101533256
+c2id_micro=101359768
 #range (-1 to 1) postive for counter-trend negative for trend i.e.
 #-1 would 0 safef ==1 and double safef==2
 #1 would 0 safef ==2 and double safef==1
@@ -82,7 +87,7 @@ for i,col in enumerate(fxRates.columns):
         
 offline = ['AC','CGB','EBS','ED','FEI','FSS','LB','YB']
 offline_mini = ['AC','AEX','CGB','DX','EBL','EBM','EBS','ED','EMD','ES','FC','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','HO','KC','KW','LB','LC','LCO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','O','OJ','S','SF','SI','SM','SMI','SSG','SXE','TF','TU','TY','VX','YA','YB','YM','YT2']
-
+offline_micro =['AC','AD','AEX','BP','CC','CD','CGB','CT','CU','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3']
 
 fxDict={
     'AUD':1/fxRates.ix['AUDUSD'],
@@ -233,6 +238,7 @@ for i,contract in enumerate(marketList):
     cValue = data.Close[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
     qty = int(math.ceil(riskEquity/usdATR))
     qty_mini = int(math.ceil(riskEquity_mini/usdATR))
+    qty_micro = int(math.ceil(riskEquity_micro/usdATR))
     #print sym, data.R[-1], contractName
     #signalFilename='v4_'+sym+'.csv'
     corrDF[sym]=pc
@@ -245,6 +251,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'usdATR',usdATR)
     futuresDF.set_value(sym,'QTY',qty)
     futuresDF.set_value(sym,'QTY_MINI',qty_mini)
+    futuresDF.set_value(sym,'QTY_MICRO',qty_micro)
     futuresDF.set_value(sym,'contractValue',cValue)
     futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
     futuresDF.set_value(sym,'RiskOn',c2contractSpec[sym][3])
@@ -425,16 +432,21 @@ print futuresDF.iloc[:,:4]
 #system file update
 system = pd.read_csv(systemPath+systemFilename)
 system_mini = pd.read_csv(systemPath+systemFilename2)
+system_micro = pd.read_csv(systemPath+systemFilename3)
 
+#macro
 for sys in system.System:
     sym=sys.split('_')[1]
     idx=system[system.System==sys].index[0]
-    print sys, sym, system.ix[idx].c2qty,
+    print 'MACRO', sys, sym, system.ix[idx].c2qty,
     system.set_value(idx,'c2qty',int(futuresDF.ix[sym]['finalQTY']))
     print system.ix[idx].c2qty, system.ix[idx].c2sym,
     system.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
     print system.ix[idx].c2sym
+system.Name=systemFilename.split('_')[1][:-4]
+system.c2id=c2id_macro
 
+#mini
 for sys in system_mini.System:
     sym=sys.split('_')[1]
     idx=system_mini[system_mini.System==sys].index[0]
@@ -446,11 +458,30 @@ for sys in system_mini.System:
     print system_mini.ix[idx].c2qty, system_mini.ix[idx].c2sym,
     system_mini.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
     print system_mini.ix[idx].c2sym
+system_mini.Name=systemFilename2.split('_')[1][:-4]
+system_mini.c2id=c2id_mini
+
+#micro
+for sys in system_micro.System:
+    sym=sys.split('_')[1]
+    idx=system_micro[system_micro.System==sys].index[0]
+    print 'MICRO', sys, sym, system_micro.ix[idx].c2qty,
+    if sym in offline_micro:
+        system_micro.set_value(idx,'c2qty',0)
+    else:
+        system_micro.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MICRO']))
+    print system_micro.ix[idx].c2qty, system_micro.ix[idx].c2sym,
+    system_micro.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
+    print system_micro.ix[idx].c2sym
+system_micro.Name=systemFilename3.split('_')[1][:-4]
+system_micro.c2id=c2id_micro 
     
 print 'Saving', systemPath+systemFilename
 system.to_csv(systemPath+systemFilename, index=False)
 print 'Saving', systemPath+systemFilename2
 system_mini.to_csv(systemPath+systemFilename2, index=False)
+print 'Saving', systemPath+systemFilename3
+system_micro.to_csv(systemPath+systemFilename3, index=False)
 #signalDF=signalDF.sort_index()
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')

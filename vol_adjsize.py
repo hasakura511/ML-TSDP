@@ -456,7 +456,7 @@ system_mini.to_csv(systemPath+systemFilename2, index=False)
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #use LastSEA for seasonality in c2
-c2system='Voting2'
+c2system='0.5LastSIG'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG',\

@@ -487,7 +487,7 @@ system_micro.to_csv(systemPath+systemFilename3, index=False)
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #use LastSEA for seasonality in c2
-c2system='LastSEA'
+c2system='prevACT'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG',\

@@ -34,7 +34,7 @@ from suztoolz.datatools.seasonalClass import seasonalClassifier
 start_time = time.time()
 version='v4'
 riskEquity=2000
-riskEquity_mini=500
+riskEquity_mini=250
 riskEquity_micro=250
 lookback=20
 refresh=False
@@ -86,7 +86,7 @@ for i,col in enumerate(fxRates.columns):
         break
         
 offline = ['AC','CGB','EBS','ED','FEI','FSS','LB','YB']
-offline_mini = ['AC','AEX','CGB','DX','EBL','EBM','EBS','ED','EMD','ES','FC','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','HO','KC','KW','LB','LC','LCO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','O','OJ','S','SF','SI','SM','SMI','SSG','SXE','TF','TU','TY','VX','YA','YB','YM','YT2']
+offline_mini = ['AC','AD','AEX','BP','CD','CGB','CU','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','HCM','HIC','HO','JY','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SF','SI','SIN','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','YA','YB','YM','YT2','YT3']
 offline_micro =['AC','AD','AEX','BP','CC','CD','CGB','CT','CU','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3']
 
 fxDict={

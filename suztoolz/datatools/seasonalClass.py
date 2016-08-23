@@ -174,6 +174,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
     zzsstd=kwargs.get('zzsstd',3.5)
     zs_window=kwargs.get('zs_window',60)
     rc_window=kwargs.get('rc_window',10)
+    pivotDateLookforward=kwargs.get('pivotDateLookforward',3)
     minValidationLength=kwargs.get('minValidationLength',5)
     savePath = kwargs.get('savePath',None)
     #atrPath = kwargs.get('atrPath', './data/futuresATR.csv')
@@ -272,16 +273,20 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
                 validationStartDate =validationStartDate2
                 validationLength=validationLength2
             #find next seasonal pivot, +5 for to lookahead of weekend/larger lookforward bias
-            i=1
-            pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
+            i=1 
+            print data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime()
+            pivotDate=(data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().year+1)*10000+\
+                            data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
                             +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
-            currentDate=data.index[-1].to_datetime().month*100+data.index[-1].to_datetime().day+3
-            #print i,pivotDate,currentDate, not currentDate<pivotDate
+            currentDate=data.index[-1].to_datetime().year*1000+data.index[-1].to_datetime().month*100\
+                                +data.index[-1].to_datetime().day+pivotDateLookforward
+            print i,pivotDate,currentDate, not currentDate<pivotDate
             while not currentDate<pivotDate:
                 i+=1
-                pivotDate=data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
+                pivotDate=(data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().year+1)*10000+\
+                                data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
                                 +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
-                #print i,pivotDate,currentDate
+                print i,pivotDate,currentDate
             nextSea=round(data.S.iloc[np.nonzero(zzs_pivots)[0][i]],2)
             
             currSea=round(data.S[-1],2)

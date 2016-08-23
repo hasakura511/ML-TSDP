@@ -278,7 +278,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             pivotDate=(data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().year+1)*10000+\
                             data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
                             +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
-            currentDate=data.index[-1].to_datetime().year*1000+data.index[-1].to_datetime().month*100\
+            currentDate=data.index[-1].to_datetime().year*10000+data.index[-1].to_datetime().month*100\
                                 +data.index[-1].to_datetime().day+pivotDateLookforward
             print i,pivotDate,currentDate, not currentDate<pivotDate
             while not currentDate<pivotDate:

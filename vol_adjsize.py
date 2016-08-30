@@ -505,6 +505,10 @@ if lastDate > sigDate:
     voting7Cols = ['RiskOff','0.5LastSIG','AntiPrevACT']
     voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
     voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
+    voting10Cols = ['RiskOn','1LastSIG','prevACT']
+    voting11Cols = ['RiskOff','1LastSIG','prevACT']
+    voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
+    voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiPrevACT']
     #voting9Cols=['Anti1LastSIG','AntiSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
     #1bi. Run v4size(to update vlookback)
@@ -527,6 +531,10 @@ if lastDate > sigDate:
     futuresDF['Voting7']=np.where(futuresDF[voting7Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting8']=np.where(futuresDF[voting8Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting9']=np.where(futuresDF[voting9Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting10']=np.where(futuresDF[voting10Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     #v9=futuresDF[voting9Cols].sum(axis=1)
     #v9[v9<0]=-1
     #v9[v9>0]=1
@@ -614,6 +622,10 @@ else:
     voting7Cols = ['RiskOff','0.5LastSIG','AntiPrevACT']
     voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
     voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
+    voting10Cols = ['RiskOn','1LastSIG','prevACT']
+    voting11Cols = ['RiskOff','1LastSIG','prevACT']
+    voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
+    voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiPrevACT']
     #voting9Cols=['Anti1LastSIG','AntiSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
@@ -633,6 +645,10 @@ else:
     futuresDF['Voting7']=np.where(futuresDF[voting7Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting8']=np.where(futuresDF[voting8Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting9']=np.where(futuresDF[voting9Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting10']=np.where(futuresDF[voting10Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
+    futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     #v9=futuresDF[voting9Cols].sum(axis=1)
     #v9[v9<0]=-1
     #v9[v9>0]=1

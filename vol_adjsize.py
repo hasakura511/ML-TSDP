@@ -510,7 +510,7 @@ if lastDate > sigDate:
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['AntiSEA','AntiPrevACT']
-    voting11Cols = ['RiskOff','1LastSIG','prevACT']
+    voting11Cols = ['RiskOff','0.5LastSIG']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiPrevACT']
     
@@ -544,7 +544,11 @@ if lastDate > sigDate:
     v10[v10<0]=-1
     v10[v10>0]=1
     futuresDF['Voting10']=v10.values
-    futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    v11=futuresDF[voting11Cols].sum(axis=1)
+    v11[v11<0]=-1
+    v11[v11>0]=1
+    futuresDF['Voting11']=v11.values
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     
@@ -632,7 +636,7 @@ else:
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['AntiSEA','AntiPrevACT']
-    voting11Cols = ['RiskOff','1LastSIG','prevACT']
+    voting11Cols = ['RiskOff','0.5LastSIG']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiPrevACT']
     #voting9Cols=['Anti1LastSIG','AntiSEA']
@@ -664,7 +668,11 @@ else:
     v10[v10<0]=-1
     v10[v10>0]=1
     futuresDF['Voting10']=v10.values
-    futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    v11=futuresDF[voting11Cols].sum(axis=1)
+    v11[v11<0]=-1
+    v11[v11>0]=1
+    futuresDF['Voting11']=v11.values
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     #v9=futuresDF[voting9Cols].sum(axis=1)

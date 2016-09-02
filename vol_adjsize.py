@@ -499,9 +499,9 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Excess','AntiExcess
 
 
 if lastDate > sigDate:
-    votingCols = ['1LastSIG','prevACT','AntiSEA']
-    voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
-    voting3Cols = ['0.75LastSIG','AntiPrevACT','AntiSEA']
+    votingCols = ['Anti1LastSIG','prevACT','AntiSEA']
+    voting2Cols = ['0.5LastSIG','AntiPrevACT','AntiAdjSEA']
+    voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
     voting4Cols=['Voting','Voting2','Voting3']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     voting6Cols = ['0.5LastSIG','AntiPrevACT','AntiSEA']
@@ -621,9 +621,9 @@ if lastDate > sigDate:
         pd.read_csv(savePath+filename, index_col=0).append(totalsDF[cols]).to_csv(savePath+filename)
         
 else:
-    votingCols =['1LastSIG','prevACT','AntiSEA']
-    voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
-    voting3Cols = ['0.75LastSIG','AntiPrevACT','AntiSEA']
+    votingCols =['Anti1LastSIG','prevACT','AntiSEA']
+    voting2Cols = ['0.5LastSIG','AntiPrevACT','AntiAdjSEA']
+    voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
     voting4Cols=['Voting','Voting2','Voting3']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     voting6Cols = ['0.5LastSIG','AntiPrevACT','AntiSEA']

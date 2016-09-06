@@ -512,7 +512,7 @@ if lastDate > sigDate:
     voting10Cols = ['AntiSEA','AntiPrevACT']
     voting11Cols = ['RiskOff','0.5LastSIG']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
-    voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiPrevACT']
+    voting13Cols = ['1LastSIG','prevSEA','prevACT']
     
     #1bi. Run v4size(to update vlookback)
     #calc the previous day's results.
@@ -552,7 +552,7 @@ if lastDate > sigDate:
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     
-    pctChgCol = [x for x in columns if 'PC' in x][0]
+    pctChgCol = sorted([x for x in columns if 'PC' in x])[-1]
     futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue*futuresDF.finalQTY
     cv_online = futuresDF['chgValue'].drop(offline,axis=0)
     for sig in signals:
@@ -638,7 +638,7 @@ else:
     voting10Cols = ['AntiSEA','AntiPrevACT']
     voting11Cols = ['RiskOff','0.5LastSIG']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
-    voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiPrevACT']
+    voting13Cols = ['1LastSIG','LastSEA','prevACT']
     #voting9Cols=['Anti1LastSIG','AntiSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)

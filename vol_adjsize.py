@@ -245,7 +245,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'Contract',contractName)
     futuresDF.set_value(sym,'LastClose',data.Close[-1])
     futuresDF.set_value(sym,'ATR'+str(lookback),atr[-1])
-    futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
+    futuresDF.set_value(sym,'LastPctChg',pc[-1])
     futuresDF.set_value(sym,'ACT',act[-1])
     #futuresDF.set_value(sym,'prevACT',act[-2])
     futuresDF.set_value(sym,'usdATR',usdATR)
@@ -253,6 +253,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'QTY_MINI',qty_mini)
     futuresDF.set_value(sym,'QTY_MICRO',qty_micro)
     futuresDF.set_value(sym,'contractValue',cValue)
+    futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
     futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
     futuresDF.set_value(sym,'group',c2contractSpec[sym][3])
     futuresDF.set_value(sym,'RiskOn',c2contractSpec[sym][4])
@@ -419,9 +420,10 @@ for i2,contract in enumerate(marketList):
     futuresDF.set_value(sym,'1LastSAFEf',data.dpsSafef.iloc[-1])
     futuresDF.set_value(sym,'1finalQTY',adjQty)
     futuresDF.set_value(sym,'1SIG'+str(data.index[-1]),data.signals.iloc[-1])
-    
+
 futuresDF=futuresDF.sort_index()
 columns = futuresDF.columns.tolist()
+futuresDF.LastPctChg=futuresDF[sorted([x for x in columns if 'PC' in x])[-1]].values
 start_idx =columns.index('ACT')+1
 nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
 new_order = columns[:start_idx]+nextColOrder

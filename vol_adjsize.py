@@ -501,10 +501,10 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Excess','AntiExcess
 
 
 if lastDate > sigDate:
-    votingCols = ['Anti1LastSIG','prevACT','AntiSEA']
+    votingCols = ['Anti1LastSIG','prevACT','prevSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AntiAdjSEA']
     voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
-    voting4Cols=['Voting','Voting2','Voting3']
+    voting4Cols=['Voting','Voting2','Voting3','Voting8']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     voting6Cols = ['0.5LastSIG','AntiPrevACT','AntiSEA']
     voting7Cols = ['RiskOff','0.5LastSIG','AntiPrevACT']
@@ -531,7 +531,7 @@ if lastDate > sigDate:
     futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
     futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
+    
     futuresDF['Voting5']=np.where(futuresDF[voting5Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting6']=np.where(futuresDF[voting6Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting7']=np.where(futuresDF[voting7Cols].sum(axis=1)<0,-1,1)
@@ -553,6 +553,11 @@ if lastDate > sigDate:
     futuresDF['Voting11']=v11.values
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
+    v4=futuresDF[voting4Cols].sum(axis=1)
+    v4[v4<0]=-1
+    v4[v4>0]=1
+    futuresDF['Voting4']=v4.values
     
     pctChgCol = sorted([x for x in columns if 'PC' in x])[-1]
     futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue*futuresDF.finalQTY
@@ -627,10 +632,10 @@ if lastDate > sigDate:
         pd.read_csv(savePath+filename, index_col=0).append(totalsDF[cols]).to_csv(savePath+filename)
         
 else:
-    votingCols =['Anti1LastSIG','prevACT','AntiSEA']
+    votingCols =['Anti1LastSIG','prevACT','LastSEA']
     voting2Cols = ['0.5LastSIG','AntiPrevACT','AntiAdjSEA']
     voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
-    voting4Cols=['Voting','Voting2','Voting3']
+    voting4Cols=['Voting','Voting2','Voting3','Voting8']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     voting6Cols = ['0.5LastSIG','AntiPrevACT','AntiSEA']
     voting7Cols = ['RiskOff','0.5LastSIG','AntiPrevACT']
@@ -655,7 +660,7 @@ else:
     futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
     futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting5']=np.where(futuresDF[voting5Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting6']=np.where(futuresDF[voting6Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting7']=np.where(futuresDF[voting7Cols].sum(axis=1)<0,-1,1)
@@ -677,10 +682,11 @@ else:
     futuresDF['Voting11']=v11.values
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
-    #v9=futuresDF[voting9Cols].sum(axis=1)
-    #v9[v9<0]=-1
-    #v9[v9>0]=1
-    #futuresDF['Voting9']=v9.values
+    #futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
+    v4=futuresDF[voting4Cols].sum(axis=1)
+    v4[v4<0]=-1
+    v4[v4>0]=1
+    futuresDF['Voting4']=v4.values
     
     print 'Saving signals from', c2system
     #1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR

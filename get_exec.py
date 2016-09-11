@@ -22,7 +22,7 @@ def get_c2trades(systemid, name, c2api):
     if len(jsondata['response']) > 1:
         dataSet=json_normalize(jsondata['response'])
         dataSet=dataSet.set_index('trade_id')
-         
+        '''
         if os.path.isfile(filename):
             existData = pd.read_csv(filename, index_col='trade_id')
             existData = existData.reset_index()
@@ -31,7 +31,7 @@ def get_c2trades(systemid, name, c2api):
             dataSet['trade_id'] = dataSet['trade_id'].astype('int')
             dataSet=dataSet.drop_duplicates(subset=['trade_id'],keep='last')
             dataSet=dataSet.set_index('trade_id') 
-            
+        '''
         dataSet=dataSet.sort_values(by='closedWhenUnixTimeStamp')
         
         dataSet.to_csv(filename)
@@ -73,4 +73,4 @@ for c2id in c2dict:
     get_c2trades(c2id, stratName, c2api)
 
 
-get_ibtrades()
+#get_ibtrades()

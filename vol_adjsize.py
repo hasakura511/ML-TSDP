@@ -491,7 +491,7 @@ system_micro.to_csv(systemPath+systemFilename3, index=False)
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #use LastSEA for seasonality in c2
-c2system='Voting8'
+c2system='Voting15'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Excess','AntiExcess',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG',\
@@ -651,7 +651,7 @@ else:
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['AntiSEA','AntiPrevACT']
-    voting11Cols = ['RiskOff','0.5LastSIG']
+    voting11Cols = ['Voting','Voting5','Voting6']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA','prevACT']
     voting14Cols = ['RiskOff','Anti0.75LastSIG']

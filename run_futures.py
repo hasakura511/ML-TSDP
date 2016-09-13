@@ -278,7 +278,7 @@ if len(sys.argv)==1:
                          #'CT',
                          #'CU',
                          #'DX',
-                         #'EBL',
+                         'EBL',
                          #'EBM',
                          #'EBS',
                          #'ED',
@@ -322,7 +322,7 @@ if len(sys.argv)==1:
                          #'RB',
                          #'RR',
                          #'RS',
-                         'S',
+                         #'S',
                          #'SB',
                          #'SF',
                          #'SI',
@@ -352,7 +352,7 @@ if len(sys.argv)==1:
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
-    vsfile =pd.read_csv('Z:/TSDP/data/futuresATR.csv', index_col=0)
+    vsfile =pd.read_csv('D:/ML-TSDP/data/futuresATR.csv', index_col=0)
     startDate_dt=dt.strptime(vsfile.ix[ticker].vSTART, '%Y-%m-%d')
     
     #Model Parameters
@@ -1721,7 +1721,10 @@ for i,mrThreshold in enumerate(mrThresholds):
     print signalDF[maxk].iloc[-1]
     if showCharts:
         #if startDate == None:
-        sdate=data.index[-validationSetLength-1].to_datetime()
+        if validationSetLength == data.shape[0]:
+            sdate=data.index[0].to_datetime()
+        else:
+            sdate=data.index[-validationSetLength-1].to_datetime()
         startDate = datetime.date(sdate.year, sdate.month, sdate.day)
         zz.plot_pivots(l=8,w=8,\
                             #startValley=(startValley, data2.Close[startValley]),\

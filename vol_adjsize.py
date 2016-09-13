@@ -497,7 +497,7 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Excess','AntiExcess
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG',\
                 'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
                 'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
-                'Voting10','Voting11','Voting12','Voting13']
+                'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
 
 
 if lastDate > sigDate:
@@ -515,6 +515,8 @@ if lastDate > sigDate:
     voting11Cols = ['RiskOff','0.5LastSIG']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     voting13Cols = ['1LastSIG','prevSEA','prevACT']
+    voting14Cols = ['RiskOff','Anti0.75LastSIG']
+    voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     
     #1bi. Run v4size(to update vlookback)
     #calc the previous day's results.
@@ -553,6 +555,12 @@ if lastDate > sigDate:
     futuresDF['Voting11']=v11.values
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting14']=np.where(futuresDF[voting14Cols].sum(axis=1)<0,-1,1)
+    v14=futuresDF[voting14Cols].sum(axis=1)
+    v14[v14<0]=-1
+    v14[v14>0]=1
+    futuresDF['Voting14']=v14.values
+    futuresDF['Voting15']=np.where(futuresDF[voting15Cols].sum(axis=1)<0,-1,1)
     #futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
     v4=futuresDF[voting4Cols].sum(axis=1)
     v4[v4<0]=-1
@@ -646,6 +654,8 @@ else:
     voting11Cols = ['RiskOff','0.5LastSIG']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     voting13Cols = ['1LastSIG','LastSEA','prevACT']
+    voting14Cols = ['RiskOff','Anti0.75LastSIG']
+    voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     #voting9Cols=['Anti1LastSIG','AntiSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
@@ -682,6 +692,12 @@ else:
     futuresDF['Voting11']=v11.values
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting14']=np.where(futuresDF[voting14Cols].sum(axis=1)<0,-1,1)
+    v14=futuresDF[voting14Cols].sum(axis=1)
+    v14[v14<0]=-1
+    v14[v14>0]=1
+    futuresDF['Voting14']=v14.values
+    futuresDF['Voting15']=np.where(futuresDF[voting15Cols].sum(axis=1)<0,-1,1)
     #futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
     v4=futuresDF[voting4Cols].sum(axis=1)
     v4[v4<0]=-1

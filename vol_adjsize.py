@@ -480,19 +480,18 @@ for sys in system_micro.System:
 system_micro.Name=systemFilename3.split('_')[1][:-4]
 system_micro.c2id=c2id_micro 
     
-print 'Saving', systemPath+systemFilename
-system.to_csv(systemPath+systemFilename, index=False)
-print 'Saving', systemPath+systemFilename2
-system_mini.to_csv(systemPath+systemFilename2, index=False)
-print 'Saving', systemPath+systemFilename3
-system_micro.to_csv(systemPath+systemFilename3, index=False)
 #signalDF=signalDF.sort_index()
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
-#use LastSEA for seasonality in c2
+#for signal files
 c2system='Voting10'
+#for system files
+c2system_macro='Voting10'
+c2system_mini='Voting3'
+c2system_micro='Voting3'
 c2safef=1
+#use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Excess','AntiExcess',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG',\
                 'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
@@ -729,7 +728,22 @@ else:
     print 'Saving', savePath+'futuresATR_Signals.csv'
     futuresDF.to_csv(savePath+'futuresATR_Signals.csv')
     
-print 'Saving', savePath+'futuresATR.csv'
+for i,sym in enumerate([x.split('_')[1] for x in system.System]):
+    system.set_value(i,'signal',futuresDF[c2system].ix[sym])
+system.to_csv(systemPath+systemFilename, index=False)
+print 'Saved', systemPath+systemFilename,c2system
+
+for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
+    system_mini.set_value(i,'signal',futuresDF[c2system_mini].ix[sym])
+system_mini.to_csv(systemPath+systemFilename2, index=False)
+print 'Saved', systemPath+systemFilename2,c2system_mini
+
+for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
+    system_micro.set_value(i,'signal',futuresDF[c2system_micro].ix[sym])
+system_micro.to_csv(systemPath+systemFilename3, index=False)
+print 'Saved', systemPath+systemFilename3, c2system_micro
+
 futuresDF.to_csv(savePath+'futuresATR.csv')
+print 'Saved', savePath+'futuresATR.csv'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

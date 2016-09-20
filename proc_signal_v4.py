@@ -76,6 +76,7 @@ def start_systems():
         
       systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'.csv')
       systemdata=systemdata.reset_index()
+      get_c2pos(systemdata)
       for i in systemdata.index:
           system=systemdata.ix[i]
           #print system, sys.argv[2]

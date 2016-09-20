@@ -39,9 +39,9 @@ def get_exec_open(systemid, apikey):
     return r.text
 
 
-def get_c2pos():
-    logging.info('GET C2 POSITION')
-    c2list=get_c2_list()
+def get_c2pos(systemdata):
+    logging.info('GETTING C2 POSITIONS...')
+    c2list=get_c2_list(systemdata)
     systems=c2list.keys()
     for systemname in systems:
         (systemid, apikey)=c2list[systemname]
@@ -113,11 +113,11 @@ def get_c2_pos(systemname, c2sym):
         return c2_pos_qty
     
 #place_order('BTO','1','EURUSD','forex')
-def get_c2_list():
+def get_c2_list(systemdata):
     dpsList=dict()
     
-    systemdata=pd.read_csv('./data/systems/system.csv')
-    systemdata=systemdata.reset_index()
+    #systemdata=pd.read_csv('./data/systems/system.csv')
+    #systemdata=systemdata.reset_index()
     for i in systemdata.index:
         system=systemdata.ix[i]
         if system['c2submit']:

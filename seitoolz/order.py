@@ -7,7 +7,7 @@ from pandas.io.json import json_normalize
 from ibapi.place_order import place_order as place_iborder
 from c2api.place_order import place_order as place_c2order
 from ibapi.get_exec import get_ib_pos, get_exec_open as get_ibexec_open, get_ib_sym_pos
-from c2api.get_exec import get_c2_pos, get_exec_open as get_c2exec_open
+from c2api.get_exec import get_c2_pos
 from seitoolz.signal import get_model_pos
 from time import gmtime, strftime, time, localtime, sleep
 import logging
@@ -17,7 +17,7 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, 
    
     logging.info('==============')
     logging.info('Strategy:' + systemname)
-    logging.info('system_pos:' +str(system_pos))
+    #logging.info('system_pos:' +str(system_pos))
     logging.info("  Signal Name: " + system)
     logging.info("  C2ID: " + systemid + "  C2Key: " + c2apikey)
     logging.info("  C2Sym: " + c2sym + " IBSym: " + ibsym)

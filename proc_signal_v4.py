@@ -12,10 +12,13 @@ from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpo
 from c2api.get_exec import get_c2pos, get_exec_open as get_c2exec_open
 from seitoolz.signal import get_dps_model_pos, get_model_pos
 from seitoolz.order import adj_size
+from seitoolz.get_exec import get_executions
 from time import gmtime, strftime, localtime, sleep
 import logging
 import sys
 import threading
+
+
 
 logging.basicConfig(filename='/logs/proc_signal_v4.log',level=logging.DEBUG)
 start_time = time.time()
@@ -70,12 +73,9 @@ def start_trade(systems):
         except Exception as e:
             logging.error("something bad happened", exc_info=True)
 
-def start_systems():
+def start_systems(systemdata):
       threads = []        
       systemList=dict()
-        
-      systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'.csv')
-      systemdata=systemdata.reset_index()
       get_c2pos(systemdata)
       for i in systemdata.index:
           system=systemdata.ix[i]
@@ -99,5 +99,8 @@ def start_systems():
       [t.join() for t in threads]
       
 #subprocess.call(['python', 'get_ibpos.py'])       
-start_systems()
+systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'.csv')
+systemdata=systemdata.reset_index()
+start_systems(systemdata)
+get_executions(systemdata)
 #subprocess.call(['python', 'get_ibpos.py'])

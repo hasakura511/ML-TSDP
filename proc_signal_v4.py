@@ -44,10 +44,10 @@ def start_trade(systems):
            print "Starting " + str(systems.iloc[0]['Name'])
            logging.info("Starting " + str(systems.iloc[0]['Name']))
         try:
-            model=get_models(systems)
-            #model = pd.concat([systems.System, systems.signal, systems.c2qty], axis=1)
-            #model.columns = ['system','action','qty']
-            #model=model.set_index(['system'])
+            #model=get_models(systems)
+            model = pd.concat([systems.System, systems.signal, systems.c2qty], axis=1)
+            model.columns = ['system','action','qty']
+            model=model.set_index(['system'])
             
             symbols=systems['c2sym'].values
             for symbol in symbols:

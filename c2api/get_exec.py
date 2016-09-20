@@ -40,6 +40,7 @@ def get_exec_open(systemid, apikey):
 
 
 def get_c2pos():
+    logging.info('GET C2 POSITION')
     c2list=get_c2_list()
     systems=c2list.keys()
     for systemname in systems:

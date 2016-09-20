@@ -1,8 +1,0 @@
-#DJ30_M6
-#JPN225_M6
-#NAS100_M6
-#S&P500_M6
-#Soybean_N6
-#US$indx_M6
-1d_GOLD
-1d_SILVER

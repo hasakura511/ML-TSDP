@@ -17,7 +17,7 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, 
    
     logging.info('==============')
     logging.info('Strategy:' + systemname)
-    logging.info('system_pos:' + system_pos)
+    logging.info('system_pos:' +str(system_pos))
     logging.info("  Signal Name: " + system)
     logging.info("  C2ID: " + systemid + "  C2Key: " + c2apikey)
     logging.info("  C2Sym: " + c2sym + " IBSym: " + ibsym)

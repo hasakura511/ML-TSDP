@@ -16,7 +16,7 @@ def proc_sig_adj(systemid,apikey):
             cancel_signal(row['signal_id'], systemid,apikey)
             #time.sleep(1)
 
-data=pd.read_csv('./data/systems/system_backup.csv')
+data=pd.read_csv('./data/systems/system_consolidated.csv')
 data=data.reset_index()
 
 for i in data.index:

@@ -170,7 +170,7 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
     l=kwargs.get('l',8)
     w=kwargs.get('w',8)
     lb=kwargs.get('lb',270)
-    zzpstd=kwargs.get('zzpstd',3.5)
+    zzpstd=kwargs.get('zzpstd',2.5)
     zzsstd=kwargs.get('zzsstd',3.5)
     zs_window=kwargs.get('zs_window',60)
     rc_window=kwargs.get('rc_window',10)
@@ -452,8 +452,8 @@ if __name__ == "__main__":
                          #'EBM',
                          #'EBS',
                          #'ED',
-                         'EMD',
-                         #'ES',
+                         #'EMD',
+                         'ES',
                          #'FCH',
                          #'FC',
                          #'FDX',

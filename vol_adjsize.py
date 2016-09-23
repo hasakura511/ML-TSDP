@@ -485,7 +485,7 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Anti1LastSIG'
+c2system='Voting10'
 #for system files
 c2system_macro=c2system
 c2system_mini='Voting3'
@@ -511,7 +511,7 @@ if lastDate > sigDate:
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
-    voting11Cols = ['Voting','Voting5','Voting6']
+    voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA','prevACT']
     voting14Cols = ['RiskOff','Anti0.75LastSIG']
@@ -547,7 +547,11 @@ if lastDate > sigDate:
     v10[v10<0]=-1
     v10[v10>0]=1
     futuresDF['Voting10']=v10.values
-    futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    v11=futuresDF[voting11Cols].sum(axis=1)
+    v11[v11<0]=-1
+    v11[v11>0]=1
+    futuresDF['Voting11']=v11.values
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     #futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     v13=futuresDF[voting13Cols].sum(axis=1)
@@ -650,7 +654,7 @@ else:
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
-    voting11Cols = ['Voting','Voting5','Voting6']
+    voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
     voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA','prevACT']
     voting14Cols = ['RiskOff','Anti0.75LastSIG']
@@ -684,7 +688,11 @@ else:
     v10[v10<0]=-1
     v10[v10>0]=1
     futuresDF['Voting10']=v10.values
-    futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+    v11=futuresDF[voting11Cols].sum(axis=1)
+    v11[v11<0]=-1
+    v11[v11>0]=1
+    futuresDF['Voting11']=v11.values
     futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
     #futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     v13=futuresDF[voting13Cols].sum(axis=1)

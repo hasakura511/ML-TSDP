@@ -485,7 +485,7 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Voting4'
+c2system='Voting10'
 #for system files
 c2system_macro=c2system
 c2system_mini='Voting3'
@@ -506,13 +506,13 @@ if lastDate > sigDate:
     voting4Cols=['Voting','Voting2','Voting3','Voting8']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     voting6Cols = ['0.5LastSIG','AntiPrevACT','AntiSEA']
-    voting7Cols = ['RiskOn','0.5LastSIG','AntiSEA']
-    voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
+    voting7Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA']
+    voting8Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
     voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
-    voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
+    voting12Cols = ['Excess','Anti1LastSIG','AntiPrevACT','AntiAdjSEA']
     voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA','prevACT']
     voting14Cols = ['RiskOff','Anti0.75LastSIG']
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
@@ -552,7 +552,11 @@ if lastDate > sigDate:
     v11[v11<0]=-1
     v11[v11>0]=1
     futuresDF['Voting11']=v11.values
-    futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
+    v12=futuresDF[voting12Cols].sum(axis=1)
+    v12[v12<0]=-1
+    v12[v12>0]=1
+    futuresDF['Voting12']=v12.values
     #futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     v13=futuresDF[voting13Cols].sum(axis=1)
     v13[v13<0]=-1
@@ -649,13 +653,13 @@ else:
     voting4Cols=['Voting','Voting2','Voting3','Voting8']
     voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
     voting6Cols = ['0.5LastSIG','AntiPrevACT','AntiSEA']
-    voting7Cols = ['RiskOn','0.5LastSIG','AntiSEA']
-    voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
+    voting7Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA']
+    voting8Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
     voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
-    voting12Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
+    voting12Cols = ['Excess','Anti1LastSIG','AntiPrevACT','AntiAdjSEA']
     voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA','prevACT']
     voting14Cols = ['RiskOff','Anti0.75LastSIG']
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
@@ -693,7 +697,11 @@ else:
     v11[v11<0]=-1
     v11[v11>0]=1
     futuresDF['Voting11']=v11.values
-    futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
+    #futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
+    v12=futuresDF[voting12Cols].sum(axis=1)
+    v12[v12<0]=-1
+    v12[v12>0]=1
+    futuresDF['Voting12']=v12.values
     #futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
     v13=futuresDF[voting13Cols].sum(axis=1)
     v13[v13<0]=-1

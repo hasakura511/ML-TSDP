@@ -485,7 +485,7 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Voting10'
+c2system='AntiAdjSEA'
 #for system files
 c2system_macro=c2system
 c2system_mini='Voting3'

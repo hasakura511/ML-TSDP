@@ -64,7 +64,7 @@ slipDF.to_csv(savePath2+filename)
 print 'Saved '+savePath2+filename
 
 plt.figure(figsize=(8,13))
-ax = slipDF.abs_slippage.plot.barh(color='r', width=0.5)
+ax = slipDF.slippage.plot.barh(color='r', width=0.5)
 
 #plt.axvline(0, color='k')
 plt.title('Slippage '+futuresDF.index.name)

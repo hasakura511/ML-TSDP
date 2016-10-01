@@ -55,9 +55,13 @@ for contract in portfolioDF.symbol.values:
 
 if slipDF.shape[0] != portfolioDF.shape[0]:
     print 'Some values are mising'
-    
-slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
 
+filename='slippage_report_'+futuresDF.index.name.split()[0].replace('-','')+'.csv'
+slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
+slipDF.to_csv(savePath+'slippage_report.csv')
+print 'Saved '+savePath+'slippage_report.csv'
+slipDF.to_csv(savePath2+filename)
+print 'Saved '+savePath2+filename
 
 plt.figure(figsize=(8,13))
 ax = slipDF.abs_slippage.plot.barh(color='r', width=0.5)
@@ -69,9 +73,8 @@ plt.title('Slippage '+futuresDF.index.name)
 plt.grid(True)
 filename='futures_4'+'.png'
 if savePath2 != None:
-    print 'Saving '+savePath2+filename
     plt.savefig(savePath2+filename, bbox_inches='tight')
-
+    print 'Saved '+savePath2+filename
 if len(sys.argv)==1 and showPlots:
     #print data.index[0],'to',data.index[-1]
     plt.show()

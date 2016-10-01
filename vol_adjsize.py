@@ -35,7 +35,10 @@ start_time = time.time()
 version='v4'
 riskEquity=2000
 riskEquity_mini=250
-riskEquity_micro=250
+riskEquity_micro=250        
+offline = ['AC','CGB','EBS','ED','FEI','FSS','LB','YB']
+offline_mini = ['AC','AD','AEX','BP','CD','CGB','CU','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','HCM','HIC','HO','JY','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SF','SI','SIN','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','YA','YB','YM','YT2','YT3']
+offline_micro =['AC','AD','AEX','BP','CC','CD','CGB','CT','CU','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3']
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
@@ -84,10 +87,6 @@ for i,col in enumerate(fxRates.columns):
     if 'Last' in col:
         fxRates = fxRates[fxRates.columns[i]]
         break
-        
-offline = ['AC','CGB','EBS','ED','FEI','FSS','LB','YB']
-offline_mini = ['AC','AD','AEX','BP','CD','CGB','CU','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','HCM','HIC','HO','JY','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SF','SI','SIN','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','YA','YB','YM','YT2','YT3']
-offline_micro =['AC','AD','AEX','BP','CC','CD','CGB','CT','CU','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3']
 
 fxDict={
     'AUD':1/fxRates.ix['AUDUSD'],
@@ -485,7 +484,7 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Anti0.75LastSIG'
+c2system='Voting10'
 #for system files
 c2system_macro=c2system
 c2system_mini='Voting3'

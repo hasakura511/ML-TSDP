@@ -59,7 +59,7 @@ if slipDF.shape[0] != portfolioDF.shape[0]:
 slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
 
 
-plt.figure(figsize=(8,10))
+plt.figure(figsize=(8,13))
 ax = slipDF.abs_slippage.plot.barh(color='r', width=0.5)
 
 #plt.axvline(0, color='k')

@@ -23,7 +23,7 @@ logging.basicConfig(filename='/logs/refresh_c2.log',level=logging.DEBUG)
 start_time = time.time()
 
 #subprocess.call(['python', 'get_ibpos.py'])       
-systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'.csv')
+systemdata=pd.read_csv('./data/systems/system_'+sys.argv[1]+'.csv')
 systemdata=systemdata.reset_index()
 get_c2pos(systemdata)
 get_executions(systemdata)

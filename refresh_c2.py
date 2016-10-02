@@ -17,7 +17,7 @@ from time import gmtime, strftime, localtime, sleep
 import logging
 import sys
 import threading
-
+from datetime import datetime as dt
 
 logging.basicConfig(filename='/logs/refresh_c2.log',level=logging.DEBUG)
 start_time = time.time()

@@ -72,4 +72,4 @@ def get_executions(data):
         get_c2trades(c2id, stratName, c2api)
 
 
-#get_ibtrades()
+    #get_ibtrades()

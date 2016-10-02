@@ -73,35 +73,13 @@ def start_trade(systems):
         except Exception as e:
             logging.error("something bad happened", exc_info=True)
 
-def start_systems(systemdata):
-      threads = []        
-      systemList=dict()
+def refresh_c2(systemdata):
       #get c2 positions
       get_c2pos(systemdata)
-      for i in systemdata.index:
-          system=systemdata.ix[i]
-          #print system, sys.argv[2]
-          if len(sys.argv) < 2 or (len(sys.argv[2]) > 0 and sys.argv[2] == system['Name']):
-              if systemList.has_key(system['Name']):
-                  systemList[system['Name']]=systemList[system['Name']].append(system)
-              else:
-                  systemList[system['Name']]=pd.DataFrame()
-                  systemList[system['Name']]=systemList[system['Name']].append(system)
-              
-      for systemname in systemList.keys():
-           systems=systemList[systemname]
-           systems['last_trade']=0
-           systems['key']=systems['c2sym']
-           systems=systems.set_index('key')
-           sig_thread = threading.Thread(target=start_trade, args=[systems])
-           sig_thread.daemon=True
-           threads.append(sig_thread)
-           sig_thread.start()
-      [t.join() for t in threads]
-      
+
 #subprocess.call(['python', 'get_ibpos.py'])       
 systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'.csv')
 systemdata=systemdata.reset_index()
-start_systems(systemdata)
+refresh_c2(systemdata)
 get_executions(systemdata)
 #subprocess.call(['python', 'get_ibpos.py'])

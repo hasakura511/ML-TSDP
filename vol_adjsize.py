@@ -287,7 +287,7 @@ if lastDate >oldDate:
     #corrDF.to_csv(savePath+'futuresPCcsv')
     #corrDF.corr().to_csv(savePath+'futuresCorr.csv')
     corrDF=corrDF.corr()
-    fig,ax = plt.subplots(figsize=(13,13))
+    fig,ax = plt.subplots(figsize=(15,13))
     ax.set_title('Correlation '+str(data.index[0])+' to '+str(data.index[-1]))
     sns.heatmap(ax=ax,data=corrDF)
     plt.yticks(rotation=0) 

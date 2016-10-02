@@ -48,13 +48,14 @@ for contract in portfolioDF.symbol.values:
             csiPrice = futuresDF[futuresDF.Contract ==contract].LastClose.values[0]
         slippage=(c2price-csiPrice)/csiPrice
         #print contract, c2price, csiPrice,slippage
-        slipDF.set_value(contract, 'c2price', c2price)
-        slipDF.set_value(contract, 'csiPrice', csiPrice)
-        slipDF.set_value(contract, 'slippage', slippage)
-        slipDF.set_value(contract, 'abs_slippage', abs(slippage))
+        rowName = 'ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
+        slipDF.set_value(rowName, 'c2price', c2price)
+        slipDF.set_value(rowName, 'csiPrice', csiPrice)
+        slipDF.set_value(rowName, 'slippage', slippage)
+        slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
 
 if slipDF.shape[0] != portfolioDF.shape[0]:
-    print 'Some values are mising'
+    print 'Warning! Some values are mising'
 
 filename='slippage_report_'+futuresDF.index.name.split()[0].replace('-','')+'.csv'
 slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)

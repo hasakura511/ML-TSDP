@@ -86,7 +86,7 @@ futuresMatrix=futuresMatrix.sort_values(by='Avg', ascending=False)
 #futuresMatrix.to_html(savePath+'futures_3.html')
 
 #print futuresMatrix
-fig,ax = plt.subplots(figsize=(13,13))
+fig,ax = plt.subplots(figsize=(15,13))
 ax.set_title(str(data.index[-lookback-1])+' to '+str(data.index[-1]))
 sns.heatmap(ax=ax,data=futuresMatrix)
 plt.yticks(rotation=0) 

@@ -7,6 +7,7 @@ import sys
 from datetime import datetime as dt
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib
 
 start_time = time.time()
 
@@ -37,28 +38,34 @@ adjDict={
 
 def plotSlip(slipDF, savePath2, filename, title, showPlots=False):
     #plt.figure(figsize=(8,13))
+    font = {'family' : 'normal',
+            'weight' : 'normal',
+            'size'   : 22}
+
+    matplotlib.rc('font', **font)
     fig = plt.figure(figsize=(8,13)) # Create matplotlib figure
     ax = fig.add_subplot(111) # Create matplotlib axes
     #ax = slipDF.slippage.plot.bar(color='r', width=0.5)
     ax2 = ax.twiny()
 
-    width=0.2
-    slipDF.slippage.plot(kind='barh', color='red', ax=ax, width=width, position=1)
-    slipDF.delta.plot(kind='barh', color='blue', ax=ax2, width=width, position=0)
+    width=.3
+    slipDF.slippage.plot(kind='barh', color='red',width=width, ax=ax, position=1)
+    slipDF.delta.plot(kind='barh', color='blue', width=width,ax=ax2, position=0)
 
     ax.set_xlabel('Slippage % (red)')
     ax2.set_xlabel('Slippage Days (blue)')
-
+    ax.grid(b=True)
+    ax2.grid(b=False)
     #ax2 = slipDF.hourdelta.plot.bar(color='b', width=0.5)
     #plt.axvline(0, color='k')
     
-    plt.text(0.5, 1.10, title,
+    plt.text(0.5, 1.08, title,
              horizontalalignment='center',
              fontsize=20,
              transform = ax2.transAxes)
     #plt.ylim(0,80)
     #plt.xticks(np.arange(-1,1.25,.25))
-    plt.grid(True)
+    #plt.grid(True)
 
     if savePath2 != None and filename != None:
         plt.savefig(savePath2+filename, bbox_inches='tight')

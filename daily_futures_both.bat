@@ -12,6 +12,7 @@ rem copy .\data\systems\system_v4micro.csv .\data\systems\system.csv
 \anaconda2\python proc_signal_v4.py 1 v4micro >> \logs\daily_futures_orders.log
 rem \anaconda2\python get_exec.py
 rem copy .\data\systems\system_backup.csv .\data\systems\system.csv
+rem \anaconda2\python slip_report.py 1 >> \logs\daily_futures.log
 \anaconda2\python create_signalPlots.py 1 >> \logs\daily_futures.log
 \anaconda2\python heatmap_futuresCSI.py 1 >> \logs\daily_futures.log
 rem \anaconda2\python instRanking.py 1 >> \logs\daily_futures.log

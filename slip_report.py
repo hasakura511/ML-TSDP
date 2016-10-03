@@ -135,14 +135,6 @@ slipDF['timedelta']=slipDF.c2timestamp-slipDF.csitimestamp
 slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
 if slipDF.shape[0] != portfolioDF.shape[0]:
     print 'Warning! Some values are mising'
-    
-slipDF.index.name = 'rowname'
-filename='slippage_report_'+str(futuresDate).split()[0].replace('-','')+'.csv'
-slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
-slipDF.to_csv(savePath+'slippage_report.csv')
-print 'Saved '+savePath+'slippage_report.csv'
-slipDF.to_csv(savePath2+filename)
-print 'Saved '+savePath2+filename
 
 openedTrades = slipDF[slipDF['Type']=='Open']
 filename='futures_Open'+'.png'
@@ -153,6 +145,16 @@ closedTrades = slipDF[slipDF['Type']=='Close']
 title = str(closedTrades.shape[0])+' Closed Trades, CSI Data as of '+str(futuresDate)
 filename='futures_Close'+'.png'
 plotSlip(closedTrades, savePath2, filename, title, showPlots=showPlots)
+
+    
+slipDF.index.name = 'rowname'
+filename='slippage_report_'+str(futuresDate).split()[0].replace('-','')+'.csv'
+slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
+slipDF.to_csv(savePath+'slippage_report.csv')
+print 'Saved '+savePath+'slippage_report.csv'
+slipDF.to_csv(savePath2+filename)
+print 'Saved '+savePath2+filename
+
 
 
 

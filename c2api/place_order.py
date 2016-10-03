@@ -6,6 +6,9 @@ import pandas as pd
 data=pd.read_csv('./data/c2api/sigid.csv').iloc[-1]
 sigid=int(data['sigid'])
 
+
+    
+        
 def place_order(action, quant, sym, type, systemid, submit,apikey, parentsig=None):
     global sigid
     if submit == False:

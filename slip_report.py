@@ -26,6 +26,7 @@ else:
     savePath2 = './data/results/'
 
 portfolioFilename = 'c2_v4futures_portfolio.csv'
+tradeFilename='v4futures_c2trades.csv'
 csidataFilename = 'futuresATR.csv'
 #adjustments
 adjDict={
@@ -34,9 +35,20 @@ adjDict={
             'QSI':0.01
             }
 
-
+#entry trades
 portfolioDF = pd.read_csv(portfolioPath+portfolioFilename)
+portfolioDF['openedWhen'] = pd.to_datetime(portfolioDF['openedWhen'])
+portfolioDF = portfolioDF.sort_values(by='openedWhen', ascending=False)
+#exit trades
+tradesDF = pd.read_csv(portfolioPath+tradeFilename)
+tradesDF=tradesDF.drop(['expir','putcall','strike','symbol_description','underlying','markToMarket_time'], axis=1).dropna()
+portfolioDF['closedWhen'] = pd.to_datetime(portfolioDF['closedWhen'])
+tradesDF = tradesDF.sort_values(by='closedWhen', ascending=False)
+#csi close data
 futuresDF = pd.read_csv(dataPath+csidataFilename, index_col=0)
+#csidata download at 8pm est
+futuresDate = dt.strptime(futuresDF.index.name, '%Y-%m-%d %H:%M:%S').replace(hour=20)
+#portfolioDF[portfolioDF['openedWhen']>=futuresDate]
 slipDF = pd.DataFrame()
 print 'sym', 'c2price', 'csiPrice', 'slippage'
 for contract in portfolioDF.symbol.values:

@@ -8,6 +8,22 @@ import time
 import logging
 import os
 
+def retrieveSystemEquity(systemid, apikey, commission_plan='default'):
+    url = 'https://api.collective2.com/world/apiv3/retrieveSystemEquity'
+    headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
+    
+    data={
+       "commission_plan" : commission_plan,
+       "systemid" : systemid,
+       "apikey" : apikey
+        }
+    
+    params={}
+    
+    r=requests.post(url, params=params, json=data);
+    print r.text
+    logging.info(r.text)
+    return r.text
 
 def get_exec(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/requestTrades'
@@ -46,6 +62,13 @@ def get_c2pos(systemdata):
     for systemname in systems:
         (systemid, apikey)=c2list[systemname]
         c2list[systemname]=get_c2livepos(systemid, apikey, systemname)
+        equityData=retrieveSystemEquity(systemid, apikey)
+        jsondata = json.loads(equityData)
+        logging.info('\n Length jsondata'+str(len(jsondata['equity_data'])))
+        dataSet=json_normalize(jsondata['equity_data'])
+        dataSet.index = pd.to_datetime(dataSet['unix_timestamp'].astype(int),unit='s')
+        dataSet.index.name = 'timestamp'
+        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_equity.csv')
     return c2list
     
 

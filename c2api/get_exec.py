@@ -14,8 +14,8 @@ def retrieveSystemEquity(systemid, apikey, commission_plan='default'):
     
     data={
        "commission_plan" : commission_plan,
-       "systemid" : systemid,
-       "apikey" : apikey
+       "systemid" : str(systemid),
+       "apikey" : str(apikey)
         }
     
     params={}

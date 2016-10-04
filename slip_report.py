@@ -136,12 +136,12 @@ slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
 if slipDF.shape[0] != portfolioDF.shape[0]:
     print 'Warning! Some values are mising'
 
-openedTrades = slipDF[slipDF['Type']=='Open']
+openedTrades = slipDF[slipDF['Type']=='Open'].sort_values(by='abs_slippage', ascending=True)
 filename='futures_Open'+'.png'
 title = str(openedTrades.shape[0])+' Open Trades, CSI Data as of '+str(futuresDate)
 plotSlip(openedTrades, savePath2, filename, title, showPlots=showPlots)
 
-closedTrades = slipDF[slipDF['Type']=='Close']
+closedTrades = slipDF[slipDF['Type']=='Close'].sort_values(by='abs_slippage', ascending=True)
 title = str(closedTrades.shape[0])+' Closed Trades, CSI Data as of '+str(futuresDate)
 filename='futures_Close'+'.png'
 plotSlip(closedTrades, savePath2, filename, title, showPlots=showPlots)

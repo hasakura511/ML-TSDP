@@ -262,25 +262,25 @@ futuresDF.index.name = lastDate
 
 
 
-    
-for i,contract in enumerate(marketList):
-    print i+1,
-    if 'YT' not in contract:
-        sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
-    else:
-        sym=contract
-    #seasonality
-    seaBias, currRun, date,vStart = seasonalClassifier(sym, dataPath, savePath=savePath2+version+'_'+sym+'_MODE2',\
-                                                debug=showPlots)
-    futuresDF.set_value(sym,'vSTART',vStart)
-    futuresDF.set_value(sym,'LastSEA',seaBias)
-    futuresDF.set_value(sym,'SEA'+str(date),seaBias)
-    futuresDF.set_value(sym,'LastSRUN',currRun)
-    futuresDF.set_value(sym,'SRUN'+str(date),currRun)
-
 #save last seasonal signal for pnl processing
 #update correl charts
 if lastDate >oldDate:
+    #first time run needs to update pivot dates for runsystems.  
+    print "First Run.. running seasonalClassifier"
+    for i,contract in enumerate(marketList):
+        print i+1,
+        if 'YT' not in contract:
+            sym = ''.join([i for i in contract.split('_')[0] if not i.isdigit()])
+        else:
+            sym=contract
+        #seasonality
+        seaBias, currRun, date,vStart = seasonalClassifier(sym, dataPath, savePath=savePath2+version+'_'+sym+'_MODE2',\
+                                                    debug=showPlots)
+        futuresDF.set_value(sym,'vSTART',vStart)
+        futuresDF.set_value(sym,'LastSEA',seaBias)
+        futuresDF.set_value(sym,'SEA'+str(date),seaBias)
+        futuresDF.set_value(sym,'LastSRUN',currRun)
+        futuresDF.set_value(sym,'SRUN'+str(date),currRun)
     futuresDF['prevACT']=futuresDF_old['prevACT']
     futuresDF['prevSEA']=futuresDF_old.LastSEA
     futuresDF['prevSRUN']=futuresDF_old.LastSRUN
@@ -320,7 +320,22 @@ if lastDate >oldDate:
             #print data.index[0],'to',data.index[-1]
             plt.show()
         plt.close()
+else:
+    print "Second Run.. skipping seasonalClassifier"
+    #second time load  "old" file for seasonality signals.
+    futuresDF['vSTART']=futuresDF_old.vSTART
+    futuresDF['LastSEA']=futuresDF_old.LastSEA
+    futuresDF['LastSRUN']=futuresDF_old.LastSRUN
+    
+    for col in futuresDF_old.columns:
+        if col.startswith('SEA'):
+            futuresDF[col]=futuresDF_old[col]
+            
+    for col in futuresDF_old.columns:
+        if col.startswith('SRUN'):
+            futuresDF[col]=futuresDF_old[col]
 
+    
 for i2,contract in enumerate(marketList):
     #print i,
     if 'YT' not in contract:

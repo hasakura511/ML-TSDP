@@ -63,7 +63,7 @@ for sys in c2dict.keys():
             qty=int(futuresDict[sys].ix[sym].c2qty)
             c2qty=int(c2dict[sys].ix[sym].quant_opened)-int(c2dict[sys].ix[sym].quant_closed)
             if sig != c2sig or qty != c2qty:
-                print 'position mismatch: ', sym, sig, c2sig, qty, c2qty
+                print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty)
         else:
             print sym, ' not in system file. exiting contract..'
             #place order to exit the contract.

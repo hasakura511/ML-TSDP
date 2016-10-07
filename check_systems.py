@@ -53,17 +53,20 @@ for sys in systems:
 for sys in c2dict.keys():
     print sys, 'Position Checking..'
     #sig reconciliation
+    count=0
     c2dict[sys]['signal']=np.where(c2dict[sys]['long_or_short'].values=='long',1,-1)
     for sym in c2dict[sys].index:
+        count+=1
         if sym in futuresDict[sys].index:
             c2sig = int(c2dict[sys].ix[sym].signal)
             sig=int(futuresDict[sys].ix[sym].signal)
             qty=int(futuresDict[sys].ix[sym].c2qty)
-            c2qty=int(c2dict[sys].ix[sym].quant_opened)
+            c2qty=int(c2dict[sys].ix[sym].quant_opened)-int(c2dict[sys].ix[sym].quant_closed)
             if sig != c2sig or qty != c2qty:
                 print 'position mismatch: ', sym, sig, c2sig, qty, c2qty
         else:
             print sym, ' not in system file. exiting contract..'
             #place order to exit the contract.
+    print count,'DONE!'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

@@ -100,87 +100,87 @@ fxDict={
     'SGD':1.34,
     'USD':1,
     }
-#csisym:[c2sym,usdFXrate,multiplier,riskON signal,excess liquidity]
+#csisym:[c2sym,usdFXrate,multiplier,riskON signal,Custom]
 c2contractSpec = {
-    'AC':['@AC',fxDict['USD'],29000,'energy',1,1],
-    'AD':['@AD',fxDict['USD'],100000,'currency',1,1],
-    'AEX':['AEX',fxDict['EUR'],200,'index',1,1],
-    'BO':['@BO',fxDict['USD'],600,'grain',1,1],
-    'BP':['@BP',fxDict['USD'],62500,'currency',1,1],
-    'C':['@C',fxDict['USD'],50,'grain',1,1],
-    'CC':['@CC',fxDict['USD'],10,'soft',1,1],
-    'CD':['@CD',fxDict['USD'],100000,'currency',1,1],
-    'CGB':['CB',fxDict['CAD'],1000,'rates',-1,1],
-    'CL':['QCL',fxDict['USD'],1000,'energy',1,1],
-    'CT':['@CT',fxDict['USD'],500,'soft',1,1],
-    'CU':['@EU',fxDict['USD'],125000,'currency',1,1],
-    'DX':['@DX',fxDict['USD'],1000,'currency',-1,-1],
-    'EBL':['BD',fxDict['EUR'],1000,'rates',-1,1],
-    'EBM':['BL',fxDict['EUR'],1000,'rates',-1,1],
-    'EBS':['EZ',fxDict['EUR'],1000,'rates',-1,1],
-    'ED':['@ED',fxDict['USD'],2500,'rates',-1,1],
-    'EMD':['@EMD',fxDict['USD'],100,'index',1,1],
-    'ES':['@ES',fxDict['USD'],50,'index',1,1],
-    'FC':['@GF',fxDict['USD'],500,'meat',1,-1],
-    'FCH':['MT',fxDict['EUR'],10,'index',1,1],
-    'FDX':['DXM',fxDict['EUR'],5,'index',1,1],
-    'FEI':['IE',fxDict['EUR'],2500,'rates',-1,1],
-    'FFI':['LF',fxDict['GBP'],10,'index',1,1],
-    'FLG':['LG',fxDict['GBP'],1000,'rates',-1,1],
-    'FSS':['LL',fxDict['GBP'],1250,'rates',-1,-1],
-    'FV':['@FV',fxDict['USD'],1000,'rates',-1,1],
-    'GC':['QGC',fxDict['USD'],100,'metal',-1,1],
-    'HCM':['HHI',fxDict['HKD'],50,'index',1,1],
-    'HG':['QHG',fxDict['USD'],250,'metal',1,1],
-    'HIC':['HSI',fxDict['HKD'],50,'index',1,1],
-    'HO':['QHO',fxDict['USD'],42000,'energy',1,1],
-    'JY':['@JY',fxDict['USD'],125000,'currency',-1,1],
-    'KC':['@KC',fxDict['USD'],375,'soft',1,1],
-    'KW':['@KW',fxDict['USD'],50,'grain',1,1],
-    'LB':['@LB',fxDict['USD'],110,'soft',1,-1],
-    'LC':['@LE',fxDict['USD'],400,'meat',1,-1],
-    'LCO':['EB',fxDict['USD'],1000,'energy',1,1],
-    'LGO':['GAS',fxDict['USD'],100,'energy',1,1],
-    'LH':['@HE',fxDict['USD'],400,'meat',1,-1],
-    'LRC':['LRC',fxDict['USD'],10,'soft',1,1],
-    'LSU':['QW',fxDict['USD'],50,'soft',1,1],
-    'MEM':['@MME',fxDict['USD'],50,'index',1,1],
-    'MFX':['IB',fxDict['EUR'],10,'index',1,1],
-    'MP':['@PX',fxDict['USD'],500000,'currency',1,1],
-    'MW':['@MW',fxDict['USD'],50,'grain',1,1],
-    'NE':['@NE',fxDict['USD'],100000,'currency',1,1],
-    'NG':['QNG',fxDict['USD'],10000,'energy',1,1],
-    'NIY':['@NKD',fxDict['JPY'],500,'index',1,-1],
-    'NQ':['@NQ',fxDict['USD'],20,'index',1,1],
-    'O':['@O',fxDict['USD'],50,'grain',1,-1],
-    'OJ':['@OJ',fxDict['USD'],150,'soft',1,1],
-    'PA':['QPA',fxDict['USD'],100,'metal',1,1],
-    'PL':['QPL',fxDict['USD'],50,'metal',-1,1],
-    'RB':['QRB',fxDict['USD'],42000,'energy',1,1],
-    'RR':['@RR',fxDict['USD'],2000,'grain',1,-1],
-    'RS':['@RS',fxDict['CAD'],20,'grain',1,-1],
-    'S':['@S',fxDict['USD'],50,'grain',1,-1],
-    'SB':['@SB',fxDict['USD'],1120,'soft',1,1],
-    'SF':['@SF',fxDict['USD'],125000,'currency',1,1],
-    'SI':['QSI',fxDict['USD'],50,'metal',-1,1],
-    'SIN':['IN',fxDict['USD'],2,'index',1,1],
-    'SJB':['BB',fxDict['JPY'],100000,'rates',-1,1],
-    'SM':['@SM',fxDict['USD'],100,'grain',1,-1],
-    'SMI':['SW',fxDict['CHF'],10,'index',1,1],
-    'SSG':['SS',fxDict['SGD'],200,'index',1,-1],
-    'STW':['TW',fxDict['USD'],100,'index',1,1],
-    'SXE':['EX',fxDict['EUR'],10,'index',1,1],
-    'TF':['@TFS',fxDict['USD'],100,'index',1,1],
-    'TU':['@TU',fxDict['USD'],2000,'rates',-1,1],
-    'TY':['@TY',fxDict['USD'],1000,'rates',-1,1],
-    'US':['@US',fxDict['USD'],1000,'rates',-1,1],
-    'VX':['@VX',fxDict['USD'],1000,'index',-1,-1],
-    'W':['@W',fxDict['USD'],50,'grain',1,1],
-    'YA':['AP',fxDict['AUD'],25,'index',1,-1],
-    'YB':['HBS',fxDict['AUD'],2400,'rates',-1,1],
-    'YM':['@YM',fxDict['USD'],5,'index',1,1],
-    'YT2':['HTS',fxDict['AUD'],2800,'rates',-1,1],
-    'YT3':['HXS',fxDict['AUD'],8000,'rates',-1,1],
+'AC':['@AC',fxDict['USD'],29000,'energy',1,1],
+'AD':['@AD',fxDict['USD'],100000,'currency',1,-1],
+'AEX':['AEX',fxDict['EUR'],200,'index',1,1],
+'BO':['@BO',fxDict['USD'],600,'grain',1,1],
+'BP':['@BP',fxDict['USD'],62500,'currency',1,-1],
+'C':['@C',fxDict['USD'],50,'grain',1,1],
+'CC':['@CC',fxDict['USD'],10,'soft',1,-1],
+'CD':['@CD',fxDict['USD'],100000,'currency',1,-1],
+'CGB':['CB',fxDict['CAD'],1000,'rates',-1,-1],
+'CL':['QCL',fxDict['USD'],1000,'energy',1,1],
+'CT':['@CT',fxDict['USD'],500,'soft',1,1],
+'CU':['@EU',fxDict['USD'],125000,'currency',1,-1],
+'DX':['@DX',fxDict['USD'],1000,'currency',-1,1],
+'EBL':['BD',fxDict['EUR'],1000,'rates',-1,-1],
+'EBM':['BL',fxDict['EUR'],1000,'rates',-1,-1],
+'EBS':['EZ',fxDict['EUR'],1000,'rates',-1,-1],
+'ED':['@ED',fxDict['USD'],2500,'rates',-1,-1],
+'EMD':['@EMD',fxDict['USD'],100,'index',1,1],
+'ES':['@ES',fxDict['USD'],50,'index',1,1],
+'FC':['@GF',fxDict['USD'],500,'meat',1,1],
+'FCH':['MT',fxDict['EUR'],10,'index',1,1],
+'FDX':['DXM',fxDict['EUR'],5,'index',1,1],
+'FEI':['IE',fxDict['EUR'],2500,'rates',-1,-1],
+'FFI':['LF',fxDict['GBP'],10,'index',1,1],
+'FLG':['LG',fxDict['GBP'],1000,'rates',-1,-1],
+'FSS':['LL',fxDict['GBP'],1250,'rates',-1,-1],
+'FV':['@FV',fxDict['USD'],1000,'rates',-1,-1],
+'GC':['QGC',fxDict['USD'],100,'metal',-1,-1],
+'HCM':['HHI',fxDict['HKD'],50,'index',1,1],
+'HG':['QHG',fxDict['USD'],250,'metal',1,-1],
+'HIC':['HSI',fxDict['HKD'],50,'index',1,1],
+'HO':['QHO',fxDict['USD'],42000,'energy',1,1],
+'JY':['@JY',fxDict['USD'],125000,'currency',-1,-1],
+'KC':['@KC',fxDict['USD'],375,'soft',1,-1],
+'KW':['@KW',fxDict['USD'],50,'grain',1,-1],
+'LB':['@LB',fxDict['USD'],110,'soft',1,1],
+'LC':['@LE',fxDict['USD'],400,'meat',1,1],
+'LCO':['EB',fxDict['USD'],1000,'energy',1,1],
+'LGO':['GAS',fxDict['USD'],100,'energy',1,1],
+'LH':['@HE',fxDict['USD'],400,'meat',1,1],
+'LRC':['LRC',fxDict['USD'],10,'soft',1,1],
+'LSU':['QW',fxDict['USD'],50,'soft',1,1],
+'MEM':['@MME',fxDict['USD'],50,'index',1,1],
+'MFX':['IB',fxDict['EUR'],10,'index',1,1],
+'MP':['@PX',fxDict['USD'],500000,'currency',1,-1],
+'MW':['@MW',fxDict['USD'],50,'grain',1,1],
+'NE':['@NE',fxDict['USD'],100000,'currency',1,-1],
+'NG':['QNG',fxDict['USD'],10000,'energy',1,1],
+'NIY':['@NKD',fxDict['JPY'],500,'index',1,1],
+'NQ':['@NQ',fxDict['USD'],20,'index',1,1],
+'O':['@O',fxDict['USD'],50,'grain',1,1],
+'OJ':['@OJ',fxDict['USD'],150,'soft',1,1],
+'PA':['QPA',fxDict['USD'],100,'metal',1,-1],
+'PL':['QPL',fxDict['USD'],50,'metal',-1,-1],
+'RB':['QRB',fxDict['USD'],42000,'energy',1,1],
+'RR':['@RR',fxDict['USD'],2000,'grain',1,1],
+'RS':['@RS',fxDict['CAD'],20,'grain',1,1],
+'S':['@S',fxDict['USD'],50,'grain',1,-1],
+'SB':['@SB',fxDict['USD'],1120,'soft',1,1],
+'SF':['@SF',fxDict['USD'],125000,'currency',1,-1],
+'SI':['QSI',fxDict['USD'],50,'metal',-1,-1],
+'SIN':['IN',fxDict['USD'],2,'index',1,1],
+'SJB':['BB',fxDict['JPY'],100000,'rates',-1,-1],
+'SM':['@SM',fxDict['USD'],100,'grain',1,-1],
+'SMI':['SW',fxDict['CHF'],10,'index',1,1],
+'SSG':['SS',fxDict['SGD'],200,'index',1,1],
+'STW':['TW',fxDict['USD'],100,'index',1,1],
+'SXE':['EX',fxDict['EUR'],10,'index',1,1],
+'TF':['@TFS',fxDict['USD'],100,'index',1,1],
+'TU':['@TU',fxDict['USD'],2000,'rates',-1,-1],
+'TY':['@TY',fxDict['USD'],1000,'rates',-1,-1],
+'US':['@US',fxDict['USD'],1000,'rates',-1,-1],
+'VX':['@VX',fxDict['USD'],1000,'index',-1,-1],
+'W':['@W',fxDict['USD'],50,'grain',1,-1],
+'YA':['AP',fxDict['AUD'],25,'index',1,1],
+'YB':['HBS',fxDict['AUD'],2400,'rates',-1,-1],
+'YM':['@YM',fxDict['USD'],5,'index',1,1],
+'YT2':['HTS',fxDict['AUD'],2800,'rates',-1,-1],
+'YT3':['HXS',fxDict['AUD'],8000,'rates',-1,-1],
     }
     
 months = {
@@ -256,7 +256,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
     futuresDF.set_value(sym,'group',c2contractSpec[sym][3])
     futuresDF.set_value(sym,'RiskOn',c2contractSpec[sym][4])
-    futuresDF.set_value(sym,'Excess',c2contractSpec[sym][5])
+    futuresDF.set_value(sym,'Custom',c2contractSpec[sym][5])
     
 futuresDF.index.name = lastDate
 
@@ -506,7 +506,7 @@ c2system_mini='Anti1LastSIG'
 c2system_micro='Voting7'
 c2safef=1
 #use LastSEA for seasonality in c2
-signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Excess','AntiExcess',\
+signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG',\
                 'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
                 'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
@@ -525,12 +525,12 @@ if lastDate > sigDate:
     voting7Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA']
     voting8Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
-    voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
+    voting9Cols=['Custom','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
     voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
-    voting12Cols = ['Excess','Anti1LastSIG','AntiPrevACT','AntiAdjSEA']
-    voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA','prevACT']
-    voting14Cols = ['RiskOn','0.5LastSIG','prevACT']
+    voting12Cols = ['Custom','Anti1LastSIG','AntiPrevACT','AntiAdjSEA']
+    voting13Cols = ['Custom','Anti0.75LastSIG','AntiSEA','prevACT']
+    voting14Cols = ['Custom','Anti0.75LastSIG','prevACT']
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     
     #1bi. Run v4size(to update vlookback)
@@ -538,7 +538,7 @@ if lastDate > sigDate:
     nrows=futuresDF.shape[0]
     totalsDF = pd.DataFrame()
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
-    futuresDF['AntiExcess']=np.where(futuresDF.Excess<0,1,-1)
+    futuresDF['AntiCustom']=np.where(futuresDF.Custom<0,1,-1)
     futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
     futuresDF['Anti0.75LastSIG'] = np.where(futuresDF['0.75LastSIG']==1,-1,1)
     futuresDF['AntiSEA'] = np.where(futuresDF.prevSEA==1,-1,1)
@@ -686,17 +686,17 @@ else:
     voting7Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA']
     voting8Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
-    voting9Cols=['Excess','0.5LastSIG','AntiPrevACT','AntiSEA']
+    voting9Cols=['Custom','0.5LastSIG','AntiPrevACT','AntiSEA']
     voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
     voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
-    voting12Cols = ['Excess','Anti1LastSIG','AntiPrevACT','AntiAdjSEA']
-    voting13Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA','prevACT']
-    voting14Cols = ['RiskOn','0.5LastSIG','prevACT']
+    voting12Cols = ['Custom','Anti1LastSIG','AntiPrevACT','AntiAdjSEA']
+    voting13Cols = ['Custom','Anti0.75LastSIG','AntiSEA','prevACT']
+    voting14Cols = ['Custom','Anti0.75LastSIG','prevACT']
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     #voting9Cols=['Anti1LastSIG','AntiSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
-    futuresDF['AntiExcess']=np.where(futuresDF.Excess<0,1,-1)
+    futuresDF['AntiCustom']=np.where(futuresDF.Custom<0,1,-1)
     futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
     futuresDF['Anti0.75LastSIG'] = np.where(futuresDF['0.75LastSIG']==1,-1,1)
     futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)

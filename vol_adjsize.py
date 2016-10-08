@@ -499,11 +499,11 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Voting6'
+c2system='Anti1LastSIG'
 #for system files
 c2system_macro=c2system
-c2system_mini='Voting6'
-c2system_micro='Voting14'
+c2system_mini='Anti1LastSIG'
+c2system_micro='Voting7'
 c2safef=1
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Excess','AntiExcess',\

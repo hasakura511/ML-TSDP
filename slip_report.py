@@ -28,7 +28,7 @@ else:
 
 portfolioFilename = 'c2_v4futures_portfolio.csv'
 tradeFilename='v4futures_c2trades.csv'
-csidataFilename = 'futuresATR.csv'
+csidataFilename = 'futuresATR_Signals.csv'
 #adjustments
 adjDict={
             '@CT':100,

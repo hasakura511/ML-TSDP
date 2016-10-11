@@ -499,10 +499,10 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Anti1LastSIG'
+c2system='Voting6'
 #for system files
 c2system_macro=c2system
-c2system_mini='Anti1LastSIG'
+c2system_mini='Voting6'
 c2system_micro='Voting7'
 c2safef=1
 #use LastSEA for seasonality in c2
@@ -786,20 +786,20 @@ else:
     print 'Saving', savePath+'futuresATR_Signals.csv'
     futuresDF.to_csv(savePath+'futuresATR_Signals.csv')
     
-for i,sym in enumerate([x.split('_')[1] for x in system.System]):
-    system.set_value(i,'signal',futuresDF[c2system].ix[sym])
-system.to_csv(systemPath+systemFilename, index=False)
-print 'Saved', systemPath+systemFilename,c2system
+    for i,sym in enumerate([x.split('_')[1] for x in system.System]):
+        system.set_value(i,'signal',futuresDF[c2system].ix[sym])
+    system.to_csv(systemPath+systemFilename, index=False)
+    print 'Saved', systemPath+systemFilename,c2system
 
-for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
-    system_mini.set_value(i,'signal',futuresDF[c2system_mini].ix[sym])
-system_mini.to_csv(systemPath+systemFilename2, index=False)
-print 'Saved', systemPath+systemFilename2,c2system_mini
+    for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
+        system_mini.set_value(i,'signal',futuresDF[c2system_mini].ix[sym])
+    system_mini.to_csv(systemPath+systemFilename2, index=False)
+    print 'Saved', systemPath+systemFilename2,c2system_mini
 
-for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
-    system_micro.set_value(i,'signal',futuresDF[c2system_micro].ix[sym])
-system_micro.to_csv(systemPath+systemFilename3, index=False)
-print 'Saved', systemPath+systemFilename3, c2system_micro
+    for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
+        system_micro.set_value(i,'signal',futuresDF[c2system_micro].ix[sym])
+    system_micro.to_csv(systemPath+systemFilename3, index=False)
+    print 'Saved', systemPath+systemFilename3, c2system_micro
 
 futuresDF.to_csv(savePath+'futuresATR.csv')
 print 'Saved', savePath+'futuresATR.csv'

@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 import json
@@ -16,19 +17,26 @@ if len(sys.argv)==1:
     showPlots=True
     dataPath='D:/ML-TSDP/data/'
     portfolioPath = 'D:/ML-TSDP/data/portfolio/'
-    savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    #savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    savePath = savePath2 = pngPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    systemPath =  'D:/ML-TSDP/data/systems/'
 else:
     debug=False
     showPlots=False
     dataPath='./data/'
     portfolioPath = './data/portfolio/'
     savePath='./data/'
-    savePath2 = './data/results/'
+    pngPath = './data/results/'
+    savePath2 = './data/portfolio/'
+    systemPath =  './data/systems/'
 
 portfolioFilename = 'c2_v4futures_portfolio.csv'
 tradeFilename='v4futures_c2trades.csv'
 csidataFilename = 'futuresATR_Signals.csv'
+systemFilename='system_v4futures.csv'
+systemFilename2='system_v4mini.csv'
+systemFilename3='system_v4micro.csv'
+
 #adjustments
 adjDict={
             '@CT':100,
@@ -36,7 +44,7 @@ adjDict={
             'QSI':0.01
             }
 
-def plotSlip(slipDF, savePath2, filename, title, showPlots=False):
+def plotSlip(slipDF, pngPath, filename, title, showPlots=False):
     #plt.figure(figsize=(8,13))
     font = {'family' : 'normal',
             'weight' : 'normal',
@@ -58,7 +66,6 @@ def plotSlip(slipDF, savePath2, filename, title, showPlots=False):
     ax2.grid(b=False)
     #ax2 = slipDF.hourdelta.plot.bar(color='b', width=0.5)
     #plt.axvline(0, color='k')
-    
     plt.text(0.5, 1.08, title,
              horizontalalignment='center',
              fontsize=20,
@@ -67,14 +74,15 @@ def plotSlip(slipDF, savePath2, filename, title, showPlots=False):
     #plt.xticks(np.arange(-1,1.25,.25))
     #plt.grid(True)
 
-    if savePath2 != None and filename != None:
-        plt.savefig(savePath2+filename, bbox_inches='tight')
-        print 'Saved '+savePath2+filename
+    if pngPath != None and filename != None:
+        plt.savefig(pngPath+filename, bbox_inches='tight')
+        print 'Saved '+pngPath+filename
     if len(sys.argv)==1 and showPlots:
         #print data.index[0],'to',data.index[-1]
         plt.show()
     plt.close()
-            
+    
+    
 #entry trades
 portfolioDF = pd.read_csv(portfolioPath+portfolioFilename)
 portfolioDF['openedWhen'] = pd.to_datetime(portfolioDF['openedWhen'])
@@ -103,6 +111,7 @@ for contract in newOpen:
         slippage=(c2price-csiPrice)/csiPrice
         #print contract, c2price, csiPrice,slippage
         rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
+        slipDF.set_value(rowName, 'symbol', contract)
         slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
         slipDF.set_value(rowName, 'c2price', c2price)
         slipDF.set_value(rowName, 'csitimestamp', futuresDate)
@@ -123,6 +132,7 @@ for contract in newCloses.symbol.values:
         slippage=(c2price-csiPrice)/csiPrice
         #print contract, c2price, csiPrice,slippage
         rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
+        slipDF.set_value(rowName, 'symbol', contract)
         slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
         slipDF.set_value(rowName, 'c2price', c2price)
         slipDF.set_value(rowName, 'csitimestamp', futuresDate)
@@ -139,25 +149,72 @@ if slipDF.shape[0] != portfolioDF.shape[0]:
 openedTrades = slipDF[slipDF['Type']=='Open'].sort_values(by='abs_slippage', ascending=True)
 filename='futures_Open'+'.png'
 title = str(openedTrades.shape[0])+' Open Trades, CSI Data as of '+str(futuresDate)
-plotSlip(openedTrades, savePath2, filename, title, showPlots=showPlots)
+plotSlip(openedTrades, pngPath, filename, title, showPlots=showPlots)
 
 closedTrades = slipDF[slipDF['Type']=='Close'].sort_values(by='abs_slippage', ascending=True)
 title = str(closedTrades.shape[0])+' Closed Trades, CSI Data as of '+str(futuresDate)
 filename='futures_Close'+'.png'
-plotSlip(closedTrades, savePath2, filename, title, showPlots=showPlots)
+plotSlip(closedTrades, pngPath, filename, title, showPlots=showPlots)
 
     
 slipDF.index.name = 'rowname'
 filename='slippage_report_'+str(futuresDate).split()[0].replace('-','')+'.csv'
 slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
-slipDF.to_csv(savePath+'slippage_report.csv')
+slipDF.to_csv(savePath+'slippage_report.csv', index=True)
 print 'Saved '+savePath+'slippage_report.csv'
-slipDF.to_csv(savePath2+filename)
+slipDF.to_csv(savePath2+filename, index=True)
 print 'Saved '+savePath2+filename
 
+#average slippage file/png
+files=os.listdir(savePath2)
+slipFiles = [x for x in files if 'slippage_report' in x]
 
-
-
-
+cons = pd.DataFrame()
+for f in slipFiles:
+    fi = pd.read_csv(savePath2+f,index_col='rowname')
+    cons=cons.append(fi)
     
+avgslip=pd.DataFrame()
+for sym in cons.symbol.unique():
+    abs_slip=abs(cons[cons.symbol==sym].abs_slippage.mean())
+    delta=cons[cons.symbol==sym].delta.mean()
+    #print sym, abs_slip
+    avgslip.set_value(sym, 'slippage', abs_slip)
+    avgslip.set_value(sym, 'delta', delta)
+avgslip=avgslip.sort_values(by='slippage', ascending=True)
+print '\n'+str(avgslip.shape[0]), 'Symbols found in the average slippage DF...'
+i=0
+for x in futuresDF.Contract.values:
+    if x not in cons.symbol.unique():
+        i+=1
+        print x,
+print i, 'Symbols missing!'
+
+system = pd.read_csv(systemPath+systemFilename)
+macro_sym=system[system.c2qty !=0].c2sym.values
+macro_slip=avgslip.ix[macro_sym].sort_values(by='slippage', ascending=True)
+filename='futures_avg_macro'+'.png'
+title='Macro Avg. Slippage of '+str(macro_slip.shape[0])+' Contracts from '+slipFiles[1].split('_')[2][:-4]+' to '+slipFiles[-1].split('_')[2][:-4]
+plotSlip(macro_slip, pngPath, filename, title, showPlots=showPlots)
+#slippage by system
+
+system_mini = pd.read_csv(systemPath+systemFilename2)
+mini_sym=system[system_mini.c2qty !=0].c2sym.values
+mini_slip=avgslip.ix[mini_sym].sort_values(by='slippage', ascending=True)
+filename='futures_avg_mini'+'.png'
+title='Mini Avg. Slippage of '+str(mini_slip.shape[0])+' Contracts from '+slipFiles[1].split('_')[2][:-4]+' to '+slipFiles[-1].split('_')[2][:-4]
+plotSlip(mini_slip, pngPath, filename, title, showPlots=showPlots)
+
+system_micro = pd.read_csv(systemPath+systemFilename3)
+micro_sym=system[system_micro.c2qty !=0].c2sym.values
+micro_slip=avgslip.ix[micro_sym].sort_values(by='slippage', ascending=True)
+filename='futures_avg_micro'+'.png'
+title='Micro Avg. Slippage of '+str(micro_slip.shape[0])+' Contracts from '+slipFiles[1].split('_')[2][:-4]+' to '+slipFiles[-1].split('_')[2][:-4]
+plotSlip(micro_slip, pngPath, filename, title, showPlots=showPlots)
+
+
+filename='slip_cons.csv'
+cons.to_csv(savePath2+'slip_cons.csv', index=True)
+print 'Saved '+savePath2+'slip_cons.csv'
+
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

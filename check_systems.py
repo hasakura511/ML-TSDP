@@ -65,7 +65,7 @@ for sys in c2dict.keys():
             if sig != c2sig or qty != c2qty:
                 print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty)
         else:
-            print sym, ' not in system file. exiting contract..'
+            print sym, ' not in system file. exit contract!!..'
             #place order to exit the contract.
     print count,'DONE!'
 

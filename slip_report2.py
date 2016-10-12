@@ -81,7 +81,7 @@ def plotSlip(slipDF, pngPath, filename, title, showPlots=False):
         plt.show()
     plt.close()
 
-cons = pd.DataFrame()
+
 for systemName in systems:
     tradeFilename='c2_'+systemName+'_trades.csv'
     portfolioFilename = 'c2_'+systemName+'_portfolio.csv'
@@ -180,7 +180,7 @@ for systemName in systems:
     files=os.listdir(savePath2)
     slipFiles = [x for x in files if systemName+'_slippage_report' in x]
 
-    
+    cons = pd.DataFrame()
     for f in slipFiles:
         fi = pd.read_csv(savePath2+f,index_col='rowname')
         cons=cons.append(fi)
@@ -193,7 +193,7 @@ for systemName in systems:
         avgslip.set_value(sym, 'slippage', abs_slip)
         avgslip.set_value(sym, 'delta', delta)
     avgslip=avgslip.sort_values(by='slippage', ascending=True)
-    print '\n'+str(avgslip.shape[0]), 'Symbols found in the average absolute slippage DF...'
+    print str(avgslip.shape[0]), 'Symbols found in the average absolute slippage DF...'
     
     i=0
     for x in futuresDF[futuresDF.finalQTY != 0].Contract:
@@ -214,6 +214,6 @@ for systemName in systems:
 
     filename=systemName+'_slip_cons.csv'
     cons.to_csv(savePath2+filename, index=True)
-    print 'Saved '+savePath2+filename
+    print 'Saved '+savePath2+filename+'\n'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

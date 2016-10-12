@@ -97,7 +97,7 @@ fxDict={
     'HKD':7.77,
     'JPY':fxRates.ix['USDJPY'],
     'NZD':1/fxRates.ix['NZDUSD'],
-    'SGD':1.34,
+    'SGD':1.38,
     'USD':1,
     }
 #csisym:[c2sym,usdFXrate,multiplier,riskON signal,Custom]

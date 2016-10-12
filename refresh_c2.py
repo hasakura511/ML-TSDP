@@ -22,12 +22,14 @@ from datetime import datetime as dt
 logging.basicConfig(filename='/logs/refresh_c2.log',level=logging.DEBUG)
 start_time = time.time()
 
-#subprocess.call(['python', 'get_ibpos.py'])       
-systemdata=pd.read_csv('./data/systems/system_'+sys.argv[1]+'.csv')
-systemdata=systemdata.reset_index()
-get_c2pos(systemdata)
-get_executions(systemdata)
-#subprocess.call(['python', 'get_ibpos.py'])
+systems = ['v4futures','v4mini', 'v4micro']
+for system in systems:
+    #subprocess.call(['python', 'get_ibpos.py'])       
+    systemdata=pd.read_csv('./data/systems/system_'+system+'.csv')
+    systemdata=systemdata.reset_index()
+    get_c2pos(systemdata)
+    get_executions(systemdata)
+    #subprocess.call(['python', 'get_ibpos.py'])
 
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

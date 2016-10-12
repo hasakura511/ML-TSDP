@@ -499,10 +499,10 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Voting6'
+c2system='None'
 #for system files
 c2system_macro=c2system
-c2system_mini='Voting6'
+c2system_mini='None'
 c2system_micro='Voting7'
 c2safef=1
 #use LastSEA for seasonality in c2
@@ -537,6 +537,7 @@ if lastDate > sigDate:
     #calc the previous day's results.
     nrows=futuresDF.shape[0]
     totalsDF = pd.DataFrame()
+    futuresDF['None']=0
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     futuresDF['AntiCustom']=np.where(futuresDF.Custom<0,1,-1)
     futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
@@ -695,6 +696,7 @@ else:
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     #voting9Cols=['Anti1LastSIG','AntiSEA']
     #voting4Cols= votingCols+voting2Cols+voting3Cols
+    futuresDF['None']=0
     futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
     futuresDF['AntiCustom']=np.where(futuresDF.Custom<0,1,-1)
     futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)

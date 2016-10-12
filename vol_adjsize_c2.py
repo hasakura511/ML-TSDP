@@ -161,10 +161,11 @@ if lastDate >oldDate:
         
     for pair in currencyPairs:
         signalFilename='v4_'+pair+'.csv'
-        #print signalFilename
-        data = pd.read_csv(signalPath+signalFilename, index_col=0)
-        #currenciesDF.set_value(pair,'SIG'+str(data.index[-3]),data.signals.iloc[-3])
-        currenciesDF.set_value(pair,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
+        if isfile(signalPath+signalFilename):
+            #print signalFilename
+            data = pd.read_csv(signalPath+signalFilename, index_col=0)
+            #currenciesDF.set_value(pair,'SIG'+str(data.index[-3]),data.signals.iloc[-3])
+            currenciesDF.set_value(pair,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
     #currenciesDF=currenciesDF.sort_index()
     print currenciesDF

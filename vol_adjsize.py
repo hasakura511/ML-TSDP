@@ -267,6 +267,7 @@ futuresDF.index.name = lastDate
 if lastDate >oldDate:
     #first time run needs to update pivot dates for runsystems.  
     print "First Run.. running seasonalClassifier"
+    nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','prevSEA','prevSRUN','prevvSTART']
     for i,contract in enumerate(marketList):
         print i+1,
         if 'YT' not in contract:
@@ -284,6 +285,7 @@ if lastDate >oldDate:
     futuresDF['prevACT']=futuresDF_old['prevACT']
     futuresDF['prevSEA']=futuresDF_old.LastSEA
     futuresDF['prevSRUN']=futuresDF_old.LastSRUN
+    futuresDF['prevvSTART']=futuresDF_old.vStart
     #corrDF.to_csv(savePath+'futuresPCcsv')
     #corrDF.corr().to_csv(savePath+'futuresCorr.csv')
     corrDF=corrDF.corr()
@@ -323,6 +325,7 @@ if lastDate >oldDate:
 else:
     print "Second Run.. skipping seasonalClassifier"
     #second time load  "old" file for seasonality signals.
+    nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
     futuresDF['vSTART']=futuresDF_old.vSTART
     futuresDF['LastSEA']=futuresDF_old.LastSEA
     futuresDF['LastSRUN']=futuresDF_old.LastSRUN
@@ -439,7 +442,6 @@ futuresDF=futuresDF.sort_index()
 columns = futuresDF.columns.tolist()
 futuresDF.LastPctChg=futuresDF[sorted([x for x in columns if 'PC' in x])[-1]].values
 start_idx =columns.index('ACT')+1
-nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
 new_order = columns[:start_idx]+nextColOrder
 new_order =  new_order+[x for x in columns if x not in new_order]
 futuresDF = futuresDF[new_order]

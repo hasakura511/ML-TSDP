@@ -94,10 +94,10 @@ fxDict={
     'CHF':fxRates.ix['USDCHF'],
     'EUR':1/fxRates.ix['EURUSD'],
     'GBP':1/fxRates.ix['GBPUSD'],
-    'HKD':7.77,
+    'HKD':fxRates.ix['USDHKD'],
     'JPY':fxRates.ix['USDJPY'],
     'NZD':1/fxRates.ix['NZDUSD'],
-    'SGD':1.38,
+    'SGD':fxRates.ix['USDSGD'],
     'USD':1,
     }
 #csisym:[c2sym,usdFXrate,multiplier,riskON signal,Custom]

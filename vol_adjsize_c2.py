@@ -52,8 +52,8 @@ else:
     pairPath =  './data/' 
     
     
-with open(pairPath+'currencies.txt') as f:
-    currencyPairs = f.read().splitlines()
+#with open(pairPath+'currencies.txt') as f:
+#    currencyPairs = f.read().splitlines()
 
 cDictCSI = {
             'AUDNZD':'AD!0000$.CSV',
@@ -84,13 +84,19 @@ cDictCSI = {
             'USDCAD':'QE20000$.CSV',
             'USDJPY':'QE90000$.CSV',
             'USDCHF':'QE}0000$.CSV',
+            'USDSGD':'QE{0000$.CSV',
+            'USDHKD':'QE70000$.CSV',
             }
-currenciesDF_old=pd.read_csv(savePath+'currenciesATR.csv', index_col=0)
-oldDate=dt.strptime(currenciesDF_old.index.name,"%Y-%m-%d %H:%M:%S")
-
+            
+if isfile(savePath+'currenciesATR.csv'):
+    currenciesDF_old=pd.read_csv(savePath+'currenciesATR.csv', index_col=0)
+    oldDate=dt.strptime(currenciesDF_old.index.name,"%Y-%m-%d %H:%M:%S")
+else:
+    oldDate=dt(1990,1,1)
+    
 currenciesDF=pd.DataFrame()
 corrDF=pd.DataFrame()
-for pair in currencyPairs:
+for pair in cDictCSI.keys():
     #end at -1 to ignore  new day. 
     data = pd.read_csv(dataPath+cDictCSI[pair], index_col=0)[-lookback-1:]
     #print pair, data.index[-1]

@@ -205,7 +205,7 @@ for systemName in systems:
     system = pd.read_csv(systemPath+systemFilename)
     system_sym=system[system.c2qty !=0].c2sym.values
     system_slip=avgslip.ix[system_sym].sort_values(by='slippage', ascending=True)
-    filename='futures_avg_'+systemName+'.png'
+    filename=systemName+'_avg_slippage.png'
     title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
             +slipFiles[1].split('_')[3][:-4]+' to '+slipFiles[-1].split('_')[3][:-4]
     plotSlip(system_slip, pngPath, filename, title, showPlots=showPlots)

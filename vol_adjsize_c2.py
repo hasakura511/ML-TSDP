@@ -170,7 +170,7 @@ if lastDate >oldDate:
     #currenciesDF=currenciesDF.sort_index()
     print currenciesDF
     print 'Saving...', savePath+'currenciesATR.csv'
-    currenciesDF.to_csv(savePath+'currenciesATR.csv')
+    currenciesDF.sort_index().to_csv(savePath+'currenciesATR.csv')
 else:
     print 'second time run.. skipping job..'
     pass

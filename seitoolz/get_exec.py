@@ -13,7 +13,7 @@ import logging
 logging.basicConfig(filename='/logs/get_exec.log',level=logging.DEBUG)
 
 def get_c2trades(systemid, name, c2api):
-    filename='./data/portfolio/' + name + '_c2trades.csv'
+    filename='./data/portfolio/c2_' + name + '_trades.csv'
     
     datestr=strftime("%Y%m%d", localtime())
     data=get_c2exec(systemid,c2api);
@@ -37,7 +37,7 @@ def get_c2trades(systemid, name, c2api):
         dataSet.to_csv(filename)
 
 def get_ibtrades():
-    filename='./data/portfolio/trades' + '.csv'
+    filename='./data/portfolio/ib_trades' + '.csv'
     
     datestr=strftime("%Y%m%d", localtime())
     data=get_ibexec()

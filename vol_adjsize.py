@@ -285,7 +285,7 @@ if lastDate >oldDate:
     futuresDF['prevACT']=futuresDF_old['prevACT']
     futuresDF['prevSEA']=futuresDF_old.LastSEA
     futuresDF['prevSRUN']=futuresDF_old.LastSRUN
-    futuresDF['prevvSTART']=futuresDF_old.vStart
+    futuresDF['prevvSTART']=futuresDF_old.vSTART
     #corrDF.to_csv(savePath+'futuresPCcsv')
     #corrDF.corr().to_csv(savePath+'futuresCorr.csv')
     corrDF=corrDF.corr()

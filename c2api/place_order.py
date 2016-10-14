@@ -43,6 +43,40 @@ def place_order(action, quant, sym, type, systemid, submit,apikey, parentsig=Non
     logging.info( str(r.text)  )
     return sigid
 
+def place_order2(action, quant, sym, type, systemid, submit,apikey, parentsig=None):
+    global sigid
+    if submit == False:
+        return 0;
+    url = 'https://collective2.com/world/apiv2/submitSignal'
+    
+    headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
+    sigid=int(sigid)+1
+    
+    data = { 
+    		"apikey":   apikey, # "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
+    		"systemid": str(systemid), 
+    		"signal":{ 
+    	   		"action": action, 
+    	   		"quant": quant, 
+    	   		"symbol": sym, 
+    	   		"typeofsymbol": type, 
+    	   		"market": 1, 	#"limit": 31.05, 
+    	   		"duration": "DAY", 
+               "signalid": sigid,
+               "conditionalupon": parentsig
+    		} 
+    	}
+    logging.info( 'sigid is: ' + str( sigid ))
+    dataf=pd.DataFrame([[sigid]], columns=['sigid'])
+    dataf.to_csv('./data/c2api/sigid.csv')    
+    params={}
+    
+    r=requests.post(url, params=params, json=data);
+    #sleep(2)
+    #print r.text
+    logging.info( str(r.text)  )
+    return str(r.text)
+    
 def set_position(positions, systemid, submit, apikey):
     if submit == False:
         return 0;

@@ -12,7 +12,7 @@ import json
 from pandas.io.json import json_normalize
 from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
 from c2api.get_exec import get_exec_open, get_c2_list, get_c2livepos
-from c2api.place_order import place_order, set_position
+from c2api.place_order import place_order2
 #from seitoolz.signal import get_dps_model_pos, get_model_pos
 #from seitoolz.order import adj_size
 #from seitoolz.get_exec import get_executions
@@ -67,16 +67,18 @@ for sys in c2dict.keys():
             if sig != c2sig or qty != c2qty:
                 print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty)
         else:
-            
-            #place order to exit the contract.
-            positions = [{
-                "symbol" : sym,
-                "typeofsymbol" : "future",
-                "quant" : 0
-                }]
-            #old contract does not exist in system file so use the new contract c2id and api
+            c2sig = int(c2dict[sys].ix[sym].signal)
+            c2qty=int(c2dict[sys].ix[sym].quant_opened)-int(c2dict[sys].ix[sym].quant_closed)
             symInfo=futuresDict[sys].ix[[x for x in futuresDict[sys].index if sym[:-2] in x][0]]
-            response = set_position(positions, symInfo.c2id, True, symInfo.c2api)
+            if c2sig==1:
+                action='STC'
+            else:
+                action='BTC'
+                
+            #place order to exit the contract.
+
+            #old contract does not exist in system file so use the new contract c2id and api
+            response = place_order2(action, c2qty, sym, symInfo.c2type, symInfo.c2id, True, symInfo.c2api)
             exitList.append(sym+' not in system file. exiting contract!!.. '+response)
             
             

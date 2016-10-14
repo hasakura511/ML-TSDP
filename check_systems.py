@@ -69,11 +69,11 @@ for sys in c2dict.keys():
         else:
             exitList.append(sym+' not in system file. exit contract!!..')
             #place order to exit the contract.
-            positions = {
+            positions = [{
                 "symbol" : sym,
                 "typeofsymbol" : "future",
                 "quant" : 0
-                }
+                }]
             #old contract does not exist in system file so use the new contract c2id and api
             symInfo=futuresDict[sys].ix[[x for x in futuresDict[sys].index if sym[:-2] in x][0]]
             set_position(positions, symInfo.c2id, True, symInfo.c2api)

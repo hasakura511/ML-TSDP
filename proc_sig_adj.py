@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 import json
@@ -5,7 +6,7 @@ from pandas.io.json import json_normalize
 import time
 from c2api.sig_adj import get_working_signals, cancel_signal
 seen=dict()
-
+    
 def proc_sig_adj(systemid,apikey):
     data=get_working_signals(systemid,apikey);
     jsondata = json.loads(data)
@@ -16,7 +17,7 @@ def proc_sig_adj(systemid,apikey):
             cancel_signal(row['signal_id'], systemid,apikey)
             #time.sleep(1)
 
-data=pd.read_csv('./data/systems/system_consolidated.csv')
+data=pd.read_csv('./data/systems/system_'+sys.argv[1]+'.csv')
 data=data.reset_index()
 
 for i in data.index:

@@ -74,8 +74,9 @@ for sys in c2dict.keys():
                 "typeofsymbol" : "future",
                 "quant" : 0
                 }
-                
-            set_position(positions, futuresDict[sys].ix[sym].c2id, True, futuresDict[sys].ix[sym].c2api)
+            #old contract does not exist in system file so use the new contract c2id and api
+            symInfo=futuresDict[sys].ix[[x for x in futuresDict[sys].index if sym[:-2] in x][0]]
+            set_position(positions, symInfo.c2id, True, symInfo.c2api)
             
             
     for e in exitList:

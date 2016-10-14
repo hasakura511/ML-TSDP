@@ -74,4 +74,5 @@ def set_position(positions, systemid, submit, apikey):
     sleep(2)
     #print r.text
     logging.info( str(r.text)  )
+    return str(r.text)
 #place_order('BTO','1','EURUSD','forex')

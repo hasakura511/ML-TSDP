@@ -52,6 +52,7 @@ for sys in systems:
 
 for sys in c2dict.keys():
     print sys, 'Position Checking..'
+    exitList=[]
     #sig reconciliation
     count=0
     c2dict[sys]['signal']=np.where(c2dict[sys]['long_or_short'].values=='long',1,-1)
@@ -65,8 +66,10 @@ for sys in c2dict.keys():
             if sig != c2sig or qty != c2qty:
                 print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty)
         else:
-            print sym, ' not in system file. exit contract!!..'
+            exitList.append(sym+' not in system file. exit contract!!..')
             #place order to exit the contract.
+    for e in exitList:
+        print e
     print count,'DONE!'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

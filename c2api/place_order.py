@@ -52,7 +52,7 @@ def set_position(positions, systemid, submit, apikey):
     
     data = { 
           "apikey":   apikey, # "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
-          "systemid": systemid, 
+          "systemid": str(systemid), 
           "positions": positions
           #{
           #   "symbol" : "MSFT",

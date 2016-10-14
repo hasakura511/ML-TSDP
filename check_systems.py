@@ -12,6 +12,7 @@ import json
 from pandas.io.json import json_normalize
 from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
 from c2api.get_exec import get_exec_open, get_c2_list, get_c2livepos
+#from c2api.place_order import place_order, set_position
 #from seitoolz.signal import get_dps_model_pos, get_model_pos
 #from seitoolz.order import adj_size
 #from seitoolz.get_exec import get_executions
@@ -21,7 +22,7 @@ import sys
 import threading
 from datetime import datetime as dt
 
-#logging.basicConfig(filename='/logs/refresh_c2.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
 start_time = time.time()
 systems = ['v4futures','v4mini','v4micro']
 
@@ -68,6 +69,15 @@ for sys in c2dict.keys():
         else:
             exitList.append(sym+' not in system file. exit contract!!..')
             #place order to exit the contract.
+            positions = {
+                "symbol" : sym,
+                "typeofsymbol" : "future",
+                "quant" : 0
+                }
+                
+            set_position(positions, futuresDict[sys].ix[sym].c2id, True, futuresDict[sys].ix[sym].c2api)
+            
+            
     for e in exitList:
         print e
     print count,'DONE!'

@@ -136,8 +136,8 @@ c2contractSpec = {
 'HO':['QHO',fxDict['USD'],42000,'energy',1,1],
 'JY':['@JY',fxDict['USD'],125000,'currency',-1,-1],
 'KC':['@KC',fxDict['USD'],375,'soft',1,1],
-'KW':['@KW',fxDict['USD'],50,'grain',1,-1],
-'LB':['@LB',fxDict['USD'],110,'soft',1,1],
+'KW':['@KW',fxDict['USD'],50,'grain',1,1],
+'LB':['@LB',fxDict['USD'],110,'soft',1,-1],
 'LC':['@LE',fxDict['USD'],400,'meat',1,-1],
 'LCO':['EB',fxDict['USD'],1000,'energy',1,1],
 'LGO':['GAS',fxDict['USD'],100,'energy',1,1],
@@ -153,7 +153,7 @@ c2contractSpec = {
 'NIY':['@NKD',fxDict['JPY'],500,'index',1,-1],
 'NQ':['@NQ',fxDict['USD'],20,'index',1,-1],
 'O':['@O',fxDict['USD'],50,'grain',1,1],
-'OJ':['@OJ',fxDict['USD'],150,'soft',1,1],
+'OJ':['@OJ',fxDict['USD'],150,'soft',1,-1],
 'PA':['QPA',fxDict['USD'],100,'metal',1,-1],
 'PL':['QPL',fxDict['USD'],50,'metal',-1,-1],
 'RB':['QRB',fxDict['USD'],42000,'energy',1,1],
@@ -175,12 +175,13 @@ c2contractSpec = {
 'TY':['@TY',fxDict['USD'],1000,'rates',-1,-1],
 'US':['@US',fxDict['USD'],1000,'rates',-1,-1],
 'VX':['@VX',fxDict['USD'],1000,'index',-1,1],
-'W':['@W',fxDict['USD'],50,'grain',1,-1],
+'W':['@W',fxDict['USD'],50,'grain',1,1],
 'YA':['AP',fxDict['AUD'],25,'index',1,-1],
 'YB':['HBS',fxDict['AUD'],2400,'rates',-1,-1],
 'YM':['@YM',fxDict['USD'],5,'index',1,-1],
 'YT2':['HTS',fxDict['AUD'],2800,'rates',-1,-1],
 'YT3':['HXS',fxDict['AUD'],8000,'rates',-1,-1],
+
     }
     
 months = {

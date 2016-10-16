@@ -766,6 +766,22 @@ else:
     v6[v6>0]=1
     futuresDF['Voting6']=v6.values
     
+    for group in futuresDF.groupby(by='group').Custom:
+        #print group
+        colors=np.array(['g']*group[1].shape[0])
+        mask = group[1]<0
+        colors[mask.values]='r'
+        group[1].plot(kind='barh', title ='Custom '+group[0], colors=colors)
+        plt.xlim(-1,1)
+
+        filename='custom_'+group[0]+'.png'
+        plt.savefig(savePath2+filename, bbogroup_inches='tight')
+        print 'Saved '+savePath2+filename
+        
+        if debug:
+            plt.show()
+        plt.close()
+    
     print 'Saving signals from', c2system
     #1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR
     #save signals to v4_ signal files for order processing

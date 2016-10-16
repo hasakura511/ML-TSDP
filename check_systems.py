@@ -12,7 +12,6 @@ import json
 from pandas.io.json import json_normalize
 from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
 from c2api.get_exec import get_exec_open, get_c2_list, get_c2livepos
-from c2api.place_order import place_order2
 #from seitoolz.signal import get_dps_model_pos, get_model_pos
 #from seitoolz.order import adj_size
 #from seitoolz.get_exec import get_executions
@@ -29,9 +28,12 @@ systems = ['v4futures','v4mini','v4micro']
 if len(sys.argv)==1:
     savePath='D:/ML-TSDP/data/portfolio/'
     systemPath = 'D:/ML-TSDP/data/systems/'
+    def place_order2(a,b,c,d,e,f,g):
+        return 0
 else:
     savePath='./data/portfolio/'
     systemPath =  './data/systems/'
+    from c2api.place_order import place_order2
 
 c2dict={}
 futuresDict={}
@@ -55,18 +57,24 @@ for sys in c2dict.keys():
     print sys, 'Position Checking..'
     exitList=[]
     #sig reconciliation
-    count=0
+    c2_count=0
+    sys_count=0
+    mismatch_count=0
+    exit_count=0
     c2dict[sys]['signal']=np.where(c2dict[sys]['long_or_short'].values=='long',1,-1)
     for sym in c2dict[sys].index:
-        count+=1
+        c2_count+=1
         if sym in futuresDict[sys].index:
+
             c2sig = int(c2dict[sys].ix[sym].signal)
             sig=int(futuresDict[sys].ix[sym].signal)
             qty=int(futuresDict[sys].ix[sym].c2qty)
             c2qty=int(c2dict[sys].ix[sym].quant_opened)-int(c2dict[sys].ix[sym].quant_closed)
             if sig != c2sig or qty != c2qty:
+                mismatch_count+=1
                 print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty)
         else:
+            exit_count+=1
             c2sig = int(c2dict[sys].ix[sym].signal)
             c2qty=int(c2dict[sys].ix[sym].quant_opened)-int(c2dict[sys].ix[sym].quant_closed)
             symInfo=futuresDict[sys].ix[[x for x in futuresDict[sys].index if sym[:-2] in x][0]]
@@ -81,9 +89,19 @@ for sys in c2dict.keys():
             response = place_order2(action, c2qty, sym, symInfo.c2type, symInfo.c2id, True, symInfo.c2api)
             exitList.append(sym+' not in system file. exiting contract!!.. '+response)
             
-            
+    for sym in futuresDict[sys].index:
+        sig=int(futuresDict[sys].ix[sym].signal)
+        qty=int(futuresDict[sys].ix[sym].c2qty)
+        systemSym = (sig !=0 and qty !=0)
+        if systemSym:
+            sys_count+=1
+        if sym not in c2dict[sys] and systemSym:
+            mismatch_count+=1
+            print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(0), 'q:'+str(qty), 'c2q:'+str(0)
+        
     for e in exitList:
         print e
-    print count,'DONE!'
+    print 'c2:'+str(c2_count)+' sys:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)
+    print 'DONE!\n'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

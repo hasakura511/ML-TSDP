@@ -11,7 +11,7 @@ import time
 import json
 from pandas.io.json import json_normalize
 from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
-from c2api.get_exec import get_exec_open, get_c2_list, get_c2livepos
+from c2api.get_exec import get_exec_open, get_c2_list, get_c2livepos, retrieveSignalsWorking
 #from seitoolz.signal import get_dps_model_pos, get_model_pos
 #from seitoolz.order import adj_size
 #from seitoolz.get_exec import get_executions
@@ -36,6 +36,7 @@ else:
     from c2api.place_order import place_order2
 
 c2dict={}
+workingSignals={}
 futuresDict={}
 for sys in systems:
     #subprocess.call(['python', 'get_ibpos.py'])       
@@ -48,7 +49,11 @@ for sys in systems:
     for systemname in systems:
         (systemid, apikey)=c2list[systemname]
         c2dict[systemname]=get_c2livepos(systemid, apikey, systemname)
-        
+        response = json.loads(retrieveSignalsWorking(systemid, apikey))
+        if len(response)>0:
+            workingSignals[systemname]= json_normalize(response)
+        else:
+            workingSignals[systemname]= response
     #trades
     #get_executions(systemdata)
     #subprocess.call(['python', 'get_ibpos.py'])
@@ -62,6 +67,7 @@ for sys in c2dict.keys():
     mismatch_count=0
     exit_count=0
     c2dict[sys]['signal']=np.where(c2dict[sys]['long_or_short'].values=='long',1,-1)
+    #check contracts in c2 file not in system file.
     for sym in c2dict[sys].index:
         c2_count+=1
         if sym in futuresDict[sys].index:
@@ -72,7 +78,23 @@ for sys in c2dict.keys():
             c2qty=int(c2dict[sys].ix[sym].quant_opened)-int(c2dict[sys].ix[sym].quant_closed)
             if sig != c2sig or qty != c2qty:
                 mismatch_count+=1
-                print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty)
+                print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
+                if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol:
+                    orders = workingSignals[sys][workingSignals[sys].symbol==sym]
+                    if sig==1 and 'BTO' in orders.action.values and 'BTC' in orders.action.values:
+                        print 'sig OK',
+                        if orders[orders.action=='BTO'].quant.values[0] == qty:
+                            print 'qty OK'
+                    elif sig==-1 and 'STO' in orders.action.values and 'STC' in orders.action.values:
+                        print 'sig OK',
+                        if orders[orders.action=='STO'].quant.values[0] == qty:
+                            print 'qty OK'
+                    else:
+                        print 'Wrong order found!'
+                     
+                else:
+                    print 'Order not found!'
+                
         else:
             exit_count+=1
             c2sig = int(c2dict[sys].ix[sym].signal)
@@ -88,7 +110,7 @@ for sys in c2dict.keys():
             #old contract does not exist in system file so use the new contract c2id and api
             response = place_order2(action, c2qty, sym, symInfo.c2type, symInfo.c2id, True, symInfo.c2api)
             exitList.append(sym+' not in system file. exiting contract!!.. '+response)
-            
+    #check contracts in system file not in c2.
     for sym in futuresDict[sys].index:
         sig=int(futuresDict[sys].ix[sym].signal)
         qty=int(futuresDict[sys].ix[sym].c2qty)
@@ -97,7 +119,22 @@ for sys in c2dict.keys():
             sys_count+=1
         if sym not in c2dict[sys].index and systemSym:
             mismatch_count+=1
-            print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(0), 'q:'+str(qty), 'c2q:'+str(0)
+            print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(0), 'q:'+str(qty), 'c2q:'+str(0),
+            if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol:
+                orders = workingSignals[sys][workingSignals[sys].symbol==sym]
+                if sig==1 and 'BTO' in orders.action.values and 'BTC' in orders.action.values:
+                    print 'sig OK',
+                    if orders[orders.action=='BTO'].quant.values[0] == qty:
+                        print 'qty OK'
+                elif sig==-1 and 'STO' in orders.action.values and 'STC' in orders.action.values:
+                    print 'sig OK',
+                    if orders[orders.action=='STO'].quant.values[0] == qty:
+                        print 'qty OK'
+                else:
+                    print 'Wrong order found!'
+                 
+            else:
+                print 'Order not found!'
         
     for e in exitList:
         print e

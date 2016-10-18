@@ -8,6 +8,22 @@ import time
 import logging
 import os
 
+def retrieveSignalsWorking(systemid, apikey):
+    url = 'https://collective2.com/world/apiv3/retrieveSignalsWorking'
+    headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
+    
+    data={
+        "systemid" : str(systemid),
+        "apikey" : str(apikey)
+        }
+    
+    params={}
+    
+    r=requests.post(url, params=params, json=data);
+    print r.text
+    logging.info(r.text)
+    return r.text
+    
 def retrieveSystemEquity(systemid, apikey, commission_plan='default'):
     url = 'https://api.collective2.com/world/apiv3/retrieveSystemEquity'
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}

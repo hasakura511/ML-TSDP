@@ -23,7 +23,8 @@ from datetime import datetime as dt
 
 logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
 start_time = time.time()
-systems = ['v4futures','v4mini','v4micro']
+#systems = ['v4futures','v4mini','v4micro']
+systems = ['v4futures']
 
 if len(sys.argv)==1:
     savePath='D:/ML-TSDP/data/portfolio/'
@@ -49,7 +50,7 @@ for sys in systems:
     for systemname in systems:
         (systemid, apikey)=c2list[systemname]
         c2dict[systemname]=get_c2livepos(systemid, apikey, systemname)
-        response = json.loads(retrieveSignalsWorking(systemid, apikey))
+        response = json.loads(retrieveSignalsWorking(systemid, apikey))['response']
         if len(response)>0:
             workingSignals[systemname]= json_normalize(response)
         else:
@@ -57,7 +58,34 @@ for sys in systems:
     #trades
     #get_executions(systemdata)
     #subprocess.call(['python', 'get_ibpos.py'])
-
+    
+def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
+        print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
+        if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol.values:
+            orders = workingSignals[sys][workingSignals[sys].symbol==sym]
+            orders.quant = orders.quant.astype(int)
+            #doesn't check STC/BTC orders, except for sig=0
+            if sig==1 and 'BTO' in orders.action.values:
+                print 'working sig OK',
+                if orders[orders.action=='BTO'].quant.values[0] == qty:
+                    print 'qty OK'
+                else:
+                    print 'qty ERROR'
+            elif sig==-1 and 'STO' in orders.action.values:
+                print 'working sig OK',
+                if orders[orders.action=='STO'].quant.values[0] == qty:
+                    print 'qty OK'
+                else:
+                    print 'qty ERROR'
+            elif sig==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values):
+                print 'working sig OK',
+                if orders.quant.values[0] == c2qty:
+                    print 'qty OK'
+                else:
+                    print 'qty ERROR'
+            else:
+                print 'Wrong order found!'
+                    
 for sys in c2dict.keys():
     print sys, 'Position Checking..'
     exitList=[]
@@ -78,22 +106,7 @@ for sys in c2dict.keys():
             c2qty=int(c2dict[sys].ix[sym].quant_opened)-int(c2dict[sys].ix[sym].quant_closed)
             if sig != c2sig or qty != c2qty:
                 mismatch_count+=1
-                print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
-                if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol:
-                    orders = workingSignals[sys][workingSignals[sys].symbol==sym]
-                    if sig==1 and 'BTO' in orders.action.values and 'BTC' in orders.action.values:
-                        print 'sig OK',
-                        if orders[orders.action=='BTO'].quant.values[0] == qty:
-                            print 'qty OK'
-                    elif sig==-1 and 'STO' in orders.action.values and 'STC' in orders.action.values:
-                        print 'sig OK',
-                        if orders[orders.action=='STO'].quant.values[0] == qty:
-                            print 'qty OK'
-                    else:
-                        print 'Wrong order found!'
-                     
-                else:
-                    print 'Order not found!'
+                reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty)
                 
         else:
             exit_count+=1
@@ -119,23 +132,8 @@ for sys in c2dict.keys():
             sys_count+=1
         if sym not in c2dict[sys].index and systemSym:
             mismatch_count+=1
-            print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(0), 'q:'+str(qty), 'c2q:'+str(0),
-            if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol:
-                orders = workingSignals[sys][workingSignals[sys].symbol==sym]
-                if sig==1 and 'BTO' in orders.action.values and 'BTC' in orders.action.values:
-                    print 'sig OK',
-                    if orders[orders.action=='BTO'].quant.values[0] == qty:
-                        print 'qty OK'
-                elif sig==-1 and 'STO' in orders.action.values and 'STC' in orders.action.values:
-                    print 'sig OK',
-                    if orders[orders.action=='STO'].quant.values[0] == qty:
-                        print 'qty OK'
-                else:
-                    print 'Wrong order found!'
-                 
-            else:
-                print 'Order not found!'
-        
+            reconcileWorkingSignals(sys, workingSignals, sym, sig, 0, qty, 0)
+            
     for e in exitList:
         print e
     print 'c2:'+str(c2_count)+' sys:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)

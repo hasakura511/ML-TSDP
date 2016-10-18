@@ -29,7 +29,7 @@ if len(sys.argv)==1:
     savePath='D:/ML-TSDP/data/portfolio/'
     systemPath = 'D:/ML-TSDP/data/systems/'
     def place_order2(a,b,c,d,e,f,g):
-        return 0
+        return "0"
 else:
     savePath='./data/portfolio/'
     systemPath =  './data/systems/'
@@ -95,7 +95,7 @@ for sys in c2dict.keys():
         systemSym = (sig !=0 and qty !=0)
         if systemSym:
             sys_count+=1
-        if sym not in c2dict[sys] and systemSym:
+        if sym not in c2dict[sys].index and systemSym:
             mismatch_count+=1
             print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(0), 'q:'+str(qty), 'c2q:'+str(0)
         

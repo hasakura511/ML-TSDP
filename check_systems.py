@@ -23,8 +23,8 @@ from datetime import datetime as dt
 
 logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
 start_time = time.time()
-#systems = ['v4futures','v4mini','v4micro']
-systems = ['v4futures']
+systems = ['v4futures','v4mini','v4micro']
+#systems = ['v4futures']
 
 if len(sys.argv)==1:
     savePath='D:/ML-TSDP/data/portfolio/'
@@ -36,28 +36,7 @@ else:
     systemPath =  './data/systems/'
     from c2api.place_order import place_order2
 
-c2dict={}
-workingSignals={}
-futuresDict={}
-for sys in systems:
-    #subprocess.call(['python', 'get_ibpos.py'])       
-    systemdata=pd.read_csv(systemPath+'system_'+sys+'.csv')
-    futuresDict[sys]=systemdata=systemdata.reset_index()
-    futuresDict[sys].index=futuresDict[sys].c2sym
-    #portfolio and equity
-    c2list=get_c2_list(systemdata)
-    systems=c2list.keys()
-    for systemname in systems:
-        (systemid, apikey)=c2list[systemname]
-        c2dict[systemname]=get_c2livepos(systemid, apikey, systemname)
-        response = json.loads(retrieveSignalsWorking(systemid, apikey))['response']
-        if len(response)>0:
-            workingSignals[systemname]= json_normalize(response)
-        else:
-            workingSignals[systemname]= response
-    #trades
-    #get_executions(systemdata)
-    #subprocess.call(['python', 'get_ibpos.py'])
+    
     
 def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
         print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
@@ -85,6 +64,30 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
                     print 'qty ERROR'
             else:
                 print 'Wrong order found!'
+                
+c2dict={}
+workingSignals={}
+futuresDict={}
+for sys in systems:
+    #subprocess.call(['python', 'get_ibpos.py'])       
+    systemdata=pd.read_csv(systemPath+'system_'+sys+'.csv')
+    futuresDict[sys]=systemdata=systemdata.reset_index()
+    futuresDict[sys].index=futuresDict[sys].c2sym
+    #portfolio and equity
+    c2list=get_c2_list(systemdata)
+    systems=c2list.keys()
+    for systemname in systems:
+        (systemid, apikey)=c2list[systemname]
+        c2dict[systemname]=get_c2livepos(systemid, apikey, systemname)
+        response = json.loads(retrieveSignalsWorking(systemid, apikey))['response']
+        if len(response)>0:
+            workingSignals[systemname]= json_normalize(response)
+        else:
+            workingSignals[systemname]= response
+    #trades
+    #get_executions(systemdata)
+    #subprocess.call(['python', 'get_ibpos.py'])
+
                     
 for sys in c2dict.keys():
     print sys, 'Position Checking..'

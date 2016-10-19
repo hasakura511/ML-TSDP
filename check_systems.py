@@ -39,31 +39,37 @@ else:
     
     
 def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
-        print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
-        if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol.values:
-            orders = workingSignals[sys][workingSignals[sys].symbol==sym]
-            orders.quant = orders.quant.astype(int)
-            #doesn't check STC/BTC orders, except for sig=0
-            if sig==1 and 'BTO' in orders.action.values:
-                print 'working sig OK',
-                if orders[orders.action=='BTO'].quant.values[0] == qty:
-                    print 'qty OK'
-                else:
-                    print 'qty ERROR'
-            elif sig==-1 and 'STO' in orders.action.values:
-                print 'working sig OK',
-                if orders[orders.action=='STO'].quant.values[0] == qty:
-                    print 'qty OK'
-                else:
-                    print 'qty ERROR'
-            elif sig==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values):
-                print 'working sig OK',
-                if orders.quant.values[0] == c2qty:
-                    print 'qty OK'
-                else:
-                    print 'qty ERROR'
+    errors=0
+    print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
+    if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol.values:
+        orders = workingSignals[sys][workingSignals[sys].symbol==sym]
+        orders.quant = orders.quant.astype(int)
+        #doesn't check STC/BTC orders, except for sig=0
+        if sig==1 and 'BTO' in orders.action.values:
+            print 'working sig OK',
+            if orders[orders.action=='BTO'].quant.values[0] == qty:
+                print 'qty OK'
             else:
-                print 'Wrong order found!'
+                print 'qty ERROR'
+                errors+=1
+        elif sig==-1 and 'STO' in orders.action.values:
+            print 'working sig OK',
+            if orders[orders.action=='STO'].quant.values[0] == qty:
+                print 'qty OK'
+            else:
+                print 'qty ERROR'
+                errors+=1
+        elif sig==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values):
+            print 'working sig OK',
+            if orders.quant.values[0] == c2qty:
+                print 'qty OK'
+            else:
+                print 'qty ERROR'
+                errors+=1
+        else:
+            print 'Wrong signal found!'
+            errors+=1
+    return errors
                 
 c2dict={}
 workingSignals={}
@@ -97,6 +103,7 @@ for sys in c2dict.keys():
     sys_count=0
     mismatch_count=0
     exit_count=0
+    error_count=0
     c2dict[sys]['signal']=np.where(c2dict[sys]['long_or_short'].values=='long',1,-1)
     #check contracts in c2 file not in system file.
     for sym in c2dict[sys].index:
@@ -109,7 +116,7 @@ for sys in c2dict.keys():
             c2qty=int(c2dict[sys].ix[sym].quant_opened)-int(c2dict[sys].ix[sym].quant_closed)
             if sig != c2sig or qty != c2qty:
                 mismatch_count+=1
-                reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty)
+                error_count+=reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty)
                 
         else:
             exit_count+=1
@@ -135,11 +142,11 @@ for sys in c2dict.keys():
             sys_count+=1
         if sym not in c2dict[sys].index and systemSym:
             mismatch_count+=1
-            reconcileWorkingSignals(sys, workingSignals, sym, sig, 0, qty, 0)
+            error_count+=reconcileWorkingSignals(sys, workingSignals, sym, sig, 0, qty, 0)
             
     for e in exitList:
         print e
-    print 'c2:'+str(c2_count)+' sys:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)
+    print 'c2:'+str(c2_count)+' sys:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)+' errors:'+str(error_count)
     print 'DONE!\n'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

@@ -253,6 +253,7 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'QTY_MINI',qty_mini)
     futuresDF.set_value(sym,'QTY_MICRO',qty_micro)
     futuresDF.set_value(sym,'contractValue',cValue)
+    futuresDF.set_value(sym,'FX',c2contractSpec[sym][1])
     futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
     futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
     futuresDF.set_value(sym,'group',c2contractSpec[sym][3])
@@ -502,10 +503,10 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Voting4'
+c2system='Voting6'
 #for system files
 c2system_macro=c2system
-c2system_mini='Voting4'
+c2system_mini='Voting6'
 c2system_micro='Voting3'
 c2safef=1
 #use LastSEA for seasonality in c2

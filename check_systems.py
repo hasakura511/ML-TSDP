@@ -47,14 +47,14 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
         #doesn't check STC/BTC orders, except for sig=0
         if sig==1 and 'BTO' in orders.action.values:
             print 'working sig OK',
-            if orders[orders.action=='BTO'].quant.values[0] == qty:
+            if orders[orders.action=='BTO'].quant.values[0] +c2qty == qty:
                 print 'qty OK'
             else:
                 print 'qty ERROR'
                 errors+=1
         elif sig==-1 and 'STO' in orders.action.values:
             print 'working sig OK',
-            if orders[orders.action=='STO'].quant.values[0] == qty:
+            if orders[orders.action=='STO'].quant.values[0] +c2qty== qty:
                 print 'qty OK'
             else:
                 print 'qty ERROR'

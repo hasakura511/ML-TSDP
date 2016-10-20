@@ -510,7 +510,7 @@ c2system_micro='Voting3'
 c2safef=1
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
-                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG'\
+                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
                 'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
                 'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
                 'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']

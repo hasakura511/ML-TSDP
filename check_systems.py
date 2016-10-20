@@ -41,20 +41,26 @@ else:
 def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
     errors=0
     print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
+    #position size adjustements
+    if sig!=c2sig:
+        c2qty2=0
+    else:
+        c2qty2=c2qty
+        
     if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol.values:
         orders = workingSignals[sys][workingSignals[sys].symbol==sym]
         orders.quant = orders.quant.astype(int)
         #doesn't check STC/BTC orders, except for sig=0
         if sig==1 and 'BTO' in orders.action.values:
             print 'working sig OK',
-            if orders[orders.action=='BTO'].quant.values[0] +c2qty == qty:
+            if orders[orders.action=='BTO'].quant.values[0] +c2qty2 == qty:
                 print 'qty OK'
             else:
                 print 'qty ERROR'
                 errors+=1
         elif sig==-1 and 'STO' in orders.action.values:
             print 'working sig OK',
-            if orders[orders.action=='STO'].quant.values[0] +c2qty== qty:
+            if orders[orders.action=='STO'].quant.values[0] +c2qty2== qty:
                 print 'qty OK'
             else:
                 print 'qty ERROR'

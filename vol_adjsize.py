@@ -33,7 +33,7 @@ import seaborn as sns
 from suztoolz.datatools.seasonalClass import seasonalClassifier
 start_time = time.time()
 version='v4'
-riskEquity=2000
+riskEquity=250
 riskEquity_mini=250
 riskEquity_micro=250        
 offline = ['AC','CGB','EBS','ED','FEI','FSS','LB','YB']

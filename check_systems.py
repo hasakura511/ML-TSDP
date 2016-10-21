@@ -65,7 +65,7 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
             else:
                 print 'qty ERROR'
                 errors+=1
-        elif (sig==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values))
+        elif (sig==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values))\
                 or (qty==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values)):
             print 'working sig OK',
             if orders.quant.values[0] == c2qty:

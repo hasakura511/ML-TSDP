@@ -533,7 +533,7 @@ if lastDate > sigDate:
     voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
     voting12Cols = ['1LastSIG','AntiPrevACT','AdjSEA']
     voting13Cols = ['RiskOn','0.75LastSIG','AntiSEA','prevACT']
-    voting14Cols = ['Anti0.5LastSIG','prevACT']
+    voting14Cols = ['RiskOn','Anti0.5LastSIG','prevSEA']
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     
     #1bi. Run v4size(to update vlookback)
@@ -696,7 +696,7 @@ else:
     voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
     voting12Cols = ['1LastSIG','AntiPrevACT','AdjSEA']
     voting13Cols = ['RiskOn','0.75LastSIG','AntiSEA','prevACT']
-    voting14Cols = ['Anti0.5LastSIG','prevACT']
+    voting14Cols = ['RiskOn','Anti0.5LastSIG','LastSEA']
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     
     #voting9Cols=['Anti1LastSIG','AntiSEA']

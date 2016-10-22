@@ -33,7 +33,7 @@ import seaborn as sns
 from suztoolz.datatools.seasonalClass import seasonalClassifier
 start_time = time.time()
 version='v4'
-riskEquity=250
+riskEquity=1000
 riskEquity_mini=250
 riskEquity_micro=250        
 offline = ['AC','CGB','EBS','ED','FEI','FSS','LB','YB']
@@ -236,7 +236,7 @@ for i,contract in enumerate(marketList):
     #print sym, atr[-1], c2contractSpec[sym][2], c2contractSpec[sym][1]
     usdATR = atr[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
     cValue = data.Close[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
-    qty = int(math.ceil(riskEquity/usdATR))
+    qty = int(max(math.floor(riskEquity/usdATR),1))
     qty_mini = int(math.ceil(riskEquity_mini/usdATR))
     qty_micro = int(math.ceil(riskEquity_micro/usdATR))
     #print sym, data.R[-1], contractName
@@ -503,10 +503,10 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Voting14'
+c2system='Voting6'
 #for system files
 c2system_macro=c2system
-c2system_mini='Voting14'
+c2system_mini='Voting6'
 c2system_micro='Voting3'
 c2safef=1
 #use LastSEA for seasonality in c2

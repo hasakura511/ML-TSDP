@@ -43,16 +43,20 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
     print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
     #position size adjustements
     if sig!=c2sig:
+        #signal reversal there is no adjustment
         c2qty2=0
     else:
+        #signal is the same there is an adjustment
+        #c2qty2 existing,orders is adjustment
         c2qty2=c2qty
         
     if 'symbol' in workingSignals[sys] and sym in workingSignals[sys].symbol.values:
         orders = workingSignals[sys][workingSignals[sys].symbol==sym]
         orders.quant = orders.quant.astype(int)
-        #doesn't check STC/BTC orders, except for sig=0
+        #Open orders
         if sig==1 and 'BTO' in orders.action.values:
             print 'working sig OK',
+            #new open adjustment plus existing position equals qty in system file
             if orders[orders.action=='BTO'].quant.values[0] +c2qty2 == qty:
                 print 'qty OK'
             else:
@@ -65,6 +69,7 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
             else:
                 print 'qty ERROR'
                 errors+=1
+        #Close Orders where sig/qty = 0
         elif (sig==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values))\
                 or (qty==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values)):
             print 'working sig OK',
@@ -74,8 +79,23 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
                 print 'qty ERROR'
                 errors+=1
         else:
-            print 'Wrong working signal found!'
-            errors+=1
+            #Close Orders where qty adjustments
+            if sig==c2sig:
+                print 'working sig OK',
+                #check for position adjustment
+                if orders.action.values[0]=='BTC' and c2qty2-orders[orders.action=='BTC'].quant.values[0] == qty:
+                    print 'qty OK'
+                elif orders.action.values[0]=='STC' and c2qty2-orders[orders.action=='STC'].quant.values[0] == qty:
+                    print 'qty OK'
+                else:
+                    #unknown scenario
+                    print 'Wrong working qty found!'
+                    errors+=1
+
+            else:
+                #unknown scenario
+                print 'Wrong working signal found!'
+                errors+=1
     return errors
                 
 c2dict={}

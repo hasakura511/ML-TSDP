@@ -518,8 +518,9 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom
 
 
 if lastDate > sigDate:
+    AdjSEACols= ['RiskOn','AntiPrevACT','prevSEA']
     votingCols = ['Anti1LastSIG','prevACT','prevSEA']
-    voting2Cols = ['0.5LastSIG','AntiPrevACT','AntiAdjSEA']
+    voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
     voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
     voting4Cols=['Voting','Voting2','Voting3','Voting8']
     #voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
@@ -549,7 +550,8 @@ if lastDate > sigDate:
     futuresDF['Anti0.5LastSIG'] = np.where(futuresDF['0.5LastSIG']==1,-1,1)
     futuresDF['AntiSEA'] = np.where(futuresDF.prevSEA==1,-1,1)
     futuresDF['AntiPrevACT'] = np.where(futuresDF.prevACT==1,-1,1)
-    futuresDF['AdjSEA'] = np.where(futuresDF.prevSRUN <0, futuresDF.prevSEA*-1, futuresDF.prevSEA)
+    #futuresDF['AdjSEA'] = np.where(futuresDF.prevSRUN <0, futuresDF.prevSEA*-1, futuresDF.prevSEA)
+    futuresDF['AdjSEA']=np.where(futuresDF[AdjSEACols].sum(axis=1)<0,-1,1)
     futuresDF['AntiAdjSEA'] = np.where(futuresDF.AdjSEA==1,-1,1)
     futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
     futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
@@ -681,8 +683,9 @@ if lastDate > sigDate:
         pd.read_csv(savePath+filename, index_col=0).append(totalsDF[cols]).to_csv(savePath+filename)
         
 else:
+    AdjSEACols= ['RiskOn','AntiPrevACT','LastSEA']
     votingCols =['Anti1LastSIG','prevACT','LastSEA']
-    voting2Cols = ['0.5LastSIG','AntiPrevACT','AntiAdjSEA']
+    voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
     voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
     voting4Cols=['Voting','Voting2','Voting3','Voting8']
     #voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
@@ -711,7 +714,8 @@ else:
     futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
     futuresDF['prevACT'] = futuresDF.ACT
     futuresDF['AntiPrevACT'] = np.where(futuresDF.ACT==1,-1,1)
-    futuresDF['AdjSEA'] = np.where(futuresDF.LastSRUN <0, futuresDF.LastSEA*-1, futuresDF.LastSEA)
+    #futuresDF['AdjSEA'] = np.where(futuresDF.LastSRUN <0, futuresDF.LastSEA*-1, futuresDF.LastSEA)
+    futuresDF['AdjSEA']=np.where(futuresDF[AdjSEACols].sum(axis=1)<0,-1,1)
     futuresDF['AntiAdjSEA'] = np.where(futuresDF.AdjSEA==1,-1,1)
     futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
     futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)

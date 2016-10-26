@@ -1,9 +1,9 @@
-import seitoolz.bars2 as bars
+import ibapi.futures_bars_1d as bars
 import pandas as pd
 import threading
 import time
 import logging
-import ibapi.get_feed as feed
+import ibapi.get_feed2 as feed
 from pytz import timezone
 from dateutil.parser import parse
 import datetime
@@ -54,8 +54,8 @@ def get_history(contracts):
 def start_proc():
     global interval
     
-    contracts=bars.get_cash_contracts()
-    pairs=bars.get_symbols()
+    symbols, contracts=bars.get_contracts()
+
     threads = []
     #get_history(contracts)
     t1 = threading.Thread(target=get_history, args=[contracts])
@@ -64,7 +64,7 @@ def start_proc():
     
     [t.start() for t in threads]
     #[t.join() for t in threads]
-    bars.update_bars(pairs, interval)
+    bars.update_bars(symbols, interval)
     
 
 start_proc()

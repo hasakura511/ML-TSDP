@@ -503,10 +503,10 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='0.5LastSIG'
+c2system='Voting11'
 #for system files
 c2system_macro=c2system
-c2system_mini='0.5LastSIG'
+c2system_mini='Voting11'
 c2system_micro='Voting3'
 c2safef=1
 #use LastSEA for seasonality in c2

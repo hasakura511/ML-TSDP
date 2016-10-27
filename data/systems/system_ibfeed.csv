@@ -22,7 +22,7 @@ HE,Hogs-Lean(Floor+Electronic Combined)-CME,LH_0_I0R.TXT,GLOBEX,HE,@HE,FUT,USD
 MXP,Mexican Peso(Floor+Electronic Combined)-CME,MP_0_I0R.TXT,GLOBEX,MXP,@PX,FUT,USD
 NZD,New Zealand Dollar-CME(Floor+Electronic Combined),NE_0_I0R.TXT,GLOBEX,NZD,@NE,FUT,USD
 NG,Natural Gas-Henry Hub-NYMEX(Floor+Electronic Combined),NG20_I0R.TXT,NYMEX,NG,QNG,FUT,USD
-NIY,Nikkei 225 Index-Yen(Floor+Electronic Combined)-CME,NIY0_I0R.TXT,GLOBEX,NIY,@NKD,FUT,USD
+NIY,Nikkei 225 Index-Yen(Floor+Electronic Combined)-CME,NIY0_I0R.TXT,GLOBEX,NIY,@NKD,FUT,JPY
 NQ,Nasdaq 100 Index-E-mini,NQ_0_I0R.TXT,GLOBEX,NQ,@NQ,FUT,USD
 ZO,Oats-CBT (Floor+Electronic Combined),O2_0_I0R.TXT,ECBOT,ZO,@O,FUT,USD
 PA,Palladium-NYMEX(Floor+Electronic Combined),PA20_I0R.TXT,NYMEX,PA,QPA,FUT,USD
@@ -32,7 +32,7 @@ ZR,Rice(Rough)-CBT(Floor Trading Only),RR20_I0R.TXT,ECBOT,ZR,@RR,FUT,USD
 ZS,Soybeans (Floor+Electronic Combined)-CBT,S2_0_I0R.TXT,ECBOT,ZS,@S,FUT,USD
 CHF,Swiss Franc-CME-(Floor+Electronic Combined),SF_0_I0R.TXT,GLOBEX,CHF,@SF,FUT,USD
 SI,Silver-COMEX(Floor+Electronic Combined),SI20_I0R.TXT,NYMEX,SI,QSI,FUT,USD
-SM,Soybean Meal-CBT (Floor+Electronic Combined),SM20_I0R.TXT,ECBOT,SM,@SM,FUT,USD
+SM,Soybean Meal-CBT (Floor+Electronic Combined),SM20_I0R.TXT,ECBOT,ZM,@SM,FUT,USD
 ZT,T-Note-U.S.  2 Yr (Floor+Electronic Combined)-CBT,TU21410R.TXT,ECBOT,ZT,@TU,FUT,USD
 ZN,T-Note-U.S. 10 Yr w/Prj A-CBT(Floor+Electronic Combined),TY_1410R.TXT,ECBOT,ZN,@TY,FUT,USD
 ZB,T-Bond-U.S.-CBT(Floor+Electronic Combined),US_1410R.TXT,ECBOT,ZB,@US,FUT,USD

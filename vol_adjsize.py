@@ -503,10 +503,10 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='Voting11'
+c2system='Voting6'
 #for system files
 c2system_macro=c2system
-c2system_mini='Voting11'
+c2system_mini='Voting6'
 c2system_micro='Voting3'
 c2safef=1
 #use LastSEA for seasonality in c2
@@ -527,8 +527,8 @@ if lastDate > sigDate:
     voting5Cols=['Voting','Voting2','Voting3','Voting14']
     #voting6Cols = ['0.5LastSIG','prevACT','AntiSEA']
     voting6Cols =['Voting','Voting2','Voting3','Voting15']
-    voting7Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA']
-    voting8Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
+    voting7Cols = ['RiskOn','0.5LastSIG','AntiSEA']
+    voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols=['RiskOn','AntiPrevACT','AntiSEA']
     voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
@@ -692,8 +692,8 @@ else:
     voting5Cols=['Voting','Voting2','Voting3','Voting14']
     #voting6Cols = ['0.5LastSIG','prevACT','AntiSEA']
     voting6Cols =['Voting','Voting2','Voting3','Voting15']
-    voting7Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA']
-    voting8Cols = ['RiskOn','Anti0.75LastSIG','AntiPrevACT']
+    voting7Cols = ['RiskOn','0.5LastSIG','AntiSEA']
+    voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
     #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
     voting9Cols= ['RiskOn','AntiPrevACT','AntiSEA']
     voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']

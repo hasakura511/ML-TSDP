@@ -12,7 +12,9 @@ from seitoolz.signal import get_model_pos
 from time import gmtime, strftime, time, localtime, sleep
 import logging
 
-def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant, c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype, ibsubmit, iblocalsym=''):
+def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
+                    c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype,\
+                    ibsubmit, iblocalsym=''):
     system_pos=model_pos.loc[system]
    
     logging.info('==============')

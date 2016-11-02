@@ -22,7 +22,7 @@ start_time = time.time()
 debug=False
 signalPath = './data/signals/'
 dataPath = './data/from_IB/'
-
+systemFile='D:/ML-TSDP/data/systems/system_micro_test.csv'
 if len(sys.argv) > 1 and sys.argv[1] == '1':
     debug=True
 
@@ -180,7 +180,7 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
     #place_iborder(ibaction, ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
 
 #subprocess.call(['python', 'get_ibpos.py'])       
-systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'.csv')
+systemdata=pd.read_csv(systemFile)
 systemdata=systemdata.reset_index()
 start_systems(systemdata)
 get_executions(systemdata)

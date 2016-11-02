@@ -112,21 +112,44 @@ def get_symbols():
 def get_contracts():
     symList=dict()
     contract_list=Instrument.objects.filter(broker='ib')
+    print 'Getting Contracts'
     for dbcontract in contract_list:
+        symbol=dbcontract.sym
+        if dbcontract.secType=='CASH':
+            symbol=dbcontract.sym + dbcontract.cur
+        print 'Found',symbol
+        contract=Contract()
+        contract.symbol = str(symbol) 
+        contract.secType = str(dbcontract.secType)
+        contract.exchange = str(dbcontract.exch)
+        contract.currency = str(dbcontract.cur)
+        contract.expiry=str(dbcontract.expiry)
+        #contract.strike=str(dbcontract.contractMonth)
+        contract.localSymbol= str(dbcontract.local_sym)
+        symList[symbol]=contract
+          
+    return symList.values()  
+
+def lookup_contract(symbol):
+    contract_list=Instrument.objects.filter(broker='ib').filter(sym=symbol)
+    if contract_list and len(contract_list) > 0:
+        dbcontract=contract_list[0]
         contract = Contract()
         symbol=dbcontract.sym
         if dbcontract.secType=='CASH':
             symbol=dbcontract.sym + dbcontract.cur
         
-        contract.symbol = symbol
-        contract.secType = dbcontract.secType
-        contract.exchange = dbcontract.exch
-        contract.currency = dbcontract.cur
-        contract.localSymbol= dbcontract.local_sym
-        symList[symbol]=contract
-          
-    return symList.values()  
-
+        contract.symbol = str(symbol) 
+        contract.secType = str(dbcontract.secType)
+        contract.exchange = str(dbcontract.exch)
+        contract.currency = str(dbcontract.cur)
+        contract.expiry=str(dbcontract.expiry)
+        #contract.strike=float(dbcontract.contractMonth)
+        contract.localSymbol= str(dbcontract.local_sym)
+        return contract
+    else:
+        return None
+    
 
 def get_cash_contracts():
     symList=dict()
@@ -137,11 +160,13 @@ def get_cash_contracts():
         if dbcontract.secType=='CASH':
             symbol=dbcontract.sym + dbcontract.cur
         
-        contract.symbol = symbol
-        contract.secType = dbcontract.secType
-        contract.exchange = dbcontract.exch
-        contract.currency = dbcontract.cur
-        contract.localSymbol= dbcontract.local_sym
+        contract.symbol = str(symbol) 
+        contract.secType = str(dbcontract.secType)
+        contract.exchange = str(dbcontract.exch)
+        contract.currency = str(dbcontract.cur)
+        contract.expiry=str(dbcontract.expiry)
+        #contract.strike=float(dbcontract.contractMonth)
+        contract.localSymbol= str(dbcontract.local_sym)
         symList[symbol]=contract
           
     return symList.values()  

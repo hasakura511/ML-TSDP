@@ -1,0 +1,15 @@
+
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="treasure panel panel-default">
+        <div class="panel-heading">
+            <h3 class = "panel-title">{{ treasure.CSIsym }}</h3>
+        </div>
+        <div class="panel-body">
+            <div class="treasure-photo-detail">
+            <img src="{{ treasure.img_url }}">
+        <p>{{ treasure.Desc }}</p>
+        <p>{{ treasure.Multiplier }}</p>
+{% endblock %}

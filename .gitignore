@@ -15,4 +15,4 @@ bars/
 *.sw[opqrstuvwxyz]
 .DS_Store
 
-django/feed/migrations/*
+feed/migrations/*

@@ -529,14 +529,18 @@ class IBWrapper(EWrapper):
         
         if int(tickType)==0:
             ## bid
+            if not fbidsize.has_key(TickerId):
+                fbidsize[TickerId]=0
             marketdata[0]=int(size)
-            fbidsize[TickerId]=int(size)
+            fbidsize[TickerId]+=int(size)
         elif int(tickType)==3:
             ## ask
+            if not fasksize.has_key(TickerId):
+                fasksize[TickerId]=0
             marketdata[1]=int(size)
-            fasksize[TickerId]=int(size)
+            fasksize[TickerId]+=int(size)
         
-        print "tickSize: ASKSIZE: " + str(marketdata[0]) +  " BIDSIZE: " + str(marketdata[1])
+        print "tickSize: tickerID",TickerId,"ASKSIZE: " + str(marketdata[0]) +  " BIDSIZE: " + str(marketdata[1])
 
    
     def tickPrice(self, TickerId, tickType, price, canAutoExecute):
@@ -901,7 +905,7 @@ class IBclient(object):
         except Exception as e:
             logging.error("get_IB_market_data", exc_info=True)   
         
-    def get_realtimebar(self, ibcontract, tickerid, whatToShow, data, filename):
+    def get_realtimebar(self, ibcontract, tickerid, whatToShow, data, filename, sec_interval=5):
         try:
             """
             Returns a list of snapshotted prices, averaged over 'real time bars'
@@ -942,7 +946,7 @@ class IBclient(object):
             tws.reqRealTimeBars(
                     tickerid,                                          # tickerId,
                     ibcontract,                                   # contract,
-                    5, 
+                    sec_interval, 
                     whatToShow,
                     0)
         

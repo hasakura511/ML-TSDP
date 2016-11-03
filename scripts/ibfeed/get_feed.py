@@ -46,9 +46,9 @@ def get_feed(contract, tickerId):
     global tickerid, client, callback
     client.get_IB_market_data(contract, tickerId)
 
-def get_realtimebar(ibcontract, tickerid, whatToShow, data, filename):
+def get_realtimebar(ibcontract, tickerid, whatToShow, data, filename, sec_interval):
     global client, callback
-    client.get_realtimebar(ibcontract, tickerid, whatToShow, data, filename)
+    client.get_realtimebar(ibcontract, tickerid, whatToShow, data, filename, sec_interval)
 
 def proc_history(tickerId, contract, data, barSizeSetting):
     global client, callback
@@ -185,11 +185,27 @@ def get_bar_realtime(dataPath, whatToShow, barSizeSetting, symfilter=''):
         if len(symfilter) == 0 or pair == symfilter:
             logging.info(  'Subscribing Realtime Bar to ' + pair  )
             interval=duration_to_interval(barSizeSetting)
+            secs=interval_to_sec(interval)
             filename=dataPath+interval+'_'+pair+'.csv'
             tickerId=get_TickerId(pair)          
-            get_realtimebar(contract, tickerId, whatToShow, prepData[pair], filename)
+            get_realtimebar(contract, tickerId, whatToShow, prepData[pair], filename, secs)
             logging.info( 'Done Subscribing to ' + pair  )
-            
+
+def interval_to_sec(interval):
+    if interval== '1 min':
+        return 60
+    
+    elif interval== '30m':
+        return 1800
+    
+    elif interval=='10m':
+        return 600
+    
+    elif interval=='1h':
+        return 3600
+    
+    elif interval=='1d':
+        return 86400           
                        
 def duration_to_interval(duration):
     if duration == '1 min':

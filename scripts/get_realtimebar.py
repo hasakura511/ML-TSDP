@@ -38,7 +38,7 @@ dataPath = '../data/from_IB/'
 minDataPoints = 10000
 durationStr='1 D'
 barSizeSetting='1 min'
-whatToShow='MIDPOINT'
+whatToShow='MID'
 
 def get_ibfeed(contract, tickerId):
 	feed.get_feed(contract, tickerId)

@@ -1,40 +1,40 @@
-csisym,Desc,filename,ibexch,ibsym,c2sym,ibtype,ibcur
-AC,Ethanol-CBT,AC_0_I0R.TXT,ECBOT,AC,@AC,FUT,USD
-AUD,Australian Dollar-CME(Floor+Electronic Combined),AD_0_I0R.TXT,GLOBEX,AUD,@AD,FUT,USD
-ZL,Soybean Oil-CBT (Floor+Electronic Combined),BO20_I0R.TXT,ECBOT,ZL,@BO,FUT,USD
-GBP,British Pound-CME(Floor+Electronic Combined),BP_0_I0R.TXT,GLOBEX,GBP,@BP,FUT,USD
-ZC,Corn-CBT (Floor+Electronic Combined),C2_0_I0R.TXT,ECBOT,ZC,@C,FUT,USD
-CAD,Canadian Dollar-CME(Floor+Electronic Combined),CD_0_I0R.TXT,GLOBEX,CAD,@CD,FUT,USD
-CL,Crude Oil-Light-NYMEX(Floor+Electronic Combined),CL20_I0R.TXT,NYMEX,CL,QCL,FUT,USD
-EUR,Euro(Floor+Electronic Combined)-CME,CU_0_I0R.TXT,GLOBEX,EUR,@EU,FUT,USD
-GE,Eurodollar-3 Mth-CME-Globex(Floor+Electronic Combined),ED_0_I0R.TXT,GLOBEX,GE,@ED,FUT,USD
-EMD,Index-S&P Midcap 400 E-mini-CME,EMD0_I0R.TXT,GLOBEX,EMD,@EMD,FUT,USD
-ES,S&P 500 Index-E-mini-CME,ES_0_I0R.TXT,GLOBEX,ES,@ES,FUT,USD
-GF,Cattle-Feeder-CME(Floor+Electronic Combined),FC_0_I0R.TXT,GLOBEX,GF,@GF,FUT,USD
-ZF,T-Note-U.S. 5 Yr-CBT(Floor+Electronic Combined),FV_1410R.TXT,ECBOT,ZF,@FV,FUT,USD
-GC,Gold-COMEX(Floor+Electronic Combined),GC20_I0R.TXT,NYMEX,GC,QGC,FUT,USD
-HG,CopperHG-COMEX(Floor+Electronic Combined),HG20_I0R.TXT,NYMEX,HG,QHG,FUT,USD
-HO,Heating Oil #2-NYMEX(Floor+Electronic Combined),HO20_I0R.TXT,NYMEX,HO,QHO,FUT,USD
-JPY,Japanese Yen-CME(Floor+Electronic Combined),JY_0_I0R.TXT,GLOBEX,JPY,@JY,FUT,USD
-LB,Lumber-CME (Floor+Electronic Combined),LB_0_I0R.TXT,GLOBEX,LB,@LB,FUT,USD
-LE,Cattle-Live(Floor+Electronic Combined)-CME,LC_0_I0R.TXT,GLOBEX,LE,@LE,FUT,USD
-HE,Hogs-Lean(Floor+Electronic Combined)-CME,LH_0_I0R.TXT,GLOBEX,HE,@HE,FUT,USD
-MXP,Mexican Peso(Floor+Electronic Combined)-CME,MP_0_I0R.TXT,GLOBEX,MXP,@PX,FUT,USD
-NZD,New Zealand Dollar-CME(Floor+Electronic Combined),NE_0_I0R.TXT,GLOBEX,NZD,@NE,FUT,USD
-NG,Natural Gas-Henry Hub-NYMEX(Floor+Electronic Combined),NG20_I0R.TXT,NYMEX,NG,QNG,FUT,USD
-NIY,Nikkei 225 Index-Yen(Floor+Electronic Combined)-CME,NIY0_I0R.TXT,GLOBEX,NIY,@NKD,FUT,JPY
-NQ,Nasdaq 100 Index-E-mini,NQ_0_I0R.TXT,GLOBEX,NQ,@NQ,FUT,USD
-ZO,Oats-CBT (Floor+Electronic Combined),O2_0_I0R.TXT,ECBOT,ZO,@O,FUT,USD
-PA,Palladium-NYMEX(Floor+Electronic Combined),PA20_I0R.TXT,NYMEX,PA,QPA,FUT,USD
-PL,Platinum-NYMEX(Floor+Electronic Combined),PL20_I0R.TXT,NYMEX,PL,QPL,FUT,USD
-RB,Gasoline-Reformulated Blendstock(Combined)-NYMEX,RB20_I0R.TXT,NYMEX,RB,QRB,FUT,USD
-ZR,Rice(Rough)-CBT(Floor Trading Only),RR20_I0R.TXT,ECBOT,ZR,@RR,FUT,USD
-ZS,Soybeans (Floor+Electronic Combined)-CBT,S2_0_I0R.TXT,ECBOT,ZS,@S,FUT,USD
-CHF,Swiss Franc-CME-(Floor+Electronic Combined),SF_0_I0R.TXT,GLOBEX,CHF,@SF,FUT,USD
-SI,Silver-COMEX(Floor+Electronic Combined),SI20_I0R.TXT,NYMEX,SI,QSI,FUT,USD
-SM,Soybean Meal-CBT (Floor+Electronic Combined),SM20_I0R.TXT,ECBOT,ZM,@SM,FUT,USD
-ZT,T-Note-U.S.  2 Yr (Floor+Electronic Combined)-CBT,TU21410R.TXT,ECBOT,ZT,@TU,FUT,USD
-ZN,T-Note-U.S. 10 Yr w/Prj A-CBT(Floor+Electronic Combined),TY_1410R.TXT,ECBOT,ZN,@TY,FUT,USD
-ZB,T-Bond-U.S.-CBT(Floor+Electronic Combined),US_1410R.TXT,ECBOT,ZB,@US,FUT,USD
-ZW,Wheat-CBT (Floor+Electronic Combined),W2_0_I0R.TXT,ECBOT,ZW,@W,FUT,USD
-YM,DJIA Mini $5 Index-CBT,YM_0_I0R.TXT,ECBOT,YM,@YM,FUT,USD
+csisym,Desc,filename,ibexch,ibsym,c2sym,ibtype,ibcur,multiplier
+AC,Ethanol-CBT,AC_0_I0R.TXT,ECBOT,AC,@AC,FUT,USD,29000
+AUD,Australian Dollar-CME(Floor+Electronic Combined),AD_0_I0R.TXT,GLOBEX,AUD,@AD,FUT,USD,100000
+ZL,Soybean Oil-CBT (Floor+Electronic Combined),BO20_I0R.TXT,ECBOT,ZL,@BO,FUT,USD,600
+GBP,British Pound-CME(Floor+Electronic Combined),BP_0_I0R.TXT,GLOBEX,GBP,@BP,FUT,USD,62500
+ZC,Corn-CBT (Floor+Electronic Combined),C2_0_I0R.TXT,ECBOT,ZC,@C,FUT,USD,50
+CAD,Canadian Dollar-CME(Floor+Electronic Combined),CD_0_I0R.TXT,GLOBEX,CAD,@CD,FUT,USD,100000
+CL,Crude Oil-Light-NYMEX(Floor+Electronic Combined),CL20_I0R.TXT,NYMEX,CL,QCL,FUT,USD,1000
+EUR,Euro(Floor+Electronic Combined)-CME,CU_0_I0R.TXT,GLOBEX,EUR,@EU,FUT,USD,125000
+GE,Eurodollar-3 Mth-CME-Globex(Floor+Electronic Combined),ED_0_I0R.TXT,GLOBEX,GE,@ED,FUT,USD,2500
+EMD,Index-S&P Midcap 400 E-mini-CME,EMD0_I0R.TXT,GLOBEX,EMD,@EMD,FUT,USD,100
+ES,S&P 500 Index-E-mini-CME,ES_0_I0R.TXT,GLOBEX,ES,@ES,FUT,USD,50
+GF,Cattle-Feeder-CME(Floor+Electronic Combined),FC_0_I0R.TXT,GLOBEX,GF,@GF,FUT,USD,500
+ZF,T-Note-U.S. 5 Yr-CBT(Floor+Electronic Combined),FV_1410R.TXT,ECBOT,ZF,@FV,FUT,USD,1000
+GC,Gold-COMEX(Floor+Electronic Combined),GC20_I0R.TXT,NYMEX,GC,QGC,FUT,USD,100
+HG,CopperHG-COMEX(Floor+Electronic Combined),HG20_I0R.TXT,NYMEX,HG,QHG,FUT,USD,250
+HO,Heating Oil #2-NYMEX(Floor+Electronic Combined),HO20_I0R.TXT,NYMEX,HO,QHO,FUT,USD,42000
+JPY,Japanese Yen-CME(Floor+Electronic Combined),JY_0_I0R.TXT,GLOBEX,JPY,@JY,FUT,USD,12500000
+LB,Lumber-CME (Floor+Electronic Combined),LB_0_I0R.TXT,GLOBEX,LB,@LB,FUT,USD,110
+LE,Cattle-Live(Floor+Electronic Combined)-CME,LC_0_I0R.TXT,GLOBEX,LE,@LE,FUT,USD,400
+HE,Hogs-Lean(Floor+Electronic Combined)-CME,LH_0_I0R.TXT,GLOBEX,HE,@HE,FUT,USD,400
+MXP,Mexican Peso(Floor+Electronic Combined)-CME,MP_0_I0R.TXT,GLOBEX,MXP,@PX,FUT,USD,500000
+NZD,New Zealand Dollar-CME(Floor+Electronic Combined),NE_0_I0R.TXT,GLOBEX,NZD,@NE,FUT,USD,100000
+NG,Natural Gas-Henry Hub-NYMEX(Floor+Electronic Combined),NG20_I0R.TXT,NYMEX,NG,QNG,FUT,USD,10000
+NIY,Nikkei 225 Index-Yen(Floor+Electronic Combined)-CME,NIY0_I0R.TXT,GLOBEX,NIY,@NKD,FUT,JPY,500
+NQ,Nasdaq 100 Index-E-mini,NQ_0_I0R.TXT,GLOBEX,NQ,@NQ,FUT,USD,20
+ZO,Oats-CBT (Floor+Electronic Combined),O2_0_I0R.TXT,ECBOT,ZO,@O,FUT,USD,50
+PA,Palladium-NYMEX(Floor+Electronic Combined),PA20_I0R.TXT,NYMEX,PA,QPA,FUT,USD,100
+PL,Platinum-NYMEX(Floor+Electronic Combined),PL20_I0R.TXT,NYMEX,PL,QPL,FUT,USD,50
+RB,Gasoline-Reformulated Blendstock(Combined)-NYMEX,RB20_I0R.TXT,NYMEX,RB,QRB,FUT,USD,42000
+ZR,Rice(Rough)-CBT(Floor Trading Only),RR20_I0R.TXT,ECBOT,ZR,@RR,FUT,USD,2000
+ZS,Soybeans (Floor+Electronic Combined)-CBT,S2_0_I0R.TXT,ECBOT,ZS,@S,FUT,USD,50
+CHF,Swiss Franc-CME-(Floor+Electronic Combined),SF_0_I0R.TXT,GLOBEX,CHF,@SF,FUT,USD,125000
+SI,Silver-COMEX(Floor+Electronic Combined),SI20_I0R.TXT,NYMEX,SI,QSI,FUT,USD,5000
+SM,Soybean Meal-CBT (Floor+Electronic Combined),SM20_I0R.TXT,ECBOT,ZM,@SM,FUT,USD,5000
+ZT,T-Note-U.S.  2 Yr (Floor+Electronic Combined)-CBT,TU21410R.TXT,ECBOT,ZT,@TU,FUT,USD,2000
+ZN,T-Note-U.S. 10 Yr w/Prj A-CBT(Floor+Electronic Combined),TY_1410R.TXT,ECBOT,ZN,@TY,FUT,USD,1000
+ZB,T-Bond-U.S.-CBT(Floor+Electronic Combined),US_1410R.TXT,ECBOT,ZB,@US,FUT,USD,1000
+ZW,Wheat-CBT (Floor+Electronic Combined),W2_0_I0R.TXT,ECBOT,ZW,@W,FUT,USD,50
+YM,DJIA Mini $5 Index-CBT,YM_0_I0R.TXT,ECBOT,YM,@YM,FUT,USD,5

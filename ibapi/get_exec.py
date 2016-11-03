@@ -19,16 +19,17 @@ def get_exec_open():
     (account_value, portfolio_data)=client.get_IB_account_data()    
     return (account_value, portfolio_data)
 
-def get_ibpos():
+def get_ibpos(**kwargs):
+    portfolioPath='./data/portfolio/'
     (account_value, portfolio_data)=get_exec_open()
     data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
     dataSet=pd.DataFrame(data)
     #dataSet=dataSet.sort_values(by='times')
     dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
     dataSet=dataSet.set_index(['symbol'])
-    dataSet.to_csv('./data/portfolio/ib_portfolio.csv')
+    dataSet.to_csv(portfolioPath+'ib_portfolio.csv')
     accountSet=pd.DataFrame(account_value)
-    accountSet.to_csv('./data/portfolio/ib_account_value.csv', index=False)
+    accountSet.to_csv(portfolioPath+'ib_account_value.csv', index=False)
     #
     return dataSet
 

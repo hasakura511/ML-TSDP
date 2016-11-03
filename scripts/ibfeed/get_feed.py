@@ -168,6 +168,21 @@ def get_bar_feed(dataPath, whatToShow, barSizeSetting, symfilter=''):
         if contract.secType == 'CASH':
             pair = contract.symbol + contract.currency
         if len(symfilter) == 0 or pair == symfilter:
+            logging.info(  'Subscribing Feed to ' + pair  )
+            interval=duration_to_interval(barSizeSetting)
+            filename=dataPath+interval+'_'+pair+'.csv'
+            tickerId=get_TickerId(pair)          
+            get_feed(contract, tickerId)
+            logging.info( 'Done Subscribing to ' + pair  )
+
+def get_bar_realtime(dataPath, whatToShow, barSizeSetting, symfilter=''):
+    global prepData
+    symbols=bars.get_contracts()
+    for contract in symbols:
+        pair=contract.symbol
+        if contract.secType == 'CASH':
+            pair = contract.symbol + contract.currency
+        if len(symfilter) == 0 or pair == symfilter:
             logging.info(  'Subscribing Realtime Bar to ' + pair  )
             interval=duration_to_interval(barSizeSetting)
             filename=dataPath+interval+'_'+pair+'.csv'
@@ -175,6 +190,7 @@ def get_bar_feed(dataPath, whatToShow, barSizeSetting, symfilter=''):
             get_realtimebar(contract, tickerId, whatToShow, prepData[pair], filename)
             logging.info( 'Done Subscribing to ' + pair  )
             
+                       
 def duration_to_interval(duration):
     if duration == '1 min':
         return '1 min'

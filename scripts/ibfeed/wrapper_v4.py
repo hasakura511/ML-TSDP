@@ -439,6 +439,9 @@ class IBWrapper(EWrapper):
         global fbid
         marketdata=self.data_tickdata[TickerId]
 
+        
+        print 'tickString: tickerID',TickerId,' field', field,'value',value
+        
         ## update string ticks
 
         tickType=field
@@ -471,6 +474,8 @@ class IBWrapper(EWrapper):
         global bidaskSaveDate
         marketdata=self.data_tickdata[TickerId]
 
+        print 'tickGeneric: tickerID',TickerId,'ticktype',tickType,'value',value
+        
         ## update generic ticks
 
         if int(tickType)==0:
@@ -531,7 +536,7 @@ class IBWrapper(EWrapper):
             marketdata[1]=int(size)
             fasksize[TickerId]=int(size)
         
-        #print "tickSize: ASKSIZE: " + str(marketdata[0]) +  " BIDSIZE: " + str(marketdata[1])
+        print "tickSize: ASKSIZE: " + str(marketdata[0]) +  " BIDSIZE: " + str(marketdata[1])
 
    
     def tickPrice(self, TickerId, tickType, price, canAutoExecute):
@@ -541,6 +546,7 @@ class IBWrapper(EWrapper):
         global bidaskSaveDate
         marketdata=self.data_tickdata[TickerId]
         
+        print 'tickPrice: tickerID',TickerId,'ticktype',tickType,'price',price 
         if int(tickType)==1:
             ## bid
             marketdata[2]=float(price)
@@ -570,6 +576,8 @@ class IBWrapper(EWrapper):
         #print "tickPrice: ASK: " + str(marketdata[3]) +  " BID: " + str(marketdata[2])
 
     def updateMktDepth(self, id, position, operation, side, price, size):
+        print 'updateMktDepth: tickerID',id,'position',position,'operation',operation,'side',side,'price',price,'size',size 
+        
         """
         Only here for completeness - not required. Market depth is only available if you subscribe to L2 data.
         Since I don't I haven't managed to test this.

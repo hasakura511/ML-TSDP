@@ -235,38 +235,6 @@ def is_bar_date(dateStr, frequency):
             return True
         return False
         
-def proc_history(contract, histdata, frequency='30m'):
-    try:
-        global rtbar
-        global rtdict
-        global rtfile
-        global rtreqid
-        global tickerId
-        
-        dataPath='../data/from_IB/'
-        
-        symbol= contract.symbol
-        currency=contract.currency
-        instrument_id=symbol
-        if contract.secType == 'CASH':
-            symbol=symbol+currency
-        filename=dataPath+frequency+'_'+instrument_id+'.csv'
-        data=cache_bar_csv(instrument_id, filename, frequency)
-        
-        if not histdata == None and len(histdata.index) > 1:
-            reqId=rtreqid[instrument_id]
-            data = data.reset_index().set_index('date')
-            histdata=histdata.reset_index().set_index('date')
-            data = data.combine_first(histdata)
-            data=data.sort_index()
-            rtbar[reqId]=data
-            data.to_csv(filename)
-            
-        return data
-            
-    except Exception as e:
-        logging.error("get_hist_bars", exc_info=True)
-
 
 def compress_min_bar(instrument_id, histData, frequency='30m'):
     try:
@@ -483,13 +451,6 @@ def get_bar_history(datas, ylabel):
         logging.error("something bad happened", exc_info=True)
     return SST
     
-def feed_ohlc_from_csv(ticker):
-    dataSet=pd.read_csv('../data/from_IB/' + ticker  + '.csv', index_col='date')
-    return dataSet
-
-def bar_ohlc_from_csv(ticker):
-    dataSet=pd.read_csv('../data/bars/' + ticker + '.csv', index_col='date')
-    return dataSet
 
 def get_bar_start_date(dbcontract, frequency):
     feed_list=Feed.objects.filter(instrument_id=dbcontract.id).filter(frequency=frequency).order_by('date')[:1]
@@ -527,7 +488,15 @@ def get_bar(dbcontract):
     except Exception as e:
         logging.error("create_bars", exc_info=True)
         
-    
+
+def feed_ohlc_from_csv(ticker):
+    dataSet=pd.read_csv('../data/from_IB/' + ticker  + '.csv', index_col='date')
+    return dataSet
+
+def bar_ohlc_from_csv(ticker):
+    dataSet=pd.read_csv('../data/bars/' + ticker + '.csv', index_col='date')
+    return dataSet
+
 def bidask_to_csv(ticker, date, bid, ask):
     data=pd.DataFrame([[date, bid, ask]], columns=['date','Bid','Ask'])
     data=data.set_index('date')

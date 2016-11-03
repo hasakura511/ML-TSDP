@@ -213,7 +213,12 @@ def interval_to_ibhist_duration(interval):
 def get_bar_date(barSizeSetting, date):
         interval=duration_to_interval(barSizeSetting)
         timestamp = time.mktime(date.timetuple())
-        if interval == '30m':
+        if interval == '1 min':
+            date=datetime.datetime.fromtimestamp(
+                            int(timestamp)
+                        ).strftime('%Y%m%d  %H:%M:00') 
+                        
+        elif interval == '30m':
             mins=int(datetime.datetime.fromtimestamp(
                         int(timestamp)
                     ).strftime('%M'))

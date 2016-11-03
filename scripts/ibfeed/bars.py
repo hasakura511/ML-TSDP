@@ -51,10 +51,10 @@ rtfile={}
 rtreqid={}
 lastDate={}
 tickerId=1
-systemfile='./data/systems/system_consolidated.csv'
+systemfile='../data/systems/system_consolidated.csv'
 
 def get_bidask_list():
-    dataPath='./data/bidask/'
+    dataPath='../data/bidask/'
     files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
     baList=list()
     for file in files:
@@ -64,7 +64,7 @@ def get_bidask_list():
     return baList
 
 def get_btc_list():
-    dataPath='./data/from_IB/'
+    dataPath='../data/from_IB/'
     files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
     btcList=list()
     for file in files:
@@ -75,7 +75,7 @@ def get_btc_list():
     return btcList
 
 def get_btc_exch_list():
-    dataPath='./data/from_IB/'
+    dataPath='../data/from_IB/'
     files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
     btcList=list()
     for file in files:
@@ -109,26 +109,62 @@ def get_symbols():
        
     return symList.keys()
 
+def dbcontract_to_ibcontract(dbcontract):
+        symbol=str(dbcontract.sym)
+        localSym=str(dbcontract.local_sym)
+        if str(dbcontract.secType)=='CASH':
+            symbol=str(dbcontract.sym) + str(dbcontract.cur)
+
+        if str(dbcontract.secType)=='FUT':
+            year=str(dbcontract.contractMonth)[0:4]
+            mon=str(dbcontract.contractMonth)[4:6]
+            addsym=''
+            
+            if int(mon) == 1:
+                addSym='F'
+            if int(mon) == 2:
+                addSym='G'
+            if int(mon) == 3:
+                addSym='H'
+            if int(mon) == 4:
+                addSym='J'
+            if int(mon) == 5:
+                addSym='K'
+            if int(mon) == 6:
+                addSym='M'
+            if int(mon) == 7:
+                addSym='N'
+            if int(mon) == 8:
+                addSym='Q'
+            if int(mon) == 9:
+                addSym='U'
+            if int(mon) == 10:
+                addSym='V'
+            if int(mon) == 11:
+                addSym='X'
+            if int(mon) == 12:
+                addsym='Z'
+            addsym+=year[3:4]
+            localSym+=addsym
+        print 'Found',symbol
+        contract=Contract()
+        contract.symbol = str(symbol) 
+        contract.secType = str(dbcontract.secType)
+        contract.exchange = str(dbcontract.exch)
+        contract.primaryExchange=str(dbcontract.exch)
+        contract.currency = str(dbcontract.cur)
+        contract.expiry=str(dbcontract.expiry)
+        #contract.strike= # Strike Price
+        contract.localSymbol= localSym
+        return contract
+    
 def get_contracts():
     symList=dict()
     contract_list=Instrument.objects.filter(broker='ib')
     print 'Getting Contracts'
     for dbcontract in contract_list:
-        symbol=dbcontract.sym
-        if dbcontract.secType=='CASH':
-            symbol=dbcontract.sym + dbcontract.cur
-        print 'Found',symbol
-        contract=Contract()
-        contract.symbol = str(symbol) 
-        contract.secType = str(dbcontract.secType)
-        #contract.exchange = str(dbcontract.exch)
-        contract.primaryExchange=str(dbcontract.exch)
-        contract.currency = str(dbcontract.cur)
-        contract.expiry=str(dbcontract.expiry)
-        
-        #contract.strike=str(dbcontract.contractMonth)
-        contract.localSymbol= str(dbcontract.local_sym)
-        symList[symbol]=contract
+        contract=dbcontract_to_ibcontract(dbcontract)
+        symList[contract.localSymbol]=contract
           
     return symList.values()  
 
@@ -136,18 +172,7 @@ def lookup_contract(symbol):
     contract_list=Instrument.objects.filter(broker='ib').filter(sym=symbol)
     if contract_list and len(contract_list) > 0:
         dbcontract=contract_list[0]
-        contract = Contract()
-        symbol=dbcontract.sym
-        if dbcontract.secType=='CASH':
-            symbol=dbcontract.sym + dbcontract.cur
-        
-        contract.symbol = str(symbol) 
-        contract.secType = str(dbcontract.secType)
-        contract.exchange = str(dbcontract.exch)
-        contract.currency = str(dbcontract.cur)
-        contract.expiry=str(dbcontract.expiry)
-        #contract.strike=float(dbcontract.contractMonth)
-        contract.localSymbol= str(dbcontract.local_sym)
+        contract=dbcontract_to_ibcontract(dbcontract)
         return contract
     else:
         return None
@@ -157,19 +182,8 @@ def get_cash_contracts():
     symList=dict()
     contract_list=Instrument.objects.filter(broker='ib').filter(secType='CASH')
     for dbcontract in contract_list:
-        contract = Contract()
-        symbol=dbcontract.sym
-        if dbcontract.secType=='CASH':
-            symbol=dbcontract.sym + dbcontract.cur
-        
-        contract.symbol = str(symbol) 
-        contract.secType = str(dbcontract.secType)
-        contract.exchange = str(dbcontract.exch)
-        contract.currency = str(dbcontract.cur)
-        contract.expiry=str(dbcontract.expiry)
-        #contract.strike=float(dbcontract.contractMonth)
-        contract.localSymbol= str(dbcontract.local_sym)
-        symList[symbol]=contract
+        contract=dbcontract_to_ibcontract(dbcontract)
+        symList[contract.localSymbol]=contract
           
     return symList.values()  
 
@@ -179,7 +193,7 @@ def create_bars(currencyPairs, interval='30m'):
     try:
         global tickerId
         
-        dataPath='./data/from_IB/'
+        dataPath='../data/from_IB/'
         for pair in currencyPairs:
             filename=dataPath+interval+'_'+pair+'.csv'
             minFile=dataPath+'1 min'+'_'+pair+'.csv'
@@ -244,7 +258,7 @@ def proc_history(contract, histdata, interval='30m'):
         global rtreqid
         global tickerId
         
-        dataPath='./data/from_IB/'
+        dataPath='../data/from_IB/'
         
         symbol= contract.symbol
         currency=contract.currency
@@ -271,12 +285,12 @@ def proc_history(contract, histdata, interval='30m'):
 def update_bars(currencyPairs, interval='30m'):
     global tickerId
     global lastDate
-    dataPath='./data/from_IB/'
+    dataPath='../data/from_IB/'
     while 1:
         try:
             for pair in currencyPairs:
                 filename=dataPath+interval+'_'+pair+'.csv'
-                minFile='./data/bars/'+pair+'.csv'
+                minFile='../data/bars/'+pair+'.csv'
                 symbol = pair
                 if os.path.isfile(minFile):
                     data=pd.read_csv(minFile)
@@ -289,7 +303,7 @@ def update_bars(currencyPairs, interval='30m'):
                     
                     if not lastDate.has_key(symbol):
                         lastDate[symbol]=timestamp
-                        dataFile='./data/from_IB/1 min_'+pair+'.csv'
+                        dataFile='../data/from_IB/1 min_'+pair+'.csv'
                         if os.path.isfile(dataFile):
                             data=pd.read_csv(dataFile)
                             regentime=60
@@ -415,7 +429,7 @@ def compress_min_bar(pair, histData, filename, interval='30m'):
                 data.to_csv(filename)
                 
                 gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], pair]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-                gotbar.to_csv('./data/bars/' + interval + '_' + pair + '.csv')
+                gotbar.to_csv('../data/bars/' + interval + '_' + pair + '.csv')
             
             print "New Bar:   " + pair + " date:" + str(date) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) 
             data=data.reset_index().append(pd.DataFrame([[date, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
@@ -435,7 +449,7 @@ def get_last_bars(currencyPairs, ylabel, callback):
             returnData=False
             for ticker in currencyPairs:
                 pair=ticker
-                minFile='./data/bars/'+pair+'.csv'
+                minFile='../data/bars/'+pair+'.csv'
                 symbol = pair
                 date=''
                 
@@ -522,11 +536,11 @@ def get_bar_history(datas, ylabel):
     return SST
     
 def feed_ohlc_from_csv(ticker):
-    dataSet=pd.read_csv('./data/from_IB/' + ticker  + '.csv', index_col='Date')
+    dataSet=pd.read_csv('../data/from_IB/' + ticker  + '.csv', index_col='Date')
     return dataSet
 
 def bar_ohlc_from_csv(ticker):
-    dataSet=pd.read_csv('./data/bars/' + ticker + '.csv', index_col='Date')
+    dataSet=pd.read_csv('../data/bars/' + ticker + '.csv', index_col='Date')
     return dataSet
 
 def get_bar(ticker):
@@ -535,7 +549,7 @@ def get_bar(ticker):
 def bidask_to_csv(ticker, date, bid, ask):
     data=pd.DataFrame([[date, bid, ask]], columns=['Date','Bid','Ask'])
     data=data.set_index('Date')
-    data.to_csv('./data/bidask/' + ticker + '.csv')
+    data.to_csv('../data/bidask/' + ticker + '.csv')
     return data
 
 def get_ask(ticker):
@@ -547,8 +561,8 @@ def get_bid(ticker):
     return data['Bid']
     
 def bidask_from_csv(ticker):
-    if os.path.isfile('./data/bidask/' + ticker + '.csv'):
-        dataSet=pd.read_csv('./data/bidask/' + ticker + '.csv', index_col='Date')
+    if os.path.isfile('../data/bidask/' + ticker + '.csv'):
+        dataSet=pd.read_csv('../data/bidask/' + ticker + '.csv', index_col='Date')
         return dataSet
     else:
         return pd.DataFrame([['20160101 01:01:01',-1,-1]], columns=['Date','Bid','Ask']).set_index('Date')

@@ -34,22 +34,21 @@ Created on Tue Mar 08 20:10:29 2016
 """
 logging.basicConfig(filename='/logs/get_feed_1m.log',level=logging.DEBUG)
 
-dataPath = '../data/from_IB/'
 minDataPoints = 10000
 durationStr='1 D'
 barSizeSetting='1 min'
-whatToShow='MIDPOINT'
+whatToShow='TRADES'
 
 def get_ibfeed(contract, tickerId):
 	feed.get_feed(contract, tickerId)
 
         
-def check_bar():
+def check_bar(symFilter):
     finished=False
     time.sleep(120)
     while not finished:
         try:
-            has_feed=feed.check_bar(barSizeSetting)
+            has_feed=feed.check_bar(barSizeSetting,symFilter)
             if not has_feed:
                 logging.error('Feed not being received - restarting')
                 feed.reconnect_ib()
@@ -59,22 +58,27 @@ def check_bar():
         except Exception as e:
             logging.error("check_bar", exc_info=True)
             
-def start_feed():
-    feed.cache_bar_csv(dataPath, barSizeSetting)
+def start_feed(symFilter):
+    #feed.cache_bar_csv(dataPath, barSizeSetting)
     
     threads = []
-    feed_thread = threading.Thread(target=feed.get_bar_feed, args=[dataPath, whatToShow, barSizeSetting])
+    feed_thread = threading.Thread(target=feed.get_bar_feed, args=[whatToShow, barSizeSetting,symFilter])
     feed_thread.daemon=True
     threads.append(feed_thread)
     
-    hist_thread = threading.Thread(target=feed.get_bar_hist, args=[dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting])
-    hist_thread.daemon=True
-    threads.append(hist_thread)
+    #hist_thread = threading.Thread(target=feed.get_bar_hist, args=[whatToShow, minDataPoints, durationStr, barSizeSetting,symFilter])
+    #hist_thread.daemon=True
+    #threads.append(hist_thread)
     
     [t.start() for t in threads]
     #[t.join() for t in threads]
 
+if len(sys.argv) > 1:
+    symFilter=sys.argv[1]
+    start_feed(symFilter)
+    check_bar(symFilter)
+else:
+    print 'The syntax is: get_feed.py SI'
+    exit()
 
-start_feed()
-check_bar()
 

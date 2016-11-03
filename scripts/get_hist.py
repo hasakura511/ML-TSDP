@@ -32,21 +32,16 @@ Created on Tue Mar 08 20:10:29 2016
 """
 logging.basicConfig(filename='/logs/get_hist.log',level=logging.DEBUG)
 
-dataPath = '..//data/from_IB/'
 
 def start_feed(symFilter, durationStr, barSizeSetting, whatToShow, minDataPoints):
-    ibfeed.cache_bar_csv(dataPath, barSizeSetting, symFilter)
     
     if durationStr == '1 min':
         threads = []
-        feed_thread = threading.Thread(target=ibfeed.get_bar_feed, args=[dataPath, whatToShow, barSizeSetting, symFilter])
+        feed_thread = threading.Thread(target=ibfeed.get_bar_realtime, args=[ whatToShow, barSizeSetting, symFilter])
         feed_thread.daemon=True
         threads.append(feed_thread)
         [t.start() for t in threads]
-    data=ibfeed.get_bar_hist(dataPath, whatToShow, minDataPoints, durationStr, barSizeSetting, symFilter)
-    interval=ibfeed.duration_to_interval(barSizeSetting)
-    filename=dataPath+interval+'_'+symFilter+'.csv'
-    data.to_csv(filename)
+    data=ibfeed.get_bar_hist(whatToShow, minDataPoints, durationStr, barSizeSetting, symFilter)
     #[t.join() for t in threads]
 
 if len(sys.argv) > 3:
@@ -57,5 +52,6 @@ if len(sys.argv) > 3:
     start_feed(symFilter, durationStr, barSizeSetting, whatToShow, minDataPoints)
 else:
     print 'The syntax is: get_hist.py EURAUD 30m 10000'
-
+    exit()
+    
 

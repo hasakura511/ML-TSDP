@@ -14,7 +14,49 @@ from pytz import timezone
 from datetime import datetime as dt
 from tzlocal import get_localzone
 import re
+import psycopg2
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import sys
+import random
+import copy
+import pytz
+from pytz import timezone
+from datetime import datetime as dt
+from tzlocal import get_localzone
+from sklearn.feature_selection import SelectKBest, chi2, f_regression, RFECV
+import os
+from dateutil.parser import parse
+import logging
+import re
 
+sys.path.append("../../")
+sys.path.append("../")
+
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tsdp.settings")
+import tsdp
+import tsdp.settings as settings
+from feed.models import *
+import datetime
+import time
+
+import csv
+
+try:
+    dbstr="dbname=" + settings.DATABASES['default']['NAME'] + \
+          " user=" + settings.DATABASES['default']['USER'] + \
+          " password=" + settings.DATABASES['default']['PASSWORD'] + \
+          " host=" + settings.DATABASES['default']['HOST'] + \
+          " port=" + settings.DATABASES['default']['PORT']
+          
+    c=psycopg2.connect(dbstr)
+except:
+    print "I am unable to connect to the database."
+    
+    
 MAX_WAIT_SECONDS=10
 MEANINGLESS_NUMBER=1729
 
@@ -32,7 +74,7 @@ fbid={}
 fbidsize={}
 fdict={}
 
-bidaskSaveDate=dict()
+bidaskSavedate=dict()
 
 def return_IB_connection_info():
     """
@@ -106,7 +148,7 @@ class IBWrapper(EWrapper):
         execdetails['commission']=commission.commission
         execdetails['commission_currency']=commission.currency
         execdetails['realized_PnL']=commission.realizedPNL
-        execdetails['yield_redemption_date']=commission.yieldRedemptionDate
+        execdetails['yield_redemption_date']=commission.yieldRedemptiondate
         filldata[execid]=execdetails
         self.data_fill_data=filldata
         
@@ -159,7 +201,7 @@ class IBWrapper(EWrapper):
             avgprice=execution.price
             cumQty=execution.cumQty
             clientid=execution.clientId
-            symbol=contract.symbol
+            symbol=contract.localSymbol
             expiry=contract.expiry
             side=execution.side
             #commission=execution.commission
@@ -212,7 +254,7 @@ class IBWrapper(EWrapper):
         """
         
         ## Get a selection of interesting things about the order
-        orderdetails=dict(symbol=contract.symbol , expiry=contract.expiry,  qty=int(order.totalQuantity) , 
+        orderdetails=dict(symbol=contract.localSymbol , expiry=contract.expiry,  qty=int(order.totalQuantity) , 
                        side=order.action , orderid=int(orderID), clientid=order.clientId ) 
         
         self.add_order_data(orderdetails)
@@ -305,7 +347,7 @@ class IBWrapper(EWrapper):
 
         portfolio_structure=self.data_portfoliodata
                 
-        portfolio_structure.append((contract.symbol, contract.expiry, position, marketPrice, marketValue, averageCost, 
+        portfolio_structure.append((contract.localSymbol, contract.expiry, position, marketPrice, marketValue, averageCost, 
                                     unrealizedPNL, realizedPNL, accountName, contract.currency))
 
     ## account value
@@ -346,6 +388,9 @@ class IBWrapper(EWrapper):
             global rtdict
             global rthist
             global rtbarsize
+            global rtfile
+            
+            dbcontract=rtfile[reqId]
             barSizeSetting=rtbarsize[reqId]
             sym=rtdict[reqId]
             data=rtbar[reqId]
@@ -355,15 +400,51 @@ class IBWrapper(EWrapper):
                 data=data.sort_index()
             else:
                 if self.is_bar_date(str(date), barSizeSetting):
-                    data.loc[date] = [open,high,low,close,volume]
+                    quote={ 'date':date,
+                           'open':open,
+                           'high':high,
+                           'low':low,
+                           'close':close,
+                           'volume':volume,
+                           'wap':WAP,
+                        }
+                    self.saveQuote(dbcontract, quote)
+                        
+                    data.loc[date] = [open,high,low,close,volume,WAP]
                 else:  
-                    print "Skipping Off Date History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+                    print "Skipping Off date History %s - open: %s, high: %s, low: %s, close: %s, volume: %d"\
                               % (date, open, high, low, close, volume)
             rtbar[reqId]=data
         
         except Exception as e:
             logging.error("historicalData", exc_info=True)
-
+            
+    def saveQuote(self, dbcontract, quote):
+        if quote.has_key('wap'):
+            print ' wap:' + str(quote['wap']) 
+        
+        eastern=timezone('US/Eastern')
+        date=parse(quote['date']).replace(tzinfo=eastern)   
+        bar_list=Feed.objects.filter(date=date).filter(instrument_id=dbcontract.id).filter(frequency=dbcontract.frequency)
+        print "close Bar: " + str(dbcontract.id) + " freq ",dbcontract.frequency, " date:" + str(quote['date']) + "date ",date, " open: " + str(quote['open']) + " high:"  + str(quote['high']) + ' low:' + str(quote['low']) + ' close: ' + str(quote['close']) + ' volume:' + str(quote['volume']) 
+        if bar_list and len(bar_list) > 0:
+            bar=bar_list[0]
+            print "found bar id",bar.id
+        else:
+            bar=Feed()
+            bar.instrument_id=dbcontract.id
+            bar.frequency=dbcontract.frequency
+            bar.date=date
+        bar.open= quote['open']
+        bar.high= quote['high']
+        bar.low= quote['low']
+        bar.close= quote['close']
+        bar.volume= quote['volume']
+        if quote.has_key('wap'):
+            bar.wap=quote['wap']
+        bar.save()
+        print "saving bar id",bar.id
+        
     def realtimeBar(self, reqId, time, open, high, low, close, volume, wap, count):
         try:
             """
@@ -379,7 +460,7 @@ class IBWrapper(EWrapper):
             global rtfile
             sym=rtdict[reqId]
             data=rtbar[reqId]
-            filename=rtfile[reqId]
+            dbcontract=rtfile[reqId]
             
             eastern=timezone('US/Eastern')
             
@@ -390,30 +471,35 @@ class IBWrapper(EWrapper):
             
             if time in data.index:
                    
-                quote=data.loc[time]
-                if high > quote['High']:
-                    quote['High']=high
-                if low < quote['Low']:
-                    quote['Low']=low
-                quote['Close']=close
-                quote['Volume']=quote['Volume'] + volume
-                if quote['Volume'] < 0:
-                    quote['Volume'] = 0 
+                quote=data.loc[time].copy()
+                if high > quote['high']:
+                    quote['high']=high
+                if low < quote['low']:
+                    quote['low']=low
+                quote['close']=close
+                quote['volume']=quote['volume'] + volume
+                if quote['volume'] < 0:
+                    quote['volume'] = 0 
+                if wap:
+                    quote['wap']=wap
+                else:
+                    quote['wap']=0
                 data.loc[time]=quote
-                #print "Update Bar: " + sym + " date:" + str(time) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
+                #print "Update Bar: " + sym + " date:" + str(time) + "open: " + str(quote['open']) + " high:"  + str(quote['high']) + ' low:' + str(quote['low']) + ' close: ' + str(quote['close']) + ' volume:' + str(quote['volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
                 
             else:
                 if len(data.index) > 1:
+                    
                     data=data.sort_index()          
-                    data.to_csv(filename)
                     
-                    quote=data.reset_index().iloc[-1]
-                    print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
+                    quote=data.reset_index().iloc[-1].copy()
+                    self.saveQuote(dbcontract, quote)
+                    print "close Bar: " + sym + " date:" + str(quote['date']) + " open: " + str(quote['open']) + " high:"  + str(quote['high']) + ' low:' + str(quote['low']) + ' close: ' + str(quote['close']) + ' volume:' + str(quote['volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
                     
-                    gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], sym]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-                    gotbar.to_csv('./data/bars/' + sym + '.csv')
+                    #gotbar=pd.DataFrame([[quote['date'], quote['open'], quote['high'], quote['low'], quote['close'], quote['volume'], sym]], columns=['date','open','high','low','close','volume','Symbol']).set_index('date')
+                    #gotbar.to_csv('./data/bars/' + sym + '.csv')
                 print "New Bar:   " + sym + " date:" + str(time) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
-                data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
+                data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume, wap]], columns=['date','open','high','low','close','volume','wap'])).set_index('date')
                 
                 
             rtbar[reqId]=data
@@ -471,7 +557,7 @@ class IBWrapper(EWrapper):
         global fbidsize
         global fask
         global fbid
-        global bidaskSaveDate
+        global bidaskSavedate
         marketdata=self.data_tickdata[TickerId]
 
         print 'tickGeneric: tickerID',TickerId,'ticktype',tickType,'value',value
@@ -498,23 +584,23 @@ class IBWrapper(EWrapper):
             global rtdict
             sym=rtdict[TickerId]
             
-            if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) > 5:
+            if not bidaskSavedate.has_key(sym) or (int(time.time()) - bidaskSavedate[sym]) > 5:
                 if fbid.has_key(TickerId) and fask.has_key(TickerId):
                     print "tickGeneric SYM: " + sym + " ", fbid[TickerId], fask[TickerId]
-                    bidaskSaveDate[sym]=int(time.time())
+                    bidaskSavedate[sym]=int(time.time())
                 
                     eastern=timezone('US/Eastern')
-                    nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
+                    nowdate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
                     if fbid.has_key(TickerId) > 0 and fask[TickerId] > 0:
-                        self.bidask_to_csv(sym, nowDate, fbid[TickerId], fask[TickerId])
+                        self.bidask_to_csv(sym, nowdate, fbid[TickerId], fask[TickerId])
                 
         except Exception as e:
             logging.error("tickGeneric", exc_info=True)
         
         
     def bidask_to_csv(self, ticker, date, bid, ask):
-        data=pd.DataFrame([[date, bid, ask]], columns=['Date','Bid','Ask'])
-        data=data.set_index('Date')
+        data=pd.DataFrame([[date, bid, ask]], columns=['date','Bid','Ask'])
+        data=data.set_index('date')
         if bid > 0 and ask > 0:
             data.to_csv('./data/bidask/' + ticker + '.csv')
         return data
@@ -547,7 +633,7 @@ class IBWrapper(EWrapper):
         ## update ticks of the form new price
         global fask
         global fbid
-        global bidaskSaveDate
+        global bidaskSavedate
         marketdata=self.data_tickdata[TickerId]
         
         print 'tickPrice: tickerID',TickerId,'ticktype',tickType,'price',price 
@@ -563,17 +649,17 @@ class IBWrapper(EWrapper):
             global rtdict
             sym=rtdict[TickerId]
            
-            if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) > 5:
+            if not bidaskSavedate.has_key(sym) or (int(time.time()) - bidaskSavedate[sym]) > 5:
                 if fbid.has_key(TickerId) and fask.has_key(TickerId):
-                    bidaskSaveDate[sym]=int(time.time())
-                    print "tickPrice SYM: " + sym + " ", fbid[TickerId], fask[TickerId], " Timer: ",(int(time.time()) - bidaskSaveDate[sym])
+                    bidaskSavedate[sym]=int(time.time())
+                    print "tickPrice SYM: " + sym + " ", fbid[TickerId], fask[TickerId], " Timer: ",(int(time.time()) - bidaskSavedate[sym])
                     
                 
                     eastern=timezone('US/Eastern')
-                    nowDate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
+                    nowdate=datetime.datetime.now(get_localzone()).astimezone(eastern).strftime('%Y%m%d %H:%M:%S') 
                     
                     if fbid.has_key(TickerId) > 0 and fask[TickerId] > 0:
-                        self.bidask_to_csv(sym, nowDate, fbid[TickerId], fask[TickerId])
+                        self.bidask_to_csv(sym, nowdate, fbid[TickerId], fask[TickerId])
                     
         except Exception as e:
             logging.error("tickPrice", exc_info=True)
@@ -748,7 +834,7 @@ class IBclient(object):
         self.cb.init_error()
                 
         start_time=time.time()
-        self.tws.reqAllOpenOrders()
+        self.tws.reqAllopenOrders()
         iserror=False
         finished=False
         
@@ -872,7 +958,7 @@ class IBclient(object):
             return fbid[tickerid]
         else:
             return -1
-    def get_IB_market_data(self, ibcontract, tickerid=999):     
+    def get_IB_market_data(self, ibcontract, tickerid, dbcontract):     
         try:
             """
             Returns granular market data
@@ -884,10 +970,11 @@ class IBclient(object):
             ## initialise the tuple
             global fdict
             global rtdict
-            symname=ibcontract.symbol
+            global rtfile
+            symname=ibcontract.localSymbol
             if ibcontract.secType == 'CASH':
-                symname=ibcontract.symbol + ibcontract.currency
-            
+                symname=ibcontract.localSymbol + ibcontract.currency
+            rtfile[tickerid]=dbcontract            
             fdict[symname]=tickerid
             rtdict[tickerid]=symname
             self.cb.init_tickdata(tickerid)
@@ -905,7 +992,7 @@ class IBclient(object):
         except Exception as e:
             logging.error("get_IB_market_data", exc_info=True)   
         
-    def get_realtimebar(self, ibcontract, tickerid, whatToShow, data, filename, sec_interval=5):
+    def get_realtimebar(self, ibcontract, tickerid, whatToShow, dbcontract, sec_interval=5):
         try:
             """
             Returns a list of snapshotted prices, averaged over 'real time bars'
@@ -913,6 +1000,8 @@ class IBclient(object):
             tws is a result of calling IBConnector()
             
             """
+            
+            data = pd.DataFrame({}, columns=['date','open','high','low','close','volume','wap']).set_index('date')
             
             tws=self.tws
             
@@ -927,18 +1016,18 @@ class IBclient(object):
             
             finished=False
             pricevalue=[]
-            symName=ibcontract.symbol
+            symName=ibcontract.localSymbol
             if ibcontract.secType == 'CASH':
-                symName=ibcontract.symbol + ibcontract.currency
+                symName=ibcontract.localSymbol + ibcontract.currency
             
             rtreqid[symName]=tickerid
             rtdict[tickerid]=symName
-            rtfile[tickerid]=filename
+            rtfile[tickerid]=dbcontract
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
             
             contract=ibcontract
-            logging.info("\nRequesting Real Time data for " + contract.symbol + " " + contract.currency + " " + contract.exchange + " " + contract.secType)
+            logging.info("\nRequesting Real Time data for " + contract.localSymbol + " " + contract.currency + " " + contract.exchange + " " + contract.secType)
         
             # Request current price in 5 second increments
             # It turns out this is the only way to do it (can't get any other increments)
@@ -946,7 +1035,7 @@ class IBclient(object):
             tws.reqRealTimeBars(
                     tickerid,                                          # tickerId,
                     ibcontract,                                   # contract,
-                    sec_interval, 
+                    5, 
                     whatToShow,
                     0)
         
@@ -958,21 +1047,25 @@ class IBclient(object):
         except Exception as e:
             logging.error("get_realtimebar", exc_info=True)   
         
-    def get_history(self, date, contract, whatToShow, data,filename,tickerid, minDataPoints, durationStr, barSizeSetting):
+    def get_history(self, date, contract, whatToShow, dbcontract,tickerid, minDataPoints, durationStr, barSizeSetting):
         try:
+            data = pd.DataFrame({}, columns=['date','open','high','low','close','volume','wap']).set_index('date')
+            
             WAIT_TIME=60
             global rtbar
             global rtdict
             global rthist
             global rtreqid
             global rtbarsize
-
-            rtdict[tickerid]=contract.symbol
-            ticker = contract.symbol
+            global rtfile
+            rtdict[tickerid]=contract.localSymbol
+            ticker = contract.localSymbol
             rtbarsize[tickerid]=barSizeSetting
+            rtfile[tickerid]=dbcontract
+            
             if contract.secType =='CASH':
-                rtdict[tickerid]=contract.symbol + contract.currency
-                ticker=contract.symbol + contract.currency
+                rtdict[tickerid]=contract.localSymbol + contract.currency
+                ticker=contract.localSymbol + contract.currency
             
             if tickerid not in rtbar:
                 rtbar[tickerid]=data
@@ -981,20 +1074,20 @@ class IBclient(object):
 
             rtreqid[ticker]=tickerid
             
-            logging.info("Req ID: " + str(tickerid) + " Requesting historical data End Date: " + date + " for " + contract.symbol + " " + contract.currency + " " + contract.exchange + " " + contract.secType)
+            logging.info("Req ID: " + str(tickerid) + " Requesting historical data End date: " + date + " for " + contract.localSymbol + " " + contract.currency + " " + contract.exchange + " " + contract.secType)
         
             # Request some historical data.
             rthist[tickerid]=Event()
-            #for endDateTime in getHistLoop:
+            #for enddateTime in getHistLoop:
             tws.reqHistoricalData(
                 tickerid,                                         # tickerId,
                 contract,                                   # contract,
-                date,                            #endDateTime
+                date,                            #enddateTime
                 durationStr,                                      # durationStr,
                 barSizeSetting,                                    # barSizeSetting,
                 whatToShow,                                   # whatToShow,
                 0,                                          # useRTH,
-                1                                         # formatDate
+                1                                         # formatdate
                 )
         
         
@@ -1015,7 +1108,7 @@ class IBclient(object):
         except Exception as e:
             logging.error("get_history", exc_info=True)   
         
-    def proc_history(self, tickerid, contract ,data,barSizeSetting):
+    def proc_history(self, tickerid, contract ,data,barSizeSetting, dbcontract):
         try:
             WAIT_TIME=60
             global rtbar
@@ -1023,10 +1116,13 @@ class IBclient(object):
             global rthist
             global rtreqid
             global rtbarsize
+            global rtfile
+            rtfile[tickerid]=dbcontract            
+            
             rtbarsize[tickerid]=barSizeSetting
             iserror=False
             
-            sym=contract.symbol 
+            sym=contract.localSymbol 
             currency=contract.currency
             
             if type == 'CASH':
@@ -1037,15 +1133,15 @@ class IBclient(object):
                 rtreqid[sym]=tickerid
                 
             if tickerid not in rtbar:
-                rtbar[tickerid]=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
+                rtbar[tickerid]=pd.DataFrame({}, columns=['date','open','high','low','close','volume']).set_index('date')
                     
             
             data=data.reset_index()
             for i in data.index:
                 tick=data.ix[i]
                 
-                self.cb.historicalData(tickerid, tick['Date'],tick['Open'],tick['High'],
-                                        tick['Low'],tick['Close'],tick['Volume'],-1,-1,-1)
+                self.cb.historicalData(tickerid, tick['date'],tick['open'],tick['high'],
+                                        tick['low'],tick['close'],tick['volume'],-1,-1,-1)
                
                      
             return rtbar[tickerid]

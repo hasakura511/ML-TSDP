@@ -9,12 +9,24 @@ sys.path.append("../")
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tsdp.settings")
 import tsdp
-import tsdp.settings as bsettings
+import tsdp.settings as settings
 from feed.models import *
 import datetime
-
+import psycopg2
 import csv
 
+
+try:
+    dbstr="dbname=" + settings.DATABASES['default']['NAME'] + \
+          " user=" + settings.DATABASES['default']['USER'] + \
+          " password=" + settings.DATABASES['default']['PASSWORD'] + \
+          " host=" + settings.DATABASES['default']['HOST'] + \
+          " port=" + settings.DATABASES['default']['PORT']
+          
+    c=psycopg2.connect(dbstr)
+except:
+    print "I am unable to connect to the database."
+    
 def output_csv(filename, queryset):
 
     opts = queryset.model._meta

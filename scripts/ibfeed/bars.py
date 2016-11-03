@@ -38,7 +38,7 @@ sys.path.append("../")
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tsdp.settings")
 import tsdp
-import tsdp.settings as bsettings
+import tsdp.settings as settings
 from feed.models import *
 import datetime
 
@@ -49,65 +49,40 @@ rtdict={}
 rthist={}
 rtfile={}
 rtreqid={}
-lastDate={}
+lastdate={}
+contract_to_dbcontract_dict=dict()
 tickerId=1
 systemfile='../data/systems/system_consolidated.csv'
+import psycopg2
 
-def get_bidask_list():
-    dataPath='../data/bidask/'
-    files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
-    baList=list()
-    for file in files:
-            inst=file.rsplit('.',1)[0]
-            baList.append(inst)
-            #print 'Found BidAsk: ' + inst
-    return baList
-
-def get_btc_list():
-    dataPath='../data/from_IB/'
-    files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
-    btcList=list()
-    for file in files:
-            if re.search(r'BTCUSD', file):
-                inst=file.rsplit('.',1)[0]
-                btcList.append(inst)
-                #print 'Found ' + inst
-    return btcList
-
-def get_btc_exch_list():
-    dataPath='../data/from_IB/'
-    files = [ f for f in os.listdir(dataPath) if os.path.isfile(os.path.join(dataPath,f)) ]
-    btcList=list()
-    for file in files:
-            if re.search(r'BTCUSD', file):
-                inst=file.rsplit('.',1)[0]
-                btcList.append(inst)
-                #print 'Found ' + inst
-    return btcList
+try:
+    dbstr="dbname=" + settings.DATABASES['default']['NAME'] + \
+          " user=" + settings.DATABASES['default']['USER'] + \
+          " password=" + settings.DATABASES['default']['PASSWORD'] + \
+          " host=" + settings.DATABASES['default']['HOST'] + \
+          " port=" + settings.DATABASES['default']['PORT']
+          
+    c=psycopg2.connect(dbstr)
+except:
+    print "I am unable to connect to the database."
     
+    
+def get_bidask_list():
+    bidask_list=BidAsk.objects.filter(date__gt=datetime.datetime.now()- datetime.timedelta(seconds=60)).order_by('-date')
+    seen=dict()
+    result=[]
+    for bidask in bidask_list:
+        if not seen.has_key(str(bidask.instrument_id)):
+            seen[bidask.instrument_id]=1
+            result.append(bidask.instrument_id)
+    return result
+
     
 def get_currencies():
     return get_symbols()
 
 
-def get_symbols():
-    symList=dict()
-    contract_list=Instrument.objects.filter(broker='ib')
-    for dbcontract in contract_list:
-        contract = Contract()
-        symbol=dbcontract.sym
-        if dbcontract.secType=='CASH':
-            symbol=dbcontract.sym + dbcontract.cur
-        
-        contract.symbol = symbol
-        contract.secType = dbcontract.secType
-        contract.exchange = dbcontract.exch
-        contract.currency = dbcontract.cur
-        contract.localSymbol= dbcontract.local_sym
-        symList[symbol]=contract
-          
-       
-    return symList.keys()
+
 
 def dbcontract_to_ibcontract(dbcontract):
         symbol=str(dbcontract.sym)
@@ -157,13 +132,17 @@ def dbcontract_to_ibcontract(dbcontract):
         #contract.strike= # Strike Price
         contract.localSymbol= localSym
         return contract
-    
+ 
+def contract_to_dbcontract(contract):
+    return contract_to_dbcontract_dict[contract.localSymbol]
+   
 def get_contracts():
     symList=dict()
     contract_list=Instrument.objects.filter(broker='ib')
     print 'Getting Contracts'
     for dbcontract in contract_list:
         contract=dbcontract_to_ibcontract(dbcontract)
+        contract_to_dbcontract_dict[contract.localSymbol]=dbcontract
         symList[contract.localSymbol]=contract
           
     return symList.values()  
@@ -173,6 +152,7 @@ def lookup_contract(symbol):
     if contract_list and len(contract_list) > 0:
         dbcontract=contract_list[0]
         contract=dbcontract_to_ibcontract(dbcontract)
+        contract_to_dbcontract_dict[contract.localSymbol]=dbcontract
         return contract
     else:
         return None
@@ -184,73 +164,78 @@ def get_cash_contracts():
     for dbcontract in contract_list:
         contract=dbcontract_to_ibcontract(dbcontract)
         symList[contract.localSymbol]=contract
+        contract_to_dbcontract_dict[contract.localSymbol]=dbcontract
           
     return symList.values()  
 
+def get_symbols():
+    symList=dict()
+    contract_list=Instrument.objects.filter(broker='ib')
+    for dbcontract in contract_list:
+        contract=dbcontract_to_ibcontract(dbcontract)
+        symList[contract.localSymbol]=contract
+        contract_to_dbcontract_dict[contract.localSymbol]=dbcontract
+    return symList.keys()
 
 
-def create_bars(currencyPairs, interval='30m'):
+def create_bars(instrument_ids, frequency):
     try:
         global tickerId
         
-        dataPath='../data/from_IB/'
-        for pair in currencyPairs:
-            filename=dataPath+interval+'_'+pair+'.csv'
-            minFile=dataPath+'1 min'+'_'+pair+'.csv'
-            symbol = pair
-            if os.path.isfile(minFile):
-                data=pd.read_csv(minFile)
-                for i in data.index:
-                    quote=data.ix[i]
-                    compress_min_bar(symbol, quote, filename, interval)
+        for instrument_id in instrument_ids:
+            sql = ' SELECT date, open, high, low, close, volume '
+            sql +=' FROM feed_feed '
+            sql +=' WHERE frequency=%s AND instrument_id=%s ' % (frequency, instrument_id)
+            sql +=' ORDER by date DESC '
+            data = pd.read_sql(sql, c, index_col='date')
+            for i in data.index:
+                quote=data.ix[i]
+                compress_min_bar(instrument_id, quote, frequency)
     except Exception as e:
         logging.error("create_bars", exc_info=True)
 
-def cache_bar_csv(pair, filename, interval):
+def cache_bar_csv(instrument_id,  frequency):
     global rtbar
     global rtdict
     global rtfile
     global rtreqid
     global tickerId
-    if not rtreqid.has_key(pair):
+    if not rtreqid.has_key(instrument_id):
             tickerId=tickerId+1
             reqId=tickerId
-            rtdict[reqId]=pair
-            rtfile[reqId]=filename
-            rtreqid[pair]=reqId
+            rtdict[reqId]=instrument_id
+            rtreqid[instrument_id]=reqId
             
-            print 'Caching: ' + pair
+            print 'Caching: ' + instrument_id
     else:
-            reqId=rtreqid[pair]
-    if not rtbar.has_key(reqId):
-        data=pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
+            reqId=rtreqid[instrument_id]
             
-        if os.path.isfile(filename):
-            procdata=pd.read_csv(filename)
-            for i in procdata.index:
-                rec=procdata.ix[i].copy()
-                if is_bar_date(rec['Date'], interval):
-                    data.loc[rec['Date']]=[rec['Open'],rec['High'],rec['Low'],rec['Close'],rec['Volume']]
-            data=data.sort_index()
+    if not rtbar.has_key(reqId):
+        
+        sql = ' SELECT date, open, high, low, close, volume '
+        sql +=' FROM feed_feed '
+        sql +=' WHERE frequency=%s AND instrument_id=%s ' % (frequency, instrument_id)
+        sql +=' ORDER by date DESC limit 1000'
+        data = pd.read_sql(sql, c, index_col='date')
             
         rtbar[reqId]=data
     return rtbar[reqId]
 
-def is_bar_date(dateStr, interval):
-        if interval == '30m':
+def is_bar_date(dateStr, frequency):
+        if frequency == '30m':
             if re.search(r'\d\d\d\d\d\d  \d\d:[03]0:00', dateStr):
                 return True
-        elif interval == '10m':
+        elif frequency == '10m':
             if re.search(r'\d\d\d\d\d\d  \d\d:[012345]0:00', dateStr):
                 return True
-        elif interval == '1h':
+        elif frequency == '1h':
             if re.search(r'\d\d\d\d\d\d  \d\d:00:00', dateStr):
                 return True
         else:
             return True
         return False
         
-def proc_history(contract, histdata, interval='30m'):
+def proc_history(contract, histdata, frequency='30m'):
     try:
         global rtbar
         global rtdict
@@ -262,16 +247,16 @@ def proc_history(contract, histdata, interval='30m'):
         
         symbol= contract.symbol
         currency=contract.currency
-        pair=symbol
+        instrument_id=symbol
         if contract.secType == 'CASH':
-            pair=symbol+currency
-        filename=dataPath+interval+'_'+pair+'.csv'
-        data=cache_bar_csv(pair, filename, interval)
+            symbol=symbol+currency
+        filename=dataPath+frequency+'_'+instrument_id+'.csv'
+        data=cache_bar_csv(instrument_id, filename, frequency)
         
         if not histdata == None and len(histdata.index) > 1:
-            reqId=rtreqid[pair]
-            data = data.reset_index().set_index('Date')
-            histdata=histdata.reset_index().set_index('Date')
+            reqId=rtreqid[instrument_id]
+            data = data.reset_index().set_index('date')
+            histdata=histdata.reset_index().set_index('date')
             data = data.combine_first(histdata)
             data=data.sort_index()
             rtbar[reqId]=data
@@ -282,55 +267,8 @@ def proc_history(contract, histdata, interval='30m'):
     except Exception as e:
         logging.error("get_hist_bars", exc_info=True)
 
-def update_bars(currencyPairs, interval='30m'):
-    global tickerId
-    global lastDate
-    dataPath='../data/from_IB/'
-    while 1:
-        try:
-            for pair in currencyPairs:
-                filename=dataPath+interval+'_'+pair+'.csv'
-                minFile='../data/bars/'+pair+'.csv'
-                symbol = pair
-                if os.path.isfile(minFile):
-                    data=pd.read_csv(minFile)
-                     
-                    eastern=timezone('US/Eastern')
-                    
-                    date=data.iloc[-1]['Date']
-                    date=parse(date).replace(tzinfo=eastern)
-                    timestamp = time.mktime(date.timetuple())
-                    
-                    if not lastDate.has_key(symbol):
-                        lastDate[symbol]=timestamp
-                        dataFile='../data/from_IB/1 min_'+pair+'.csv'
-                        if os.path.isfile(dataFile):
-                            data=pd.read_csv(dataFile)
-                            regentime=60
-                            if interval == '30m':
-                                regentime=60*6
-                            elif interval == '1h':
-                                regentime = 60 * 6
-                            elif interval == '10m':
-                                regentime == 60 * 6
-                            
-                            quote=data
-                            if quote.shape[0] > regentime:
-                                quote=quote.tail(regentime)
-                            for i in quote.index:
-                                data=quote.ix[i]
-                                compress_min_bar(symbol, data, filename, interval)
-                                       
-                    if lastDate[symbol] < timestamp:
-                        lastDate[symbol]=timestamp
-                        quote=data.iloc[-1]
-                        compress_min_bar(symbol, quote, filename, interval) 
-                        
-            time.sleep(20)
-        except Exception as e:
-            logging.error("update_bars", exc_info=True)
 
-def compress_min_bar(pair, histData, filename, interval='30m'):
+def compress_min_bar(instrument_id, histData, frequency='30m'):
     try:
         global pricevalue
         global finished
@@ -340,21 +278,21 @@ def compress_min_bar(pair, histData, filename, interval='30m'):
         global rtreqid
         global tickerId
         
-        data=cache_bar_csv(pair, filename,interval)
-        reqId=rtreqid[pair]
+        data=cache_bar_csv(instrument_id, frequency)
+        reqId=rtreqid[instrument_id]
         
-        date=histData['Date']
-        open=histData['Open']
-        high=histData['High']
-        low=histData['Low']
-        close=histData['Close']
-        volume=histData['Volume']
+        date=histData['date']
+        open=histData['open']
+        high=histData['high']
+        low=histData['low']
+        close=histData['close']
+        volume=histData['volume']
         
         eastern=timezone('US/Eastern')
         #timestamp
         date=parse(date).replace(tzinfo=eastern)
         timestamp = time.mktime(date.timetuple())
-        if interval == '30m':
+        if frequency == '30m':
             mins=int(datetime.datetime.fromtimestamp(
                         int(timestamp)
                     ).strftime('%M'))
@@ -367,7 +305,7 @@ def compress_min_bar(pair, histData, filename, interval='30m'):
                  date=datetime.datetime.fromtimestamp(
                             int(timestamp)
                         ).strftime('%Y%m%d  %H:30:00') 
-        elif interval == '10m':
+        elif frequency == '10m':
             mins=int(datetime.datetime.fromtimestamp(
                         int(timestamp)
                     ).strftime('%M'))
@@ -400,7 +338,7 @@ def compress_min_bar(pair, histData, filename, interval='30m'):
                  date=datetime.datetime.fromtimestamp(
                             int(timestamp)
                         ).strftime('%Y%m%d  %H:50:00') 
-        elif interval == '1h':
+        elif frequency == '1h':
             date=datetime.datetime.fromtimestamp(
                     int(timestamp)
                 ).strftime('%Y%m%d  %H:00:00') 
@@ -410,61 +348,71 @@ def compress_min_bar(pair, histData, filename, interval='30m'):
         if date in data.index:
                
             quote=data.loc[date].copy()
-            if high > quote['High']:
-                quote['High']=high
-            if low < quote['Low']:
-                quote['Low']=low
-            quote['Close']=close
-            quote['Volume']=quote['Volume'] + volume
-            if quote['Volume'] < 0:
-                quote['Volume'] = 0 
+            if high > quote['high']:
+                quote['high']=high
+            if low < quote['low']:
+                quote['low']=low
+            quote['close']=close
+            quote['volume']=quote['volume'] + volume
+            if quote['volume'] < 0:
+                quote['volume'] = 0 
             data.loc[date]=quote
-            #print "Update Bar: bar: sym: " + sym + " date:" + str(date) + "open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) 
+            #print "Update Bar: bar: sym: " + sym + " date:" + str(date) + "open: " + str(quote['open']) + " high:"  + str(quote['high']) + ' low:' + str(quote['low']) + ' close: ' + str(quote['close']) + ' volume:' + str(quote['volume']) 
                     
         else:
             if len(data.index) > 1:
                 data=data.sort_index()
                 quote=data.reset_index().iloc[-1]
-                print "Close Bar: " + pair + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) 
-                data.to_csv(filename)
+                print "close Bar: " + instrument_id + " date:" + str(quote['date']) + " open: " + str(quote['open']) + " high:"  + str(quote['high']) + ' low:' + str(quote['low']) + ' close: ' + str(quote['close']) + ' volume:' + str(quote['volume']) + ' wap:' + str(wap) 
+                bar_list=Feed.objects.filter(date=quote['date']).filter(instrument_id=instrument_id).filter(frequency=frequency)
+                if bar_list and len(bar_list) > 0:
+                    bar=bar_list[0]
+                else:
+                    bar=Feed()
+                    bar.instrument_id=instrument_id
+                    bar.frequency=frequency
+                    bar.date=quote['date']
+                bar.open= quote['open']
+                bar.high= quote['high']
+                bar.low= quote['low']
+                bar.close= quote['close']
+                bar.volume= quote['volume']
+                bar.save()
                 
-                gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], pair]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
-                gotbar.to_csv('../data/bars/' + interval + '_' + pair + '.csv')
-            
-            print "New Bar:   " + pair + " date:" + str(date) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) 
-            data=data.reset_index().append(pd.DataFrame([[date, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
+            print "New Bar:   " + instrument_id + " date:" + str(date) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) 
+            data=data.reset_index().append(pd.DataFrame([[date, open, high, low, close, volume]], columns=['date','open','high','low','close','volume'])).set_index('date')
             
         rtbar[reqId]=data
     except Exception as e:
         logging.error("compress_min_bars", exc_info=True)
         
-def get_last_bars(currencyPairs, ylabel, callback):
+def get_last_bars(instrument_ids, ylabel, callback):
     global tickerId
-    global lastDate
+    global lastdate
     while 1:
         try:
             
             SST=pd.DataFrame()
             symbols=list()
             returnData=False
-            for ticker in currencyPairs:
-                pair=ticker
-                minFile='../data/bars/'+pair+'.csv'
-                symbol = pair
+            for ticker in instrument_ids:
+                instrument_id=ticker
+                minFile='../data/bars/'+instrument_id+'.csv'
+                symbol = instrument_id
                 date=''
                 
                 if os.path.isfile(minFile):
                     dta=pd.read_csv(minFile)
-                    date=dta.iloc[-1]['Date']
+                    date=dta.iloc[-1]['date']
                     
                     eastern=timezone('US/Eastern')
                     date=parse(date).replace(tzinfo=eastern)
                     timestamp = time.mktime(date.timetuple())
                     #print 'loading',minFile,date,dta[ylabel],'\n'
                     data=pd.DataFrame()
-                    data['Date']=dta['Date']
+                    data['date']=dta['date']
                     data[symbol]=dta[ylabel]
-                    data=data.set_index('Date') 
+                    data=data.set_index('date') 
                     
                     
                     
@@ -475,20 +423,20 @@ def get_last_bars(currencyPairs, ylabel, callback):
                             SST = SST.combine_first(data).sort_index()
                             #SST=SST.join(data)
                         
-                        if not lastDate.has_key(symbol):
+                        if not lastdate.has_key(symbol):
                             returnData=True
-                            lastDate[symbol]=timestamp
+                            lastdate[symbol]=timestamp
                             symbols.append(symbol)
                                                    
-                        if lastDate[symbol] < timestamp:
+                        if lastdate[symbol] < timestamp:
                             returnData=True
-                            lastDate[symbol]=timestamp
+                            lastdate[symbol]=timestamp
                             symbols.append(symbol)
                         #print 'Shape: ' + str(len(SST.index)) 
                         
             if returnData:
                 data=SST.copy()
-                data=data.reset_index() #.set_index('Date')
+                data=data.reset_index() #.set_index('date')
                 data=data.fillna(method='pad')
                 callback(data, symbols)
             time.sleep(20)
@@ -504,30 +452,30 @@ def get_bar_history(datas, ylabel):
             #symbol=ticker[0:3]
             #currency=ticker[3:6]
             #print 'plot for ticker: ' + currency
-            #if ylabel == 'Close':
+            #if ylabel == 'close':
             #    diviser=dta.iloc[0][ylabel]
             #    dta[ylabel]=dta[ylabel] /diviser
                 
             #dta[ylabel].plot(label=ticker)   
             data=pd.DataFrame()
             
-            data['Date']=pd.to_datetime(dta[dta.columns[0]])
+            data['date']=pd.to_datetime(dta[dta.columns[0]])
             
             data[ticker]=dta[ylabel]
-            data=data.set_index('Date') 
+            data=data.set_index('date') 
             if len(SST.index.values) < 2:
                 SST=data
             else:
                 SST = SST.combine_first(data).sort_index()
         colnames=list()
         for col in SST.columns:
-            if col != 'Date' and col != 0:
+            if col != 'date' and col != 0:
                 colnames.append(col)
         data=SST
         data=data.reset_index()        
-        data['timestamp']= data['Date']
+        data['timestamp']= data['date']
         
-        data=data.set_index('Date')
+        data=data.set_index('date')
         data=data.fillna(method='pad')
         return data
         
@@ -536,19 +484,53 @@ def get_bar_history(datas, ylabel):
     return SST
     
 def feed_ohlc_from_csv(ticker):
-    dataSet=pd.read_csv('../data/from_IB/' + ticker  + '.csv', index_col='Date')
+    dataSet=pd.read_csv('../data/from_IB/' + ticker  + '.csv', index_col='date')
     return dataSet
 
 def bar_ohlc_from_csv(ticker):
-    dataSet=pd.read_csv('../data/bars/' + ticker + '.csv', index_col='Date')
+    dataSet=pd.read_csv('../data/bars/' + ticker + '.csv', index_col='date')
     return dataSet
 
-def get_bar(ticker):
-     return bar_ohlc_from_csv(ticker)
+def get_bar_start_date(dbcontract, frequency):
+    feed_list=Feed.objects.filter(instrument_id=dbcontract.id).filter(frequency=frequency).order_by('date')[:1]
+    if feed_list and len(feed_list) > 0:
+        return feed_list[0].date
+    
+def get_bar_end_date(dbcontract, frequency):
+    feed_list=Feed.objects.filter(instrument_id=dbcontract.id).filter(frequency=frequency).order_by('-date')[:1]
+    if feed_list and len(feed_list > 0):
+        return feed_list[0].date
+
+def get_bar_count(dbcontract, frequency, date):
+    eastern=timezone('US/Eastern')
+    
+    date=parse(date).replace(tzinfo=eastern)  
+    
+    feed_list=Feed.objects.filter(instrument_id=dbcontract.id).filter(frequency=frequency).filter(date__lte=date)
+    if feed_list:
+        print 'get bar count ',dbcontract.local_sym, ' freq ', frequency, ' date ', date, ' found ', len(feed_list)
+        return feed_list.count()
+    else:
+        return 0
+    
+def get_bar(dbcontract):
+    try:
+        global tickerId
+        
+        sql = ' SELECT date, open, high, low, close, volume, wap '
+        sql +=' FROM feed_feed '
+        sql +=' WHERE frequency=%s AND instrument_id=%s ' % (60, dbcontract.id)
+        sql +=' ORDER by date DESC '
+        data = pd.read_sql(sql, c, index_col='date')
+        return data
+    
+    except Exception as e:
+        logging.error("create_bars", exc_info=True)
+        
     
 def bidask_to_csv(ticker, date, bid, ask):
-    data=pd.DataFrame([[date, bid, ask]], columns=['Date','Bid','Ask'])
-    data=data.set_index('Date')
+    data=pd.DataFrame([[date, bid, ask]], columns=['date','Bid','Ask'])
+    data=data.set_index('date')
     data.to_csv('../data/bidask/' + ticker + '.csv')
     return data
 
@@ -562,7 +544,7 @@ def get_bid(ticker):
     
 def bidask_from_csv(ticker):
     if os.path.isfile('../data/bidask/' + ticker + '.csv'):
-        dataSet=pd.read_csv('../data/bidask/' + ticker + '.csv', index_col='Date')
+        dataSet=pd.read_csv('../data/bidask/' + ticker + '.csv', index_col='date')
         return dataSet
     else:
-        return pd.DataFrame([['20160101 01:01:01',-1,-1]], columns=['Date','Bid','Ask']).set_index('Date')
+        return pd.DataFrame([['20160101 01:01:01',-1,-1]], columns=['date','Bid','Ask']).set_index('date')

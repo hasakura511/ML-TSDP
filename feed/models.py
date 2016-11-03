@@ -14,6 +14,7 @@ import os
 import re
 import uuid
 import operator
+from pytz import timezone
 
 mytz = pytz.timezone('Asia/Seoul')
 
@@ -47,9 +48,12 @@ class Instrument(models.Model):
         return '%s' % self.name
 
     def save(self, *args, **kwargs):
+        eastern=timezone('US/Eastern')
+       
         if self.created_at == None:
-            self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+            self.created_at = datetime.now().replace(tzinfo=eastern)  
+        self.updated_at = datetime.now().replace(tzinfo=eastern) 
+        
         super(Instrument, self).save(*args, **kwargs)
 
 
@@ -81,6 +85,7 @@ class Feed(models.Model):
     low=models.FloatField(null=True)
     close=models.FloatField(null=True)
     volume=models.FloatField(null=True)
+    wap=models.FloatField(null=True)
     
     created_at = models.DateTimeField(
         auto_now_add=True, null=True, db_index=True)
@@ -92,10 +97,39 @@ class Feed(models.Model):
         return '%s' % self.name
 
     def save(self, *args, **kwargs):
+        eastern=timezone('US/Eastern')
+       
         if self.created_at == None:
-            self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+            self.created_at = datetime.now().replace(tzinfo=eastern)  
+        self.updated_at = datetime.now().replace(tzinfo=eastern)  
         super(Feed, self).save(*args, **kwargs)
+
+class BidAsk(models.Model):
+    instrument=models.ForeignKey(Instrument, db_index=True)
+    frequency=models.IntegerField(null=True, db_index=True)
+    ask=models.FloatField(null=True)
+    asksize=models.FloatField(null=True)
+    bid=models.FloatField(null=True)
+    bidsize=models.FloatField(null=True)
+    date=models.DateTimeField(
+        null=True, db_index=True)
+    
+    created_at = models.DateTimeField(
+        auto_now_add=True, null=True, db_index=True)
+    updated_at = models.DateTimeField(
+        auto_now_add=True, null=True, db_index=True)
+    crawl_source=models.CharField(max_length=200, default='', blank=True, null=True)
+
+    def __unicode__(self):
+        return '%s' % self.name
+
+    def save(self, *args, **kwargs):
+        eastern=timezone('US/Eastern')
+       
+        if self.created_at == None:
+            self.created_at = datetime.now().replace(tzinfo=eastern)  
+        self.updated_at = datetime.now().replace(tzinfo=eastern) 
+        super(BidAsk, self).save(*args, **kwargs)
 
 
 

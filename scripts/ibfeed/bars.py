@@ -121,9 +121,11 @@ def get_contracts():
         contract=Contract()
         contract.symbol = str(symbol) 
         contract.secType = str(dbcontract.secType)
-        contract.exchange = str(dbcontract.exch)
+        #contract.exchange = str(dbcontract.exch)
+        contract.primaryExchange=str(dbcontract.exch)
         contract.currency = str(dbcontract.cur)
         contract.expiry=str(dbcontract.expiry)
+        
         #contract.strike=str(dbcontract.contractMonth)
         contract.localSymbol= str(dbcontract.local_sym)
         symList[symbol]=contract

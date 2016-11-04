@@ -1,0 +1,8 @@
+pandas
+numpy
+matplotlib
+ta-lib
+swigibpy
+tzlocal
+sklearn
+

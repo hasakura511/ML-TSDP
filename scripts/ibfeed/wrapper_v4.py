@@ -420,13 +420,13 @@ class IBWrapper(EWrapper):
             logging.error("historicalData", exc_info=True)
             
     def saveQuote(self, dbcontract, quote):
-        if quote.has_key('wap'):
-            print ' wap:' + str(quote['wap']) 
+        #if quote.has_key('wap'):
+        #    print ' wap:' + str(quote['wap']) 
         
         eastern=timezone('US/Eastern')
         date=parse(quote['date']).replace(tzinfo=eastern)   
         bar_list=Feed.objects.filter(date=date).filter(instrument_id=dbcontract.id).filter(frequency=dbcontract.frequency)
-        print "close Bar: " + str(dbcontract.id) + " freq ",dbcontract.frequency, " date:" + str(quote['date']) + "date ",date, " open: " + str(quote['open']) + " high:"  + str(quote['high']) + ' low:' + str(quote['low']) + ' close: ' + str(quote['close']) + ' volume:' + str(quote['volume']) 
+        #print "close Bar: " + str(dbcontract.id) + " freq ",dbcontract.frequency, " date:" + str(quote['date']) + "date ",date, " open: " + str(quote['open']) + " high:"  + str(quote['high']) + ' low:' + str(quote['low']) + ' close: ' + str(quote['close']) + ' volume:' + str(quote['volume']) 
         if bar_list and len(bar_list) > 0:
             bar=bar_list[0]
             print "found bar id",bar.id
@@ -443,7 +443,7 @@ class IBWrapper(EWrapper):
         if quote.has_key('wap'):
             bar.wap=quote['wap']
         bar.save()
-        print "saving bar id",bar.id
+        #print "saving bar id",bar.id
         
     def realtimeBar(self, reqId, time, open, high, low, close, volume, wap, count):
         try:

@@ -93,10 +93,12 @@ def dbcontract_to_ibcontract(dbcontract):
         if str(dbcontract.secType)=='FUT':
             year=str(dbcontract.contractMonth)[0:4]
             mon=str(dbcontract.contractMonth)[4:6]
-            addsym=''
+            addSym=''
+            print symbol,year,int(mon)
             
             if int(mon) == 1:
                 addSym='F'
+                print addSym
             if int(mon) == 2:
                 addSym='G'
             if int(mon) == 3:
@@ -118,10 +120,11 @@ def dbcontract_to_ibcontract(dbcontract):
             if int(mon) == 11:
                 addSym='X'
             if int(mon) == 12:
-                addsym='Z'
-            addsym+=year[3:4]
-            localSym+=addsym
-        print 'Found',symbol
+                addSym='Z'
+            addSym+=year[3:4]
+            print addSym
+            localSym+=addSym
+        print 'Found',localSym
         contract=Contract()
         contract.symbol = str(symbol) 
         contract.secType = str(dbcontract.secType)
@@ -138,8 +141,19 @@ def contract_to_dbcontract(contract):
    
 def get_contracts():
     symList=dict()
-    contract_list=Instrument.objects.filter(broker='ib')
+    contract_list=Instrument.objects.filter(broker='ib').order_by('-sym')
     print 'Getting Contracts'
+    for dbcontract in contract_list:
+        contract=dbcontract_to_ibcontract(dbcontract)
+        contract_to_dbcontract_dict[contract.localSymbol]=dbcontract
+        symList[contract.localSymbol]=contract
+          
+    return symList.values()  
+
+def get_contract(sym):
+    symList=dict()
+    contract_list=Instrument.objects.filter(broker='ib').filter(sym=sym)
+    print 'Getting Contract', sym
     for dbcontract in contract_list:
         contract=dbcontract_to_ibcontract(dbcontract)
         contract_to_dbcontract_dict[contract.localSymbol]=dbcontract

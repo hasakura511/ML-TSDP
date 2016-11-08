@@ -30,7 +30,7 @@ def index(request):
     return render(request, 'index.html', context)
     
 def detail(request, treasure_id):
-    treasure = Dictionary.objects.get(id=treasure_id)
+    treasure = Dictionary.objects.get(CSIsym=treasure_id)
     context ={'treasure':treasure}
     return render(request, 'detail.html', context)
 

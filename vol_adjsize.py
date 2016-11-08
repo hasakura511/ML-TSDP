@@ -215,6 +215,7 @@ for i,contract in enumerate(marketList):
     data.index = pd.to_datetime(data.index,format='%Y%m%d')
     data.columns = ['Open','High','Low','Close','Volume','OI','R','S']
     data.index.name = 'Dates'
+    data.R = data.R.astype(int)
     atr=ATR2(data.High.values,data.Low.values,data.Close.values,lookback)
     pc=data.Close.pct_change()
     act=np.where(pc<0,-1,1)
@@ -503,11 +504,11 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='0.5LastSIG'
+c2system='Voting9'
 #for system files
 c2system_macro=c2system
-c2system_mini='0.5LastSIG'
-c2system_micro='Anti1LastSIG'
+c2system_mini='Voting9'
+c2system_micro='Voting3'
 c2safef=1
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\

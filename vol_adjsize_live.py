@@ -8,6 +8,8 @@ import time
 import math
 import numpy as np
 import pandas as pd
+import sqlite3
+from pandas.io import sql
 from os import listdir
 from os.path import isfile, join
 import io
@@ -31,6 +33,7 @@ from suztoolz.transform import ATR2
 import matplotlib.pyplot as plt
 import seaborn as sns
 from suztoolz.datatools.seasonalClass import seasonalClassifier
+
 start_time = time.time()
 version='v4'
 riskEquity=1000
@@ -54,10 +57,13 @@ c2id_micro=101359768
 #1 would 0 safef ==2 and double safef==1
 safefAdjustment=0
 
-if len(sys.argv)==1:
+if sys.argv[2]=='0':
     debug=True
+    
+    marketList=[sys.argv[1]]
     showPlots=False
-    dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
+    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dataPath='D:/ML-TSDP/data/csidata/v4futures4/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     
@@ -68,21 +74,26 @@ if len(sys.argv)==1:
     #test last=old
     dataPath2='D:/ML-TSDP/data/'
     
-    signalPath ='D:/ML-TSDP/data/signals/'
+    #signalPath ='D:/ML-TSDP/data/signals2/'
+    signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
     
 else:
     debug=False
+    
+    marketList=[sys.argv[1]]
     showPlots=False
-    dataPath='./data/csidata/v4futures2/'
+    dbPath='./data/futures.sqlite3'
+    dataPath='./data/csidata/v4futures4/'
     dataPath2='./data/'
     savePath='./data/'
-    signalPath = './data/signals/' 
-    signalSavePath = './data/signals/' 
+    signalPath = './data/signals2/' 
+    signalSavePath = './data/signals2/' 
     savePath2 = './data/results/'
     systemPath =  './data/systems/'
-
+    
+conn = sqlite3.connect(dbPath)
 fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
 for i,col in enumerate(fxRates.columns):
     if 'Last' in col:
@@ -199,10 +210,16 @@ months = {
                 12:'Z'
                 }
 
+def fixTypes(original, transformed):
+    for x in original.index:
+        #print x, type(series[x]),
+        transformed[x]=transformed[x].astype(type(original[x]))
+    return transformed
     
-    
-files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-marketList = [x.split('_')[0] for x in files]
+#files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+#marketList = [x.split('_')[0] for x in files]
+
+
 futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
 #futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 
@@ -264,7 +281,7 @@ for i,contract in enumerate(marketList):
 futuresDF.index.name = lastDate
 
 
-
+'''
 #save last seasonal signal for pnl processing
 #update correl charts
 if lastDate >oldDate:
@@ -326,20 +343,21 @@ if lastDate >oldDate:
             plt.show()
         plt.close()
 else:
-    print "Second Run.. skipping seasonalClassifier"
-    #second time load  "old" file for seasonality signals.
-    nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
-    futuresDF['vSTART']=futuresDF_old.vSTART
-    futuresDF['LastSEA']=futuresDF_old.LastSEA
-    futuresDF['LastSRUN']=futuresDF_old.LastSRUN
-    
-    for col in futuresDF_old.columns:
-        if col.startswith('SEA'):
-            futuresDF[col]=futuresDF_old[col]
-            
-    for col in futuresDF_old.columns:
-        if col.startswith('SRUN'):
-            futuresDF[col]=futuresDF_old[col]
+'''
+print "Second Run.. skipping seasonalClassifier"
+#second time load  "old" file for seasonality signals.
+nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
+futuresDF['vSTART']=futuresDF_old.vSTART
+futuresDF['LastSEA']=futuresDF_old.LastSEA
+futuresDF['LastSRUN']=futuresDF_old.LastSRUN
+
+for col in futuresDF_old.columns:
+    if col.startswith('SEA'):
+        futuresDF[col]=futuresDF_old[col]
+        
+for col in futuresDF_old.columns:
+    if col.startswith('SRUN'):
+        futuresDF[col]=futuresDF_old[col]
 
     
 for i2,contract in enumerate(marketList):
@@ -458,7 +476,7 @@ system_mini = pd.read_csv(systemPath+systemFilename2)
 system_micro = pd.read_csv(systemPath+systemFilename3)
 
 #macro
-for sys in system.System:
+for sys in [x for x in system.System if marketList[0] in x]:
     sym=sys.split('_')[1]
     idx=system[system.System==sys].index[0]
     print 'MACRO', sys, sym, system.ix[idx].c2qty,
@@ -470,7 +488,7 @@ system.Name=systemFilename.split('_')[1][:-4]
 system.c2id=c2id_macro
 
 #mini
-for sys in system_mini.System:
+for sys in [x for x in system_mini.System if marketList[0] in x]:
     sym=sys.split('_')[1]
     idx=system_mini[system_mini.System==sys].index[0]
     print 'MINI', sys, sym, system_mini.ix[idx].c2qty,
@@ -485,7 +503,7 @@ system_mini.Name=systemFilename2.split('_')[1][:-4]
 system_mini.c2id=c2id_mini
 
 #micro
-for sys in system_micro.System:
+for sys in [x for x in system_micro.System if marketList[0] in x]:
     sym=sys.split('_')[1]
     idx=system_micro[system_micro.System==sys].index[0]
     print 'MICRO', sys, sym, system_micro.ix[idx].c2qty,
@@ -504,11 +522,11 @@ system_micro.c2id=c2id_micro
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
 #for signal files
-c2system='0.5LastSIG'
+c2system='Anti1LastSIG'
 #for system files
 c2system_macro=c2system
-c2system_mini='0.5LastSIG'
-c2system_micro='RiskOff'
+c2system_mini='Anti1LastSIG'
+c2system_micro='Voting3'
 c2safef=1
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
@@ -517,7 +535,7 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom
                 'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
                 'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
 
-
+'''
 if lastDate > sigDate:
     AdjSEACols= ['RiskOn','AntiPrevACT','prevSEA']
     votingCols = ['Anti1LastSIG','prevACT','prevSEA']
@@ -684,156 +702,193 @@ if lastDate > sigDate:
         pd.read_csv(savePath+filename, index_col=0).append(totalsDF[cols]).to_csv(savePath+filename)
         
 else:
-    AdjSEACols= ['RiskOn','AntiPrevACT','LastSEA']
-    votingCols =['Anti1LastSIG','prevACT','LastSEA']
-    voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
-    voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
-    voting4Cols=['Voting','Voting2','Voting3','Voting8']
-    #voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
-    voting5Cols=['Voting','Voting2','Voting3','Voting14']
-    #voting6Cols = ['0.5LastSIG','prevACT','AntiSEA']
-    voting6Cols =['Voting','Voting2','Voting3','Voting15']
-    voting7Cols = ['RiskOn','0.5LastSIG','AntiSEA']
-    voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
-    #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
-    voting9Cols= ['RiskOn','AntiPrevACT','AntiSEA']
-    voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
-    voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
-    voting12Cols = ['1LastSIG','AntiPrevACT','AdjSEA']
-    voting13Cols = ['RiskOn','0.75LastSIG','AntiSEA','prevACT']
-    voting14Cols = ['RiskOn','Anti0.5LastSIG','LastSEA']
-    voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
-    
-    #voting9Cols=['Anti1LastSIG','AntiSEA']
-    #voting4Cols= votingCols+voting2Cols+voting3Cols
-    futuresDF['None']=0
-    futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
-    futuresDF['AntiCustom']=np.where(futuresDF.Custom<0,1,-1)
-    futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
-    futuresDF['Anti0.75LastSIG'] = np.where(futuresDF['0.75LastSIG']==1,-1,1)
-    futuresDF['Anti0.5LastSIG'] = np.where(futuresDF['0.5LastSIG']==1,-1,1)
-    futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
-    futuresDF['prevACT'] = futuresDF.ACT
-    futuresDF['AntiPrevACT'] = np.where(futuresDF.ACT==1,-1,1)
-    #futuresDF['AdjSEA'] = np.where(futuresDF.LastSRUN <0, futuresDF.LastSEA*-1, futuresDF.LastSEA)
-    futuresDF['AdjSEA']=np.where(futuresDF[AdjSEACols].sum(axis=1)<0,-1,1)
-    futuresDF['AntiAdjSEA'] = np.where(futuresDF.AdjSEA==1,-1,1)
-    futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
-    #futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
-    #futuresDF['Voting5']=np.where(futuresDF[voting5Cols].sum(axis=1)<0,-1,1)
-    #futuresDF['Voting6']=np.where(futuresDF[voting6Cols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting7']=np.where(futuresDF[voting7Cols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting8']=np.where(futuresDF[voting8Cols].sum(axis=1)<0,-1,1)
-    #futuresDF['Voting9']=np.where(futuresDF[voting9Cols].sum(axis=1)<0,-1,1)
-    v9=futuresDF[voting9Cols].sum(axis=1)
-    v9[v9<0]=-1
-    v9[v9>0]=1
-    futuresDF['Voting9']=v9.values
-    #futuresDF['Voting10']=np.where(futuresDF[voting10Cols].sum(axis=1)<0,-1,1)
-    v10=futuresDF[voting10Cols].sum(axis=1)
-    v10[v10<0]=-1
-    v10[v10>0]=1
-    futuresDF['Voting10']=v10.values
-    #futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
-    v11=futuresDF[voting11Cols].sum(axis=1)
-    v11[v11<0]=-1
-    v11[v11>0]=1
-    futuresDF['Voting11']=v11.values
-    #futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
-    v12=futuresDF[voting12Cols].sum(axis=1)
-    v12[v12<0]=-1
-    v12[v12>0]=1
-    futuresDF['Voting12']=v12.values
-    #futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
-    v13=futuresDF[voting13Cols].sum(axis=1)
-    v13[v13<0]=-1
-    v13[v13>0]=1
-    futuresDF['Voting13']=v13.values
-    #futuresDF['Voting14']=np.where(futuresDF[voting14Cols].sum(axis=1)<0,-1,1)
-    v14=futuresDF[voting14Cols].sum(axis=1)
-    v14[v14<0]=-1
-    v14[v14>0]=1
-    futuresDF['Voting14']=v14.values
-    futuresDF['Voting15']=np.where(futuresDF[voting15Cols].sum(axis=1)<0,-1,1)
-    #futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
-    
-    #Voting of Voting
-    v4=futuresDF[voting4Cols].sum(axis=1)
-    v4[v4<0]=-1
-    v4[v4>0]=1
-    futuresDF['Voting4']=v4.values
-    
-    v5=futuresDF[voting5Cols].sum(axis=1)
-    v5[v5<0]=-1
-    v5[v5>0]=1
-    futuresDF['Voting5']=v5.values 
-    
-    v6=futuresDF[voting6Cols].sum(axis=1)
-    v6[v6<0]=-1
-    v6[v6>0]=1
-    futuresDF['Voting6']=v6.values
-    
-    for group in futuresDF.groupby(by='group').Custom:
-        #print group
-        colors=np.array(['r']*group[1].shape[0])
-        mask = group[1]>0
-        colors[mask.values]='g'
-        Lper = round(sum(mask.values)/float(group[1].shape[0])*100,1)
-        title = 'Custom '+group[0] + ' L% '+ str(Lper)
-        group[1].plot(kind='barh', title =title, colors=colors)
-        plt.xlim(-1,1)
+'''
+AdjSEACols= ['RiskOn','AntiPrevACT','LastSEA']
+votingCols =['Anti1LastSIG','prevACT','LastSEA']
+voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
+voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
+voting4Cols=['Voting','Voting2','Voting3','Voting8']
+#voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
+voting5Cols=['Voting','Voting2','Voting3','Voting14']
+#voting6Cols = ['0.5LastSIG','prevACT','AntiSEA']
+voting6Cols =['Voting','Voting2','Voting3','Voting15']
+voting7Cols = ['RiskOn','0.5LastSIG','AntiSEA']
+voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
+#voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
+voting9Cols= ['RiskOn','AntiPrevACT','AntiSEA']
+voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
+voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
+voting12Cols = ['1LastSIG','AntiPrevACT','AdjSEA']
+voting13Cols = ['RiskOn','0.75LastSIG','AntiSEA','prevACT']
+voting14Cols = ['RiskOn','Anti0.5LastSIG','LastSEA']
+voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
 
-        filename='custom_'+group[0]+'.png'
-        plt.savefig(savePath2+filename, bbogroup_inches='tight')
-        print 'Saved '+savePath2+filename
-        
-        if debug:
-            plt.show()
-        plt.close()
-    
-    print 'Saving signals from', c2system
-    #1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR
-    #save signals to v4_ signal files for order processing
+#voting9Cols=['Anti1LastSIG','AntiSEA']
+#voting4Cols= votingCols+voting2Cols+voting3Cols
+futuresDF['None']=0
+futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
+futuresDF['AntiCustom']=np.where(futuresDF.Custom<0,1,-1)
+futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
+futuresDF['Anti0.75LastSIG'] = np.where(futuresDF['0.75LastSIG']==1,-1,1)
+futuresDF['Anti0.5LastSIG'] = np.where(futuresDF['0.5LastSIG']==1,-1,1)
+futuresDF['AntiSEA'] = np.where(futuresDF.LastSEA==1,-1,1)
+futuresDF['prevACT'] = futuresDF.ACT
+futuresDF['AntiPrevACT'] = np.where(futuresDF.ACT==1,-1,1)
+#futuresDF['AdjSEA'] = np.where(futuresDF.LastSRUN <0, futuresDF.LastSEA*-1, futuresDF.LastSEA)
+futuresDF['AdjSEA']=np.where(futuresDF[AdjSEACols].sum(axis=1)<0,-1,1)
+futuresDF['AntiAdjSEA'] = np.where(futuresDF.AdjSEA==1,-1,1)
+futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
+futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
+futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
+#futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
+#futuresDF['Voting5']=np.where(futuresDF[voting5Cols].sum(axis=1)<0,-1,1)
+#futuresDF['Voting6']=np.where(futuresDF[voting6Cols].sum(axis=1)<0,-1,1)
+futuresDF['Voting7']=np.where(futuresDF[voting7Cols].sum(axis=1)<0,-1,1)
+futuresDF['Voting8']=np.where(futuresDF[voting8Cols].sum(axis=1)<0,-1,1)
+#futuresDF['Voting9']=np.where(futuresDF[voting9Cols].sum(axis=1)<0,-1,1)
+v9=futuresDF[voting9Cols].sum(axis=1)
+v9[v9<0]=-1
+v9[v9>0]=1
+futuresDF['Voting9']=v9.values
+#futuresDF['Voting10']=np.where(futuresDF[voting10Cols].sum(axis=1)<0,-1,1)
+v10=futuresDF[voting10Cols].sum(axis=1)
+v10[v10<0]=-1
+v10[v10>0]=1
+futuresDF['Voting10']=v10.values
+#futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
+v11=futuresDF[voting11Cols].sum(axis=1)
+v11[v11<0]=-1
+v11[v11>0]=1
+futuresDF['Voting11']=v11.values
+#futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
+v12=futuresDF[voting12Cols].sum(axis=1)
+v12[v12<0]=-1
+v12[v12>0]=1
+futuresDF['Voting12']=v12.values
+#futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
+v13=futuresDF[voting13Cols].sum(axis=1)
+v13[v13<0]=-1
+v13[v13>0]=1
+futuresDF['Voting13']=v13.values
+#futuresDF['Voting14']=np.where(futuresDF[voting14Cols].sum(axis=1)<0,-1,1)
+v14=futuresDF[voting14Cols].sum(axis=1)
+v14[v14<0]=-1
+v14[v14>0]=1
+futuresDF['Voting14']=v14.values
+futuresDF['Voting15']=np.where(futuresDF[voting15Cols].sum(axis=1)<0,-1,1)
+#futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
 
-    nsig=0
-    for ticker in futuresDF.index:
-        nsig+=1
-        signalFile=pd.read_csv(signalSavePath+ version+'_'+ ticker+ '.csv', index_col=['dates'])
-        #addLine = signalFile.iloc[-1]
-        #addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
-        #addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
-        #addLine.name = sst.iloc[-1].name
-        addLine = pd.Series(name=lastDate)
-        addLine['signals']=futuresDF.ix[ticker][c2system]
-        addLine['safef']=c2safef
-        addLine['timestamp']=dt.now().strftime("%Y%m%d %H:%M:%S %Z")
-        signalFile = signalFile.append(addLine)
-        filename=signalSavePath + version+'_'+ ticker+ '.csv'
-        print 'Saving...',  addLine['signals'], addLine['safef'], filename
-        signalFile.to_csv(filename, index=True)
-    print nsig, 'files updated'
-        
-    print 'Saving', savePath+'futuresATR_Signals.csv'
-    futuresDF.to_csv(savePath+'futuresATR_Signals.csv')
+#Voting of Voting
+v4=futuresDF[voting4Cols].sum(axis=1)
+v4[v4<0]=-1
+v4[v4>0]=1
+futuresDF['Voting4']=v4.values
+
+v5=futuresDF[voting5Cols].sum(axis=1)
+v5[v5<0]=-1
+v5[v5>0]=1
+futuresDF['Voting5']=v5.values 
+
+v6=futuresDF[voting6Cols].sum(axis=1)
+v6[v6<0]=-1
+v6[v6>0]=1
+futuresDF['Voting6']=v6.values
+
+for group in futuresDF.groupby(by='group').Custom:
+    #print group
+    colors=np.array(['r']*group[1].shape[0])
+    mask = group[1]>0
+    colors[mask.values]='g'
+    Lper = round(sum(mask.values)/float(group[1].shape[0])*100,1)
+    title = 'Custom '+group[0] + ' L% '+ str(Lper)
+    group[1].plot(kind='barh', title =title, colors=colors)
+    plt.xlim(-1,1)
+
+    filename='custom_'+group[1].index[0]+'.png'
+    plt.savefig(savePath2+filename, bbogroup_inches='tight')
+    print 'Saved '+savePath2+filename
     
-    for i,sym in enumerate([x.split('_')[1] for x in system.System]):
+    #if debug:
+    #    plt.show()
+    #plt.close()
+
+#print 'Saving signals from', c2system
+#1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR
+#save signals to v4_ signal files for order processing
+lastDate=int(lastDate.strftime('%Y%m%d'))
+'''
+nsig=0
+for ticker in futuresDF.index:
+    #nsig+=1
+    #signalFile=pd.read_csv(signalSavePath+ version+'_'+ ticker+ '.csv', index_col=['dates'])
+    #addLine = signalFile.iloc[-1]
+    #addLine = addLine.append(pd.Series(data=timenow.strftime("%Y%m%d %H:%M:%S %Z"), index=['timestamp']))
+    #addLine = addLine.append(pd.Series(data=cycleTime, index=['cycleTime']))
+    #addLine.name = sst.iloc[-1].name
+    addLine = pd.Series(name=lastDate)
+    addLine['CSIsym']=ticker
+    #addLine['c2sym']=ticker
+    addLine['signals']=futuresDF.ix[ticker][c2system]
+    addLine['safef']=c2safef
+    addLine['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    #signalFile = signalFile.append(addLine)
+    #filename=signalSavePath + version+'_'+ ticker+ '.csv'
+    
+    addLine.to_frame().transpose().to_sql(name='Signals', if_exists='append', con=conn, index=True, index_label='Date')
+    print 'Saved sql',  addLine['signals'], addLine['safef']
+    #signalFile.to_csv(filename, index=True)
+#print nsig, 'files updated'
+'''
+
+futuresDF['Date']=lastDate
+futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+futuresDF.to_sql(name='futuresATR', if_exists='append', con=conn, index=True, index_label='CSIsym')
+print 'Saved sql', 'futuresATR'
+
+for i,sym in enumerate([x.split('_')[1] for x in system.System]):
+    if sym==marketList[0]:
         system.set_value(i,'signal',futuresDF[c2system].ix[sym])
-    system.to_csv(systemPath+systemFilename, index=False)
-    print 'Saved', systemPath+systemFilename,c2system
+        series=system.ix[i]
+        series.name=sym
+        series=fixTypes(series,series.to_frame().transpose())
+        break
+#system.to_csv(systemPath+systemFilename, index=False)
+series['Date']=lastDate
+series['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+series.to_sql(name='v4macro', if_exists='append', con=conn, index=True, index_label='CSIsym')
+series.to_sql(name='signals', if_exists='append', con=conn, index=True, index_label='CSIsym')
 
-    for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
+print 'Saved sql', systemFilename,c2system
+
+for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
+    if sym==marketList[0]:
         system_mini.set_value(i,'signal',futuresDF[c2system_mini].ix[sym])
-    system_mini.to_csv(systemPath+systemFilename2, index=False)
-    print 'Saved', systemPath+systemFilename2,c2system_mini
+        series=system_mini.ix[i]
+        series.name=sym
+        series=fixTypes(series,series.to_frame().transpose())
+        break
+#system_mini.to_csv(systemPath+systemFilename2, index=False)
+series['Date']=lastDate
+series['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+series.to_sql(name='v4mini', if_exists='append', con=conn, index=True, index_label='CSIsym')
+series.to_sql(name='signals', if_exists='append', con=conn, index=True, index_label='CSIsym')
+print 'Saved sql', systemFilename2,c2system_mini
 
-    for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
+for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
+    if sym==marketList[0]:
         system_micro.set_value(i,'signal',futuresDF[c2system_micro].ix[sym])
-    system_micro.to_csv(systemPath+systemFilename3, index=False)
-    print 'Saved', systemPath+systemFilename3, c2system_micro
+        series=system_micro.ix[i]
+        series.name=sym
+        series=fixTypes(series,series.to_frame().transpose())
+        break
+series['Date']=lastDate
+series['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+series.to_sql(name='v4micro', if_exists='append', con=conn, index=True, index_label='CSIsym')
+series.to_sql(name='signals', if_exists='append', con=conn, index=True, index_label='CSIsym')
+#system_micro.to_csv(systemPath+systemFilename3, index=False)
+print 'Saved', systemFilename3, c2system_micro
 
-futuresDF.to_csv(savePath+'futuresATR.csv')
-print 'Saved', savePath+'futuresATR.csv'
+#futuresDF.to_csv(savePath+'futuresATR.csv')
+#print 'Saved', savePath+'futuresATR.csv'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

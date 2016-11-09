@@ -6,37 +6,118 @@ from ibapi.place_order import place_order as place_iborder
 from c2api.place_order import place_order as place_c2order
 import json
 from pandas.io.json import json_normalize
-from ibapi.get_exec import get_ibpos, get_exec_open, get_ib_pos
 from c2api.get_exec import get_c2pos, get_exec_open, retrieveSystemEquity, get_c2_pos
-from seitoolz.signal import get_dps_model_pos, get_model_pos
-from seitoolz.get_exec import get_executions
+#from seitoolz.get_exec import get_executions as get_c2trades
+from ibapi.place_order2 import place_orders as place_iborders
 from time import gmtime, strftime, localtime, sleep
 import logging
 import sys
 import threading
+import sqlite3
 
 
-
-logging.basicConfig(filename='/logs/proc_signal_v4.log',level=logging.DEBUG)
+logging.basicConfig(filename='/logs/proc_signal_v4_live.log',level=logging.DEBUG)
 start_time = time.time()
-debug=False
 
-
-if len(sys.argv) > 1 and sys.argv[1] == '1':
+if len(sys.argv)==1:
     debug=True
 
-def get_timestamp():
-	timestamp = int(time.time())
-	return timestamp
+    showPlots=False
+    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dataPath='D:/ML-TSDP/data/csidata/v4futures4/'
+    savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    #test last>old
+    #dataPath2=savePath2
+    #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     
-def get_models(systems):
-    dpsList=dict()
-    for i in systems.index:
-        system=systems.ix[i]
-        dpsList[system['System']]=1
-    dps_model_pos=get_dps_model_pos(dpsList.keys())    
-    return dps_model_pos
+    #test last=old
+    dataPath2='D:/ML-TSDP/data/'
     
+    #signalPath ='D:/ML-TSDP/data/signals2/'
+    signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
+    
+else:
+    debug=False
+    feedfile='./data/systems/system_ibfeed.csv'
+    dbPath='./data/futures.sqlite3'
+    dataPath='./data/csidata/v4futures4/'
+    dataPath2='./data/'
+    savePath='./data/'
+    signalPath = './data/signals2/' 
+    signalSavePath = './data/signals2/' 
+    savePath2 = './data/results/'
+    systemPath =  './data/systems/'
+
+#systems = ['v4micro','v4mini','v4macro']
+systems = ['v4mini']
+
+conn = sqlite3.connect(dbPath)
+
+
+def get_c2trades(systemid, name, c2api):
+    filename='./data/portfolio/c2_' + name + '_trades.csv'
+    
+    datestr=strftime("%Y%m%d", localtime())
+    data=get_c2exec(systemid,c2api);
+    
+    jsondata = json.loads(data)
+    if len(jsondata['response']) > 1:
+        dataSet=json_normalize(jsondata['response'])
+        dataSet=dataSet.set_index('trade_id')
+        '''
+        if os.path.isfile(filename):
+            existData = pd.read_csv(filename, index_col='trade_id')
+            existData = existData.reset_index()
+            dataSet   =   dataSet.reset_index()
+            dataSet=existData.append(dataSet)
+            dataSet['trade_id'] = dataSet['trade_id'].astype('int')
+            dataSet=dataSet.drop_duplicates(subset=['trade_id'],keep='last')
+            dataSet=dataSet.set_index('trade_id') 
+        '''
+        dataSet=dataSet.sort_values(by='closedWhenUnixTimeStamp')
+        
+        dataSet.to_csv(filename)
+
+def get_ibtrades():
+    filename='./data/portfolio/ib_trades' + '.csv'
+    
+    datestr=strftime("%Y%m%d", localtime())
+    data=get_ibexec()
+    dataSet=pd.DataFrame(data)
+    if len(dataSet.index) > 0:
+	dataSet=dataSet.set_index('permid')
+    
+    	if os.path.isfile(filename):
+        	existData = pd.read_csv(filename, index_col='permid')
+        	existData =existData.reset_index()
+        	dataSet=dataSet.reset_index()
+        	dataSet=existData.append(dataSet)
+        	dataSet['permid'] = dataSet['permid'].astype('int')
+        	dataSet=dataSet.drop_duplicates(subset=['permid'],keep='last')
+        	dataSet=dataSet.set_index('permid')
+    	dataSet=dataSet.sort_values(by='times')
+    	dataSet.to_csv(filename)
+
+def get_c2executions(data):        
+    #data=pd.read_csv('./data/systems/system.csv')
+    #data=data.reset_index()
+
+    c2dict={}
+    for i in data.index:
+        system=data.ix[i]
+        print system['Name'] + ' ' + str(system['c2submit'])
+        if system['c2submit']:
+                c2dict[system['c2id']]=(system['Name'],system['c2api'])
+
+    for c2id in c2dict:
+        (stratName,c2api)=c2dict[c2id]
+        get_c2trades(c2id, stratName, c2api)
+
+
 def start_trade(systems): 
         global debug
         if debug:
@@ -160,7 +241,7 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
                     place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
                 else:
                     place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
-   
+'''
     if ibsubmit:
         ib_pos_qty=get_ib_pos(ibsym, ibcurrency)
         system_ibpos_qty=round(system_pos['action']) * ibquant
@@ -177,10 +258,13 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
             place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);
     #
     #place_iborder(ibaction, ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit);
-
+'''
 #subprocess.call(['python', 'get_ibpos.py'])       
-systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'.csv')
-systemdata=systemdata.reset_index()
-start_systems(systemdata)
-get_executions(systemdata)
+def proc_orders():
+    global systems
+    for sys in systems:
+        systemdata=pd.read_sql(sql='select * from '+sys, con=conn)
+        #systemdata=systemdata.reset_index()
+        start_systems(systemdata)
+        get_c2executions(systemdata)
 #subprocess.call(['python', 'get_ibpos.py'])

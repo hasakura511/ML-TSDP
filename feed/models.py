@@ -5,7 +5,6 @@ from datetime import *
 from django.template.defaultfilters import slugify
 from django.contrib.humanize.templatetags.humanize import *
 
-from autoslug import AutoSlugField
 from django.utils.safestring import mark_safe
 from dateutil.relativedelta import relativedelta
 import dateutil.parser

@@ -58,6 +58,7 @@ if len(sys.argv)==1:
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
     runPath2='D:/ML-TSDP/vol_adjsize_live.py'
+    runPath3='D:/ML-TSDP/proc_signal_v4_live.py'
     logPath='C:/logs/'
     dataPath='D:/ML-TSDP/data/'
     portfolioPath = 'D:/ML-TSDP/data/portfolio/'
@@ -78,6 +79,7 @@ else:
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
     runPath2='./vol_adjsize_live.py'
+    runPath3='./proc_signal_v4_live.py'
     logPath='/logs/'
     dataPath='./data/'
     portfolioPath = './data/portfolio/'
@@ -124,23 +126,17 @@ months = {
 conn = sqlite3.connect(dbPath)
 
 
-def popenAndCall(sym, popenArgs,popenArgs2):
-    """
-    Runs the given args in a subprocess.Popen, and then calls the function
-    onExit when the subprocess completes.
-    onExit is a callable object, and popenArgs is a list/tuple of args that 
-    would give to subprocess.Popen.
-    """
-    def runInThread():
-        with open(logPath+sym+'.txt', 'w') as f:
-            with open(logPath+sym+'_error.txt', 'w') as e:
-                proc = Popen(popenArgs, stdout=f, stderr=e)
-                proc.wait()
-                #check_output(popenArgs)
-                proc2= Popen(popenArgs2, stdout=f, stderr=e)
-                proc2.wait()
-                proc_orders(sym)
-            return
+
+def runInThread(sym, popenArgs):
+    with open(logPath+sym+'.txt', 'w') as f:
+        with open(logPath+sym+'_error.txt', 'w') as e:
+            proc = Popen(popenArgs, stdout=f, stderr=e)
+            proc.wait()
+            #check_output(popenArgs)
+            proc2= Popen(popenArgs2, stdout=f, stderr=e)
+            proc2.wait()
+            proc_orders(sym)
+        return
     thread = threading.Thread(target=runInThread)
     #, args=(onExit, popenArgs))
     thread.start()
@@ -298,7 +294,7 @@ def refresh_all_histories(execDict):
         contract = execDict[sym][2]
         print 'getting data for', sym
         data = client.get_history(endDateTime, contract, whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
-        data.to_csv(csiDataPath2+feeddata.ix[sym].CSIsym+'.csv', index=True)
+        data.to_csv(csiDataPath2+feeddata.ix[sym].CSIsym2+'.csv', index=True)
         
 def refresh_history(sym, execDict):
     global client
@@ -308,7 +304,7 @@ def refresh_history(sym, execDict):
     contract = execDict[sym][2]
     print 'getting data for', sym
     data = client.get_history(endDateTime, contract, whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
-    data.to_csv(csiDataPath2+feeddata.ix[sym].CSIsym+'.csv', index=True)
+    data.to_csv(csiDataPath2+feeddata.ix[sym].CSIsym2+'.csv', index=True)
     return data
     
 def get_tradingHours(sym, contractsDF):
@@ -386,7 +382,7 @@ def find_triggers(feeddata, execDict):
         loaddate=str(ttdate)
     else:
         #get a new timetable
-        print csidate, '>=', ttdate, 'getting new timetable'
+        print 'csidate',csidate, '>=', 'ttdate', ttdate, 'getting new timetable'
         timetable = get_timetable(execDict, systemPath)
         loaddate=str([d for d in timetable.columns.astype(int) if d>csidate][0])
         
@@ -396,8 +392,8 @@ def find_triggers(feeddata, execDict):
     threadlist=[]
     for t in triggers.index:
         ibsym=t.split()[0]
-        csiFileSym=feeddata.ix[ibsym].CSIsym
-        csiRunSym=feeddata.ix[ibsym].CSIsym2
+        csiFileSym=feeddata.ix[ibsym].CSIsym2
+        csiRunSym=feeddata.ix[ibsym].CSIsym
         fmt = '%Y-%m-%d %H:%M'    
         tdate=dt.strptime(triggers.ix[t],fmt).replace(tzinfo=eastern)
         if endDateTime>tdate:
@@ -471,7 +467,7 @@ def append_data(sym, timetable, loaddate):
         newbar = pd.DataFrame({}, columns=['Date', 'Open','High','Low','Close','Volume','OI','R','S']).set_index('Date')
         newbar.loc[loaddate] = [data.Open[0],max(data2.High), min(data2.Low),data2.Close[-1],data2.Volume.sum(),np.nan,np.nan,np.nan]
         #load old bar
-        csisym=feeddata.ix[sym].CSIsym
+        csisym=feeddata.ix[sym].CSIsym2
         filename = csiDataPath+csisym+'_B.CSV'
         if os.path.isfile(filename):
             csidata=pd.read_csv(filename, index_col=0, header=None)
@@ -506,8 +502,17 @@ if __name__ == "__main__":
     execDict=get_orders(feeddata, systemdata)
     threadlist=find_triggers(feeddata, execDict)
     runThreads(threadlist)
-    print 'returned to main thread'
-    #check threadlist tos ee if everythong's there
+    print 'returned to main thread, running vol_adjsize_live'
+    #check threadlist tos ee if everythong's there?
+    with open(logPath+'vol_adjsize_live.txt', 'w') as f:
+        with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+            proc = Popen(['python',runPath2], stdout=f, stderr=e)
+            proc.wait()
+    print 'returned to main thread, running c2 orders'
+    with open(logPath+'proc_signal_v4_live.txt', 'w') as f:
+        with open(logPath+'proc_signal_v4_live.txt', 'w') as e:
+            proc = Popen(['python',runPath3], stdout=f, stderr=e)
+            proc.wait()
     
     
     #symbols = execDict.keys()

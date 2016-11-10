@@ -1,4 +1,4 @@
-Desc,filename,ibexch,ibsym,c2sym,ibtype,ibcur,multiplier,CSIsym,CSIsym2
+Desc,filename,ibexch,ibsym,c2sym,ibtype,ibcur,multiplier,CSIsym2,CSIsym
 Ethanol-CBT,AC_0_I0R.TXT,ECBOT,AC,@AC,FUT,USD,29000,AC,AC
 Australian Dollar-CME(Floor+Electronic Combined),AD_0_I0R.TXT,GLOBEX,AUD,@AD,FUT,USD,100000,AD,AD
 Soybean Oil-CBT (Floor+Electronic Combined),BO20_I0R.TXT,ECBOT,ZL,@BO,FUT,USD,60000,BO2,BO

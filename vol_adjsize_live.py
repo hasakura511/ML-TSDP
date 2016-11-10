@@ -46,9 +46,9 @@ offline_micro =['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM',
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
-systemFilename='system_v4futures.csv'
-systemFilename2='system_v4mini.csv'
-systemFilename3='system_v4micro.csv'
+systemFilename='system_v4futures_live.csv'
+systemFilename2='system_v4mini_live.csv'
+systemFilename3='system_v4micro_live.csv'
 c2id_macro=102324563
 c2id_mini=101533256
 c2id_micro=101359768
@@ -57,16 +57,16 @@ c2id_micro=101359768
 #1 would 0 safef ==2 and double safef==1
 safefAdjustment=0
 
-if sys.argv[2]=='0':
+if len(sys.argv)==1:
     debug=True
     
-    marketList=[sys.argv[1]]
+    #marketList=[sys.argv[1]]
     showPlots=False
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dataPath='D:/ML-TSDP/data/csidata/v4futures4/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    
+    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     #test last>old
     #dataPath2=savePath2
     #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
@@ -82,8 +82,9 @@ if sys.argv[2]=='0':
 else:
     debug=False
     
-    marketList=[sys.argv[1]]
+    #marketList=[sys.argv[1]]
     showPlots=False
+    feedfile='./data/systems/system_ibfeed.csv'
     dbPath='./data/futures.sqlite3'
     dataPath='./data/csidata/v4futures4/'
     dataPath2='./data/'
@@ -216,8 +217,8 @@ def fixTypes(original, transformed):
         transformed[x]=transformed[x].astype(type(original[x]))
     return transformed
     
-#files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-#marketList = [x.split('_')[0] for x in files]
+files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+marketList = [x.split('_')[0] for x in files]
 
 
 futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
@@ -471,50 +472,60 @@ print futuresDF.iloc[:,:4]
 
 
 #system file update
-system = pd.read_csv(systemPath+systemFilename)
-system_mini = pd.read_csv(systemPath+systemFilename2)
-system_micro = pd.read_csv(systemPath+systemFilename3)
+ff = pd.read_csv(feedfile, index_col='CSIsym')
+system = pd.read_csv(systemPath+systemFilename, index_col=0)
+system.index = [x.split('_')[1] for x in system.System]
+system.index.name = 'CSIsym'
+system_mini = pd.read_csv(systemPath+systemFilename2, index_col=0)
+system_mini.index = [x.split('_')[1] for x in system_mini.System]
+system_mini.index.name = 'CSIsym'
+system_micro = pd.read_csv(systemPath+systemFilename3, index_col=0)
+system_micro.index = [x.split('_')[1] for x in system_micro.System]
+system_micro.index.name = 'CSIsym'
 
 #macro
-for sys in [x for x in system.System if marketList[0] in x]:
+for sys in system.System:
     sym=sys.split('_')[1]
-    idx=system[system.System==sys].index[0]
-    print 'MACRO', sys, sym, system.ix[idx].c2qty,
-    system.set_value(idx,'c2qty',int(futuresDF.ix[sym]['finalQTY']))
-    print system.ix[idx].c2qty, system.ix[idx].c2sym,
-    system.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
-    print system.ix[idx].c2sym
-system.Name=systemFilename.split('_')[1][:-4]
+    if sym in futuresDF.index:
+        idx=system[system.System==sys].index[0]
+        print 'MACRO', sys, sym, system.ix[idx].c2qty,
+        system.set_value(idx,'c2qty',int(futuresDF.ix[sym]['finalQTY']))
+        print system.ix[idx].c2qty, system.ix[idx].c2sym,
+        system.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
+        print system.ix[idx].c2sym
+#system.Name=systemFilename.split('_')[1][:-4]
 system.c2id=c2id_macro
 
 #mini
-for sys in [x for x in system_mini.System if marketList[0] in x]:
+for sys in system_mini.System:
     sym=sys.split('_')[1]
-    idx=system_mini[system_mini.System==sys].index[0]
-    print 'MINI', sys, sym, system_mini.ix[idx].c2qty,
-    if sym in offline_mini:
-        system_mini.set_value(idx,'c2qty',0)
-    else:
-        system_mini.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MINI']))
-    print system_mini.ix[idx].c2qty, system_mini.ix[idx].c2sym,
-    system_mini.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
-    print system_mini.ix[idx].c2sym
-system_mini.Name=systemFilename2.split('_')[1][:-4]
+    if sym in futuresDF.index:
+        idx=system_mini[system_mini.System==sys].index[0]
+        print 'MINI', sys, sym, system_mini.ix[idx].c2qty,
+        if sym in offline_mini:
+            system_mini.set_value(idx,'c2qty',0)
+        else:
+            system_mini.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MINI']))
+        print system_mini.ix[idx].c2qty, system_mini.ix[idx].c2sym,
+        system_mini.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
+        print system_mini.ix[idx].c2sym
+#system_mini.Name=systemFilename2.split('_')[1][:-4]
 system_mini.c2id=c2id_mini
 
 #micro
-for sys in [x for x in system_micro.System if marketList[0] in x]:
+for sys in system_micro.System:
     sym=sys.split('_')[1]
-    idx=system_micro[system_micro.System==sys].index[0]
-    print 'MICRO', sys, sym, system_micro.ix[idx].c2qty,
-    if sym in offline_micro:
-        system_micro.set_value(idx,'c2qty',0)
-    else:
-        system_micro.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MICRO']))
-    print system_micro.ix[idx].c2qty, system_micro.ix[idx].c2sym,
-    system_micro.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
-    print system_micro.ix[idx].c2sym
-system_micro.Name=systemFilename3.split('_')[1][:-4]
+    if sym in futuresDF.index:
+        idx=system_micro[system_micro.System==sys].index[0]
+        print 'MICRO', sys, sym, system_micro.ix[idx].c2qty,
+        if sym in offline_micro:
+            system_micro.set_value(idx,'c2qty',0)
+        else:
+            system_micro.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MICRO']))
+        print system_micro.ix[idx].c2qty, system_micro.ix[idx].c2sym,
+        system_micro.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
+        print system_micro.ix[idx].c2sym
+#system_micro.Name=systemFilename3.split('_')[1][:-4]
 system_micro.c2id=c2id_micro 
     
 #signalDF=signalDF.sort_index()
@@ -794,6 +805,8 @@ v6[v6<0]=-1
 v6[v6>0]=1
 futuresDF['Voting6']=v6.values
 
+
+
 for group in futuresDF.groupby(by='group').Custom:
     #print group
     colors=np.array(['r']*group[1].shape[0])
@@ -804,14 +817,13 @@ for group in futuresDF.groupby(by='group').Custom:
     group[1].plot(kind='barh', title =title, colors=colors)
     plt.xlim(-1,1)
 
-    filename='custom_'+group[1].index[0]+'.png'
+    filename='custom_'+group[0]+'.png'
     plt.savefig(savePath2+filename, bbogroup_inches='tight')
     print 'Saved '+savePath2+filename
     
     #if debug:
     #    plt.show()
-    #plt.close()
-
+    plt.close()
 #print 'Saving signals from', c2system
 #1biv. Run v4size (signals and size) and check system.csv for qty,contracts with futuresATR
 #save signals to v4_ signal files for order processing
@@ -839,54 +851,60 @@ for ticker in futuresDF.index:
     #signalFile.to_csv(filename, index=True)
 #print nsig, 'files updated'
 '''
-
+mode = 'replace'
+#mode= 'append'
 futuresDF['Date']=lastDate
 futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-futuresDF.to_sql(name='futuresATR', if_exists='append', con=conn, index=True, index_label='CSIsym')
-print 'Saved sql', 'futuresATR'
+futuresDF.index.name = 'CSIsym'
+futuresDF.to_sql(name='futuresATR', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+print 'Saved to sql db table', 'futuresATR'
 
 for i,sym in enumerate([x.split('_')[1] for x in system.System]):
-    if sym==marketList[0]:
-        system.set_value(i,'signal',futuresDF[c2system].ix[sym])
-        series=system.ix[i]
-        series.name=sym
-        series=fixTypes(series,series.to_frame().transpose())
-        break
-#system.to_csv(systemPath+systemFilename, index=False)
-series['Date']=lastDate
-series['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-series.to_sql(name='v4macro', if_exists='append', con=conn, index=True, index_label='CSIsym')
-series.to_sql(name='signals', if_exists='append', con=conn, index=True, index_label='CSIsym')
+    if sym in futuresDF.index:
+        system.set_value(sym,'signal',futuresDF[c2system].ix[sym])
+        #series=system.ix[i]
+        #series.name=sym
+        #series=fixTypes(series,series.to_frame().transpose())
 
-print 'Saved sql', systemFilename,c2system
+#system.to_csv(systemPath+systemFilename, index=False)
+system['Date']=lastDate
+system['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+tablename = 'v4macro'
+system.ix[futuresDF.index].to_sql(name=tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+print 'Saved to sql db', tablename,c2system
+system.to_csv(systemPath+systemFilename, index=True)
 
 for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
-    if sym==marketList[0]:
-        system_mini.set_value(i,'signal',futuresDF[c2system_mini].ix[sym])
-        series=system_mini.ix[i]
-        series.name=sym
-        series=fixTypes(series,series.to_frame().transpose())
-        break
+    if sym in futuresDF.index:
+        system_mini.set_value(sym,'signal',futuresDF[c2system_mini].ix[sym])
+        #series=system_mini.ix[i]
+        #series.name=sym
+        #series=fixTypes(series,series.to_frame().transpose())
+        
 #system_mini.to_csv(systemPath+systemFilename2, index=False)
-series['Date']=lastDate
-series['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-series.to_sql(name='v4mini', if_exists='append', con=conn, index=True, index_label='CSIsym')
-series.to_sql(name='signals', if_exists='append', con=conn, index=True, index_label='CSIsym')
-print 'Saved sql', systemFilename2,c2system_mini
+system_mini['Date']=lastDate
+system_mini['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+tablename = 'v4mini'
+system_mini.ix[futuresDF.index].to_sql(name=tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system_mini.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+print 'Saved to sql db', tablename,c2system_mini
+system_mini.to_csv(systemPath+systemFilename2, index=True)
 
 for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
-    if sym==marketList[0]:
-        system_micro.set_value(i,'signal',futuresDF[c2system_micro].ix[sym])
-        series=system_micro.ix[i]
-        series.name=sym
-        series=fixTypes(series,series.to_frame().transpose())
-        break
-series['Date']=lastDate
-series['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-series.to_sql(name='v4micro', if_exists='append', con=conn, index=True, index_label='CSIsym')
-series.to_sql(name='signals', if_exists='append', con=conn, index=True, index_label='CSIsym')
-#system_micro.to_csv(systemPath+systemFilename3, index=False)
-print 'Saved', systemFilename3, c2system_micro
+    if sym in futuresDF.index:
+        system_micro.set_value(sym,'signal',futuresDF[c2system_micro].ix[sym])
+        #series=system_micro.ix[i]
+        #series.name=sym
+        #series=fixTypes(series,series.to_frame().transpose())
+        
+system_micro['Date']=lastDate
+system_micro['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+tablename = 'v4micro'
+system_micro.ix[futuresDF.index].to_sql(name= tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system_micro.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+print 'Saved to sql db', tablename, c2system_micro
+system_micro.to_csv(systemPath+systemFilename3, index=True)
 
 #futuresDF.to_csv(savePath+'futuresATR.csv')
 #print 'Saved', savePath+'futuresATR.csv'

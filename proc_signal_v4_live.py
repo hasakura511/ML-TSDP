@@ -268,3 +268,10 @@ def proc_orders():
         start_systems(systemdata)
         get_c2executions(systemdata)
 #subprocess.call(['python', 'get_ibpos.py'])
+
+#subprocess.call(['python', 'get_ibpos.py'])       
+systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'_live.csv')
+systemdata=systemdata.reset_index()
+start_systems(systemdata)
+get_c2executions(systemdata)
+#subprocess.call(['python', 'get_ibpos.py'])

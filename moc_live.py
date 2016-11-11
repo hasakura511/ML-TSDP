@@ -317,7 +317,7 @@ def get_orders(feeddata, systemfile):
     execDict=dict()
 
     systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
-    systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
+    #systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
     openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
     feeddata=feeddata.reset_index()
@@ -387,8 +387,8 @@ def get_orders(feeddata, systemfile):
         execDict[symbol]=[action, ibquant, contract]
 
         #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
-    systemdata.to_csv(systemfile, index=False)
-    print 'saved', systemfile
+    #systemdata.to_csv(systemfile, index=False)
+    #print 'saved', systemfile
       
     print len(execDict.keys()), execDict.keys()
     return execDict

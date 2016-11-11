@@ -101,7 +101,7 @@ else:
     feedfile='./data/systems/system_ibfeed.csv'
     dbPath='./data/futures.sqlite3'
     #dataPath='./data/csidata/v4futures4/'
-    dataPath='./data/csidata/v4futures4_debug/'
+    dataPath='./data/csidata/v4futures4/'
     dataPath2='./data/'
     savePath='./data/'
     signalPath = './data/signals2/' 

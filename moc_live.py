@@ -81,7 +81,7 @@ if len(sys.argv)==1:
 else:
     debug=False
     showPlots=False
-    submitIB=False
+    submitIB=True
     triggertime = 30 #mins
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'

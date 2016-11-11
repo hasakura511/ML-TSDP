@@ -43,14 +43,17 @@ offline =['AC','AEX','CC','CGB','CT','DX','EBL','EBM','EBS','ED','FCH','FDX','FE
 offline_mini = ['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM','EBS','ED','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SMI','SSG','STW','SXE','TF','US','VX','YA','YB','YM','YT2','YT3',]
 offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3',]
 
-#for signal files
-c2system='0.5LastSIG'
-#for system files
-c2system_macro=c2system
-c2system_mini='0.5LastSIG'
-c2system_micro='Voting'
-c2safef=1
 
+#for system files
+c2system_macro=c2system='0.5LastSIG'
+c2system_mini='0.5LastSIG'
+c2system_micro='LastSEA'
+c2safef=1
+signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
+                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
+                'LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
+                'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
+                'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
@@ -228,13 +231,15 @@ def fixTypes(original, transformed):
         transformed[x]=transformed[x].astype(type(original[x]))
     return transformed
     
-files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-marketList = [x.split('_')[0] for x in files]
+
 
 
 #system file update.
 #load from daily run, save to live (to update pivot dates)
 ff = pd.read_csv(feedfile, index_col='CSIsym')
+#files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+marketList = ff.CSIsym2.values
+
 system = pd.read_csv(systemPath+systemFilename, index_col=0)
 system.index = [x.split('_')[1] for x in system.System]
 system.index.name = 'CSIsym'
@@ -552,11 +557,7 @@ system_micro.c2id=c2id_micro
 
 
 #use LastSEA for seasonality in c2
-signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
-                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
-                'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
-                'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
-                'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
+
 
 '''
 if lastDate > sigDate:

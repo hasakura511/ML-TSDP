@@ -36,7 +36,7 @@ callback = IBWrapper()
 client=IBclient(callback)
 
 #systems = ['v4micro','v4mini','v4macro']
-systems = ['v4mini']
+
 durationStr ='2 D'
 barSizeSetting='30 mins'
 whatToShow='TRADES'
@@ -54,6 +54,7 @@ minDataPoints = 5
 
 
 if len(sys.argv)==1:
+    systems = ['v4mini']
     debug=True
     showPlots=True
     submitIB=False
@@ -78,6 +79,7 @@ if len(sys.argv)==1:
     csiDataPath3=  'D:/ML-TSDP/data/csidata/v4futures4/'
     signalPath =  'D:/ML-TSDP/data/signals2/1_'
 else:
+    systems = ['v4micro','v4mini','v4macro']
     debug=False
     showPlots=False
     submitIB=True
@@ -607,15 +609,6 @@ def append_data(sym, timetable, loaddate):
         print sym, 'no data found between', opentime, closetime
         return False
         
-def proc_orders(sym):
-    global systems
-    
-    for sys in systems:
-        print 'sending orders for', sys, sym
-        #systemdata=pd.read_sql(sql='select * from '+sys, con=conn)
-        #systemdata=systemdata.reset_index()
-        #start_systems(systemdata)
-        #get_c2trades(systemdata)
 
 
 if __name__ == "__main__":
@@ -647,7 +640,7 @@ if __name__ == "__main__":
             proc = Popen(runPath4, stdout=f, stderr=e)
             proc.wait()
             
-    systemfile=systemPath+'system_v4macro_live.csv'
+    systemfile=systemPath+'system_v4futures_live.csv'
     if submitIB:
         execDict=update_orders(feeddata, systemfile, execDict)
         print 'placing ib orders from', systemfile

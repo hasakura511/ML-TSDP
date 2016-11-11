@@ -640,8 +640,8 @@ if __name__ == "__main__":
                 proc.wait()
                 
     print 'returned to main thread, running check systems'
-    with open(logPath+'check_systems.txt', 'w') as f:
-        with open(logPath+'check_systems_error.txt', 'w') as e:
+    with open(logPath+'check_systems_live.txt', 'w') as f:
+        with open(logPath+'check_systems_live_error.txt', 'w') as e:
             proc = Popen(runPath4, stdout=f, stderr=e)
             proc.wait()
             

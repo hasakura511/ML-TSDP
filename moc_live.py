@@ -36,6 +36,8 @@ import sqlite3
 callback = IBWrapper()
 client=IBclient(callback)
 
+#systems = ['v4micro','v4mini','v4macro']
+systems = ['v4mini']
 durationStr ='2 D'
 barSizeSetting='30 mins'
 whatToShow='TRADES'
@@ -50,11 +52,13 @@ tickerId=random.randint(100,9999)
 
 interval='1d'
 minDataPoints = 5
-triggertime = 600 #mins
+
 
 if len(sys.argv)==1:
     debug=True
     showPlots=True
+    submitIB=False
+    triggertime = 600 #mins
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
     runPath2= ['python','D:/ML-TSDP/vol_adjsize_live.py']
@@ -77,6 +81,8 @@ if len(sys.argv)==1:
 else:
     debug=False
     showPlots=False
+    submitIB=False
+    triggertime = 30 #mins
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
     runPath2=['python','./vol_adjsize_live.py','1']
@@ -614,9 +620,6 @@ def proc_orders(sym):
 
 
 if __name__ == "__main__":
-    submitIB=False
-    #systems = ['v4micro','v4mini','v4macro']
-    systems = ['v4mini']
     print durationStr, barSizeSetting, whatToShow
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
     for sys in systems:

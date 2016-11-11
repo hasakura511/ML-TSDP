@@ -39,19 +39,30 @@ version='v4'
 riskEquity=1000
 riskEquity_mini=250
 riskEquity_micro=250        
-offline = ['AC','CGB','EBS','ED','FEI','FSS','LB','YB']
-offline_mini = ['AC','AD','AEX','BP','CC','CD','CGB','CT','CU','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3']
-offline_micro =['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM','EBS','ED','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SMI','SSG','STW','SXE','TF','US','VX','YA','YB','YM','YT2','YT3',]
+offline =['AC','AEX','CC','CGB','CT','DX','EBL','EBM','EBS','ED','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','KC','KW','LB','LCO','LGO','LRC','LSU','MEM','MFX','MW','O','OJ','RR','RS','SB','SIN','SJB','SMI','SSG','STW','SXE','TF','VX','YA','YB','YT2','YT3',]
+offline_mini = ['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM','EBS','ED','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SMI','SSG','STW','SXE','TF','US','VX','YA','YB','YM','YT2','YT3',]
+offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3',]
+
+#for signal files
+c2system='0.5LastSIG'
+#for system files
+c2system_macro=c2system
+c2system_mini='0.5LastSIG'
+c2system_micro='Voting'
+c2safef=1
 
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
-systemFilename='system_v4futures_live.csv'
-systemFilename2='system_v4mini_live.csv'
-systemFilename3='system_v4micro_live.csv'
+systemFilename='system_v4futures.csv'
+systemFilename2='system_v4mini.csv'
+systemFilename3='system_v4micro.csv'
+systemFilename_tosave='system_v4futures_live.csv'
+systemFilename2_tosave='system_v4mini_live.csv'
+systemFilename3_tosave='system_v4micro_live.csv'
 c2id_macro=102324563
-c2id_mini=101533256
-c2id_micro=101359768
+c2id_mini=101359768
+c2id_micro=101533256
 #range (-1 to 1) postive for counter-trend negative for trend i.e.
 #-1 would 0 safef ==1 and double safef==2
 #1 would 0 safef ==2 and double safef==1
@@ -220,6 +231,24 @@ def fixTypes(original, transformed):
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 marketList = [x.split('_')[0] for x in files]
 
+
+#system file update.
+#load from daily run, save to live (to update pivot dates)
+ff = pd.read_csv(feedfile, index_col='CSIsym')
+system = pd.read_csv(systemPath+systemFilename, index_col=0)
+system.index = [x.split('_')[1] for x in system.System]
+system.index.name = 'CSIsym'
+system = system.ix[ff.index]
+
+system_mini = pd.read_csv(systemPath+systemFilename2, index_col=0)
+system_mini.index = [x.split('_')[1] for x in system_mini.System]
+system_mini.index.name = 'CSIsym'
+system_mini = system_mini.ix[ff.index]
+
+system_micro = pd.read_csv(systemPath+systemFilename3, index_col=0)
+system_micro.index = [x.split('_')[1] for x in system_micro.System]
+system_micro.index.name = 'CSIsym'
+system_micro = system_micro.ix[ff.index]
 
 futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
 #futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
@@ -471,17 +500,6 @@ print futuresDF.iloc[:,:4]
 
 
 
-#system file update
-ff = pd.read_csv(feedfile, index_col='CSIsym')
-system = pd.read_csv(systemPath+systemFilename, index_col=0)
-system.index = [x.split('_')[1] for x in system.System]
-system.index.name = 'CSIsym'
-system_mini = pd.read_csv(systemPath+systemFilename2, index_col=0)
-system_mini.index = [x.split('_')[1] for x in system_mini.System]
-system_mini.index.name = 'CSIsym'
-system_micro = pd.read_csv(systemPath+systemFilename3, index_col=0)
-system_micro.index = [x.split('_')[1] for x in system_micro.System]
-system_micro.index.name = 'CSIsym'
 
 #macro
 for sys in system.System:
@@ -532,13 +550,7 @@ system_micro.c2id=c2id_micro
 #print signalDF
 #signalDF.to_csv(savePath+'futuresSignals.csv')
 
-#for signal files
-c2system='Anti1LastSIG'
-#for system files
-c2system_macro=c2system
-c2system_mini='Anti1LastSIG'
-c2system_micro='Voting3'
-c2safef=1
+
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
@@ -871,8 +883,9 @@ system['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4macro'
 system.ix[futuresDF.index].to_sql(name=tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
 system.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
-print 'Saved to sql db', tablename,c2system
-system.to_csv(systemPath+systemFilename, index=True)
+print tablename,c2system
+print 'Saved to sql db and',  systemPath+systemFilename_tosave
+system.to_csv(systemPath+systemFilename_tosave, index=True)
 
 for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
     if sym in futuresDF.index:
@@ -887,8 +900,9 @@ system_mini['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4mini'
 system_mini.ix[futuresDF.index].to_sql(name=tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
 system_mini.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
-print 'Saved to sql db', tablename,c2system_mini
-system_mini.to_csv(systemPath+systemFilename2, index=True)
+print tablename,c2system_mini
+print 'Saved to sql db and', systemPath+systemFilename2_tosave
+system_mini.to_csv(systemPath+systemFilename2_tosave, index=True)
 
 for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
     if sym in futuresDF.index:
@@ -902,8 +916,9 @@ system_micro['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4micro'
 system_micro.ix[futuresDF.index].to_sql(name= tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
 system_micro.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
-print 'Saved to sql db', tablename, c2system_micro
-system_micro.to_csv(systemPath+systemFilename3, index=True)
+print tablename, c2system_micro
+print  'Saved to sql db and', systemPath+systemFilename3_tosave
+system_micro.to_csv(systemPath+systemFilename3_tosave, index=True)
 
 #futuresDF.to_csv(savePath+'futuresATR.csv')
 #print 'Saved', savePath+'futuresATR.csv'

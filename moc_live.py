@@ -54,7 +54,8 @@ minDataPoints = 5
 
 
 if len(sys.argv)==1:
-    systems = ['v4mini']
+    #systems = ['v4mini']
+    systems = ['v4micro','v4mini','v4futures']
     debug=True
     showPlots=True
     submitIB=False
@@ -79,7 +80,7 @@ if len(sys.argv)==1:
     csiDataPath3=  'D:/ML-TSDP/data/csidata/v4futures4/'
     signalPath =  'D:/ML-TSDP/data/signals2/1_'
 else:
-    systems = ['v4micro','v4mini','v4macro']
+    systems = ['v4micro','v4mini','v4futures']
     debug=False
     showPlots=False
     submitIB=True
@@ -87,7 +88,7 @@ else:
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
     runPath2=['python','./vol_adjsize_live.py','1']
-    runPath3=['python','./proc_signal_v4_live.py','1']
+    runPath3=['python','./proc_signal_v4_live_csv.py','1']
     runPath4=['python','./check_systems_live.py','1']
     logPath='/logs/'
     dataPath='./data/'
@@ -614,23 +615,24 @@ def append_data(sym, timetable, loaddate):
 if __name__ == "__main__":
     print durationStr, barSizeSetting, whatToShow
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
-    for sys in systems:
-        systemfile=systemPath+'system_'+sys+'_live.csv'
-        execDict=create_execDict(feeddata, systemfile)
+    systemfile=systemPath+'system_v4futures_live.csv'
+    #systemfile=systemPath+'system_'+sys+'_live.csv'
+    execDict=create_execDict(feeddata, systemfile)
 
-        threadlist=find_triggers(feeddata, execDict)
-        runThreads(threadlist)
-        print 'returned to main thread'
-        #check threadlist tos ee if everythong's there?
-        print 'running vol_adjsize_live'
-        with open(logPath+'vol_adjsize_live.txt', 'w') as f:
-            with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
-                proc = Popen(runPath2, stdout=f, stderr=e)
-                proc.wait()
-                
-        print 'returned to main thread, running c2 orders'
-        with open(logPath+'proc_signal_v4_live.txt', 'w') as f:
-            with open(logPath+'proc_signal_v4_live_error.txt', 'w') as e:
+    threadlist=find_triggers(feeddata, execDict)
+    runThreads(threadlist)
+    print 'returned to main thread'
+    #check threadlist tos ee if everythong's there?
+    print 'running vol_adjsize_live'
+    with open(logPath+'vol_adjsize_live.txt', 'w') as f:
+        with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+            proc = Popen(runPath2, stdout=f, stderr=e)
+            proc.wait()
+            
+    for sys in systems:
+        print 'returned to main thread, running c2 orders for',sys
+        with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
+            with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as e:
                 proc = Popen(runPath3+[sys], stdout=f, stderr=e)
                 proc.wait()
                 
@@ -640,7 +642,7 @@ if __name__ == "__main__":
             proc = Popen(runPath4, stdout=f, stderr=e)
             proc.wait()
             
-    systemfile=systemPath+'system_v4futures_live.csv'
+    #v4futures for ib orders
     if submitIB:
         execDict=update_orders(feeddata, systemfile, execDict)
         print 'placing ib orders from', systemfile

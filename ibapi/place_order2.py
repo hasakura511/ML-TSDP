@@ -66,14 +66,7 @@ class PlaceOrderExample(EWrapper):
                                             commissionReport.commission,
                                             commissionReport.realizedPNL)
 
-def place_order(action, quant, contract, submit):
-    if submit == False:
-          return 0;
-    #prompt = input("WARNING: This example will place an order on your IB "
-    #               "account, are you sure? (Type yes to continue): ")
-    #if prompt.lower() != 'yes':
-    #    sys.exit()
-    
+def place_orders(execDict):
     # Instantiate our callback object
     callback = PlaceOrderExample()
 
@@ -85,69 +78,85 @@ def place_order(action, quant, contract, submit):
     tid=random.randint(1,10000)
     if not tws.eConnect("", 7496, tid):
         raise RuntimeError('Failed to connect to TWS')
-    
-    # Simple contract for GOOG
-    #contract = Contract()
-    #contract.symbol = sym
-    #contract.secType = type
-    #contract.exchange = exchange
-    #contract.currency = currency
-    #contract.localSymbol=iblocalsym
+        
+    for sym in execDict.keys():
+        action, quant, contract = execDict[sym]
+        if action == 'PASS':
+            print 'skipping', sym
+            continue
 
-    print('Waiting for valid order id')
-    order_id = callback.order_ids.get(timeout=WAIT_TIME)
-    if not order_id:
-        raise RuntimeError('Failed to receive order id after %ds' % WAIT_TIME)
-    
-    # Order details
-    algoParams = TagValueList()
-    #algoParams.append(TagValue("componentSize", "3"))
-    #algoParams.append(TagValue("timeBetweenOrders", "60"))
-    #algoParams.append(TagValue("randomizeTime20", "1"))
-    #algoParams.append(TagValue("randomizeSize55", "1"))
-    #algoParams.append(TagValue("giveUp", "1"))
-    #algoParams.append(TagValue("catchUp", "1"))
-    algoParams.append(TagValue("waitForFill", "1"))
-    #algoParams.append(TagValue("startTime", "20110302-14:30:00 GMT"))
-    #algoParams.append(TagValue("endTime", "20110302-21:00:00 GMT"))
+        #prompt = input("WARNING: This example will place an order on your IB "
+        #               "account, are you sure? (Type yes to continue): ")
+        #if prompt.lower() != 'yes':
+        #    sys.exit()
+        
 
-    order = Order()
-    order.action = action
-    #order.lmtPrice = 140
-    order.orderType = 'MKT'
-    order.totalQuantity = quant
-    #order.algoStrategy = "AD"
-    order.tif = 'DAT'
-    order.algoParams = algoParams
-    #order.transmit = False
+        
+        # Simple contract for GOOG
+        #contract = Contract()
+        #contract.symbol = sym
+        #contract.secType = type
+        #contract.exchange = exchange
+        #contract.currency = currency
+        #contract.localSymbol=iblocalsym
 
-    
-    print("Placing order for %d %s's (id: %d)" % (order.totalQuantity,
-                                                  contract.symbol, order_id))
-    
-    # Place the order
-    tws.placeOrder(
-        order_id,                                   # orderId,
-        contract,                                   # contract,
-        order                                       # order
-    )
-    
-    print("\n====================================================================")
-    print(" Order placed, waiting %ds for TWS responses" % WAIT_TIME)
-    print("====================================================================\n")
-    
-    
-    print("Waiting for order to be filled..")
-    
-    try:
-        callback.order_filled.wait(WAIT_TIME)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        if not callback.order_filled.is_set():
-            print('Failed to fill order')
-    
-        print("\nDisconnecting...")
-        tws.eDisconnect()
-    time.sleep(2)
+        print('Waiting for valid order id')
+        if callback.order_ids.empty():
+            tws.reqIds(0)
+
+        order_id = callback.order_ids.get(timeout=WAIT_TIME)
+        if not order_id:
+            raise RuntimeError('Failed to receive order id after %ds' % WAIT_TIME)
+        
+        # Order details
+        algoParams = TagValueList()
+        #algoParams.append(TagValue("componentSize", "3"))
+        #algoParams.append(TagValue("timeBetweenOrders", "60"))
+        #algoParams.append(TagValue("randomizeTime20", "1"))
+        #algoParams.append(TagValue("randomizeSize55", "1"))
+        #algoParams.append(TagValue("giveUp", "1"))
+        #algoParams.append(TagValue("catchUp", "1"))
+        algoParams.append(TagValue("waitForFill", "1"))
+        #algoParams.append(TagValue("startTime", "20110302-14:30:00 GMT"))
+        #algoParams.append(TagValue("endTime", "20110302-21:00:00 GMT"))
+
+        order = Order()
+        order.action = action
+        #order.lmtPrice = 140
+        order.orderType = 'MKT'
+        order.totalQuantity = quant
+        #order.algoStrategy = "AD"
+        order.tif = 'DAY'
+        #order.algoParams = algoParams
+        #order.transmit = False
+
+        
+        print("Placing order for %d %s's (id: %d)" % (order.totalQuantity,
+                                                      contract.symbol, order_id))
+        
+        # Place the order
+        tws.placeOrder(
+            order_id,                                   # orderId,
+            contract,                                   # contract,
+            order                                       # order
+        )
+        
+        print("\n====================================================================")
+        print(" Order placed, waiting %ds for TWS responses" % WAIT_TIME)
+        print("====================================================================\n")
+        
+        
+        print("Waiting for order to be filled..")
+        
+        try:
+            callback.order_filled.wait(WAIT_TIME)
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if not callback.order_filled.is_set():
+                print('Failed to fill order')
+        time.sleep(2)
+        
+    print("\nDisconnecting...")
+    tws.eDisconnect()
 #place_order("BUY", 1, "EUR", "CASH", "USD", "IDEALPRO");

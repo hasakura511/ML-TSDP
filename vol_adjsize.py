@@ -509,7 +509,7 @@ c2system='0.5LastSIG'
 #for system files
 c2system_macro=c2system
 c2system_mini='0.5LastSIG'
-c2system_micro='Voting'
+c2system_micro='LastSEA'
 c2safef=1
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\

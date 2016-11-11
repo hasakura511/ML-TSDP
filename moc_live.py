@@ -67,17 +67,17 @@ if len(sys.argv)==1:
     runPath4=['python','D:/ML-TSDP/check_systems_live.py','0']
     logPath='C:/logs/'
     dataPath='D:/ML-TSDP/data/'
-    portfolioPath = 'D:/ML-TSDP/data/portfolio/'
+    #portfolioPath = 'D:/ML-TSDP/data/portfolio/'
     #savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    savePath = savePath2 = pngPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    systemPath =  'D:/ML-TSDP/data/systems/'
+    savePath = savePath2 = pngPath=portfolioPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    systemPath =  'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/'
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     #systemfile='D:/ML-TSDP/data/systems/system_v4micro.csv'
     timetablePath=   'D:/ML-TSDP/data/systems/timetables_debug/'
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed_fx.csv'
     csiDataPath=  'D:/ML-TSDP/data/csidata/v4futures2/'
     csiDataPath2=  'D:/ML-TSDP/data/csidata/v4futures3/'
-    csiDataPath3=  'D:/ML-TSDP/data/csidata/v4futures4/'
+    csiDataPath3=  'D:/ML-TSDP/data/csidata/v4futures4_debug/'
     signalPath =  'D:/ML-TSDP/data/signals2/1_'
 else:
     systems = ['v4micro','v4mini','v4futures']
@@ -88,7 +88,7 @@ else:
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
     runPath2=['python','./vol_adjsize_live.py','1']
-    runPath3=['python','./proc_signal_v4_live_csv.py','1']
+    runPath3=['python','./proc_signal_v4_live.py','1']
     runPath4=['python','./check_systems_live.py','1']
     logPath='/logs/'
     dataPath='./data/'

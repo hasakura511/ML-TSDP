@@ -23,19 +23,21 @@ from datetime import datetime as dt
 
 #logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
 start_time = time.time()
-systems = ['v4futures','v4mini','v4micro']
-#systems = ['v4micro']
+
 
 if len(sys.argv)==1 or sys.argv[1]=='0':
+    #systems = ['v4micro']
+    systems = ['v4futures','v4mini','v4micro']
     logging.basicConfig(filename='C:/logs/c2.log',level=logging.DEBUG)
     logging.info('test')
-    savePath='D:/ML-TSDP/data/portfolio/'
-    systemPath = 'D:/ML-TSDP/data/systems/'
+    #savePath='D:/ML-TSDP/data/portfolio/'
+    systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/'
     def place_order2(a,b,c,d,e,f,g):
         return "0"
 else:
+    systems = ['v4futures','v4mini','v4micro']
     logging.basicConfig(filename='/logs/c2.log',level=logging.DEBUG)
-    savePath='./data/portfolio/'
+    #savePath='./data/portfolio/'
     systemPath =  './data/systems/'
     from c2api.place_order import place_order2
 
@@ -109,7 +111,7 @@ workingSignals={}
 futuresDict={}
 for sys in systems:
     #subprocess.call(['python', 'get_ibpos.py'])       
-    print sys
+    print sys, 'Getting c2 positions'
     systemdata=pd.read_csv(systemPath+'system_'+sys+'_live.csv')
     futuresDict[sys]=systemdata=systemdata.reset_index()
     futuresDict[sys].index=futuresDict[sys].c2sym

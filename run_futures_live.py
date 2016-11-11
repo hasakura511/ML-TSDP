@@ -350,7 +350,7 @@ if len(sys.argv)==1 or len(sys.argv)==2:
         ticker=sys.argv[1]
     #dataPath =  'Z:/TSDP/data/from_IB/'
     #dataPath = 'D:/data/tickerData/'
-    dataPath = 'D:/ML-TSDP/data/csidata/v4futures4/'
+    dataPath = 'D:/ML-TSDP/data/csidata/v4futures4_debug/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals2/' 
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker

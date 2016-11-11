@@ -23,9 +23,9 @@ if sys.argv[1]=='0':
     debug=True
 
     showPlots=False
-    systemfile='D:/ML-TSDP/data/systems/system_'+sys.argv[2]+'_live.csv'
+    systemfile='C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/system_'+sys.argv[2]+'_live.csv'
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
-    dataPath='D:/ML-TSDP/data/csidata/v4futures4/'
+    dataPath='D:/ML-TSDP/data/csidata/v4futures4_debug/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'

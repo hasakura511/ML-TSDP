@@ -77,7 +77,7 @@ if len(sys.argv)==1:
     #marketList=[sys.argv[1]]
     showPlots=False
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
-    dataPath='D:/ML-TSDP/data/csidata/v4futures4/'
+    dataPath='D:/ML-TSDP/data/csidata/v4futures4_debug/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'

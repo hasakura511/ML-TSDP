@@ -28,7 +28,6 @@ from tzlocal import get_localzone
 import logging
 from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
 from dateutil.parser import parse
-from c2api.proc_signal_v4_live import start_systems, get_c2trades
 import sqlite3
 #currencyPairsDict=dict()
 #prepData=dict()

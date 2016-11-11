@@ -2,13 +2,14 @@ import requests
 from time import gmtime, strftime, time, localtime, sleep
 import logging
 import pandas as pd
-
+import sqlite3
 
 
 
     
         
-def place_order(conn, action, quant, sym, type, systemid, submit,apikey, parentsig=None):
+def place_order(dbPath, action, quant, sym, type, systemid, submit,apikey, parentsig=None):
+    conn = sqlite3.connect(dbPath)
     sigid=int(pd.read_sql('select * from c2sigid', con=conn).iloc[-1])
     if submit == False:
         return 0;
@@ -42,7 +43,8 @@ def place_order(conn, action, quant, sym, type, systemid, submit,apikey, parents
     logging.info( str(r.text)  )
     return sigid
 
-def place_order2(conn, action, quant, sym, type, systemid, submit,apikey, parentsig=None):
+def place_order2(dbPath, action, quant, sym, type, systemid, submit,apikey, parentsig=None):
+    conn = sqlite3.connect(dbPath)
     sigid=int(pd.read_sql('select * from c2sigid', con=conn).iloc[-1])
     if submit == False:
         return 0;

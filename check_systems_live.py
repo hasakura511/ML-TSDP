@@ -23,8 +23,8 @@ from datetime import datetime as dt
 
 #logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
 start_time = time.time()
-#systems = ['v4futures','v4mini','v4micro']
-systems = ['v4micro']
+systems = ['v4futures','v4mini','v4micro']
+#systems = ['v4micro']
 
 if len(sys.argv)==1 or sys.argv[1]=='0':
     logging.basicConfig(filename='C:/logs/c2.log',level=logging.DEBUG)

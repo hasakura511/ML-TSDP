@@ -1,0 +1,3 @@
+dates,CAR25,dd95,ddTol,dpsCommission,dpsNetEquity,dpsNetPNL,dpsRunName,dpsSafef,gainAhead,is_period,netEquity,netPNL,nodpsComm,nodpsSafef,signalType,signals,v4.4_system,safef,mrThreshold,timestamp
+2016-11-10,0.0387421395037,5.09993400045e-05,0.00208514414057,0.0,106175.47,1170.84,both_zigZag_PCA10_VotingSoft DPS wl5.0 maxL2 dd95_0.002 thres_0.0,2.0,-0.00584333543904,wf_is_pv3s_v2v,103254.05,572.47,0.0,1.0,zigZag_PCA10_VotingSoft,-1.0,zigZag_PCA10_f10_is27,1.0,,
+2016-11-11,0.0524139555549,3.99996000001e-05,0.00228416096288,0.0,107416.31,1240.84,both_zigZag_PCA10_VotingSoft DPS wl6.0 maxL2 dd95_0.002 thres_0.0,2.0,0.0,wf_is_pv3s_v2v,103857.4,603.35,0.0,1.0,zigZag_PCA10_VotingSoft,-1.0,zigZag_PCA10_f10_is27,1.0,0.75,20161111 08:07:48 EST

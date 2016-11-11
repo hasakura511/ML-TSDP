@@ -73,7 +73,7 @@ if len(sys.argv)==1:
     systemPath =  'D:/ML-TSDP/data/systems/'
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     #systemfile='D:/ML-TSDP/data/systems/system_v4micro.csv'
-    timetablePath=   'D:/ML-TSDP/data/systems/timetables/'
+    timetablePath=   'D:/ML-TSDP/data/systems/timetables_debug/'
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed_fx.csv'
     csiDataPath=  'D:/ML-TSDP/data/csidata/v4futures2/'
     csiDataPath2=  'D:/ML-TSDP/data/csidata/v4futures3/'
@@ -632,7 +632,7 @@ if __name__ == "__main__":
     for sys in systems:
         print 'returned to main thread, running c2 orders for',sys
         with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
-            with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as e:
+            with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'w') as e:
                 proc = Popen(runPath3+[sys], stdout=f, stderr=e)
                 proc.wait()
                 

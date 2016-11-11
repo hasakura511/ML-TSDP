@@ -16,7 +16,6 @@ import sys
 import threading
 
 
-
 logging.basicConfig(filename='/logs/proc_signal_v4.log',level=logging.DEBUG)
 start_time = time.time()
 debug=False

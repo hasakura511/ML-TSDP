@@ -8,6 +8,8 @@ import time
 import logging
 import os
 
+#logging.basicConfig(filename='/logs/c2.log',level=logging.DEBUG)
+
 def retrieveSignalsWorking(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/retrieveSignalsWorking'
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
@@ -20,7 +22,7 @@ def retrieveSignalsWorking(systemid, apikey):
     params={}
     
     r=requests.post(url, params=params, json=data);
-    print r.text
+    #print r.text
     logging.info(r.text)
     return r.text
     
@@ -37,7 +39,7 @@ def retrieveSystemEquity(systemid, apikey, commission_plan='default'):
     params={}
     
     r=requests.post(url, params=params, json=data);
-    print r.text
+    #print r.text
     logging.info(r.text)
     return r.text
 
@@ -50,7 +52,7 @@ def get_exec(systemid, apikey):
           }
     params={}
     r=requests.post(url, params=params, json=data);
-    print r.text
+    #print r.text
     logging.info(r.text)
     return r.text
 
@@ -66,7 +68,7 @@ def get_exec_open(systemid, apikey):
     params={}
     
     r=requests.post(url, params=params, json=data);
-    print r.text
+    #print r.text
     logging.info(r.text)
     return r.text
 

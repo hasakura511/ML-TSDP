@@ -57,8 +57,9 @@ if len(sys.argv)==1:
     showPlots=True
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
-    runPath2='D:/ML-TSDP/vol_adjsize_live.py'
-    runPath3='D:/ML-TSDP/proc_signal_v4_live.py'
+    runPath2= ['python','D:/ML-TSDP/vol_adjsize_live.py']
+    runPath3=  ['python','D:/ML-TSDP/proc_signal_v4_live.py','0']
+    runPath4=['python','D:/ML-TSDP/check_systems_live.py','0']
     logPath='C:/logs/'
     dataPath='D:/ML-TSDP/data/'
     portfolioPath = 'D:/ML-TSDP/data/portfolio/'
@@ -66,7 +67,7 @@ if len(sys.argv)==1:
     savePath = savePath2 = pngPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     systemPath =  'D:/ML-TSDP/data/systems/'
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
-    systemfile='D:/ML-TSDP/data/systems/system_v4micro.csv'
+    #systemfile='D:/ML-TSDP/data/systems/system_v4micro.csv'
     timetablePath=   'D:/ML-TSDP/data/systems/timetables/'
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed_fx.csv'
     csiDataPath=  'D:/ML-TSDP/data/csidata/v4futures2/'
@@ -78,8 +79,9 @@ else:
     showPlots=False
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
-    runPath2='./vol_adjsize_live.py'
-    runPath3='./proc_signal_v4_live.py'
+    runPath2=['python','./vol_adjsize_live.py','1']
+    runPath3=['python','./proc_signal_v4_live.py','1']
+    runPath4=['python','./check_systems_live.py','1']
     logPath='/logs/'
     dataPath='./data/'
     portfolioPath = './data/portfolio/'
@@ -192,9 +194,118 @@ def get_ibfutpositions(portfolioPath):
     print 'saved', filename
     #
     return dataSet
-    
-def get_orders(feeddata, systemdata):
+
+def create_execDict(feeddata, systemfile):
     global client
+    execDict=dict()
+    #need systemdata for the contract expiry
+    systemdata=pd.read_csv(systemfile)
+    systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
+    systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
+    #openPositions=get_ibfutpositions(portfolioPath)
+    #print feeddata.columns
+    feeddata=feeddata.reset_index()
+    for i in feeddata.index:
+        
+        #print 'Read: ',i
+        system=feeddata.ix[i]
+        #find the current contract
+
+        #print system
+        contract = Contract()
+        
+        if system['ibtype'] == 'CASH':
+            #fx
+            symbol=system['ibsym']+system['ibcur']
+            contract.symbol=system['ibsym']
+        else:
+            #futures
+            currentcontract = [x for i,x in enumerate(systemdata.c2sym) if x[:-2] == system.c2sym]
+            if len(currentcontract)==1:
+                #Z6
+                ccontract = currentcontract[0][-2:]
+                ccontract = 201000+int(ccontract[-1])*100+months[ccontract[0]]
+                contract.expiry=str(ccontract)
+            else:
+                ccontract = ''
+            symbol=contract.symbol= system['ibsym']
+            contract.multiplier = str(system['multiplier'])
+
+        #contract.symbol = system['ibsym']
+        contract.secType = system['ibtype']
+        contract.exchange = system['ibexch']
+        contract.currency = system['ibcur']
+        
+        #update system file with correct ibsym and contract expiry
+        c2sym=system.c2sym
+        ibsym=system.ibsym   
+        index = systemdata[systemdata.c2sym2==c2sym].index[0]
+        #print index, ibsym, ccontract, systemdata.columns
+        systemdata.set_value(index, 'ibsym', ibsym)
+        systemdata.set_value(index, 'ibexpiry', ccontract)
+        execDict[symbol]=['PASS', 0, contract]
+
+        #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
+    systemdata.to_csv(systemfile, index=False)
+    print 'saved', systemfile
+      
+    print len(execDict.keys()), execDict.keys()
+    return execDict
+   
+def update_orders(feeddata, systemfile, execDict):
+    global client
+    global portfolioPath
+    systemdata=pd.read_csv(systemfile)
+    #systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
+    #systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
+    #openPositions=get_ibfutpositions(portfolioPath)
+    #print feeddata.columns
+    feeddata=feeddata.reset_index()
+    openPositions=get_ibfutpositions(portfolioPath)
+
+    for i in feeddata.index:
+        system=feeddata.ix[i]
+        c2sym=system.c2sym
+        ibsym=system.ibsym   
+        index = systemdata[systemdata.c2sym2==c2sym].index[0]
+
+        if ibsym in openPositions.index:
+            ib_pos_qty=openPositions.ix[ibsym].qty
+        else:
+            ib_pos_qty=0
+        #ib_pos_qty=0
+        #print ib_pos_qty
+        ibquant = systemdata.ix[index].c2qty
+        system_ibpos_qty=systemdata.ix[index].signal * ibquant
+        #print 'ibq', type(ibquant), 'sysibq', type(system_ibpos_qty)
+        #print( "system_ib_pos: " + str(system_ibpos_qty) ),
+        #print( "ib_pos: " + str(ib_pos_qty) ),
+        
+        action='PASS'
+        if system_ibpos_qty > ib_pos_qty:
+            action = 'BUY'
+            ibquant=int(system_ibpos_qty - ib_pos_qty)
+            #print( 'BUY: ' + str(ibquant) )
+            #place_iborder('BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);
+        if system_ibpos_qty < ib_pos_qty:
+            action='SELL'
+            ibquant=int(ib_pos_qty - system_ibpos_qty)
+            #print( 'SELL: ' + str(ibquant) )
+            #place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);         
+        #print( action+': ' + str(ibquant) )
+        execDict[ibsym][0]=action
+        execDict[ibsym][1]=ibquant
+
+        #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
+    #systemdata.to_csv(systemfile, index=False)
+    #print 'saved', systemfile
+      
+    print len(execDict.keys()), execDict.keys()
+    return execDict
+    
+def get_orders(feeddata, systemfile):
+    global client
+    systemdata=pd.read_csv(systemfile)
     execDict=dict()
 
     systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
@@ -397,11 +508,11 @@ def find_triggers(feeddata, execDict):
         fmt = '%Y-%m-%d %H:%M'    
         tdate=dt.strptime(triggers.ix[t],fmt).replace(tzinfo=eastern)
         if endDateTime>tdate:
-            print 'checking trigger', csiRunSym,
+            #print 'checking trigger:',
             filename = csiDataPath3+csiFileSym+'_B.CSV'
             if not os.path.isfile(filename) or os.path.getsize(filename)==0:
                 #create new file
-                print 'file not found appending data'
+                print csiRunSym, 'file not found appending data'
                 dataNotAppended = True
             else:
                 #check csiDataPath3
@@ -417,9 +528,14 @@ def find_triggers(feeddata, execDict):
                     lastsignaldate=0
                 
                 if int(loaddate) > lastdate and int(loaddate) > int(lastsignaldate):
+                    print csiRunSym,'appending.. data has not yet been appended and signal has not yet been generated',
                     print 'loaddate', loaddate, '>', 'lastdate',lastdate,'lastsignaldate', lastsignaldate
                     dataNotAppended=True
                 else:
+                    if int(loaddate) <= lastdate:
+                        print csiRunSym,'skipping append.. data has already been appended',
+                    if int(loaddate) <= int(lastsignaldate):
+                        print csiRunSym,'skipping append.. signal has been generated',
                     print 'loaddate', loaddate, '<', 'lastdate',lastdate,'lastsignaldate', lastsignaldate
                     dataNotAppended=False
             #append data if M-F, not a holiday and if the data hasn't been appended yet. US MARKETS EST.
@@ -428,7 +544,7 @@ def find_triggers(feeddata, execDict):
                 #append new bar
                 runsystem = append_data(ibsym, timetable, loaddate)
                 if runsystem:
-                    print 'data appended running system',
+                    print csiRunSym, 'data appended running system',
                     if debug==True:
                         print 'debug mode'
                         popenArgs = ['python', runPath,csiRunSym]
@@ -440,10 +556,12 @@ def find_triggers(feeddata, execDict):
                         #popenArgs2 = ['python', runPath2, csiFileSym,'1']
                         threadlist.append((csiRunSym,popenArgs))
                 else:
-                    print 'skipping runsystem append_data returned 0', csiRunSym
+                    print csiRunSym, 'skipping runsystem append_data returned 0'
             else:
-                print 'skipping append.. day of week',days[dayofweek],'dataNotAppended',dataNotAppended, 'loaddate',\
-                        loaddate, '>', 'lastdate',lastdate,'lastsignaldate', lastsignaldate
+                if dayofweek>=5:
+                    print csiRunSym, 'skipping append.. day of week', days[dayofweek]
+
+                
         else:
             print csiRunSym,'not triggered: next trigger',tdate,'now', endDateTime
     return threadlist
@@ -493,26 +611,45 @@ def proc_orders(sym):
         #systemdata=systemdata.reset_index()
         #start_systems(systemdata)
         #get_c2trades(systemdata)
-        
+
+
 if __name__ == "__main__":
+    submitIB=False
+    #systems = ['v4micro','v4mini','v4macro']
     systems = ['v4mini']
     print durationStr, barSizeSetting, whatToShow
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
-    systemdata=pd.read_csv(systemfile)
-    execDict=get_orders(feeddata, systemdata)
-    threadlist=find_triggers(feeddata, execDict)
-    runThreads(threadlist)
-    print 'returned to main thread, running vol_adjsize_live'
-    #check threadlist tos ee if everythong's there?
-    with open(logPath+'vol_adjsize_live.txt', 'w') as f:
-        with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
-            proc = Popen(['python',runPath2], stdout=f, stderr=e)
+    for sys in systems:
+        systemfile=systemPath+'system_'+sys+'_live.csv'
+        execDict=create_execDict(feeddata, systemfile)
+
+        threadlist=find_triggers(feeddata, execDict)
+        runThreads(threadlist)
+        print 'returned to main thread'
+        #check threadlist tos ee if everythong's there?
+        print 'running vol_adjsize_live'
+        with open(logPath+'vol_adjsize_live.txt', 'w') as f:
+            with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+                proc = Popen(runPath2, stdout=f, stderr=e)
+                proc.wait()
+                
+        print 'returned to main thread, running c2 orders'
+        with open(logPath+'proc_signal_v4_live.txt', 'w') as f:
+            with open(logPath+'proc_signal_v4_live_error.txt', 'w') as e:
+                proc = Popen(runPath3+[sys], stdout=f, stderr=e)
+                proc.wait()
+                
+    print 'returned to main thread, running check systems'
+    with open(logPath+'check_systems.txt', 'w') as f:
+        with open(logPath+'check_systems_error.txt', 'w') as e:
+            proc = Popen(runPath4, stdout=f, stderr=e)
             proc.wait()
-    print 'returned to main thread, running c2 orders'
-    with open(logPath+'proc_signal_v4_live.txt', 'w') as f:
-        with open(logPath+'proc_signal_v4_live.txt', 'w') as e:
-            proc = Popen(['python',runPath3], stdout=f, stderr=e)
-            proc.wait()
+            
+    systemfile=systemPath+'system_v4macro_live.csv'
+    if submitIB:
+        execDict=update_orders(feeddata, systemfile, execDict)
+        print 'placing ib orders from', systemfile
+        place_iborders(execDict)
     
     
     #symbols = execDict.keys()

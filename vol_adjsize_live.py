@@ -59,7 +59,7 @@ safefAdjustment=0
 
 if len(sys.argv)==1:
     debug=True
-    
+    mode = 'replace'
     #marketList=[sys.argv[1]]
     showPlots=False
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
@@ -81,7 +81,7 @@ if len(sys.argv)==1:
     
 else:
     debug=False
-    
+    mode= 'append'
     #marketList=[sys.argv[1]]
     showPlots=False
     feedfile='./data/systems/system_ibfeed.csv'
@@ -851,8 +851,7 @@ for ticker in futuresDF.index:
     #signalFile.to_csv(filename, index=True)
 #print nsig, 'files updated'
 '''
-mode = 'replace'
-#mode= 'append'
+
 futuresDF['Date']=lastDate
 futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 futuresDF.index.name = 'CSIsym'

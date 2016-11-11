@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 import subprocess
 import time
-from ibapi.place_order import place_order as place_iborder
-from c2api.place_order import place_order as place_c2order
+#from ibapi.place_order import place_order as place_iborder
+from c2api.place_order2 import place_order as place_c2order
 import json
 from pandas.io.json import json_normalize
-from c2api.get_exec import get_c2pos, get_exec_open, retrieveSystemEquity, get_c2_pos
+from c2api.get_exec import get_c2pos, get_exec_open, retrieveSystemEquity, get_c2_pos, get_exec
 #from seitoolz.get_exec import get_executions as get_c2trades
-from ibapi.place_order2 import place_orders as place_iborders
+#from ibapi.place_order2 import place_orders as place_iborders
 from time import gmtime, strftime, localtime, sleep
 import logging
 import sys
@@ -16,18 +16,20 @@ import threading
 import sqlite3
 
 
-logging.basicConfig(filename='/logs/proc_signal_v4_live.log',level=logging.DEBUG)
+#logging.basicConfig(filename='/logs/proc_signal_v4_live.log',level=logging.DEBUG)
 start_time = time.time()
 
-if len(sys.argv)==1:
+if sys.argv[1]=='0':
     debug=True
 
     showPlots=False
+    systemfile='D:/ML-TSDP/data/systems/system_'+sys.argv[2]+'_live.csv'
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dataPath='D:/ML-TSDP/data/csidata/v4futures4/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    logging.basicConfig(filename='C:/logs/c2.log',level=logging.DEBUG)
     #test last>old
     #dataPath2=savePath2
     #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
@@ -39,9 +41,10 @@ if len(sys.argv)==1:
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
-    
+    portfolioPath = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/c2_' 
 else:
     debug=False
+    systemfile='./data/systems/system_'+sys.argv[2]+'_live.csv'
     feedfile='./data/systems/system_ibfeed.csv'
     dbPath='./data/futures.sqlite3'
     dataPath='./data/csidata/v4futures4/'
@@ -51,18 +54,31 @@ else:
     signalSavePath = './data/signals2/' 
     savePath2 = './data/results/'
     systemPath =  './data/systems/'
-
-#systems = ['v4micro','v4mini','v4macro']
-systems = ['v4mini']
-
+    portfolioPath = './data/portfolio/c2_' 
+    logging.basicConfig(filename='/logs/c2.log',level=logging.DEBUG)
+    
 conn = sqlite3.connect(dbPath)
 
+def checkTableExists(dbcon, tablename):
+    dbcur = dbcon.cursor()
+    dbcur.execute("""
+        SELECT COUNT(*)
+        FROM sqlite_master
+        WHERE type= 'table' AND name = '{0}'
+        """.format(tablename.replace('\'', '\'\'')))
+    if dbcur.fetchone()[0] == 1:
+        dbcur.close()
+        return True
 
+    dbcur.close()
+    return False
+    
 def get_c2trades(systemid, name, c2api):
-    filename='./data/portfolio/c2_' + name + '_trades.csv'
+    global portfolioPath
+    filename=portfolioPath+ name + '_trades.csv'
     
     datestr=strftime("%Y%m%d", localtime())
-    data=get_c2exec(systemid,c2api);
+    data=get_exec(systemid,c2api);
     
     jsondata = json.loads(data)
     if len(jsondata['response']) > 1:
@@ -81,26 +97,6 @@ def get_c2trades(systemid, name, c2api):
         dataSet=dataSet.sort_values(by='closedWhenUnixTimeStamp')
         
         dataSet.to_csv(filename)
-
-def get_ibtrades():
-    filename='./data/portfolio/ib_trades' + '.csv'
-    
-    datestr=strftime("%Y%m%d", localtime())
-    data=get_ibexec()
-    dataSet=pd.DataFrame(data)
-    if len(dataSet.index) > 0:
-	dataSet=dataSet.set_index('permid')
-    
-    	if os.path.isfile(filename):
-        	existData = pd.read_csv(filename, index_col='permid')
-        	existData =existData.reset_index()
-        	dataSet=dataSet.reset_index()
-        	dataSet=existData.append(dataSet)
-        	dataSet['permid'] = dataSet['permid'].astype('int')
-        	dataSet=dataSet.drop_duplicates(subset=['permid'],keep='last')
-        	dataSet=dataSet.set_index('permid')
-    	dataSet=dataSet.sort_values(by='times')
-    	dataSet.to_csv(filename)
 
 def get_c2executions(data):        
     #data=pd.read_csv('./data/systems/system.csv')
@@ -122,7 +118,7 @@ def start_trade(systems):
         global debug
         if debug:
            print "Starting " + str(systems.iloc[0]['Name'])
-           logging.info("Starting " + str(systems.iloc[0]['Name']))
+           #logging.info("Starting " + str(systems.iloc[0]['Name']))
         try:
             #model=get_models(systems)
             model = pd.concat([systems.System, systems.signal, systems.c2qty], axis=1)
@@ -148,7 +144,8 @@ def start_trade(systems):
                              system['iblocalsym'])
               #time.sleep(30)
         except Exception as e:
-            logging.error("something bad happened", exc_info=True)
+            #logging.error("something bad happened", exc_info=True)
+            print e
 
 def start_systems(systemdata):
       threads = []        
@@ -183,12 +180,12 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
                     ibsubmit, iblocalsym=''):
     system_pos=model_pos.loc[system]
    
-    logging.info('==============')
-    logging.info('Strategy:' + systemname)
-    #logging.info('system_pos:' +str(system_pos))
-    logging.info("  Signal Name: " + system)
-    logging.info("  C2ID: " + systemid + "  C2Key: " + c2apikey)
-    logging.info("  C2Sym: " + c2sym + " IBSym: " + ibsym)
+    print('==============')
+    print('Strategy:' + systemname)
+    #print('system_pos:' +str(system_pos))
+    print("  Signal Name: " + system)
+    print("  C2ID: " + systemid + "  C2Key: " + c2apikey)
+    print("  C2Sym: " + c2sym + " IBSym: " + ibsym)
     if c2submit == 'TRUE':
         c2submit=True
     elif c2submit == 'FALSE':
@@ -204,8 +201,8 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
     if c2submit:
         c2_pos_qty=get_c2_pos(systemname, c2sym)           
         system_c2pos_qty=round(system_pos['action']) * c2quant
-        logging.info( "system_c2_pos: " + str(system_c2pos_qty) )
-        logging.info( "c2_pos: " + str(c2_pos_qty) )
+        print( "system_c2_pos: " + str(system_c2pos_qty) )
+        print( "c2_pos: " + str(c2_pos_qty) )
         
         if system_c2pos_qty > c2_pos_qty:
             c2quant=system_c2pos_qty - c2_pos_qty
@@ -213,34 +210,34 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
             psigid=0
             if c2_pos_qty < 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
-                logging.info( 'BTC: ' + str(qty) )
-                psigid=place_c2order('BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
+                print( 'BTC: ' + str(qty) )
+                psigid=place_c2order(conn,'BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 isrev=True                
                 c2quant = c2quant - qty
                 
             if c2quant > 0:
-                logging.info( 'BTO: ' + str(c2quant) )
+                print( 'BTO: ' + str(c2quant) )
                 if isrev:
-                    place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
+                    place_c2order(conn,'BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
                 else:
-                    place_c2order('BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+                    place_c2order(conn,'BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
         if system_c2pos_qty < c2_pos_qty:
             c2quant=c2_pos_qty - system_c2pos_qty   
             isrev=False
             psigid=0
             if c2_pos_qty > 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
-                logging.info( 'STC: ' + str(qty) )
-                psigid=place_c2order('STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
+                print( 'STC: ' + str(qty) )
+                psigid=place_c2order(conn,'STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 isrev=True 
                 c2quant = c2quant - qty
 
             if c2quant > 0:
-                logging.info( 'STO: ' + str(c2quant) )
+                print( 'STO: ' + str(c2quant) )
                 if isrev:
-                    place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
+                    place_c2order(conn,'STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
                 else:
-                    place_c2order('STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+                    place_c2order(conn,'STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
 '''
     if ibsubmit:
         ib_pos_qty=get_ib_pos(ibsym, ibcurrency)
@@ -270,7 +267,9 @@ def proc_orders():
 #subprocess.call(['python', 'get_ibpos.py'])
 
 #subprocess.call(['python', 'get_ibpos.py'])       
-systemdata=pd.read_csv('./data/systems/system_'+sys.argv[2]+'_live.csv')
+systemdata=pd.read_csv(systemfile)
+if not checkTableExists(conn, 'c2sigid'):
+    pd.DataFrame(pd.Series(data=1), columns=['c2sigid']).to_sql(name='c2sigid',con=conn, index=False)
 systemdata=systemdata.reset_index()
 start_systems(systemdata)
 get_c2executions(systemdata)

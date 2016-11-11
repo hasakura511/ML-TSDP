@@ -10,7 +10,7 @@ import time
 #from c2api.place_order import place_order as place_c2order
 import json
 from pandas.io.json import json_normalize
-from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
+#from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
 from c2api.get_exec import get_exec_open, get_c2_list, get_c2livepos, retrieveSignalsWorking
 #from seitoolz.signal import get_dps_model_pos, get_model_pos
 #from seitoolz.order import adj_size
@@ -21,17 +21,20 @@ import sys
 import threading
 from datetime import datetime as dt
 
-logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
+#logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
 start_time = time.time()
-systems = ['v4futures','v4mini','v4micro']
-#systems = ['v4futures']
+#systems = ['v4futures','v4mini','v4micro']
+systems = ['v4micro']
 
-if len(sys.argv)==1:
+if len(sys.argv)==1 or sys.argv[1]=='0':
+    logging.basicConfig(filename='C:/logs/c2.log',level=logging.DEBUG)
+    logging.info('test')
     savePath='D:/ML-TSDP/data/portfolio/'
     systemPath = 'D:/ML-TSDP/data/systems/'
     def place_order2(a,b,c,d,e,f,g):
         return "0"
 else:
+    logging.basicConfig(filename='/logs/c2.log',level=logging.DEBUG)
     savePath='./data/portfolio/'
     systemPath =  './data/systems/'
     from c2api.place_order import place_order2
@@ -106,13 +109,14 @@ workingSignals={}
 futuresDict={}
 for sys in systems:
     #subprocess.call(['python', 'get_ibpos.py'])       
-    systemdata=pd.read_csv(systemPath+'system_'+sys+'.csv')
+    print sys
+    systemdata=pd.read_csv(systemPath+'system_'+sys+'_live.csv')
     futuresDict[sys]=systemdata=systemdata.reset_index()
     futuresDict[sys].index=futuresDict[sys].c2sym
     #portfolio and equity
     c2list=get_c2_list(systemdata)
-    systems=c2list.keys()
-    for systemname in systems:
+    c2systems=c2list.keys()
+    for systemname in c2systems:
         (systemid, apikey)=c2list[systemname]
         c2dict[systemname]=get_c2livepos(systemid, apikey, systemname)
         response = json.loads(retrieveSignalsWorking(systemid, apikey))['response']

@@ -657,7 +657,7 @@ if __name__ == "__main__":
         execDict=update_orders(feeddata, systemfile, execDict)
         place_iborders(execDict)
     
-   print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
     
     #symbols = execDict.keys()

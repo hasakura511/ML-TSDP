@@ -667,15 +667,16 @@ if lastDate > sigDate:
     futuresDF.to_csv(savePath+'futuresATR_Results.csv')
     
     filename='futuresL_History.csv'
-    cols=['L%_currency',
-             'L%_energy',
-             'L%_grain',
-             'L%_index',
-             'L%_meat',
-             'L%_metal',
-             'L%_ACT',
-             'L%_rates',
-             'L%_soft']
+    #cols=['L%_currency',
+    #         'L%_energy',
+    #         'L%_grain',
+    #         'L%_index',
+    #         'L%_meat',
+    #         'L%_metal',
+    #         'L%_ACT',
+    #         'L%_rates',
+    #         'L%_soft']
+    cols = [x for x in totalsDF if 'L%' in x]
     if filename not in files:
         print 'Saving', savePath+filename
         totalsDF[cols].to_csv(savePath+filename)

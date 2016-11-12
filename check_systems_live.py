@@ -20,7 +20,7 @@ import logging
 import sys
 import threading
 from datetime import datetime as dt
-
+import sqlite3
 #logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
 start_time = time.time()
 
@@ -32,6 +32,7 @@ if len(sys.argv)==1 or sys.argv[1]=='0':
     logging.info('test')
     #savePath='D:/ML-TSDP/data/portfolio/'
     systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/'
+    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     def place_order2(a,b,c,d,e,f,g):
         return "0"
 else:
@@ -39,9 +40,10 @@ else:
     logging.basicConfig(filename='/logs/c2.log',level=logging.DEBUG)
     #savePath='./data/portfolio/'
     systemPath =  './data/systems/'
+    dbPath='./data/futures.sqlite3'
     from c2api.place_order import place_order2
 
-    
+conn = sqlite3.connect(dbPath)
     
 def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
     errors=0
@@ -109,6 +111,9 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
 c2dict={}
 workingSignals={}
 futuresDict={}
+totalerrors=0
+    
+    
 for sys in systems:
     #subprocess.call(['python', 'get_ibpos.py'])       
     print sys, 'Getting c2 positions'
@@ -179,10 +184,10 @@ for sys in c2dict.keys():
         if sym not in c2dict[sys].index and systemSym:
             mismatch_count+=1
             error_count+=reconcileWorkingSignals(sys, workingSignals, sym, sig, 0, qty, 0)
-            
+    totalerrors+=error_count
     for e in exitList:
         print e
     print 'c2:'+str(c2_count)+' sys:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)+' errors:'+str(error_count)
     print 'DONE!\n'
-
+pd.DataFrame(pd.Series(data=totalerrors), columns=['totalerrors']).to_sql(name='checkSystems',con=conn, index=False, if_exists='replace')
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

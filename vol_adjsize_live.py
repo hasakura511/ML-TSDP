@@ -35,6 +35,7 @@ import seaborn as sns
 from suztoolz.datatools.seasonalClass import seasonalClassifier
 
 start_time = time.time()
+
 version='v4'
 riskEquity=1000
 riskEquity_mini=250

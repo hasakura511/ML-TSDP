@@ -639,7 +639,7 @@ if __name__ == "__main__":
 
     threadlist=find_triggers(feeddata, execDict)
     runThreads(threadlist)
-    print 'returned to main thread with', len(threadlsit), 'threads'
+    print 'returned to main thread with', len(threadlist), 'threads'
     #check threadlist tos ee if everythong's there?
     if len(threadlist)==0:
         print 'Found nothing to update!'

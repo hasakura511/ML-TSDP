@@ -86,7 +86,7 @@ else:
     systems = ['v4micro','v4mini','v4futures']
     debug=False
     showPlots=False
-    submitIB=True
+    submitIB=False
     triggertime = 30 #mins
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
@@ -565,8 +565,8 @@ def find_triggers(feeddata, execDict):
             #append data if M-F, not a holiday and if the data hasn't been appended yet. US MARKETS EST.
             dayofweek = endDateTime.date().weekday()
             
-            if dayofweek<5 and dataNotAppended:
-            #if dataNotAppended:
+            #if dayofweek<5 and dataNotAppended:
+            if dataNotAppended:
                 #append new bar
                 runsystem = append_data(ibsym, timetable, loaddate)
                 if runsystem:
@@ -639,7 +639,7 @@ if __name__ == "__main__":
 
     threadlist=find_triggers(feeddata, execDict)
     runThreads(threadlist)
-    print 'returned to main thread'
+    print 'returned to main thread with', len(threadlsit), 'threads'
     #check threadlist tos ee if everythong's there?
     if len(threadlist)==0:
         print 'Found nothing to update!'

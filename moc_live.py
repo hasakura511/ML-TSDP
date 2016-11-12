@@ -82,6 +82,7 @@ if len(sys.argv)==1:
     csiDataPath3=  'D:/ML-TSDP/data/csidata/v4futures4_debug/'
     signalPathDaily =  'D:/ML-TSDP/data/signals/'
     signalPathMOC =  'D:/ML-TSDP/data/signals2/'
+    logging.basicConfig(filename='C:/logs/ib_live.log',level=logging.DEBUG)
 else:
     systems = ['v4micro','v4mini','v4futures']
     debug=False
@@ -109,6 +110,7 @@ else:
     csiDataPath3=  './data/csidata/v4futures4/'
     signalPathDaily =  './data/signals/'
     signalPathMOC =  './data/signals2/'
+    logging.basicConfig(filename='/logs/ib_live.log',level=logging.DEBUG)
 
 tzDict = {
     'CST':'CST6CDT',
@@ -655,7 +657,7 @@ if __name__ == "__main__":
         execDict=update_orders(feeddata, systemfile, execDict)
         place_iborders(execDict)
     
-    print 'DONE!'
+   print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
     
     #symbols = execDict.keys()

@@ -63,7 +63,7 @@ systemFilename3='system_v4micro.csv'
 systemFilename_tosave='system_v4futures_live.csv'
 systemFilename2_tosave='system_v4mini_live.csv'
 systemFilename3_tosave='system_v4micro_live.csv'
-c2id_macro=102324563
+c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
 #range (-1 to 1) postive for counter-trend negative for trend i.e.

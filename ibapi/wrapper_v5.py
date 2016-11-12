@@ -75,7 +75,7 @@ class IBWrapper(EWrapper):
        
         if errorCode in ERRORS_TO_TRIGGER:
             errormsg="IB error id %d errorcode %d string %s" %(id, errorCode, errorString)
-            print errormsg
+            logging.info(errormsg)
             setattr(self, "flag_iserror", True)
             setattr(self, "error_msg", True)
            
@@ -93,9 +93,9 @@ class IBWrapper(EWrapper):
         pass
 
     def commissionReport(self, commission):
-        print 'Commission %s %s P&L: %s' % (commission.currency,
+        logging.info('Commission %s %s P&L: %s' % (commission.currency,
                                             commission.commission,
-                                            commission.realizedPNL)
+                                            commission.realizedPNL))
         filldata=self.data_fill_data
         
         #if reqId not in filldata.keys():
@@ -352,10 +352,10 @@ class IBWrapper(EWrapper):
             sym=rtdict[reqId]
             data=rtbar[reqId]
             if date[:8] == 'finished':
-                print("Req ID: " + str(reqId) + " History request complete " + str(data.shape[0]) + " Records")
+                logging.info("Req ID: " + str(reqId) + " History request complete " + str(data.shape[0]) + " Records")
                 rthist[reqId].set()
                 data=data.sort_index()
-                print data
+                logging.info(data)
             else:
                 
                 if self.is_bar_date(str(date), barSizeSetting):
@@ -373,8 +373,8 @@ class IBWrapper(EWrapper):
                 else:  
                     #print date, type(date), len(str(date))
                     #e.g. half an hour bar in hourly bar request
-                    print "Skipping Off Date History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
-                              % (date, open, high, low, close, volume)
+                    logging.info("Skipping Off Date History %s - Open: %s, High: %s, Low: %s, Close: %s, Volume: %d"\
+                              % (date, open, high, low, close, volume))
 
                     
             rtbar[reqId]=data
@@ -427,11 +427,11 @@ class IBWrapper(EWrapper):
                     data.to_csv(filename)
                     
                     quote=data.reset_index().iloc[-1]
-                    print "Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
+                    logging.info("Close Bar: " + sym + " date:" + str(quote['Date']) + " open: " + str(quote['Open']) + " high:"  + str(quote['High']) + ' low:' + str(quote['Low']) + ' close: ' + str(quote['Close']) + ' volume:' + str(quote['Volume']) + ' wap:' + str(wap) + ' count:' + str(data.shape[0]))
                     
                     gotbar=pd.DataFrame([[quote['Date'], quote['Open'], quote['High'], quote['Low'], quote['Close'], quote['Volume'], sym]], columns=['Date','Open','High','Low','Close','Volume','Symbol']).set_index('Date')
                     gotbar.to_csv(barPath + sym + '.csv')
-                print "New Bar:   " + sym + " date:" + str(time) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(data.shape[0])
+                logging.info("New Bar:   " + sym + " date:" + str(time) + " open: " + str(open) + " high:"  + str(high) + ' low:' + str(low) + ' close: ' + str(close) + ' volume:' + str(volume) + ' wap:' + str(wap) + ' count:' + str(data.shape[0]))
                 data=data.reset_index().append(pd.DataFrame([[time, open, high, low, close, volume]], columns=['Date','Open','High','Low','Close','Volume'])).set_index('Date')
                 
                 
@@ -514,7 +514,7 @@ class IBWrapper(EWrapper):
             
             if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) > 5:
                 if fbid.has_key(TickerId) and fask.has_key(TickerId):
-                    print "tickGeneric SYM: " + sym + " ", fbid[TickerId], fask[TickerId]
+                    logging.info("tickGeneric SYM: " + sym + " ", fbid[TickerId], fask[TickerId])
                     bidaskSaveDate[sym]=int(time.time())
                 
                     eastern=timezone('US/Eastern')
@@ -575,7 +575,7 @@ class IBWrapper(EWrapper):
             if not bidaskSaveDate.has_key(sym) or (int(time.time()) - bidaskSaveDate[sym]) > 5:
                 if fbid.has_key(TickerId) and fask.has_key(TickerId):
                     bidaskSaveDate[sym]=int(time.time())
-                    print "tickPrice SYM: " + sym + " ", fbid[TickerId], fask[TickerId], " Timer: ",(int(time.time()) - bidaskSaveDate[sym])
+                    logging.info("tickPrice SYM: " + sym + " ", fbid[TickerId], fask[TickerId], " Timer: ",(int(time.time()) - bidaskSaveDate[sym]))
                     
                 
                     eastern=timezone('US/Eastern')
@@ -600,11 +600,11 @@ class IBWrapper(EWrapper):
         """
         pass
     def updateAccountTime	(self, timestamp):
-        print 'update account time', timestamp
+        logging.info('update account time', timestamp)
         
     def tickSnapshotEnd(self, tickerId):
         
-        print "No longer want to get %d" % tickerId
+        logging.info("No longer want to get %d" % tickerId)
 
 class IBclient(object):
     """
@@ -664,8 +664,8 @@ class IBclient(object):
     
         contract_details=self.cb.data_contractdetails[reqId]
         if iserror or contract_details=={}:
-            print self.cb.error_msg
-            print "Problem getting details"
+            logging.info( self.cb.error_msg)
+            logging.info( "Problem getting details")
             return None
     
         return contract_details
@@ -700,8 +700,8 @@ class IBclient(object):
 
         
         if brokerorderid is None or iserror:
-            print self.cb.error_msg
-            print "Problem getting next broker orderid"
+            logging.info( self.cb.error_msg)
+            logging.info( "Problem getting next broker orderid")
             return None
         
         return brokerorderid
@@ -725,10 +725,10 @@ class IBclient(object):
 
         ## We can eithier supply our own ID or ask IB to give us the next valid one
         if orderid is None:
-            print "Getting orderid from IB"
+            logging.info( "Getting orderid from IB")
             orderid=self.get_next_brokerorderid()
             
-        print "Using order id of %d" % orderid
+        logging.info( "Using order id of %d" % orderid)
     
          # Place the order
         self.tws.placeOrder(
@@ -770,8 +770,8 @@ class IBclient(object):
         
         order_structure=self.cb.data_order_structure
         if iserror:
-            print self.cb.error_msg
-            print "Problem getting open orders"
+            logging.info( self.cb.error_msg)
+            logging.info( "Problem getting open orders")
     
         return order_structure    
     
@@ -812,8 +812,8 @@ class IBclient(object):
                     pass
             
                 if iserror:
-                    print self.cb.error_msg
-                    print "Problem getting executions"
+                    logging.info( self.cb.error_msg)
+                    logging.info( "Problem getting executions")
                 
                 t=t-1;
                 
@@ -842,11 +842,11 @@ class IBclient(object):
     
                 if (time.time() - start_time) > MAX_WAIT_SECONDS:
                     finished=True
-                    print "Didn't get an end for account update, might be missing stuff"
+                    logging.info( "Didn't get an end for account update, might be missing stuff")
                 pass
             if iserror:
-                print self.cb.error_msg
-                print "Problem getting details"
+                logging.info( self.cb.error_msg)
+                logging.info( "Problem getting details")
                 return None
     
     
@@ -1013,9 +1013,9 @@ class IBclient(object):
                 )
         
         
-            print("====================================================================")
-            print(" %s History requested, waiting %ds for TWS responses" % (date, WAIT_TIME))
-            print("====================================================================")
+            logging.info("====================================================================")
+            logging.info(" %s History requested, waiting %ds for TWS responses" % (date, WAIT_TIME))
+            logging.info("====================================================================")
             
             try:
                 rthist[tickerid].wait(timeout=WAIT_TIME)
@@ -1023,7 +1023,7 @@ class IBclient(object):
                 pass
             finally:
                 if not rthist[tickerid].is_set():
-                    print('Failed to get history within %d seconds' % WAIT_TIME)
+                    logging.info('Failed to get history within %d seconds' % WAIT_TIME)
             
            
             return rtbar[tickerid]

@@ -29,7 +29,7 @@ if sys.argv[1]=='0':
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
-    logging.basicConfig(filename='C:/logs/c2.log',level=logging.DEBUG)
+    logging.basicConfig(filename='C:/logs/c2_live.log',level=logging.DEBUG)
     #test last>old
     #dataPath2=savePath2
     #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
@@ -55,7 +55,7 @@ else:
     savePath2 = './data/results/'
     systemPath =  './data/systems/'
     portfolioPath = './data/portfolio/c2_' 
-    logging.basicConfig(filename='/logs/c2.log',level=logging.DEBUG)
+    logging.basicConfig(filename='/logs/c2_live.log',level=logging.DEBUG)
     
 conn = sqlite3.connect(dbPath)
 

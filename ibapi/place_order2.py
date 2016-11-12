@@ -2,6 +2,7 @@ import sys
 import random
 import time
 from threading import Event
+import logging
 
 from swigibpy import (EWrapper, EPosixClientSocket, Contract, Order, TagValue,
                       TagValueList)
@@ -51,7 +52,7 @@ class PlaceOrderExample(EWrapper):
     def orderStatus(self, id, status, filled, remaining, avgFillPrice, permId,
                     parentId, lastFilledPrice, clientId, whyHeld):
 
-        print(("Order #%s - %s (filled %d, remaining %d, avgFillPrice %f,"
+        logging.info(("Order #%s - %s (filled %d, remaining %d, avgFillPrice %f,"
                "last fill price %f)") %
               (id, status, filled, remaining, avgFillPrice, lastFilledPrice))
         if remaining <= 0:
@@ -59,12 +60,12 @@ class PlaceOrderExample(EWrapper):
 
     def openOrder(self, orderID, contract, order, orderState):
 
-        print("Order opened for %s" % contract.symbol)
+        logging.info("Order opened for %s" % contract.symbol)
 
     def commissionReport(self, commissionReport):
-        print 'Commission %s %s P&L: %s' % (commissionReport.currency,
+        logging.info('Commission %s %s P&L: %s' % (commissionReport.currency,
                                             commissionReport.commission,
-                                            commissionReport.realizedPNL)
+                                            commissionReport.realizedPNL))
 
 def place_orders(execDict):
     # Instantiate our callback object
@@ -82,7 +83,7 @@ def place_orders(execDict):
     for sym in execDict.keys():
         action, quant, contract = execDict[sym]
         if action == 'PASS':
-            print 'skipping', sym
+            logging.info('skipping', sym)
             continue
 
         #prompt = input("WARNING: This example will place an order on your IB "
@@ -100,7 +101,7 @@ def place_orders(execDict):
         #contract.currency = currency
         #contract.localSymbol=iblocalsym
 
-        print('Waiting for valid order id')
+        logging.info('Waiting for valid order id')
         if callback.order_ids.empty():
             tws.reqIds(0)
 
@@ -131,7 +132,7 @@ def place_orders(execDict):
         #order.transmit = False
 
         
-        print("Placing order for %d %s's (id: %d)" % (order.totalQuantity,
+        logging.info("Placing order for %d %s's (id: %d)" % (order.totalQuantity,
                                                       contract.symbol, order_id))
         
         # Place the order
@@ -141,12 +142,12 @@ def place_orders(execDict):
             order                                       # order
         )
         
-        print("\n====================================================================")
-        print(" Order placed, waiting %ds for TWS responses" % WAIT_TIME)
-        print("====================================================================\n")
+        logging.info("\n====================================================================")
+        logging.info(" Order placed, waiting %ds for TWS responses" % WAIT_TIME)
+        logging.info("====================================================================\n")
         
         
-        print("Waiting for order to be filled..")
+        logging.info("Waiting for order to be filled..")
         
         try:
             callback.order_filled.wait(WAIT_TIME)
@@ -154,9 +155,9 @@ def place_orders(execDict):
             pass
         finally:
             if not callback.order_filled.is_set():
-                print('Failed to fill order')
+                logging.info('Failed to fill order')
         time.sleep(2)
         
-    print("\nDisconnecting...")
+    logging.info("\nDisconnecting...")
     tws.eDisconnect()
 #place_order("BUY", 1, "EUR", "CASH", "USD", "IDEALPRO");

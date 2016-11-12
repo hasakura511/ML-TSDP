@@ -46,7 +46,7 @@ currencyFile = 'currenciesATR.csv'
 systemFilename='system_v4futures.csv'
 systemFilename2='system_v4mini.csv'
 systemFilename3='system_v4micro.csv'
-c2id_macro=102324563
+c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
 

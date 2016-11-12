@@ -308,8 +308,8 @@ for i,contract in enumerate(marketList):
     futuresDF.set_value(sym,'QTY_MICRO',qty_micro)
     futuresDF.set_value(sym,'contractValue',cValue)
     futuresDF.set_value(sym,'FX',c2contractSpec[sym][1])
-    futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
-    futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
+    #futuresDF.set_value(sym,'PC'+str(data.index[-1]),pc[-1])
+    #futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
     futuresDF.set_value(sym,'group',c2contractSpec[sym][3])
     futuresDF.set_value(sym,'RiskOn',c2contractSpec[sym][4])
     futuresDF.set_value(sym,'Custom',c2contractSpec[sym][5])
@@ -449,7 +449,7 @@ for i2,contract in enumerate(marketList):
     futuresDF.set_value(sym,'0.5LastSIG',data.signals.iloc[-1])
     futuresDF.set_value(sym,'0.5LastSAFEf',data.dpsSafef.iloc[-1])
     futuresDF.set_value(sym,'0.5finalQTY',adjQty)
-    futuresDF.set_value(sym,'0.5SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    #futuresDF.set_value(sym,'0.5SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
 for i2,contract in enumerate(marketList):
     #print i,
@@ -471,7 +471,7 @@ for i2,contract in enumerate(marketList):
     futuresDF.set_value(sym,'0.75LastSIG',data.signals.iloc[-1])
     futuresDF.set_value(sym,'0.75LastSAFEf',data.dpsSafef.iloc[-1])
     futuresDF.set_value(sym,'0.75finalQTY',adjQty)
-    futuresDF.set_value(sym,'0.75SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    #futuresDF.set_value(sym,'0.75SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
 for i2,contract in enumerate(marketList):
     #print i,
@@ -493,7 +493,7 @@ for i2,contract in enumerate(marketList):
     futuresDF.set_value(sym,'1LastSIG',data.signals.iloc[-1])
     futuresDF.set_value(sym,'1LastSAFEf',data.dpsSafef.iloc[-1])
     futuresDF.set_value(sym,'1finalQTY',adjQty)
-    futuresDF.set_value(sym,'1SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    #futuresDF.set_value(sym,'1SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
 futuresDF=futuresDF.sort_index()
 columns = futuresDF.columns.tolist()

@@ -508,7 +508,7 @@ system_micro.c2id=c2id_micro
 #for system files
 c2system_macro=c2system='Anti1LastSIG'
 c2system_mini='Anti1LastSIG'
-c2system_micro='LastSEA'
+c2system_micro='Anti1LastSIG'
 c2safef=1
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\

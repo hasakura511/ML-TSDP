@@ -1,5 +1,7 @@
 #import ibapi.futures_bars_1d as bars
 import os
+from os import listdir
+from os.path import isfile, join
 import random
 import sys
 from subprocess import Popen, PIPE, check_output
@@ -78,7 +80,8 @@ if len(sys.argv)==1:
     csiDataPath=  'D:/ML-TSDP/data/csidata/v4futures2/'
     csiDataPath2=  'D:/ML-TSDP/data/csidata/v4futures3/'
     csiDataPath3=  'D:/ML-TSDP/data/csidata/v4futures4_debug/'
-    signalPath =  'D:/ML-TSDP/data/signals2/1_'
+    signalPathDaily =  'D:/ML-TSDP/data/signals/'
+    signalPathMOC =  'D:/ML-TSDP/data/signals2/'
 else:
     systems = ['v4micro','v4mini','v4futures']
     debug=False
@@ -104,7 +107,8 @@ else:
     csiDataPath=  './data/csidata/v4futures2/'
     csiDataPath2=  './data/csidata/v4futures3/'
     csiDataPath3=  './data/csidata/v4futures4/'
-    signalPath =  './data/signals2/1_'
+    signalPathDaily =  './data/signals/'
+    signalPathMOC =  './data/signals2/'
 
 tzDict = {
     'CST':'CST6CDT',
@@ -509,6 +513,8 @@ def find_triggers(feeddata, execDict):
     timetable=pd.read_csv(filename, index_col=0)
     triggers=timetable.ix[[i for i in timetable.index if 'trigger' in i]][loaddate]
     threadlist=[]
+    signalFilesMOC = [ f for f in listdir(signalPathMOC) if isfile(join(signalPathMOC,f)) ]
+    signalFilesDaily =[ f for f in listdir(signalPathDaily) if isfile(join(signalPathDaily,f)) ]
     for t in triggers.index:
         ibsym=t.split()[0]
         csiFileSym=feeddata.ix[ibsym].CSIsym2
@@ -523,28 +529,29 @@ def find_triggers(feeddata, execDict):
                 print csiRunSym, 'file not found appending data'
                 dataNotAppended = True
             else:
-                #check csiDataPath3
+                #check csiDataPath3 for last date
                 data = pd.read_csv(filename, index_col=0, header=None)
                 lastdate=data.index[-1]
                 
-                filename=signalPath+csiRunSym+'_1D.csv'
-                if os.path.isfile(filename):
-                    signalfile=pd.read_csv(filename, index_col='dates')
-                    lastsignaldate = signalfile.index.to_datetime()[-1].strftime('%Y%m%d')
-                else:
-                    #is signal file dosen't exist make a new one if new date available
-                    lastsignaldate=0
+                symSignalFilesDaily=[x for x in signalFilesDaily if '_'+csiRunSym+'_' in x]
+                symSignalFilesMOC=[x for x in signalFilesMOC if '_'+csiRunSym+'_' in x]
                 
-                if int(loaddate) > lastdate and int(loaddate) > int(lastsignaldate):
-                    print csiRunSym,'appending.. data has not yet been appended and signal has not yet been generated',
-                    print 'loaddate', loaddate, '>', 'lastdate',lastdate,'lastsignaldate', lastsignaldate
+                for f in [x for x in symSignalFilesDaily if x not in symSignalFilesMOC]:
+                    #is signal file dosen't exist copy a portion of the old one.
+                    pd.read_csv(signalPathDaily+f).iloc[-2:].to_csv(signalPathMOC+f, index=False)
+                
+                #if int(loaddate) > lastdate and int(loaddate) > int(lastsignaldate):
+                if int(loaddate) > lastdate:
+                    print csiRunSym,'appending.. data has not yet been appended',
+                    print 'loaddate', loaddate, '>', 'lastdate'
+                    #print 'loaddate', loaddate, '>', 'lastdate',lastdate,'lastsignaldate', lastsignaldate
                     dataNotAppended=True
                 else:
-                    if int(loaddate) <= lastdate:
-                        print csiRunSym,'skipping append.. data has already been appended',
-                    if int(loaddate) <= int(lastsignaldate):
-                        print csiRunSym,'skipping append.. signal has been generated',
-                    print 'loaddate', loaddate, '<', 'lastdate',lastdate,'lastsignaldate', lastsignaldate
+                    #if int(loaddate) <= lastdate:
+                    print csiRunSym,'skipping append.. data has already been appended',
+                    #if int(loaddate) <= int(lastsignaldate):
+                    #    print csiRunSym,'skipping append.. signal has been generated',
+                    print 'loaddate', loaddate, '<', 'lastdate',lastdate
                     dataNotAppended=False
             #append data if M-F, not a holiday and if the data hasn't been appended yet. US MARKETS EST.
             dayofweek = endDateTime.date().weekday()
@@ -644,9 +651,11 @@ if __name__ == "__main__":
             
     #v4futures for ib orders
     if submitIB:
+        print 'returned to main thread, placing ib orders from', systemfile
         execDict=update_orders(feeddata, systemfile, execDict)
-        print 'placing ib orders from', systemfile
         place_iborders(execDict)
+    
+    print 'DONE!'
     
     
     #symbols = execDict.keys()

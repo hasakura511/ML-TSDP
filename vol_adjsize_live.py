@@ -238,8 +238,9 @@ def fixTypes(original, transformed):
 #system file update.
 #load from daily run, save to live (to update pivot dates)
 ff = pd.read_csv(feedfile, index_col='CSIsym')
-#files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-marketList = ff.CSIsym2.values
+files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+marketList = [x.split('_')[0] for x in files]
+#marketList = ff.CSIsym2.values
 
 system = pd.read_csv(systemPath+systemFilename, index_col=0)
 system.index = [x.split('_')[1] for x in system.System]

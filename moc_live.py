@@ -564,7 +564,9 @@ def find_triggers(feeddata, execDict):
                     dataNotAppended=False
             #append data if M-F, not a holiday and if the data hasn't been appended yet. US MARKETS EST.
             dayofweek = endDateTime.date().weekday()
-            if  dayofweek<5 and dataNotAppended:
+            
+            if dayofweek<5 and dataNotAppended:
+            #if dataNotAppended:
                 #append new bar
                 runsystem = append_data(ibsym, timetable, loaddate)
                 if runsystem:
@@ -639,33 +641,36 @@ if __name__ == "__main__":
     runThreads(threadlist)
     print 'returned to main thread'
     #check threadlist tos ee if everythong's there?
-    print 'running vol_adjsize_live'
-    with open(logPath+'vol_adjsize_live.txt', 'w') as f:
-        with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
-            proc = Popen(runPath2, stdout=f, stderr=e)
-            proc.wait()
-            
-    #send orders if live mode
-    if debug==False:        
-        for sys in systems:
-            print 'returned to main thread, running c2 orders for',sys
-            with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
-                with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'w') as e:
-                    proc = Popen(runPath3+[sys], stdout=f, stderr=e)
-                    proc.wait()
-                    
-        #v4futures for ib orders
-        if submitIB:
-            print 'returned to main thread, placing ib orders from', systemfile
-            execDict=update_orders(feeddata, systemfile, execDict)
-            place_iborders(execDict)
-            
-    print 'returned to main thread, running check systems'
-    with open(logPath+'check_systems_live.txt', 'w') as f:
-        with open(logPath+'check_systems_live_error.txt', 'w') as e:
-            proc = Popen(runPath4, stdout=f, stderr=e)
-            proc.wait()
-            
+    if len(threadlist)==0:
+        print 'Found nothing to update!'
+    else:
+        print 'running vol_adjsize_live'
+        with open(logPath+'vol_adjsize_live.txt', 'w') as f:
+            with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+                proc = Popen(runPath2, stdout=f, stderr=e)
+                proc.wait()
+                
+        #send orders if live mode
+        if debug==False:        
+            for sys in systems:
+                print 'returned to main thread, running c2 orders for',sys
+                with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
+                    with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'w') as e:
+                        proc = Popen(runPath3+[sys], stdout=f, stderr=e)
+                        proc.wait()
+                        
+            #v4futures for ib orders
+            if submitIB:
+                print 'returned to main thread, placing ib orders from', systemfile
+                execDict=update_orders(feeddata, systemfile, execDict)
+                place_iborders(execDict)
+                
+        print 'returned to main thread, running check systems'
+        with open(logPath+'check_systems_live.txt', 'w') as f:
+            with open(logPath+'check_systems_live_error.txt', 'w') as e:
+                proc = Popen(runPath4, stdout=f, stderr=e)
+                proc.wait()
+                
     #update slippage report
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

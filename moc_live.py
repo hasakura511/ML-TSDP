@@ -645,7 +645,8 @@ if __name__ == "__main__":
             proc = Popen(runPath2, stdout=f, stderr=e)
             proc.wait()
             
-    debug==False:        
+    #send orders if live mode
+    if debug==False:        
         for sys in systems:
             print 'returned to main thread, running c2 orders for',sys
             with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:

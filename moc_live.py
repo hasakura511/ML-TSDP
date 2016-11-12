@@ -680,7 +680,7 @@ if __name__ == "__main__":
                     proc = Popen(runPath4, stdout=f, stderr=e)
                     proc.wait()
                     
-             totalerrors=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
+            totalerrors=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
             print 'Found', totalerrors,'position errors'
              
 

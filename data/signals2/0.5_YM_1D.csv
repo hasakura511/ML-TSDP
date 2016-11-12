@@ -1,0 +1,4 @@
+dates,CAR25,dd95,ddTol,dpsCommission,dpsNetEquity,dpsNetPNL,dpsRunName,dpsSafef,gainAhead,is_period,netEquity,netPNL,nodpsComm,nodpsSafef,signalType,signals,v4.4_system,safef,mrThreshold,timestamp
+2016-11-09 00:00:00,-0.0058633420067,0.0,0.00131876094679,3.76576697,94140.41,-1292.91,both_zigZag_GNBayes DPS wl2.0 maxL2 dd95_0.001 thres_0.0,1.0,0.0,wf_is_short,96901.36,-1330.83,3.87620944648,1.0,zigZag_GNBayes,1.0,zigZag_GNBayes_f86_is3,1.0,0.5,20161109 22:16:04 EST
+2016-11-10 00:00:00,-0.00678854473417,0.0,0.00161514570617,0.0,94695.69,-1315.94,both_sellHold DPS wl3.0 maxL2 dd95_0.002 thres_0.0,1.0,0.0,wf_is_pv2e_p2p,94693.81,-1315.91,0.0,1.0,sellHold,-1.0,sellHold,1.0,0.5,20161110 21:13:22 EST
+2016-11-14 00:00:00,-0.00207628635133,0.0,0.00208514414057,0.0,94705.77,15.12,both_sellHold DPS wl5.0 maxL2 dd95_0.002 thres_0.0,1.0,0.0,wf_is_pv2e_p2p,94703.89,15.12,0.0,1.0,sellHold,-1.0,sellHold,1.0,0.5,20161111 21:55:44 EST

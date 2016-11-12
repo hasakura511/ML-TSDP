@@ -3,10 +3,10 @@ import pandas as pd
 import subprocess
 import time
 #from ibapi.place_order import place_order as place_iborder
-from c2api.place_order2 import place_order as place_c2order
+#from c2api.place_order2 import place_order as place_c2order
 import json
 from pandas.io.json import json_normalize
-from c2api.get_exec import get_c2pos, get_exec_open, retrieveSystemEquity, get_c2_pos, get_exec
+from c2api.get_exec import get_c2pos, get_exec_open, retrieveSystemEquity, get_c2_pos, get_exec, place_order
 #from seitoolz.get_exec import get_executions as get_c2trades
 #from ibapi.place_order2 import place_orders as place_iborders
 from time import gmtime, strftime, localtime, sleep
@@ -211,16 +211,16 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
             if c2_pos_qty < 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 print( 'BTC: ' + str(qty) )
-                psigid=place_c2order(dbPath,'BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
+                psigid=place_order(dbPath,'BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 isrev=True                
                 c2quant = c2quant - qty
                 
             if c2quant > 0:
                 print( 'BTO: ' + str(c2quant) )
                 if isrev:
-                    place_c2order(dbPath,'BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
+                    place_order(dbPath,'BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
                 else:
-                    place_c2order(dbPath,'BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+                    place_order(dbPath,'BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
         if system_c2pos_qty < c2_pos_qty:
             c2quant=c2_pos_qty - system_c2pos_qty   
             isrev=False
@@ -228,16 +228,16 @@ def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
             if c2_pos_qty > 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
                 print( 'STC: ' + str(qty) )
-                psigid=place_c2order(dbPath,'STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
+                psigid=place_order(dbPath,'STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 isrev=True 
                 c2quant = c2quant - qty
 
             if c2quant > 0:
                 print( 'STO: ' + str(c2quant) )
                 if isrev:
-                    place_c2order(dbPath,'STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
+                    place_order(dbPath,'STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
                 else:
-                    place_c2order(dbPath,'STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+                    place_order(dbPath,'STO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
 '''
     if ibsubmit:
         ib_pos_qty=get_ib_pos(ibsym, ibcurrency)

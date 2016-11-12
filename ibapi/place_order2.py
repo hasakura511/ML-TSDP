@@ -83,7 +83,7 @@ def place_orders(execDict):
     for sym in execDict.keys():
         action, quant, contract = execDict[sym]
         if action == 'PASS':
-            logging.info('skipping', sym)
+            logging.info('skipping'+sym)
             continue
 
         #prompt = input("WARNING: This example will place an order on your IB "

@@ -18,7 +18,6 @@ import datetime
 from ibapi.wrapper_v5 import IBWrapper, IBclient
 from ibapi.place_order2 import place_orders as place_iborders
 from swigibpy import Contract 
-import time
 import pandas as pd
 from time import gmtime, strftime, localtime, sleep
 import json
@@ -33,7 +32,7 @@ from dateutil.parser import parse
 import sqlite3
 #currencyPairsDict=dict()
 #prepData=dict()
-
+start_time = time.time()
 callback = IBWrapper()
 client=IBclient(callback)
 
@@ -646,24 +645,27 @@ if __name__ == "__main__":
             proc = Popen(runPath2, stdout=f, stderr=e)
             proc.wait()
             
-    for sys in systems:
-        print 'returned to main thread, running c2 orders for',sys
-        with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
-            with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'w') as e:
-                proc = Popen(runPath3+[sys], stdout=f, stderr=e)
-                proc.wait()
-                
+    debug==False:        
+        for sys in systems:
+            print 'returned to main thread, running c2 orders for',sys
+            with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
+                with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'w') as e:
+                    proc = Popen(runPath3+[sys], stdout=f, stderr=e)
+                    proc.wait()
+                    
+        #v4futures for ib orders
+        if submitIB:
+            print 'returned to main thread, placing ib orders from', systemfile
+            execDict=update_orders(feeddata, systemfile, execDict)
+            place_iborders(execDict)
+            
     print 'returned to main thread, running check systems'
     with open(logPath+'check_systems_live.txt', 'w') as f:
         with open(logPath+'check_systems_live_error.txt', 'w') as e:
             proc = Popen(runPath4, stdout=f, stderr=e)
             proc.wait()
             
-    #v4futures for ib orders
-    if submitIB:
-        print 'returned to main thread, placing ib orders from', systemfile
-        execDict=update_orders(feeddata, systemfile, execDict)
-        place_iborders(execDict)
+    #update slippage report
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     

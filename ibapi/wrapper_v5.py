@@ -600,7 +600,7 @@ class IBWrapper(EWrapper):
         """
         pass
     def updateAccountTime	(self, timestamp):
-        logging.info('update account time', timestamp)
+        logging.info('update account time '+str(timestamp))
         
     def tickSnapshotEnd(self, tickerId):
         

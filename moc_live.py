@@ -489,6 +489,13 @@ def get_timetable(execDict, systemPath):
     return timetable
         
 def find_triggers(feeddata, execDict):
+    def is_int(s):
+        try: 
+            int(s)
+            return True
+        except ValueError:
+            return False
+            
     eastern=timezone(tzDict['EST'])
     endDateTime=dt.now(get_localzone())
     #endDateTime=dt.now(get_localzone())+datetime.timedelta(days=5)
@@ -498,7 +505,8 @@ def find_triggers(feeddata, execDict):
     ttfiles = os.listdir(timetablePath)
     ttdates = []
     for f in ttfiles:
-        ttdates.append(int(f.split('.')[0]))
+        if '.csv' in f and is_int(f.split('.')[0]):
+            ttdates.append(int(f.split('.')[0]))
         
     csidate=lastCsiDownloadDate()
     ttdate=max(ttdates)

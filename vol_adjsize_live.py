@@ -499,7 +499,7 @@ for i2,contract in enumerate(marketList):
 
 futuresDF=futuresDF.sort_index()
 columns = futuresDF.columns.tolist()
-futuresDF.LastPctChg=futuresDF[sorted([x for x in columns if 'PC' in x])[-1]].values
+#futuresDF.LastPctChg=futuresDF[sorted([x for x in columns if 'PC' in x])[-1]].values
 start_idx =columns.index('ACT')+1
 new_order = columns[:start_idx]+nextColOrder
 new_order =  new_order+[x for x in columns if x not in new_order]

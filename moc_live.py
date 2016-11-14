@@ -86,7 +86,7 @@ else:
     systems = ['v4micro','v4mini','v4futures']
     debug=False
     showPlots=False
-    submitIB=True
+    submitIB=False
     triggertime = 30 #mins
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'

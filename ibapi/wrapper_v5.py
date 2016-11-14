@@ -290,10 +290,10 @@ class IBWrapper(EWrapper):
     ## portfolio
 
     def init_portfolio_data(self):
-        if "data_portfoliodata" not in dir(self):
-            setattr(self, "data_portfoliodata", [])
-        if "data_accountvalue" not in dir(self):
-            setattr(self, "data_accountvalue", [])
+        #if "data_portfoliodata" not in dir(self):
+        setattr(self, "data_portfoliodata", [])
+        #if "data_accountvalue" not in dir(self):
+        setattr(self, "data_accountvalue", [])
             
         
         setattr(self, "flag_finished_portfolio", False)

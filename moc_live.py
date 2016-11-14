@@ -194,16 +194,21 @@ def get_ibfutpositions(portfolioPath):
     (account_value, portfolio_data)=client.get_IB_account_data()    
     data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
     dataSet=data[data.exp != '']
-    print dataSet.shape[0],'futures positions found'
-    #dataSet=dataSet.sort_values(by='times')
-    #dataSet['symbol']=dataSet['sym'] + dataSet['currency'] 
     dataSet=dataSet.set_index(['sym'])
+
+    
+    
+    accountSet=pd.DataFrame(account_value,columns=['desc','value','currency','account_id'])
+    accountSet=accountSet.set_index(['desc'])
+    accountValue = accountSet.ix['NetLiquidation'].value
+    print dataSet.shape[0],'futures positions found with account value:', accountValue
+    
     filename=portfolioPath+'ib_portfolio.csv'
     dataSet.to_csv(filename)
     print 'saved', filename
-    accountSet=pd.DataFrame(account_value)
+    
     filename=portfolioPath+'ib_account_value.csv'
-    accountSet.to_csv(filename, index=False)
+    accountSet.to_csv(filename, index=True)
     print 'saved', filename
     #
     return dataSet
@@ -260,15 +265,17 @@ def create_execDict(feeddata, systemfile):
 
         #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
     systemdata.to_csv(systemfile, index=False)
-    print 'saved', systemfile
+    print 'updated', systemfile
       
-    print len(execDict.keys()), execDict.keys()
+    print 'Created exec dict with', len(execDict.keys()), 'symbols'
+    print execDict.keys()
     return execDict
    
 def update_orders(feeddata, systemfile, execDict):
     global client
     global portfolioPath
     systemdata=pd.read_csv(systemfile)
+    systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
     #systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
     #systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
     #openPositions=get_ibfutpositions(portfolioPath)
@@ -296,12 +303,12 @@ def update_orders(feeddata, systemfile, execDict):
         
         action='PASS'
         if system_ibpos_qty > ib_pos_qty:
-            action = 'BUY'
+            action = 'BOT'
             ibquant=int(system_ibpos_qty - ib_pos_qty)
             #print( 'BUY: ' + str(ibquant) )
             #place_iborder('BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);
         if system_ibpos_qty < ib_pos_qty:
-            action='SELL'
+            action='SLD'
             ibquant=int(ib_pos_qty - system_ibpos_qty)
             #print( 'SELL: ' + str(ibquant) )
             #place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);         
@@ -313,7 +320,7 @@ def update_orders(feeddata, systemfile, execDict):
     #systemdata.to_csv(systemfile, index=False)
     #print 'saved', systemfile
       
-    print len(execDict.keys()), execDict.keys()
+    #print len(execDict.keys()), execDict.keys()
     return execDict
     
 def get_orders(feeddata, systemfile):
@@ -416,7 +423,7 @@ def refresh_all_histories(execDict):
         data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
         tickerId=random.randint(100,9999)
         contract = execDict[sym][2]
-        print 'getting data for', sym
+        print sym, 'getting data from IB'
         data = client.get_history(endDateTime, contract, whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
         data.to_csv(csiDataPath2+feeddata.ix[sym].CSIsym2+'.csv', index=True)
         
@@ -426,7 +433,7 @@ def refresh_history(sym, execDict):
     data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
     tickerId=random.randint(100,9999)
     contract = execDict[sym][2]
-    print 'getting data for', sym
+    print 'getting data from IB...',
     data = client.get_history(endDateTime, contract, whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
     data.to_csv(csiDataPath2+feeddata.ix[sym].CSIsym2+'.csv', index=True)
     return data
@@ -466,6 +473,28 @@ def lastCsiDownloadDate():
             dates.append(lastdate)
             
     return max(dates)
+    
+def filterIBexec():
+    global client
+    global feeddata
+    global csiDataPath3
+    executions=pd.DataFrame(client.get_executions())
+    executions=executions.set_index('symbol')
+    executions['CSIsym2']=[feeddata.ix[sym].CSIsym2 for sym in executions.index]
+    index = executions.reset_index().groupby(['CSIsym2'])['times'].transform(max)==executions.times
+    executions= executions.reset_index().ix[index].set_index('CSIsym2')
+    datafiles = os.listdir(csiDataPath3)
+
+    for f in [f for f in datafiles if f.split('_')[0] in executions.index]:
+        sym = f.split('_')[0]
+        lastdate = pd.read_csv(csiDataPath3+f, index_col=0).index[-1]
+        executions.set_value(sym, 'lastAppend', dt.strptime(str(lastdate),'%Y%m%d'))
+
+    executions.times = pd.to_datetime(executions.times)
+    executions = executions[executions.times >= executions.lastAppend].reset_index().set_index('symbol')
+    executions.to_csv(portfolioPath+'ib_exec_last.csv', index=True)
+    print 'saved', portfolioPath+'ib_exec_last.csv'
+    return executions
     
 def get_timetable(execDict, systemPath):
     global client
@@ -552,7 +581,7 @@ def find_triggers(feeddata, execDict):
                 #if int(loaddate) > lastdate and int(loaddate) > int(lastsignaldate):
                 if int(loaddate) > lastdate:
                     print csiRunSym,'appending.. data has not yet been appended',
-                    print 'loaddate', loaddate, '>', 'lastdate'
+                    print 'loaddate', loaddate, '>', 'lastdate',
                     #print 'loaddate', loaddate, '>', 'lastdate',lastdate,'lastsignaldate', lastsignaldate
                     dataNotAppended=True
                 else:
@@ -560,7 +589,7 @@ def find_triggers(feeddata, execDict):
                     print csiRunSym,'skipping append.. data has already been appended',
                     #if int(loaddate) <= int(lastsignaldate):
                     #    print csiRunSym,'skipping append.. signal has been generated',
-                    print 'loaddate', loaddate, '<', 'lastdate',lastdate
+                    print 'loaddate', loaddate, '<', 'lastdate',lastdate,
                     dataNotAppended=False
             #append data if M-F, not a holiday and if the data hasn't been appended yet. US MARKETS EST.
             dayofweek = endDateTime.date().weekday()
@@ -570,7 +599,7 @@ def find_triggers(feeddata, execDict):
                 #append new bar
                 runsystem = append_data(ibsym, timetable, loaddate)
                 if runsystem:
-                    print csiRunSym, 'data appended running system',
+                    print 'data appended running system',
                     if debug==True:
                         print 'debug mode'
                         popenArgs = ['python', runPath,csiRunSym]
@@ -582,10 +611,10 @@ def find_triggers(feeddata, execDict):
                         #popenArgs2 = ['python', runPath2, csiFileSym,'1']
                         threadlist.append((csiRunSym,popenArgs))
                 else:
-                    print csiRunSym, 'skipping runsystem append_data returned 0'
+                    print 'skipping runsystem append_data returned 0'
             else:
                 if dayofweek>=5:
-                    print csiRunSym, 'skipping append.. day of week', days[dayofweek]
+                    print 'skipping append.. day of week', days[dayofweek]
 
                 
         else:
@@ -622,10 +651,10 @@ def append_data(sym, timetable, loaddate):
             print 'saved', filename
             return True
         else:
-            print filename, 'not found. terminating.'
+            print filename, 'not found. terminating.',
             return False
     else:
-        print sym, 'no data found between', opentime, closetime
+        print 'no data found between', opentime, closetime,
         return False
         
 
@@ -652,15 +681,16 @@ if __name__ == "__main__":
         with open(logPath+'check_systems_live_error.txt', 'w') as e:
             proc = Popen(runPath4, stdout=f, stderr=e)
             proc.wait()
-    totalerrors=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
+    totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
 
-    if len(threadlist)==0 and totalerrors ==0:
+    if len(threadlist)==0 and totalc2orders ==0:
         print 'Found nothing to update!'
     else:
-        print 'Found', totalerrors,'position errors'
+        print 'Found', totalc2orders, 'c2 position adjustments'
                 
         #send orders if live mode
-        if debug==False:        
+        if debug==False:
+            print 'Live mode: running orders'
             for sys in systems:
                 print 'returned to main thread, running c2 orders for',sys
                 with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
@@ -669,20 +699,36 @@ if __name__ == "__main__":
                         proc.wait()
                         
             #v4futures for ib orders
+            
             if submitIB:
                 print 'returned to main thread, placing ib orders from', systemfile
                 execDict=update_orders(feeddata, systemfile, execDict)
+                iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+                num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+                print 'Found', num_iborders,'ib position adjustments. Placing orders...'
                 place_iborders(execDict)
+                executions=filterIBexec()
                 
+                for tuple in iborders:
+                    sym=tuple[0]
+                    order =tuple[0][1]
+                    if order[0]==executions.ix[sym].side:
+                        execDict[sym][0] = 'PASS'
+                        execDict[sym][1] = execDict[sym][1]-executions.ix[sym].qty
+                    else:
+                        print 'There was an error:',sym,'order',  execDict[sym][:2], 'ib returned',\
+                            executions.ix[sym].side, executions.ix[sym].qty
+                            
             print 'returned to main thread, running check systems'
             with open(logPath+'check_systems_live.txt', 'w') as f:
                 with open(logPath+'check_systems_live_error.txt', 'w') as e:
                     proc = Popen(runPath4, stdout=f, stderr=e)
                     proc.wait()
                     
-            totalerrors=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
-            print 'Found', totalerrors,'position errors'
-             
+            totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
+            print 'Found', totalc2orders, 'c2 position adjustments'
+        else:
+            print 'Debug mode: skipping orders'
 
                 
     #update slippage report

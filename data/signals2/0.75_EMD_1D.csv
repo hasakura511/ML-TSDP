@@ -1,0 +1,3 @@
+dates,CAR25,dd95,ddTol,dpsCommission,dpsNetEquity,dpsNetPNL,dpsRunName,dpsSafef,gainAhead,is_period,netEquity,netPNL,nodpsComm,nodpsSafef,signalType,signals,v4.4_system,safef,mrThreshold,timestamp
+2016-11-10,0.0312743396043,3.999982e-05,0.00186500961648,0.0,109703.83,905.36,both_buyHold DPS wl4.0 maxL2 dd95_0.002 thres_0.0,2.0,0.0117829858863,wf_is_short,104872.97,434.54,0.0,1.0,buyHold,1.0,buyHold,1.0,,
+2016-11-11,0.0844922433703,3.999982e-05,0.00208514414057,0.0,112289.11,2585.28,both_buyHold DPS wl5.0 maxL2 dd95_0.002 thres_0.0,2.0,0.0,wf_is_short,106108.69,1235.72,0.0,1.0,buyHold,1.0,buyHold,1.0,0.75,20161112 03:10:42 EST

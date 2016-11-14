@@ -665,10 +665,11 @@ if __name__ == "__main__":
     systemfile=systemPath+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
     execDict=create_execDict(feeddata, systemfile)
-
     threadlist=find_triggers(feeddata, execDict)
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     runThreads(threadlist)
     print 'returned to main thread with', len(threadlist), 'threads'
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     #check threadlist tos ee if everythong's there?
     print 'running vol_adjsize_live'
     with open(logPath+'vol_adjsize_live.txt', 'w') as f:

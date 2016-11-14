@@ -506,9 +506,9 @@ system_micro.c2id=c2id_micro
 
 #for signal files
 #for system files
-c2system_macro=c2system='Anti1LastSIG'
-c2system_mini='Anti1LastSIG'
-c2system_micro='Anti1LastSIG'
+c2system_macro=c2system='Voting13'
+c2system_mini='Voting13'
+c2system_micro='Voting13'
 c2safef=1
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\

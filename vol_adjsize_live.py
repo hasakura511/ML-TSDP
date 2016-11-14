@@ -46,9 +46,9 @@ offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EB
 
 
 #for system files
-c2system_macro=c2system='Voting9'
-c2system_mini='Voting9'
-c2system_micro='Voting9'
+c2system_macro=c2system='Voting13'
+c2system_mini='Voting13'
+c2system_micro='Voting13'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
@@ -58,6 +58,7 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
+futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
 systemFilename='system_v4futures.csv'
 systemFilename2='system_v4mini.csv'
 systemFilename3='system_v4micro.csv'
@@ -74,7 +75,7 @@ safefAdjustment=0
 
 if len(sys.argv)==1:
     debug=True
-    mode = 'replace'
+    mode = 'append'
     #marketList=[sys.argv[1]]
     showPlots=False
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
@@ -258,7 +259,7 @@ system_micro.index = [x.split('_')[1] for x in system_micro.System]
 system_micro.index.name = 'CSIsym'
 system_micro = system_micro.ix[ff.index]
 
-futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+
 #futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 
 oldDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
@@ -391,11 +392,11 @@ futuresDF['LastSRUN']=futuresDF_old.LastSRUN
 
 for col in futuresDF_old.columns:
     if col.startswith('SEA'):
-        futuresDF[col]=futuresDF_old[col]
+        futuresDF['SEA']=futuresDF_old[col]
         
 for col in futuresDF_old.columns:
     if col.startswith('SRUN'):
-        futuresDF[col]=futuresDF_old[col]
+        futuresDF['SRUN']=futuresDF_old[col]
 
     
 for i2,contract in enumerate(marketList):
@@ -421,7 +422,7 @@ for i2,contract in enumerate(marketList):
     futuresDF.set_value(sym,'LastSIG',data.signals.iloc[-1])
     futuresDF.set_value(sym,'LastSAFEf',data.safef.iloc[-1])
     futuresDF.set_value(sym,'finalQTY',adjQty)
-    futuresDF.set_value(sym,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    #futuresDF.set_value(sym,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
    
 
 for i2,contract in enumerate(marketList):
@@ -871,9 +872,13 @@ for ticker in futuresDF.index:
 futuresDF['Date']=lastDate
 futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 futuresDF.index.name = 'CSIsym'
-futuresDF.to_sql(name='futuresATR', if_exists=mode, con=conn, index=True, index_label='CSIsym')
-print 'Saved to sql db table', 'futuresATR'
 
+try:
+    futuresDF.to_sql(name='futuresATR', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+    print 'Saved to sql db table', 'futuresATR'
+except Exception as e:
+    print e
+    
 for i,sym in enumerate([x.split('_')[1] for x in system.System]):
     if sym in futuresDF.index:
         system.set_value(sym,'signal',futuresDF[c2system].ix[sym])

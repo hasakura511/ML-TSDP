@@ -15,24 +15,33 @@ start_time = time.time()
 if len(sys.argv)==1:
     debug=True
     showPlots=True
+    start_slip=0
+    figsize=(6,8)
+    fontsize=12
     dataPath='D:/ML-TSDP/data/'
     portfolioPath = 'D:/ML-TSDP/data/portfolio/'
     #savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath = savePath2 = pngPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     systemPath =  'D:/ML-TSDP/data/systems/'
+    #timetablePath=   'D:/ML-TSDP/data/systems/timetables_debug/'
+    timetablePath=   'D:/ML-TSDP/data/systems/timetables/'
+    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
 else:
     debug=False
     showPlots=False
-    dataPath='./data/'
-    portfolioPath = './data/portfolio/'
-    savePath='./data/'
+    start_slip=20161111
+    figsize=(8,13)
+    fontsize=20
+    dataPath=savePath='./data/'
+    portfolioPath = savePath2 ='./data/portfolio/'
     pngPath = './data/results/'
-    savePath2 = './data/portfolio/'
     systemPath =  './data/systems/'
+    timetablePath=   './data/systems/timetables/'
+    feedfile='./data/systems/system_ibfeed.csv'
 
 
 
-csidataFilename = 'futuresATR_Signals.csv'
+atrFilename = 'futuresATR.csv'
 systems = ['v4futures','v4mini', 'v4micro']
 #systems = ['v4micro']
 #systems = ['v4futures']
@@ -43,15 +52,21 @@ adjDict={
             '@JY':0.01,
             'QSI':0.01
             }
-
-def plotSlip(slipDF, pngPath, filename, title, showPlots=False):
+def is_int(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+        
+def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=False):
     #plt.figure(figsize=(8,13))
     font = {'family' : 'normal',
             'weight' : 'normal',
             'size'   : 22}
 
     matplotlib.rc('font', **font)
-    fig = plt.figure(figsize=(8,13)) # Create matplotlib figure
+    fig = plt.figure(figsize=figsize) # Create matplotlib figure
     ax = fig.add_subplot(111) # Create matplotlib axes
     #ax = slipDF.slippage.plot.bar(color='r', width=0.5)
     ax2 = ax.twiny()
@@ -68,7 +83,7 @@ def plotSlip(slipDF, pngPath, filename, title, showPlots=False):
     #plt.axvline(0, color='k')
     plt.text(0.5, 1.08, title,
              horizontalalignment='center',
-             fontsize=20,
+             fontsize=fontsize,
              transform = ax2.transAxes)
     #plt.ylim(0,80)
     #plt.xticks(np.arange(-1,1.25,.25))
@@ -81,9 +96,26 @@ def plotSlip(slipDF, pngPath, filename, title, showPlots=False):
         #print data.index[0],'to',data.index[-1]
         plt.show()
     plt.close()
+    
+futuresDF = pd.read_csv(dataPath+atrFilename, index_col=0)
+csidate = futuresDF.index.name.split()[0].replace('-','')
+feeddata=pd.read_csv(feedfile,index_col='c2sym')
 
+#import timetable
+ttfiles = os.listdir(timetablePath)
+ttdates = []
+for f in ttfiles:
+    if '.csv' in f and is_int(f.split('.')[0]):
+        ttdates.append(int(f.split('.')[0]))
+ttdate=max(ttdates)
+timetable = pd.read_csv(timetablePath+str(ttdate)+'.csv', index_col=0)
+for col in timetable.columns:
+    timetable[col]=pd.to_datetime(timetable[col])
+idx_close = [x for x in timetable.index if 'close' in x]
+idx_trigger = [x for x in timetable.index if 'trigger' in x]
 
 for systemName in systems:
+    print systemName
     tradeFilename='c2_'+systemName+'_trades.csv'
     portfolioFilename = 'c2_'+systemName+'_portfolio.csv'
     systemFilename='system_'+systemName+'.csv'
@@ -91,24 +123,46 @@ for systemName in systems:
 
     #entry trades
     portfolioDF = pd.read_csv(portfolioPath+portfolioFilename)
+    portfolioDF.index = feeddata.ix[[x[:-2] for x in portfolioDF.symbol.values]].ibsym.values
     portfolioDF['openedWhen'] = pd.to_datetime(portfolioDF['openedWhen'])
     portfolioDF = portfolioDF.sort_values(by='openedWhen', ascending=False)
     #exit trades
     tradesDF = pd.read_csv(portfolioPath+tradeFilename)
+    tradesDF.index = feeddata.ix[[x[:-2] for x in tradesDF.symbol.values]].ibsym.values
     tradesDF=tradesDF.drop(['expir','putcall','strike','symbol_description','underlying','markToMarket_time'], axis=1).dropna()
     tradesDF['closedWhen'] = pd.to_datetime(tradesDF['closedWhen'])
     tradesDF = tradesDF.sort_values(by='closedWhen', ascending=False)
     #csi close data
-    futuresDF = pd.read_csv(dataPath+csidataFilename, index_col=0)
+    
     #csidata download at 8pm est
-    futuresDate = dt.strptime(futuresDF.index.name, '%Y-%m-%d %H:%M:%S').replace(hour=20)
+    #futuresDate = dt.strptime(futuresDF.index.name, '%Y-%m-%d %H:%M:%S').replace(hour=20)
     slipDF = pd.DataFrame()
     #print 'sym', 'c2price', 'csiPrice', 'slippage'
     #new entry trades
-    newOpen=portfolioDF[portfolioDF['openedWhen']>=futuresDate].symbol.values
-    print newOpen.shape[0], 'Open Trades Found'
-    print newOpen
-    for contract in newOpen:
+    #newOpen=portfolioDF[portfolioDF['openedWhen']>=futuresDate].symbol.values
+    newOpen={}
+    for x in idx_trigger:
+        sym=x.split()[0]
+        if sym in portfolioDF.index:
+            if portfolioDF.index.tolist().count(sym) == 1:
+                row=portfolioDF.ix[sym]
+            else:
+                row=portfolioDF.ix[sym].iloc[0]
+            if csidate in timetable:
+                print sym,'trigger', timetable.ix[x][csidate],
+                if row.openedWhen>=timetable.ix[x][csidate]:
+                    print 'new open', row.openedWhen,'adding..'
+                    newOpen[row.symbol]=timetable.ix[x][csidate]
+                else:
+                    print ' no open trades found skipping..'
+            else:
+                print x,csidate,'not found in timetable, skipping..'
+        else:
+            print sym,' no open trades found skipping..'
+            
+    print systemName, len(newOpen.keys()), 'Open Trades Found'
+    print systemName, newOpen.keys()
+    for contract in newOpen.keys():
         c2price=portfolioDF[portfolioDF.symbol ==contract].opening_price_VWAP.values[0]
         c2timestamp=pd.Timestamp(portfolioDF[portfolioDF.symbol ==contract].openedWhen.values[0])
         if contract in futuresDF.Contract.values:
@@ -122,18 +176,41 @@ for systemName in systems:
             slipDF.set_value(rowName, 'symbol', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
-            slipDF.set_value(rowName, 'csitimestamp', futuresDate)
+            slipDF.set_value(rowName, 'trigger', newOpen[contract])
             slipDF.set_value(rowName, 'csiPrice', csiPrice)
             slipDF.set_value(rowName, 'slippage', slippage)
             slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
             slipDF.set_value(rowName, 'Type', 'Open')
 
-    newCloses=tradesDF[tradesDF['closedWhen']>=futuresDate]
-    print newCloses.shape[0], 'Close Trades Found'
-    print newCloses.symbol.values
-    for contract in newCloses.symbol.values:
-        c2price=newCloses[newCloses.symbol ==contract].closing_price_VWAP.values[0]
-        c2timestamp=pd.Timestamp(newCloses[newCloses.symbol ==contract].closedWhen.values[0])
+    #newCloses=tradesDF[tradesDF['closedWhen']>=futuresDate]
+    newCloses=pd.DataFrame()
+    for x in idx_trigger:
+        sym=x.split()[0]
+        if sym in tradesDF.index:
+            if tradesDF.index.tolist().count(sym) == 1:
+                row=tradesDF.ix[sym]
+            else:
+                row=tradesDF.ix[sym].iloc[0]
+
+            if csidate in timetable:
+                print sym,'trigger', timetable.ix[x][csidate],
+                if row.closedWhen>=timetable.ix[x][csidate]:
+                    print 'new close', row.closedWhen,'adding..'
+                    row['trigger']=timetable.ix[x][csidate]
+                    newCloses = newCloses.append(row)
+                else:
+                    print 'closed before trigger skipping..'
+            else:
+                print x,csidate,'not found in timetable, skipping..'
+        else:
+            print sym,' no close trades found skipping..'
+            
+    print systemName, newCloses.shape[0], 'Close Trades Found'
+    print systemName, newCloses.index
+    
+    for contract in newCloses.index:
+        c2price=newCloses.ix[contract].closing_price_VWAP
+        c2timestamp=pd.Timestamp(newCloses.ix[contract].closedWhen)
         if contract in futuresDF.Contract.values:
             if contract[:-2] in adjDict.keys():
                 csiPrice = futuresDF[futuresDF.Contract ==contract].LastClose.values[0]*adjDict[contract[:-2]]
@@ -145,16 +222,16 @@ for systemName in systems:
             slipDF.set_value(rowName, 'symbol', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
-            slipDF.set_value(rowName, 'csitimestamp', futuresDate)
+            slipDF.set_value(rowName, 'trigger', contract.trigger)
             slipDF.set_value(rowName, 'csiPrice', csiPrice)
             slipDF.set_value(rowName, 'slippage', slippage)
             slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
             slipDF.set_value(rowName, 'Type', 'Close')
     
     if slipDF.shape[0]==0:
-        print 'No new trades yesterday, skipping daily report'
+        print systemName, 'No new trades yesterday, skipping daily report'
     else:
-        slipDF['timedelta']=slipDF.c2timestamp-slipDF.csitimestamp
+        slipDF['timedelta']=slipDF.c2timestamp-slipDF.trigger
         slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
         #if slipDF.shape[0] != portfolioDF.shape[0]:
         #    print 'Warning! Some values may be mising'
@@ -162,67 +239,76 @@ for systemName in systems:
         
         openedTrades = slipDF[slipDF['Type']=='Open'].sort_values(by='abs_slippage', ascending=True)
         filename=systemName+'_open_slippage.png'
-        title = systemName+' '+str(openedTrades.shape[0])+' Opened Trades, CSI Data as of '+str(futuresDate)
+        title = systemName+' '+str(openedTrades.shape[0])+' Opened Trades, CSI Data as of '+str(csidate)
         if openedTrades.shape[0] !=0:
-            plotSlip(openedTrades, pngPath, filename, title, showPlots=showPlots)
+            plotSlip(openedTrades, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
         else:
             print title
             
         closedTrades = slipDF[slipDF['Type']=='Close'].sort_values(by='abs_slippage', ascending=True)
-        title = systemName+' '+str(closedTrades.shape[0])+' Closed Trades, CSI Data as of '+str(futuresDate)
+        title = systemName+' '+str(closedTrades.shape[0])+' Closed Trades, CSI Data as of '+str(csidate)
         filename=systemName+'_close_slippage.png'
         if closedTrades.shape[0] != 0:
-            plotSlip(closedTrades, pngPath, filename, title, showPlots=showPlots)
+            plotSlip(closedTrades, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
         else:
             print title
             
         slipDF.index.name = 'rowname'
-        filename=systemName+'_slippage_report_'+str(futuresDate).split()[0].replace('-','')+'.csv'
+        filename=systemName+'_slippage_report_'+str(csidate).split()[0].replace('-','')+'.csv'
         slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
         slipDF.to_csv(savePath+systemName+'_slippage_report.csv', index=True)
         print 'Saved '+savePath+systemName+'_slippage_report.csv'
         slipDF.to_csv(savePath2+filename, index=True)
         print 'Saved '+savePath2+filename
 
+    ###########################################################
     #average slippage file/png
-    files=os.listdir(savePath2)
-    slipFiles = [x for x in files if systemName+'_slippage_report' in x]
-
+    files=os.listdir(portfolioPath)
+    slipFiles = [x for x in files if systemName+'_slippage_report_' in x]
+    slipFiles = [x for x in slipFiles if is_int(x.split('_')[-1].split('.')[0])]
+    slipFiles = [x for x in slipFiles if int(x.split('_')[-1].split('.')[0])>start_slip]
+    
     cons = pd.DataFrame()
     for f in slipFiles:
-        fi = pd.read_csv(savePath2+f,index_col='rowname')
+        fi = pd.read_csv(portfolioPath+f,index_col='rowname')
         cons=cons.append(fi)
-        
-    avgslip=pd.DataFrame()
-    for sym in cons.symbol.unique():
-        abs_slip=abs(cons[cons.symbol==sym].abs_slippage.mean())
-        delta=cons[cons.symbol==sym].delta.mean()
-        #print sym, abs_slip
-        avgslip.set_value(sym, 'slippage', abs_slip)
-        avgslip.set_value(sym, 'delta', delta)
-    avgslip=avgslip.sort_values(by='slippage', ascending=True)
-    print str(avgslip.shape[0]), 'Symbols found in the average absolute slippage DF...'
-    print avgslip.index.values
-    '''
-    i=0
-    for x in futuresDF[futuresDF.finalQTY != 0].Contract:
-        if x not in cons.symbol.unique():
-            i+=1
-            print x,
-    print i, 'Symbols missing!'
-    '''
-    system = pd.read_csv(systemPath+systemFilename)
-    system_sym=system[system.c2qty !=0].c2sym.values
-    system_slip=avgslip.ix[system_sym].sort_values(by='slippage', ascending=True)
-    filename=systemName+'_avg_slippage.png'
-    title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
-            +slipFiles[1].split('_')[3][:-4]+' to '+slipFiles[-1].split('_')[3][:-4]
-    plotSlip(system_slip, pngPath, filename, title, showPlots=showPlots)
-    #slippage by system
+    if cons.shape[0] !=0:
+        avgslip=pd.DataFrame()
+        for sym in cons.symbol.unique():
+            trades =len(cons[cons.symbol==sym].c2timestamp.unique())
+            abs_slip=abs(cons[cons.symbol==sym].abs_slippage.mean())
+            delta=cons[cons.symbol==sym].delta.mean()
+            #print sym, abs_slip
+            avgslip.set_value(sym, 'slippage', abs_slip)
+            avgslip.set_value(sym, 'delta', delta)
+            avgslip.set_value(sym, 'trades', trades)
+        avgslip=avgslip.sort_values(by='slippage', ascending=True)
+        print systemName, str(avgslip.shape[0]), 'Symbols found in the average absolute slippage DF...'
+        print avgslip.index.values
+        '''
+        i=0
+        for x in futuresDF[futuresDF.finalQTY != 0].Contract:
+            if x not in cons.symbol.unique():
+                i+=1
+                print x,
+        print i, 'Symbols missing!'
+        '''
+        index = str(trades)+'trades '+sym
+        system = pd.read_csv(systemPath+systemFilename)
+        system_sym=[ x for x  in system[system.c2qty !=0].c2sym.values if x in avgslip.index.values]
+        system_slip=avgslip.ix[system_sym].sort_values(by='slippage', ascending=True)
+        system_slip.index = [str(int(system_slip.ix[i].trades))+' trades '+i for i in system_slip.index]
+        filename=systemName+'_avg_slippage.png'
+        title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
+                +slipFiles[1].split('_')[3][:-4]+' to '+slipFiles[-1].split('_')[3][:-4]
+        plotSlip(system_slip, pngPath, filename, title,figsize, fontsize, showPlots=showPlots)
+        #slippage by system
 
 
-    filename=systemName+'_slip_cons.csv'
-    cons.to_csv(savePath2+filename, index=True)
-    print 'Saved '+savePath2+filename+'\n'
+        filename=systemName+'_slip_cons.csv'
+        cons.to_csv(savePath2+filename, index=True)
+        print 'Saved '+savePath2+filename+'\n'
+    else:
+        print 'no slippage reports found. skipping consolidated report.'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

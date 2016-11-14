@@ -86,7 +86,7 @@ else:
     systems = ['v4micro','v4mini','v4futures']
     debug=False
     showPlots=False
-    submitIB=False
+    submitIB=True
     triggertime = 30 #mins
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
@@ -267,7 +267,7 @@ def create_execDict(feeddata, systemfile):
     systemdata.to_csv(systemfile, index=False)
     print 'updated', systemfile
       
-    print 'Created exec dict with', len(execDict.keys()), 'symbols'
+    print 'Created exec dict with', len(execDict.keys()), 'symbols:'
     print execDict.keys()
     return execDict
    
@@ -589,7 +589,7 @@ def find_triggers(feeddata, execDict):
                     print csiRunSym,'skipping append.. data has already been appended',
                     #if int(loaddate) <= int(lastsignaldate):
                     #    print csiRunSym,'skipping append.. signal has been generated',
-                    print 'loaddate', loaddate, '<', 'lastdate',lastdate,
+                    print 'loaddate', loaddate, '<', 'lastdate',lastdate
                     dataNotAppended=False
             #append data if M-F, not a holiday and if the data hasn't been appended yet. US MARKETS EST.
             dayofweek = endDateTime.date().weekday()
@@ -711,7 +711,7 @@ if __name__ == "__main__":
                 
                 for tuple in iborders:
                     sym=tuple[0]
-                    order =tuple[0][1]
+                    order =tuple[1]
                     if order[0]==executions.ix[sym].side:
                         execDict[sym][0] = 'PASS'
                         execDict[sym][1] = execDict[sym][1]-executions.ix[sym].qty

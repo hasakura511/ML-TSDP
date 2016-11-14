@@ -46,9 +46,9 @@ offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EB
 
 
 #for system files
-c2system_macro=c2system='Anti1LastSIG'
-c2system_mini='Anti1LastSIG'
-c2system_micro='LastSEA'
+c2system_macro=c2system='Voting9'
+c2system_mini='Voting9'
+c2system_micro='Voting9'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\

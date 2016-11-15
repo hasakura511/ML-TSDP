@@ -10,11 +10,12 @@ import numpy as np
 import threading
 import time
 import logging
+import copy
 #import get_feed2 as feed
 from pytz import timezone
 from dateutil.parser import parse
 import datetime
-
+import traceback
 from ibapi.wrapper_v5 import IBWrapper, IBclient
 from ibapi.place_order2 import place_orders as place_iborders
 from swigibpy import Contract 
@@ -61,6 +62,7 @@ if len(sys.argv)==1:
     debug=True
     showPlots=True
     submitIB=False
+    submitC2=False
     triggertime = 30 #mins
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
@@ -152,7 +154,13 @@ months = {
                 }
 conn = sqlite3.connect(dbPath)
 
-
+def is_int(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+        
 
 def runInThread(sym, popenArgs):
     with open(logPath+sym+'.txt', 'w') as f:
@@ -203,27 +211,31 @@ def runThreads(threadlist):
     
 def get_ibfutpositions(portfolioPath):
     global client
-    (account_value, portfolio_data)=client.get_IB_account_data()    
-    data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
-    dataSet=data[data.exp != '']
-    dataSet=dataSet.set_index(['sym'])
-
+    (account_value, portfolio_data)=client.get_IB_account_data()
     
-    
-    accountSet=pd.DataFrame(account_value,columns=['desc','value','currency','account_id'])
-    accountSet=accountSet.set_index(['desc'])
-    accountValue = accountSet.ix['NetLiquidation'].value
-    print dataSet.shape[0],'futures positions found with account value:', accountValue
-    
-    filename=portfolioPath+'ib_portfolio.csv'
-    dataSet.to_csv(filename)
-    print 'saved', filename
-    
-    filename=portfolioPath+'ib_account_value.csv'
-    accountSet.to_csv(filename, index=True)
-    print 'saved', filename
-    #
-    return dataSet
+    if len(account_value) != 0:
+        accountSet=pd.DataFrame(account_value,columns=['desc','value','currency','account_id'])
+        accountSet=accountSet.set_index(['desc'])
+        filename=portfolioPath+'ib_account_value.csv'
+        accountSet.to_csv(filename, index=True)
+        print 'saved', filename
+        if 'NetLiquidation' in accountSet.index:
+            accountValue = accountSet.ix['NetLiquidation'].value        
+            print 'Account value:', accountValue
+    else:
+        print 'Account value returned nothing'
+        
+    if len(portfolio_data) !=0:
+        data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
+        dataSet=data[data.exp != '']
+        dataSet=dataSet.set_index(['sym'])
+        filename=portfolioPath+'ib_portfolio.csv'
+        dataSet.to_csv(filename)
+        print 'saved', filename
+        print dataSet.shape[0],'futures positions found'
+        return dataSet
+    else:
+        return 0
 
 def create_execDict(feeddata, systemfile):
     global client
@@ -293,48 +305,52 @@ def update_orders(feeddata, systemfile, execDict):
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
     feeddata=feeddata.reset_index()
-    openPositions=get_ibfutpositions(portfolioPath)
+    portfolio=get_ibfutpositions(portfolioPath)
+    if isinstance(portfolio, type(pd.DataFrame())):
+        openPositions = portfolio.reset_index().groupby(['sym'])[['qty']].sum()
+        for i in feeddata.index:
+            system=feeddata.ix[i]
+            c2sym=system.c2sym
+            ibsym=system.ibsym   
+            index = systemdata[systemdata.c2sym2==c2sym].index[0]
 
-    for i in feeddata.index:
-        system=feeddata.ix[i]
-        c2sym=system.c2sym
-        ibsym=system.ibsym   
-        index = systemdata[systemdata.c2sym2==c2sym].index[0]
+            if ibsym in openPositions.index:
+                ib_pos_qty=openPositions.ix[ibsym].qty
+            else:
+                ib_pos_qty=0
+            #ib_pos_qty=0
+            #print ib_pos_qty
+            ibquant = systemdata.ix[index].c2qty
+            system_ibpos_qty=systemdata.ix[index].signal * ibquant
+            print 'ibq', type(ibquant), 'sysibq', type(system_ibpos_qty)
+            print( "system_ib_pos: " + str(system_ibpos_qty) ),
+            print( "ib_pos: " + str(ib_pos_qty) ),
+            
+            action='PASS'
+            if system_ibpos_qty > ib_pos_qty:
+                action = 'BOT'
+                ibquant=int(system_ibpos_qty - ib_pos_qty)
+                #print( 'BUY: ' + str(ibquant) )
+                #place_iborder('BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);
+            if system_ibpos_qty < ib_pos_qty:
+                action='SLD'
+                ibquant=int(ib_pos_qty - system_ibpos_qty)
+                #print( 'SELL: ' + str(ibquant) )
+                #place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);         
+            #print( action+': ' + str(ibquant) )
+            execDict[ibsym][0]=action
+            execDict[ibsym][1]=ibquant
 
-        if ibsym in openPositions.index:
-            ib_pos_qty=openPositions.ix[ibsym].qty
-        else:
-            ib_pos_qty=0
-        #ib_pos_qty=0
-        #print ib_pos_qty
-        ibquant = systemdata.ix[index].c2qty
-        system_ibpos_qty=systemdata.ix[index].signal * ibquant
-        #print 'ibq', type(ibquant), 'sysibq', type(system_ibpos_qty)
-        #print( "system_ib_pos: " + str(system_ibpos_qty) ),
-        #print( "ib_pos: " + str(ib_pos_qty) ),
-        
-        action='PASS'
-        if system_ibpos_qty > ib_pos_qty:
-            action = 'BOT'
-            ibquant=int(system_ibpos_qty - ib_pos_qty)
-            #print( 'BUY: ' + str(ibquant) )
-            #place_iborder('BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);
-        if system_ibpos_qty < ib_pos_qty:
-            action='SLD'
-            ibquant=int(ib_pos_qty - system_ibpos_qty)
-            #print( 'SELL: ' + str(ibquant) )
-            #place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);         
-        #print( action+': ' + str(ibquant) )
-        execDict[ibsym][0]=action
-        execDict[ibsym][1]=ibquant
+            #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
+        #systemdata.to_csv(systemfile, index=False)
+        #print 'saved', systemfile
+          
+        #print len(execDict.keys()), execDict.keys()
+        return execDict
+    else:
+        print 'Could not get open positions from IB'
+        return execDict
 
-        #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
-    #systemdata.to_csv(systemfile, index=False)
-    #print 'saved', systemfile
-      
-    #print len(execDict.keys()), execDict.keys()
-    return execDict
-    
 def get_orders(feeddata, systemfile):
     global client
     systemdata=pd.read_csv(systemfile)
@@ -504,6 +520,8 @@ def filterIBexec():
 
     executions.times = pd.to_datetime(executions.times)
     executions = executions[executions.times >= executions.lastAppend].reset_index().set_index('symbol')
+    #combine orders
+    
     executions.to_csv(portfolioPath+'ib_exec_last.csv', index=True)
     print 'saved', portfolioPath+'ib_exec_last.csv'
     return executions
@@ -529,13 +547,7 @@ def get_timetable(execDict, systemPath):
     return timetable
         
 def find_triggers(feeddata, execDict):
-    def is_int(s):
-        try: 
-            int(s)
-            return True
-        except ValueError:
-            return False
-            
+
     eastern=timezone(tzDict['EST'])
     endDateTime=dt.now(get_localzone())
     #endDateTime=dt.now(get_localzone())+datetime.timedelta(days=5)
@@ -683,7 +695,7 @@ if __name__ == "__main__":
     print 'returned to main thread with', len(threadlist), 'threads'
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     #check threadlist tos ee if everythong's there?
-    print 'running vol_adjsize_live'
+    print 'running vol_adjsize_live to update system files'
     with open(logPath+'vol_adjsize_live.txt', 'w') as f:
         with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
             proc = Popen(runPath2, stdout=f, stderr=e)
@@ -695,12 +707,22 @@ if __name__ == "__main__":
             proc = Popen(runPath4, stdout=f, stderr=e)
             proc.wait()
     totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
-
-    if len(threadlist)==0 and totalc2orders ==0:
+    
+    #check ib positions
+    try:
+        execDict=update_orders(feeddata, systemfile, execDict)
+    except Exception as e:
+        #print e
+        traceback.print_exc()
+        
+    iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+    num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+    
+    if len(threadlist)==0 and totalc2orders ==0 and num_iborders==0:
         print 'Found nothing to update!'
     else:
-        print 'Found', totalc2orders, 'c2 position adjustments'
-                
+        print 'Found', totalc2orders, 'c2 position adjustments.'
+        print 'Found', num_iborders,'ib position adjustments.'
         #send orders if live mode
         if debug==False:
             print 'Live mode: running orders'
@@ -712,41 +734,41 @@ if __name__ == "__main__":
                             proc = Popen(runPath3+[sys], stdout=f, stderr=e)
                             proc.wait()
                             
-                print 'returned to main thread, running check systems'
+                print 'returned to main thread, running check systems again..'
                 with open(logPath+'check_systems_live.txt', 'w') as f:
                     with open(logPath+'check_systems_live_error.txt', 'w') as e:
                         proc = Popen(runPath4, stdout=f, stderr=e)
                         proc.wait()
             else:
                 print 'submitC2 set to False'
-            #v4futures for ib orders
             
             if submitIB:
-                print 'returned to main thread, placing ib orders from', systemfile
-                execDict=update_orders(feeddata, systemfile, execDict)
-                iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+                print 'returned to main thread, placing ib orders from', systemfile 
+                try:
+                    place_iborders(execDict)
+                    executions=filterIBexec()
+                    
+                    #check executions
+                    #drop data we don't need.
+                    executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
+
+                    for (sym,[order,qty]) in iborders:
+                        if (sym,order) in executions2.index and executions2.ix[sym].qty[0] ==qty:
+                            execDict[sym][0] = 'PASS'
+                            execDict[sym][1] = 0
+                        else:
+                            print 'There was an error:',sym,'order',  execDict[sym][:2], 'ib returned',\
+                                executions2.ix[sym].index[0], executions2.ix[sym].qty[0]
+                except Exception as e:
+                    #print e
+                    traceback.print_exc()
                 num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
-                print 'Found', num_iborders,'ib position adjustments. Placing orders...'
-                place_iborders(execDict)
-                executions=filterIBexec()
-                
-                #check executions
-                for tuple in iborders:
-                    sym=tuple[0]
-                    order =tuple[1]
-                    if order[0]==executions.ix[sym].side:
-                        execDict[sym][0] = 'PASS'
-                        execDict[sym][1] = execDict[sym][1]-executions.ix[sym].qty
-                    else:
-                        print 'There was an error:',sym,'order',  execDict[sym][:2], 'ib returned',\
-                            executions.ix[sym].side, executions.ix[sym].qty
+                print 'Found', num_iborders,'ib position adjustments after placing orders.'
             else:
                 print 'submitIB set to False'
-                
-
-                    
+             
             totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
-            print 'Found', totalc2orders, 'c2 position adjustments'
+            print 'Found', totalc2orders, 'c2 position adjustments.'
         else:
             print 'Debug mode: skipping orders'
 

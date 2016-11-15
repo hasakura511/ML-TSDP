@@ -61,7 +61,7 @@ if len(sys.argv)==1:
     debug=True
     showPlots=True
     submitIB=False
-    triggertime = 600 #mins
+    triggertime = 30 #mins
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
     runPath2= ['python','D:/ML-TSDP/vol_adjsize_live.py']

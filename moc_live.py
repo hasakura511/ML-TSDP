@@ -322,9 +322,9 @@ def update_orders(feeddata, systemfile, execDict):
             #print ib_pos_qty
             ibquant = systemdata.ix[index].c2qty
             system_ibpos_qty=systemdata.ix[index].signal * ibquant
-            print 'ibq', type(ibquant), 'sysibq', type(system_ibpos_qty)
-            print( "system_ib_pos: " + str(system_ibpos_qty) ),
-            print( "ib_pos: " + str(ib_pos_qty) ),
+            #print 'ibq', type(ibquant), 'sysibq', type(system_ibpos_qty)
+            #print( "system_ib_pos: " + str(system_ibpos_qty) ),
+            #print( "ib_pos: " + str(ib_pos_qty) ),
             
             action='PASS'
             if system_ibpos_qty > ib_pos_qty:

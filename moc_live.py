@@ -53,7 +53,8 @@ tickerId=random.randint(100,9999)
 interval='1d'
 minDataPoints = 5
 
-
+#python moc_live.py 1 1 1
+#python moc_live.py live submitc2 submitIB
 if len(sys.argv)==1:
     #systems = ['v4mini']
     systems = ['v4micro','v4mini','v4futures']
@@ -86,7 +87,18 @@ else:
     systems = ['v4micro','v4mini','v4futures']
     debug=False
     showPlots=False
-    submitIB=False
+    
+    if sys.argv[2]==1:
+        submitC2=True
+    else:
+        submitC2=False
+    
+    if sys.argv[3]==1:
+        submitIB=True
+    else:
+        submitIB=False
+    
+    
     triggertime = 30 #mins
     dbPath='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
@@ -692,13 +704,21 @@ if __name__ == "__main__":
         #send orders if live mode
         if debug==False:
             print 'Live mode: running orders'
-            for sys in systems:
-                print 'returned to main thread, running c2 orders for',sys
-                with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
-                    with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'w') as e:
-                        proc = Popen(runPath3+[sys], stdout=f, stderr=e)
+            if submitC2:
+                for sys in systems:
+                    print 'returned to main thread, running c2 orders for',sys
+                    with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
+                        with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'w') as e:
+                            proc = Popen(runPath3+[sys], stdout=f, stderr=e)
+                            proc.wait()
+                            
+                print 'returned to main thread, running check systems'
+                with open(logPath+'check_systems_live.txt', 'w') as f:
+                    with open(logPath+'check_systems_live_error.txt', 'w') as e:
+                        proc = Popen(runPath4, stdout=f, stderr=e)
                         proc.wait()
-                        
+            else:
+                print 'submitC2 set to False'
             #v4futures for ib orders
             
             if submitIB:
@@ -710,6 +730,7 @@ if __name__ == "__main__":
                 place_iborders(execDict)
                 executions=filterIBexec()
                 
+                #check executions
                 for tuple in iborders:
                     sym=tuple[0]
                     order =tuple[1]
@@ -719,12 +740,10 @@ if __name__ == "__main__":
                     else:
                         print 'There was an error:',sym,'order',  execDict[sym][:2], 'ib returned',\
                             executions.ix[sym].side, executions.ix[sym].qty
-                            
-            print 'returned to main thread, running check systems'
-            with open(logPath+'check_systems_live.txt', 'w') as f:
-                with open(logPath+'check_systems_live_error.txt', 'w') as e:
-                    proc = Popen(runPath4, stdout=f, stderr=e)
-                    proc.wait()
+            else:
+                print 'submitIB set to False'
+                
+
                     
             totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
             print 'Found', totalc2orders, 'c2 position adjustments'

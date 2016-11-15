@@ -28,6 +28,7 @@ import os
 import os.path
 import sys
 import ssl
+import traceback
 from copy import deepcopy
 from suztoolz.transform import ATR2
 import matplotlib.pyplot as plt
@@ -391,6 +392,7 @@ futuresDF['vSTART']=futuresDF_old.vSTART
 futuresDF['LastSEA']=futuresDF_old.LastSEA
 futuresDF['LastSRUN']=futuresDF_old.LastSRUN
 
+'''
 for col in futuresDF_old.columns:
     if col.startswith('SEA'):
         futuresDF['SEA']=futuresDF_old[col]
@@ -398,7 +400,7 @@ for col in futuresDF_old.columns:
 for col in futuresDF_old.columns:
     if col.startswith('SRUN'):
         futuresDF['SRUN']=futuresDF_old[col]
-
+'''
     
 for i2,contract in enumerate(marketList):
     #print i,
@@ -878,7 +880,8 @@ try:
     futuresDF.to_sql(name='futuresATR', if_exists=mode, con=conn, index=True, index_label='CSIsym')
     print 'Saved to sql db table', 'futuresATR'
 except Exception as e:
-    print e
+    #print e
+    traceback.print_exc()
     
 for i,sym in enumerate([x.split('_')[1] for x in system.System]):
     if sym in futuresDF.index:

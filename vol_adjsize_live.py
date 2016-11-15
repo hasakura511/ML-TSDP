@@ -58,7 +58,6 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
-futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
 systemFilename='system_v4futures.csv'
 systemFilename2='system_v4mini.csv'
 systemFilename3='system_v4micro.csv'
@@ -113,6 +112,8 @@ else:
     
 conn = sqlite3.connect(dbPath)
 fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
+futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+
 for i,col in enumerate(fxRates.columns):
     if 'Last' in col:
         fxRates = fxRates[fxRates.columns[i]]

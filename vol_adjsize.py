@@ -63,7 +63,7 @@ accountInfo = pd.DataFrame(data=[[c2system, c2system_mini, c2system_micro]],colu
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2id_macro, c2id_mini, c2id_micro]],columns=systems,index=['c2id']))
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2key, c2key, c2key]],columns=systems,index=['c2key']))
 accountInfo = accountInfo.append(pd.DataFrame(data=[[riskEquity, riskEquity_mini, riskEquity_micro]],columns=systems,index=['riskEquity']))
-
+accountInfo = accountInfo.append(pd.DataFrame(data=[[str(offline), str(offline_mini), str(offline_micro)]],columns=systems,index=['offline']))
 #range (-1 to 1) postive for counter-trend negative for trend i.e.
 #-1 would 0 safef ==1 and double safef==2
 #1 would 0 safef ==2 and double safef==1

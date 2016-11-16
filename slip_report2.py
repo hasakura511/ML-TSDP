@@ -119,16 +119,19 @@ for systemName in systems:
     tradeFilename='c2_'+systemName+'_trades.csv'
     portfolioFilename = 'c2_'+systemName+'_portfolio.csv'
     systemFilename='system_'+systemName+'.csv'
-
-
+    system = pd.read_csv(systemPath+systemFilename)
+    
+    
     #entry trades
     portfolioDF = pd.read_csv(portfolioPath+portfolioFilename)
     portfolioDF.index = feeddata.ix[[x[:-2] for x in portfolioDF.symbol.values]].ibsym.values
+    portfolioDF = portfolioDF.ix[[True if type(x)==str else False for x in portfolioDF.index]]
     portfolioDF['openedWhen'] = pd.to_datetime(portfolioDF['openedWhen'])
     portfolioDF = portfolioDF.sort_values(by='openedWhen', ascending=False)
     #exit trades
     tradesDF = pd.read_csv(portfolioPath+tradeFilename)
     tradesDF.index = feeddata.ix[[x[:-2] for x in tradesDF.symbol.values]].ibsym.values
+    tradesDF=tradesDF.ix[[True if type(x)==str else False for x in tradesDF.index]]
     tradesDF=tradesDF.drop(['expir','putcall','strike','symbol_description','underlying','markToMarket_time'], axis=1).dropna()
     tradesDF['closedWhen'] = pd.to_datetime(tradesDF['closedWhen'])
     tradesDF = tradesDF.sort_values(by='closedWhen', ascending=False)
@@ -141,6 +144,7 @@ for systemName in systems:
     #new entry trades
     #newOpen=portfolioDF[portfolioDF['openedWhen']>=futuresDate].symbol.values
     newOpen={}
+    system.index= system.c2sym
     for x in idx_trigger:
         sym=x.split()[0]
         if sym in portfolioDF.index:
@@ -171,8 +175,13 @@ for systemName in systems:
             else:
                 csiPrice = futuresDF[futuresDF.Contract ==contract].LastClose.values[0]
             slippage=(c2price-csiPrice)/csiPrice
+            signal = system.ix[contract].signal
+            qty = system.ix[contract].c2qty
+            cv = futuresDF[futuresDF.Contract ==contract].contractValue.values[0]
+            dollarslip = int(-slippage*signal*qty*cv)
             #print contract, c2price, csiPrice,slippage
-            rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
+            #rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
+            rowName = 'ctwo: '+str(c2timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
             slipDF.set_value(rowName, 'symbol', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
@@ -181,9 +190,11 @@ for systemName in systems:
             slipDF.set_value(rowName, 'slippage', slippage)
             slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
             slipDF.set_value(rowName, 'Type', 'Open')
-
+            slipDF.set_value(rowName, 'signal', signal)
+            slipDF.set_value(rowName, 'dollarslip', dollarslip)
     #newCloses=tradesDF[tradesDF['closedWhen']>=futuresDate]
     newCloses=pd.DataFrame()
+    
     for x in idx_trigger:
         sym=x.split()[0]
         if sym in tradesDF.index:
@@ -206,28 +217,40 @@ for systemName in systems:
             print sym,' no close trades found skipping..'
             
     print systemName, newCloses.shape[0], 'Close Trades Found'
+    newCloses.index = newCloses.symbol
     print systemName, newCloses.index
     
     for contract in newCloses.index:
         c2price=newCloses.ix[contract].closing_price_VWAP
         c2timestamp=pd.Timestamp(newCloses.ix[contract].closedWhen)
+        trigger = pd.Timestamp(newCloses.ix[contract].trigger)
         if contract in futuresDF.Contract.values:
             if contract[:-2] in adjDict.keys():
                 csiPrice = futuresDF[futuresDF.Contract ==contract].LastClose.values[0]*adjDict[contract[:-2]]
             else:
                 csiPrice = futuresDF[futuresDF.Contract ==contract].LastClose.values[0]
             slippage=(c2price-csiPrice)/csiPrice
+            if newCloses.ix[contract].long_or_short == 'long':
+                signal=-1
+            else:
+                signal =1
+            qty = system.ix[contract].c2qty
+            cv = futuresDF[futuresDF.Contract ==contract].contractValue.values[0]
+            dollarslip = int(-slippage*signal*qty*cv)
             #print contract, c2price, csiPrice,slippage
-            rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
+            #rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
+            rowName = 'ctwo: '+str(c2timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
             slipDF.set_value(rowName, 'symbol', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
-            slipDF.set_value(rowName, 'trigger', contract.trigger)
+            slipDF.set_value(rowName, 'trigger', trigger)
             slipDF.set_value(rowName, 'csiPrice', csiPrice)
             slipDF.set_value(rowName, 'slippage', slippage)
             slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
             slipDF.set_value(rowName, 'Type', 'Close')
-    
+            slipDF.set_value(rowName, 'signal', signal)
+            slipDF.set_value(rowName, 'dollarslip', dollarslip)
+            
     if slipDF.shape[0]==0:
         print systemName, 'No new trades yesterday, skipping daily report'
     else:
@@ -239,15 +262,19 @@ for systemName in systems:
 
         
         openedTrades = slipDF[slipDF['Type']=='Open'].sort_values(by='abs_slippage', ascending=True)
+        totalslip = int(openedTrades.dollarslip.sum())
         filename=systemName+'_open_slippage.png'
-        title = systemName+' '+str(openedTrades.shape[0])+' Opened Trades, CSI Data as of '+str(csidate)
+        title = systemName+': '+str(openedTrades.shape[0])+' Opened Trades, $'+str(totalslip)\
+                    +' Slippage, CSI Data as of '+str(csidate)
         if openedTrades.shape[0] !=0:
             plotSlip(openedTrades, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
         else:
             print title
             
         closedTrades = slipDF[slipDF['Type']=='Close'].sort_values(by='abs_slippage', ascending=True)
-        title = systemName+' '+str(closedTrades.shape[0])+' Closed Trades, CSI Data as of '+str(csidate)
+        totalslip = int(closedTrades.dollarslip.sum())
+        title = systemName+': '+str(closedTrades.shape[0])+' Closed Trades, $'+str(totalslip)\
+                    +' Slippage, CSI Data as of '+str(csidate)
         filename=systemName+'_close_slippage.png'
         if closedTrades.shape[0] != 0:
             plotSlip(closedTrades, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
@@ -295,7 +322,7 @@ for systemName in systems:
         print i, 'Symbols missing!'
         '''
         index = str(trades)+'trades '+sym
-        system = pd.read_csv(systemPath+systemFilename)
+        
         system_sym=[ x for x  in system[system.c2qty !=0].c2sym.values if x in avgslip.index.values]
         system_slip=avgslip.ix[system_sym].sort_values(by='slippage', ascending=True)
         system_slip.index = [str(int(system_slip.ix[i].trades))+' trades '+i for i in system_slip.index]

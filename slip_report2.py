@@ -15,7 +15,7 @@ start_time = time.time()
 if len(sys.argv)==1:
     debug=True
     showPlots=True
-    start_slip=0
+    start_slip=20161111
     figsize=(6,8)
     fontsize=12
     dataPath='D:/ML-TSDP/data/'
@@ -327,8 +327,12 @@ for systemName in systems:
         system_slip=avgslip.ix[system_sym].sort_values(by='slippage', ascending=True)
         system_slip.index = [str(int(system_slip.ix[i].trades))+' trades '+i for i in system_slip.index]
         filename=systemName+'_avg_slippage.png'
-        title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
-                +slipFiles[1].split('_')[3][:-4]+' to '+slipFiles[-1].split('_')[3][:-4]
+        if len(slipFiles)>1:
+            title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
+                    +slipFiles[1].split('_')[3][:-4]+' to '+slipFiles[-1].split('_')[3][:-4]
+        else:
+            title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
+                    +slipFiles[-1].split('_')[3][:-4]
         plotSlip(system_slip, pngPath, filename, title,figsize, fontsize, showPlots=showPlots)
         #slippage by system
 

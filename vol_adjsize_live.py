@@ -28,7 +28,7 @@ import os
 import os.path
 import sys
 import ssl
-import traceback
+
 from copy import deepcopy
 from suztoolz.transform import ATR2
 import matplotlib.pyplot as plt

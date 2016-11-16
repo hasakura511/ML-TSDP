@@ -9,17 +9,20 @@ from datetime import datetime as dt
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib
+import sqlite3
 
 start_time = time.time()
 
 if len(sys.argv)==1:
     debug=True
     showPlots=True
+    commission=1
     start_slip=20161111
     figsize=(6,8)
     fontsize=12
     dataPath='D:/ML-TSDP/data/'
     portfolioPath = 'D:/ML-TSDP/data/portfolio/'
+    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     #savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath = savePath2 = pngPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     systemPath =  'D:/ML-TSDP/data/systems/'
@@ -29,9 +32,11 @@ if len(sys.argv)==1:
 else:
     debug=False
     showPlots=False
+    commission=1
     start_slip=20161111
     figsize=(8,13)
     fontsize=20
+    dbPath='./data/futures.sqlite3'
     dataPath=savePath='./data/'
     portfolioPath = savePath2 ='./data/portfolio/'
     pngPath = './data/results/'
@@ -40,7 +45,7 @@ else:
     feedfile='./data/systems/system_ibfeed.csv'
 
 
-
+conn = sqlite3.connect(dbPath)
 atrFilename = 'futuresATR.csv'
 systems = ['v4futures','v4mini', 'v4micro']
 #systems = ['v4micro']
@@ -156,7 +161,7 @@ for systemName in systems:
                 print sym,'trigger', timetable.ix[x][csidate],
                 if row.openedWhen>=timetable.ix[x][csidate]:
                     print 'new open', row.openedWhen,'adding..'
-                    newOpen[row.symbol]=timetable.ix[x][csidate]
+                    newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
                 else:
                     print ' no open trades found skipping..'
             else:
@@ -176,22 +181,24 @@ for systemName in systems:
                 csiPrice = futuresDF[futuresDF.Contract ==contract].LastClose.values[0]
             slippage=(c2price-csiPrice)/csiPrice
             signal = system.ix[contract].signal
-            qty = system.ix[contract].c2qty
+            qty =newOpen[contract][1]
+            commissions = commission*qty
             cv = futuresDF[futuresDF.Contract ==contract].contractValue.values[0]
             dollarslip = int(-slippage*signal*qty*cv)
             #print contract, c2price, csiPrice,slippage
             #rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
             rowName = 'ctwo: '+str(c2timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
-            slipDF.set_value(rowName, 'symbol', contract)
+            slipDF.set_value(rowName, 'contract', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
-            slipDF.set_value(rowName, 'trigger', newOpen[contract])
+            slipDF.set_value(rowName, 'trigger', newOpen[contract][0])
             slipDF.set_value(rowName, 'csiPrice', csiPrice)
             slipDF.set_value(rowName, 'slippage', slippage)
             slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
             slipDF.set_value(rowName, 'Type', 'Open')
             slipDF.set_value(rowName, 'signal', signal)
             slipDF.set_value(rowName, 'dollarslip', dollarslip)
+            slipDF.set_value(rowName, 'commissions', commissions)
     #newCloses=tradesDF[tradesDF['closedWhen']>=futuresDate]
     newCloses=pd.DataFrame()
     
@@ -234,13 +241,14 @@ for systemName in systems:
                 signal=-1
             else:
                 signal =1
-            qty = system.ix[contract].c2qty
+            qty = newCloses.ix[contract].quant_closed
+            commissions = commission*qty
             cv = futuresDF[futuresDF.Contract ==contract].contractValue.values[0]
             dollarslip = int(-slippage*signal*qty*cv)
             #print contract, c2price, csiPrice,slippage
             #rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
             rowName = 'ctwo: '+str(c2timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
-            slipDF.set_value(rowName, 'symbol', contract)
+            slipDF.set_value(rowName, 'contract', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
             slipDF.set_value(rowName, 'trigger', trigger)
@@ -250,6 +258,7 @@ for systemName in systems:
             slipDF.set_value(rowName, 'Type', 'Close')
             slipDF.set_value(rowName, 'signal', signal)
             slipDF.set_value(rowName, 'dollarslip', dollarslip)
+            slipDF.set_value(rowName, 'commissions', commissions)
             
     if slipDF.shape[0]==0:
         print systemName, 'No new trades yesterday, skipping daily report'
@@ -288,6 +297,12 @@ for systemName in systems:
         print 'Saved '+savePath+systemName+'_slippage_report.csv'
         slipDF.to_csv(savePath2+filename, index=True)
         print 'Saved '+savePath2+filename
+        slipDF['Name']=systemName
+        slipDF['ibsym']=feeddata.ix[[x[:-2] for x in slipDF.contract.values]].ibsym.values
+        slipDF['csiDate']=csidate
+        slipDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        slipDF.to_sql(name= 'slippage', if_exists='append', con=conn, index=True, index_label='CSIsym')
+        
 
     ###########################################################
     #average slippage file/png
@@ -302,10 +317,10 @@ for systemName in systems:
         cons=cons.append(fi)
     if cons.shape[0] !=0:
         avgslip=pd.DataFrame()
-        for sym in cons.symbol.unique():
-            trades =len(cons[cons.symbol==sym].c2timestamp.unique())
-            abs_slip=abs(cons[cons.symbol==sym].abs_slippage.mean())
-            delta=cons[cons.symbol==sym].delta.mean()
+        for sym in cons.contract.unique():
+            trades =len(cons[cons.contract==sym].c2timestamp.unique())
+            abs_slip=abs(cons[cons.contract==sym].abs_slippage.mean())
+            delta=cons[cons.contract==sym].delta.mean()
             #print sym, abs_slip
             avgslip.set_value(sym, 'slippage', abs_slip)
             avgslip.set_value(sym, 'delta', delta)

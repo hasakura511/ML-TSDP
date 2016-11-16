@@ -894,7 +894,7 @@ for i,sym in enumerate([x.split('_')[1] for x in system.System]):
 system['Date']=lastDate
 system['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4macro'
-system.ix[futuresDF.index].to_sql(name=tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system.ix[futuresDF.index].to_sql(name=tablename, if_exists='replace', con=conn, index=True, index_label='CSIsym')
 system.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
 print tablename,c2system
 print 'Saved to sql db and',  systemPath+systemFilename_tosave
@@ -911,7 +911,7 @@ for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
 system_mini['Date']=lastDate
 system_mini['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4mini'
-system_mini.ix[futuresDF.index].to_sql(name=tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system_mini.ix[futuresDF.index].to_sql(name=tablename, if_exists='replace', con=conn, index=True, index_label='CSIsym')
 system_mini.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
 print tablename,c2system_mini
 print 'Saved to sql db and', systemPath+systemFilename2_tosave
@@ -927,7 +927,7 @@ for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
 system_micro['Date']=lastDate
 system_micro['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4micro'
-system_micro.ix[futuresDF.index].to_sql(name= tablename, if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system_micro.ix[futuresDF.index].to_sql(name= tablename, if_exists='replace', con=conn, index=True, index_label='CSIsym')
 system_micro.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
 print tablename, c2system_micro
 print  'Saved to sql db and', systemPath+systemFilename3_tosave

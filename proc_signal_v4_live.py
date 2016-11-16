@@ -1,3 +1,7 @@
+import json
+from pandas.io.json import json_normalize
+from c2api.sig_adj import get_working_signals, cancel_signal
+
 import numpy as np
 import pandas as pd
 import subprocess
@@ -6,7 +10,7 @@ import time
 #from c2api.place_order2 import place_order as place_c2order
 import json
 from pandas.io.json import json_normalize
-from c2api.get_exec import get_c2pos, get_exec_open, retrieveSystemEquity, get_c2_pos, get_exec, place_order
+from c2api.get_exec import get_c2pos, get_exec_open, get_c2equity, get_c2_pos, get_exec, place_order
 #from seitoolz.get_exec import get_executions as get_c2trades
 #from ibapi.place_order2 import place_orders as place_iborders
 from time import gmtime, strftime, localtime, sleep
@@ -23,7 +27,8 @@ if sys.argv[1]=='0':
     debug=True
 
     showPlots=False
-    systemfile='C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/system_'+sys.argv[2]+'_live.csv'
+    #systemfile='C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/system_'+sys.argv[2]+'_live.csv'
+    systemfile='D:/ML-TSDP/data/systems/system_v4futures.csv'
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dataPath='D:/ML-TSDP/data/csidata/v4futures4_debug/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
@@ -263,14 +268,37 @@ def proc_orders():
         systemdata=pd.read_sql(sql='select * from '+sys, con=conn)
         #systemdata=systemdata.reset_index()
         start_systems(systemdata)
-        get_c2executions(systemdata)
-#subprocess.call(['python', 'get_ibpos.py'])
+        get_c2executions(systemdata) 
 
-#subprocess.call(['python', 'get_ibpos.py'])       
+    
+def proc_sig_adj(systemid,apikey):
+    data=get_working_signals(systemid,apikey);
+    jsondata = json.loads(data)
+    if len(jsondata['response']) > 0:
+        dataSet=json_normalize(jsondata['response'])
+        for i in dataSet.index:
+            row=dataSet.ix[i]
+            cancel_signal(row['signal_id'], systemid,apikey)
+            #time.sleep(1)
+            
 systemdata=pd.read_csv(systemfile)
+seen=dict()
+
+#cancel all pending orders
+for i in systemdata.index:
+        system=systemdata.ix[i]
+        if system['c2submit'] and not seen.has_key(str(system['c2id'])):
+            try:
+                proc_sig_adj(str(system['c2id']),system['c2api'])
+                seen[str(system['c2id'])]=1
+            except Exception as e:
+                print 'Error on', system['c2id']
+
+
+#send new orders
 if not checkTableExists(conn, 'c2sigid'):
     pd.DataFrame(pd.Series(data=1), columns=['c2sigid']).to_sql(name='c2sigid',con=conn, index=False)
 systemdata=systemdata.reset_index()
 start_systems(systemdata)
 get_c2executions(systemdata)
-#subprocess.call(['python', 'get_ibpos.py'])
+

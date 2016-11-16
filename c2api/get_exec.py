@@ -258,14 +258,13 @@ def get_exec_open(systemid, apikey):
     logging.info(r.text)
     return r.text
 
-
-def get_c2pos(systemdata):
-    logging.info('GETTING C2 POSITIONS...')
+def get_c2equity(systemdata):
+    logging.info('GETTING C2 EQUITY...')
     c2list=get_c2_list(systemdata)
     systems=c2list.keys()
     for systemname in systems:
         (systemid, apikey)=c2list[systemname]
-        c2list[systemname]=get_c2livepos(systemid, apikey, systemname)
+        #c2list[systemname]=get_c2livepos(systemid, apikey, systemname)
         equityData=retrieveSystemEquity(systemid, apikey)
         jsondata = json.loads(equityData)
         logging.info('\n Length jsondata'+str(len(jsondata['equity_data'])))
@@ -273,6 +272,22 @@ def get_c2pos(systemdata):
         dataSet.index = pd.to_datetime(dataSet['unix_timestamp'].astype(int),unit='s')
         dataSet.index.name = 'timestamp'
         dataSet.to_csv('./data/portfolio/c2_' + systemname + '_equity.csv')
+    return dataSet
+    
+def get_c2pos(systemdata):
+    logging.info('GETTING C2 POSITIONS...')
+    c2list=get_c2_list(systemdata)
+    systems=c2list.keys()
+    for systemname in systems:
+        (systemid, apikey)=c2list[systemname]
+        c2list[systemname]=get_c2livepos(systemid, apikey, systemname)
+        #equityData=retrieveSystemEquity(systemid, apikey)
+        #jsondata = json.loads(equityData)
+        #logging.info('\n Length jsondata'+str(len(jsondata['equity_data'])))
+        #dataSet=json_normalize(jsondata['equity_data'])
+        #dataSet.index = pd.to_datetime(dataSet['unix_timestamp'].astype(int),unit='s')
+        #dataSet.index.name = 'timestamp'
+        #dataSet.to_csv('./data/portfolio/c2_' + systemname + '_equity.csv')
     return c2list
     
 
@@ -341,14 +356,14 @@ def get_c2_pos(systemname, c2sym):
     
 #place_order('BTO','1','EURUSD','forex')
 def get_c2_list(systemdata):
-    dpsList=dict()
+    c2list=dict()
     
     #systemdata=pd.read_csv('./data/systems/system.csv')
     #systemdata=systemdata.reset_index()
     for i in systemdata.index:
         system=systemdata.ix[i]
         if system['c2submit']:
-            dpsList[system['Name']]=[system['c2id'], system['c2api']]
+            c2list[system['Name']]=[system['c2id'], system['c2api']]
         
-    return dpsList
+    return c2list
     

@@ -877,7 +877,8 @@ futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 futuresDF.index.name = 'CSIsym'
 
 try:
-    futuresDF.to_sql(name='futuresATR', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+    futuresDF.to_sql(name='futuresATRhist', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+    futuresDF.to_sql(name='futuresATR', if_exists='replace', con=conn, index=True, index_label='CSIsym')
     print 'Saved to sql db table', 'futuresATR'
 except Exception as e:
     #print e

@@ -302,7 +302,7 @@ for systemName in systems:
         slipDF['csiDate']=csidate
         slipDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
         slipDF.to_sql(name= 'slippage', if_exists='append', con=conn, index=True, index_label='CSIsym')
-        
+        print 'Saved '+systemName+' to sql'
 
     ###########################################################
     #average slippage file/png

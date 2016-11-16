@@ -352,6 +352,7 @@ if len(sys.argv)==1 or len(sys.argv)==2:
     #dataPath = 'D:/data/tickerData/'
     dataPath = 'D:/ML-TSDP/data/csidata/v4futures4_debug/'
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals2/' 
+    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     #chartSavePath = None
     chartSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/simCharts/'+version+'_'+ticker
     vsfile =pd.read_csv('D:/ML-TSDP/data/futuresATR.csv', index_col=0)
@@ -446,6 +447,7 @@ else:
     #currency=ticker[3:6]
     signalPath = './data/signals2/'
     dataPath = './data/csidata/v4futures4/'
+    feedfile='./data/systems/system_ibfeed.csv'
     chartSavePath = './data/results/'+version+'_'+ticker
     
     #adds auxilary pair features
@@ -458,8 +460,10 @@ else:
     verbose=False
 
 #aux futures
+ff = pd.read_csv(feedfile, index_col='CSIsym')
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 auxFutures = [x.split('_')[0] for x in files]
+auxFutures = [x for x in auxFutures if x in ff.CSIsym2.values]
 
 
 

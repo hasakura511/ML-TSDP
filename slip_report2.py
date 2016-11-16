@@ -76,7 +76,7 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
     slipDF.delta.plot(kind='barh', color='blue', width=width,ax=ax2, position=0)
 
     ax.set_xlabel('Slippage % (red)')
-    ax2.set_xlabel('Slippage Days (blue)')
+    ax2.set_xlabel('Slippage Minutes (blue)')
     ax.grid(b=True)
     ax2.grid(b=False)
     #ax2 = slipDF.hourdelta.plot.bar(color='b', width=0.5)
@@ -232,7 +232,8 @@ for systemName in systems:
         print systemName, 'No new trades yesterday, skipping daily report'
     else:
         slipDF['timedelta']=slipDF.c2timestamp-slipDF.trigger
-        slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
+        slipDF['delta']=slipDF['timedelta'].astype('timedelta64[m]')
+        #slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
         #if slipDF.shape[0] != portfolioDF.shape[0]:
         #    print 'Warning! Some values may be mising'
 

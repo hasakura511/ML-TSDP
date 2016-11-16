@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from os import listdir
 from os.path import isfile, join
+import sqlite3
 import io
 import traceback
 import json
@@ -31,14 +32,17 @@ from suztoolz.transform import ATR2
 import matplotlib.pyplot as plt
 import seaborn as sns
 from suztoolz.datatools.seasonalClass import seasonalClassifier
+
 start_time = time.time()
 version='v4'
+systems = ['v4futures','v4mini','v4micro']
 riskEquity=1000
 riskEquity_mini=250
 riskEquity_micro=250        
 offline =['AC','AEX','CC','CGB','CT','DX','EBL','EBM','EBS','ED','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','KC','KW','LB','LCO','LGO','LRC','LSU','MEM','MFX','MW','O','OJ','RR','RS','SB','SIN','SJB','SMI','SSG','STW','SXE','TF','VX','YA','YB','YT2','YT3',]
 offline_mini = ['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM','EBS','ED','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SMI','SSG','STW','SXE','TF','US','VX','YA','YB','YM','YT2','YT3',]
 offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3',]
+
 
 lookback=20
 refresh=False
@@ -49,6 +53,16 @@ systemFilename3='system_v4micro.csv'
 c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
+c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
+c2system_macro=c2system='AdjSEA'
+c2system_mini='AdjSEA'
+c2system_micro='AdjSEA'
+c2safef=1
+
+accountInfo = pd.DataFrame(data=[[c2system, c2system_mini, c2system_micro]],columns=systems,index=['selection'])
+accountInfo = accountInfo.append(pd.DataFrame(data=[[c2id_macro, c2id_mini, c2id_micro]],columns=systems,index=['c2id']))
+accountInfo = accountInfo.append(pd.DataFrame(data=[[c2key, c2key, c2key]],columns=systems,index=['c2key']))
+accountInfo = accountInfo.append(pd.DataFrame(data=[[riskEquity, riskEquity_mini, riskEquity_micro]],columns=systems,index=['riskEquity']))
 
 #range (-1 to 1) postive for counter-trend negative for trend i.e.
 #-1 would 0 safef ==1 and double safef==2
@@ -58,6 +72,7 @@ safefAdjustment=0
 if len(sys.argv)==1:
     debug=True
     showPlots=False
+    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
@@ -76,6 +91,7 @@ if len(sys.argv)==1:
 else:
     debug=False
     showPlots=False
+    dbPath='./data/futures.sqlite3'
     dataPath='./data/csidata/v4futures2/'
     dataPath2='./data/'
     savePath='./data/'
@@ -83,6 +99,8 @@ else:
     signalSavePath = './data/signals/' 
     savePath2 = './data/results/'
     systemPath =  './data/systems/'
+    
+conn = sqlite3.connect(dbPath)
 
 fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
 for i,col in enumerate(fxRates.columns):
@@ -506,10 +524,7 @@ system_micro.c2id=c2id_micro
 
 #for signal files
 #for system files
-c2system_macro=c2system='Voting13'
-c2system_mini='Voting13'
-c2system_micro='Voting13'
-c2safef=1
+
 #use LastSEA for seasonality in c2
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
@@ -836,5 +851,11 @@ else:
 
 futuresDF.to_csv(savePath+'futuresATR.csv')
 print 'Saved', savePath+'futuresATR.csv'
+
+lastDate=int(lastDate.strftime('%Y%m%d'))
+accountInfo['Date']=lastDate
+accountInfo['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+accountInfo.to_sql(name='accountInfo',con=conn, index=True, if_exists='append')
+print 'Saved accountInfo to', dbPath
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

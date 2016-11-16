@@ -90,12 +90,12 @@ else:
     debug=False
     showPlots=False
     
-    if sys.argv[2]==1:
+    if sys.argv[2]=='1':
         submitC2=True
     else:
         submitC2=False
     
-    if sys.argv[3]==1:
+    if sys.argv[3]=='1':
         submitIB=True
     else:
         submitIB=False
@@ -729,14 +729,14 @@ if __name__ == "__main__":
             if submitC2:
                 for sys in systems:
                     print 'returned to main thread, running c2 orders for',sys
-                    with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'w') as f:
-                        with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'w') as e:
+                    with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'a') as f:
+                        with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'a') as e:
                             proc = Popen(runPath3+[sys], stdout=f, stderr=e)
                             proc.wait()
                             
                 print 'returned to main thread, running check systems again..'
-                with open(logPath+'check_systems_live.txt', 'w') as f:
-                    with open(logPath+'check_systems_live_error.txt', 'w') as e:
+                with open(logPath+'check_systems_live.txt', 'a') as f:
+                    with open(logPath+'check_systems_live_error.txt', 'a') as e:
                         proc = Popen(runPath4, stdout=f, stderr=e)
                         proc.wait()
             else:

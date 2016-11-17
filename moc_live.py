@@ -697,24 +697,24 @@ if __name__ == "__main__":
     print 'returned to main thread with', len(threadlist), 'threads'
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     #check threadlist tos ee if everythong's there?
-    if len(threadlist)==0:
-        print 'Found nothing to update! Skipping position sizing!'
-    else:
-        print 'running vol_adjsize_live to update system files'
-        with open(logPath+'vol_adjsize_live.txt', 'w') as f:
-            with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
-                f.flush()
-                e.flush()
-                proc = Popen(runPath2, stdout=f, stderr=e)
-                proc.wait()
-                
-        print 'returned to main thread, running check systems if new orders are necessary.'
-        with open(logPath+'check_systems_live.txt', 'w') as f:
-            with open(logPath+'check_systems_live_error.txt', 'w') as e:
-                f.flush()
-                e.flush()
-                proc = Popen(runPath4, stdout=f, stderr=e)
-                proc.wait()
+    #if len(threadlist)==0:
+    #    print 'Found nothing to update! Skipping position sizing!'
+    #else:
+    print 'running vol_adjsize_live to update system files'
+    with open(logPath+'vol_adjsize_live.txt', 'w') as f:
+        with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+            f.flush()
+            e.flush()
+            proc = Popen(runPath2, stdout=f, stderr=e)
+            proc.wait()
+            
+    print 'returned to main thread, running check systems if new orders are necessary.'
+    with open(logPath+'check_systems_live.txt', 'w') as f:
+        with open(logPath+'check_systems_live_error.txt', 'w') as e:
+            f.flush()
+            e.flush()
+            proc = Popen(runPath4, stdout=f, stderr=e)
+            proc.wait()
     totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
     
     #check ib positions

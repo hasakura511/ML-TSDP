@@ -643,8 +643,6 @@ except Exception as e:
     #print e
     traceback.print_exc()
     
-for sys in systems:
-
     
 #for csv system files
 systemFilename='system_v4futures.csv'

@@ -1,3 +1,3 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-QHGZ6,113,1479333143,,,246.20000,,future,short,2016-11-16 16:52:23,1479333143,open,2016-11-16 16:52:21,246.15000,250,,0,1,,,107266637,
-QNGF7,-240,1479180997,,,2.94700,,future,long,2016-11-14 22:36:37,1479180997,open,2016-11-14 22:36:36,2.94400,10000,,0,1,,,107196578,
+QHGZ6,463,1479333143,,,246.20000,,future,short,2016-11-16 16:52:23,1479333143,open,2016-11-16 16:52:21,246.15000,250,,0,1,,,107266637,
+QNGF7,-230,1479180997,,,2.94700,,future,long,2016-11-14 22:36:37,1479180997,open,2016-11-14 22:36:36,2.94400,10000,,0,1,,,107196578,

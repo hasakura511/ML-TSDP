@@ -107,17 +107,22 @@ csidate = futuresDF.index.name.split()[0].replace('-','')
 feeddata=pd.read_csv(feedfile,index_col='c2sym')
 
 #import timetable
-ttfiles = os.listdir(timetablePath)
-ttdates = []
-for f in ttfiles:
-    if '.csv' in f and is_int(f.split('.')[0]):
-        ttdates.append(int(f.split('.')[0]))
-ttdate=max(ttdates)
-timetable = pd.read_csv(timetablePath+str(ttdate)+'.csv', index_col=0)
-for col in timetable.columns:
-    timetable[col]=pd.to_datetime(timetable[col])
-idx_close = [x for x in timetable.index if 'close' in x]
-idx_trigger = [x for x in timetable.index if 'trigger' in x]
+#ttfiles = os.listdir(timetablePath)
+#ttdates = []
+#for f in ttfiles:
+#    if '.csv' in f and is_int(f.split('.')[0]):
+#        ttdates.append(int(f.split('.')[0]))
+#ttdate=max(ttdates)
+if os.path.isfile(timetablePath+str(csidate)+'.csv'):
+    timetable = pd.read_csv(timetablePath+str(csidate)+'.csv', index_col=0)
+    for col in timetable.columns:
+        timetable[col]=pd.to_datetime(timetable[col])
+    idx_close = [x for x in timetable.index if 'close' in x]
+    idx_trigger = [x for x in timetable.index if 'trigger' in x]
+else:
+    print 'timetable for', csidate,'not found! Ending script.'
+    systems=[]
+
 
 for systemName in systems:
     print systemName

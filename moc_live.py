@@ -63,7 +63,7 @@ if len(sys.argv)==1:
     showPlots=True
     submitIB=False
     submitC2=False
-    triggertime = 600 #mins
+    triggertime = 30 #mins
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
     runPath2= ['python','D:/ML-TSDP/vol_adjsize_live.py']
@@ -115,7 +115,7 @@ else:
     savePath2 = './data/portfolio/'
     systemPath =  './data/systems/'
     feedfile='./data/systems/system_ibfeed.csv'
-    systemfile='./data/systems/system_v4micro.csv'
+    #systemfile='./data/systems/system_v4micro.csv'
     timetablePath=   './data/systems/timetables/'
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed_fx.csv'
     csiDataPath=  './data/csidata/v4futures2/'
@@ -682,7 +682,7 @@ def append_data(sym, timetable, loaddate):
     else:
         print 'no data found between', opentime, closetime,
         return False
-        
+
 
 
 if __name__ == "__main__":
@@ -770,8 +770,11 @@ if __name__ == "__main__":
                             execDict[sym][0] = 'PASS'
                             execDict[sym][1] = 0
                         else:
-                            print 'There was an error:',sym,'order',  execDict[sym][:2], 'ib returned',\
-                                executions2.ix[sym].index[0], executions2.ix[sym].qty[0]
+                            print 'There was an error:',sym,'order',  execDict[sym][:2], 
+                            if sym in executions2.index:
+                                print 'ib returned', executions2.ix[sym].index[0], executions2.ix[sym].qty[0]
+                            else:
+                                print 'ib execution not found'
                 except Exception as e:
                     #print e
                     traceback.print_exc()
@@ -791,21 +794,30 @@ if __name__ == "__main__":
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
     
-    #symbols = execDict.keys()
-    #contracts = [x[2] for x in execDict.values()]
-    '''
-    def onExit():
-        #run voladjsize_live
-        print 'DONE!!!!!'
-    sym='EMD'
-    popenArgs = ['python', runPath,sym,'0']
-    popenArgs = ['python', runPath]
-    popenArgs2 = ['python', runPath2, sym]
-    popenArgs2 = ['python', runPath2]
-    '''
-    #place_iborders(execDict)
-    #contractsDF = get_contractdf(execDict, systemPath)
-    #timetable= get_timetable(execDict, systemPath)
 
-    #client.get_realtimebar(contracts[0], tickerId, whatToShow, data, filename)
-    #client.get_history(endDateTime, execDict['LE'][2], whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
+'''
+#debug order executions
+systemfile='D:/ML-TSDP/data/systems/system_v4futures_live.csv'
+feeddata=pd.read_csv(feedfile,index_col='ibsym')
+#systemfile=systemPath+'system_'+sys+'_live.csv'
+execDict=create_execDict(feeddata, systemfile)
+try:
+    execDict=update_orders(feeddata, systemfile, execDict)
+except Exception as e:
+    #print e
+    traceback.print_exc()
+iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+executions=filterIBexec()
+
+executions=filterIBexec()
+executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
+
+'''
+
+#place_iborders(execDict)
+#contractsDF = get_contractdf(execDict, systemPath)
+#timetable= get_timetable(execDict, systemPath)
+
+#client.get_realtimebar(contracts[0], tickerId, whatToShow, data, filename)
+#client.get_history(endDateTime, execDict['LE'][2], whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)

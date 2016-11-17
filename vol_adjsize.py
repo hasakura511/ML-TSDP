@@ -54,11 +54,16 @@ c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
-c2system_macro=c2system='AdjSEA'
-c2system_mini='AdjSEA'
-c2system_micro='AdjSEA'
+c2system_macro=c2system='Voting4'
+c2system_mini='Voting4'
+c2system_micro='Voting4'
 c2safef=1
-
+signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
+                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
+                'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
+                'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
+                'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
+                
 accountInfo = pd.DataFrame(data=[[c2system, c2system_mini, c2system_micro]],columns=systems,index=['selection'])
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2id_macro, c2id_mini, c2id_micro]],columns=systems,index=['c2id']))
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2key, c2key, c2key]],columns=systems,index=['c2key']))
@@ -526,11 +531,7 @@ system_micro.c2id=c2id_micro
 #for system files
 
 #use LastSEA for seasonality in c2
-signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
-                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
-                'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
-                'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
-                'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
+
 
 
 if lastDate > sigDate:

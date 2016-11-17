@@ -16,7 +16,7 @@ start_time = time.time()
 if len(sys.argv)==1:
     debug=True
     showPlots=True
-    commission=1
+    commission=2.5
     start_slip=20161111
     figsize=(6,8)
     fontsize=12
@@ -32,7 +32,7 @@ if len(sys.argv)==1:
 else:
     debug=False
     showPlots=False
-    commission=1
+    commission=2.5
     start_slip=20161111
     figsize=(8,13)
     fontsize=20

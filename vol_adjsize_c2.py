@@ -29,6 +29,7 @@ from copy import deepcopy
 from suztoolz.transform import ATR2
 import matplotlib.pyplot as plt
 import seaborn as sns
+import sqlite3
 start_time = time.time()
 barSizeSetting='4h'
 tradingEquity=1000000
@@ -38,18 +39,22 @@ lookback=20
 refresh=False
 
 if len(sys.argv)==1:
+    showPlots = False
     dataPath='D:/ML-TSDP/data/csidata/fx/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     signalPath = 'D:/ML-TSDP/data/signals/' 
     pairPath =  'D:/ML-TSDP/data/' 
+    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     
 else:
+    showPlots = False
     dataPath='./data/csidata/fx/'
     savePath='./data/'
     signalPath = './data/signals/' 
     savePath2 = './data/results/'
     pairPath =  './data/' 
+    dbPath='./data/futures.sqlite3'
     
     
 #with open(pairPath+'currencies.txt') as f:
@@ -87,10 +92,12 @@ cDictCSI = {
             'USDSGD':'QE{0000$.CSV',
             'USDHKD':'QE70000$.CSV',
             }
+conn = sqlite3.connect(dbPath)
 currencyPairs=cDictCSI.keys()
 if isfile(savePath+'currenciesATR.csv'):
     currenciesDF_old=pd.read_csv(savePath+'currenciesATR.csv', index_col=0)
-    oldDate=dt.strptime(currenciesDF_old.index.name,"%Y-%m-%d %H:%M:%S")
+    oldDate=dt(1990,1,1)
+    #oldDate=dt.strptime(currenciesDF_old.index.name,"%Y-%m-%d %H:%M:%S")
 else:
     oldDate=dt(1990,1,1)
     
@@ -113,9 +120,10 @@ for pair in currencyPairs:
     
     currenciesDF.set_value(pair,'Last',data.Close.iloc[-1])
     currenciesDF.set_value(pair,'ATR'+str(lookback),atr[-1])
-    currenciesDF.set_value(pair,'Close'+str(data.index[-1]),data.Close.iloc[-1])
-    currenciesDF.set_value(pair,'PC'+str(data.index[-1]),pc.iloc[-1])
-    currenciesDF.set_value(pair,'ACT'+str(data.index[-1]),priorSig)
+    currenciesDF.set_value(pair,'Close',data.Close.iloc[-1])
+    currenciesDF.set_value(pair,'PC',pc.iloc[-1])
+    currenciesDF.set_value(pair,'ACT',priorSig)
+    currenciesDF.set_value(pair,'Date',data.index[-1].strftime('%Y%m%d'))
 currenciesDF.index.name=lastDate=data.index[-1]
 #corrDF.to_csv(savePath+'currenciesPCcsv')
 #corrDF.corr().to_csv(savePath+'currenciesCorr.csv')
@@ -134,7 +142,7 @@ if lastDate >oldDate:
         print 'Saving '+savePath2+'currencies_4.png'
         fig.savefig(savePath2+'currencies_4.png', bbox_inches='tight')
         
-    if len(sys.argv)==1:
+    if len(sys.argv)==1 and showPlots:
         print data.index[0],'to',data.index[-1]
         plt.show()
     plt.close()
@@ -152,13 +160,13 @@ if lastDate >oldDate:
             print 'Saving '+savePath2+filename
             plt.savefig(savePath2+filename, bbox_inches='tight')
         
-        if len(sys.argv)==1:
+        if len(sys.argv)==1 and showPlots:
             #print data.index[0],'to',data.index[-1]
             plt.show()
         plt.close()
 
 
-        
+    '''
     for pair in currencyPairs:
         signalFilename='v4_'+pair+'.csv'
         if isfile(signalPath+signalFilename):
@@ -166,11 +174,15 @@ if lastDate >oldDate:
             data = pd.read_csv(signalPath+signalFilename, index_col=0)
             #currenciesDF.set_value(pair,'SIG'+str(data.index[-3]),data.signals.iloc[-3])
             currenciesDF.set_value(pair,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
-
+    '''
     #currenciesDF=currenciesDF.sort_index()
     print currenciesDF
     print 'Saving...', savePath+'currenciesATR.csv'
     currenciesDF.sort_index().to_csv(savePath+'currenciesATR.csv')
+    #currenciesDF['Date']=lastDate.strftime('%Y%m%d')
+    currenciesDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    currenciesDF.to_sql(name='currenciesDF',con=conn, index=True, if_exists='replace', index_label='CSIsym')
+    print 'Saved currenciesDF to', dbPath
 else:
     print 'second time run.. skipping job..'
     pass

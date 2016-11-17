@@ -185,6 +185,8 @@ def runThreads(threadlist):
         
         with open(logPath+sym+'.txt', 'w') as f:
             with open(logPath+sym+'_error.txt', 'w') as e:
+                f.flush()
+                e.flush()
                 proc = Popen(popenArgs, stdout=f, stderr=e)
                 proc.wait()
                 print sym,'Done!'
@@ -701,12 +703,16 @@ if __name__ == "__main__":
         print 'running vol_adjsize_live to update system files'
         with open(logPath+'vol_adjsize_live.txt', 'w') as f:
             with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+                f.flush()
+                e.flush()
                 proc = Popen(runPath2, stdout=f, stderr=e)
                 proc.wait()
                 
         print 'returned to main thread, running check systems if new orders are necessary.'
         with open(logPath+'check_systems_live.txt', 'w') as f:
             with open(logPath+'check_systems_live_error.txt', 'w') as e:
+                f.flush()
+                e.flush()
                 proc = Popen(runPath4, stdout=f, stderr=e)
                 proc.wait()
     totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
@@ -734,12 +740,16 @@ if __name__ == "__main__":
                     print 'returned to main thread, running c2 orders for',sys
                     with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'a') as f:
                         with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'a') as e:
+                            f.flush()
+                            e.flush()
                             proc = Popen(runPath3+[sys], stdout=f, stderr=e)
                             proc.wait()
                             
                 print 'returned to main thread, running check systems again..'
                 with open(logPath+'check_systems_live.txt', 'a') as f:
                     with open(logPath+'check_systems_live_error.txt', 'a') as e:
+                        f.flush()
+                        e.flush()
                         proc = Popen(runPath4, stdout=f, stderr=e)
                         proc.wait()
             else:

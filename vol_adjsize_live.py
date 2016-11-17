@@ -36,7 +36,12 @@ import seaborn as sns
 from suztoolz.datatools.seasonalClass import seasonalClassifier
 
 start_time = time.time()
-
+#signal file version
+version='v4'
+safefAdjustment=0
+#atr lookback
+lookback=20
+#c2safef=1
 
 
 if len(sys.argv)==1:
@@ -45,6 +50,7 @@ if len(sys.argv)==1:
     #marketList=[sys.argv[1]]
     showPlots=False
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
     dataPath='D:/ML-TSDP/data/csidata/v4futures4_debug/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
@@ -60,7 +66,8 @@ if len(sys.argv)==1:
     signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
-    
+    readConn = sqlite3.connect(dbPath2)
+    writeConn= sqlite3.connect(dbPath)
 else:
     debug=False
     mode= 'append'
@@ -76,47 +83,50 @@ else:
     signalSavePath = './data/signals2/' 
     savePath2 = './data/results/'
     systemPath =  './data/systems/'
+    readConn = writeConn= sqlite3.connect(dbPath)
+
     
-conn = sqlite3.connect(dbPath)
-fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
-futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+ff = pd.read_csv(feedfile, index_col='CSIsym')
+files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
+marketList = [x.split('_')[0] for x in files]
+marketList = [x for x in marketList if x in ff.CSIsym2.values]
+
+#fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
+#futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+futuresDF_old=pd.read_sql('select * from futuresATR where timestamp=\
+            (select max(timestamp) from futuresATR as maxtimestamp)', con=readConn,  index_col='CSIsym')
+fxRates=pd.read_sql('select * from currenciesDF where timestamp=\
+            (select max(timestamp) from currenciesDF as maxtimestamp)', con=readConn,  index_col='CSIsym')
 accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
-            (select max(timestamp) from accountInfo as maxtimestamp)', con=conn)
-version='v4'
-riskEquity=1000
-riskEquity_mini=250
-riskEquity_micro=250        
-offline =['AC','AEX','CC','CGB','CT','DX','EBL','EBM','EBS','ED','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','KC','KW','LB','LCO','LGO','LRC','LSU','MEM','MFX','MW','O','OJ','RR','RS','SB','SIN','SJB','SMI','SSG','STW','SXE','TF','VX','YA','YB','YT2','YT3',]
-offline_mini = ['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM','EBS','ED','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SMI','SSG','STW','SXE','TF','US','VX','YA','YB','YM','YT2','YT3',]
-offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3',]
+            (select max(timestamp) from accountInfo as maxtimestamp)', con=readConn,  index_col='index')
+systems = [x for x in accountInfo.columns if x not in ['Date','timestamp']]
+riskEquity=int(accountInfo.v4futures.riskEquity)
+riskEquity_mini=int(accountInfo.v4mini.riskEquity)
+riskEquity_micro=int(accountInfo.v4micro.riskEquity)   
+     
+offline =eval(accountInfo.v4futures.offline)
+offline_mini = eval(accountInfo.v4mini.offline)
+offline_micro =eval(accountInfo.v4micro.offline)
 
+c2system=accountInfo.v4futures.selection
+c2system_mini=accountInfo.v4mini.selection
+c2system_micro=accountInfo.v4micro.selection
 
-#for system files
-c2system_macro=c2system='Voting4'
-c2system_mini='Voting4'
-c2system_micro='Voting4'
-c2safef=1
+c2id_macro=int(accountInfo.v4futures.c2id)
+c2id_mini=int(accountInfo.v4mini.c2id)
+c2id_micro=int(accountInfo.v4micro.c2id)
+
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
                 'LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
                 'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
                 'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
-lookback=20
-refresh=False
-currencyFile = 'currenciesATR.csv'
-systemFilename='system_v4futures.csv'
-systemFilename2='system_v4mini.csv'
-systemFilename3='system_v4micro.csv'
-systemFilename_tosave='system_v4futures_live.csv'
-systemFilename2_tosave='system_v4mini_live.csv'
-systemFilename3_tosave='system_v4micro_live.csv'
-c2id_macro=107146997
-c2id_mini=101359768
-c2id_micro=101533256
-#range (-1 to 1) postive for counter-trend negative for trend i.e.
-#-1 would 0 safef ==1 and double safef==2
-#1 would 0 safef ==2 and double safef==1
-safefAdjustment=0
+#refresh=False
+#currencyFile = 'currenciesATR.csv'
+
+
+
+
 
 for i,col in enumerate(fxRates.columns):
     if 'Last' in col:
@@ -242,32 +252,12 @@ def fixTypes(original, transformed):
 
 
 
-#system file update.
-#load from daily run, save to live (to update pivot dates)
-ff = pd.read_csv(feedfile, index_col='CSIsym')
-files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-marketList = [x.split('_')[0] for x in files]
-marketList = [x for x in marketList if x in ff.CSIsym2.values]
-
-system = pd.read_csv(systemPath+systemFilename, index_col=0)
-system.index = [x.split('_')[1] for x in system.System]
-system.index.name = 'CSIsym'
-system = system.ix[ff.index]
-
-system_mini = pd.read_csv(systemPath+systemFilename2, index_col=0)
-system_mini.index = [x.split('_')[1] for x in system_mini.System]
-system_mini.index.name = 'CSIsym'
-system_mini = system_mini.ix[ff.index]
-
-system_micro = pd.read_csv(systemPath+systemFilename3, index_col=0)
-system_micro.index = [x.split('_')[1] for x in system_micro.System]
-system_micro.index.name = 'CSIsym'
-system_micro = system_micro.ix[ff.index]
 
 
-#futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 
-oldDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
+futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
+
+#oldDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
 futuresDF=pd.DataFrame()
 corrDF=pd.DataFrame()
 
@@ -388,7 +378,7 @@ if lastDate >oldDate:
         plt.close()
 else:
 '''
-print "Second Run.. skipping seasonalClassifier"
+print ".. skipping seasonalClassifier, copying seasonality from futuresDF_old"
 #second time load  "old" file for seasonality signals.
 nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
 futuresDF['vSTART']=futuresDF_old.vSTART
@@ -512,231 +502,8 @@ new_order = columns[:start_idx]+nextColOrder
 new_order =  new_order+[x for x in columns if x not in new_order]
 futuresDF = futuresDF[new_order]
 print futuresDF.iloc[:,:4]
+print 'Creating voting signals..'
 
-
-
-
-#macro
-for sys in system.System:
-    sym=sys.split('_')[1]
-    if sym in futuresDF.index:
-        idx=system[system.System==sys].index[0]
-        print 'MACRO', sys, sym, system.ix[idx].c2qty,
-        system.set_value(idx,'c2qty',int(futuresDF.ix[sym]['finalQTY']))
-        print system.ix[idx].c2qty, system.ix[idx].c2sym,
-        system.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
-        print system.ix[idx].c2sym
-#system.Name=systemFilename.split('_')[1][:-4]
-system.c2id=c2id_macro
-
-#mini
-for sys in system_mini.System:
-    sym=sys.split('_')[1]
-    if sym in futuresDF.index:
-        idx=system_mini[system_mini.System==sys].index[0]
-        print 'MINI', sys, sym, system_mini.ix[idx].c2qty,
-        if sym in offline_mini:
-            system_mini.set_value(idx,'c2qty',0)
-        else:
-            system_mini.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MINI']))
-        print system_mini.ix[idx].c2qty, system_mini.ix[idx].c2sym,
-        system_mini.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
-        print system_mini.ix[idx].c2sym
-#system_mini.Name=systemFilename2.split('_')[1][:-4]
-system_mini.c2id=c2id_mini
-
-#micro
-for sys in system_micro.System:
-    sym=sys.split('_')[1]
-    if sym in futuresDF.index:
-        idx=system_micro[system_micro.System==sys].index[0]
-        print 'MICRO', sys, sym, system_micro.ix[idx].c2qty,
-        if sym in offline_micro:
-            system_micro.set_value(idx,'c2qty',0)
-        else:
-            system_micro.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MICRO']))
-        print system_micro.ix[idx].c2qty, system_micro.ix[idx].c2sym,
-        system_micro.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
-        print system_micro.ix[idx].c2sym
-#system_micro.Name=systemFilename3.split('_')[1][:-4]
-system_micro.c2id=c2id_micro 
-    
-#signalDF=signalDF.sort_index()
-#print signalDF
-#signalDF.to_csv(savePath+'futuresSignals.csv')
-
-
-#use LastSEA for seasonality in c2
-
-
-'''
-if lastDate > sigDate:
-    AdjSEACols= ['RiskOn','AntiPrevACT','prevSEA']
-    votingCols = ['Anti1LastSIG','prevACT','prevSEA']
-    voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
-    voting3Cols = ['Anti0.75LastSIG','AntiPrevACT','AntiSEA']
-    voting4Cols=['Voting','Voting2','Voting3','Voting8']
-    #voting5Cols=['prevACT','Anti1LastSIG','AntiAdjSEA']
-    voting5Cols=['Voting','Voting2','Voting3','Voting14']
-    #voting6Cols = ['0.5LastSIG','prevACT','AntiSEA']
-    voting6Cols =['Voting','Voting2','Voting3','Voting15']
-    voting7Cols = ['RiskOn','0.5LastSIG','AntiSEA']
-    voting8Cols = ['RiskOn','0.5LastSIG','AntiPrevACT']
-    #voting9Cols = ['RiskOn','0.5LastSIG','AntiSEA']
-    voting9Cols=['RiskOn','AntiPrevACT','AntiSEA']
-    voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
-    voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
-    voting12Cols = ['1LastSIG','AntiPrevACT','AdjSEA']
-    voting13Cols = ['RiskOn','0.75LastSIG','AntiSEA','prevACT']
-    voting14Cols = ['RiskOn','Anti0.5LastSIG','prevSEA']
-    voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
-    
-    #1bi. Run v4size(to update vlookback)
-    #calc the previous day's results.
-    nrows=futuresDF.shape[0]
-    totalsDF = pd.DataFrame()
-    futuresDF['None']=0
-    futuresDF['RiskOff']=np.where(futuresDF.RiskOn<0,1,-1)
-    futuresDF['AntiCustom']=np.where(futuresDF.Custom<0,1,-1)
-    futuresDF['Anti1LastSIG'] = np.where(futuresDF['1LastSIG']==1,-1,1)
-    futuresDF['Anti0.75LastSIG'] = np.where(futuresDF['0.75LastSIG']==1,-1,1)
-    futuresDF['Anti0.5LastSIG'] = np.where(futuresDF['0.5LastSIG']==1,-1,1)
-    futuresDF['AntiSEA'] = np.where(futuresDF.prevSEA==1,-1,1)
-    futuresDF['AntiPrevACT'] = np.where(futuresDF.prevACT==1,-1,1)
-    #futuresDF['AdjSEA'] = np.where(futuresDF.prevSRUN <0, futuresDF.prevSEA*-1, futuresDF.prevSEA)
-    futuresDF['AdjSEA']=np.where(futuresDF[AdjSEACols].sum(axis=1)<0,-1,1)
-    futuresDF['AntiAdjSEA'] = np.where(futuresDF.AdjSEA==1,-1,1)
-    futuresDF['Voting']=np.where(futuresDF[votingCols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting2']=np.where(futuresDF[voting2Cols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting3']=np.where(futuresDF[voting3Cols].sum(axis=1)<0,-1,1)
-    
-    #futuresDF['Voting5']=np.where(futuresDF[voting5Cols].sum(axis=1)<0,-1,1)
-    #futuresDF['Voting6']=np.where(futuresDF[voting6Cols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting7']=np.where(futuresDF[voting7Cols].sum(axis=1)<0,-1,1)
-    futuresDF['Voting8']=np.where(futuresDF[voting8Cols].sum(axis=1)<0,-1,1)
-    #futuresDF['Voting9']=np.where(futuresDF[voting9Cols].sum(axis=1)<0,-1,1)
-    v9=futuresDF[voting9Cols].sum(axis=1)
-    v9[v9<0]=-1
-    v9[v9>0]=1
-    futuresDF['Voting9']=v9.values
-    #futuresDF['Voting10']=np.where(futuresDF[voting10Cols].sum(axis=1)<0,-1,1)
-    v10=futuresDF[voting10Cols].sum(axis=1)
-    v10[v10<0]=-1
-    v10[v10>0]=1
-    futuresDF['Voting10']=v10.values
-    #futuresDF['Voting11']=np.where(futuresDF[voting11Cols].sum(axis=1)<0,-1,1)
-    v11=futuresDF[voting11Cols].sum(axis=1)
-    v11[v11<0]=-1
-    v11[v11>0]=1
-    futuresDF['Voting11']=v11.values
-    #futuresDF['Voting12']=np.where(futuresDF[voting12Cols].sum(axis=1)<0,-1,1)
-    v12=futuresDF[voting12Cols].sum(axis=1)
-    v12[v12<0]=-1
-    v12[v12>0]=1
-    futuresDF['Voting12']=v12.values
-    #futuresDF['Voting13']=np.where(futuresDF[voting13Cols].sum(axis=1)<0,-1,1)
-    v13=futuresDF[voting13Cols].sum(axis=1)
-    v13[v13<0]=-1
-    v13[v13>0]=1
-    futuresDF['Voting13']=v13.values
-    #futuresDF['Voting14']=np.where(futuresDF[voting14Cols].sum(axis=1)<0,-1,1)
-    v14=futuresDF[voting14Cols].sum(axis=1)
-    v14[v14<0]=-1
-    v14[v14>0]=1
-    futuresDF['Voting14']=v14.values
-    futuresDF['Voting15']=np.where(futuresDF[voting15Cols].sum(axis=1)<0,-1,1)
-    #futuresDF['Voting4']=np.where(futuresDF[voting4Cols].sum(axis=1)<0,-1,1)
-    
-    #Voting of Voting
-    v4=futuresDF[voting4Cols].sum(axis=1)
-    v4[v4<0]=-1
-    v4[v4>0]=1
-    futuresDF['Voting4']=v4.values
-    
-    v5=futuresDF[voting5Cols].sum(axis=1)
-    v5[v5<0]=-1
-    v5[v5>0]=1
-    futuresDF['Voting5']=v5.values 
-    
-    v6=futuresDF[voting6Cols].sum(axis=1)
-    v6[v6<0]=-1
-    v6[v6>0]=1
-    futuresDF['Voting6']=v6.values
-    
-    pctChgCol = sorted([x for x in columns if 'PC' in x])[-1]
-    futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue*futuresDF.finalQTY
-    cv_online = futuresDF['chgValue'].drop(offline,axis=0)
-    for sig in signals:
-        futuresDF['PNL_'+sig]=futuresDF['chgValue']*futuresDF[sig]
-        totalsDF.set_value(lastDate, 'ACC_'+sig, sum(futuresDF[sig]==futuresDF.ACT)/float(nrows))
-        totalsDF.set_value(lastDate, 'L%_'+sig, sum(futuresDF[sig]==1)/float(nrows))
-    totals =futuresDF[[x for x in futuresDF if 'PNL' in x]].sum()
-    for i,value in enumerate(totals):
-        totalsDF.set_value(lastDate, totals.index[i], value)
-        
-    bygroup = pd.concat([abs(futuresDF['chgValue']), futuresDF['group']],axis=1).drop(offline, axis=0).groupby(['group'])
-    volByGroupByContract = bygroup.sum()/bygroup.count()
-    bygroup2 = pd.concat([futuresDF['chgValue'], futuresDF['group']],axis=1).drop(offline, axis=0).groupby(['group'])
-    chgByGroupByContract = bygroup2.sum()/bygroup2.count()
-    bygroup3 = pd.concat([futuresDF['ACT']==1, futuresDF['group']],axis=1).drop(offline, axis=0).groupby(['group'])
-    longPerByGroup = bygroup3.sum()/bygroup3.count()
-    
-    totalsDF.set_value(lastDate, 'Vol_All', abs(cv_online).sum()/cv_online.count())
-    for i,value in enumerate(volByGroupByContract['chgValue']):
-        totalsDF.set_value(lastDate, 'Vol_'+volByGroupByContract.index[i], value)
-    
-    totalsDF.set_value(lastDate, 'Chg_All', cv_online.sum()/cv_online.count())
-    for i,value in enumerate(chgByGroupByContract['chgValue']):
-        totalsDF.set_value(lastDate, 'Chg_'+chgByGroupByContract.index[i], value)
-    
-    totalsDF.set_value(lastDate, 'L%_All', sum(futuresDF.ACT.drop(offline, axis=0)==1)/float(cv_online.count()))
-    for i,value in enumerate(longPerByGroup['ACT']):
-        totalsDF.set_value(lastDate, 'L%_'+longPerByGroup.index[i], value)
-    
-    print totalsDF.sort_index().transpose()
-    
-    filename='futuresResults_'+lastDate.strftime("%Y%m%d%H%M")+'.csv'
-    print 'Saving', savePath2+filename
-    totalsDF.sort_index().transpose().to_csv(savePath2+filename)
-    
-    filename='futuresResults_Last.csv'
-    print 'Saving', savePath+filename
-    totalsDF.sort_index().transpose().to_csv(savePath+filename)
-    
-    files = [ f for f in listdir(savePath) if isfile(join(savePath,f)) ]
-    filename = 'futuresResultsHistory.csv'
-    if filename not in files:
-        print 'Saving', savePath+filename
-        totalsDF.to_csv(savePath+filename)
-    else:
-        print 'Saving', savePath+filename
-        pd.read_csv(savePath+filename, index_col=0).append(totalsDF).to_csv(savePath+filename)
-        
-    filename='futuresATR_'+lastDate.strftime("%Y%m%d%H%M")+'.csv'
-    print 'Saving', savePath2+filename
-    futuresDF.to_csv(savePath2+filename)
-    print 'Saving', savePath+'futuresATR_Results.csv'
-    futuresDF.to_csv(savePath+'futuresATR_Results.csv')
-    
-    filename='futuresL_History.csv'
-    cols=['L%_currency',
-             'L%_energy',
-             'L%_grain',
-             'L%_index',
-             'L%_meat',
-             'L%_metal',
-             'L%_ACT',
-             'L%_rates',
-             'L%_soft']
-    if filename not in files:
-        print 'Saving', savePath+filename
-        totalsDF[cols].to_csv(savePath+filename)
-    else:
-        print 'Saving', savePath+filename
-        pd.read_csv(savePath+filename, index_col=0).append(totalsDF[cols]).to_csv(savePath+filename)
-        
-else:
-'''
 AdjSEACols= ['RiskOn','AntiPrevACT','LastSEA']
 votingCols =['Anti1LastSIG','prevACT','LastSEA']
 voting2Cols = ['0.5LastSIG','AntiPrevACT','AdjSEA']
@@ -880,12 +647,88 @@ futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 futuresDF.index.name = 'CSIsym'
 
 try:
-    futuresDF.to_sql(name='futuresATRhist', if_exists=mode, con=conn, index=True, index_label='CSIsym')
-    futuresDF.to_sql(name='futuresATR', if_exists='replace', con=conn, index=True, index_label='CSIsym')
+    futuresDF.to_sql(name='futuresATRhist', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+    futuresDF.to_sql(name='futuresATR', if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
     print 'Saved to sql db table', 'futuresATR'
 except Exception as e:
     #print e
     traceback.print_exc()
+    
+
+    
+#for csv system files
+systemFilename='system_v4futures.csv'
+systemFilename2='system_v4mini.csv'
+systemFilename3='system_v4micro.csv'
+systemFilename_tosave='system_v4futures_live.csv'
+systemFilename2_tosave='system_v4mini_live.csv'
+systemFilename3_tosave='system_v4micro_live.csv'
+
+#system file update.
+#load from daily run, save to live (to update pivot dates)
+
+
+system = pd.read_csv(systemPath+systemFilename, index_col=0)
+system.index = [x.split('_')[1] for x in system.System]
+system.index.name = 'CSIsym'
+system = system.ix[ff.index]
+
+system_mini = pd.read_csv(systemPath+systemFilename2, index_col=0)
+system_mini.index = [x.split('_')[1] for x in system_mini.System]
+system_mini.index.name = 'CSIsym'
+system_mini = system_mini.ix[ff.index]
+
+system_micro = pd.read_csv(systemPath+systemFilename3, index_col=0)
+system_micro.index = [x.split('_')[1] for x in system_micro.System]
+system_micro.index.name = 'CSIsym'
+system_micro = system_micro.ix[ff.index]
+
+#macro
+for sys in system.System:
+    sym=sys.split('_')[1]
+    if sym in futuresDF.index:
+        idx=system[system.System==sys].index[0]
+        print 'MACRO', sys, sym, system.ix[idx].c2qty,
+        system.set_value(idx,'c2qty',int(futuresDF.ix[sym]['finalQTY']))
+        print system.ix[idx].c2qty, system.ix[idx].c2sym,
+        system.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
+        print system.ix[idx].c2sym
+#system.Name=systemFilename.split('_')[1][:-4]
+system.c2id=c2id_macro
+
+#mini
+for sys in system_mini.System:
+    sym=sys.split('_')[1]
+    if sym in futuresDF.index:
+        idx=system_mini[system_mini.System==sys].index[0]
+        print 'MINI', sys, sym, system_mini.ix[idx].c2qty,
+        if sym in offline_mini:
+            system_mini.set_value(idx,'c2qty',0)
+        else:
+            system_mini.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MINI']))
+        print system_mini.ix[idx].c2qty, system_mini.ix[idx].c2sym,
+        system_mini.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
+        print system_mini.ix[idx].c2sym
+#system_mini.Name=systemFilename2.split('_')[1][:-4]
+system_mini.c2id=c2id_mini
+
+#micro
+for sys in system_micro.System:
+    sym=sys.split('_')[1]
+    if sym in futuresDF.index:
+        idx=system_micro[system_micro.System==sys].index[0]
+        print 'MICRO', sys, sym, system_micro.ix[idx].c2qty,
+        if sym in offline_micro:
+            system_micro.set_value(idx,'c2qty',0)
+        else:
+            system_micro.set_value(idx,'c2qty',int(futuresDF.ix[sym]['QTY_MICRO']))
+        print system_micro.ix[idx].c2qty, system_micro.ix[idx].c2sym,
+        system_micro.set_value(idx,'c2sym',futuresDF.ix[sym]['Contract'])
+        print system_micro.ix[idx].c2sym
+#system_micro.Name=systemFilename3.split('_')[1][:-4]
+system_micro.c2id=c2id_micro 
+    
+
     
 for i,sym in enumerate([x.split('_')[1] for x in system.System]):
     if sym in futuresDF.index:
@@ -898,8 +741,8 @@ for i,sym in enumerate([x.split('_')[1] for x in system.System]):
 system['Date']=lastDate
 system['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4macro'
-system.ix[futuresDF.index].to_sql(name=tablename, if_exists='replace', con=conn, index=True, index_label='CSIsym')
-system.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system.ix[futuresDF.index].to_sql(name=tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
+system.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
 print tablename,c2system
 print 'Saved to sql db and',  systemPath+systemFilename_tosave
 system.to_csv(systemPath+systemFilename_tosave, index=True)
@@ -915,8 +758,8 @@ for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
 system_mini['Date']=lastDate
 system_mini['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4mini'
-system_mini.ix[futuresDF.index].to_sql(name=tablename, if_exists='replace', con=conn, index=True, index_label='CSIsym')
-system_mini.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system_mini.ix[futuresDF.index].to_sql(name=tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
+system_mini.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
 print tablename,c2system_mini
 print 'Saved to sql db and', systemPath+systemFilename2_tosave
 system_mini.to_csv(systemPath+systemFilename2_tosave, index=True)
@@ -931,8 +774,8 @@ for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
 system_micro['Date']=lastDate
 system_micro['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 tablename = 'v4micro'
-system_micro.ix[futuresDF.index].to_sql(name= tablename, if_exists='replace', con=conn, index=True, index_label='CSIsym')
-system_micro.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=conn, index=True, index_label='CSIsym')
+system_micro.ix[futuresDF.index].to_sql(name= tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
+system_micro.ix[futuresDF.index].to_sql(name='signals', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
 print tablename, c2system_micro
 print  'Saved to sql db and', systemPath+systemFilename3_tosave
 system_micro.to_csv(systemPath+systemFilename3_tosave, index=True)

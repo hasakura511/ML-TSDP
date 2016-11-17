@@ -96,8 +96,8 @@ conn = sqlite3.connect(dbPath)
 currencyPairs=cDictCSI.keys()
 if isfile(savePath+'currenciesATR.csv'):
     currenciesDF_old=pd.read_csv(savePath+'currenciesATR.csv', index_col=0)
-    oldDate=dt(1990,1,1)
-    #oldDate=dt.strptime(currenciesDF_old.index.name,"%Y-%m-%d %H:%M:%S")
+    #oldDate=dt(1990,1,1)
+    oldDate=dt.strptime(currenciesDF_old.index.name,"%Y-%m-%d %H:%M:%S")
 else:
     oldDate=dt(1990,1,1)
     
@@ -181,7 +181,7 @@ if lastDate >oldDate:
     currenciesDF.sort_index().to_csv(savePath+'currenciesATR.csv')
     #currenciesDF['Date']=lastDate.strftime('%Y%m%d')
     currenciesDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-    currenciesDF.to_sql(name='currenciesDF',con=conn, index=True, if_exists='replace', index_label='CSIsym')
+    currenciesDF.to_sql(name='currenciesDF',con=conn, index=True, if_exists='append', index_label='CSIsym')
     print 'Saved currenciesDF to', dbPath
 else:
     print 'second time run.. skipping job..'

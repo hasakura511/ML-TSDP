@@ -466,7 +466,6 @@ for i2,contract in enumerate(marketList):
     futuresDF.set_value(sym,'1finalQTY',adjQty)
     futuresDF.set_value(sym,'1SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
-futuresDF=sort_cols(futuresDF)
 futuresDF=futuresDF.sort_index()
 columns = futuresDF.columns.tolist()
 futuresDF.LastPctChg=futuresDF[sorted([x for x in columns if 'PC' in x])[-1]].values

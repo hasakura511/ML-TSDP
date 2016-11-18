@@ -54,13 +54,13 @@ c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
-c2system_macro=c2system='RiskOn'
+c2system_macro=c2system='LastSEA'
 c2system_mini='RiskOn'
 c2system_micro='Anti0.75LastSIG'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
-                'prevSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
+                'prevSEA','LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
                 'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
                 'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
                 
@@ -78,6 +78,7 @@ if len(sys.argv)==1:
     debug=True
     showPlots=False
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPath2='D:/ML-TSDP/data/futures.sqlite3'
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
     savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
@@ -96,7 +97,7 @@ if len(sys.argv)==1:
 else:
     debug=False
     showPlots=False
-    dbPath='./data/futures.sqlite3'
+    dbPath=dbPath2='./data/futures.sqlite3'
     dataPath='./data/csidata/v4futures2/'
     dataPath2='./data/'
     savePath='./data/'
@@ -106,6 +107,7 @@ else:
     systemPath =  './data/systems/'
     
 conn = sqlite3.connect(dbPath)
+readConn =  sqlite3.connect(dbPath2)
 
 fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
 for i,col in enumerate(fxRates.columns):
@@ -224,7 +226,6 @@ months = {
                 }
 
     
-    
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 marketList = [x.split('_')[0] for x in files]
 futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
@@ -288,7 +289,7 @@ for i,contract in enumerate(marketList):
 futuresDF.index.name = lastDate
 
 
-
+#oldDate=pd.Timestamp(0)
 #save last seasonal signal for pnl processing
 #update correl charts
 if lastDate >oldDate:
@@ -465,6 +466,7 @@ for i2,contract in enumerate(marketList):
     futuresDF.set_value(sym,'1finalQTY',adjQty)
     futuresDF.set_value(sym,'1SIG'+str(data.index[-1]),data.signals.iloc[-1])
 
+futuresDF=sort_cols(futuresDF)
 futuresDF=futuresDF.sort_index()
 columns = futuresDF.columns.tolist()
 futuresDF.LastPctChg=futuresDF[sorted([x for x in columns if 'PC' in x])[-1]].values
@@ -532,6 +534,7 @@ system_micro.c2id=c2id_micro
 
 #use LastSEA for seasonality in c2
 
+#sigDate=pd.Timestamp(0)
 
 
 if lastDate > sigDate:
@@ -681,6 +684,17 @@ if lastDate > sigDate:
     futuresDF.to_csv(savePath2+filename)
     print 'Saving', savePath+'futuresATR_Results.csv'
     futuresDF.to_csv(savePath+'futuresATR_Results.csv')
+    futuresDF_live = pd.read_sql('select * from futuresATR where timestamp=\
+            (select max(timestamp) from futuresATR as maxtimestamp)', con=readConn,  index_col='CSIsym')
+
+    futuresDF_toexcel=pd.concat([futuresDF_live, futuresDF.drop(futuresDF_live.index,axis=0)],axis=0).sort_index()
+    #seasonality data same as before
+    futuresDF_toexcel['prevSEA']=futuresDF.LastSEA
+    futuresDF_toexcel['prevSRUN']=futuresDF.LastSRUN
+    futuresDF_toexcel['prevvSTART']=futuresDF.prevvSTART
+    futuresDF_toexcel=futuresDF_toexcel[[x for x in futuresDF.columns if x in futuresDF_toexcel.columns]]
+    futuresDF_toexcel.dropna(axis=1).to_csv(savePath+'futuresATR_Excel.csv')
+    print 'Saved', savePath+'futuresATR_Excel.csv'
     
     filename='futuresL_History.csv'
     #cols=['L%_currency',
@@ -834,6 +848,11 @@ else:
         
     print 'Saving', savePath+'futuresATR_Signals.csv'
     futuresDF.to_csv(savePath+'futuresATR_Signals.csv')
+    futuresDF['Date']=int(lastDate.strftime('%Y%m%d'))
+    futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    futuresDF.drop([col for col in futuresDF.columns if '00:00:00' in col], axis=1).to_sql(name='futuresDF_all',\
+                            con=conn, index=True, if_exists='append', index_label='CSIsym')
+    print 'Saved futuresDF_all to', dbPath
     
     for i,sym in enumerate([x.split('_')[1] for x in system.System]):
         system.set_value(i,'signal',futuresDF[c2system].ix[sym])
@@ -853,8 +872,8 @@ else:
 futuresDF.to_csv(savePath+'futuresATR.csv')
 print 'Saved', savePath+'futuresATR.csv'
 
-lastDate=int(lastDate.strftime('%Y%m%d'))
-accountInfo['Date']=lastDate
+
+accountInfo['Date']=int(lastDate.strftime('%Y%m%d'))
 accountInfo['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
 accountInfo.to_sql(name='accountInfo',con=conn, index=True, if_exists='append')
 print 'Saved accountInfo to', dbPath

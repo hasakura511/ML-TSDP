@@ -92,9 +92,9 @@ marketList = [x.split('_')[0] for x in files]
 marketList = [x for x in marketList if x in ff.CSIsym2.values]
 
 #fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
-#futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
-futuresDF_old=pd.read_sql('select * from futuresATR where timestamp=\
-            (select max(timestamp) from futuresATR as maxtimestamp)', con=readConn,  index_col='CSIsym')
+#futuresDF_all=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+futuresDF_all=pd.read_sql('select * from futuresDF_all where timestamp=\
+            (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
 fxRates=pd.read_sql('select * from currenciesDF where timestamp=\
             (select max(timestamp) from currenciesDF as maxtimestamp)', con=readConn,  index_col='CSIsym')
 accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
@@ -102,8 +102,27 @@ accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
 systems = [x for x in accountInfo.columns if x not in ['Date','timestamp']]
 riskEquity=int(accountInfo.v4futures.riskEquity)
 riskEquity_mini=int(accountInfo.v4mini.riskEquity)
-riskEquity_micro=int(accountInfo.v4micro.riskEquity)   
+riskEquity_micro=int(accountInfo.v4micro.riskEquity)  
+ 
+#for csv system files
+systemFilename='system_v4futures.csv'
+systemFilename2='system_v4mini.csv'
+systemFilename3='system_v4micro.csv'
+systemFilename_tosave='system_v4futures_live.csv'
+systemFilename2_tosave='system_v4mini_live.csv'
+systemFilename3_tosave='system_v4micro_live.csv'
+     
+offline =eval(accountInfo.v4futures.offline)
+offline_mini = eval(accountInfo.v4mini.offline)
+offline_micro =eval(accountInfo.v4micro.offline)
 
+c2system=accountInfo.v4futures.selection
+c2system_mini=accountInfo.v4mini.selection
+c2system_micro=accountInfo.v4micro.selection
+
+c2id_macro=int(accountInfo.v4futures.c2id)
+c2id_mini=int(accountInfo.v4mini.c2id)
+c2id_micro=int(accountInfo.v4micro.c2id)
 
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
@@ -244,9 +263,9 @@ def fixTypes(original, transformed):
 
 
 
-futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
+#futuresDF_all=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 
-#oldDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
+#oldDate=dt.strptime(futuresDF_all.index.name,"%Y-%m-%d %H:%M:%S")
 futuresDF=pd.DataFrame()
 corrDF=pd.DataFrame()
 
@@ -325,10 +344,10 @@ if lastDate >oldDate:
         futuresDF.set_value(sym,'SEA'+str(date),seaBias)
         futuresDF.set_value(sym,'LastSRUN',currRun)
         futuresDF.set_value(sym,'SRUN'+str(date),currRun)
-    futuresDF['prevACT']=futuresDF_old['prevACT']
-    futuresDF['prevSEA']=futuresDF_old.LastSEA
-    futuresDF['prevSRUN']=futuresDF_old.LastSRUN
-    futuresDF['prevvSTART']=futuresDF_old.vSTART
+    futuresDF['prevACT']=futuresDF_all['prevACT']
+    futuresDF['prevSEA']=futuresDF_all.LastSEA
+    futuresDF['prevSRUN']=futuresDF_all.LastSRUN
+    futuresDF['prevvSTART']=futuresDF_all.vSTART
     #corrDF.to_csv(savePath+'futuresPCcsv')
     #corrDF.corr().to_csv(savePath+'futuresCorr.csv')
     corrDF=corrDF.corr()
@@ -367,21 +386,21 @@ if lastDate >oldDate:
         plt.close()
 else:
 '''
-print ".. skipping seasonalClassifier, copying seasonality from futuresDF_old"
+print ".. skipping seasonalClassifier, copying seasonality from futuresDF_all"
 #second time load  "old" file for seasonality signals.
 nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
-futuresDF['vSTART']=futuresDF_old.vSTART
-futuresDF['LastSEA']=futuresDF_old.LastSEA
-futuresDF['LastSRUN']=futuresDF_old.LastSRUN
+futuresDF['vSTART']=futuresDF_all.vSTART
+futuresDF['LastSEA']=futuresDF_all.LastSEA
+futuresDF['LastSRUN']=futuresDF_all.LastSRUN
 
 '''
-for col in futuresDF_old.columns:
+for col in futuresDF_all.columns:
     if col.startswith('SEA'):
-        futuresDF['SEA']=futuresDF_old[col]
+        futuresDF['SEA']=futuresDF_all[col]
         
-for col in futuresDF_old.columns:
+for col in futuresDF_all.columns:
     if col.startswith('SRUN'):
-        futuresDF['SRUN']=futuresDF_old[col]
+        futuresDF['SRUN']=futuresDF_all[col]
 '''
     
 for i2,contract in enumerate(marketList):
@@ -644,25 +663,7 @@ except Exception as e:
     traceback.print_exc()
     
     
-#for csv system files
-systemFilename='system_v4futures.csv'
-systemFilename2='system_v4mini.csv'
-systemFilename3='system_v4micro.csv'
-systemFilename_tosave='system_v4futures_live.csv'
-systemFilename2_tosave='system_v4mini_live.csv'
-systemFilename3_tosave='system_v4micro_live.csv'
-     
-offline =eval(accountInfo.v4futures.offline)
-offline_mini = eval(accountInfo.v4mini.offline)
-offline_micro =eval(accountInfo.v4micro.offline)
 
-c2system=accountInfo.v4futures.selection
-c2system_mini=accountInfo.v4mini.selection
-c2system_micro=accountInfo.v4micro.selection
-
-c2id_macro=int(accountInfo.v4futures.c2id)
-c2id_mini=int(accountInfo.v4mini.c2id)
-c2id_micro=int(accountInfo.v4micro.c2id)
 
 #system file update.
 #load from daily run, save to live (to update pivot dates)

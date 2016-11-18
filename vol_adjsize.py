@@ -54,8 +54,8 @@ c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
-c2system_macro=c2system='Anti0.75LastSIG'
-c2system_mini='Anti0.75LastSIG'
+c2system_macro=c2system='RiskOn'
+c2system_mini='RiskOn'
 c2system_micro='Anti0.75LastSIG'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
@@ -552,7 +552,7 @@ if lastDate > sigDate:
     voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
     voting12Cols = ['1LastSIG','AntiPrevACT','AdjSEA']
     voting13Cols = ['RiskOn','0.75LastSIG','AntiSEA','prevACT']
-    voting14Cols = ['RiskOn','Anti0.5LastSIG','prevSEA']
+    voting14Cols = ['RiskOn','Anti1LastSIG','prevSEA','prevACT']
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     
     #1bi. Run v4size(to update vlookback)
@@ -718,7 +718,7 @@ else:
     voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
     voting12Cols = ['1LastSIG','AntiPrevACT','AdjSEA']
     voting13Cols = ['RiskOn','0.75LastSIG','AntiSEA','prevACT']
-    voting14Cols = ['RiskOn','Anti0.5LastSIG','LastSEA']
+    voting14Cols = ['RiskOn','Anti1LastSIG','LastSEA','prevACT']
     voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
     
     #voting9Cols=['Anti1LastSIG','AntiSEA']

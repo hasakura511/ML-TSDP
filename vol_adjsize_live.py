@@ -510,7 +510,7 @@ voting10Cols = ['RiskOn','0.5LastSIG','AntiSEA','AntiPrevACT']
 voting11Cols = ['RiskOn','Anti0.75LastSIG','AntiSEA','AntiPrevACT']
 voting12Cols = ['1LastSIG','AntiPrevACT','AdjSEA']
 voting13Cols = ['RiskOn','0.75LastSIG','AntiSEA','prevACT']
-voting14Cols = ['RiskOn','Anti0.5LastSIG','LastSEA']
+voting14Cols = ['RiskOn','Anti1LastSIG','LastSEA','prevACT']
 voting15Cols = ['RiskOff','Anti0.75LastSIG','AntiSEA']
 
 #voting9Cols=['Anti1LastSIG','AntiSEA']

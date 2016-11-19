@@ -22,7 +22,8 @@ if len(sys.argv)==1:
     fontsize=12
     dataPath='D:/ML-TSDP/data/'
     portfolioPath = 'D:/ML-TSDP/data/portfolio/'
-    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPathWrite='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPathRead = 'D:/ML-TSDP/data/futures.sqlite3'
     #savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath = savePath2 = pngPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     systemPath =  'D:/ML-TSDP/data/systems/'
@@ -36,7 +37,7 @@ else:
     start_slip=20161111
     figsize=(8,13)
     fontsize=20
-    dbPath='./data/futures.sqlite3'
+    dbPathWrite=dbPathRead='./data/futures.sqlite3'
     dataPath=savePath='./data/'
     portfolioPath = savePath2 ='./data/portfolio/'
     pngPath = './data/results/'
@@ -44,13 +45,22 @@ else:
     timetablePath=   './data/systems/timetables/'
     feedfile='./data/systems/system_ibfeed.csv'
 
-
-conn = sqlite3.connect(dbPath)
+readConn= sqlite3.connect(dbPathRead)
+writeConn = sqlite3.connect(dbPathWrite)
+accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
+            (select max(timestamp) from accountInfo as maxtimestamp)', con=readConn,  index_col='index')
 atrFilename = 'futuresATR.csv'
-systems = ['v4futures','v4mini', 'v4micro']
+systems = [x for x in accountInfo.columns if x not in ['Date','timestamp']]
+#systems = ['v4futures','v4mini', 'v4micro']
 #systems = ['v4micro']
 #systems = ['v4futures']
+fixed_signals = ['RiskOn','RiskOff','Custom','AntiCustom','LastSEA','AntiSEA','AdjSEA','AntiAdjSEA']
 
+signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
+                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
+                'LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
+                'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
+                'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
 #adjustments
 adjDict={
             '@CT':100,
@@ -103,6 +113,8 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
     plt.close()
     
 futuresDF = pd.read_csv(dataPath+atrFilename, index_col=0)
+prevCSIdownloadDate = dt.strptime(futuresDF.index.name, '%Y-%m-%d %H:%M:%S').replace(hour=20)
+prevCSIdownloadDate = prevCSIdownloadDate.replace(day=prevCSIdownloadDate.day-1)
 csidate = futuresDF.index.name.split()[0].replace('-','')
 feeddata=pd.read_csv(feedfile,index_col='c2sym')
 
@@ -148,14 +160,13 @@ for systemName in systems:
     #csi close data
     
     #csidata download at 8pm est
-    #futuresDate = dt.strptime(futuresDF.index.name, '%Y-%m-%d %H:%M:%S').replace(hour=20)
     slipDF = pd.DataFrame()
     #print 'sym', 'c2price', 'csiPrice', 'slippage'
     #new entry trades
     #newOpen=portfolioDF[portfolioDF['openedWhen']>=futuresDate].symbol.values
     newOpen={}
     system.index= system.c2sym
-    for x in idx_trigger:
+    for x in idx_close:
         sym=x.split()[0]
         if sym in portfolioDF.index:
             if portfolioDF.index.tolist().count(sym) == 1:
@@ -163,12 +174,19 @@ for systemName in systems:
             else:
                 row=portfolioDF.ix[sym].iloc[0]
             if csidate in timetable:
-                print sym,'trigger', timetable.ix[x][csidate],
+                print sym,'close', timetable.ix[x][csidate],
                 if row.openedWhen>=timetable.ix[x][csidate]:
                     print 'new open', row.openedWhen,'adding..'
                     newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
                 else:
-                    print ' no open trades found skipping..'
+                    print 'new open', row.openedWhen,' before close ',
+                    selection =accountInfo[systemName].selection
+                    if selection in fixed_signals and row.openedWhen>prevCSIdownloadDate:
+                        print 'adding..', selection,'is a fixed signal and opened after prevCSIdownloadDate'
+                        newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
+                    else:
+                        print 'skipping..', selection,'is not a fixed signal or opened before prevCSIdownloadDate',prevCSIdownloadDate
+
             else:
                 print x,csidate,'not found in timetable, skipping..'
         else:
@@ -196,7 +214,7 @@ for systemName in systems:
             slipDF.set_value(rowName, 'contract', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
-            slipDF.set_value(rowName, 'trigger', newOpen[contract][0])
+            slipDF.set_value(rowName, 'closetime', newOpen[contract][0])
             slipDF.set_value(rowName, 'csiPrice', csiPrice)
             slipDF.set_value(rowName, 'slippage', slippage)
             slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
@@ -207,7 +225,7 @@ for systemName in systems:
     #newCloses=tradesDF[tradesDF['closedWhen']>=futuresDate]
     newCloses=pd.DataFrame()
     
-    for x in idx_trigger:
+    for x in idx_close:
         sym=x.split()[0]
         if sym in tradesDF.index:
             if tradesDF.index.tolist().count(sym) == 1:
@@ -216,26 +234,35 @@ for systemName in systems:
                 row=tradesDF.ix[sym].iloc[0]
 
             if csidate in timetable:
-                print sym,'trigger', timetable.ix[x][csidate],
+                print sym,'close', timetable.ix[x][csidate],
                 if row.closedWhen>=timetable.ix[x][csidate]:
                     print 'new close', row.closedWhen,'adding..'
-                    row['trigger']=timetable.ix[x][csidate]
+                    row['closetime']=timetable.ix[x][csidate]
                     newCloses = newCloses.append(row)
                 else:
-                    print 'closed before trigger skipping..'
+                    print 'new close', row.closedWhen,' before close ',
+                    selection =accountInfo[systemName].selection
+                    if selection in fixed_signals and row.closedWhen>prevCSIdownloadDate:
+                        print 'adding..', selection,'is a fixed signal and opened after prevCSIdownloadDate'
+                        row['closetime']=timetable.ix[x][csidate]
+                        newCloses = newCloses.append(row)
+                    else:
+                        print 'skipping..', selection,'is not a fixed signal or closed before prevCSIdownloadDate',prevCSIdownloadDate
+                    
             else:
                 print x,csidate,'not found in timetable, skipping..'
         else:
             print sym,' no close trades found skipping..'
             
     print systemName, newCloses.shape[0], 'Close Trades Found'
-    newCloses.index = newCloses.symbol
+    if newCloses.shape[0]>0:
+        newCloses.index = newCloses.symbol
     print systemName, newCloses.index
     
     for contract in newCloses.index:
         c2price=newCloses.ix[contract].closing_price_VWAP
         c2timestamp=pd.Timestamp(newCloses.ix[contract].closedWhen)
-        trigger = pd.Timestamp(newCloses.ix[contract].trigger)
+        closetime = pd.Timestamp(newCloses.ix[contract].closetime)
         if contract in futuresDF.Contract.values:
             if contract[:-2] in adjDict.keys():
                 csiPrice = futuresDF[futuresDF.Contract ==contract].LastClose.values[0]*adjDict[contract[:-2]]
@@ -256,7 +283,7 @@ for systemName in systems:
             slipDF.set_value(rowName, 'contract', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
-            slipDF.set_value(rowName, 'trigger', trigger)
+            slipDF.set_value(rowName, 'closetime', closetime)
             slipDF.set_value(rowName, 'csiPrice', csiPrice)
             slipDF.set_value(rowName, 'slippage', slippage)
             slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
@@ -268,7 +295,7 @@ for systemName in systems:
     if slipDF.shape[0]==0:
         print systemName, 'No new trades yesterday, skipping daily report'
     else:
-        slipDF['timedelta']=slipDF.c2timestamp-slipDF.trigger
+        slipDF['timedelta']=slipDF.c2timestamp-slipDF.closetime
         slipDF['delta']=slipDF['timedelta'].astype('timedelta64[m]')
         #slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
         #if slipDF.shape[0] != portfolioDF.shape[0]:
@@ -306,7 +333,7 @@ for systemName in systems:
         slipDF['ibsym']=feeddata.ix[[x[:-2] for x in slipDF.contract.values]].ibsym.values
         slipDF['csiDate']=csidate
         slipDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-        slipDF.to_sql(name= 'slippage', if_exists='append', con=conn, index=True, index_label='CSIsym')
+        slipDF.to_sql(name= 'slippage', if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
         print 'Saved '+systemName+' to sql'
 
     ###########################################################

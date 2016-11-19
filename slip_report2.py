@@ -333,7 +333,7 @@ for systemName in systems:
         slipDF['ibsym']=feeddata.ix[[x[:-2] for x in slipDF.contract.values]].ibsym.values
         slipDF['csiDate']=csidate
         slipDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-        slipDF.to_sql(name= 'slippage', if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
+        slipDF.to_sql(name= 'slippage', if_exists='append', con=writeConn, index=True, index_label='CSIsym')
         print 'Saved '+systemName+' to sql'
 
     ###########################################################

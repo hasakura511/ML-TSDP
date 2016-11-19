@@ -77,6 +77,7 @@ safefAdjustment=0
 if len(sys.argv)==1:
     debug=True
     showPlots=False
+    refreshSea=True
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3'
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
@@ -105,7 +106,10 @@ else:
     signalSavePath = './data/signals/' 
     savePath2 = './data/results/'
     systemPath =  './data/systems/'
-    
+    if len(sys.argv)>2:
+        refreshSea=True
+    else:
+        refreshSea=False
 conn = sqlite3.connect(dbPath)
 readConn =  sqlite3.connect(dbPath2)
 
@@ -228,15 +232,26 @@ months = {
     
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
 marketList = [x.split('_')[0] for x in files]
-futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+
 #futuresDF_old=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 
-oldDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
+
 futuresDF=pd.DataFrame()
 corrDF=pd.DataFrame()
 
+if refreshSea:
+    #prevUpdateDate=pd.Timestamp(0)
+    idx=-2
+else:
+    idx=-1
+
+    
 for i,contract in enumerate(marketList):
-    data = pd.read_csv(dataPath+contract+'_B.csv', index_col=0, header=None)[-lookback-1:]
+    if idx==-2:
+        data = pd.read_csv(dataPath+contract+'_B.csv', index_col=0, header=None)[-lookback-2:-1]
+    else:
+        data = pd.read_csv(dataPath+contract+'_B.csv', index_col=0, header=None)[-lookback-1:]
+
     data.index = pd.to_datetime(data.index,format='%Y%m%d')
     data.columns = ['Open','High','Low','Close','Volume','OI','R','S']
     data.index.name = 'Dates'
@@ -288,11 +303,20 @@ for i,contract in enumerate(marketList):
     
 futuresDF.index.name = lastDate
 
+if refreshSea:
+    prevUpdateDate=pd.read_sql(\
+            'select DISTINCT Date from futuresATRhist where Date < %s order by Date ASC' \
+            % lastDate.strftime('%Y%m%d') , con=readConn)
+    prevUpdateDate = dt.strptime(str(prevUpdateDate.values.flatten()[-1]),'%Y%m%d')
+    futuresDF_old=pd.read_sql( 'select * from futuresDF_all where Date = %s' %prevUpdateDate.strftime('%Y%m%d'),\
+            con=readConn,  index_col='CSIsym')
+else:
+    futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+    prevUpdateDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
 
-#oldDate=pd.Timestamp(0)
 #save last seasonal signal for pnl processing
 #update correl charts
-if lastDate >oldDate:
+if lastDate >prevUpdateDate:
     #first time run needs to update pivot dates for runsystems.  
     print "First Run.. running seasonalClassifier"
     nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','prevSEA','prevSRUN','prevvSTART']
@@ -366,6 +390,7 @@ else:
         if col.startswith('SRUN'):
             futuresDF[col]=futuresDF_old[col]
 
+
     
 for i2,contract in enumerate(marketList):
     #print i,
@@ -382,15 +407,15 @@ for i2,contract in enumerate(marketList):
     if sym in offline:
         adjQty=0
     else:
-        if data.safef.iloc[-1] ==1:
+        if data.safef.iloc[idx] ==1:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1+safefAdjustment)))
         else:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1-safefAdjustment)))
         
-    futuresDF.set_value(sym,'LastSIG',data.signals.iloc[-1])
-    futuresDF.set_value(sym,'LastSAFEf',data.safef.iloc[-1])
+    futuresDF.set_value(sym,'LastSIG',data.signals.iloc[idx])
+    futuresDF.set_value(sym,'LastSAFEf',data.safef.iloc[idx])
     futuresDF.set_value(sym,'finalQTY',adjQty)
-    futuresDF.set_value(sym,'SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    futuresDF.set_value(sym,'SIG'+str(data.index[idx]),data.signals.iloc[idx])
    
 
 for i2,contract in enumerate(marketList):
@@ -404,23 +429,23 @@ for i2,contract in enumerate(marketList):
     data = pd.read_csv(signalPath+signalFilename, index_col=0)
     data.index = pd.to_datetime(data.index,format='%Y-%m-%d')
     if i2==0:
-        sigDate = data.index[-1]
+        sigDate = data.index[idx]
     else:
-        if data.index[-1]> sigDate:
-            sigDate=data.index[-1]
+        if data.index[idx]> sigDate:
+            sigDate=data.index[idx]
             
     if sym in offline:
         adjQty=0
     else:
-        if data.dpsSafef.iloc[-1] ==1:
+        if data.dpsSafef.iloc[idx] ==1:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1+safefAdjustment)))
         else:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1-safefAdjustment)))
             
-    futuresDF.set_value(sym,'0.5LastSIG',data.signals.iloc[-1])
-    futuresDF.set_value(sym,'0.5LastSAFEf',data.dpsSafef.iloc[-1])
+    futuresDF.set_value(sym,'0.5LastSIG',data.signals.iloc[idx])
+    futuresDF.set_value(sym,'0.5LastSAFEf',data.dpsSafef.iloc[idx])
     futuresDF.set_value(sym,'0.5finalQTY',adjQty)
-    futuresDF.set_value(sym,'0.5SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    futuresDF.set_value(sym,'0.5SIG'+str(data.index[idx]),data.signals.iloc[idx])
 
 for i2,contract in enumerate(marketList):
     #print i,
@@ -434,15 +459,15 @@ for i2,contract in enumerate(marketList):
     if sym in offline:
         adjQty=0
     else:
-        if data.dpsSafef.iloc[-1] ==1:
+        if data.dpsSafef.iloc[idx] ==1:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1+safefAdjustment)))
         else:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1-safefAdjustment)))
             
-    futuresDF.set_value(sym,'0.75LastSIG',data.signals.iloc[-1])
-    futuresDF.set_value(sym,'0.75LastSAFEf',data.dpsSafef.iloc[-1])
+    futuresDF.set_value(sym,'0.75LastSIG',data.signals.iloc[idx])
+    futuresDF.set_value(sym,'0.75LastSAFEf',data.dpsSafef.iloc[idx])
     futuresDF.set_value(sym,'0.75finalQTY',adjQty)
-    futuresDF.set_value(sym,'0.75SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    futuresDF.set_value(sym,'0.75SIG'+str(data.index[idx]),data.signals.iloc[idx])
 
 for i2,contract in enumerate(marketList):
     #print i,
@@ -456,15 +481,15 @@ for i2,contract in enumerate(marketList):
     if sym in offline:
         adjQty=0
     else:
-        if data.dpsSafef.iloc[-1] ==1:
+        if data.dpsSafef.iloc[idx] ==1:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1+safefAdjustment)))
         else:
             adjQty = int(round(futuresDF.ix[sym].QTY*(1-safefAdjustment)))
             
-    futuresDF.set_value(sym,'1LastSIG',data.signals.iloc[-1])
-    futuresDF.set_value(sym,'1LastSAFEf',data.dpsSafef.iloc[-1])
+    futuresDF.set_value(sym,'1LastSIG',data.signals.iloc[idx])
+    futuresDF.set_value(sym,'1LastSAFEf',data.dpsSafef.iloc[idx])
     futuresDF.set_value(sym,'1finalQTY',adjQty)
-    futuresDF.set_value(sym,'1SIG'+str(data.index[-1]),data.signals.iloc[-1])
+    futuresDF.set_value(sym,'1SIG'+str(data.index[idx]),data.signals.iloc[idx])
 
 futuresDF=futuresDF.sort_index()
 columns = futuresDF.columns.tolist()
@@ -533,8 +558,8 @@ system_micro.c2id=c2id_micro
 
 #use LastSEA for seasonality in c2
 
-#sigDate=pd.Timestamp(0)
 
+    
 
 if lastDate > sigDate:
     AdjSEACols= ['RiskOn','AntiPrevACT','prevSEA']
@@ -683,8 +708,9 @@ if lastDate > sigDate:
     futuresDF.to_csv(savePath2+filename)
     print 'Saving', savePath+'futuresATR_Results.csv'
     futuresDF.to_csv(savePath+'futuresATR_Results.csv')
-    futuresDF_live = pd.read_sql('select * from futuresATR where timestamp=\
-            (select max(timestamp) from futuresATR as maxtimestamp)', con=readConn,  index_col='CSIsym')
+    futuresDF_live = pd.read_sql('select * from futuresATRhist where timestamp=\
+            (select max(timestamp) from futuresATRhist where Date=%s)' %prevUpdateDate.strftime('%Y%m%d'),\
+            con=readConn,  index_col='CSIsym')
 
     futuresDF_toexcel=pd.concat([futuresDF_live, futuresDF.drop(futuresDF_live.index,axis=0)],axis=0).sort_index()
     #seasonality data same as before

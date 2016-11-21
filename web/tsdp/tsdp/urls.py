@@ -15,11 +15,21 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf import settings
+from django.views.static import serve
 from main_app import views
 
+
 urlpatterns = [
+    url(r'^user/(\w+)/$', views.profile, name='profile'),
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index),
     url(r'^([A-Z]+)/$', views.detail, name='detail'),
     url(r'^post_url/$', views.post_treasure, name='post_treasure'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        url(r'^media/(?P<path>.*)$', serve,
+            {'document_root': settings.MEDIA_ROOT,}),
+        ]

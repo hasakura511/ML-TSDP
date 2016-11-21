@@ -1,5 +1,7 @@
 from django import forms
+from .models import Treasure
 
+'''
 class TreasureForm(forms.Form):
     name = forms.CharField(label='Name', max_length=100)
     value = forms.DecimalField(label='Value', max_digits=10, decimal_places=2)
@@ -9,3 +11,9 @@ class TreasureForm(forms.Form):
     
     def __str__(self):
         return self.name
+'''
+
+class TreasureForm(forms.ModelForm):
+    class Meta:
+        model=Treasure
+        fields = ['name','value','location','material','image']

@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Dictionary
+from .models import Treasure
 from .forms import TreasureForm
+from django.contrib.auth.models import User
 # Create your views here.
 '''
 class Treasure:
@@ -35,8 +37,13 @@ def detail(request, treasure_id):
     return render(request, 'detail.html', context)
 
 def post_treasure(request):
-    form = TreasureForm(request.POST)
+    form = TreasureForm(request.POST, request.FILES)
     if form.is_valid():
+        treasure = form.save(commit = False)
+        treasure.user=request.user
+        treasure.save()
+        #form.save(commit = True)
+        '''
         treasure = Treasure(
                             name = form.cleaned_data['name'],
                             value = form.cleaned_data['value'],
@@ -45,4 +52,12 @@ def post_treasure(request):
                             img_url = form.cleaned_data['img_url']
                             )
         treasure.save()
+        '''
     return HttpResponseRedirect('/')
+
+def profile(request, username):
+    user = User.objects.get(username=username)
+    treasures = Treasure.objects.filter(user=user)
+    return render(request, 'profile.html',{'username':username,
+                        'treasures':treasures})
+                        

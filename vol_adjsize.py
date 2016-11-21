@@ -56,7 +56,7 @@ c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
 c2system_macro=c2system='LastSEA'
 c2system_mini='RiskOn'
-c2system_micro='Anti0.75LastSIG'
+c2system_micro='Voting11'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
@@ -77,6 +77,7 @@ safefAdjustment=0
 if len(sys.argv)==1:
     debug=True
     showPlots=False
+    #refreshSea tries to recreate the first run futuresATR file after new signals have been generated
     refreshSea=True
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3'
@@ -98,6 +99,8 @@ if len(sys.argv)==1:
 else:
     debug=False
     showPlots=False
+    #if set to on its probably going to mess up the db.
+    refreshSea=False
     dbPath=dbPath2='./data/futures.sqlite3'
     dataPath='./data/csidata/v4futures2/'
     dataPath2='./data/'
@@ -106,10 +109,7 @@ else:
     signalSavePath = './data/signals/' 
     savePath2 = './data/results/'
     systemPath =  './data/systems/'
-    if len(sys.argv)>2:
-        refreshSea=True
-    else:
-        refreshSea=False
+
 conn = sqlite3.connect(dbPath)
 readConn =  sqlite3.connect(dbPath2)
 
@@ -239,19 +239,11 @@ marketList = [x.split('_')[0] for x in files]
 futuresDF=pd.DataFrame()
 corrDF=pd.DataFrame()
 
-if refreshSea:
-    #prevUpdateDate=pd.Timestamp(0)
-    idx=-2
-else:
-    idx=-1
+
 
     
 for i,contract in enumerate(marketList):
-    if idx==-2:
-        data = pd.read_csv(dataPath+contract+'_B.csv', index_col=0, header=None)[-lookback-2:-1]
-    else:
-        data = pd.read_csv(dataPath+contract+'_B.csv', index_col=0, header=None)[-lookback-1:]
-
+    data = pd.read_csv(dataPath+contract+'_B.csv', index_col=0, header=None)[-lookback-1:]
     data.index = pd.to_datetime(data.index,format='%Y%m%d')
     data.columns = ['Open','High','Low','Close','Volume','OI','R','S']
     data.index.name = 'Dates'
@@ -304,13 +296,18 @@ for i,contract in enumerate(marketList):
 futuresDF.index.name = lastDate
 
 if refreshSea:
+    print 'refreshSea is on.. debug mode'
+    #for sig
+    idx=-2
     prevUpdateDate=pd.read_sql(\
             'select DISTINCT Date from futuresATRhist where Date < %s order by Date ASC' \
-            % lastDate.strftime('%Y%m%d') , con=readConn)
+            % lastDate.strftime('%Y%m%d') , con=readConn).iloc[-1]
     prevUpdateDate = dt.strptime(str(prevUpdateDate.values.flatten()[-1]),'%Y%m%d')
-    futuresDF_old=pd.read_sql( 'select * from futuresDF_all where Date = %s' %prevUpdateDate.strftime('%Y%m%d'),\
+    futuresDF_old=pd.read_sql( 'select * from futuresDF_all where timestamp=\
+            (select max(timestamp) from futuresDF_all where Date=%s)' %prevUpdateDate.strftime('%Y%m%d'),\
             con=readConn,  index_col='CSIsym')
 else:
+    idx=-1
     futuresDF_old=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
     prevUpdateDate=dt.strptime(futuresDF_old.index.name,"%Y-%m-%d %H:%M:%S")
 
@@ -713,12 +710,17 @@ if lastDate > sigDate:
             con=readConn,  index_col='CSIsym')
 
     futuresDF_toexcel=pd.concat([futuresDF_live, futuresDF.drop(futuresDF_live.index,axis=0)],axis=0).sort_index()
+    #update old act and pct change to csi values
+    futuresDF_toexcel['ACT']=futuresDF.ACT
+    futuresDF_toexcel['LastPctChg']=futuresDF.LastPctChg
     #seasonality data same as before
     futuresDF_toexcel['prevSEA']=futuresDF.LastSEA
     futuresDF_toexcel['prevSRUN']=futuresDF.LastSRUN
     futuresDF_toexcel['prevvSTART']=futuresDF.prevvSTART
-    futuresDF_toexcel=futuresDF_toexcel[[x for x in futuresDF.columns if x in futuresDF_toexcel.columns]]
-    futuresDF_toexcel.dropna(axis=1).to_csv(savePath+'futuresATR_Excel.csv')
+    cols =[x for x in futuresDF.columns if x in futuresDF_toexcel.columns]+['Date','timestamp']
+    futuresDF_toexcel=futuresDF_toexcel[cols]
+    #recreated new price change data with previous signals from csi (offline) ib(online)
+    futuresDF_toexcel.to_csv(savePath+'futuresATR_Excel.csv')
     print 'Saved', savePath+'futuresATR_Excel.csv'
     
     filename='futuresL_History.csv'

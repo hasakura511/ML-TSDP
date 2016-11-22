@@ -64,7 +64,7 @@ if len(sys.argv)==1:
     submitIB=False
     submitC2=False
     triggertime = 30 #mins
-    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPath=dbPath2='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
     runPath2= ['python','D:/ML-TSDP/vol_adjsize_live.py']
     runPath3=  ['python','D:/ML-TSDP/proc_signal_v4_live.py','0']
@@ -102,7 +102,7 @@ else:
     
     
     triggertime = 30 #mins
-    dbPath='./data/futures.sqlite3'
+    dbPath=dbPath2='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
     runPath2=['python','./vol_adjsize_live.py','1']
     runPath3=['python','./proc_signal_v4_live.py','1']
@@ -124,6 +124,9 @@ else:
     signalPathDaily =  './data/signals/'
     signalPathMOC =  './data/signals2/'
     logging.basicConfig(filename='/logs/ib_live.log',level=logging.DEBUG)
+
+writeConn = sqlite3.connect(dbPath)
+readConn =  sqlite3.connect(dbPath2)
 
 tzDict = {
     'CST':'CST6CDT',
@@ -152,7 +155,6 @@ months = {
                 'X':11,
                 'Z':12
                 }
-conn = sqlite3.connect(dbPath)
 
 def is_int(s):
     try: 
@@ -546,6 +548,9 @@ def get_timetable(execDict, systemPath):
     filename=timetablePath+str(filedate)+'.csv'
     timetable.to_csv(filename, index=True)
     print 'saved', filename
+    timetable['Date']=csidate
+    timetable['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    timetable.to_sql(name='timetable', con=writeConn, index=True, if_exists='append', index_label='Desc')
     return timetable
         
 def find_triggers(feeddata, execDict):
@@ -715,7 +720,7 @@ if __name__ == "__main__":
             e.flush()
             proc = Popen(runPath4, stdout=f, stderr=e)
             proc.wait()
-    totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
+    totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
     
     #check ib positions
     try:
@@ -783,7 +788,7 @@ if __name__ == "__main__":
             else:
                 print 'submitIB set to False'
              
-            totalc2orders=int(pd.read_sql('select * from checkSystems', con=conn).iloc[-1])
+            totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
             print 'Found', totalc2orders, 'c2 position adjustments.'
         else:
             print 'Debug mode: skipping orders'

@@ -821,8 +821,8 @@ if __name__ == "__main__":
         print 'Found', num_iborders,'ib position adjustments.'
         #send orders if live mode
         if debug==False:
-            print 'Live mode: running orders'
-            if submitC2:
+            if submitC2 and totalc2orders !=0:
+                print 'Live mode: running c2 orders'
                 for sys in systems:
                     print 'returned to main thread, running c2 orders for',sys
                     with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'a') as f:
@@ -840,12 +840,17 @@ if __name__ == "__main__":
                         proc = Popen(runPath4, stdout=f, stderr=e)
                         proc.wait()
             else:
-                print 'submitC2 set to False'
+                if submitC2==False:
+                    print 'skipped c2 orders: submitC2 set to False'
+                if totalc2orders ==0:
+                    print 'skipped c2 orders: No c2 orders to be processed.'
             
-            if submitIB:
+            if submitIB and num_iborders!=0:
                 print 'returned to main thread, placing ib orders from', systemfile 
                 try:
                     place_iborders(execDict)
+                    #wait for orders to be filled
+                    sleep(15)
                     executions=filterIBexec()
                     iborders_lessOpen=updateWithOpen(iborders)
 
@@ -875,15 +880,15 @@ if __name__ == "__main__":
                 print 'Found', len(iborders_lessExec),'ib position adjustments after placing orders.'
                 print iborders_lessExec
             else:
-                print 'submitIB set to False'
-             
+                if submitIB==False:
+                    print 'submitIB set to False'
+                if num_iborders==0:
+                    print 'skipped IB orders: No IB orders to be processed.'
+                    
             totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
             print 'Found', totalc2orders, 'c2 position adjustments.'
         else:
             print 'Debug mode: skipping orders'
-
-                
-    #update slippage report
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     

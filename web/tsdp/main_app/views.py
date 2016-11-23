@@ -110,5 +110,5 @@ def like_treasure(request):
             treasure.likes=likes
             treasure.save()
             
-    return HttpResponseRedirect(likes)
+    return HttpResponse(likes)
     

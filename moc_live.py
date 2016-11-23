@@ -489,7 +489,8 @@ def refresh_history(sym, execDict):
     global feeddata
     data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
     tickerId=random.randint(100,9999)
-    contract = execDict[sym][2]
+    sym2=[x for x in execDict.keys() if sym in x][0]
+    contract = execDict[sym2][2]
     print 'getting data from IB...',
     data = client.get_history(endDateTime, contract, whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
     data.to_csv(csiDataPath2+feeddata.ix[sym].CSIsym2+'.csv', index=True)

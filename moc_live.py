@@ -37,6 +37,7 @@ start_time = time.time()
 callback = IBWrapper()
 client=IBclient(callback)
 
+
 #systems = ['v4micro','v4mini','v4macro']
 
 durationStr ='2 D'
@@ -74,7 +75,8 @@ if len(sys.argv)==1:
     #portfolioPath = 'D:/ML-TSDP/data/portfolio/'
     #savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     savePath = savePath2 = pngPath=portfolioPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    systemPath =  'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/'
+    #systemPath =  'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/'
+    systemPath = 'D:/ML-TSDP/data/systems/'
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     #systemfile='D:/ML-TSDP/data/systems/system_v4micro.csv'
     timetablePath=   'D:/ML-TSDP/data/systems/timetables_debug/'
@@ -155,6 +157,19 @@ months = {
                 'X':11,
                 'Z':12
                 }
+                
+def lastCsiDownloadDate():
+    global csiDataPath
+    datafiles = os.listdir(csiDataPath)
+    dates = []
+    for f in datafiles:
+        lastdate = pd.read_csv(csiDataPath+f, index_col=0).index[-1]
+        if lastdate not in dates:
+            dates.append(lastdate)
+            
+    return max(dates)
+    
+csidate=lastCsiDownloadDate()
 
 def is_int(s):
     try: 
@@ -162,7 +177,16 @@ def is_int(s):
         return True
     except ValueError:
         return False
-        
+
+def getContractDate(c2sym, systemdata):
+    currentcontract = [x for x in systemdata.c2sym if x[:-2] == c2sym]
+    if len(currentcontract)==1:
+        #Z6
+        ccontract = currentcontract[0][-2:]
+        ccontract = 201000+int(ccontract[-1])*100+months[ccontract[0]]
+        return str(ccontract)
+    else:
+        return ''
 
 def runInThread(sym, popenArgs):
     with open(logPath+sym+'.txt', 'w') as f:
@@ -215,6 +239,7 @@ def runThreads(threadlist):
     
 def get_ibfutpositions(portfolioPath):
     global client
+    global csidate
     (account_value, portfolio_data)=client.get_IB_account_data()
     
     if len(account_value) != 0:
@@ -226,18 +251,37 @@ def get_ibfutpositions(portfolioPath):
         if 'NetLiquidation' in accountSet.index:
             accountValue = accountSet.ix['NetLiquidation'].value        
             print 'Account value:', accountValue
+            try:
+                accountSet['Date']=csidate
+                accountSet['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+                accountSet.to_sql(name='ib_accountData', con=writeConn, index=True, if_exists='append', index_label='Desc')
+                print 'saved ib_accountData to', dbPath
+            except Exception as e:
+                #print e
+                traceback.print_exc()
     else:
         print 'Account value returned nothing'
         
     if len(portfolio_data) !=0:
         data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
+        #return contracts only
         dataSet=data[data.exp != '']
-        dataSet=dataSet.set_index(['sym'])
+        contracts = [dataSet.ix[i].sym+dataSet.ix[i].exp for i in dataSet.index]
+        dataSet['contracts']=contracts
+        dataSet=dataSet.set_index(['contracts'])
         filename=portfolioPath+'ib_portfolio.csv'
         dataSet.to_csv(filename)
         print 'saved', filename
-        print dataSet.shape[0],'futures positions found'
-        return dataSet
+        try:
+            dataSet['Date']=csidate
+            dataSet['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+            dataSet.to_sql(name='ib_portfolioData', con=writeConn, index=True, if_exists='append', index_label='contracts')
+            print 'saved ib_portfolioData to', dbPath
+        except Exception as e:
+            #print e
+            traceback.print_exc()
+        
+        return dataSet.drop(['Date','timestamp'],axis=1)
     else:
         return 0
 
@@ -250,6 +294,8 @@ def create_execDict(feeddata, systemfile):
     systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
+
+    contractsDF=pd.DataFrame()
     feeddata=feeddata.reset_index()
     for i in feeddata.index:
         
@@ -264,16 +310,10 @@ def create_execDict(feeddata, systemfile):
             #fx
             symbol=system['ibsym']+system['ibcur']
             contract.symbol=system['ibsym']
+            ccontract = ''
         else:
             #futures
-            currentcontract = [x for i,x in enumerate(systemdata.c2sym) if x[:-2] == system.c2sym]
-            if len(currentcontract)==1:
-                #Z6
-                ccontract = currentcontract[0][-2:]
-                ccontract = 201000+int(ccontract[-1])*100+months[ccontract[0]]
-                contract.expiry=str(ccontract)
-            else:
-                ccontract = ''
+            contract.expiry = getContractDate(system.c2sym, systemdata)
             symbol=contract.symbol= system['ibsym']
             contract.multiplier = str(system['multiplier'])
 
@@ -282,22 +322,28 @@ def create_execDict(feeddata, systemfile):
         contract.exchange = system['ibexch']
         contract.currency = system['ibcur']
         
+        print i+1, contract.symbol,
+        contractInfo=client.get_contract_details(contract)
+        contractsDF=contractsDF.append(contractInfo)
         #update system file with correct ibsym and contract expiry
         c2sym=system.c2sym
         ibsym=system.ibsym   
         index = systemdata[systemdata.c2sym2==c2sym].index[0]
-        #print index, ibsym, ccontract, systemdata.columns
+        #print index, ibsym, contract.expiry, systemdata.columns
         systemdata.set_value(index, 'ibsym', ibsym)
-        systemdata.set_value(index, 'ibexpiry', ccontract)
-        execDict[symbol]=['PASS', 0, contract]
+        systemdata.set_value(index, 'ibexpiry', contract.expiry)
+        execDict[symbol+contractInfo.expiry[0]]=['PASS', 0, contract]
 
-        #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
-    systemdata.to_csv(systemfile, index=False)
-    print 'updated', systemfile
-      
-    print 'Created exec dict with', len(execDict.keys()), 'symbols:'
+        #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, contract.expiry
+    #systemdata.to_csv(systemfile, index=False)
+    #print 'updated', systemfile
+        
+    contractsDF=contractsDF.set_index('symbol')
+    contractsDF.to_csv(systemPath+'ib_contracts.csv', index=True)
+    print 'saved', systemPath+'ib_contracts.csv'
+    print 'Created exec dict with', len(execDict.keys()), 'contracts:'
     print execDict.keys()
-    return execDict
+    return execDict,contractsDF
    
 def update_orders(feeddata, systemfile, execDict):
     global client
@@ -310,16 +356,74 @@ def update_orders(feeddata, systemfile, execDict):
     #print feeddata.columns
     feeddata=feeddata.reset_index()
     portfolio=get_ibfutpositions(portfolioPath)
+
     if isinstance(portfolio, type(pd.DataFrame())):
-        openPositions = portfolio.reset_index().groupby(['sym'])[['qty']].sum()
+        #get rid of 0 qty
+        clean_portfolio=portfolio[portfolio.qty != 0]
+        print clean_portfolio.shape[0],'futures positions found'
+        #openPositions = portfolio.reset_index().groupby(['sym'])[['qty']].sum()
+        #openPositions = portfolio.reset_index().groupby(['sym','exp'])[['qty']].sum()
+        openPositions = clean_portfolio.reset_index().groupby(clean_portfolio.index)[['qty']].sum()
+        currentOpenPos = pd.DataFrame()
+        execDictExpired={}
+        for contract in openPositions.index:
+            #print sym,exp
+            sym=contract[:-8]
+            exp=contract[-8:]
+            exp2=contract[-8:-2]
+            qty=openPositions.ix[contract].qty
+            #execDict should only contain one match at this point.
+            match = [x for x in execDict.keys() if contract[:-8] in x][0]
+            #currentExpiry=execDict[match][2].expiry
+            currentContract=execDict[match][2]
+            if exp==match[-8:]:
+                currentOpenPos.set_value(contract, 'qty',openPositions.ix[contract][0])
+                currentOpenPos.set_value(contract, 'exp',exp)
+            else:
+                
+                if qty > 0:
+                    action='SLD'
+                else:
+                    action='BOT'
+                
+                #create new contract. no deep copy
+                IBcontract = Contract()
+                IBcontract.symbol= currentContract.symbol
+                #missing from ibswigpy
+                #IBcontract.LastTradeDateOrContractMonth=exp
+                IBcontract.multiplier = currentContract.multiplier
+                IBcontract.secType = currentContract.secType
+                IBcontract.exchange = currentContract.exchange
+                IBcontract.currency =currentContract.currency
+                contractInfo=client.get_contract_details(IBcontract)
+                #print contractInfo
+                contractMonth=contractInfo[contractInfo.expiry==exp].contractMonth
+                if len(contractMonth) >0:
+                    IBcontract.expiry=contractMonth.values[0]
+                    execDictExpired[contract]=[action,int(abs(qty)),IBcontract]
+                    print 'Expired contract:', contract, qty, 'added to execDict:',sym, action, abs(qty), IBcontract.expiry
+                else:
+                    print 'Expired contract:', contract, qty, 'could not be found. Exit Manually:',sym, action, abs(qty)
+        
         for i in feeddata.index:
             system=feeddata.ix[i]
             c2sym=system.c2sym
             ibsym=system.ibsym   
             index = systemdata[systemdata.c2sym2==c2sym].index[0]
-
-            if ibsym in openPositions.index:
-                ib_pos_qty=openPositions.ix[ibsym].qty
+            currentcontract = [x for x in systemdata.c2sym if x[:-2] == system.c2sym]
+            if len(currentcontract)==1:
+                #Z6
+                ccontract = currentcontract[0][-2:]
+                ccontract = 201000+int(ccontract[-1])*100+months[ccontract[0]]
+                
+            match = [x for x in currentOpenPos.index if ibsym in x]
+            
+            if len(match) !=0:
+                contract=match[0]
+                if contract in currentOpenPos.index:
+                    ib_pos_qty=currentOpenPos.ix[contract].qty
+                else:
+                    ib_pos_qty=0
             else:
                 ib_pos_qty=0
             #ib_pos_qty=0
@@ -342,110 +446,32 @@ def update_orders(feeddata, systemfile, execDict):
                 #print( 'SELL: ' + str(ibquant) )
                 #place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);         
             #print( action+': ' + str(ibquant) )
-            execDict[ibsym][0]=action
-            execDict[ibsym][1]=ibquant
-
-            #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
+            #expiry = getContractDate(c2sym, systemdata)
+            contract=[x for x in execDict.keys() if ibsym in x][0]
+            execDict[contract][0]=action
+            execDict[contract][1]=ibquant
+            if action != 'PASS':
+                print 'Position Change: ', contract, 'IB', ib_pos_qty, 'SYS', system_ibpos_qty, 'ADJ', action, ibquant
         #systemdata.to_csv(systemfile, index=False)
         #print 'saved', systemfile
           
         #print len(execDict.keys()), execDict.keys()
-        return execDict
+        execDictMerged = execDict.copy()
+        execDictMerged.update(execDictExpired)
+        return execDictMerged
     else:
         print 'Could not get open positions from IB'
         return execDict
 
-def get_orders(feeddata, systemfile):
-    global client
-    systemdata=pd.read_csv(systemfile)
-    execDict=dict()
-
-    systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
-    #systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
-    openPositions=get_ibfutpositions(portfolioPath)
-    #print feeddata.columns
-    feeddata=feeddata.reset_index()
-    for i in feeddata.index:
-        
-        #print 'Read: ',i
-        system=feeddata.ix[i]
-        #find the current contract
-
-        #print system
-        contract = Contract()
-        
-        if system['ibtype'] == 'CASH':
-            #fx
-            symbol=system['ibsym']+system['ibcur']
-            contract.symbol=system['ibsym']
-        else:
-            #futures
-            currentcontract = [x for i,x in enumerate(systemdata.c2sym) if x[:-2] == system.c2sym]
-            if len(currentcontract)==1:
-                #Z6
-                ccontract = currentcontract[0][-2:]
-                ccontract = 201000+int(ccontract[-1])*100+months[ccontract[0]]
-                contract.expiry=str(ccontract)
-            else:
-                ccontract = ''
-            symbol=contract.symbol= system['ibsym']
-            contract.multiplier = str(system['multiplier'])
-
-        #contract.symbol = system['ibsym']
-        contract.secType = system['ibtype']
-        contract.exchange = system['ibexch']
-        contract.currency = system['ibcur']
-        
-        #update system file with correct ibsym and contract expiry
-        c2sym=system.c2sym
-        ibsym=system.ibsym   
-        index = systemdata[systemdata.c2sym2==c2sym].index[0]
-        #print index, ibsym, ccontract, systemdata.columns
-        systemdata.set_value(index, 'ibsym', ibsym)
-        systemdata.set_value(index, 'ibexpiry', ccontract)
-        
-        if ibsym in openPositions.index:
-            ib_pos_qty=openPositions.ix[ibsym].qty
-        else:
-            ib_pos_qty=0
-        #ib_pos_qty=0
-        #print ib_pos_qty
-        ibquant = systemdata.ix[index].c2qty
-        system_ibpos_qty=systemdata.ix[index].signal * ibquant
-        #print 'ibq', type(ibquant), 'sysibq', type(system_ibpos_qty)
-        #print( "system_ib_pos: " + str(system_ibpos_qty) ),
-        #print( "ib_pos: " + str(ib_pos_qty) ),
-        
-        action='PASS'
-        if system_ibpos_qty > ib_pos_qty:
-            action = 'BUY'
-            ibquant=int(system_ibpos_qty - ib_pos_qty)
-            #print( 'BUY: ' + str(ibquant) )
-            #place_iborder('BUY', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);
-        if system_ibpos_qty < ib_pos_qty:
-            action='SELL'
-            ibquant=int(ib_pos_qty - system_ibpos_qty)
-            #print( 'SELL: ' + str(ibquant) )
-            #place_iborder('SELL', ibquant, ibsym, ibtype, ibcurrency, ibexch, ibsubmit, iblocalsym);         
-        #print( action+': ' + str(ibquant) )
-        execDict[symbol]=[action, ibquant, contract]
-
-        #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, ccontract
-    #systemdata.to_csv(systemfile, index=False)
-    #print 'saved', systemfile
-      
-    print len(execDict.keys()), execDict.keys()
-    return execDict
-
 def get_contractdf(execDict, systemPath):
     global client
     contracts = [x[2] for x in execDict.values()]
-    contractDF=pd.DataFrame()
+    contractsDF=pd.DataFrame()
     for i,contract in enumerate(contracts):
         print i, contract.symbol,
-        contractDF=contractDF.append(json_normalize(client.get_contract_details(contract)))
-    contractDF.to_csv(systemPath+'ib_contracts.csv', index=False)
-    return contractDF
+        contractsDF=contractsDF.append(json_normalize(client.get_contract_details(contract)))
+    contractsDF.to_csv(systemPath+'ib_contracts.csv', index=False)
+    return contractsDF
 
 
 def refresh_all_histories(execDict):
@@ -495,21 +521,13 @@ def get_tradingHours(sym, contractsDF):
             thDict[date]=[opendate.strftime(fmt),closedate.strftime(fmt), triggerdate.strftime(fmt)]
     return thDict
         
-def lastCsiDownloadDate():
-    global csiDataPath
-    datafiles = os.listdir(csiDataPath)
-    dates = []
-    for f in datafiles:
-        lastdate = pd.read_csv(csiDataPath+f, index_col=0).index[-1]
-        if lastdate not in dates:
-            dates.append(lastdate)
-            
-    return max(dates)
+
     
 def filterIBexec():
     global client
     global feeddata
     global csiDataPath3
+    global csidate
     executions=pd.DataFrame(client.get_executions())
     executions=executions.set_index('symbol')
     executions['CSIsym2']=[feeddata.ix[sym].CSIsym2 for sym in executions.index]
@@ -524,37 +542,47 @@ def filterIBexec():
 
     executions.times = pd.to_datetime(executions.times)
     executions = executions[executions.times >= executions.lastAppend].reset_index().set_index('symbol')
-    #combine orders
     
+    executions['contract'] =[x+executions.iloc[i].expiry for i,x in enumerate(executions.index)]
     executions.to_csv(portfolioPath+'ib_exec_last.csv', index=True)
     print 'saved', portfolioPath+'ib_exec_last.csv'
-    return executions
+    executions['Date']=csidate
+    executions['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    try:
+        executions.to_sql(name='ib_executions', con=writeConn, index=True, if_exists='append', index_label='ibsym')
+    except Exception as e:
+        #print e
+        traceback.print_exc()
+    return executions.drop(['Date','timestamp'],axis=1)
     
-def get_timetable(execDict, systemPath):
+def get_timetable(execDict, contractsDF):
     global client
-    global csiDataPath
+    global csidate
     #to be run after csi download
     
-    contractsDF = get_contractdf(execDict, systemPath)
-    contractsDF=contractsDF.set_index('symbol')
+
     for i,sym in enumerate(contractsDF.index):
         thDict = get_tradingHours(sym, contractsDF)
         if i == 0:
             timetable=pd.DataFrame(thDict,index=[sym+' open',sym+' close',sym+' trigger'])
         else:
             timetable=pd.concat([timetable, pd.DataFrame(thDict,index=[sym+' open',sym+' close',sym+' trigger'])], axis=0)
-    csidate=lastCsiDownloadDate()
+    
     filedate=[d for d in timetable.columns.astype(int) if d>csidate][0]
     filename=timetablePath+str(filedate)+'.csv'
     timetable.to_csv(filename, index=True)
     print 'saved', filename
     timetable['Date']=csidate
     timetable['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-    timetable.to_sql(name='timetable', con=writeConn, index=True, if_exists='append', index_label='Desc')
-    return timetable
+    try:
+        timetable.to_sql(name='timetable', con=writeConn, index=True, if_exists='append', index_label='Desc')
+    except Exception as e:
+        #print e
+        traceback.print_exc()
+    return timetable.drop(['Date','timestamp'],axis=1)
         
-def find_triggers(feeddata, execDict):
-
+def find_triggers(feeddata, execDict, contractsDF):
+    global csidate
     eastern=timezone(tzDict['EST'])
     endDateTime=dt.now(get_localzone())
     #endDateTime=dt.now(get_localzone())+datetime.timedelta(days=5)
@@ -567,7 +595,7 @@ def find_triggers(feeddata, execDict):
         if '.csv' in f and is_int(f.split('.')[0]):
             ttdates.append(int(f.split('.')[0]))
         
-    csidate=lastCsiDownloadDate()
+    
     ttdate=max(ttdates)
     if ttdate>csidate:
         #timetable file date is greater than the csi download date. 
@@ -575,7 +603,7 @@ def find_triggers(feeddata, execDict):
     else:
         #get a new timetable
         print 'csidate',csidate, '>=', 'ttdate', ttdate, 'getting new timetable'
-        timetable = get_timetable(execDict, systemPath)
+        timetable = get_timetable(execDict, contractsDF)
         loaddate=str([d for d in timetable.columns.astype(int) if d>csidate][0])
         
     filename=timetablePath+loaddate+'.csv'
@@ -688,15 +716,65 @@ def append_data(sym, timetable, loaddate):
         print 'no data found between', opentime, closetime,
         return False
 
+def getIBopen():
+    global csidate
+    openOrders = pd.DataFrame(client.get_open_orders()).transpose()
+    if len(openOrders) !=0:
+        openOrders=openOrders.set_index('orderid')
+        openOrders['contract']=[openOrders.ix[i].symbol+openOrders.ix[i].expiry for i in openOrders.index]
+        openOrders=openOrders.set_index('contract')
+        openOrders['Date']=csidate
+        openOrders['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        try:
+            openOrders.to_sql(name='ib_openorders', con=writeConn, index=True, if_exists='append', index_label='contract')
+        except Exception as e:
+            #print e
+            traceback.print_exc()
+        return openOrders.drop(['Date','timestamp'],axis=1)
+    else:
+        return 0
 
-
+def updateWithOpen(iborders, execDict=None):
+    print 'checking IB open orders..'
+    openOrders=getIBopen()
+    #check open orders
+    iborders_lessOpen=[]
+    if isinstance(openOrders, type(pd.DataFrame())):
+        for (contract,[order,qty]) in iborders:
+            #print sym, order, qty
+            if order == 'SLD':
+                order2='SELL'
+            else:
+                order2='BUY'
+                
+            if contract in openOrders.index:
+                print 'open order found..',contract, order, qty, openOrders.ix[contract].side, openOrders.ix[contract].qty,
+                if openOrders.ix[contract].side==order2 and openOrders.ix[contract].qty == qty:
+                    print 'OK'
+                else:
+                    print 'Error: mismatch!'
+                    iborders_lessOpen+=[(contract,[order,qty])]
+            else:
+                #not in open orders
+                iborders_lessOpen+=[(contract,[order,qty])]
+    else:
+        print 'no open orders found'
+        iborders_lessOpen=iborders
+        
+    if execDict == None:
+        return iborders_lessOpen
+    else:
+        return iborders_lessOpen, { key: execDict[key] for (key,lst) in iborders_lessOpen }
+        
 if __name__ == "__main__":
     print durationStr, barSizeSetting, whatToShow
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
     systemfile=systemPath+'system_v4futures_live.csv'
+    #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
-    execDict=create_execDict(feeddata, systemfile)
-    threadlist=find_triggers(feeddata, execDict)
+    execDict, contractsDF=create_execDict(feeddata, systemfile)
+
+    threadlist=find_triggers(feeddata, execDict, contractsDF)
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     runThreads(threadlist)
     print 'returned to main thread with', len(threadlist), 'threads'
@@ -725,12 +803,16 @@ if __name__ == "__main__":
     #check ib positions
     try:
         execDict=update_orders(feeddata, systemfile, execDict)
+        iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+        num_iborders=len(iborders)
+        #get rid of orders if they are already working orders.
+        #only checks for orders in execDict
+        iborders, execDict= updateWithOpen(iborders, execDict=execDict)
     except Exception as e:
         #print e
         traceback.print_exc()
         
-    iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
-    num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+
     
     if len(threadlist)==0 and totalc2orders ==0 and num_iborders==0:
         print 'Found nothing to update!'
@@ -765,26 +847,33 @@ if __name__ == "__main__":
                 try:
                     place_iborders(execDict)
                     executions=filterIBexec()
-                    
-                    #check executions
-                    #drop data we don't need.
-                    executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
+                    iborders_lessOpen=updateWithOpen(iborders)
 
-                    for (sym,[order,qty]) in iborders:
+                        
+                    #check executions
+                    executions2 = executions.reset_index().groupby(['contract','side'])[['qty']].max()
+                    
+                    #check if expired contracts have been exited.
+                    #executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
+                    iborders_lessExec=[]
+                    for (sym,[order,qty]) in iborders_lessOpen:
                         if (sym,order) in executions2.index and executions2.ix[sym].qty[0] ==qty:
-                            execDict[sym][0] = 'PASS'
-                            execDict[sym][1] = 0
+                            print 'execution found..',sym, order, qty, executions2.ix[sym].index[0],  executions2.ix[sym].qty[0]
+                            #execDict[sym][0] = 'PASS'
+                            #execDict[sym][1] = 0
                         else:
                             print 'There was an error:',sym,'order',  execDict[sym][:2], 
                             if sym in executions2.index:
                                 print 'ib returned', executions2.ix[sym].index[0], executions2.ix[sym].qty[0]
                             else:
                                 print 'ib execution not found'
+                            iborders_lessExec+=[(sym,[order,qty])]
                 except Exception as e:
                     #print e
                     traceback.print_exc()
-                num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
-                print 'Found', num_iborders,'ib position adjustments after placing orders.'
+                #num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+                print 'Found', len(iborders_lessExec),'ib position adjustments after placing orders.'
+                print iborders_lessExec
             else:
                 print 'submitIB set to False'
              

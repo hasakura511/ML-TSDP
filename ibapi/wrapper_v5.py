@@ -245,7 +245,8 @@ class IBWrapper(EWrapper):
         else:
             dict_contractdetails=self.data_contractdetails
         
-        dict_contractdetails[reqId]={}
+        #dict_contractdetails[reqId]={}
+        dict_contractdetails[reqId]=pd.DataFrame()
         setattr(self, "flag_finished_contractdetails", False)
         setattr(self, "data_contractdetails", dict_contractdetails)
         
@@ -258,7 +259,7 @@ class IBWrapper(EWrapper):
         """
         
         contract_details=self.data_contractdetails[reqId]
-
+        '''
         contract_details["contractMonth"]=contractDetails.contractMonth
         contract_details["liquidHours"]=contractDetails.liquidHours
         contract_details["longName"]=contractDetails.longName
@@ -272,12 +273,32 @@ class IBWrapper(EWrapper):
         contract2 = contractDetails.summary
 
         contract_details["expiry"]=contract2.expiry
-
         contract_details["exchange"]=contract2.exchange
         contract_details["symbol"]=contract2.symbol
         contract_details["secType"]=contract2.secType
         contract_details["currency"]=contract2.currency
+        '''
+        contract2 = contractDetails.summary
+        index=contract2.symbol+contract2.expiry
+        contract_details.set_value(index, "reqId",reqId)
+        contract_details.set_value(index, "contractMonth",contractDetails.contractMonth)
+        contract_details.set_value(index, "liquidHours",contractDetails.liquidHours)
+        contract_details.set_value(index, "longName",contractDetails.longName)
+        contract_details.set_value(index, "minTick",contractDetails.minTick)
+        contract_details.set_value(index, "tradingHours",contractDetails.tradingHours)
+        contract_details.set_value(index, "timeZoneId",contractDetails.timeZoneId)
+        contract_details.set_value(index, "underConId",contractDetails.underConId)
+        contract_details.set_value(index, "evRule",contractDetails.evRule)
+        contract_details.set_value(index, "evMultiplier",contractDetails.evMultiplier)
 
+        
+
+        contract_details.set_value(index, "expiry",contract2.expiry)
+        contract_details.set_value(index, "exchange",contract2.exchange)
+        contract_details.set_value(index, "symbol",contract2.symbol)
+        contract_details.set_value(index, "secType",contract2.secType)
+        contract_details.set_value(index, "currency",contract2.currency)
+        
     def contractDetailsEnd(self, reqId):
         """
         Finished getting contract details
@@ -663,7 +684,8 @@ class IBclient(object):
             pass
     
         contract_details=self.cb.data_contractdetails[reqId]
-        if iserror or contract_details=={}:
+        #if iserror or contract_details=={}:
+        if iserror:
             logging.info( self.cb.error_msg)
             logging.info( "Problem getting details")
             return None

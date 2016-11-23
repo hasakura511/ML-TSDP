@@ -31,7 +31,8 @@ def index(request):
     #context = {'treasure_name': name, 'treasure_val' : value}
     form = TreasureForm()
     treasures=Dictionary.objects.all()
-    context ={'treasures':treasures, 'form':form}
+    treasures2=Treasure.objects.all()
+    context ={'treasures':treasures, 'form':form,'treasures2':treasures2}
     return render(request, 'index.html', context)
     
 def detail(request, treasure_id):
@@ -97,3 +98,17 @@ def register(request):
     else:
         form = UserCreationForm()
         return render(request, 'registration.html',{'form':form})
+
+def like_treasure(request):
+    treasure_id = request.GET.get('treasure_id', None)
+    print treasure_id
+    likes = 0
+    if (treasure_id):
+        treasure = Treasure.objects.get(id=int(treasure_id))
+        if treasure is not None:
+            likes= treasure.likes+1
+            treasure.likes=likes
+            treasure.save()
+            
+    return HttpResponseRedirect(likes)
+    

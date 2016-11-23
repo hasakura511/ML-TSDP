@@ -55,7 +55,7 @@ c2id_mini=101359768
 c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
 c2system_macro=c2system='RiskOn'
-c2system_mini='Voting14'
+c2system_mini='RiskOn'
 c2system_micro='AdjSEA'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\

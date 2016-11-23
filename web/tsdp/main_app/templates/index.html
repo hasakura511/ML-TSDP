@@ -20,6 +20,12 @@
                 {% else %}
                     <p> Unknkown </p>
                 {% endif %}
+                {% for treasure2 in treasures2 %}
+                <button id ="likes" data-id="{{treasure2.id}}"
+                    class="btn btn-mini btn-danger"
+                    type="button">
+                {% if treasure2.likes > 0 %} {{ treasure2.likes }} {% endif %}
+                {% endfor %}
             </div>
         </a>
     </div>

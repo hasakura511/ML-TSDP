@@ -311,10 +311,15 @@ class IBWrapper(EWrapper):
     ## portfolio
 
     def init_portfolio_data(self):
-        #if "data_portfoliodata" not in dir(self):
-        setattr(self, "data_portfoliodata", [])
-        #if "data_accountvalue" not in dir(self):
-        setattr(self, "data_accountvalue", [])
+        if "data_portfoliodata" not in dir(self):
+            setattr(self, "data_portfoliodata", [])
+        else:
+            self.data_portfoliodata=[]
+            
+        if "data_accountvalue" not in dir(self):
+            setattr(self, "data_accountvalue", [])
+        else:
+            self.data_accountvalue=[]
             
         
         setattr(self, "flag_finished_portfolio", False)
@@ -875,7 +880,7 @@ class IBclient(object):
             
             ## Turn off the streaming
             ## Note portfolio_structure will also be updated
-            #self.tws.reqAccountUpdates(False, self.accountid)
+            self.tws.reqAccountUpdates(False, self.accountid)
     
             portfolio_data=self.cb.data_portfoliodata
             account_value=self.cb.data_accountvalue

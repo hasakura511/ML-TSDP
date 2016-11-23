@@ -265,9 +265,8 @@ def get_ibfutpositions(portfolioPath):
     if len(portfolio_data) !=0:
         data=pd.DataFrame(portfolio_data,columns=['sym','exp','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency'])
         #return contracts only
-        dataSet=data[data.exp != '']
-        contracts = [dataSet.ix[i].sym+dataSet.ix[i].exp for i in dataSet.index]
-        dataSet['contracts']=contracts
+        dataSet=data[data.exp != ''].copy(deep=True)
+        dataSet['contracts']=[dataSet.ix[i].sym+dataSet.ix[i].exp for i in dataSet.index]
         dataSet=dataSet.set_index(['contracts'])
         filename=portfolioPath+'ib_portfolio.csv'
         dataSet.to_csv(filename)

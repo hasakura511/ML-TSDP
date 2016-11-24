@@ -616,7 +616,11 @@ def find_triggers(feeddata, execDict, contractsDF):
         ibsym=t.split()[0]
         csiFileSym=feeddata.ix[ibsym].CSIsym2
         csiRunSym=feeddata.ix[ibsym].CSIsym
-        fmt = '%Y-%m-%d %H:%M'    
+        if not isinstance(triggers.ix[t], str):
+            print 'skipping..', t, triggers.ix[t], 'datetime not found'
+            continue
+            
+        fmt = '%Y-%m-%d %H:%M'
         tdate=dt.strptime(triggers.ix[t],fmt).replace(tzinfo=eastern)
         if endDateTime>tdate:
             #print 'checking trigger:',

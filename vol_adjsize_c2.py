@@ -190,6 +190,7 @@ try:
         print 'Saved currenciesDF to', dbPath
     else:
         print 'second time run.. skipping job..'
+        print 0/0
         pass
 
     #signalDF=signalDF.sort_index()

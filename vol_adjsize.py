@@ -297,7 +297,7 @@ try:
         futuresDF.set_value(sym,'Close'+str(data.index[-1]),data.Close[-1])
         futuresDF.set_value(sym,'group',c2contractSpec[sym][3])
         futuresDF.set_value(sym,'RiskOn',c2contractSpec[sym][4])
-        futuresDF.set_value(sym,'Custom',c2contractSpec[sym][5]/0)
+        futuresDF.set_value(sym,'Custom',c2contractSpec[sym][5])
         
     futuresDF.index.name = lastDate
     feeddata=pd.read_csv(feedfile,index_col='CSIsym')

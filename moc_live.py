@@ -157,7 +157,12 @@ months = {
                 'X':11,
                 'Z':12
                 }
-                
+IB2CSI_multiplier_adj={
+    'HG':100,
+    'SI':100,
+    'JPY':100,
+    }
+    
 def lastCsiDownloadDate():
     global csiDataPath
     datafiles = os.listdir(csiDataPath)
@@ -690,6 +695,12 @@ def append_data(sym, timetable, loaddate):
     global client
     global csiDataPath
     global csiDataPath3
+    global IB2CSI_multiplier_adj
+    
+    if sym in IB2CSI_multiplier_adj.keys():
+        mult=IB2CSI_multiplier_adj[sym]
+    else:
+        mult=1
     #datafiles = os.listdir(csiDataPath)
     fmt = '%Y-%m-%d %H:%M'
     #create new bar
@@ -701,7 +712,7 @@ def append_data(sym, timetable, loaddate):
     data2=data.ix[mask]
     if data2.shape[0]>0:
         newbar = pd.DataFrame({}, columns=['Date', 'Open','High','Low','Close','Volume','OI','R','S']).set_index('Date')
-        newbar.loc[loaddate] = [data.Open[0],max(data2.High), min(data2.Low),data2.Close[-1],data2.Volume.sum(),np.nan,np.nan,np.nan]
+        newbar.loc[loaddate] = [data.Open[0]*mult,max(data2.High)*mult, min(data2.Low)*mult,data2.Close[-1]*mult,data2.Volume.sum(),np.nan,np.nan,np.nan]
         #load old bar
         csisym=feeddata.ix[sym].CSIsym2
         filename = csiDataPath+csisym+'_B.CSV'

@@ -79,7 +79,7 @@ if len(sys.argv)==1:
     debug=True
     showPlots=False
     #refreshSea tries to recreate the first run futuresATR file after new signals have been generated
-    refreshSea=False
+    refreshSea=True
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3'
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
@@ -256,6 +256,7 @@ try:
         data.R = data.R.astype(int)
         atr=ATR2(data.High.values,data.Low.values,data.Close.values,lookback)
         pc=data.Close.pct_change()
+        #no zeros in act because ACT used in prevACT.
         act=np.where(pc<0,-1,1)
         
         if i==0:
@@ -735,6 +736,8 @@ try:
 
         futuresDF_toexcel=pd.concat([futuresDF_live, futuresDF.drop(futuresDF_live.index,axis=0)],axis=0).sort_index()
         #update old act and pct change to csi values
+        futuresDF_toexcel['ACT_IB']=futuresDF_toexcel['ACT']
+        futuresDF_toexcel['LastPctChg_IB']=futuresDF_toexcel['LastPctChg']
         futuresDF_toexcel['ACT']=futuresDF.ACT
         futuresDF_toexcel['LastPctChg']=futuresDF.LastPctChg
         pc_cols=[x for x in futuresDF.columns if 'PC' in x]
@@ -743,7 +746,7 @@ try:
         futuresDF_toexcel['prevSEA']=futuresDF.LastSEA
         futuresDF_toexcel['prevSRUN']=futuresDF.LastSRUN
         futuresDF_toexcel['prevvSTART']=futuresDF.prevvSTART
-        cols =[x for x in futuresDF.columns if x in futuresDF_toexcel.columns]+['Date','timestamp']
+        cols =[x for x in futuresDF.columns if x in futuresDF_toexcel.columns]+['LastPctChg_IB','ACT_IB','Date','timestamp']
         futuresDF_toexcel=futuresDF_toexcel[cols]
         #recreated new price change data with previous signals from csi (offline) ib(online)
         futuresDF_toexcel.to_csv(savePath+'futuresATR_Excel.csv')

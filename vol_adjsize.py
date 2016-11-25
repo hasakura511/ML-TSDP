@@ -735,9 +735,19 @@ try:
                 con=readConn,  index_col='CSIsym')
 
         futuresDF_toexcel=pd.concat([futuresDF_live, futuresDF.drop(futuresDF_live.index,axis=0)],axis=0).sort_index()
+        futuresDF_toexcel.columns=[x if x !='Date' else 'signalDate' for x in futuresDF_toexcel.columns]
+        
         #update old act and pct change to csi values
-        futuresDF_toexcel['ACT_IB']=futuresDF_toexcel['ACT']
-        futuresDF_toexcel['LastPctChg_IB']=futuresDF_toexcel['LastPctChg']
+        futuresDF_toexcel['ACT_IB']=futuresDF.ACT
+        futuresDF_toexcel['LastPctChg_IB']=futuresDF.LastPctChg
+        #overwrite CSI's values with ones from IB.
+        ACT_IB=pd.read_sql('select CSIsym, ACT from futuresATR', con=readConn, index_col='CSIsym')
+        for sym in ACT_IB.index:
+            futuresDF_toexcel.set_value(sym, 'ACT_IB', ACT_IB.ix[sym][0])
+        LastPctChg_IB=pd.read_sql('select CSIsym, LastPctChg from futuresATR', con=readConn, index_col='CSIsym')
+        for sym in LastPctChg_IB.index:
+            futuresDF_toexcel.set_value(sym, 'LastPctChg_IB', LastPctChg_IB.ix[sym][0])
+        futuresDF_toexcel['pcDate']=pd.read_sql('select CSIsym, Date from futuresATR', con=readConn, index_col='CSIsym')
         futuresDF_toexcel['ACT']=futuresDF.ACT
         futuresDF_toexcel['LastPctChg']=futuresDF.LastPctChg
         pc_cols=[x for x in futuresDF.columns if 'PC' in x]
@@ -746,7 +756,8 @@ try:
         futuresDF_toexcel['prevSEA']=futuresDF.LastSEA
         futuresDF_toexcel['prevSRUN']=futuresDF.LastSRUN
         futuresDF_toexcel['prevvSTART']=futuresDF.prevvSTART
-        cols =[x for x in futuresDF.columns if x in futuresDF_toexcel.columns]+['LastPctChg_IB','ACT_IB','Date','timestamp']
+        
+        cols =[x for x in futuresDF.columns if x in futuresDF_toexcel.columns]+['LastPctChg_IB','ACT_IB','pcDate','signalDate','timestamp']
         futuresDF_toexcel=futuresDF_toexcel[cols]
         #recreated new price change data with previous signals from csi (offline) ib(online)
         futuresDF_toexcel.to_csv(savePath+'futuresATR_Excel.csv')

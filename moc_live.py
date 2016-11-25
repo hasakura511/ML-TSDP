@@ -819,10 +819,11 @@ if __name__ == "__main__":
     try:
         execDict=update_orders(feeddata, systemfile, execDict)
         iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
-        num_iborders=len(iborders)
+
         #get rid of orders if they are already working orders.
         #only checks for orders in execDict
         iborders, execDict= updateWithOpen(iborders, execDict=execDict)
+        num_iborders=len(iborders)
     except Exception as e:
         #print e
         traceback.print_exc()

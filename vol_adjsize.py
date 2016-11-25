@@ -56,7 +56,7 @@ c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
 c2system_macro=c2system='RiskOn'
 c2system_mini='RiskOn'
-c2system_micro='0.5LastSIG'
+c2system_micro='Anti0.75LastSIG'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
@@ -78,7 +78,7 @@ if len(sys.argv)==1:
     debug=True
     showPlots=False
     #refreshSea tries to recreate the first run futuresATR file after new signals have been generated
-    refreshSea=True
+    refreshSea=False
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3'
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
@@ -677,15 +677,23 @@ if lastDate > sigDate:
     bygroup3 = pd.concat([futuresDF['ACT']==1, futuresDF['group']],axis=1).drop(offline, axis=0).groupby(['group'])
     longPerByGroup = bygroup3.sum()/bygroup3.count()
     
-    totalsDF.set_value(lastDate, 'Vol_All', abs(cv_online).sum()/cv_online.count())
+    if cv_online.count() >0:
+        totalsDF.set_value(lastDate, 'Vol_All', abs(cv_online).sum()/cv_online.count())
+        totalsDF.set_value(lastDate, 'Chg_All', cv_online.sum()/cv_online.count())
+        totalsDF.set_value(lastDate, 'L%_All', sum(futuresDF.ACT.drop(offline, axis=0)==1)/float(cv_online.count()))
+    else:
+        totalsDF.set_value(lastDate, 'Vol_All', np.nan)
+        totalsDF.set_value(lastDate, 'Chg_All', np.nan)
+        totalsDF.set_value(lastDate, 'L%_All', np.nan)
+    
     for i,value in enumerate(volByGroupByContract['chgValue']):
         totalsDF.set_value(lastDate, 'Vol_'+volByGroupByContract.index[i], value)
     
-    totalsDF.set_value(lastDate, 'Chg_All', cv_online.sum()/cv_online.count())
+    
     for i,value in enumerate(chgByGroupByContract['chgValue']):
         totalsDF.set_value(lastDate, 'Chg_'+chgByGroupByContract.index[i], value)
     
-    totalsDF.set_value(lastDate, 'L%_All', sum(futuresDF.ACT.drop(offline, axis=0)==1)/float(cv_online.count()))
+   
     for i,value in enumerate(longPerByGroup['ACT']):
         totalsDF.set_value(lastDate, 'L%_'+longPerByGroup.index[i], value)
     
@@ -697,7 +705,12 @@ if lastDate > sigDate:
     
     filename='futuresResults_Last.csv'
     print 'Saving', savePath+filename
+    
     totalsDF.sort_index().transpose().to_csv(savePath+filename)
+    totalsDF['Date']=int(lastDate.strftime('%Y%m%d'))
+    totalsDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    totalsDF.to_sql(name='totalsDF',con=writeConn, index=False, if_exists='append')
+    print 'Saved totalsDF to', dbPath
     
     files = [ f for f in listdir(savePath) if isfile(join(savePath,f)) ]
     filename = 'futuresResultsHistory.csv'

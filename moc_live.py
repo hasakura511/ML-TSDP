@@ -211,10 +211,10 @@ def runThreads(threadlist):
         
         with open(logPath+sym+'.txt', 'w') as f:
             with open(logPath+sym+'_error.txt', 'w') as e:
-                f.flush()
-                e.flush()
                 proc = Popen(popenArgs, stdout=f, stderr=e)
                 proc.wait()
+                f.flush()
+                e.flush()
                 print sym,'Done!'
                 #check_output(popenArgs)
                 #proc2= Popen(popenArgs2, stdout=f, stderr=e)
@@ -617,7 +617,7 @@ def find_triggers(feeddata, execDict, contractsDF):
         csiFileSym=feeddata.ix[ibsym].CSIsym2
         csiRunSym=feeddata.ix[ibsym].CSIsym
         if not isinstance(triggers.ix[t], str):
-            print 'skipping..', t, triggers.ix[t], 'datetime not found'
+            print t, triggers.ix[t], 'datetime not found skipping..'
             continue
             
         fmt = '%Y-%m-%d %H:%M'
@@ -627,7 +627,7 @@ def find_triggers(feeddata, execDict, contractsDF):
             filename = csiDataPath3+csiFileSym+'_B.CSV'
             if not os.path.isfile(filename) or os.path.getsize(filename)==0:
                 #create new file
-                print csiRunSym, 'file not found appending data'
+                print csiRunSym, 'file not found appending data',
                 dataNotAppended = True
             else:
                 #check csiDataPath3 for last date
@@ -711,7 +711,7 @@ def append_data(sym, timetable, loaddate):
             csidata.columns = ['Open','High','Low','Close','Volume','OI','R','S']
             filename = csiDataPath3+csisym+'_B.CSV'
             csidata.append(newbar).fillna(method='ffill').to_csv(filename, header=False, index=True)
-            print 'saved', filename
+            print 'saved', filename,
             return True
         else:
             print filename, 'not found. terminating.',

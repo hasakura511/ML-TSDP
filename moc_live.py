@@ -31,6 +31,7 @@ import logging
 from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
 from dateutil.parser import parse
 import sqlite3
+from suztoolz.vol_adjsize_live_func import vol_adjsize_live
 #currencyPairsDict=dict()
 #prepData=dict()
 start_time = time.time()
@@ -580,7 +581,7 @@ def get_timetable(execDict, contractsDF):
     timetable['Date']=csidate
     timetable['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
     try:
-        timetable.to_sql(name='timetable', con=writeConn, index=True, if_exists='append', index_label='Desc')
+        timetable.to_sql(name='timetable', con=writeConn, index=True, if_exists='replace', index_label='Desc')
     except Exception as e:
         #print e
         traceback.print_exc()
@@ -794,18 +795,20 @@ if __name__ == "__main__":
     runThreads(threadlist)
     print 'returned to main thread with', len(threadlist), 'threads'
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-    #check threadlist tos ee if everythong's there?
-    #if len(threadlist)==0:
-    #    print 'Found nothing to update! Skipping position sizing!'
-    #else:
-    print 'running vol_adjsize_live to update system files'
-    with open(logPath+'vol_adjsize_live.txt', 'w') as f:
-        with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
-            f.flush()
-            e.flush()
-            proc = Popen(runPath2, stdout=f, stderr=e)
-            proc.wait()
-            
+    
+    if len(threadlist)>0:
+        print 'running vol_adjsize_live to update system files'
+        vol_adjsize_live(debug, threadlist)
+    else:
+        print 'threadlist returning nothing. skipping vol_adjsize_live'
+        
+    #with open(logPath+'vol_adjsize_live.txt', 'w') as f:
+    #    with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+    #        f.flush()
+    #        e.flush()
+    #        proc = Popen(runPath2, stdout=f, stderr=e)
+    #        proc.wait()
+
     print 'returned to main thread, running check systems if new orders are necessary.'
     with open(logPath+'check_systems_live.txt', 'w') as f:
         with open(logPath+'check_systems_live_error.txt', 'w') as e:
@@ -819,7 +822,7 @@ if __name__ == "__main__":
     try:
         execDict=update_orders(feeddata, systemfile, execDict)
         iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
-
+        
         #get rid of orders if they are already working orders.
         #only checks for orders in execDict
         iborders, execDict= updateWithOpen(iborders, execDict=execDict)
@@ -908,7 +911,7 @@ if __name__ == "__main__":
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
-    
+
 
 '''
 #debug order executions

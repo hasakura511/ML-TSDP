@@ -64,7 +64,22 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom
                 'prevSEA','LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
                 'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
                 'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
-                
+ComponentsDict ={'Previoius':'prevACT',
+                            'Anti-Previous':'AntiPrevACT',
+                            'RiskOn':'RiskOn',
+                            'RiskOff':'RiskOff',
+                            'Custom':'Custom',
+                            'Anti-Custom':'AntiCustom',
+                            '50/50':'0.75LastSIG',
+                            'LowestEquity':'0.5LastSIG',
+                            'HighestEquity':'1LastSIG',
+                            'AntiHighestEquity':'Anti1LastSIG',
+                            'Anti50/50':'Anti0.75LastSIG',
+                            'AntiLowestEquity':'Anti0.5LastSIG',
+                            'Seasonality':'LastSEA',
+                            'Anti-Seasonality':'AntiSEA',
+                            }
+
 accountInfo = pd.DataFrame(data=[[c2system, c2system_mini, c2system_micro]],columns=systems,index=['selection'])
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2id_macro, c2id_mini, c2id_micro]],columns=systems,index=['c2id']))
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2key, c2key, c2key]],columns=systems,index=['c2key']))

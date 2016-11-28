@@ -64,7 +64,9 @@ signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom
                 'prevSEA','LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
                 'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
                 'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
-ComponentsDict ={'Previoius':'prevACT',
+ComponentsDict ={
+                            'Off':'None',
+                            'Previous':'prevACT',
                             'Anti-Previous':'AntiPrevACT',
                             'RiskOn':'RiskOn',
                             'RiskOff':'RiskOff',

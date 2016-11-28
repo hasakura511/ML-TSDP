@@ -55,8 +55,8 @@ c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
-c2system_macro=c2system='RiskOn'
-c2system_mini='RiskOn'
+c2system_macro=c2system='RiskOff'
+c2system_mini='RiskOff'
 c2system_micro='Anti0.75LastSIG'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
@@ -747,6 +747,12 @@ try:
         futuresDF.to_csv(savePath2+filename)
         print 'Saving', savePath+'futuresATR_Results.csv'
         futuresDF.to_csv(savePath+'futuresATR_Results.csv')
+        futuresDF['Date']=int(lastDate.strftime('%Y%m%d'))
+        futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        futuresDF.drop([col for col in futuresDF.columns if '00:00:00' in col], axis=1).to_sql(name='futuresDF_results',\
+                                con=writeConn, index=True, if_exists='append', index_label='CSIsym')
+                                
+        print 'Saved futuresDF_results to', dbPath
         futuresDF_live = pd.read_sql('select * from futuresATRhist where timestamp=\
                 (select max(timestamp) from futuresATRhist where Date=%s)' %prevUpdateDate.strftime('%Y%m%d'),\
                 con=readConn,  index_col='CSIsym')

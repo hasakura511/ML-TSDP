@@ -721,10 +721,4 @@ def vol_adjsize_live(debug, threadlist):
     
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-    
-    ordersDict= { 
-                    'v4macro':system.ix[futuresDF.index],
-                    'v4mini':system_mini.ix[futuresDF.index],
-                    'v4micro':system_micro.ix[futuresDF.index],
-                    }
-    return ordersDict
+    return

@@ -96,7 +96,7 @@ if len(sys.argv)==1:
     debug=True
     showPlots=False
     #refreshSea tries to recreate the first run futuresATR file after new signals have been generated
-    refreshSea=True
+    refreshSea=False
     dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3'
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
@@ -948,17 +948,35 @@ try:
             system.set_value(i,'signal',futuresDF[c2system].ix[sym])
         system.to_csv(systemPath+systemFilename, index=False)
         print 'Saved', systemPath+systemFilename,c2system
-
+        system['Date']=int(lastDate.strftime('%Y%m%d'))
+        system['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        tablename = 'v4futures'
+        system.to_sql(name=tablename, if_exists='replace', con=writeConn, index=False)
+        system.to_sql(name='signals_csi', if_exists='append', con=writeConn, index=False)
+        print 'Saved to sql db',  tablename,c2system
+        
         for i,sym in enumerate([x.split('_')[1] for x in system_mini.System]):
             system_mini.set_value(i,'signal',futuresDF[c2system_mini].ix[sym])
         system_mini.to_csv(systemPath+systemFilename2, index=False)
         print 'Saved', systemPath+systemFilename2,c2system_mini
+        system_mini['Date']=int(lastDate.strftime('%Y%m%d'))
+        system_mini['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        tablename = 'v4mini'
+        system_mini.to_sql(name=tablename, if_exists='replace', con=writeConn, index=False)
+        system_mini.to_sql(name='signals_csi', if_exists='append', con=writeConn, index=False)
+        print 'Saved to sql db',  tablename,c2system_mini
 
         for i,sym in enumerate([x.split('_')[1] for x in system_micro.System]):
             system_micro.set_value(i,'signal',futuresDF[c2system_micro].ix[sym])
         system_micro.to_csv(systemPath+systemFilename3, index=False)
         print 'Saved', systemPath+systemFilename3, c2system_micro
-
+        system_micro['Date']=int(lastDate.strftime('%Y%m%d'))
+        system_micro['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        tablename = 'v4micro'
+        system_micro.to_sql(name=tablename, if_exists='replace', con=writeConn, index=False)
+        system_micro.to_sql(name='signals_csi', if_exists='append', con=writeConn, index=False)
+        print 'Saved to sql db',  tablename,c2system_micro
+        
     futuresDF.to_csv(savePath+'futuresATR.csv')
     print 'Saved', savePath+'futuresATR.csv'
 

@@ -55,9 +55,9 @@ c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
-c2system_macro=c2system='AntiPrevACT'
-c2system_mini='AntiPrevACT'
-c2system_micro='prevACT'
+c2system_macro=c2system='RiskOn'
+c2system_mini='RiskOn'
+c2system_micro='RiskOn'
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\

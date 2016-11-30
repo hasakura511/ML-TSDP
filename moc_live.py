@@ -32,6 +32,8 @@ from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Exec
 from dateutil.parser import parse
 import sqlite3
 from suztoolz.vol_adjsize_live_func import vol_adjsize_live
+from suztoolz.check_systems_live_func import check_systems_live
+from suztoolz.proc_signal_v4_live_func import proc_signal_v4_live
 #currencyPairsDict=dict()
 #prepData=dict()
 start_time = time.time()
@@ -83,7 +85,7 @@ if len(sys.argv)==1:
     timetablePath=   'D:/ML-TSDP/data/systems/timetables_debug/'
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed_fx.csv'
     csiDataPath=  'D:/ML-TSDP/data/csidata/v4futures2/'
-    csiDataPath2=  'D:/ML-TSDP/data/csidata/v4futures3/'
+    csiDataPath2=  'D:/ML-TSDP/data/csidata/v4futures3_debug/'
     csiDataPath3=  'D:/ML-TSDP/data/csidata/v4futures4_debug/'
     signalPathDaily =  'D:/ML-TSDP/data/signals/'
     signalPathMOC =  'D:/ML-TSDP/data/signals2/'
@@ -350,10 +352,11 @@ def create_execDict(feeddata, systemfile):
     print execDict.keys()
     return execDict,contractsDF
    
-def update_orders(feeddata, systemfile, execDict):
+def update_orders(feeddata, systemdata2, execDict):
     global client
     global portfolioPath
-    systemdata=pd.read_csv(systemfile)
+    #systemdata=pd.read_csv(systemfile)
+    systemdata= systemdata2.copy(deep=True)
     systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
     #systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
     #systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
@@ -413,7 +416,10 @@ def update_orders(feeddata, systemfile, execDict):
         for i in feeddata.index:
             system=feeddata.ix[i]
             c2sym=system.c2sym
-            ibsym=system.ibsym   
+            ibsym=system.ibsym
+            if c2sym not in systemdata.c2sym2.values:
+                continue
+                
             index = systemdata[systemdata.c2sym2==c2sym].index[0]
             currentcontract = [x for x in systemdata.c2sym if x[:-2] == system.c2sym]
             if len(currentcontract)==1:
@@ -518,8 +524,14 @@ def get_tradingHours(sym, contractsDF):
             #print thlist
             openclosetimes = thlist[1].split('-')
             opentime = openclosetimes[0]
-            opendate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8])-1,\
-                hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+            if int(date[6:8])-1 ==0:
+                #first day of the month
+                date2=dates[0].split(':')[0]
+                opendate=dt(year=int(date2[0:4]), month=int(date2[4:6]), day=int(date2[6:8]),\
+                    hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+            else:
+                opendate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8])-1,\
+                    hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
             closetime = openclosetimes[-1]
             closedate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8]),\
                 hour=int(closetime[0:2]), minute=int(closetime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
@@ -534,8 +546,18 @@ def filterIBexec():
     global feeddata
     global csiDataPath3
     global csidate
-    executions=pd.DataFrame(client.get_executions())
-    executions=executions.set_index('symbol')
+    global portfolioPath
+    
+    executions_raw=pd.DataFrame(client.get_executions())
+    if len(executions_raw) ==0:
+        print 'IB returned no executions, returning to main thread'
+        return
+    filename = portfolioPath+'ib_executions_raw.csv'
+    executions_raw.to_csv(filename)
+    print 'Saved', filename
+    executions_raw=executions_raw.set_index('symbol')
+    #get rid of symbols not in feeddata
+    executions=executions_raw.ix[[x for x in executions.index if x in feeddata.index]].copy()
     executions['CSIsym2']=[feeddata.ix[sym].CSIsym2 for sym in executions.index]
     index = executions.reset_index().groupby(['CSIsym2'])['times'].transform(max)==executions.times
     executions= executions.reset_index().ix[index].set_index('CSIsym2')
@@ -650,7 +672,7 @@ def find_triggers(feeddata, execDict, contractsDF):
                 #if int(loaddate) > lastdate and int(loaddate) > int(lastsignaldate):
                 if int(loaddate) > lastdate:
                     print csiRunSym,'appending.. data has not yet been appended',
-                    print 'loaddate', loaddate, '>', 'lastdate',
+                    print 'loaddate', loaddate, '>', 'lastdate', lastdate,
                     #print 'loaddate', loaddate, '>', 'lastdate',lastdate,'lastsignaldate', lastsignaldate
                     dataNotAppended=True
                 else:
@@ -766,13 +788,16 @@ def updateWithOpen(iborders, execDict=None):
             if contract in openOrders.index:
                 print 'open order found..',contract, order, qty, openOrders.ix[contract].side, openOrders.ix[contract].qty,
                 if openOrders.ix[contract].side==order2 and openOrders.ix[contract].qty == qty:
-                    print 'OK'
+                    print 'OK: removing order from execDict'
+                    openOrders = openOrders.drop(contract, axis=0)
                 else:
                     print 'Error: mismatch!'
                     iborders_lessOpen+=[(contract,[order,qty])]
             else:
                 #not in open orders
                 iborders_lessOpen+=[(contract,[order,qty])]
+        print 'Open orders not found in execDict'
+        print openOrders
     else:
         print 'no open orders found'
         iborders_lessOpen=iborders
@@ -798,9 +823,33 @@ if __name__ == "__main__":
     
     if len(threadlist)>0:
         print 'running vol_adjsize_live to update system files'
-        vol_adjsize_live(debug, threadlist)
+        #ordersDict = vol_adjsize_live(debug, threadlist)
+        ordersDict={}
+        ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
+        
+        if isinstance(ordersDict, type({})):
+            #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
+            totalc2orders=check_systems_live(debug, ordersDict)
+            #check ib positions
+            try:
+                execDict=update_orders(feeddata, ordersDict['v4futures'], execDict)
+                iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+                
+                #get rid of orders if they are already working orders.
+                #only checks for orders in execDict
+                iborders, execDict= updateWithOpen(iborders, execDict=execDict)
+                num_iborders=len(iborders)
+            except Exception as e:
+                #print e
+                traceback.print_exc()
+        else:
+            print 'No orders in orderDict'
+            totalc2orders =0
+            num_iborders=0
     else:
-        print 'threadlist returning nothing. skipping vol_adjsize_live'
+        print 'threadlist returning nothing. skipping vol_adjsize_live, check_systems'
+        totalc2orders =0
+        num_iborders=0
         
     #with open(logPath+'vol_adjsize_live.txt', 'w') as f:
     #    with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
@@ -809,31 +858,16 @@ if __name__ == "__main__":
     #        proc = Popen(runPath2, stdout=f, stderr=e)
     #        proc.wait()
 
-    print 'returned to main thread, running check systems if new orders are necessary.'
-    with open(logPath+'check_systems_live.txt', 'w') as f:
-        with open(logPath+'check_systems_live_error.txt', 'w') as e:
-            f.flush()
-            e.flush()
-            proc = Popen(runPath4, stdout=f, stderr=e)
-            proc.wait()
-    totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
+    #print 'returned to main thread, running check systems if new orders are necessary.'
+    #with open(logPath+'check_systems_live.txt', 'w') as f:
+    #    with open(logPath+'check_systems_live_error.txt', 'w') as e:
+    #        f.flush()
+    #        e.flush()
+    #        proc = Popen(runPath4, stdout=f, stderr=e)
+    #        proc.wait()
+    #totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
     
-    #check ib positions
-    try:
-        execDict=update_orders(feeddata, systemfile, execDict)
-        iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
-        
-        #get rid of orders if they are already working orders.
-        #only checks for orders in execDict
-        iborders, execDict= updateWithOpen(iborders, execDict=execDict)
-        num_iborders=len(iborders)
-    except Exception as e:
-        #print e
-        traceback.print_exc()
-        
-
-    
-    if len(threadlist)==0 and totalc2orders ==0 and num_iborders==0:
+    if totalc2orders ==0 and num_iborders==0:
         print 'Found nothing to update!'
     else:
         print 'Found', totalc2orders, 'c2 position adjustments.'
@@ -842,22 +876,24 @@ if __name__ == "__main__":
         if debug==False:
             if submitC2 and totalc2orders !=0:
                 print 'Live mode: running c2 orders'
-                for sys in systems:
-                    print 'returned to main thread, running c2 orders for',sys
-                    with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'a') as f:
-                        with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'a') as e:
-                            f.flush()
-                            e.flush()
-                            proc = Popen(runPath3+[sys], stdout=f, stderr=e)
-                            proc.wait()
+                proc_signal_v4_live(debug, ordersDict)
+                #for sys in systems:
+                #    print 'returned to main thread, running c2 orders for',sys
+                #    with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'a') as f:
+                #        with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'a') as e:
+                #            f.flush()
+                #            e.flush()
+                #            proc = Popen(runPath3+[sys], stdout=f, stderr=e)
+                #            proc.wait()
                             
                 print 'returned to main thread, running check systems again..'
-                with open(logPath+'check_systems_live.txt', 'a') as f:
-                    with open(logPath+'check_systems_live_error.txt', 'a') as e:
-                        f.flush()
-                        e.flush()
-                        proc = Popen(runPath4, stdout=f, stderr=e)
-                        proc.wait()
+                totalc2orders=check_systems_live(debug, ordersDict)
+                #with open(logPath+'check_systems_live.txt', 'a') as f:
+                #    with open(logPath+'check_systems_live_error.txt', 'a') as e:
+                #        f.flush()
+                #        e.flush()
+                #        proc = Popen(runPath4, stdout=f, stderr=e)
+                #        proc.wait()
             else:
                 if submitC2==False:
                     print 'skipped c2 orders: submitC2 set to False'
@@ -892,12 +928,14 @@ if __name__ == "__main__":
                             else:
                                 print 'ib execution not found'
                             iborders_lessExec+=[(sym,[order,qty])]
+                            
+                    #num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+                    print 'Found', len(iborders_lessExec),'ib position adjustments after placing orders.'
+                    print iborders_lessExec
                 except Exception as e:
                     #print e
                     traceback.print_exc()
-                #num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
-                print 'Found', len(iborders_lessExec),'ib position adjustments after placing orders.'
-                print iborders_lessExec
+
             else:
                 if submitIB==False:
                     print 'submitIB set to False'

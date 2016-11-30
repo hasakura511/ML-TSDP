@@ -823,9 +823,9 @@ if __name__ == "__main__":
     
     if len(threadlist)>0:
         print 'running vol_adjsize_live to update system files'
-        #ordersDict = vol_adjsize_live(debug, threadlist)
-        ordersDict={}
-        ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
+        ordersDict = vol_adjsize_live(debug, threadlist)
+        #ordersDict={}
+        #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
         
         if isinstance(ordersDict, type({})):
             #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]

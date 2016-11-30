@@ -79,7 +79,7 @@ def get_c2executions(data, portfolioPath):
         get_c2trades(c2id, stratName, c2api, portfolioPath)
 
 
-def start_trade(systems): 
+def start_trade(systems, dbPath): 
     systems.index=systems.c2sym
     #global debug
     #if debug:
@@ -102,7 +102,7 @@ def start_trade(systems):
           if system['ibtype'] != 'BITCOIN':
             #and get_timestamp() - int(system['last_trade']) > int(system['trade_freq']):
             if system['c2submit'] or system['ibsubmit']:
-                adj_size(model, system['System'], system['Name'], 
+                adj_size(dbPath, model, system['System'], system['Name'], 
                          str(int(system['c2id'])),system['c2api'],
                          system['c2qty'],system['c2sym'],system['c2type'],system['c2submit'], 
                          system['ibqty'],system['ibsym'],system['ibcur'],
@@ -141,7 +141,7 @@ def process_systems(systemdata):
 
 
 
-def adj_size(model_pos, system, systemname, systemid, c2apikey, c2quant,\
+def adj_size(dbPath, model_pos, system, systemname, systemid, c2apikey, c2quant,\
                     c2sym, c2type, c2submit, ibquant, ibsym, ibcurrency, ibexch, ibtype,\
                     ibsubmit, iblocalsym=''):
     system_pos=model_pos.loc[system]
@@ -305,7 +305,7 @@ def proc_signal_v4_live(debug, ordersDict):
             if not checkTableExists(conn, 'c2sigid'):
                 pd.DataFrame(pd.Series(data=1), columns=['c2sigid']).to_sql(name='c2sigid',con=conn, index=False)
             systemdata=systemdata.reset_index()
-            start_trade(systemdata)
+            start_trade(systemdata, dbPath)
             sleep(1)
             get_c2executions(systemdata, portfolioPath)
 

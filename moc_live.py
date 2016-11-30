@@ -557,7 +557,7 @@ def filterIBexec():
     print 'Saved', filename
     executions_raw=executions_raw.set_index('symbol')
     #get rid of symbols not in feeddata
-    executions=executions_raw.ix[[x for x in executions.index if x in feeddata.index]].copy()
+    executions=executions_raw.ix[[x for x in executions_raw.index if x in feeddata.index]].copy()
     executions['CSIsym2']=[feeddata.ix[sym].CSIsym2 for sym in executions.index]
     index = executions.reset_index().groupby(['CSIsym2'])['times'].transform(max)==executions.times
     executions= executions.reset_index().ix[index].set_index('CSIsym2')

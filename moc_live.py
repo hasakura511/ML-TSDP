@@ -820,7 +820,7 @@ if __name__ == "__main__":
     runThreads(threadlist)
     print 'returned to main thread with', len(threadlist), 'threads'
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-    
+    threadlist = [(x,x) for x in feeddata.index]
     if len(threadlist)>0:
         print 'running vol_adjsize_live to update system files'
         ordersDict = vol_adjsize_live(debug, threadlist)

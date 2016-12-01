@@ -298,6 +298,7 @@ def get_ibfutpositions(portfolioPath):
         return 0
 
 def create_execDict(feeddata, systemfile):
+    global debug
     global client
     execDict=dict()
     #need systemdata for the contract expiry
@@ -351,8 +352,9 @@ def create_execDict(feeddata, systemfile):
     #print 'updated', systemfile
         
     contractsDF=contractsDF.set_index('symbol')
-    contractsDF.to_csv(systemPath+'ib_contracts.csv', index=True)
-    print 'saved', systemPath+'ib_contracts.csv'
+    if not debug:
+        contractsDF.to_csv(systemPath+'ib_contracts.csv', index=True)
+        print 'saved', systemPath+'ib_contracts.csv'
     print 'Created exec dict with', len(execDict.keys()), 'contracts:'
     print execDict.keys()
     return execDict,contractsDF
@@ -493,6 +495,7 @@ def get_contractdf(execDict, systemPath):
 def refresh_all_histories(execDict):
     global client
     global feeddata
+    global endDateTime
     for sym in execDict:
         data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
         tickerId=random.randint(100,9999)
@@ -504,6 +507,7 @@ def refresh_all_histories(execDict):
 def refresh_history(sym, execDict):
     global client
     global feeddata
+    global endDateTime
     data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
     tickerId=random.randint(100,9999)
     sym2=[x for x in execDict.keys() if sym in x][0]
@@ -530,11 +534,20 @@ def get_tradingHours(sym, contractsDF):
             openclosetimes = thlist[1].split('-')
             opentime = openclosetimes[0]
             if int(date[6:8])-1 ==0:
+                #print 'first day of month', date
                 #first day of the month
                 date2=dates[0].split(':')[0]
-                opendate=dt(year=int(date2[0:4]), month=int(date2[4:6]), day=int(date2[6:8]),\
-                    hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+                if date != date2:
+                    #print 'last day of previous month in timetable. opendate', date2
+                    opendate=dt(year=int(date2[0:4]), month=int(date2[4:6]), day=int(date2[6:8]),\
+                        hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+                else:
+                    date3 = (dt.strptime(date2,'%Y%m%d')-datetime.timedelta(days=1)).strftime('%Y%m%d')
+                    #print 'last day of previous month not in timetable. opendate', date3
+                    opendate=dt(year=int(date3[0:4]), month=int(date3[4:6]), day=int(date3[6:8]),\
+                        hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
             else:
+                #print 'not a first day of month', date
                 opendate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8])-1,\
                     hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
             closetime = openclosetimes[-1]
@@ -549,6 +562,7 @@ def get_tradingHours(sym, contractsDF):
 def filterIBexec():
     global client
     global feeddata
+    global csiDataPath
     global csiDataPath3
     global csidate
     global portfolioPath
@@ -566,13 +580,21 @@ def filterIBexec():
     executions['CSIsym2']=[feeddata.ix[sym].CSIsym2 for sym in executions.index]
     index = executions.reset_index().groupby(['CSIsym2'])['times'].transform(max)==executions.times
     executions= executions.reset_index().ix[index].set_index('CSIsym2')
-    datafiles = os.listdir(csiDataPath3)
 
-    for f in [f for f in datafiles if f.split('_')[0] in executions.index]:
+    #append csi's lastdate first if ib's does not exist yet (expired contracts)
+    datafiles_csi = os.listdir(csiDataPath)
+    for f in [f for f in datafiles_csi if f.split('_')[0] in executions.index]:
+        sym = f.split('_')[0]
+        lastdate = pd.read_csv(csiDataPath+f, index_col=0).index[-1]
+        #print lastdate
+        executions.set_value(sym, 'lastAppend', dt.strptime(str(lastdate),'%Y%m%d'))
+        
+    datafiles_ib = os.listdir(csiDataPath3)
+    for f in [f for f in datafiles_ib if f.split('_')[0] in executions.index]:
         sym = f.split('_')[0]
         lastdate = pd.read_csv(csiDataPath3+f, index_col=0).index[-1]
         executions.set_value(sym, 'lastAppend', dt.strptime(str(lastdate),'%Y%m%d'))
-
+        
     executions.times = pd.to_datetime(executions.times)
     executions = executions[executions.times >= executions.lastAppend].reset_index().set_index('symbol')
     
@@ -617,9 +639,9 @@ def get_timetable(execDict, contractsDF):
 def find_triggers(feeddata, execDict, contractsDF):
     global csidate
     eastern=timezone(tzDict['EST'])
-    endDateTime=dt.now(get_localzone())
-    #endDateTime=dt.now(get_localzone())+datetime.timedelta(days=5)
-    endDateTime=endDateTime.astimezone(eastern)
+    nowDateTime=dt.now(get_localzone())
+    #nowDateTime=dt.now(get_localzone())+datetime.timedelta(days=5)
+    nowDateTime=nowDateTime.astimezone(eastern)
 
     #load timetable
     ttfiles = os.listdir(timetablePath)
@@ -655,7 +677,7 @@ def find_triggers(feeddata, execDict, contractsDF):
             
         fmt = '%Y-%m-%d %H:%M'
         tdate=dt.strptime(triggers.ix[t],fmt).replace(tzinfo=eastern)
-        if endDateTime>tdate:
+        if nowDateTime>tdate:
             #print 'checking trigger:',
             filename = csiDataPath3+csiFileSym+'_B.CSV'
             if not os.path.isfile(filename) or os.path.getsize(filename)==0:
@@ -688,14 +710,14 @@ def find_triggers(feeddata, execDict, contractsDF):
                     print 'loaddate', loaddate, '<', 'lastdate',lastdate
                     dataNotAppended=False
             #append data if M-F, not a holiday and if the data hasn't been appended yet. US MARKETS EST.
-            dayofweek = endDateTime.date().weekday()
+            dayofweek = nowDateTime.date().weekday()
             
             if dayofweek<5 and dataNotAppended:
             #if dataNotAppended:
                 #append new bar
                 runsystem = append_data(ibsym, timetable, loaddate)
                 if runsystem:
-                    print 'data appended running system',
+                    print 'running system',
                     if debug==True:
                         print 'debug mode'
                         popenArgs = ['python', runPath,csiRunSym]
@@ -714,7 +736,7 @@ def find_triggers(feeddata, execDict, contractsDF):
 
                 
         else:
-            print csiRunSym,'not triggered: next trigger',tdate,'now', endDateTime
+            print csiRunSym,'not triggered: next trigger',tdate,'now', nowDateTime
     return threadlist
                 
 def append_data(sym, timetable, loaddate):
@@ -751,9 +773,10 @@ def append_data(sym, timetable, loaddate):
             filename = csiDataPath3+csisym+'_B.CSV'
             csidata.append(newbar).fillna(method='ffill').to_csv(filename, header=False, index=True)
             print 'saved', filename,
+            print 'appended data between', opentime, closetime,
             return True
         else:
-            print filename, 'not found. terminating.',
+            print filename, 'not found..',
             return False
     else:
         print 'no data found between', opentime, closetime,
@@ -821,6 +844,7 @@ if __name__ == "__main__":
     execDict, contractsDF=create_execDict(feeddata, systemfile)
 
     threadlist=find_triggers(feeddata, execDict, contractsDF)
+
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     runThreads(threadlist)
     print 'returned to main thread with', len(threadlist), 'threads'

@@ -5,6 +5,8 @@ set "HH=%dt:~8,2%" & set "Min=%dt:~10,2%" & set "Sec=%dt:~12,2%"
 
 set "datestamp=%YYYY%%MM%%DD%" & set "timestamp=%HH%%Min%%Sec%"
 set "fullstamp=%YYYY%%MM%%DD%_%HH%-%Min%-%Sec%"
+echo datestamp: "%datestamp%"
+echo timestamp: "%timestamp%"
+echo fullstamp: "%fullstamp%"
 
-cd \cygwin64\media\sf_python\tsdp
-\anaconda2\python start_moc_live.py >> \logs\moc_live_%fullstamp%.txt
+timestamp2.bat >> c:\logs\testlog_%fullstamp%.log

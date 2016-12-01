@@ -64,6 +64,7 @@ if len(sys.argv)==1:
     #systems = ['v4mini']
     systems = ['v4micro','v4mini','v4futures']
     debug=True
+    immediate=False
     showPlots=True
     submitIB=False
     submitC2=False
@@ -105,6 +106,10 @@ else:
     else:
         submitIB=False
     
+    if sys.argv[4]=='1':
+        immediate=True
+    else:
+        immediate=False
     
     triggertime = 30 #mins
     dbPath=dbPath2='./data/futures.sqlite3'
@@ -820,7 +825,11 @@ if __name__ == "__main__":
     runThreads(threadlist)
     print 'returned to main thread with', len(threadlist), 'threads'
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-    threadlist = [(x,x) for x in feeddata.index]
+    
+    if immediate:
+        #include all symbols in threadlist to refresh all orders from selection
+        threadlist = [(x,x) for x in feeddata.index]
+    
     if len(threadlist)>0:
         print 'running vol_adjsize_live to update system files'
         ordersDict = vol_adjsize_live(debug, threadlist)

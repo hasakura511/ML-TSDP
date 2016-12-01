@@ -17,7 +17,7 @@ if len(sys.argv)==1:
     debug=True
     showPlots=True
     commission=2.5
-    start_slip=20161111
+    start_slip=20161128
     figsize=(6,8)
     fontsize=12
     dataPath='D:/ML-TSDP/data/'
@@ -34,7 +34,7 @@ else:
     debug=False
     showPlots=False
     commission=2.5
-    start_slip=20161111
+    start_slip=20161128
     figsize=(8,13)
     fontsize=20
     dbPathWrite=dbPathRead='./data/futures.sqlite3'
@@ -176,16 +176,16 @@ for systemName in systems:
             if csidate in timetable:
                 print sym,'close', timetable.ix[x][csidate],
                 if row.openedWhen>=timetable.ix[x][csidate]:
-                    print 'new open', row.openedWhen,'adding..'
+                    print 'new open', row.openedWhen,'>=',x,timetable.ix[x][csidate],'adding.. opened after current csidate',csidate
                     newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
                 else:
-                    print 'new open', row.openedWhen,' before close ',
+                    print 'new open', row.openedWhen,'prevCSIdownloadDate',prevCSIdownloadDate,
                     selection =accountInfo[systemName].selection
                     if selection in fixed_signals and row.openedWhen>prevCSIdownloadDate:
-                        print 'adding..', selection,'is a fixed signal and opened after prevCSIdownloadDate'
+                        print 'adding..', selection,'is a fixed signal AND opened after prevCSIdownloadDate'
                         newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
                     else:
-                        print 'skipping..', selection,'is not a fixed signal or opened before prevCSIdownloadDate',prevCSIdownloadDate
+                        print 'skipping..', selection,'is not a fixed signal AND opened after prevCSIdownloadDate'
 
             else:
                 print x,csidate,'not found in timetable, skipping..'
@@ -236,18 +236,18 @@ for systemName in systems:
             if csidate in timetable:
                 print sym,'close', timetable.ix[x][csidate],
                 if row.closedWhen>=timetable.ix[x][csidate]:
-                    print 'new close', row.closedWhen,'adding..'
+                    print 'new close', row.closedWhen,'>=',x,timetable.ix[x][csidate],'adding.. closed after current csidate',csidate
                     row['closetime']=timetable.ix[x][csidate]
                     newCloses = newCloses.append(row)
                 else:
-                    print 'new close', row.closedWhen,' before close ',
+                    print 'new close', row.closedWhen,'prevCSIdownloadDate',prevCSIdownloadDate,
                     selection =accountInfo[systemName].selection
                     if selection in fixed_signals and row.closedWhen>prevCSIdownloadDate:
-                        print 'adding..', selection,'is a fixed signal and opened after prevCSIdownloadDate'
+                        print 'adding..', selection,'is a fixed signal AND opened after prevCSIdownloadDate'
                         row['closetime']=timetable.ix[x][csidate]
                         newCloses = newCloses.append(row)
                     else:
-                        print 'skipping..', selection,'is not a fixed signal or closed before prevCSIdownloadDate',prevCSIdownloadDate
+                        print 'skipping..', selection,'is not a fixed signal AND closed before prevCSIdownloadDate'
                     
             else:
                 print x,csidate,'not found in timetable, skipping..'

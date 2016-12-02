@@ -83,7 +83,7 @@ def start_trade(systems, dbPath):
     systems.index=systems.c2sym
     #global debug
     #if debug:
-    print "Starting " + str(systems.iloc[0]['Name'])
+    #print "Starting " + str(systems.iloc[0]['Name'])
        #logging.info("Starting " + str(systems.iloc[0]['Name']))
     try:
         #model=get_models(systems)
@@ -108,6 +108,7 @@ def start_trade(systems, dbPath):
                          system['ibqty'],system['ibsym'],system['ibcur'],
                          system['ibexch'],system['ibtype'],system['ibsubmit'],
                          system['iblocalsym'])
+            
           #time.sleep(30)
     except Exception as e:
         #logging.error("something bad happened", exc_info=True)
@@ -146,12 +147,6 @@ def adj_size(dbPath, model_pos, system, systemname, systemid, c2apikey, c2quant,
                     ibsubmit, iblocalsym=''):
     system_pos=model_pos.loc[system]
    
-    print('==============')
-    print('Strategy:' + systemname)
-    #print('system_pos:' +str(system_pos))
-    print("  Signal Name: " + system)
-    print("  C2ID: " + systemid + "  C2Key: " + c2apikey)
-    print("  C2Sym: " + c2sym + " IBSym: " + ibsym)
     if c2submit == 'TRUE':
         c2submit=True
     elif c2submit == 'FALSE':
@@ -167,10 +162,18 @@ def adj_size(dbPath, model_pos, system, systemname, systemid, c2apikey, c2quant,
     if c2submit:
         c2_pos_qty=get_c2_pos(systemname, c2sym)           
         system_c2pos_qty=round(system_pos['action']) * c2quant
+        #print('==============')
+        print systemname, 
+        print system, 
+        #print('Strategy:' + systemname),
+        #print('system_pos:' +str(system_pos))
+        #print("  Signal Name: " + system)
+        #print("  C2ID: " + systemid + "  C2Key: " + c2apikey)
+        #print("  C2Sym: " + c2sym + " IBSym: " + ibsym)
         print( "system_pos: " + str(system_c2pos_qty) ),
         print( "c2_pos: " + str(c2_pos_qty) ),
         if system_c2pos_qty != c2_pos_qty:
-            print 'Placing Order'
+            print 'Placing Order',
         else:
             print 'No orders to be placed.'
             
@@ -180,7 +183,7 @@ def adj_size(dbPath, model_pos, system, systemname, systemid, c2apikey, c2quant,
             psigid=0
             if c2_pos_qty < 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
-                print( 'BTC: ' + str(qty) )
+                print( 'BTC: ' + str(qty) ),
                 psigid=place_order(dbPath,'BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 isrev=True                
                 c2quant = c2quant - qty
@@ -191,13 +194,14 @@ def adj_size(dbPath, model_pos, system, systemname, systemid, c2apikey, c2quant,
                     place_order(dbPath,'BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey, psigid)
                 else:
                     place_order(dbPath,'BTO', c2quant, c2sym, c2type, systemid, c2submit, c2apikey)
+        
         if system_c2pos_qty < c2_pos_qty:
             c2quant=c2_pos_qty - system_c2pos_qty   
             isrev=False
             psigid=0
             if c2_pos_qty > 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
-                print( 'STC: ' + str(qty) )
+                print( 'STC: ' + str(qty) ),
                 psigid=place_order(dbPath,'STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 isrev=True 
                 c2quant = c2quant - qty

@@ -824,8 +824,11 @@ def updateWithOpen(iborders, execDict=None):
             else:
                 #not in open orders
                 iborders_lessOpen+=[(contract,[order,qty])]
-        print 'Open orders not found in execDict'
-        print openOrders
+                
+        if len(openOrders)>0:
+            print 'Open orders that were not found in execDict:'
+            print openOrders
+            print 'Cancel these orders if immediate == True?'
     else:
         print 'no open orders found'
         iborders_lessOpen=iborders
@@ -862,7 +865,7 @@ if __name__ == "__main__":
         
         if isinstance(ordersDict, type({})):
             #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
-            totalc2orders=check_systems_live(debug, ordersDict)
+            totalc2orders=check_systems_live(debug, ordersDict, csidate)
             #check ib positions
             try:
                 execDict=update_orders(feeddata, ordersDict['v4futures'], execDict)
@@ -920,7 +923,7 @@ if __name__ == "__main__":
                 #            proc.wait()
                             
                 print 'returned to main thread, running check systems again..'
-                totalc2orders=check_systems_live(debug, ordersDict)
+                totalc2orders=check_systems_live(debug, ordersDict, csidate)
                 #with open(logPath+'check_systems_live.txt', 'a') as f:
                 #    with open(logPath+'check_systems_live_error.txt', 'a') as e:
                 #        f.flush()

@@ -228,7 +228,24 @@ def retrieveSystemEquity(systemid, apikey, commission_plan='default'):
     #print r.text
     logging.info(r.text)
     return r.text
-
+    
+def getSystemDetails(systemid, apikey):
+    url = 'https://api.collective2.com/world/apiv3/getSystemDetails'
+    headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
+    
+    data={
+       #"commission_plan" : commission_plan,
+       "systemid" : str(systemid),
+       "apikey" : str(apikey)
+        }
+    
+    params={}
+    
+    r=requests.post(url, params=params, json=data);
+    #print r.text
+    logging.info(r.text)
+    return r.text
+    
 def get_exec(systemid, apikey):
     url = 'https://collective2.com/world/apiv3/requestTrades'
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
@@ -272,6 +289,22 @@ def get_c2equity(systemdata):
         dataSet.index = pd.to_datetime(dataSet['unix_timestamp'].astype(int),unit='s')
         dataSet.index.name = 'timestamp'
         dataSet.to_csv('./data/portfolio/c2_' + systemname + '_equity.csv')
+    return dataSet
+
+def get_c2lastEquity(systemdata):
+    #logging.info('GETTING C2 EQUITY...')
+    c2list=get_c2_list(systemdata)
+    systems=c2list.keys()
+    for systemname in systems:
+        (systemid, apikey)=c2list[systemname]
+        #c2list[systemname]=get_c2livepos(systemid, apikey, systemname)
+        equityData=getSystemDetails(systemid, apikey)
+        jsondata = json.loads(equityData)
+        #logging.info('\n Length jsondata'+str(len(jsondata['equity_data'])))
+        dataSet=json_normalize(jsondata['response']['marginEquityData'])
+        #dataSet.index = pd.to_datetime(dataSet['unix_timestamp'].astype(int),unit='s')
+        #dataSet.index.name = 'timestamp'
+        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_lastEquity.csv', index=False)
     return dataSet
     
 def get_c2pos(systemdata):

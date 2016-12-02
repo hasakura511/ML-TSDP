@@ -11,7 +11,8 @@ import time
 import json
 from pandas.io.json import json_normalize
 #from ibapi.get_exec import get_ibpos, get_exec_open as get_ibexec_open, get_ibpos_from_csv
-from c2api.get_exec import get_exec_open, get_c2_list, get_c2livepos, retrieveSignalsWorking
+from c2api.get_exec import get_c2livepos, retrieveSignalsWorking, get_c2lastEquity
+
 #from seitoolz.signal import get_dps_model_pos, get_model_pos
 #from seitoolz.order import adj_size
 #from seitoolz.get_exec import get_executions
@@ -88,7 +89,7 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
         errors+=1
     return errors
 
-def check_systems_live(debug, ordersDict):
+def check_systems_live(debug, ordersDict, csidate):
     try:
         start_time = time.time()
         systems = ordersDict.keys()
@@ -101,6 +102,7 @@ def check_systems_live(debug, ordersDict):
             #savePath='D:/ML-TSDP/data/portfolio/'
             systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/'
             dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+            dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
             def place_order2(a,b,c,d,e,f,g):
                 return "0"
         else:
@@ -108,11 +110,13 @@ def check_systems_live(debug, ordersDict):
             logging.basicConfig(filename='/logs/c2.log',level=logging.DEBUG)
             #savePath='./data/portfolio/'
             systemPath =  './data/systems/'
-            dbPath='./data/futures.sqlite3'
+            dbPath=dbPath2='./data/futures.sqlite3'
             from c2api.place_order import place_order2
 
-        conn = sqlite3.connect(dbPath)
-
+        #conn = sqlite3.connect(dbPath)
+        writeConn = sqlite3.connect(dbPath)
+        readConn =  sqlite3.connect(dbPath2)
+        
         c2openpositions={}
         workingSignals={}
         futuresDict={}
@@ -145,6 +149,17 @@ def check_systems_live(debug, ordersDict):
             #subprocess.call(['python', 'get_ibpos.py'])
             sleep(1)
             print 'success!'
+            print sys, 'Getting c2 equity...',
+            equity=get_c2lastEquity(systemdata)
+            if len(equity)>0 and 'modelAccountValue' in equity.columns:
+                print equity['modelAccountValue'][0]
+                equity['system']=sys
+                equity['Date']=csidate
+                equity['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+                equity.to_sql(name='c2_equity',con=writeConn, index=False, if_exists='append')
+                print  'Saved to sql db',dbPath
+            else:
+                print 'Could not get last equity from c2'
 
                             
         for sys in c2openpositions.keys():
@@ -173,7 +188,7 @@ def check_systems_live(debug, ordersDict):
                 else:
                     #exit if not in the main file
                     systemdata_csi=pd.read_sql('select * from %s where timestamp=\
-                                (select max(timestamp) from %s as maxtimestamp)' % (sys, sys), con=conn,  index_col='c2sym')
+                                (select max(timestamp) from %s as maxtimestamp)' % (sys, sys), con=readConn,  index_col='c2sym')
                     if sym not in systemdata_csi.index:
                         exit_count+=1
                         c2sig = int(c2openpositions[sys].ix[sym].signal)
@@ -204,7 +219,7 @@ def check_systems_live(debug, ordersDict):
                 print e
             print 'c2:'+str(c2_count)+' sys:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)+' errors:'+str(error_count)
             print 'DONE!\n'
-        pd.DataFrame(pd.Series(data=totalerrors), columns=['totalerrors']).to_sql(name='checkSystems',con=conn, index=False, if_exists='replace')
+        pd.DataFrame(pd.Series(data=totalerrors), columns=['totalerrors']).to_sql(name='checkSystems',con=writeConn, index=False, if_exists='replace')
         print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
         
         return totalerrors

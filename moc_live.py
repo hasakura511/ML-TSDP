@@ -300,6 +300,7 @@ def get_ibfutpositions(portfolioPath):
 def create_execDict(feeddata, systemfile):
     global debug
     global client
+    global csidate
     execDict=dict()
     #need systemdata for the contract expiry
     systemdata=pd.read_csv(systemfile)
@@ -352,6 +353,13 @@ def create_execDict(feeddata, systemfile):
     #print 'updated', systemfile
         
     contractsDF=contractsDF.set_index('symbol')
+    contractsDF['Date']=csidate
+    contractsDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    try:
+        contractsDF.to_sql(name='ib_contracts', con=writeConn, index=True, if_exists='append', index_label='ibsym')
+    except Exception as e:
+        #print e
+        traceback.print_exc()
     if not debug:
         contractsDF.to_csv(systemPath+'ib_contracts.csv', index=True)
         print 'saved', systemPath+'ib_contracts.csv'

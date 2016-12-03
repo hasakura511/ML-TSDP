@@ -753,10 +753,13 @@ try:
                                 con=writeConn, index=True, if_exists='append', index_label='CSIsym')
                                 
         print 'Saved futuresDF_results to', dbPath
-        futuresDF_live = pd.read_sql('select * from futuresATRhist where timestamp=\
-                (select max(timestamp) from futuresATRhist where Date=%s)' %prevUpdateDate.strftime('%Y%m%d'),\
-                con=readConn,  index_col='CSIsym')
-
+        #futuresDF_live = pd.read_sql('select * from futuresATRhist where timestamp=\
+        #        (select max(timestamp) from futuresATRhist where Date=%s)' %prevUpdateDate.strftime('%Y%m%d'),\
+        #        con=readConn,  index_col='CSIsym')
+        futuresDF_live = pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
+                            order by timestamp ASC) group by CSIsym' %prevUpdateDate.strftime('%Y%m%d'),\
+                            con=readConn,  index_col='CSIsym')
+        
         futuresDF_toexcel=pd.concat([futuresDF_live, futuresDF.drop(futuresDF_live.index,axis=0)],axis=0).sort_index()
         futuresDF_toexcel.columns=[x if x !='Date' else 'signalDate' for x in futuresDF_toexcel.columns]
         

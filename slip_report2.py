@@ -174,18 +174,21 @@ for systemName in systems:
             else:
                 row=portfolioDF.ix[sym].iloc[0]
             if csidate in timetable:
-                print sym,'close', timetable.ix[x][csidate],
+                print sym,
+                #print sym,'close', timetable.ix[x][csidate],
                 if row.openedWhen>=timetable.ix[x][csidate]:
-                    print 'new open', row.openedWhen,'>=',x,timetable.ix[x][csidate],'adding.. opened after current csidate',csidate
+                    #print 'new open', row.openedWhen,'>=',x,timetable.ix[x][csidate],'adding.. opened after current csi close',csidate
+                    print 'adding.. opened after current csi close',timetable.ix[x][csidate],'opened',row.openedWhen
                     newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
                 else:
-                    print 'new open', row.openedWhen,'prevCSIdownloadDate',prevCSIdownloadDate,
+                    #print 'new open', row.openedWhen,'prevCSIdownloadDate',prevCSIdownloadDate,
                     selection =accountInfo[systemName].selection
-                    if selection in fixed_signals and row.openedWhen>prevCSIdownloadDate:
-                        print 'adding..', selection,'is a fixed signal AND opened after prevCSIdownloadDate'
+                    #if selection in fixed_signals and row.openedWhen>prevCSIdownloadDate:
+                    if row.openedWhen>prevCSIdownloadDate:
+                        print 'adding..', selection,'opened after prevCSIdownloadDate',prevCSIdownloadDate, 'opened', row.openedWhen
                         newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
                     else:
-                        print 'skipping..', selection,'is not a fixed signal AND opened after prevCSIdownloadDate'
+                        print 'skipping..', selection,'opened before prevCSIdownloadDate',prevCSIdownloadDate, 'opened', row.openedWhen
 
             else:
                 print x,csidate,'not found in timetable, skipping..'
@@ -234,20 +237,23 @@ for systemName in systems:
                 row=tradesDF.ix[sym].iloc[0]
 
             if csidate in timetable:
-                print sym,'close', timetable.ix[x][csidate],
+                print sym,
+                #print sym,'close', timetable.ix[x][csidate],
                 if row.closedWhen>=timetable.ix[x][csidate]:
-                    print 'new close', row.closedWhen,'>=',x,timetable.ix[x][csidate],'adding.. closed after current csidate',csidate
+                    #print 'new close', row.closedWhen,'>=',x,timetable.ix[x][csidate],'adding.. closed after current csi close',csidate
+                    print 'adding.. closed after current csi close',timetable.ix[x][csidate],'closed',row.closedWhen
                     row['closetime']=timetable.ix[x][csidate]
                     newCloses = newCloses.append(row)
                 else:
-                    print 'new close', row.closedWhen,'prevCSIdownloadDate',prevCSIdownloadDate,
+                    #print 'new close', row.closedWhen,'prevCSIdownloadDate',prevCSIdownloadDate,
                     selection =accountInfo[systemName].selection
-                    if selection in fixed_signals and row.closedWhen>prevCSIdownloadDate:
-                        print 'adding..', selection,'is a fixed signal AND opened after prevCSIdownloadDate'
+                    #if selection in fixed_signals and row.closedWhen>prevCSIdownloadDate:
+                    if row.closedWhen>prevCSIdownloadDate:
+                        print 'adding..', selection,'opened after prevCSIdownloadDate',prevCSIdownloadDate, 'closed', row.closedWhen
                         row['closetime']=timetable.ix[x][csidate]
                         newCloses = newCloses.append(row)
                     else:
-                        print 'skipping..', selection,'is not a fixed signal AND closed before prevCSIdownloadDate'
+                        print 'skipping..', selection,'closed before prevCSIdownloadDate',prevCSIdownloadDate, 'closed', row.closedWhen
                     
             else:
                 print x,csidate,'not found in timetable, skipping..'

@@ -358,8 +358,8 @@ def create_execDict(feeddata, systemfile):
     contractsDF['Date']=csidate
     contractsDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
     #print contractsDF.index
-    print feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1).head()
-    #contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1),contractsDF], axis=1)
+    #print feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1).head()
+    contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1),contractsDF], axis=1)
     try:
         contractsDF.to_sql(name='ib_contracts', con=writeConn, index=True, if_exists='replace', index_label='ibsym')
         print 'saved ib_contracts to',dbPath

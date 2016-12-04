@@ -351,12 +351,18 @@ def create_execDict(feeddata, systemfile):
         #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, contract.expiry
     #systemdata.to_csv(systemfile, index=False)
     #print 'updated', systemfile
-        
+    feeddata=feeddata.set_index('ibsym')
     contractsDF=contractsDF.set_index('symbol')
+    contractsDF.index.name = 'ibsym'
+    contractsDF['contracts']=[x+contractsDF.ix[x].expiry for x in contractsDF.index]
     contractsDF['Date']=csidate
     contractsDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    #print contractsDF.index
+    print feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1).head()
+    #contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1),contractsDF], axis=1)
     try:
-        contractsDF.to_sql(name='ib_contracts', con=writeConn, index=True, if_exists='append', index_label='ibsym')
+        contractsDF.to_sql(name='ib_contracts', con=writeConn, index=True, if_exists='replace', index_label='ibsym')
+        print 'saved ib_contracts to',dbPath
     except Exception as e:
         #print e
         traceback.print_exc()

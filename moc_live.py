@@ -858,9 +858,10 @@ if __name__ == "__main__":
     systemfile=systemPath+'system_v4futures_live.csv'
     #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
-    execDict=contractsDF=None
+    execDict={}
+    contractsDF=pd.DateFrame()
     tries = 0
-    while (execDict  == None or contractsDF ==None) and tries<5:
+    while (len(execDict)  == 0 or len(contractsDF) == 0) and tries<5:
         try:
             execDict, contractsDF=create_execDict(feeddata, systemfile)
         except Exception as e:

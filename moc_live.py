@@ -859,7 +859,7 @@ if __name__ == "__main__":
     #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
     execDict={}
-    contractsDF=pd.DateFrame()
+    contractsDF=pd.DataFrame()
     tries = 0
     while (len(execDict)  == 0 or len(contractsDF) == 0) and tries<5:
         try:

@@ -183,9 +183,9 @@ def adj_size(dbPath, model_pos, system, systemname, systemid, c2apikey, c2quant,
             psigid=0
             if c2_pos_qty < 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
-                print( 'BTC: ' + str(qty) )
-                if system_c2pos_qty !=0:
-                    print '',
+                print( 'BTC: ' + str(qty) ),
+                if system_c2pos_qty ==0:
+                    print ''
                 psigid=place_order(dbPath,'BTC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 isrev=True                
                 c2quant = c2quant - qty
@@ -203,9 +203,9 @@ def adj_size(dbPath, model_pos, system, systemname, systemid, c2apikey, c2quant,
             psigid=0
             if c2_pos_qty > 0:        
                 qty=min(abs(c2_pos_qty), abs(c2_pos_qty - system_c2pos_qty))
-                print( 'STC: ' + str(qty) )
-                if system_c2pos_qty !=0:
-                    print '',
+                print( 'STC: ' + str(qty) ),
+                if system_c2pos_qty ==0:
+                    print ''
                 psigid=place_order(dbPath,'STC', qty, c2sym, c2type, systemid, c2submit, c2apikey)
                 isrev=True 
                 c2quant = c2quant - qty

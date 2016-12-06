@@ -237,3 +237,5 @@ if lastExecutions.shape[0] >0:
     else:
         print 'no slippage reports found. skipping consolidated report.'
 '''
+
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

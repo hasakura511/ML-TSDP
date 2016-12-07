@@ -68,7 +68,9 @@ if len(sys.argv)==1:
     showPlots=True
     submitIB=False
     submitC2=False
-    triggertime = 30 #mins
+    #if trigger time set to value then trigger time in feedfile is ignored.
+    triggertimes = None
+    #triggertime = 30 #mins
     dbPath=dbPath2='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
     runPath2= ['python','D:/ML-TSDP/vol_adjsize_live.py']
@@ -110,8 +112,8 @@ else:
         immediate=True
     else:
         immediate=False
-    
-    triggertime = 30 #mins
+    triggertimes = None
+    #triggertime = 30 #mins
     dbPath=dbPath2='./data/futures.sqlite3'
     runPath='./run_futures_live.py'
     runPath2=['python','./vol_adjsize_live.py','1']
@@ -362,7 +364,7 @@ def create_execDict(feeddata, systemfile):
     contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1),contractsDF], axis=1)
     try:
         contractsDF.to_sql(name='ib_contracts', con=writeConn, index=True, if_exists='replace', index_label='ibsym')
-        print 'saved ib_contracts to',dbPath
+        print '\nsaved ib_contracts to',dbPath
     except Exception as e:
         #print e
         traceback.print_exc()
@@ -532,11 +534,17 @@ def refresh_history(sym, execDict):
     return data
     
 def get_tradingHours(sym, contractsDF):
-    global triggertime
+    global triggertimes
     fmt = '%Y-%m-%d %H:%M'
     dates = contractsDF.ix[sym].tradingHours.split(";")
     tz = timezone(tzDict[contractsDF.ix[sym].timeZoneId[:3]])
     
+    if triggertimes == None:
+        triggertime = int(contractsDF.ix[sym].triggertime)
+        print sym, triggertime
+    else:
+        triggertime = triggertimes
+        
     thDict = {}
     for th in dates:
         thlist = th.split(':')
@@ -868,8 +876,9 @@ if __name__ == "__main__":
             #print e
             traceback.print_exc()
             tries+=1
-            pass
-        
+            if tries==5:
+                sys.exit('failed 5 times to get contract info')
+
     threadlist=find_triggers(feeddata, execDict, contractsDF)
 
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
@@ -1008,7 +1017,7 @@ if __name__ == "__main__":
             print 'Debug mode: skipping orders'
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-    
+
 
 
 '''

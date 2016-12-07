@@ -318,11 +318,11 @@ try:
         futuresDF.set_value(sym,'Custom',c2contractSpec[sym][5])
         
     futuresDF.index.name = lastDate
-    feeddata=pd.read_csv(feedfile,index_col='CSIsym')
-    feeddata['Date']=int(lastDate.strftime('%Y%m%d'))
-    feeddata['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
-    feeddata.to_sql(name='feeddata', con=writeConn, index=True, if_exists='append', index_label='CSIsym')
-    print 'Saved', feedfile, 'to', dbPath
+    #feeddata=pd.read_csv(feedfile,index_col='CSIsym')
+    #feeddata['Date']=int(lastDate.strftime('%Y%m%d'))
+    #feeddata['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    #feeddata.to_sql(name='feeddata', con=writeConn, index=True, if_exists='append', index_label='CSIsym')
+    #print 'Saved', feedfile, 'to', dbPath
 
     if refreshSea:
         print 'refreshSea is on.. debug mode'

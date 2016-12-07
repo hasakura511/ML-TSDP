@@ -541,7 +541,7 @@ def get_tradingHours(sym, contractsDF):
     
     if triggertimes == None:
         triggertime = int(contractsDF.ix[sym].triggertime)
-        print sym, triggertime
+        #print sym, triggertime
     else:
         triggertime = triggertimes
         

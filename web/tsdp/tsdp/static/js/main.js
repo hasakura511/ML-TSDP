@@ -1,0 +1,25 @@
+$('button').on('click', function(event){
+    event.preventDefault();
+    var element = $(this);
+    $.ajax({
+        url:'/like_treasure/',
+        type:'GET',
+        data: {treasure_id:element.attr("data-id")},
+        success : function(response){
+                        element.html(' '+response);
+                        }
+    });
+});
+
+/*
+$('#search-form').on('submit', function(event){
+    event.preventDefault();
+
+    $.ajax({
+        url:'/search/',
+        method:'GET',
+        data: { search: $('#search-text').val() },
+        success:function(json){alert(JSON.stringify(json))}
+    });
+});
+*/

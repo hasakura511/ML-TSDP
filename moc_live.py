@@ -140,6 +140,41 @@ else:
 writeConn = sqlite3.connect(dbPath)
 readConn =  sqlite3.connect(dbPath2)
 
+timeZoneId ={'AUD': 'CST',
+     'CAD': 'CST',
+     'CHF': 'CST',
+     'CL': 'EST5EDT',
+     'EMD': 'CST',
+     'ES': 'CST',
+     'EUR': 'CST',
+     'GBP': 'CST',
+     'GC': 'EST5EDT',
+     'GF': 'CST',
+     'HE': 'CST',
+     'HG': 'EST5EDT',
+     'HO': 'EST5EDT',
+     'JPY': 'CST',
+     'LE': 'CST',
+     'MXP': 'CST',
+     'NG': 'EST5EDT',
+     'NIY': 'CST',
+     'NQ': 'CST',
+     'NZD': 'CST',
+     'PA': 'EST5EDT',
+     'PL': 'EST5EDT',
+     'RB': 'EST5EDT',
+     'SI': 'EST5EDT',
+     'YM': 'CST',
+     'ZB': 'CST',
+     'ZC': 'CST',
+     'ZF': 'CST',
+     'ZL': 'CST',
+     'ZM': 'CST',
+     'ZN': 'CST',
+     'ZS': 'CST',
+     'ZT': 'CST',
+     'ZW': 'CST'}
+     
 tzDict = {
     'CST':'CST6CDT',
     'EST':'EST5EDT',
@@ -537,7 +572,12 @@ def get_tradingHours(sym, contractsDF):
     global triggertimes
     fmt = '%Y-%m-%d %H:%M'
     dates = contractsDF.ix[sym].tradingHours.split(";")
-    tz = timezone(tzDict[contractsDF.ix[sym].timeZoneId[:3]])
+    
+    #IB didn't return timezoneid one day..
+    if contractsDF.ix[sym].timeZoneId[:3] =='':
+        tz=timezone(tzDict[timeZoneId[sym][:3]])
+    else:
+        tz = timezone(tzDict[contractsDF.ix[sym].timeZoneId[:3]])
     
     if triggertimes == None:
         triggertime = int(contractsDF.ix[sym].triggertime)
@@ -592,7 +632,7 @@ def filterIBexec():
     executions_raw=pd.DataFrame(client.get_executions())
     if len(executions_raw) ==0:
         print 'IB returned no executions, returning to main thread'
-        return
+        return None
     filename = portfolioPath+'ib_executions_raw.csv'
     executions_raw.to_csv(filename)
     print 'Saved', filename
@@ -978,29 +1018,32 @@ if __name__ == "__main__":
                     executions=filterIBexec()
                     iborders_lessOpen=updateWithOpen(iborders)
 
+                    if executions is not None:
+                        #check executions
+                        executions2 = executions.reset_index().groupby(['contract','side'])[['qty']].max()
                         
-                    #check executions
-                    executions2 = executions.reset_index().groupby(['contract','side'])[['qty']].max()
-                    
-                    #check if expired contracts have been exited.
-                    #executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
-                    iborders_lessExec=[]
-                    for (sym,[order,qty]) in iborders_lessOpen:
-                        if (sym,order) in executions2.index and executions2.ix[sym].qty[0] ==qty:
-                            print 'execution found..',sym, order, qty, executions2.ix[sym].index[0],  executions2.ix[sym].qty[0]
-                            #execDict[sym][0] = 'PASS'
-                            #execDict[sym][1] = 0
-                        else:
-                            print 'There was an error:',sym,'order',  execDict[sym][:2], 
-                            if sym in executions2.index:
-                                print 'ib returned', executions2.ix[sym].index[0], executions2.ix[sym].qty[0]
+                        #check if expired contracts have been exited.
+                        #executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
+                        iborders_lessExec=[]
+                        for (sym,[order,qty]) in iborders_lessOpen:
+                            if (sym,order) in executions2.index and executions2.ix[sym].qty[0] ==qty:
+                                print 'execution found..',sym, order, qty, executions2.ix[sym].index[0],  executions2.ix[sym].qty[0]
+                                #execDict[sym][0] = 'PASS'
+                                #execDict[sym][1] = 0
                             else:
-                                print 'ib execution not found'
-                            iborders_lessExec+=[(sym,[order,qty])]
-                            
-                    #num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
-                    print 'Found', len(iborders_lessExec),'ib position adjustments after placing orders.'
-                    print iborders_lessExec
+                                print 'There was an error:',sym,'order',  execDict[sym][:2], 
+                                if sym in executions2.index:
+                                    print 'ib returned', executions2.ix[sym].index[0], executions2.ix[sym].qty[0]
+                                else:
+                                    print 'ib execution not found'
+                                iborders_lessExec+=[(sym,[order,qty])]
+                                
+                        #num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+                        print 'Found', len(iborders_lessExec),'ib position adjustments after placing orders.'
+                        print iborders_lessExec
+                    else:
+                        print 'IB orders not verified:'
+                        print iborders_lessOpen
                 except Exception as e:
                     #print e
                     traceback.print_exc()

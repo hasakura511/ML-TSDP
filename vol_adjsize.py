@@ -68,7 +68,7 @@ if ready:
 else:
     c2system_macro=c2system='RiskOn'
     c2system_mini='RiskOn'
-    c2system_micro='Anti0.75LastSIG'
+    c2system_micro='prevACT'
     
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\

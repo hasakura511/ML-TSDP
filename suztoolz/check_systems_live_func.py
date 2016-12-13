@@ -125,7 +125,7 @@ def check_systems_live(debug, ordersDict, csidate):
             
         for sys in systems:
             #subprocess.call(['python', 'get_ibpos.py'])       
-            print sys, 'Getting c2 positions...',
+            print sys, 'Getting c2 positions...'
             #systemdata=pd.read_csv(systemPath+'system_'+sys+'_live.csv')
             systemdata=ordersDict[sys]
             futuresDict[sys]=systemdata=systemdata.reset_index()
@@ -138,6 +138,14 @@ def check_systems_live(debug, ordersDict, csidate):
             apikey = systemdata.c2api[0]
             systemid = systemdata.c2id[0]
             c2openpositions[sys]=get_c2livepos(systemid, apikey, sys)
+            c2open=c2openpositions[sys].copy()
+            if len(c2open)>0:
+                c2open['system']=sys
+                c2open['Date']=csidate
+                c2open['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+                c2open.to_sql(name='c2_portfolio',con=writeConn, index=False, if_exists='append')
+                print  'Saved',sys,'c2_portfolio to sql db',dbPath
+            
             sleep(1)
             response = json.loads(retrieveSignalsWorking(systemid, apikey))['response']
             if len(response)>0:
@@ -148,7 +156,7 @@ def check_systems_live(debug, ordersDict, csidate):
             #get_executions(systemdata)
             #subprocess.call(['python', 'get_ibpos.py'])
             sleep(1)
-            print 'success!'
+            #print 'success!'
             print sys, 'Getting c2 equity...',
             equity=get_c2lastEquity(systemdata)
             if len(equity)>0 and 'modelAccountValue' in equity.columns:
@@ -157,7 +165,7 @@ def check_systems_live(debug, ordersDict, csidate):
                 equity['Date']=csidate
                 equity['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
                 equity.to_sql(name='c2_equity',con=writeConn, index=False, if_exists='append')
-                print  'Saved to sql db',dbPath
+                print  'Saved',sys,'c2_equity to sql db',dbPath
             else:
                 print 'Could not get last equity from c2'
 

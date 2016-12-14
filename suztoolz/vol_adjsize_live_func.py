@@ -12,6 +12,7 @@ import sqlite3
 from pandas.io import sql
 from os import listdir
 from os.path import isfile, join
+import calendar
 import io
 import traceback
 import json
@@ -23,6 +24,7 @@ import re
 import datetime
 from datetime import datetime as dt
 import time
+import calendar
 import inspect
 import os
 import os.path
@@ -578,7 +580,7 @@ def vol_adjsize_live(debug, threadlist):
             #addLine['c2sym']=ticker
             addLine['signals']=futuresDF.ix[ticker][c2system]
             addLine['safef']=c2safef
-            addLine['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+            addLine['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
             #signalFile = signalFile.append(addLine)
             #filename=signalSavePath + version+'_'+ ticker+ '.csv'
             
@@ -589,7 +591,7 @@ def vol_adjsize_live(debug, threadlist):
         '''
 
         futuresDF['Date']=lastDate
-        futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        futuresDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         futuresDF.index.name = 'CSIsym'
 
         try:
@@ -678,7 +680,7 @@ def vol_adjsize_live(debug, threadlist):
 
         #system.to_csv(systemPath+systemFilename, index=False)
         system['Date']=lastDate
-        system['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        system['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         tablename = 'v4futures_live'
         system.ix[futuresDF.index].to_sql(name=tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
         system.ix[futuresDF.index].to_sql(name='signals_live', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
@@ -695,7 +697,7 @@ def vol_adjsize_live(debug, threadlist):
                 
         #system_mini.to_csv(systemPath+systemFilename2, index=False)
         system_mini['Date']=lastDate
-        system_mini['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        system_mini['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         tablename = 'v4mini_live'
         system_mini.ix[futuresDF.index].to_sql(name=tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
         system_mini.ix[futuresDF.index].to_sql(name='signals_live', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
@@ -711,7 +713,7 @@ def vol_adjsize_live(debug, threadlist):
                 #series=fixTypes(series,series.to_frame().transpose())
                 
         system_micro['Date']=lastDate
-        system_micro['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        system_micro['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         tablename = 'v4micro_live'
         system_micro.ix[futuresDF.index].to_sql(name= tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
         system_micro.ix[futuresDF.index].to_sql(name='signals_live', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')

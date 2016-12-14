@@ -6,6 +6,7 @@ import subprocess
 import numpy as np
 import pandas as pd
 import time
+import calendar
 #from ibapi.place_order import place_order as place_iborder
 #from c2api.place_order import place_order as place_c2order
 import json
@@ -142,7 +143,7 @@ def check_systems_live(debug, ordersDict, csidate):
             if len(c2open)>0:
                 c2open['system']=sys
                 c2open['Date']=csidate
-                c2open['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+                c2open['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
                 c2open.to_sql(name='c2_portfolio',con=writeConn, index=False, if_exists='append')
                 print  'Saved',sys,'c2_portfolio to sql db',dbPath
             
@@ -163,7 +164,7 @@ def check_systems_live(debug, ordersDict, csidate):
                 print equity['modelAccountValue'][0]
                 equity['system']=sys
                 equity['Date']=csidate
-                equity['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+                equity['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
                 equity.to_sql(name='c2_equity',con=writeConn, index=False, if_exists='append')
                 print  'Saved',sys,'c2_equity to sql db',dbPath
             else:

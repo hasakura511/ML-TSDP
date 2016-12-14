@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import json
 from pandas.io.json import json_normalize
+import calendar
 import time
 import sys
 from datetime import datetime as dt
@@ -338,7 +339,7 @@ for systemName in systems:
         slipDF['Name']=systemName
         slipDF['ibsym']=feeddata.ix[[x[:-2] for x in slipDF.contract.values]].ibsym.values
         slipDF['csiDate']=csidate
-        slipDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        slipDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         slipDF.index = feeddata.ix[[x[:-2] for x in slipDF.contract.values]].CSIsym.values
         slipDF.index.name = 'CSIsym'
         slipDF.to_sql(name= 'slippage', if_exists='append', con=writeConn, index=True, index_label='CSIsym')

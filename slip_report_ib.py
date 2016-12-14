@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib
 import sqlite3
+import calendar
 
 start_time = time.time()
 systemName='v4futures'
@@ -184,7 +185,7 @@ if lastExecutions.shape[0] >0:
     print 'Saved '+savePath2+filename
     slipDF['Name']=systemName
     slipDF['Date']=csidate
-    slipDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    slipDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     slipDF.to_sql(name= 'ib_slippage', if_exists='replace', con=writeConn, index=False)
     print 'Saved ib_slippage to',dbPathWrite
         

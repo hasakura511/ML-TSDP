@@ -22,6 +22,7 @@ import webbrowser
 import re
 import datetime
 from datetime import datetime as dt
+import calendar
 import time
 import inspect
 import os
@@ -68,7 +69,7 @@ if ready:
 else:
     c2system_macro=c2system='RiskOn'
     c2system_mini='RiskOn'
-    c2system_micro='prevACT'
+    c2system_micro='AdjSEA'
     
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
@@ -332,7 +333,7 @@ try:
     futuresDF.index.name = lastDate
     #feeddata=pd.read_csv(feedfile,index_col='CSIsym')
     #feeddata['Date']=int(lastDate.strftime('%Y%m%d'))
-    #feeddata['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    #feeddata['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     #feeddata.to_sql(name='feeddata', con=writeConn, index=True, if_exists='append', index_label='CSIsym')
     #print 'Saved', feedfile, 'to', dbPath
 
@@ -741,7 +742,7 @@ try:
         
         totalsDF.sort_index().transpose().to_csv(savePath+filename)
         totalsDF['Date']=int(lastDate.strftime('%Y%m%d'))
-        totalsDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        totalsDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         totalsDF.to_sql(name='totalsDF',con=writeConn, index=False, if_exists='append')
         print 'Saved totalsDF to', dbPath
         
@@ -760,7 +761,7 @@ try:
         print 'Saving', savePath+'futuresATR_Results.csv'
         futuresDF.to_csv(savePath+'futuresATR_Results.csv')
         futuresDF['Date']=int(lastDate.strftime('%Y%m%d'))
-        futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        futuresDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         futuresDF.drop([col for col in futuresDF.columns if '00:00:00' in col], axis=1).to_sql(name='futuresDF_results',\
                                 con=writeConn, index=True, if_exists='append', index_label='CSIsym')
                                 
@@ -954,7 +955,7 @@ try:
         print 'Saving', savePath+'futuresATR_Signals.csv'
         futuresDF.to_csv(savePath+'futuresATR_Signals.csv')
         futuresDF['Date']=int(lastDate.strftime('%Y%m%d'))
-        futuresDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        futuresDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         futuresDF.drop([col for col in futuresDF.columns if '00:00:00' in col], axis=1).to_sql(name='futuresDF_all',\
                                 con=writeConn, index=True, if_exists='append', index_label='CSIsym')
         print 'Saved futuresDF_all to', dbPath
@@ -964,7 +965,7 @@ try:
         system.to_csv(systemPath+systemFilename, index=False)
         print 'Saved', systemPath+systemFilename,c2system
         system['Date']=int(lastDate.strftime('%Y%m%d'))
-        system['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        system['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         tablename = 'v4futures'
         system.to_sql(name=tablename, if_exists='replace', con=writeConn, index=False)
         system.to_sql(name='signals_csi', if_exists='append', con=writeConn, index=False)
@@ -975,7 +976,7 @@ try:
         system_mini.to_csv(systemPath+systemFilename2, index=False)
         print 'Saved', systemPath+systemFilename2,c2system_mini
         system_mini['Date']=int(lastDate.strftime('%Y%m%d'))
-        system_mini['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        system_mini['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         tablename = 'v4mini'
         system_mini.to_sql(name=tablename, if_exists='replace', con=writeConn, index=False)
         system_mini.to_sql(name='signals_csi', if_exists='append', con=writeConn, index=False)
@@ -986,7 +987,7 @@ try:
         system_micro.to_csv(systemPath+systemFilename3, index=False)
         print 'Saved', systemPath+systemFilename3, c2system_micro
         system_micro['Date']=int(lastDate.strftime('%Y%m%d'))
-        system_micro['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        system_micro['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         tablename = 'v4micro'
         system_micro.to_sql(name=tablename, if_exists='replace', con=writeConn, index=False)
         system_micro.to_sql(name='signals_csi', if_exists='append', con=writeConn, index=False)
@@ -997,7 +998,7 @@ try:
 
 
     accountInfo['Date']=int(lastDate.strftime('%Y%m%d'))
-    accountInfo['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    accountInfo['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     accountInfo.to_sql(name='accountInfo',con=writeConn, index=True, if_exists='append')
     print 'Saved accountInfo to', dbPath
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

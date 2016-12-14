@@ -19,6 +19,7 @@ import webbrowser
 import re
 import datetime
 from datetime import datetime as dt
+import calendar
 import time
 import inspect
 import os
@@ -185,7 +186,7 @@ try:
         print 'Saving...', savePath+'currenciesATR.csv'
         currenciesDF.sort_index().to_csv(savePath+'currenciesATR.csv')
         #currenciesDF['Date']=lastDate.strftime('%Y%m%d')
-        currenciesDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        currenciesDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         currenciesDF.to_sql(name='currenciesDF',con=conn, index=True, if_exists='append', index_label='CSIsym')
         print 'Saved currenciesDF to', dbPath
     else:

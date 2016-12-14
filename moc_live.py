@@ -11,6 +11,7 @@ import threading
 import time
 import logging
 import copy
+import calendar
 #import get_feed2 as feed
 from pytz import timezone
 from dateutil.parser import parse
@@ -303,7 +304,7 @@ def get_ibfutpositions(portfolioPath):
             print 'Account value:', accountValue
             try:
                 accountSet['Date']=csidate
-                accountSet['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+                accountSet['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
                 accountSet.to_sql(name='ib_accountData', con=writeConn, index=True, if_exists='append', index_label='Desc')
                 print 'saved ib_accountData to', dbPath
             except Exception as e:
@@ -323,7 +324,7 @@ def get_ibfutpositions(portfolioPath):
         print 'saved', filename
         try:
             dataSet['Date']=csidate
-            dataSet['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+            dataSet['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
             dataSet.to_sql(name='ib_portfolioData', con=writeConn, index=True, if_exists='append', index_label='contracts')
             print 'saved ib_portfolioData to', dbPath
         except Exception as e:
@@ -393,7 +394,7 @@ def create_execDict(feeddata, systemfile):
     contractsDF.index.name = 'ibsym'
     contractsDF['contracts']=[x+contractsDF.ix[x].expiry for x in contractsDF.index]
     contractsDF['Date']=csidate
-    contractsDF['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    contractsDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     #print contractsDF.index
     #print feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1).head()
     contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1),contractsDF], axis=1)
@@ -664,7 +665,7 @@ def filterIBexec():
     executions.to_csv(portfolioPath+'ib_exec_last.csv', index=True)
     print 'saved', portfolioPath+'ib_exec_last.csv'
     executions['Date']=csidate
-    executions['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    executions['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     try:
         executions.to_sql(name='ib_executions', con=writeConn, index=True, if_exists='append', index_label='ibsym')
     except Exception as e:
@@ -690,7 +691,7 @@ def get_timetable(execDict, contractsDF):
     timetable.to_csv(filename, index=True)
     print 'saved', filename
     timetable['Date']=csidate
-    timetable['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+    timetable['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     try:
         timetable.to_sql(name='timetable', con=writeConn, index=True, if_exists='replace', index_label='Desc')
     except Exception as e:
@@ -852,7 +853,7 @@ def getIBopen():
         openOrders['contract']=[openOrders.ix[i].symbol+openOrders.ix[i].expiry for i in openOrders.index]
         openOrders=openOrders.set_index('contract')
         openOrders['Date']=csidate
-        openOrders['timestamp']=int(time.mktime(dt.utcnow().timetuple()))
+        openOrders['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         try:
             openOrders.to_sql(name='ib_openorders', con=writeConn, index=True, if_exists='append', index_label='contract')
         except Exception as e:

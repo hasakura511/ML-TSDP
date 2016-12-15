@@ -2,6 +2,7 @@ from subprocess import Popen, PIPE, check_output
 import time
 import pandas as pd
 import threading
+from datetime import datetime as dt
 start_time = time.time()
 
 def runThreads(threadlist):
@@ -35,7 +36,8 @@ def runThreads(threadlist):
      # Wait for all of them to finish
     for x in threads:
         x.join()
-
+        
+logPath='/logs/'
 csiDataPath=  './data/csidata/v4futures2/'
 futuresdict = pd.read_csv('./data/systems/futuresdict.csv', index_col='CSIsym')
 runPath='./run_futures.py'

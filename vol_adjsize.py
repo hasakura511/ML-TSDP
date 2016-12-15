@@ -57,12 +57,13 @@ c2id_macro=107146997
 c2id_mini=101359768
 c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
-request='http://www.globalsystemsmanagement.net/last_userselection/'
-selectionDF = pd.DataFrame(requests.get(request).json())
-selectionDict=eval(selectionDF.selection[0])
+
 
 ready = False
 if ready:
+    request='http://www.globalsystemsmanagement.net/last_userselection/'
+    selectionDF = pd.DataFrame(requests.get(request).json())
+    selectionDict=eval(selectionDF.selection[0])
     c2system_macro=c2system=selectionDict["v4futures"][0]
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]

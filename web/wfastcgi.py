@@ -580,7 +580,8 @@ class handle_response(object):
         self._get_errors = get_errors
         self.error_message = ''
         self.fatal_errors = False
-        self.physical_path = ''
+        #self.physical_path = ''
+		self.physical_path = '/cygwin64/media/sf_Python/TSDP/web/'
         self.header_bytes = None
         self.sent_headers = False
 

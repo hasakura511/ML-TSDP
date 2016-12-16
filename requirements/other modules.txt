@@ -1,0 +1,7 @@
+python -m pip install --upgrade pip
+pip install arch
+pip install pytz
+pip install tzlocal
+pip install seaborn
+pip install .\TA_Lib-0.4.10-cp27-cp27m-win_amd64.whl
+pip install django

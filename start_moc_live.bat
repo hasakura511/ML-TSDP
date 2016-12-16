@@ -6,5 +6,5 @@ set "HH=%dt:~8,2%" & set "Min=%dt:~10,2%" & set "Sec=%dt:~12,2%"
 set "datestamp=%YYYY%%MM%%DD%" & set "timestamp=%HH%%Min%%Sec%"
 set "fullstamp=%YYYY%%MM%%DD%_%HH%-%Min%-%Sec%"
 
-cd \cygwin64\media\sf_python\tsdp
+cd \ML-TSDP\
 \anaconda2\python start_moc_live.py >> \logs\moc_live_%fullstamp%.txt

@@ -1,0 +1,18 @@
+Install
+anaconda
+git
+IBAPI
+CSIdata
+np++
+chrome
+procexp
+desktops
+db explorer
+csvviewer
+https://sourceforge.net/projects/unxutils/
+add wbin dir to env paths 
+
+open port 80
+https://support.rackspace.com/how-to/managing-the-windows-server-2012-firewall/
+
+mkdir /logs

@@ -3,6 +3,7 @@ change timezone on windows clock!
 anaconda
 --> may need to downgrade pandas version
 git
+--> update git ignore toignore results and static files
 IBAPI
 --> settings uncheck readonly API
 --> change port to 7496

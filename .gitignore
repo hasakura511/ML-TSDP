@@ -3,3 +3,5 @@
 .DS_Store
 
 feed/migrations/*
+/data/results/
+static/images/

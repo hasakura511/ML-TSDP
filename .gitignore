@@ -4,4 +4,4 @@
 
 feed/migrations/*
 /data/results/
-static/images/
+images/

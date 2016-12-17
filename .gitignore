@@ -1,7 +1,8 @@
 *.pyc
+*.png
 *.sw[opqrstuvwxyz]
 .DS_Store
 
 feed/migrations/*
-/data/results/
-images/
+/data/results/*.png
+/web/tsdp/betting/static/images/system/*

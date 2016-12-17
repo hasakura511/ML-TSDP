@@ -1,9 +1,14 @@
 Install
 change timezone on windows clock!
+
 anaconda
 --> may need to downgrade pandas version
+
 git
 --> update git ignore toignore results and static files
+git rm -r --cached .
+git commit -m ".gitignore is now working"
+
 IBAPI
 --> settings uncheck readonly API
 --> change port to 7496

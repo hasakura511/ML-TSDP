@@ -1,8 +1,14 @@
 Install
+change timezone on windows clock!
 anaconda
+--> may need to downgrade pandas version
 git
 IBAPI
+--> settings uncheck readonly API
+--> change port to 7496
 CSIdata
+-->database -> schedule db update -> wait until everything traded
+--> preferences -> ddist2 -> check rolling report
 np++
 chrome
 procexp

@@ -1,78 +1,47 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSelection
-from django import forms
+from .helpers import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
-
-import time
-import math
-import datetime
-from datetime import datetime as dt
-from pytz import timezone
-from tzlocal import get_localzone
-
+from django.http import JsonResponse
+import pandas as pd
+import sqlite3
 import json
+
+dbPath = '/tsdpWEB/tsdp/db.sqlite3'
+readConn = sqlite3.connect(dbPath)
 
 
 # Create your views here.
-class LoginForm(forms.Form):
-    username = forms.CharField(label='User Name', max_length=64)
-    password = forms.CharField(widget=forms.PasswordInput())
-
-
-def MCdate():
-    cutoff = datetime.time(17, 0, 0, 0)
-    cutoff2 = datetime.time(23, 59, 59)
-    eastern = timezone('US/Eastern')
-    now = dt.now(get_localzone())
-    now = now.astimezone(eastern)
-
-    if now.weekday() == 5:
-        # Saturday so set to monday
-        next = now + datetime.timedelta(days=2)
-        return next.strftime("%Y%m%d")
-
-    if now.weekday() == 6:
-        # Sunday so set to monday
-        next = now + datetime.timedelta(days=1)
-        return next.strftime("%Y%m%d")
-
-    if now.time() > cutoff and now.time() < cutoff2:
-        if now.weekday() > 4:
-            if now.weekday() == 4:
-                # friday after cutoff so set to monday
-                next = now + datetime.timedelta(days=3)
-                return next.strftime("%Y%m%d")
-        else:
-            # M-TH after cutoff
-            next = now + datetime.timedelta(days=1)
-            return next.strftime("%Y%m%d")
-    else:
-        # M-FRI before cutoff?
-        return now.strftime("%Y%m%d")
-
-
-def getTimeStamp():
-    timestamp = int(time.mktime(dt.utcnow().timetuple()))
-    return timestamp
-
+def refreshMetaData(request):
+    updateMeta = MetaData(mcdate=MCdate(), timestamp=getTimeStamp())
+    updateMeta.save()
 
 def addrecord(request):
-    record = UserSelection(userID=request.GET['user_id'], selection=request.GET['Selection'],
-                           v4futures=request.GET['v4futures'], v4mini=request.GET['v4mini'],
+    record = UserSelection(userID=request.GET['user_id'], selection=request.GET['Selection'], \
+                           v4futures=request.GET['v4futures'], v4mini=request.GET['v4mini'], \
                            v4micro=request.GET['v4micro'], mcdate=MCdate(), timestamp=getTimeStamp())
     record.save()
     return HttpResponse(json.dumps({"id": record.id}))
 
 
 def getrecords(request):
-    records = [dict((cn, getattr(data, cn)) for cn in ('name', 'data')) for data in MyTable.objects.all()]
-    print(records)
-    return HttpResponse(json.dumps(records))
+    # records = [ dict((cn, getattr(data, cn)) for cn in ('v4futures', 'v4mini')) for data in UserSelection.objects.all() ]
+    # print(records)
+    # return HttpResponse(json.dumps(records))
+
+    firstrec = UserSelection.objects.order_by('-timestamp').first()
+    firstdata = firstrec.dic()
+    # print(json.dumps(firstdata))
+    recent = UserSelection.objects.order_by('-timestamp')[:20]
+    recentdata = [dict((cn, getattr(data, cn)) for cn in ('timestamp', 'mcdate', 'selection')) for data in recent]
+    return HttpResponse(json.dumps({"first": firstdata, "recent": recentdata}))
 
 
 def post_list(request):
+    updateMeta()
+    getAccountValues()
     return render(request, 'index.html', {})
 
 
@@ -119,3 +88,9 @@ def register(request):
     else:
         form = UserCreationForm()
         return render(request, 'registration.html', {'form': form})
+
+
+def last_userselection(request):
+    lastSelection = pd.read_sql('select * from betting_userselection where timestamp=\
+            (select max(timestamp) from betting_userselection as maxtimestamp)', con=readConn, index_col='userID')
+    return JsonResponse(eval(lastSelection.to_json()))

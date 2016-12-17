@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.globalsystemsmanagement.com',
-    'www.globalsystemsmanagement.net',
 	'localhost'
 ]
 

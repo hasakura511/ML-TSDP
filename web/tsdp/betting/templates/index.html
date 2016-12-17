@@ -4,6 +4,7 @@
 
 
 {% block content %}
+<base href="/">
 {% if user.is_authenticated %}
     <bet-app>Loading...</bet-app>
     <script src="{% static 'js/libs.min.js' %}"></script>

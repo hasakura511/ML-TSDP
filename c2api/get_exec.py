@@ -428,7 +428,7 @@ def get_executions(data):
         
 def get_c2trades(systemid, name, c2api):
 
-    filename='./data/portfolio/' + name + '_trades.csv'
+    filename='./data/portfolio/c2_' + name + '_trades.csv'
     
     datestr=strftime("%Y%m%d", localtime())
     data=get_exec(systemid,c2api);

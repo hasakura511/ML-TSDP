@@ -2,13 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e841186d-6f3c-480f-a3fe-a2b27d85687e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slip_report_ib.py" afterPath="$PROJECT_DIR$/slip_report_ib.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/loadFuturesCSI.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/loadFuturesCSI.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/mrClassifier.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/mrClassifier.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/mrClassifier3.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/mrClassifier3.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/smoothHurst.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/smoothHurst.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/smoothHurst2.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/smoothHurst2.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/zigzag.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/zigzag.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/zigzag2.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/zigzag2.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -76,7 +69,7 @@
         <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="651">
-              <caret line="281" column="12" lean-forward="true" selection-start-line="281" selection-start-column="12" selection-end-line="281" selection-end-column="97" />
+              <caret line="281" column="12" lean-forward="false" selection-start-line="281" selection-start-column="12" selection-end-line="281" selection-end-column="97" />
               <folding />
             </state>
           </provider>
@@ -85,9 +78,11 @@
       <file leaf-file-name="zigzag2.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2724">
-              <caret line="8" column="19" lean-forward="true" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
-              <folding />
+            <state relative-caret-position="286">
+              <caret line="374" column="24" lean-forward="false" selection-start-line="374" selection-start-column="24" selection-end-line="374" selection-end-column="24" />
+              <folding>
+                <element signature="e#85#96#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -382,16 +377,18 @@
     <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="651">
-          <caret line="281" column="12" lean-forward="true" selection-start-line="281" selection-start-column="12" selection-end-line="281" selection-end-column="97" />
+          <caret line="281" column="12" lean-forward="false" selection-start-line="281" selection-start-column="12" selection-end-line="281" selection-end-column="97" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2724">
-          <caret line="8" column="19" lean-forward="true" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
-          <folding />
+        <state relative-caret-position="286">
+          <caret line="374" column="24" lean-forward="false" selection-start-line="374" selection-start-column="24" selection-end-line="374" selection-end-column="24" />
+          <folding>
+            <element signature="e#85#96#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

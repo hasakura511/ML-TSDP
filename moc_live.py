@@ -124,7 +124,7 @@ else:
     dataPath='./data/'
     portfolioPath = './data/portfolio/'
     savePath='./data/'
-    pngPath = './data/results/'
+    pngPath = './web/betting/static/images/'
     savePath2 = './data/portfolio/'
     systemPath =  './data/systems/'
     feedfile='./data/systems/system_ibfeed.csv'

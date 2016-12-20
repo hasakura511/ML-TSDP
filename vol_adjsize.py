@@ -59,11 +59,59 @@ c2id_micro=101533256
 c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
 
 
-ready = False
-if ready:
-    request='http://www.globalsystemsmanagement.net/last_userselection/'
-    selectionDF = pd.DataFrame(requests.get(request).json())
-    selectionDict=eval(selectionDF.selection[0])
+if len(sys.argv)==1:
+    debug=True
+    showPlots=False
+    #refreshSea tries to recreate the first run futuresATR file after new signals have been generated
+    refreshSea=False
+    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPath2='D:/ML-TSDP/data/futures.sqlite3'
+    dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
+    dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
+    savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    pngPath=savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    #test last>old
+    #dataPath2=savePath2
+    #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    
+    #test last=old
+    dataPath2='D:/ML-TSDP/data/'
+    
+    signalPath ='D:/ML-TSDP/data/signals/'
+    signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
+    logging.basicConfig(filename='C:/logs/vol_adjsize_error.log',level=logging.DEBUG)
+    
+else:
+    debug=False
+    showPlots=False
+    #if set to on its probably going to mess up the db.
+    refreshSea=False
+    dbPathWeb ='./web/tsdp/db.sqlite3'
+    dbPath=dbPath2='./data/futures.sqlite3'
+    dataPath='./data/csidata/v4futures2/'
+    dataPath2='./data/'
+    savePath='./data/'
+    signalPath = './data/signals/' 
+    signalSavePath = './data/signals/' 
+    savePath2 = './data/results/'
+    pngPath= './web/betting/static/images/'
+    systemPath =  './data/systems/'
+    feedfile='./data/systems/system_ibfeed.csv'
+    logging.basicConfig(filename='/logs/vol_adjsize_error.log',level=logging.DEBUG)
+    
+writeConn = sqlite3.connect(dbPath)
+readConn =  sqlite3.connect(dbPath2)
+readWebConn = sqlite3.connect(dbPathWeb)
+webready = False
+if webready:
+    #request='http://www.globalsystemsmanagement.net/last_userselection/'
+    #selectionDF = pd.DataFrame(requests.get(request).json())
+    #selectionDict=eval(selectionDF.selection[0])
+    selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
+            (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
+    selectionDict=eval(selectionDF.selection[0].values[0])
     c2system_macro=c2system=selectionDict["v4futures"][0]
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]
@@ -105,49 +153,6 @@ accountInfo = accountInfo.append(pd.DataFrame(data=[[str(offline), str(offline_m
 #-1 would 0 safef ==1 and double safef==2
 #1 would 0 safef ==2 and double safef==1
 safefAdjustment=0
-
-if len(sys.argv)==1:
-    debug=True
-    showPlots=False
-    #refreshSea tries to recreate the first run futuresATR file after new signals have been generated
-    refreshSea=False
-    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
-    dbPath2='D:/ML-TSDP/data/futures.sqlite3'
-    dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
-    savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
-    #test last>old
-    #dataPath2=savePath2
-    #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-    
-    #test last=old
-    dataPath2='D:/ML-TSDP/data/'
-    
-    signalPath ='D:/ML-TSDP/data/signals/'
-    signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-    systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
-    logging.basicConfig(filename='C:/logs/vol_adjsize_error.log',level=logging.DEBUG)
-    
-else:
-    debug=False
-    showPlots=False
-    #if set to on its probably going to mess up the db.
-    refreshSea=False
-    dbPath=dbPath2='./data/futures.sqlite3'
-    dataPath='./data/csidata/v4futures2/'
-    dataPath2='./data/'
-    savePath='./data/'
-    signalPath = './data/signals/' 
-    signalSavePath = './data/signals/' 
-    savePath2 = './data/results/'
-    systemPath =  './data/systems/'
-    feedfile='./data/systems/system_ibfeed.csv'
-    logging.basicConfig(filename='/logs/vol_adjsize_error.log',level=logging.DEBUG)
-    
-writeConn = sqlite3.connect(dbPath)
-readConn =  sqlite3.connect(dbPath2)
-
 
 
 fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
@@ -367,7 +372,7 @@ try:
             else:
                 sym=contract
             #seasonality
-            seaBias, currRun, date,vStart = seasonalClassifier(sym, dataPath, savePath=savePath2+version+'_'+sym+'_MODE2',\
+            seaBias, currRun, date,vStart = seasonalClassifier(sym, dataPath, savePath=pngPath+version+'_'+sym+'_MODE2',\
                                                         debug=showPlots)
             futuresDF.set_value(sym,'vSTART',vStart)
             futuresDF.set_value(sym,'LastSEA',seaBias)
@@ -388,9 +393,9 @@ try:
         plt.xticks(rotation=90) 
         corrDF.to_html(savePath2+'futures_3.html')
 
-        if savePath2 != None:
-            print 'Saving '+savePath2+'futures_3.png'
-            fig.savefig(savePath2+'futures_3.png', bbox_inches='tight')
+        if pngPath != None:
+            print 'Saving '+pngPath+'futures_3.png'
+            fig.savefig(pngPath+'futures_3.png', bbox_inches='tight')
             
         if len(sys.argv)==1 and showPlots:
             #print data.index[0],'to',data.index[-1]
@@ -406,9 +411,9 @@ try:
             plt.xticks(np.arange(-1,1.25,.25))
             plt.grid(True)
             filename=version+'_'+col+'_CORREL'+'.png'
-            if savePath2 != None:
-                print i+1,'Saving '+savePath2+filename
-                plt.savefig(savePath2+filename, bbox_inches='tight')
+            if pngPath != None:
+                print i+1,'Saving '+pngPath+filename
+                plt.savefig(pngPath+filename, bbox_inches='tight')
             
             if len(sys.argv)==1 and showPlots:
                 #print data.index[0],'to',data.index[-1]
@@ -924,8 +929,8 @@ try:
             plt.xlim(-1,1)
 
             filename='custom_'+group[0]+'.png'
-            plt.savefig(savePath2+filename, bbogroup_inches='tight')
-            print 'Saved '+savePath2+filename
+            plt.savefig(pngPath+filename, bbogroup_inches='tight')
+            print 'Saved '+pngPath+filename
             
             if debug:
                 plt.show()

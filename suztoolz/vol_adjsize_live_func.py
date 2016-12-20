@@ -60,12 +60,13 @@ def vol_adjsize_live(debug, threadlist):
             showPlots=False
             dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
             dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
+            dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
             dataPath='D:/ML-TSDP/data/csidata/v4futures4_debug/'
             savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-            savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+            pngPath = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
             feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
             #test last>old
-            #dataPath2=savePath2
+            #dataPath2=pngPath
             #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
             
             #test last=old
@@ -77,6 +78,7 @@ def vol_adjsize_live(debug, threadlist):
             systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
             readConn = sqlite3.connect(dbPath2)
             writeConn= sqlite3.connect(dbPath)
+            readWebConn = sqlite3.connect(dbPathWeb)
             logging.basicConfig(filename='C:/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
         else:
             mode= 'append'
@@ -84,15 +86,17 @@ def vol_adjsize_live(debug, threadlist):
             showPlots=False
             feedfile='./data/systems/system_ibfeed.csv'
             dbPath='./data/futures.sqlite3'
+            dbPathWeb ='./web/tsdp/db.sqlite3'
             #dataPath='./data/csidata/v4futures4/'
             dataPath='./data/csidata/v4futures4/'
             dataPath2='./data/'
             savePath='./data/'
             signalPath = './data/signals2/' 
             signalSavePath = './data/signals2/' 
-            savePath2 = './data/results/'
+            pngPath = './web/betting/static/images/'
             systemPath =  './data/systems/'
             readConn = writeConn= sqlite3.connect(dbPath)
+            readWebConn = sqlite3.connect(dbPathWeb)
             logging.basicConfig(filename='/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
         
         updatedSymbols = [x[0] for x in threadlist]
@@ -556,8 +560,8 @@ def vol_adjsize_live(debug, threadlist):
             plt.xlim(-1,1)
 
             filename='custom_'+group[0]+'.png'
-            plt.savefig(savePath2+filename, bbogroup_inches='tight')
-            print 'Saved '+savePath2+filename
+            plt.savefig(pngPath+filename, bbogroup_inches='tight')
+            print 'Saved '+pngPath+filename
             
             #if debug:
             #    plt.show()

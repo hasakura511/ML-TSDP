@@ -18,7 +18,7 @@ if len(sys.argv)==1:
     savePath =  'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     #pairPath='D:/ML-TSDP/data/csidata/v4futures/'
 else:
-    savePath = './data/results/'
+    savePath = './web/betting/static/images/'
     dataPath = './data/csidata/v4futures2/'
     #pairPath='./data/'
     

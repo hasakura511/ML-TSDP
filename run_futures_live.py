@@ -281,8 +281,8 @@ if len(sys.argv)==1 or len(sys.argv)==2:
                              #'EBL',
                              #'EBM',
                              #'EBS',
-                             #'ED',
-                             'EMD',
+                             'ED',
+                             #'EMD',
                              #'ES',
                              #'FCH',
                              #'FC',
@@ -448,7 +448,7 @@ else:
     signalPath = './data/signals2/'
     dataPath = './data/csidata/v4futures4/'
     feedfile='./data/systems/system_ibfeed.csv'
-    chartSavePath = './data/results/'+version+'_'+ticker
+    chartSavePath =  './web/betting/static/images/'+version+'_'+ticker
     
     #adds auxilary pair features
     addAux = True

@@ -278,10 +278,10 @@ if len(sys.argv)==1:
                          #'CT',
                          #'CU',
                          #'DX',
-                         'EBL',
+                         #'EBL',
                          #'EBM',
                          #'EBS',
-                         #'ED',
+                         'ED',
                          #'EMD',
                          #'ES',
                          #'FCH',
@@ -762,6 +762,9 @@ dataSet, auxFuturesDict = loadFutures(auxFutures, dataPath,\
 #account for data loss
 #validationSetLength = dataSet.shape[0]-supportResistanceLB*2
 validationSetLength = dataSet.ix[startDate:].shape[0]-1
+#hotfix for sdate=data.index[-validationSetLength-1].to_datetime()
+if validationSetLength>supportResistanceLB:
+    validationSetLength=supportResistanceLB-2
 dataSet2= dataSet.copy()
 dataSet=dataSet.iloc[-(maxlb+validationSetLength):]
 

@@ -17,8 +17,7 @@ from suztoolz.datatools.zigzag2 import zigzag as zg
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tick
 import statsmodels.tsa.stattools as ts
-#from pandas.stats.api import ols
-import statsmodels.api as sm
+from pandas.stats.api import ols
 from matplotlib.dates import DateFormatter, WeekdayLocator,\
                                             MonthLocator, MONDAY, HourLocator, date2num
 class zigzag(object):
@@ -275,18 +274,18 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
                 validationLength=validationLength2
             #find next seasonal pivot, +5 for to lookahead of weekend/larger lookforward bias
             i=1 
-            print data.index[np.nonzero(zzs_pivots)[0][i]].to_pydatetime()
-            pivotDate=(data.index[np.nonzero(zzs_pivots)[0][i]].to_pydatetime().year+1)*10000+\
-                            data.index[np.nonzero(zzs_pivots)[0][i]].to_pydatetime().month*100\
-                            +data.index[np.nonzero(zzs_pivots)[0][i]].to_pydatetime().day
-            currentDate=data.index[-1].to_pydatetime().year*10000+data.index[-1].to_pydatetime().month*100\
-                                +data.index[-1].to_pydatetime().day+pivotDateLookforward
+            print data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime()
+            pivotDate=(data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().year+1)*10000+\
+                            data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
+                            +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
+            currentDate=data.index[-1].to_datetime().year*10000+data.index[-1].to_datetime().month*100\
+                                +data.index[-1].to_datetime().day+pivotDateLookforward
             print i,pivotDate,currentDate, not currentDate<pivotDate
             while not currentDate<pivotDate:
                 i+=1
-                pivotDate=(data.index[np.nonzero(zzs_pivots)[0][i]].to_pydatetime().year+1)*10000+\
-                                data.index[np.nonzero(zzs_pivots)[0][i]].to_pydatetime().month*100\
-                                +data.index[np.nonzero(zzs_pivots)[0][i]].to_pydatetime().day
+                pivotDate=(data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().year+1)*10000+\
+                                data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().month*100\
+                                +data.index[np.nonzero(zzs_pivots)[0][i]].to_datetime().day
                 print i,pivotDate,currentDate
             nextSea=round(data.S.iloc[np.nonzero(zzs_pivots)[0][i]],2)
             
@@ -296,25 +295,13 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             else:
                 seaBias=-1
             #ax3
-            #print data.Close.pct_change().dropna().rolling(rc_window).corr()
-            #print data.S.pct_change().shift(-1).dropna().rolling(rc_window)
-            #hotfix
-            corr= data.Close.pct_change().dropna().rolling(rc_window).corr(\
-                        data.S.pct_change().shift(-1).dropna().rolling(rc_window)).values
-            #print corr.shape[:-1], corr[:-1]
-            #old
-            #corr = pd.rolling_corr(data.Close.pct_change().dropna().values,\
-            #                                data.S.pct_change().shift(-1).dropna().values,window=rc_window) 
-            corr=pd.Series(np.insert(corr[:-1],0,np.nan), index=data.index).ewm(com=0.5).mean()
-            #corr=pd.ewma(pd.Series(np.insert(corr[:-1],0,np.nan), index=data.index),com=0.5)
+            corr = pd.rolling_corr(data.Close.pct_change().dropna().values,\
+                                            data.S.pct_change().shift(-1).dropna().values,window=rc_window) 
+            corr=pd.ewma(pd.Series(np.insert(corr,0,np.nan), index=data.index),com=0.5)
             #ax4 spread
-            #res = ols(y=data2.Close, x=data2.S)
-            res = sm.OLS(data2.Close, data2.S).fit()
-
-            #spread=data2.Close-res.beta.x*data2.S      
-            spread=data2.Close-res.params.S*data2.S
-            zs_spread= ((spread - spread.rolling(zs_window).mean())/spread.rolling(zs_window).std()).ix[data.index]
-            #zs_spread= ((spread - pd.rolling_mean(spread,zs_window))/pd.rolling_std(spread,zs_window)).ix[data.index]
+            res = ols(y=data2.Close, x=data2.S)
+            spread=data2.Close-res.beta.x*data2.S        
+            zs_spread= ((spread - pd.rolling_mean(spread,zs_window))/pd.rolling_std(spread,zs_window)).ix[data.index]
             
             #top axis
             fig = plt.figure(figsize=(w,l*2))
@@ -447,15 +434,6 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
 
 if __name__ == "__main__":
     version = 'v4'
-    l=8
-    w=8
-    lb=270
-    zzpstd=2.5
-    zzsstd=3.5
-    zs_window=60
-    rc_window=10
-    pivotDateLookforward=3
-    minValidationLength=5
     liveFutures =  [
                          #'AC',
                          #'AD',

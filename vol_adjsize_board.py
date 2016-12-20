@@ -41,7 +41,12 @@ version='v4'
 systems = ['v4futures','v4mini','v4micro']
 riskEquity=1000
 riskEquity_mini=250
-riskEquity_micro=250        
+riskEquity_micro=250      
+c2safef=1  
+#range (-1 to 1) postive for counter-trend negative for trend i.e.
+#-1 would 0 safef ==1 and double safef==2
+#1 would 0 safef ==2 and double safef==1
+safefAdjustment=0
 offline =['AC','AEX','CC','CGB','CT','DX','EBL','EBM','EBS','ED','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','KC','KW','LB','LCO','LGO','LRC','LSU','MEM','MFX','MW','O','OJ','RR','RS','SB','SIN','SJB','SMI','SSG','STW','SXE','TF','VX','YA','YB','YT2','YT3',]
 offline_mini = ['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM','EBS','ED','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SMI','SSG','STW','SXE','TF','US','VX','YA','YB','YM','YT2','YT3',]
 offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3',]
@@ -100,27 +105,36 @@ else:
     systemPath =  './data/systems/'
     feedfile='./data/systems/system_ibfeed.csv'
     logging.basicConfig(filename='/logs/vol_adjsize_error.log',level=logging.DEBUG)
+
+def checkTableExists(dbconn, tablename):
+    dbcur = dbconn.cursor()
+    dbcur.execute("""
+        SELECT COUNT(*)
+        FROM sqlite_master
+        WHERE type= 'table' AND name = '{0}'
+        """.format(tablename.replace('\'', '\'\'')))
+    if dbcur.fetchone()[0] == 1:
+        dbcur.close()
+        return True
+
+    dbcur.close()
+    return False
     
 writeConn = sqlite3.connect(dbPath)
 readConn =  sqlite3.connect(dbPath2)
 readWebConn = sqlite3.connect(dbPathWeb)
-webready = False
-if webready:
-    #request='http://www.globalsystemsmanagement.net/last_userselection/'
-    #selectionDF = pd.DataFrame(requests.get(request).json())
-    #selectionDict=eval(selectionDF.selection[0])
-    selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
-            (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
-    selectionDict=eval(selectionDF.selection[0].values[0])
-    c2system_macro=c2system=selectionDict["v4futures"][0]
-    c2system_mini=selectionDict["v4mini"][0]
-    c2system_micro=selectionDict["v4micro"][0]
-else:
-    c2system_macro=c2system='RiskOn'
-    c2system_mini='RiskOn'
-    c2system_micro='AdjSEA'
-    
-c2safef=1
+
+#request='http://www.globalsystemsmanagement.net/last_userselection/'
+#selectionDF = pd.DataFrame(requests.get(request).json())
+#selectionDict=eval(selectionDF.selection[0])
+selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
+        (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
+selectionDict=eval(selectionDF.selection.values[0])
+c2system_macro=c2system=selectionDict["v4futures"][0]
+c2system_mini=selectionDict["v4mini"][0]
+c2system_micro=selectionDict["v4micro"][0]
+
+'''
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                 'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
                 'prevSEA','LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
@@ -143,16 +157,67 @@ ComponentsDict ={
                             'Seasonality':'LastSEA',
                             'Anti-Seasonality':'AntiSEA',
                             }
+'''
 
+if checkTableExists(writeConn, 'webSelection'):
+    last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
+    #read from writeconn for debugging purpose
+    last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
+                            (select max(timestamp) from webSelection as maxtimestamp)',\
+                            con=writeConn, index_col='userID').reset_index().to_dict()
+    # if selectionDF is same as before then exit.
+    # need to do this by system. 
+    selectionDict_old=eval(last_selectionBack['selection'][0])
+    if selectionDict == selectionDict_old:
+        #no change sysexit
+        print 'no change in user selection', selectionDict
+        sys.exit('no change in user selection')
+    else:
+        #write new selection to backend db
+        selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
+                    con=writeConn, index=False)
+        print 'appending webSelection to', dbPath
+        #check each system to see if its changed.
+        #need to check each system in between MOC and CSI data release
+        #we don't revert back to the prior day's. this will happen when only one system
+        #changes and others don't.
+        
+        newselectionDict={}
+        for key in selectionDict.keys():
+            print key, selectionDict[key], selectionDict_old[key]
+            if selectionDict[key] != selectionDict_old[key]:
+                newselectionDict[key]=selectionDict[key]
+        #reset the selection dict with only the systems that's changed.
+        selectionDict = newselectionDict.copy()
+else:  
+    #user has changed selection
+    selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='replace',\
+                con=writeConn, index=False)
+    print 'wrote webSelection to ',dbPath
+
+    
+#loadlast futures ATR data. live dumps into table 'futuresATR'
+#using the EOD all because ithink if we are at this point, we are processing immediate orders.
+#or new orders (change in system selection since MOC). right??
+futuresDF=pd.read_sql('select * from futuresDF_all where timestamp=\
+                        (select max(timestamp) from futuresDF_all as maxtimestamp)',\
+                        con=readConn, index_col='CSIsym').reset_index().to_dict()
+                        
+systemDict={}
+for key in selectionDict.keys():
+    ComponentsDict = eval(eval(selectionDF[key].values[0])
+    ComponentsDict = addAnti(ComponentsDict)
+    systemDict[key]={
+                                'system':[ComponentsDict[x] for x in [selectionDict[key][0]]],
+                                'immediate':eval(selectionDict[key][1])
+                                }
+'''
 accountInfo = pd.DataFrame(data=[[c2system, c2system_mini, c2system_micro]],columns=systems,index=['selection'])
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2id_macro, c2id_mini, c2id_micro]],columns=systems,index=['c2id']))
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2key, c2key, c2key]],columns=systems,index=['c2key']))
 accountInfo = accountInfo.append(pd.DataFrame(data=[[riskEquity, riskEquity_mini, riskEquity_micro]],columns=systems,index=['riskEquity']))
 accountInfo = accountInfo.append(pd.DataFrame(data=[[str(offline), str(offline_mini), str(offline_micro)]],columns=systems,index=['offline']))
-#range (-1 to 1) postive for counter-trend negative for trend i.e.
-#-1 would 0 safef ==1 and double safef==2
-#1 would 0 safef ==2 and double safef==1
-safefAdjustment=0
+
 
 
 fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
@@ -1011,3 +1076,4 @@ try:
 except Exception as e:
     logging.exception("message")
     logging.info( str(dt.now()))
+'''

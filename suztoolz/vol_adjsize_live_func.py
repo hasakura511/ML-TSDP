@@ -556,7 +556,7 @@ def vol_adjsize_live(debug, threadlist):
             colors[mask.values]='g'
             Lper = round(sum(mask.values)/float(group[1].shape[0])*100,1)
             title = 'Custom '+group[0] + ' L% '+ str(Lper)
-            group[1].plot(kind='barh', title =title, colors=colors)
+            group[1].plot(kind='barh', title =title, color=colors)
             plt.xlim(-1,1)
 
             filename='custom_'+group[0]+'.png'

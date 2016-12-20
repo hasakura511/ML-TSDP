@@ -266,7 +266,7 @@ class zigzag(object):
             #            [plt.cm.cool(i) for i in np.linspace(0, 1, len(signals.columns))])))
             nrows = len(self.prices)
             ax2=ax.twinx()
-            ax2.set_color_cycle(sns.color_palette("husl", len(signals.columns)))
+            ax2.set_prop_cycle(sns.color_palette("husl", len(signals.columns)))
             ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
             ax2.set_title(chartTitle)
             ga_pct = self.prices.pct_change().shift(-1).fillna(0)

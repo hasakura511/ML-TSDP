@@ -8,7 +8,7 @@
       <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
       <user-name>beginning</user-name>
       <user-password>dfc8dfcfdfcddfc8dfcfdfcddf8bdfeadf89</user-password>
-      <resolve-scope>tsdp:public,beginning</resolve-scope>
+      <resolve-scope>tsdp:beginning,public</resolve-scope>
     </data-source>
   </component>
 </project>

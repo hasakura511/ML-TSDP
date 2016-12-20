@@ -219,7 +219,7 @@ def volatilityClassifier(p,bars,threshold=0.5, showPlot=False, ticker='', savePa
                 
     ax2=ax.twinx()
     #same color to dashed and non-dashed
-    ax2.set_color_cycle(sorted(sns.color_palette("husl", 4)))
+    ax2.set_prop_cycle(sorted(sns.color_palette("husl", 4)))
     #ax2.plot(np.arange(len(p)),Hurst,color='b', label='Hurst')
     #ax2.plot(np.arange(len(p)),SmoothHurst,color='b', label='smoothHurst')
     ax2.plot(np.arange(len(p)),SmoothGarch, label='smoothGarch')

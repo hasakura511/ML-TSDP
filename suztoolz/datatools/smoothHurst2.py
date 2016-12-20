@@ -121,7 +121,7 @@ def smoothHurst2(p,bars,threshold=0.5, showPlot=False):
                     
         ax2=ax.twinx()
         #same color to dashed and non-dashed
-        ax2.set_color_cycle(sorted(sns.color_palette("husl", 2)))
+        ax2.set_prop_cycle(sorted(sns.color_palette("husl", 2)))
         #ax2.plot(np.arange(len(p)),SmoothHurst,color='b', label='smoothHurst')
         #ax2.plot(np.arange(len(p)),SmoothGarch,color='c', label='smoothGarch')
         ax2.plot(np.arange(len(p)),SmoothHG,color='y', label='smoothHG')

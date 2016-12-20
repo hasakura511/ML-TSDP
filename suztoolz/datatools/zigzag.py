@@ -279,7 +279,7 @@ class zigzag(object):
             nrows = len(self.prices)
             ax2=ax.twinx()
             #same color to dashed and non-dashed
-            ax2.set_color_cycle(sorted(sns.color_palette("husl", len(signals))*2))
+            ax2.set_prop_cycle(sorted(sns.color_palette("husl", len(signals))*2))
             ax2.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
             ax2.set_title(chartTitle)
             #ga_pct = self.prices.pct_change().shift(-1).fillna(0)

@@ -2,19 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e841186d-6f3c-480f-a3fe-a2b27d85687e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources/4b0fa58a-8de8-47ca-8c79-8bd5bc42629e.xml" afterPath="$PROJECT_DIR$/.idea/dataSources/4b0fa58a-8de8-47ca-8c79-8bd5bc42629e.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run_futures.py" afterPath="$PROJECT_DIR$/run_futures.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slip_report_ib.py" afterPath="$PROJECT_DIR$/slip_report_ib.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/loadFuturesCSI.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/loadFuturesCSI.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/mrClassifier.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/mrClassifier.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/mrClassifier3.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/mrClassifier3.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/smoothHurst.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/smoothHurst.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/smoothHurst2.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/smoothHurst2.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/volatilityClassifier.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/volatilityClassifier.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/zigzag.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/zigzag.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/datatools/zigzag2.py" afterPath="$PROJECT_DIR$/suztoolz/datatools/zigzag2.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/suztoolz/transform.py" afterPath="$PROJECT_DIR$/suztoolz/transform.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -47,11 +42,71 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="seasonalClass.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="seasonalClass.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/suztoolz/datatools/seasonalClass.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7948">
+            <state relative-caret-position="-7977">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="smoothHurst.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/suztoolz/datatools/smoothHurst.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="571">
+              <caret line="97" column="77" lean-forward="false" selection-start-line="97" selection-start-column="77" selection-end-line="97" selection-end-column="77" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="smoothHurst2.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/suztoolz/datatools/smoothHurst2.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="702">
+              <caret line="123" column="77" lean-forward="false" selection-start-line="123" selection-start-column="77" selection-end-line="123" selection-end-column="77" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="zigzag.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="651">
+              <caret line="281" column="12" lean-forward="true" selection-start-line="281" selection-start-column="12" selection-end-line="281" selection-end-column="97" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="zigzag2.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag2.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2724">
+              <caret line="8" column="19" lean-forward="true" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mrClassifier.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/suztoolz/datatools/mrClassifier.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="277">
+              <caret line="238" column="77" lean-forward="false" selection-start-line="238" selection-start-column="77" selection-end-line="238" selection-end-column="77" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mrClassifier3.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/suztoolz/datatools/mrClassifier3.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="396">
+              <caret line="243" column="77" lean-forward="false" selection-start-line="243" selection-start-column="77" selection-end-line="243" selection-end-column="77" />
               <folding />
             </state>
           </provider>
@@ -62,6 +117,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>set_color_cycle</find>
+      <find>set_prop_cycle</find>
     </findStrings>
     <replaceStrings>
       <replace>set_prop_cycle</replace>
@@ -73,14 +129,15 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/suztoolz/datatools/volatilityClassifier.py" />
+        <option value="$PROJECT_DIR$/suztoolz/transform.py" />
+        <option value="$PROJECT_DIR$/suztoolz/datatools/seasonalClass.py" />
         <option value="$PROJECT_DIR$/suztoolz/datatools/mrClassifier.py" />
         <option value="$PROJECT_DIR$/suztoolz/datatools/mrClassifier3.py" />
         <option value="$PROJECT_DIR$/suztoolz/datatools/smoothHurst.py" />
         <option value="$PROJECT_DIR$/suztoolz/datatools/smoothHurst2.py" />
-        <option value="$PROJECT_DIR$/suztoolz/datatools/volatilityClassifier.py" />
         <option value="$PROJECT_DIR$/suztoolz/datatools/zigzag.py" />
         <option value="$PROJECT_DIR$/suztoolz/datatools/zigzag2.py" />
-        <option value="$PROJECT_DIR$/suztoolz/transform.py" />
       </list>
     </option>
   </component>
@@ -266,58 +323,10 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/smoothHurst.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1218">
-          <caret line="97" column="27" lean-forward="false" selection-start-line="97" selection-start-column="27" selection-end-line="97" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/smoothHurst2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1609">
-          <caret line="123" column="27" lean-forward="false" selection-start-line="123" selection-start-column="27" selection-end-line="123" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/mrClassifier3.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3615">
-          <caret line="243" column="23" lean-forward="false" selection-start-line="243" selection-start-column="23" selection-end-line="243" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/mrClassifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="238" column="23" lean-forward="false" selection-start-line="238" selection-start-column="23" selection-end-line="238" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/suztoolz/datatools/volatilityClassifier.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3258">
           <caret line="221" column="23" lean-forward="false" selection-start-line="221" selection-start-column="23" selection-end-line="221" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4312">
-          <caret line="281" column="31" lean-forward="false" selection-start-line="281" selection-start-column="31" selection-end-line="281" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5791">
-          <caret line="374" column="31" lean-forward="false" selection-start-line="374" selection-start-column="31" selection-end-line="374" selection-end-column="31" />
           <folding />
         </state>
       </provider>
@@ -330,10 +339,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/mrClassifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="238" column="77" lean-forward="false" selection-start-line="238" selection-start-column="77" selection-end-line="238" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/mrClassifier3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="243" column="77" lean-forward="false" selection-start-line="243" selection-start-column="77" selection-end-line="243" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/suztoolz/datatools/seasonalClass.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7948">
+        <state relative-caret-position="-7977">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/smoothHurst.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="571">
+          <caret line="97" column="77" lean-forward="false" selection-start-line="97" selection-start-column="77" selection-end-line="97" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/smoothHurst2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="702">
+          <caret line="123" column="77" lean-forward="false" selection-start-line="123" selection-start-column="77" selection-end-line="123" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="651">
+          <caret line="281" column="12" lean-forward="true" selection-start-line="281" selection-start-column="12" selection-end-line="281" selection-end-column="97" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/suztoolz/datatools/zigzag2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2724">
+          <caret line="8" column="19" lean-forward="true" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
           <folding />
         </state>
       </provider>

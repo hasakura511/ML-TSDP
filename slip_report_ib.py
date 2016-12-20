@@ -108,87 +108,90 @@ if lastExecutions.shape[0] >0:
     lastExecutions.lastAppend= pd.to_datetime(lastExecutions.lastAppend).dt.strftime('%Y%m%d')
     #calc slipage for current contracts
     executions = lastExecutions.ix[[x for x in lastExecutions.index if x in contractsDF.contracts.values]].copy()
-    executions['CSIsym']=contractsDF.ix[executions.ibsym].CSIsym.values
-    csidate=executions.lastAppend[0]
-    futuresDF=pd.read_sql( 'select * from futuresDF_all where timestamp=\
-            (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
-    system = pd.read_sql('select * from (select * from signals_live where Date=%s and Name=\'%s\'\
-                        order by timestamp ASC) group by CSIsym' %(csidate, systemName),\
-                        con=readConn,  index_col='CSIsym')
-                        
-    if os.path.isfile(timetablePath+str(csidate)+'.csv'):
-        timetable = pd.read_csv(timetablePath+str(csidate)+'.csv', index_col=0)
-        for col in timetable.columns:
-            timetable[col]=pd.to_datetime(timetable[col])
-        idx_close = [x for x in timetable.index if 'close' in x]
-        idx_trigger = [x for x in timetable.index if 'trigger' in x]
-    else:
-        print 'timetable for', csidate,'not found! Ending script.'
-        sys.exit("timetable not found")
         
-    slipDF = pd.DataFrame()
-    for contract in executions.index:
-        ibsym = executions.ix[contract].ibsym
-        CSIsym=executions.ix[contract].CSIsym
-        if ibsym in IB2CSI_multiplier_adj.keys():
-            ib_price=executions.ix[contract].price*IB2CSI_multiplier_adj[ibsym]
+    if executions.shape[0]>0:
+        executions['CSIsym']=contractsDF.ix[executions.ibsym].CSIsym.values
+        csidate=executions.lastAppend[0]
+        futuresDF=pd.read_sql( 'select * from futuresDF_all where timestamp=\
+                (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
+        system = pd.read_sql('select * from (select * from signals_live where Date=%s and Name=\'%s\'\
+                            order by timestamp ASC) group by CSIsym' %(csidate, systemName),\
+                            con=readConn,  index_col='CSIsym')
+                            
+        if os.path.isfile(timetablePath+str(csidate)+'.csv'):
+            timetable = pd.read_csv(timetablePath+str(csidate)+'.csv', index_col=0)
+            for col in timetable.columns:
+                timetable[col]=pd.to_datetime(timetable[col])
+            idx_close = [x for x in timetable.index if 'close' in x]
+            idx_trigger = [x for x in timetable.index if 'trigger' in x]
         else:
-            ib_price=executions.ix[contract].price
+            print 'timetable for', csidate,'not found! Ending script.'
+            sys.exit("timetable not found")
             
-        ib_timestamp=executions.ix[contract].times
-        qty =executions.ix[contract].qty
-        #current contracts in contractsDF taken from system file which creates directly from csidata
-        if CSIsym in futuresDF.index:
-            csiPrice = futuresDF.ix[CSIsym].LastClose
-            slippage=(ib_price-csiPrice)/csiPrice
-            signal = system.ix[CSIsym].signal
-            closetime=timetable.ix[[x for x in idx_close if ibsym in x]][csidate][0]
-            commissions = commission*qty
-            cv = futuresDF.ix[CSIsym].contractValue
-            dollarslip = int(-slippage*signal*qty*cv)
-            #print contract, ib_price, csiPrice,slippage
-            #rowName = str(ib_timestamp)+' ctwo:'+str(ib_price)+' csi:'+str(csiPrice)+' '+contract
-            rowName = 'ib: '+str(ib_timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
-            slipDF.set_value(rowName, 'contract', contract)
-            slipDF.set_value(rowName, 'ibsym', ibsym)
-            slipDF.set_value(rowName, 'CSIsym', CSIsym)
-            slipDF.set_value(rowName, 'ib_timestamp', ib_timestamp)
-            slipDF.set_value(rowName, 'ib_price', ib_price)
-            slipDF.set_value(rowName, 'closetime', closetime)
-            slipDF.set_value(rowName, 'csiPrice', csiPrice)
-            slipDF.set_value(rowName, 'slippage', slippage)
-            slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
-            slipDF.set_value(rowName, 'Type', 'Open')
-            slipDF.set_value(rowName, 'signal', signal)
-            slipDF.set_value(rowName, 'dollarslip', dollarslip)
-            slipDF.set_value(rowName, 'commissions', commissions)
+        slipDF = pd.DataFrame()
+        for contract in executions.index:
+            ibsym = executions.ix[contract].ibsym
+            CSIsym=executions.ix[contract].CSIsym
+            if ibsym in IB2CSI_multiplier_adj.keys():
+                ib_price=executions.ix[contract].price*IB2CSI_multiplier_adj[ibsym]
+            else:
+                ib_price=executions.ix[contract].price
+                
+            ib_timestamp=executions.ix[contract].times
+            qty =executions.ix[contract].qty
+            #current contracts in contractsDF taken from system file which creates directly from csidata
+            if CSIsym in futuresDF.index:
+                csiPrice = futuresDF.ix[CSIsym].LastClose
+                slippage=(ib_price-csiPrice)/csiPrice
+                signal = system.ix[CSIsym].signal
+                closetime=timetable.ix[[x for x in idx_close if ibsym in x]][csidate][0]
+                commissions = commission*qty
+                cv = futuresDF.ix[CSIsym].contractValue
+                dollarslip = int(-slippage*signal*qty*cv)
+                #print contract, ib_price, csiPrice,slippage
+                #rowName = str(ib_timestamp)+' ctwo:'+str(ib_price)+' csi:'+str(csiPrice)+' '+contract
+                rowName = 'ib: '+str(ib_timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
+                slipDF.set_value(rowName, 'contract', contract)
+                slipDF.set_value(rowName, 'ibsym', ibsym)
+                slipDF.set_value(rowName, 'CSIsym', CSIsym)
+                slipDF.set_value(rowName, 'ib_timestamp', ib_timestamp)
+                slipDF.set_value(rowName, 'ib_price', ib_price)
+                slipDF.set_value(rowName, 'closetime', closetime)
+                slipDF.set_value(rowName, 'csiPrice', csiPrice)
+                slipDF.set_value(rowName, 'slippage', slippage)
+                slipDF.set_value(rowName, 'abs_slippage', abs(slippage))
+                slipDF.set_value(rowName, 'Type', 'Open')
+                slipDF.set_value(rowName, 'signal', signal)
+                slipDF.set_value(rowName, 'dollarslip', dollarslip)
+                slipDF.set_value(rowName, 'commissions', commissions)
+                
+        #slipDF['timedelta']=slipDF.ib_timestamp-slipDF.closetime
+        slipDF['timedelta']=(slipDF.ib_timestamp-slipDF.closetime).astype('timedelta64[m]')
+        #slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
+        #if slipDF.shape[0] != portfolioDF.shape[0]:
+        #    print 'Warning! Some values may be mising'
+
+        totalslip = int(slipDF.dollarslip.sum())
+        filename=systemName+'_ib_slippage.png'
+        title = systemName+': '+str(slipDF.shape[0])+' Trades, $'+str(totalslip)\
+                    +' Slippage, CSI Data as of '+str(csidate)
+        plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
+
             
-    #slipDF['timedelta']=slipDF.ib_timestamp-slipDF.closetime
-    slipDF['timedelta']=(slipDF.ib_timestamp-slipDF.closetime).astype('timedelta64[m]')
-    #slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
-    #if slipDF.shape[0] != portfolioDF.shape[0]:
-    #    print 'Warning! Some values may be mising'
-
-    totalslip = int(slipDF.dollarslip.sum())
-    filename=systemName+'_ib_slippage.png'
-    title = systemName+': '+str(slipDF.shape[0])+' Trades, $'+str(totalslip)\
-                +' Slippage, CSI Data as of '+str(csidate)
-    plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
-
-        
-    slipDF.index.name = 'rowname'
-    filename=systemName+'_ib_slippage_report_'+str(csidate).split()[0].replace('-','')+'.csv'
-    slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
-    slipDF.to_csv(savePath+systemName+'_ib_slippage_report.csv', index=True)
-    print 'Saved '+savePath+systemName+'_ib_slippage_report.csv'
-    slipDF.to_csv(savePath2+filename, index=True)
-    print 'Saved '+savePath2+filename
-    slipDF['Name']=systemName
-    slipDF['Date']=csidate
-    slipDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
-    slipDF.to_sql(name= 'ib_slippage', if_exists='replace', con=writeConn, index=False)
-    print 'Saved ib_slippage to',dbPathWrite
-        
+        slipDF.index.name = 'rowname'
+        filename=systemName+'_ib_slippage_report_'+str(csidate).split()[0].replace('-','')+'.csv'
+        slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)
+        slipDF.to_csv(savePath+systemName+'_ib_slippage_report.csv', index=True)
+        print 'Saved '+savePath+systemName+'_ib_slippage_report.csv'
+        slipDF.to_csv(savePath2+filename, index=True)
+        print 'Saved '+savePath2+filename
+        slipDF['Name']=systemName
+        slipDF['Date']=csidate
+        slipDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
+        slipDF.to_sql(name= 'ib_slippage', if_exists='replace', con=writeConn, index=False)
+        print 'Saved ib_slippage to',dbPathWrite
+    else:
+        print 'Only found executions for expired contracts'
 
 '''
     ###########################################################

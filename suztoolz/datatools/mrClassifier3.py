@@ -241,7 +241,7 @@ def mrClassifier(p,bars, threshold=-1.5, showPlot=False, ticker='', savePath=Non
                 
     ax2=ax.twinx()
     #same color to dashed and non-dashed
-    ax2.set_prop_cycle(sorted(sns.color_palette("husl", 4)))
+    ax2.set_prop_cycle(cycler('color', sorted(sns.color_palette("husl", 4))))
     #ax2.plot(np.arange(len(p)),Hurst,color='b', label='Hurst')
     #print len(p), len(SmoothADF)
     ax2.plot(np.arange(len(p)),SmoothADF,color='b', label='SmoothADF')

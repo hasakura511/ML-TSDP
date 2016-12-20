@@ -448,7 +448,7 @@ else:
     signalPath = './data/signals2/'
     dataPath = './data/csidata/v4futures4/'
     feedfile='./data/systems/system_ibfeed.csv'
-    chartSavePath =  './web/betting/static/images/'+version+'_'+ticker
+    chartSavePath =  './web/tsdp/betting/static/images/'+version+'_'+ticker
     
     #adds auxilary pair features
     addAux = True

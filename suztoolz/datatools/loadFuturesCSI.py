@@ -156,7 +156,7 @@ def loadFutures(auxFutures, dataPath, barSizeSetting, maxlb, ticker,\
                     
         #align the index, at the end of the loop, dataSet should have an index that all contracts contain
         for contract in futuresDict2:
-            missingData=futuresDict2[ticker].index.symmetric_difference(futuresDict2[contract].index)
+            missingData=futuresDict2[ticker].index.sym_diff(futuresDict2[contract].index)
             print 'Missing data:',ticker,contract, missingData
             
             #forward fill missing data
@@ -181,7 +181,7 @@ def loadFutures(auxFutures, dataPath, barSizeSetting, maxlb, ticker,\
                 
         dataSet=futuresDict2[ticker].copy(deep=True)
         print nrows-dataSet.shape[0], 'rows lost for', ticker
-        print futuresDict[ticker].index.symmetric_difference(dataSet.index)
+        print futuresDict[ticker].index.sym_diff(dataSet.index)
         
         futuresDict3 ={}
         for contract in futuresDict2:

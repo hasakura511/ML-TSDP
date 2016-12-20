@@ -288,7 +288,9 @@ def get_c2equity(systemdata):
         dataSet=json_normalize(jsondata['equity_data'])
         dataSet.index = pd.to_datetime(dataSet['unix_timestamp'].astype(int),unit='s')
         dataSet.index.name = 'timestamp'
-        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_equity.csv')
+        filename = './data/portfolio/c2_' + systemname + '_equity.csv'
+        dataSet.to_csv(filename)
+        print 'saved', filename
     return dataSet
 
 def get_c2lastEquity(systemdata):
@@ -304,7 +306,9 @@ def get_c2lastEquity(systemdata):
         dataSet=json_normalize(jsondata['response']['marginEquityData'])
         #dataSet.index = pd.to_datetime(dataSet['unix_timestamp'].astype(int),unit='s')
         #dataSet.index.name = 'timestamp'
-        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_lastEquity.csv', index=False)
+        filename = './data/portfolio/c2_' + systemname + '_lastEquity.csv'
+        dataSet.to_csv(filename, index=False)
+        print 'saved', filename
     return dataSet
     
 def get_c2pos(systemdata):
@@ -334,13 +338,17 @@ def get_c2livepos(systemid, apikey, systemname):
     if len(jsondata['response']) > 0:
         dataSet=json_normalize(jsondata['response'])
         dataSet=dataSet.set_index('symbol')
-        dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
+        filename='./data/portfolio/c2_' + systemname + '_portfolio.csv'
+        dataSet.to_csv(filename)
+        print 'saved', filename
         return dataSet
     else:
         if os.path.isfile('./data/portfolio/c2_' + systemname + '_portfolio.csv'):
             dataSet=get_c2pos_from_csv(systemname);
             dataSet=dataSet[dataSet.index == ''].copy()
-            dataSet.to_csv('./data/portfolio/c2_' + systemname + '_portfolio.csv')
+            filename = './data/portfolio/c2_' + systemname + '_portfolio.csv'
+            dataSet.to_csv(filename)
+            print 'saved', filename
             return dataSet
         
         
@@ -368,6 +376,7 @@ def get_c2_portfolio(systemname):
                      'markToMarket_time','openVWAP_timestamp','openedWhen','qty'])
         dataSet = dataSet.set_index('symbol')
         dataSet.to_csv(filename)
+        print 'saved', filename
         return dataSet
 
     
@@ -400,3 +409,45 @@ def get_c2_list(systemdata):
         
     return c2list
     
+def get_executions(data):        
+    #data=pd.read_csv('./data/systems/system.csv')
+    #data=data.reset_index()
+
+    c2dict={}
+    for i in data.index:
+        system=data.ix[i]
+        #print system['Name'] + ' ' + str(system['c2submit'])
+        if system['c2submit']:
+                c2dict[system['c2id']]=(system['Name'],system['c2api'])
+
+
+
+    for c2id in c2dict:
+        (stratName,c2api)=c2dict[c2id]
+        get_c2trades(c2id, stratName, c2api)
+        
+def get_c2trades(systemid, name, c2api):
+
+    filename='./data/portfolio/' + name + '_trades.csv'
+    
+    datestr=strftime("%Y%m%d", localtime())
+    data=get_exec(systemid,c2api);
+    
+    jsondata = json.loads(data)
+    if len(jsondata['response']) > 1:
+        dataSet=json_normalize(jsondata['response'])
+        dataSet=dataSet.set_index('trade_id')
+        '''
+        if os.path.isfile(filename):
+            existData = pd.read_csv(filename, index_col='trade_id')
+            existData = existData.reset_index()
+            dataSet   =   dataSet.reset_index()
+            dataSet=existData.append(dataSet)
+            dataSet['trade_id'] = dataSet['trade_id'].astype('int')
+            dataSet=dataSet.drop_duplicates(subset=['trade_id'],keep='last')
+            dataSet=dataSet.set_index('trade_id') 
+        '''
+        dataSet=dataSet.sort_values(by='closedWhenUnixTimeStamp')
+        
+        dataSet.to_csv(filename)
+        print 'saved', filename

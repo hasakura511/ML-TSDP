@@ -96,7 +96,7 @@ else:
     signalPath = './data/signals/' 
     signalSavePath = './data/signals/' 
     savePath2 = './data/results/'
-    pngPath= './web/betting/static/images/'
+    pngPath= './web/tsdp/betting/static/images/'
     systemPath =  './data/systems/'
     feedfile='./data/systems/system_ibfeed.csv'
     logging.basicConfig(filename='/logs/vol_adjsize_error.log',level=logging.DEBUG)

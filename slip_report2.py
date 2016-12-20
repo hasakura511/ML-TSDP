@@ -41,7 +41,7 @@ else:
     dbPathWrite=dbPathRead='./data/futures.sqlite3'
     dataPath=savePath='./data/'
     portfolioPath = savePath2 ='./data/portfolio/'
-    pngPath = './web/betting/static/images/'
+    pngPath = './web/tsdp/betting/static/images/'
     systemPath =  './data/systems/'
     timetablePath=   './data/systems/timetables/'
     feedfile='./data/systems/system_ibfeed.csv'

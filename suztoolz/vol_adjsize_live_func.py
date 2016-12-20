@@ -93,7 +93,7 @@ def vol_adjsize_live(debug, threadlist):
             savePath='./data/'
             signalPath = './data/signals2/' 
             signalSavePath = './data/signals2/' 
-            pngPath = './web/betting/static/images/'
+            pngPath = './web/tsdp/betting/static/images/'
             systemPath =  './data/systems/'
             readConn = writeConn= sqlite3.connect(dbPath)
             readWebConn = sqlite3.connect(dbPathWeb)

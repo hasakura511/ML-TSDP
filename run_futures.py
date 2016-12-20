@@ -444,7 +444,7 @@ else:
     #currency=ticker[3:6]
     signalPath = './data/signals/'
     dataPath = './data/csidata/v4futures2/'
-    chartSavePath =  './web/betting/static/images/'+version+'_'+ticker
+    chartSavePath =  './web/tsdp/betting/static/images/'+version+'_'+ticker
     
     #adds auxilary pair features
     addAux = True

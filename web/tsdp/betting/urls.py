@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^register/$', views.register, name='register'),
     url(r'^user/(\w+)/$', views.profile, name='profile'),
 	url(r'^last_userselection/$', views.last_userselection, name='last_userselection'),
+    url(r'^downloaddb/$', views.downloaddb, name='downloaddb'),
 ]

@@ -5,18 +5,23 @@ from .helpers import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
+from django.views.static import serve
 import pandas as pd
 import sqlite3
 import json
+import os
 
 dbPath = '/tsdpWEB/tsdp/db.sqlite3'
 readConn = sqlite3.connect(dbPath)
 
+def downloaddb(request):
+    filepath = '/ml-tsdp/data/futures.sqlite3'
+    return serve(request, os.path.basename(filepath), os.path.dirname(filepath))
 
 # Create your views here.
-def refreshMetaData(request):
-    updateMeta = MetaData(mcdate=MCdate(), timestamp=getTimeStamp())
-    updateMeta.save()
+#def refreshMetaData(request):
+#    updateMeta = MetaData(mcdate=MCdate(), timestamp=getTimeStamp())
+#    updateMeta.save()
 
 def addrecord(request):
     record = UserSelection(userID=request.GET['user_id'], selection=request.GET['Selection'], \
@@ -91,6 +96,7 @@ def register(request):
 
 
 def last_userselection(request):
-    lastSelection = pd.read_sql('select * from betting_userselection where timestamp=\
-            (select max(timestamp) from betting_userselection as maxtimestamp)', con=readConn, index_col='userID')
-    return JsonResponse(eval(lastSelection.to_json()))
+    #lastSelection = pd.read_sql('select * from betting_userselection where timestamp=\
+    #        (select max(timestamp) from betting_userselection as maxtimestamp)', con=readConn, index_col='userID')
+    lastSelection=UserSelection.objects.all().order_by('-timestamp')[0]
+    return JsonResponse(lastSelection.dic())

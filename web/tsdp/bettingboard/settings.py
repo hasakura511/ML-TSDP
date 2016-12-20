@@ -26,8 +26,9 @@ SECRET_KEY = 'o-+q!46u*&-*2l5(osfvi0d@_&=mgd0bn_#9zynw2uz7**=!5s'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'globalsystemsmanagement.com',
     'www.globalsystemsmanagement.com',
-	'localhost'
+	'localhost',
 ]
 
 

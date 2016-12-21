@@ -35,6 +35,7 @@ import sqlite3
 from suztoolz.vol_adjsize_live_func import vol_adjsize_live
 from suztoolz.check_systems_live_func import check_systems_live
 from suztoolz.proc_signal_v4_live_func import proc_signal_v4_live
+from suztoolz.vol_adjsize_board_func import vol_adjsize_board
 #currencyPairsDict=dict()
 #prepData=dict()
 start_time = time.time()
@@ -334,7 +335,8 @@ def get_ibfutpositions(portfolioPath):
         return dataSet.drop(['Date','timestamp'],axis=1)
     else:
         return 0
-
+  
+        
 def create_execDict(feeddata, systemfile):
     global debug
     global client
@@ -929,11 +931,15 @@ if __name__ == "__main__":
     
     if immediate:
         #include all symbols in threadlist to refresh all orders from selection
-        threadlist = [(x,x) for x in feeddata.index]
+        threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
     
     if len(threadlist)>0:
-        print 'running vol_adjsize_live to update system files'
-        ordersDict = vol_adjsize_live(debug, threadlist)
+        if immediate:
+            print 'running vol_adjsize_board to process immediate orders'
+            ordersDict = vol_adjsize_board(debug, threadlist)
+        else:
+            print 'running vol_adjsize_live to update system files'
+            ordersDict = vol_adjsize_live(debug, threadlist)
         #ordersDict={}
         #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
         
@@ -942,7 +948,8 @@ if __name__ == "__main__":
             totalc2orders=check_systems_live(debug, ordersDict, csidate)
             #check ib positions
             try:
-                execDict=update_orders(feeddata, ordersDict['v4futures'], execDict)
+                if 'v4futures' in ordersDict.keys():
+                    execDict=update_orders(feeddata, ordersDict['v4futures'], execDict)
                 iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
                 
                 #get rid of orders if they are already working orders.

@@ -299,22 +299,22 @@ def seasonalClassifier(ticker, dataPath, **kwargs):
             #print data.Close.pct_change().dropna().rolling(rc_window).corr()
             #print data.S.pct_change().shift(-1).dropna().rolling(rc_window)
             #hotfix
-            corr= data.Close.pct_change().dropna().rolling(rc_window).corr(\
-                        data.S.pct_change().shift(-1).dropna().rolling(rc_window)).values
+            #corr= data.Close.pct_change().dropna().rolling(rc_window).corr(\
+            #            data.S.pct_change().shift(-1).dropna().rolling(rc_window)).values
             #print corr.shape[:-1], corr[:-1]
             #old
-            #corr = pd.rolling_corr(data.Close.pct_change().dropna().values,\
-            #                                data.S.pct_change().shift(-1).dropna().values,window=rc_window) 
-            corr=pd.Series(np.insert(corr[:-1],0,np.nan), index=data.index).ewm(com=0.5).mean()
-            #corr=pd.ewma(pd.Series(np.insert(corr[:-1],0,np.nan), index=data.index),com=0.5)
+            corr = pd.rolling_corr(data.Close.pct_change().dropna().values,\
+                                            data.S.pct_change().shift(-1).dropna().values,window=rc_window) 
+            #corr=pd.Series(np.insert(corr[:-1],0,np.nan), index=data.index).ewm(com=0.5).mean()
+            corr=pd.ewma(pd.Series(np.insert(corr,0,np.nan), index=data.index),com=0.5)
             #ax4 spread
             #res = ols(y=data2.Close, x=data2.S)
             res = sm.OLS(data2.Close, data2.S).fit()
 
             #spread=data2.Close-res.beta.x*data2.S      
             spread=data2.Close-res.params.S*data2.S
-            zs_spread= ((spread - spread.rolling(zs_window).mean())/spread.rolling(zs_window).std()).ix[data.index]
-            #zs_spread= ((spread - pd.rolling_mean(spread,zs_window))/pd.rolling_std(spread,zs_window)).ix[data.index]
+            #zs_spread= ((spread - spread.rolling(zs_window).mean())/spread.rolling(zs_window).std()).ix[data.index]
+            zs_spread= ((spread - pd.rolling_mean(spread,zs_window))/pd.rolling_std(spread,zs_window)).ix[data.index]
             
             #top axis
             fig = plt.figure(figsize=(w,l*2))

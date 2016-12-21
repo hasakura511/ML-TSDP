@@ -1,17 +1,33 @@
 Install
 change timezone on windows clock!
+will need to put password for each task in scheduler later if not changed.
 
 anaconda
---> may need to downgrade pandas version
+--> downgrade pandas version pandas 0.17.1
+python -m pip install --upgrade pip
+pip install arch
+pip install pytz
+pip install tzlocal
+pip install seaborn
+pip install .\TA_Lib-0.4.10-cp27-cp27m-win_amd64.whl
+pip install django
 
 git
 --> update git ignore toignore results and static files
 git rm -r --cached .
 git commit -m ".gitignore is now working"
+-->gitignore
+*.pyc
+*.sw[opqrstuvwxyz]
+.DS_Store
+feed/migrations/*
+/data/results/*.png
+/web/tsdp/betting/static/images/*
 
 IBAPI
 --> settings uncheck readonly API
 --> change port to 7496
+
 CSIdata
 -->database -> schedule db update -> wait until everything traded
 --> preferences -> ddist2 -> check rolling report
@@ -24,7 +40,8 @@ csvviewer
 https://sourceforge.net/projects/unxutils/
 add wbin dir to env paths 
 
-open port 80
+DJANGO
+open port 80, run django
 https://support.rackspace.com/how-to/managing-the-windows-server-2012-firewall/
 
 mkdir /logs

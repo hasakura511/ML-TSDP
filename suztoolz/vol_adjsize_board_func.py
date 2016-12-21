@@ -197,7 +197,7 @@ def vol_adjsize_board(debug, threadlist):
                         'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
 
         '''
-
+        #find any changes to userselection
         if checkTableExists(readConn, 'webSelection'):
             last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
             #read from writeconn for debugging purpose
@@ -223,8 +223,8 @@ def vol_adjsize_board(debug, threadlist):
                 
                 newselectionDict={}
                 for key in selectionDict.keys():
-                    print key, selectionDict[key], selectionDict_old[key]
                     if selectionDict[key] != selectionDict_old[key]:
+                        print key, 'found new', selectionDict[key], 'old', selectionDict_old[key]
                         newselectionDict[key]=selectionDict[key]
                 #reset the selection dict with only the systems that's changed.
                 selectionDict = newselectionDict.copy()
@@ -233,7 +233,7 @@ def vol_adjsize_board(debug, threadlist):
             selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='replace',\
                         con=writeConn, index=False)
             print 'could not find table webSelection. wrote webSelection to ',dbPath
-
+        print '\n'
             
         #loadlast futures ATR data. live dumps into table 'futuresATR'
         #using the EOD all because ithink if we are at this point, we are processing immediate orders.
@@ -263,6 +263,7 @@ def vol_adjsize_board(debug, threadlist):
                 systemdata.index = [x.split('_')[1] for x in systemdata.System]
                 systemdata.signal = systemDict[key][selectionDict[key][0]]
                 orderDict[key]=systemdata.ix[([x[0] for x in threadlist])]
+                print key, 'added system',selectionDict[key][0],'to orderDict for IMMEDIATE processing.'
         return orderDict
         
     except Exception as e:

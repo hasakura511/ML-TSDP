@@ -116,9 +116,9 @@ if webready:
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]
 else:
-    c2system_macro=c2system='Anti0.75LastSIG'
-    c2system_mini='Anti0.75LastSIG'
-    c2system_micro='Anti0.75LastSIG'
+    c2system_macro=c2system='AdjSEA'
+    c2system_mini='AdjSEA'
+    c2system_micro='AdjSEA'
     
 c2safef=1
 signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\

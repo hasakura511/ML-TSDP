@@ -114,8 +114,8 @@ def getAccountValues():
     urpnls['v4futures']={'timestamp':timestamp.strftime('%Y-%m-%d %I:%M:%S %p'), 'UnrealizedPnL':urpnl}
     
     #C2
-    c2_equity = pd.read_sql('select * from (select * from c2_equity where Date=\
-          (select max(Date) from c2_equity order by timestamp ASC)) group by system', con=readConn, index_col='system')
+    c2_equity = pd.read_sql('select * from (select * from c2_equity order by timestamp ASC) group by system',\
+                                        con=readConn, index_col='system')
     c2_equity.updatedLastTimeET = pd.to_datetime(c2_equity.updatedLastTimeET)
     for system in c2_equity.drop(['v4futures'], axis=0).index:
         timestamp = c2_equity.ix[system].updatedLastTimeET.strftime('%Y-%m-%d %I:%M:%S %p')

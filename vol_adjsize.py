@@ -116,16 +116,12 @@ if webready:
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]
 else:
-    c2system_macro=c2system='AdjSEA'
-    c2system_mini='AdjSEA'
-    c2system_micro='AdjSEA'
+    c2system_macro=c2system='prevACT'
+    c2system_mini='prevACT'
+    c2system_micro='prevACT'
     
 c2safef=1
-signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
-                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
-                'prevSEA','LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
-                'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
-                'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
+
 ComponentsDict ={
                             'Off':'None',
                             'Previous':'prevACT',
@@ -702,6 +698,11 @@ try:
         pctChgCol = sorted([x for x in columns if 'PC' in x])[-1]
         futuresDF['chgValue'] = futuresDF[pctChgCol]* futuresDF.contractValue*futuresDF.finalQTY
         cv_online = futuresDF['chgValue'].drop(offline,axis=0)
+        signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
+                'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
+                'prevSEA','LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
+                'Voting','Voting2','Voting3','Voting4','Voting5','Voting6','Voting7','Voting8','Voting9',\
+                'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
         for sig in signals:
             futuresDF['PNL_'+sig]=futuresDF['chgValue']*futuresDF[sig]
             totalsDF.set_value(lastDate, 'ACC_'+sig, sum(futuresDF[sig]==futuresDF.ACT)/float(nrows))

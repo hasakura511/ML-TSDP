@@ -49,6 +49,8 @@ def post_list(request):
     getAccountValues()
     return render(request, 'index.html', {})
 
+def futures(request):
+    return render(request, 'futures.html', {})
 
 def profile(request, username):
     user = User.objects.get(username=username)

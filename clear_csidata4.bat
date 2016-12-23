@@ -4,6 +4,6 @@ rem for /F "delims=" %%i in ('dir /b') do (del "%%i" /s/q)
 del . /F /Q
 
 
-cd \ML-TSDP\
-\anaconda2\python vol_adjsize_c2.py 1 >> \logs\daily_data.log
-\anaconda2\python vol_adjsize.py 1 >> \logs\daily_data.log
+rem cd \ML-TSDP\
+rem \anaconda2\python vol_adjsize_c2.py 1 >> \logs\daily_data.log
+rem \anaconda2\python vol_adjsize.py 1 >> \logs\daily_data.log

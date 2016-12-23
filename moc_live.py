@@ -400,6 +400,10 @@ def create_execDict(feeddata, systemfile):
         if downloadtt:
             contractInfo=client.get_contract_details(contract)
             contractsDF=contractsDF.append(contractInfo)
+            execDict[symbol+contractInfo.expiry[0]]=['PASS', 0, contract]
+        else:
+            execDict[contractsDF.ix[symbol].contracts]=['PASS', 0, contract]
+            
         #update system file with correct ibsym and contract expiry
         c2sym=system.c2sym
         ibsym=system.ibsym   
@@ -407,7 +411,7 @@ def create_execDict(feeddata, systemfile):
         #print index, ibsym, contract.expiry, systemdata.columns
         systemdata.set_value(index, 'ibsym', ibsym)
         systemdata.set_value(index, 'ibexpiry', contract.expiry)
-        execDict[symbol+contractInfo.expiry[0]]=['PASS', 0, contract]
+        
 
         #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, contract.expiry
     #systemdata.to_csv(systemfile, index=False)

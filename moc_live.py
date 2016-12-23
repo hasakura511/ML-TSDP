@@ -354,7 +354,8 @@ def create_execDict(feeddata, systemfile):
     global client
     global csidate
     global ttdate
-    downloadtt = not ttdate>csidate
+    
+    downloadtt = not ttdate>csidate or immediate == True
     execDict=dict()
     #need systemdata for the contract expiry
     systemdata=pd.read_csv(systemfile)
@@ -363,8 +364,10 @@ def create_execDict(feeddata, systemfile):
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
     if downloadtt:
+        print 'new timetable available, geting new contract details from IB'
         contractsDF=pd.DataFrame()
     else:
+        print 'loading contract details from file'
         contractsDF=pd.read_csv(systemPath+'ib_contracts.csv', index_col='ibsym')
         
     feeddata=feeddata.reset_index()

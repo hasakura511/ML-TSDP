@@ -210,6 +210,13 @@ IB2CSI_multiplier_adj={
     'JPY':100,
     }
     
+def is_int(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+        
 def lastCsiDownloadDate():
     global csiDataPath
     datafiles = os.listdir(csiDataPath)
@@ -234,13 +241,6 @@ def lastTimeTableDate():
     return max(ttdates)
 
 ttdate= lastTimeTableDate()
-
-def is_int(s):
-    try: 
-        int(s)
-        return True
-    except ValueError:
-        return False
 
 def getContractDate(c2sym, systemdata):
     currentcontract = [x for x in systemdata.c2sym if x[:-2] == c2sym]

@@ -437,7 +437,7 @@ def create_execDict(feeddata, systemfile):
             contractsDF.to_csv(systemPath+'ib_contracts.csv', index=True)
             print 'saved', systemPath+'ib_contracts.csv'
             
-    print 'Created exec dict with', len(execDict.keys()), 'contracts:'
+    print '\nCreated exec dict with', len(execDict.keys()), 'contracts:'
     print execDict.keys()
     return execDict,contractsDF
    

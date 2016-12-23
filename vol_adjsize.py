@@ -116,9 +116,9 @@ if webready:
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]
 else:
-    c2system_macro=c2system='prevACT'
-    c2system_mini='prevACT'
-    c2system_micro='prevACT'
+    c2system_macro=c2system='RiskOn'
+    c2system_mini='RiskOn'
+    c2system_micro='RiskOn'
     
 c2safef=1
 

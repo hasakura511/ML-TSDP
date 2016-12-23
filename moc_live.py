@@ -223,6 +223,18 @@ def lastCsiDownloadDate():
     
 csidate=lastCsiDownloadDate()
 
+def lastTimeTableDate():
+    #load timetable
+    ttfiles = os.listdir(timetablePath)
+    ttdates = []
+    for f in ttfiles:
+        if '.csv' in f and is_int(f.split('.')[0]):
+            ttdates.append(int(f.split('.')[0]))
+        
+    return max(ttdates)
+
+ttdate= lastTimeTableDate()
+
 def is_int(s):
     try: 
         int(s)
@@ -341,6 +353,8 @@ def create_execDict(feeddata, systemfile):
     global debug
     global client
     global csidate
+    global ttdate
+    downloadtt = not ttdate>csidate
     execDict=dict()
     #need systemdata for the contract expiry
     systemdata=pd.read_csv(systemfile)
@@ -348,8 +362,11 @@ def create_execDict(feeddata, systemfile):
     systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
-
-    contractsDF=pd.DataFrame()
+    if downloadtt:
+        contractsDF=pd.DataFrame()
+    else:
+        contractsDF=pd.read_csv(systemPath+'ib_contracts.csv', index_col='ibsym')
+        
     feeddata=feeddata.reset_index()
     for i in feeddata.index:
         
@@ -377,8 +394,9 @@ def create_execDict(feeddata, systemfile):
         contract.currency = system['ibcur']
         
         print i+1, contract.symbol,
-        contractInfo=client.get_contract_details(contract)
-        contractsDF=contractsDF.append(contractInfo)
+        if downloadtt:
+            contractInfo=client.get_contract_details(contract)
+            contractsDF=contractsDF.append(contractInfo)
         #update system file with correct ibsym and contract expiry
         c2sym=system.c2sym
         ibsym=system.ibsym   
@@ -391,24 +409,27 @@ def create_execDict(feeddata, systemfile):
         #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, contract.expiry
     #systemdata.to_csv(systemfile, index=False)
     #print 'updated', systemfile
-    feeddata=feeddata.set_index('ibsym')
-    contractsDF=contractsDF.set_index('symbol')
-    contractsDF.index.name = 'ibsym'
-    contractsDF['contracts']=[x+contractsDF.ix[x].expiry for x in contractsDF.index]
-    contractsDF['Date']=csidate
-    contractsDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
-    #print contractsDF.index
-    #print feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1).head()
-    contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1),contractsDF], axis=1)
-    try:
-        contractsDF.to_sql(name='ib_contracts', con=writeConn, index=True, if_exists='replace', index_label='ibsym')
-        print '\nsaved ib_contracts to',dbPath
-    except Exception as e:
-        #print e
-        traceback.print_exc()
-    if not debug:
-        contractsDF.to_csv(systemPath+'ib_contracts.csv', index=True)
-        print 'saved', systemPath+'ib_contracts.csv'
+    
+    if downloadtt:
+        feeddata=feeddata.set_index('ibsym')
+        contractsDF=contractsDF.set_index('symbol')
+        contractsDF.index.name = 'ibsym'
+        contractsDF['contracts']=[x+contractsDF.ix[x].expiry for x in contractsDF.index]
+        contractsDF['Date']=csidate
+        contractsDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
+        #print contractsDF.index
+        #print feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1).head()
+        contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1),contractsDF], axis=1)
+        try:
+            contractsDF.to_sql(name='ib_contracts', con=writeConn, index=True, if_exists='replace', index_label='ibsym')
+            print '\nsaved ib_contracts to',dbPath
+        except Exception as e:
+            #print e
+            traceback.print_exc()
+        if not debug:
+            contractsDF.to_csv(systemPath+'ib_contracts.csv', index=True)
+            print 'saved', systemPath+'ib_contracts.csv'
+            
     print 'Created exec dict with', len(execDict.keys()), 'contracts:'
     print execDict.keys()
     return execDict,contractsDF
@@ -675,7 +696,7 @@ def filterIBexec():
         traceback.print_exc()
     return executions.drop(['Date','timestamp'],axis=1)
     
-def get_timetable(execDict, contractsDF):
+def get_timetable(contractsDF):
     global client
     global csidate
     #to be run after csi download
@@ -703,27 +724,19 @@ def get_timetable(execDict, contractsDF):
         
 def find_triggers(feeddata, execDict, contractsDF):
     global csidate
+    global ttdate
     eastern=timezone(tzDict['EST'])
     nowDateTime=dt.now(get_localzone())
     #nowDateTime=dt.now(get_localzone())+datetime.timedelta(days=5)
     nowDateTime=nowDateTime.astimezone(eastern)
 
-    #load timetable
-    ttfiles = os.listdir(timetablePath)
-    ttdates = []
-    for f in ttfiles:
-        if '.csv' in f and is_int(f.split('.')[0]):
-            ttdates.append(int(f.split('.')[0]))
-        
-    
-    ttdate=max(ttdates)
     if ttdate>csidate:
         #timetable file date is greater than the csi download date. 
         loaddate=str(ttdate)
     else:
         #get a new timetable
         print 'csidate',csidate, '>=', 'ttdate', ttdate, 'getting new timetable'
-        timetable = get_timetable(execDict, contractsDF)
+        timetable = get_timetable(contractsDF)
         loaddate=str([d for d in timetable.columns.astype(int) if d>csidate][0])
         
     filename=timetablePath+loaddate+'.csv'

@@ -124,10 +124,7 @@ def vol_adjsize_live(debug, threadlist):
                         'AntiSEA':'Anti-Seasonality',
                         }
                         
-        keep_cols = ['Contract', 'LastClose', 'ATR20', 'LastPctChg', 'ACT',
-               '0.75LastSIG', '0.5LastSIG', '1LastSIG', 'LastSEA', 'LastSRUN',
-               'vSTART', 'usdATR', 'QTY', 'QTY_MINI', 'QTY_MICRO',
-               'contractValue', 'FX', 'group', 'Date', 'timestamp']
+        keep_cols = ['Contract', 'group', 'Date', 'timestamp']
                
         if debug:
             mode = 'append'
@@ -753,7 +750,7 @@ def vol_adjsize_live(debug, threadlist):
                 systemDict[key][col].name = col
                 futuresDF_boards[key]=futuresDF_boards[key].join(systemDict[key][col])
             
-            tablename = 'futuresATR_board_'+key
+            tablename = 'signals_board_'+key
             futuresDF_boards[key].to_sql(name= tablename, if_exists='append', con=writeConn, index=True, index_label='CSIsym')
             filename = savePath+'system_'+tablename+'_'+dt.now().strftime("%Y%m%d%H%M")+'.csv'
             futuresDF_boards[key].to_csv(filename, index=True)

@@ -20,36 +20,58 @@ class LoginForm(forms.Form):
 
 
 def MCdate():
+    readConn = getBackendDB()
+    timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc')
+    ttdates = timetables.drop(['Date','timestamp'],axis=1).columns.tolist()
     cutoff = datetime.time(17, 0, 0, 0)
     cutoff2 = datetime.time(23, 59, 59)
     eastern = timezone('US/Eastern')
     now = dt.now(get_localzone())
     now = now.astimezone(eastern)
+    today = now.strftime("%Y%m%d")
+    
+    def guessMCdate():
+        if now.time() > cutoff and now.time() < cutoff2:
+            # M-SUN after cutoff, set next day
+            next = now + datetime.timedelta(days=1)
+            mcdate = next.strftime("%Y%m%d")
+        else:
+            # M-SUN before cutoff, keep same day
+            mcdate = now.strftime("%Y%m%d")
 
-    if now.time() > cutoff and now.time() < cutoff2:
-        # M-SUN after cutoff, set next day
-        next = now + datetime.timedelta(days=1)
-        mcdate = next.strftime("%Y%m%d")
+        # overwrite weekends
+        if now.weekday() == 4 and now.time() > cutoff and now.time() < cutoff2:
+            # friday after cutoff so set to monday
+            next = now + datetime.timedelta(days=3)
+            mcdate = next.strftime("%Y%m%d")
+
+        if now.weekday() == 5:
+            # Saturday so set to monday
+            next = now + datetime.timedelta(days=2)
+            mcdate = next.strftime("%Y%m%d")
+
+        if now.weekday() == 6:
+            # Sunday so set to monday
+            next = now + datetime.timedelta(days=1)
+            mcdate = next.strftime("%Y%m%d")
+        return mcdate
+        
+    if today in ttdates and ttdates.index(today)==0:
+        closes = pd.DataFrame(timetables[today].ix[[x for x in timetables.index if 'close' in x]].copy())
+        lastclose=eastern.localize(pd.to_datetime(closes[today]).max().to_pydatetime())
+        if now>=lastclose and len(ttdates)>1:
+            mcdate = ttdates[1]
+        elif now<lastclose:
+            mcdate =today
+        else:
+            print 'something wrong with timetable data. guessing next MCDATE'
+            mcdate = guessMCdate()
     else:
-        # M-SUN before cutoff, keep same day
-        mcdate = now.strftime("%Y%m%d")
-
-    # overwrite weekends
-    if now.weekday() == 4 and now.time() > cutoff and now.time() < cutoff2:
-        # friday after cutoff so set to monday
-        next = now + datetime.timedelta(days=3)
-        mcdate = next.strftime("%Y%m%d")
-
-    if now.weekday() == 5:
-        # Saturday so set to monday
-        next = now + datetime.timedelta(days=2)
-        mcdate = next.strftime("%Y%m%d")
-
-    if now.weekday() == 6:
-        # Sunday so set to monday
-        next = now + datetime.timedelta(days=1)
-        mcdate = next.strftime("%Y%m%d")
+        print 'something wrong with timetable data. guessing next MCDATE'
+        mcdate = guessMCdate()
+        
     return mcdate
+
 
 
 def getTimeStamp():

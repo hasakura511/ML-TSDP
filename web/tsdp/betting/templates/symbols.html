@@ -1,0 +1,20 @@
+﻿{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<base href="/">
+<main class="container container--mw700">
+    <div class="row">
+    {% for chart in charts %}
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <h2 class="panel-title">{{ chart.name }}</h2>
+        </div>
+        <div>
+            <img src="{{ chart.img_url }}" height="100">
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+</main>
+{% endblock %}

@@ -1,5 +1,6 @@
 from django import forms
 import time
+import json
 import datetime
 from datetime import datetime as dt
 from pytz import timezone
@@ -117,7 +118,8 @@ def updateMeta():
     triggers.columns = [['Triggertime']]
     triggers['Group']=futuresDict.ix[triggers.index].Group.values
     triggers['Date']=mcdate
-    record = MetaData(components=getComponents(), triggers=triggers.transpose().to_dict(),mcdate=mcdate,\
+    record = MetaData(components=json.dumps(getComponents()), triggers=json.dumps(triggers.transpose().to_dict()),\
+                                    mcdate=mcdate,\
                                     timestamp=getTimeStamp())
     record.save()
     
@@ -165,7 +167,7 @@ def getAccountValues():
           (select max(timestamp) from c2_portfolio where system=\'v4futures\')', con=readConn)
     '''
     
-    record = AccountData(value1=urpnls, value2=accountvalues,mcdate=mcdate,\
+    record = AccountData(value1=json.dumps(urpnls), value2=json.dumps(accountvalues),mcdate=mcdate,\
                                     timestamp=getTimeStamp())
     record.save()
   

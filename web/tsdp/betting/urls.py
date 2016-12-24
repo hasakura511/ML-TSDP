@@ -12,4 +12,6 @@ urlpatterns = [
 	url(r'^last_userselection/$', views.last_userselection, name='last_userselection'),
     url(r'^downloaddb/$', views.downloaddb, name='downloaddb'),
     url(r'^futures/$', views.futures, name='futures'),
+    url(r'^symbols/$', views.symbols, name='symbols'),
+    url(r'^([A-Z\d]+)/$', views.system_charts, name='system_charts'),
 ]

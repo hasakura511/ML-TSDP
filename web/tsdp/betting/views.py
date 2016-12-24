@@ -49,8 +49,16 @@ def post_list(request):
     getAccountValues()
     return render(request, 'index.html', {})
 
+def markets(request):
+    return render(request, 'symbols.html', {})
+
 def futures(request):
     return render(request, 'futures.html', {})
+
+def system_charts(request, symbol):
+    imagedir = '/ml-tsdp/web/tsdp/betting/static/images/'
+    filenames = [x for x in os.listdir(imagedir) if 'v4_'+symbol+'_' in x]
+    return render(request, 'system_charts.html', {'charts':filenames})
 
 def profile(request, username):
     user = User.objects.get(username=username)

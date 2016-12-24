@@ -56,20 +56,26 @@ def MCdate():
             mcdate = next.strftime("%Y%m%d")
         return mcdate
         
-    if today in ttdates and ttdates.index(today)==0:
+        
+    if today in ttdates and ttdates.index(today)==0 and len(ttdates)>1:
         closes = pd.DataFrame(timetables[today].ix[[x for x in timetables.index if 'close' in x]].copy())
         lastclose=eastern.localize(pd.to_datetime(closes[today]).max().to_pydatetime())
-        if now>=lastclose and len(ttdates)>1:
+        if now>=lastclose :
             mcdate = ttdates[1]
-        elif now<lastclose:
-            mcdate =today
         else:
-            print 'something wrong with timetable data. guessing next MCDATE'
-            mcdate = guessMCdate()
+            #now<lastclose
+            mcdate =today
     else:
-        print 'something wrong with timetable data. guessing next MCDATE'
-        mcdate = guessMCdate()
-        
+        lastttdate = ttdates[-1]
+        closes = pd.DataFrame(timetables[lastttdate].ix[[x for x in timetables.index if 'close' in x]].copy())
+        lastclose=eastern.localize(pd.to_datetime(closes[lastttdate]).max().to_pydatetime())
+        if now>=lastclose :
+            print('something wrong with timetable data. guessing next MCDATE')
+            mcdate = guessMCdate()
+        else:
+            #now<lastclose
+            mcdate =lastttdate
+
     return mcdate
 
 

@@ -65,7 +65,7 @@ def MCdate():
         else:
             #now<lastclose
             mcdate =today
-    else:
+    elif len(ttdates)>0:
         lastttdate = ttdates[-1]
         closes = pd.DataFrame(timetables[lastttdate].ix[[x for x in timetables.index if 'close' in x]].copy())
         lastclose=eastern.localize(pd.to_datetime(closes[lastttdate]).max().to_pydatetime())
@@ -75,6 +75,9 @@ def MCdate():
         else:
             #now<lastclose
             mcdate =lastttdate
+    else:
+        print('something wrong with timetable data. guessing next MCDATE')
+        mcdate = guessMCdate()
 
     return mcdate
 

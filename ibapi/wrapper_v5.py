@@ -44,8 +44,8 @@ def return_IB_connection_info():
     host=""
    
     port=7496
-    clientid=random.randint(100,9999)
-    
+    #clientid=random.randint(100,9999)
+    clientid=666
     return (host, port, clientid)
 
 class IBWrapper(EWrapper):
@@ -657,7 +657,17 @@ class IBclient(object):
         self.tws=tws
         self.cb=callback
         self.accountid=''
-
+        
+    def reqGlobalCancel(self):
+        logging.info( "requesting global cancel")
+        self.tws.reqGlobalCancel()
+        
+        
+    def cancelOrder(self, orderId):
+        logging.info( "requesting cancel orderid"+str(orderId))
+        self.tws.cancelOrder(orderId)
+        
+        
     def get_contract_details(self, ibcontract, reqId=MEANINGLESS_NUMBER):
     
         """

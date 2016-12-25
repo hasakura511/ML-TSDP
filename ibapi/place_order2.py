@@ -76,7 +76,8 @@ def place_orders(execDict):
     tws = EPosixClientSocket(callback)
     
     # Connect to tws running on localhost
-    tid=random.randint(1,10000)
+    #tid=random.randint(1,10000)
+    tid=999
     if not tws.eConnect("", 7496, tid):
         raise RuntimeError('Failed to connect to TWS')
         

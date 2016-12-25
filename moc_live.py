@@ -441,17 +441,18 @@ def create_execDict(feeddata, systemfile):
     print execDict.keys()
     return execDict,contractsDF
    
-def update_orders(feeddata, systemdata2, execDict):
+def update_orders(feeddata, systemdata2, execDict, threadlist):
     global client
     global portfolioPath
     #systemdata=pd.read_csv(systemfile)
+    triggered_syms=[feeddata[feeddata.CSIsym==x[0]].index.values[0] for x in threadlist]
     systemdata= systemdata2.copy(deep=True)
     systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
     #systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
     #systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
-    feeddata=feeddata.reset_index()
+    
     portfolio=get_ibfutpositions(portfolioPath)
 
     if isinstance(portfolio, type(pd.DataFrame())):
@@ -477,31 +478,35 @@ def update_orders(feeddata, systemdata2, execDict):
                 currentOpenPos.set_value(contract, 'qty',openPositions.ix[contract][0])
                 currentOpenPos.set_value(contract, 'exp',exp)
             else:
-                
-                if qty > 0:
-                    action='SLD'
+                #add expired contract to execdict if in threadlist to avoid early exits
+                if sym in triggered_syms:
+                    if qty > 0:
+                        action='SLD'
+                    else:
+                        action='BOT'
+                    
+                    #create new contract. no deep copy
+                    IBcontract = Contract()
+                    IBcontract.symbol= currentContract.symbol
+                    #missing from ibswigpy
+                    #IBcontract.LastTradeDateOrContractMonth=exp
+                    IBcontract.multiplier = currentContract.multiplier
+                    IBcontract.secType = currentContract.secType
+                    IBcontract.exchange = currentContract.exchange
+                    IBcontract.currency =currentContract.currency
+                    contractInfo=client.get_contract_details(IBcontract)
+                    #print contractInfo
+                    contractMonth=contractInfo[contractInfo.expiry==exp].contractMonth
+                    if len(contractMonth) >0:
+                        IBcontract.expiry=contractMonth.values[0]
+                        execDictExpired[contract]=[action,int(abs(qty)),IBcontract]
+                        print 'Expired contract:', contract, qty, 'added to execDict:',sym, action, abs(qty), IBcontract.expiry
+                    else:
+                        print 'Expired contract:', contract, qty, 'could not be found. Exit Manually:',sym, action, abs(qty)
                 else:
-                    action='BOT'
-                
-                #create new contract. no deep copy
-                IBcontract = Contract()
-                IBcontract.symbol= currentContract.symbol
-                #missing from ibswigpy
-                #IBcontract.LastTradeDateOrContractMonth=exp
-                IBcontract.multiplier = currentContract.multiplier
-                IBcontract.secType = currentContract.secType
-                IBcontract.exchange = currentContract.exchange
-                IBcontract.currency =currentContract.currency
-                contractInfo=client.get_contract_details(IBcontract)
-                #print contractInfo
-                contractMonth=contractInfo[contractInfo.expiry==exp].contractMonth
-                if len(contractMonth) >0:
-                    IBcontract.expiry=contractMonth.values[0]
-                    execDictExpired[contract]=[action,int(abs(qty)),IBcontract]
-                    print 'Expired contract:', contract, qty, 'added to execDict:',sym, action, abs(qty), IBcontract.expiry
-                else:
-                    print 'Expired contract:', contract, qty, 'could not be found. Exit Manually:',sym, action, abs(qty)
-        
+                    print 'Expired contract:', contract, qty, 'not yet triggered'
+                    
+        feeddata=feeddata.reset_index()
         for i in feeddata.index:
             system=feeddata.ix[i]
             c2sym=system.c2sym
@@ -729,7 +734,7 @@ def get_timetable(contractsDF):
         traceback.print_exc()
     return timetable.drop(['Date','timestamp'],axis=1)
         
-def find_triggers(feeddata, execDict, contractsDF):
+def find_triggers(feeddata, contractsDF):
     global csidate
     global ttdate
     eastern=timezone(tzDict['EST'])
@@ -822,6 +827,7 @@ def find_triggers(feeddata, execDict, contractsDF):
                 
         else:
             print csiRunSym,'not triggered: next trigger',tdate,'now', nowDateTime
+            
     return threadlist
                 
 def append_data(sym, timetable, loaddate):
@@ -871,13 +877,13 @@ def getIBopen():
     global csidate
     openOrders = pd.DataFrame(client.get_open_orders()).transpose()
     if len(openOrders) !=0:
-        openOrders=openOrders.set_index('orderid')
+        #openOrders=openOrders.set_index('orderid')
         openOrders['contract']=[openOrders.ix[i].symbol+openOrders.ix[i].expiry for i in openOrders.index]
         openOrders=openOrders.set_index('contract')
         openOrders['Date']=csidate
         openOrders['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         try:
-            openOrders.to_sql(name='ib_openorders', con=writeConn, index=True, if_exists='append', index_label='contract')
+            openOrders.to_sql(name='ib_openorders', con=writeConn, index=True, if_exists='replace', index_label='contract')
         except Exception as e:
             #print e
             traceback.print_exc()
@@ -942,7 +948,7 @@ if __name__ == "__main__":
             if tries==5:
                 sys.exit('failed 5 times to get contract info')
 
-    threadlist=find_triggers(feeddata, execDict, contractsDF)
+    threadlist=find_triggers(feeddata, contractsDF)
 
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     runThreads(threadlist)
@@ -954,6 +960,8 @@ if __name__ == "__main__":
         threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
     
     if len(threadlist)>0:
+        print 'requesting global cancel orders'
+        client.reqGlobalCancel()
         if immediate:
             print 'running vol_adjsize_board to process immediate orders'
             ordersDict = vol_adjsize_board(debug, threadlist)
@@ -969,7 +977,7 @@ if __name__ == "__main__":
             #check ib positions
             try:
                 if 'v4futures' in ordersDict.keys():
-                    execDict=update_orders(feeddata, ordersDict['v4futures'], execDict)
+                    execDict=update_orders(feeddata, ordersDict['v4futures'], execDict, threadlist)
                 iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
                 
                 #get rid of orders if they are already working orders.

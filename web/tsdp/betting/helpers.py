@@ -19,7 +19,6 @@ class LoginForm(forms.Form):
     username = forms.CharField(label='User Name', max_length=64)
     password = forms.CharField(widget=forms.PasswordInput())
 
-
 def MCdate():
     readConn = getBackendDB()
     timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc')
@@ -82,11 +81,17 @@ def MCdate():
 
     return mcdate
 
-
-
 def getTimeStamp():
     timestamp = int(calendar.timegm(dt.utcnow().utctimetuple()))
     return timestamp
+
+def get_futures_dictionary():
+    readConn = getBackendDB()
+    futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='CSIsym')
+    groupdict = {group: {sym: futuresDict.ix[sym].to_dict() for sym in futuresDict.index if\
+                            futuresDict.ix[sym].Group == group}\
+                        for group in futuresDict.Group.unique()}
+    return groupdict
 
 def getComponents():
     ComponentsDict ={
@@ -152,8 +157,8 @@ def getAccountValues():
     c2_equity.updatedLastTimeET = pd.to_datetime(c2_equity.updatedLastTimeET)
     for system in c2_equity.drop(['v4futures'], axis=0).index:
         timestamp = c2_equity.ix[system].updatedLastTimeET.strftime('%Y-%m-%d %I:%M:%S %p')
-        accountvalue=c2_equity.ix[system].modelAccountValue
-        urpnl=c2_equity.ix[system].equity
+        accountvalue=int(c2_equity.ix[system].modelAccountValue)
+        urpnl=int(c2_equity.ix[system].equity)
         accountvalues[system]={'timestamp':timestamp, 'Account Value':accountvalue}
         urpnls[system]={'timestamp':timestamp, 'UnrealizedPnL':urpnl}
     '''

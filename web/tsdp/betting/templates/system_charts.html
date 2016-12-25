@@ -6,14 +6,15 @@
 <main class="container container--mw700">
     <div class="row">
     {% for chart in charts %}
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <a href="static/images/{{ chart }}">{{ chart }}</a>
 
-        <div class="panel panel-default">
-            <h2 class="panel-title">{{ chart }}</h2>
+            <div>
+            <img src="static/images/{{ chart }}" height="600" width="450">
+            </div>
+            </div>
         </div>
-        <div>
-            <img src="static/images/{{ chart }}">
-        </div>
-
     {% endfor %}
     </div>
 </main>

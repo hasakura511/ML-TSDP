@@ -61,7 +61,7 @@ def vol_adjsize_live(debug, threadlist):
             dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
             dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
             dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
-            dataPath='D:/ML-TSDP/data/csidata/v4futures4_debug/'
+            dataPath='D:/ML-TSDP/data/csidata/v4futures4/'
             savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
             pngPath = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
             feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'

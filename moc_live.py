@@ -32,15 +32,16 @@ import logging
 from swigibpy import EPosixClientSocket, ExecutionFilter, CommissionReport, Execution, Contract
 from dateutil.parser import parse
 import sqlite3
-from suztoolz.vol_adjsize_live_func import vol_adjsize_live
+#from suztoolz.vol_adjsize_live_func import vol_adjsize_live
 from suztoolz.check_systems_live_func import check_systems_live
 from suztoolz.proc_signal_v4_live_func import proc_signal_v4_live
+from suztoolz.vol_adjsize_moclive_func import vol_adjsize_live
 from suztoolz.vol_adjsize_board_func import vol_adjsize_board
 #currencyPairsDict=dict()
 #prepData=dict()
 start_time = time.time()
 callback = IBWrapper()
-client=IBclient(callback)
+client=IBclient(callback, port=7496, clientid=666)
 
 
 #systems = ['v4micro','v4mini','v4macro']
@@ -55,7 +56,7 @@ endDateTime=dt.now(get_localzone())
 endDateTime=endDateTime.astimezone(eastern)
 endDateTime=endDateTime.strftime("%Y%m%d %H:%M:%S EST")    
 data = pd.DataFrame({}, columns=['Date','Open','High','Low','Close','Volume']).set_index('Date')
-tickerId=random.randint(100,9999)
+#tickerId=random.randint(100,9999)
 
 interval='1d'
 minDataPoints = 5
@@ -891,12 +892,14 @@ def getIBopen():
     else:
         return 0
 
-def updateWithOpen(iborders, execDict=None):
+def updateWithOpen(iborders, cid):
     print 'checking IB open orders..'
     openOrders=getIBopen()
+    #filter out openorders from prior clients
+    openOrders=openOrders[openOrders.clientid==cid].copy()
     #check open orders
     iborders_lessOpen=[]
-    if isinstance(openOrders, type(pd.DataFrame())):
+    if isinstance(openOrders, type(pd.DataFrame())) and len(openOrders>0):
         for (contract,[order,qty]) in iborders:
             #print sym, order, qty
             if order == 'SLD':
@@ -907,27 +910,27 @@ def updateWithOpen(iborders, execDict=None):
             if contract in openOrders.index:
                 print 'open order found..',contract, order, qty, openOrders.ix[contract].side, openOrders.ix[contract].qty,
                 if openOrders.ix[contract].side==order2 and openOrders.ix[contract].qty == qty:
-                    print 'OK: removing order from execDict'
+                    print 'OK: removing order from iborders'
                     openOrders = openOrders.drop(contract, axis=0)
                 else:
                     print 'Error: mismatch!'
                     iborders_lessOpen+=[(contract,[order,qty])]
             else:
-                #not in open orders
+                print 'Error: Open Order for',contract, order, qty,'Not found!! Check IB..'
                 iborders_lessOpen+=[(contract,[order,qty])]
                 
-        if len(openOrders)>0:
-            print 'Open orders that were not found in execDict:'
-            print openOrders
-            print 'Cancel these orders if immediate == True?'
+        #if len(openOrders)>0:
+        #    print 'Open orders that were not found in execDict:'
+        #    print openOrders
+        #    print 'Cancel these orders if immediate == True?'
     else:
         print 'no open orders found'
         iborders_lessOpen=iborders
         
-    if execDict == None:
-        return iborders_lessOpen
-    else:
-        return iborders_lessOpen, { key: execDict[key] for (key,lst) in iborders_lessOpen }
+    #if execDict == None:
+    return iborders_lessOpen
+    #else:
+    #return iborders_lessOpen, { key: execDict[key] for (key,lst) in iborders_lessOpen }
         
 if __name__ == "__main__":
     print durationStr, barSizeSetting, whatToShow
@@ -947,17 +950,21 @@ if __name__ == "__main__":
             tries+=1
             if tries==5:
                 sys.exit('failed 5 times to get contract info')
-
-    threadlist=find_triggers(feeddata, contractsDF)
-
-    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-    runThreads(threadlist)
+                
+    if immediate:
+        print 'Running Immediate Process...'
+        #include all symbols in threadlist to refresh all orders from selection
+        threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
+    else:
+        print 'Running MOC Process...'
+        threadlist=find_triggers(feeddata, contractsDF)
+        print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
+        runThreads(threadlist)
+        
     print 'returned to main thread with', len(threadlist), 'threads'
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
-    if immediate:
-        #include all symbols in threadlist to refresh all orders from selection
-        threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
+
     
     if len(threadlist)>0:
         print 'requesting global cancel orders'
@@ -981,8 +988,8 @@ if __name__ == "__main__":
                 iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
                 
                 #get rid of orders if they are already working orders.
-                #only checks for orders in execDict
-                iborders, execDict= updateWithOpen(iborders, execDict=execDict)
+                #dont need this anymore because we reqGlobalCancel
+                #iborders, execDict= updateWithOpen(iborders, execDict=execDict)
                 num_iborders=len(iborders)
             except Exception as e:
                 #print e
@@ -1048,11 +1055,13 @@ if __name__ == "__main__":
             if submitIB and num_iborders!=0:
                 print 'returned to main thread, placing ib orders from', systemfile 
                 try:
-                    place_iborders(execDict)
+                    #set the client date to timestamp to filter out openorders from prior runs.
+                    cid=int(calendar.timegm(dt.utcnow().utctimetuple()))
+                    place_iborders(execDict, cid)
                     #wait for orders to be filled
                     sleep(15)
                     executions=filterIBexec()
-                    iborders_lessOpen=updateWithOpen(iborders)
+                    iborders_lessOpen=updateWithOpen(iborders, cid)
 
                     if executions is not None:
                         #check executions
@@ -1096,7 +1105,6 @@ if __name__ == "__main__":
             print 'Debug mode: skipping orders'
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-
 
 
 '''

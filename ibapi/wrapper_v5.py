@@ -643,15 +643,15 @@ class IBclient(object):
     client=IBclient(callback)
     We then use various methods to get prices etc
     """
-    def __init__(self, callback):
+    def __init__(self, callback, port=7496, clientid=random.randint(100,9999)):
         """
         Create like this
         callback = IBWrapper()
         client=IBclient(callback)
         """
-        
+        host=''
         tws = EPosixClientSocket(callback)
-        (host, port, clientid)=return_IB_connection_info()
+        #(host, port, clientid)=return_IB_connection_info()
         tws.eConnect(host, port, clientid)
 
         self.tws=tws

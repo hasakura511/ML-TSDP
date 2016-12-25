@@ -67,7 +67,7 @@ class PlaceOrderExample(EWrapper):
                                             commissionReport.commission,
                                             commissionReport.realizedPNL))
 
-def place_orders(execDict):
+def place_orders(execDict, clientid):
     # Instantiate our callback object
     callback = PlaceOrderExample()
 
@@ -77,8 +77,8 @@ def place_orders(execDict):
     
     # Connect to tws running on localhost
     #tid=random.randint(1,10000)
-    tid=999
-    if not tws.eConnect("", 7496, tid):
+
+    if not tws.eConnect("", 7496, clientid):
         raise RuntimeError('Failed to connect to TWS')
         
     for sym in execDict.keys():

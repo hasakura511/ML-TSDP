@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import UserSelection
 from .helpers import *
+from .start_immediate import start_immediate
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
@@ -45,12 +46,41 @@ def getrecords(request):
 
 
 def post_list(request):
+    lastSelection = UserSelection.objects.all().order_by('-timestamp').first()
+    lastMCdate = int(lastSelection.mcdate)
+    mcdate = int(MCdate())
+    if lastMCdate<mcdate:
+        #no change in user selection since mcdate change
+        updated_selection=json.dumps({key: [order[0], "False"] for key, order in eval(lastSelection.selection).items()})
+        record = UserSelection(userID=lastSelection.userID, selection=updated_selection, \
+                               v4futures=lastSelection.v4futures, v4mini=lastSelection.v4mini, \
+                               v4micro=lastSelection.v4micro, mcdate=mcdate, timestamp=getTimeStamp())
+        record.save()
+    else:
+        #check if any immediate orders
+        if 'True' in [order[1] for sys, order in eval(lastSelection.selection).items()]:
+            print('processing immediate orders')
+            start_immediate()
+
     updateMeta()
     getAccountValues()
     return render(request, 'index.html', {})
 
-def markets(request):
-    return render(request, 'symbols.html', {})
+def getmetadata(request):
+    returnrec = MetaData.objects.order_by('-timestamp').first()
+    returndata = returnrec.dic()
+    print(returndata)
+    return HttpResponse(json.dumps(returndata))
+
+def getaccountdata(request):
+    returnrec = AccountData.objects.order_by('-timestamp').first()
+    returndata = returnrec.dic()
+    print(returndata)
+    return HttpResponse(json.dumps(returndata))
+
+def symbols(request):
+    futuresdict = get_futures_dictionary()
+    return render(request, 'symbols.html', {'groups':futuresdict})
 
 def futures(request):
     return render(request, 'futures.html', {})

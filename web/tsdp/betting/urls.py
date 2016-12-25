@@ -5,6 +5,8 @@ urlpatterns = [
     url(r'^$', views.post_list),
     url(r'^addrecord$', views.addrecord),
     url(r'^getrecords$', views.getrecords),
+    url(r'^getmetadata$', views.getmetadata),
+    url(r'^getaccountdata$', views.getaccountdata),
     url(r'^login/$', views.login_view, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^register/$', views.register, name='register'),

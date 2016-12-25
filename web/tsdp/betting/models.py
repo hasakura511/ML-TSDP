@@ -27,6 +27,13 @@ class MetaData(models.Model):
     mcdate = models.TextField()
     timestamp = models.IntegerField()
 
+    def dic(self):
+        fields = ['components', 'triggers', 'mcdate', 'timestamp']
+        result = {}
+        for field in fields :
+            result[field] = self.__dict__[field]
+        return result
+
     def __str__(self):
         return self.mcdate
 
@@ -36,6 +43,13 @@ class AccountData(models.Model):
     value2 = models.TextField()
     mcdate = models.TextField()
     timestamp = models.IntegerField()
+
+    def dic(self):
+        fields = ['value1', 'value2', 'mcdate', 'timestamp']
+        result = {}
+        for field in fields :
+            result[field] = self.__dict__[field]
+        return result
 
     def __str__(self):
         return self.mcdate

@@ -967,7 +967,6 @@ if __name__ == "__main__":
 
     
     if len(threadlist)>0:
-        print 'requesting global cancel orders'
         if immediate:
             print 'running vol_adjsize_board to process immediate orders'
             ordersDict = vol_adjsize_board(debug, threadlist)
@@ -1055,6 +1054,7 @@ if __name__ == "__main__":
                 print 'returned to main thread, placing ib orders from', systemfile 
                 try:
                     #clear all orders first
+                    print 'requesting global cancel IB orders'
                     client.reqGlobalCancel()
                     sleep(1)
                     #set the client date to timestamp to filter out openorders from prior runs.

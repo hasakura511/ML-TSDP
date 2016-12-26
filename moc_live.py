@@ -36,7 +36,7 @@ import sqlite3
 from suztoolz.check_systems_live_func import check_systems_live
 from suztoolz.proc_signal_v4_live_func import proc_signal_v4_live
 from suztoolz.vol_adjsize_moclive_func import vol_adjsize_live
-from suztoolz.vol_adjsize_board_func import vol_adjsize_board
+from suztoolz.vol_adjsize_immediate_func import vol_adjsize_board
 #currencyPairsDict=dict()
 #prepData=dict()
 start_time = time.time()
@@ -356,7 +356,7 @@ def create_execDict(feeddata, systemfile):
     global csidate
     global ttdate
     
-    downloadtt = not ttdate>csidate or immediate == True
+    downloadtt = not ttdate>csidate
     execDict=dict()
     #need systemdata for the contract expiry
     systemdata=pd.read_csv(systemfile)

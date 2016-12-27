@@ -202,13 +202,12 @@ def vol_adjsize_board(debug, threadlist):
     
     #find any changes to userselection
     if checkTableExists(readConn, 'webSelection'):
-        webSelection = selectionDF.reset_index().drop(['id'],axis=1)
-        webSelection['Executed']=False
-        webSelection.to_sql(name='webSelection', if_exists='replace',\
-                                        con=writeConn, index=False)
-        print 'appending webSelection to', dbPath
-        
-        '''
+        #webSelection = selectionDF.reset_index().drop(['id'],axis=1)
+        #webSelection['Executed']=False
+        #webSelection.to_sql(name='webSelection', if_exists='replace',\
+        #                                con=writeConn, index=False)
+        #print 'appending webSelection to', dbPath
+
         last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
         #read from writeconn for debugging purpose
         last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
@@ -238,13 +237,15 @@ def vol_adjsize_board(debug, threadlist):
                     newselectionDict[key]=selectionDict[key]
             #reset the selection dict with only the systems that's changed.
             selectionDict = newselectionDict.copy()
-        '''
+        
     else:  
         #create selection
-        webSelection = selectionDF.reset_index().drop(['id'],axis=1)
-        webSelection['Executed']=False
-        webSelection.to_sql(name='webSelection', if_exists='replace',\
-                                        con=writeConn, index=False)
+        #webSelection = selectionDF.reset_index().drop(['id'],axis=1)
+        #webSelection['Executed']=False
+        #webSelection.to_sql(name='webSelection', if_exists='replace',\
+        #                                con=writeConn, index=False)
+        selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='replace',\
+            con=writeConn, index=False)
         print 'could not find table webSelection. wrote webSelection to ',dbPath
     print '\n'
         

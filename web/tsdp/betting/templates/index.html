@@ -6,7 +6,7 @@
 {% block content %}
 <base href="/">
 {% if user.is_authenticated %}
-    <bet-app>Loading...</bet-app>
+    <img src="static/images/ajax-loading-large.gif">
     <script src="{% static 'js/libs.min.js' %}"></script>
     <script src="{% static 'js/bundle.min.js' %}"></script>
 {% else %}

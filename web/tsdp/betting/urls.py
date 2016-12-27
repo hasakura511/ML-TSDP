@@ -2,7 +2,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.post_list),
+    url(r'^$', views.board),
     url(r'^addrecord$', views.addrecord),
     url(r'^getrecords$', views.getrecords),
     url(r'^getmetadata$', views.getmetadata),
@@ -16,4 +16,6 @@ urlpatterns = [
     url(r'^futures/$', views.futures, name='futures'),
     url(r'^symbols/$', views.symbols, name='symbols'),
     url(r'^([A-Z\d]+)/$', views.system_charts, name='system_charts'),
+    url(r'^order_status/$', views.order_status, name='order_status'),
+    url(r'^board/$', views.loading_page, name='board'),
 ]

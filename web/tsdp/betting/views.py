@@ -44,8 +44,10 @@ def getrecords(request):
     recentdata = [dict((cn, getattr(data, cn)) for cn in ('timestamp', 'mcdate', 'selection')) for data in recent]
     return HttpResponse(json.dumps({"first": firstdata, "recent": recentdata}))
 
+def loading_page(request):
+    return render(request, 'loading_page.html', {})
 
-def post_list(request):
+def board(request):
     lastSelection = UserSelection.objects.all().order_by('-timestamp').first()
     lastMCdate = int(lastSelection.mcdate)
     mcdate = int(MCdate())
@@ -64,7 +66,7 @@ def post_list(request):
 
     updateMeta()
     getAccountValues()
-    return render(request, 'index.html', {})
+    return render(request, 'board.html', {})
 
 def getmetadata(request):
     returnrec = MetaData.objects.order_by('-timestamp').first()
@@ -84,6 +86,29 @@ def symbols(request):
 
 def futures(request):
     return render(request, 'futures.html', {})
+
+def order_status(request):
+    logdict={'logfiles':[]}
+
+    class LogFiles(object):
+        def __init__(self, filename):
+            self.filename = filename
+
+        def display_text_file(self):
+            with open(self.filename) as fp:
+                return fp.read()
+
+    files = get_logfiles(search_string='moc_live')
+    timestamp = sorted([f[-21:] for f in files])[-1]
+    logfile=[f for f in files if 'error' not in f and timestamp in f][-1]
+    logdict['logfiles'].append((logfile,LogFiles(logfile)))
+
+    errorfiles= [f for f in files if logfile[-21:] in f and 'error' in f]
+    if len(errorfiles)>0:
+        errorfile=errorfiles[-1]
+        logdict['logfiles'].append((errorfile,LogFiles(errorfile)))
+
+    return render(request, 'show_log.html', logdict)
 
 def system_charts(request, symbol):
     imagedir = '/ml-tsdp/web/tsdp/betting/static/images/'

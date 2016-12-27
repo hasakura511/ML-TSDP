@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class UserSelection(models.Model):
     userID = models.IntegerField()
     selection = models.TextField()

@@ -9,11 +9,20 @@ import sqlite3
 import pandas as pd
 from .models import MetaData, AccountData
 import calendar
+import os
 
 def getBackendDB():
     dbPath = '/ML-TSDP/data/futures.sqlite3'
     readConn = sqlite3.connect(dbPath)
     return readConn
+
+def get_logfiles(search_string=''):
+    search_dir = "/logs/"
+    os.chdir(search_dir)
+    files = filter(os.path.isfile, os.listdir(search_dir))
+    files = [os.path.join(search_dir, f) for f in files if search_string in f]  # add path to each file
+    files.sort(key=lambda x: os.path.getmtime(x))
+    return files
 
 class LoginForm(forms.Form):
     username = forms.CharField(label='User Name', max_length=64)
@@ -127,40 +136,54 @@ def updateMeta():
                                     mcdate=mcdate,\
                                     timestamp=getTimeStamp())
     record.save()
-    
+
+
 def getAccountValues():
     readConn = getBackendDB()
     mcdate = MCdate()
     eastern = timezone('US/Eastern')
     utc = timezone('UTC')
-    accountvalues={}
+    accountvalues = {}
     urpnls = {}
-    
-    #ib
+
+    # ib
     ib_equity = pd.read_sql('select * from ib_accountData where timestamp=\
-                (select max(timestamp) from ib_accountData) and Desc=\'NetLiquidation\'',\
+                (select max(timestamp) from ib_accountData) and Desc=\'NetLiquidation\'', \
                             con=readConn, index_col='Desc')
     timestamp = utc.localize(dt.utcfromtimestamp(ib_equity.timestamp)).astimezone(eastern)
-    accountvalue=int(float(ib_equity.value[0]))
-    accountvalues['v4futures']={'timestamp':timestamp.strftime('%Y-%m-%d %I:%M:%S %p'), 'Account Value':accountvalue}
-    
+    accountvalue = int(float(ib_equity.value[0]))
+    accountvalues['v4futures'] = {
+        'col1title': 'Account Value', 'col1value': accountvalue, \
+        'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p')
+    }
+
     ib_urpnl = pd.read_sql('select * from ib_accountData where timestamp=\
-                (select max(timestamp) from ib_accountData) and Desc=\'UnrealizedPnL\' and currency=\'BASE\'',\
+                (select max(timestamp) from ib_accountData) and Desc=\'UnrealizedPnL\' and currency=\'BASE\'', \
                            con=readConn, index_col='Desc')
     timestamp = utc.localize(dt.utcfromtimestamp(ib_urpnl.timestamp)).astimezone(eastern)
-    urpnl=int(float(ib_urpnl.value[0]))
-    urpnls['v4futures']={'timestamp':timestamp.strftime('%Y-%m-%d %I:%M:%S %p'), 'UnrealizedPnL':urpnl}
-    
-    #C2
-    c2_equity = pd.read_sql('select * from (select * from c2_equity order by timestamp ASC) group by system',\
-                                        con=readConn, index_col='system')
+    urpnl = int(float(ib_urpnl.value[0]))
+    urpnls['v4futures'] = {
+        'col1title': 'UnrealizedPnL', 'col1value': urpnl, \
+        'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p')
+    }
+
+    # C2
+    c2_equity = pd.read_sql('select * from (select * from c2_equity order by timestamp ASC) group by system', \
+                            con=readConn, index_col='system')
     c2_equity.updatedLastTimeET = pd.to_datetime(c2_equity.updatedLastTimeET)
     for system in c2_equity.drop(['v4futures'], axis=0).index:
-        timestamp = c2_equity.ix[system].updatedLastTimeET.strftime('%Y-%m-%d %I:%M:%S %p')
-        accountvalue=int(c2_equity.ix[system].modelAccountValue)
-        urpnl=int(c2_equity.ix[system].equity)
-        accountvalues[system]={'timestamp':timestamp, 'Account Value':accountvalue}
-        urpnls[system]={'timestamp':timestamp, 'UnrealizedPnL':urpnl}
+        timestamp = c2_equity.ix[system].updatedLastTimeET
+        accountvalue = int(c2_equity.ix[system].modelAccountValue)
+        urpnl = int(c2_equity.ix[system].equity)
+
+        urpnls[system] = {
+            'col1title': 'UnrealizedPnL', 'col1value': urpnl, \
+            'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p')
+        }
+        accountvalues[system] = {
+            'col1title': 'Account Value', 'col1value': accountvalue, \
+            'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p')
+        }
     '''
     c2_v4micro = pd.read_sql('select * from c2_portfolio where timestamp=\
           (select max(timestamp) from c2_portfolio where system=\'v4micro\')', con=readConn)
@@ -171,9 +194,8 @@ def getAccountValues():
     c2_v4futures = pd.read_sql('select * from c2_portfolio where timestamp=\
           (select max(timestamp) from c2_portfolio where system=\'v4futures\')', con=readConn)
     '''
-    
-    record = AccountData(value1=json.dumps(urpnls), value2=json.dumps(accountvalues),mcdate=mcdate,\
-                                    timestamp=getTimeStamp())
+
+    record = AccountData(value1=json.dumps(urpnls), value2=json.dumps(accountvalues), mcdate=mcdate, \
+                         timestamp=getTimeStamp())
     record.save()
-  
           

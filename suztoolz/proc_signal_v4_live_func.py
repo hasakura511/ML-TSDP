@@ -292,31 +292,28 @@ def proc_signal_v4_live(debug, ordersDict):
         systemPath =  './data/systems/'
         portfolioPath = './data/portfolio/c2_' 
         logging.basicConfig(filename='/logs/c2_live.log',level=logging.DEBUG)
-    try:
-        conn = sqlite3.connect(dbPath)
-        for sys in systems:
-            systemdata=ordersDict[sys]
-            seen=dict()
 
-            #cancel all pending orders
-            for i in systemdata.index:
-                    system=systemdata.ix[i]
-                    if system['c2submit'] and not seen.has_key(str(system['c2id'])):
-                        try:
-                            proc_sig_adj(str(system['c2id']),system['c2api'])
-                            seen[str(system['c2id'])]=1
-                        except Exception as e:
-                            print 'Error on', system['c2id']
+    conn = sqlite3.connect(dbPath)
+    for sys in systems:
+        systemdata=ordersDict[sys]
+        seen=dict()
+
+        #cancel all pending orders
+        for i in systemdata.index:
+                system=systemdata.ix[i]
+                if system['c2submit'] and not seen.has_key(str(system['c2id'])):
+                    try:
+                        proc_sig_adj(str(system['c2id']),system['c2api'])
+                        seen[str(system['c2id'])]=1
+                    except Exception as e:
+                        print 'Error on', system['c2id']
 
 
-            #send new orders
-            if not checkTableExists(conn, 'c2sigid'):
-                pd.DataFrame(pd.Series(data=1), columns=['c2sigid']).to_sql(name='c2sigid',con=conn, index=False)
-            systemdata=systemdata.reset_index()
-            start_trade(systemdata, dbPath)
-            sleep(1)
-            get_c2executions(systemdata, portfolioPath)
+        #send new orders
+        if not checkTableExists(conn, 'c2sigid'):
+            pd.DataFrame(pd.Series(data=1), columns=['c2sigid']).to_sql(name='c2sigid',con=conn, index=False)
+        systemdata=systemdata.reset_index()
+        start_trade(systemdata, dbPath)
+        sleep(1)
+        get_c2executions(systemdata, portfolioPath)
 
-    except Exception as e:
-        #print e
-        traceback.print_exc()

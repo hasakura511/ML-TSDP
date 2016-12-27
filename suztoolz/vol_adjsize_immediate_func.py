@@ -283,7 +283,7 @@ def vol_adjsize_board(debug, threadlist):
     for system in orderDict.keys():
         tablename = system+'_live'
         orderDict[system].to_sql(name= tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
-        orderDict[system].to_sql(name='signals_live', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+        #orderDict[system].to_sql(name='signals_live', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
         print tablename, selectionDict[system][0]
         filename = systemPath+'system_'+tablename+'.csv'
         orderDict[system].to_csv(filename, index=True)

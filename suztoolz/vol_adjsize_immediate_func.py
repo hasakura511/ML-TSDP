@@ -208,7 +208,7 @@ def vol_adjsize_board(debug, threadlist):
                                             con=writeConn, index=False)
             print 'appending webSelection to', dbPath
             
-        '''
+            '''
             last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
             #read from writeconn for debugging purpose
             last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
@@ -238,7 +238,7 @@ def vol_adjsize_board(debug, threadlist):
                         newselectionDict[key]=selectionDict[key]
                 #reset the selection dict with only the systems that's changed.
                 selectionDict = newselectionDict.copy()
-        '''
+            '''
         else:  
             #create selection
             webSelection = selectionDF.reset_index().drop(['id'],axis=1)

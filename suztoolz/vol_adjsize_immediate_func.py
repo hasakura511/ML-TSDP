@@ -199,8 +199,16 @@ def vol_adjsize_board(debug, threadlist):
                         'Voting10','Voting11','Voting12','Voting13','Voting14','Voting15']
 
         '''
+        
         #find any changes to userselection
         if checkTableExists(readConn, 'webSelection'):
+            webSelection = selectionDF.reset_index().drop(['id'],axis=1)
+            webSelection['Executed']=False
+            webSelection.to_sql(name='webSelection', if_exists='replace',\
+                                            con=writeConn, index=False)
+            print 'appending webSelection to', dbPath
+            
+        '''
             last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
             #read from writeconn for debugging purpose
             last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
@@ -230,10 +238,13 @@ def vol_adjsize_board(debug, threadlist):
                         newselectionDict[key]=selectionDict[key]
                 #reset the selection dict with only the systems that's changed.
                 selectionDict = newselectionDict.copy()
+        '''
         else:  
             #create selection
-            selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='replace',\
-                        con=writeConn, index=False)
+            webSelection = selectionDF.reset_index().drop(['id'],axis=1)
+            webSelection['Executed']=False
+            webSelection.to_sql(name='webSelection', if_exists='replace',\
+                                            con=writeConn, index=False)
             print 'could not find table webSelection. wrote webSelection to ',dbPath
         print '\n'
             
@@ -265,6 +276,7 @@ def vol_adjsize_board(debug, threadlist):
                 systemdata.index = [x.split('_')[1] for x in systemdata.System]
                 systemdata.signal = systemDict[key][selectionDict[key][0]]
                 orderDict[key]=systemdata.ix[[x[0] for x in threadlist]]
+                print orderDict[key], threadlist
                 print key, 'added system',selectionDict[key][0],'to orderDict for IMMEDIATE processing.'
         
         #save to file and db

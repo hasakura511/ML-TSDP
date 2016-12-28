@@ -79,7 +79,7 @@ def checkTableExists(dbconn, tablename):
 #feeddata=pd.read_csv(feedfile,index_col='ibsym')
 #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
 
-def vol_adjsize_live(debug, threadlist):
+def vol_adjsize_moc(debug, threadlist):
     start_time = time.time()
     #signal file version
     version='v4'

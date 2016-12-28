@@ -197,8 +197,8 @@ class IBWrapper(EWrapper):
         else:
             orderdata=self.data_order_structure
 
-        orderid=orderdetails['orderid']
-        orderdata[orderid]=orderdetails
+        symbol=orderdetails['symbol']
+        orderdata[symbol]=orderdetails
                         
         setattr(self, "data_order_structure", orderdata)
 

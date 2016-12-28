@@ -35,8 +35,8 @@ import sqlite3
 #from suztoolz.vol_adjsize_live_func import vol_adjsize_live
 from suztoolz.check_systems_live_func import check_systems_live
 from suztoolz.proc_signal_v4_live_func import proc_signal_v4_live
-from suztoolz.vol_adjsize_moclive_func import vol_adjsize_live
-from suztoolz.vol_adjsize_immediate_func import vol_adjsize_board
+from suztoolz.vol_adjsize_moclive_func import vol_adjsize_moc
+from suztoolz.vol_adjsize_immediate_func import vol_adjsize_immediate
 #currencyPairsDict=dict()
 #prepData=dict()
 start_time = time.time()
@@ -884,7 +884,7 @@ def getIBopen():
         openOrders['Date']=csidate
         openOrders['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         try:
-            openOrders.to_sql(name='ib_openorders', con=writeConn, index=True, if_exists='replace', index_label='contract')
+            openOrders.to_sql(name='ib_openorders', con=writeConn, index=True, if_exists='append', index_label='contract')
         except Exception as e:
             #print e
             traceback.print_exc()
@@ -896,10 +896,11 @@ def updateWithOpen(iborders, cid):
     print 'checking IB open orders..'
     openOrders=getIBopen()
     #filter out openorders from prior clients
-    openOrders=openOrders[openOrders.clientid==cid].copy()
+
     #check open orders
     iborders_lessOpen=[]
     if isinstance(openOrders, type(pd.DataFrame())) and len(openOrders>0):
+        openOrders=openOrders[openOrders.clientid==cid].copy()
         for (contract,[order,qty]) in iborders:
             #print sym, order, qty
             if order == 'SLD':
@@ -918,6 +919,10 @@ def updateWithOpen(iborders, cid):
             else:
                 print 'Error: Open Order for',contract, order, qty,'Not found!! Check IB..'
                 iborders_lessOpen+=[(contract,[order,qty])]
+                
+        for contract in openOrders.index:
+            if contract not in [x[0] for x in iborders]:
+                print 'Found open order not in execDict!\n', openOrders.ix[contract]
                 
         #if len(openOrders)>0:
         #    print 'Open orders that were not found in execDict:'
@@ -951,7 +956,7 @@ if __name__ == "__main__":
             tries+=1
             if tries==5:
                 sys.exit('failed 5 times to get contract info')
-                
+
     if immediate:
         print 'Running Immediate Process...'
         #include all symbols in threadlist to refresh all orders from selection
@@ -970,11 +975,11 @@ if __name__ == "__main__":
     
     if len(threadlist)>0:
         if immediate:
-            print 'running vol_adjsize_board to process immediate orders'
-            ordersDict = vol_adjsize_board(debug, threadlist)
+            print 'running vol_adjsize_immediate to process immediate orders'
+            ordersDict = vol_adjsize_immediate(debug, threadlist)
         else:
-            print 'running vol_adjsize_live to update system files'
-            ordersDict = vol_adjsize_live(debug, threadlist)
+            print 'running vol_adjsize_moc to update system files'
+            ordersDict = vol_adjsize_moc(debug, threadlist)
         #ordersDict={}
         #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
         
@@ -1061,11 +1066,12 @@ if __name__ == "__main__":
                     sleep(1)
                     #set the client date to timestamp to filter out openorders from prior runs.
                     cid=int(calendar.timegm(dt.utcnow().utctimetuple()))
+                    print 'placing IB orders', iborders
                     place_iborders(execDict, cid)
                     #wait for orders to be filled
                     sleep(15)
+                    print 'checking executions..'
                     executions=filterIBexec()
-                    iborders_lessOpen=updateWithOpen(iborders, cid)
 
                     if executions is not None:
                         #check executions
@@ -1074,7 +1080,7 @@ if __name__ == "__main__":
                         #check if expired contracts have been exited.
                         #executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
                         iborders_lessExec=[]
-                        for (sym,[order,qty]) in iborders_lessOpen:
+                        for (sym,[order,qty]) in iborders:
                             if (sym,order) in executions2.index and executions2.ix[sym].qty[0] ==qty:
                                 print 'execution found..',sym, order, qty, executions2.ix[sym].index[0],  executions2.ix[sym].qty[0]
                                 #execDict[sym][0] = 'PASS'
@@ -1091,8 +1097,13 @@ if __name__ == "__main__":
                         print 'Found', len(iborders_lessExec),'ib position adjustments after placing orders.'
                         print iborders_lessExec
                     else:
-                        print 'IB orders not verified:'
-                        print iborders_lessOpen
+                        print 'executions returned None. IB orders could not be verified:'
+                        print iborders
+                    
+                    if len(iborders_lessExec)>0:
+                        print 'checking open orders to see if orders not executed are pending orders..'
+                        iborders_lessOpen=updateWithOpen(iborders_lessExec, cid)
+                    
                 except Exception as e:
                     #print e
                     traceback.print_exc()

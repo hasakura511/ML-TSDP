@@ -159,7 +159,7 @@ def vol_adjsize_live(debug, threadlist):
         dbPath='./data/futures.sqlite3'
         dbPathWeb ='./web/tsdp/db.sqlite3'
         #dataPath='./data/csidata/v4futures4/'
-        dataPath='./data/csidata/v4futures4/'
+        dataPath='./data/csidata/v4futures2/'
         dataPath2='./data/'
         savePath='./data/results/'
         signalPath = './data/signals2/' 

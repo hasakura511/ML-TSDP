@@ -35,7 +35,7 @@ from copy import deepcopy
 #import seaborn as sns
 #from suztoolz.datatools.seasonalClass import seasonalClassifier
 import logging
-def vol_adjsize_board(debug, threadlist):
+def vol_adjsize_immediate(debug, threadlist):
 
     start_time = time.time()
     version='v4'

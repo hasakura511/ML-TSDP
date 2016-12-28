@@ -961,7 +961,7 @@ if __name__ == "__main__":
         threadlist=find_triggers(feeddata, contractsDF)
         print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
         runThreads(threadlist)
-        threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
+        #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
         
     print 'returned to main thread with', len(threadlist), 'threads'
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

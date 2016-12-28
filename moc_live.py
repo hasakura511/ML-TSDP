@@ -934,6 +934,7 @@ def updateWithOpen(iborders, cid):
         
 if __name__ == "__main__":
     print durationStr, barSizeSetting, whatToShow
+    #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
     systemfile=systemPath+'system_v4futures_live.csv'
     #systemfile=systemPathRO+'system_v4futures_live.csv'
@@ -960,6 +961,7 @@ if __name__ == "__main__":
         threadlist=find_triggers(feeddata, contractsDF)
         print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
         runThreads(threadlist)
+        threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
         
     print 'returned to main thread with', len(threadlist), 'threads'
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

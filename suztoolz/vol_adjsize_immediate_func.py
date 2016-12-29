@@ -30,11 +30,8 @@ import os.path
 import sys
 import ssl
 from copy import deepcopy
-#from suztoolz.transform import ATR2
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-#from suztoolz.datatools.seasonalClass import seasonalClassifier
 import logging
+
 def vol_adjsize_immediate(debug, threadlist):
 
     start_time = time.time()
@@ -175,12 +172,10 @@ def vol_adjsize_immediate(debug, threadlist):
         dbcur.close()
         return False
 
-
-        
     writeConn = sqlite3.connect(dbPath)
     readConn =  sqlite3.connect(dbPath2)
     readWebConn = sqlite3.connect(dbPathWeb)
-
+    
     #request='http://www.globalsystemsmanagement.net/last_userselection/'
     #selectionDF = pd.DataFrame(requests.get(request).json())
     #selectionDict=eval(selectionDF.selection[0])
@@ -201,7 +196,7 @@ def vol_adjsize_immediate(debug, threadlist):
     '''
     
     #find any changes to userselection
-    if checkTableExists(readConn, 'webSelection'):
+    if checkTableExists(readConn, 'webSelection') and debug==False:
         #webSelection = selectionDF.reset_index().drop(['id'],axis=1)
         #webSelection['Executed']=False
         #webSelection.to_sql(name='webSelection', if_exists='replace',\
@@ -212,7 +207,7 @@ def vol_adjsize_immediate(debug, threadlist):
         #read from writeconn for debugging purpose
         last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
                                 (select max(timestamp) from webSelection as maxtimestamp)',\
-                                con=readConn, index_col='userID').reset_index().to_dict()
+                                con=writeConn, index_col='userID').reset_index().to_dict()
         # if selectionDF is same as before then exit.
         # need to do this by system. 
         selectionDict_old=eval(last_selectionBack['selection'][0])
@@ -252,11 +247,20 @@ def vol_adjsize_immediate(debug, threadlist):
     #loadlast futures ATR data. live dumps into table 'futuresATR'
     #using the EOD all because ithink if we are at this point, we are processing immediate orders.
     #or new orders (change in system selection since MOC). right??
-    futuresDF=pd.read_sql('select * from futuresDF_all where timestamp=\
-                            (select max(timestamp) from futuresDF_all as maxtimestamp)',\
+    
+    #csi
+    #futuresDF=pd.read_sql('select * from futuresDF_all where timestamp=\
+    #                        (select max(timestamp) from futuresDF_all as maxtimestamp)',\
+    #                        con=readConn, index_col='CSIsym')
+    
+    #moc
+    futuresDF=pd.read_sql('select * from (select * from futuresATRhist order by timestamp ASC) group by CSIsym',\
                             con=readConn, index_col='CSIsym')
+    #debug
+    #selectionDict={'v4mini': ['RiskOn', 'True'], 'v4futures': ['HighestEquity', 'True'], 'v4micro': ['HighestEquity', 'True']}
+    #print futuresDF,selectionDict
     componentsignals=futuresDF[corecomponents]
-
+    
     systemDict={}
     orderDict={}
     for key in selectionDict.keys():
@@ -279,7 +283,8 @@ def vol_adjsize_immediate(debug, threadlist):
             orderDict[key]=systemdata.ix[[x[0] for x in threadlist]]
             #print orderDict[key], threadlist
             print key, 'added system',selectionDict[key][0],'to orderDict for IMMEDIATE processing.'
-    
+        else:
+            print key, 'skipped',selectionDict[key][0],'IMMEDIATE==FALSE.'
     #save to file and db
     for system in orderDict.keys():
         tablename = system+'_live'
@@ -288,7 +293,7 @@ def vol_adjsize_immediate(debug, threadlist):
         print tablename, selectionDict[system][0]
         filename = systemPath+'system_'+tablename+'.csv'
         orderDict[system].to_csv(filename, index=True)
-        print  'Saved to table',tablename, 'and', filename
+        print  'Saved to table',tablename, dbPath,'and', filename
 
     return orderDict
         

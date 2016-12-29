@@ -74,7 +74,8 @@ if len(sys.argv)==1:
     #if trigger time set to value then trigger time in feedfile is ignored.
     triggertimes = None
     #triggertime = 30 #mins
-    dbPath=dbPath2='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPath2='D:/ML-TSDP/data//futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
     runPath2= ['python','D:/ML-TSDP/vol_adjsize_live.py']
     runPath3=  ['python','D:/ML-TSDP/proc_signal_v4_live.py','0']
@@ -350,7 +351,7 @@ def get_ibfutpositions(portfolioPath):
         return 0
   
         
-def create_execDict(feeddata, systemfile):
+def create_execDict(feeddata, systemdata):
     global debug
     global client
     global csidate
@@ -359,9 +360,8 @@ def create_execDict(feeddata, systemfile):
     downloadtt = not ttdate>csidate
     execDict=dict()
     #need systemdata for the contract expiry
-    systemdata=pd.read_csv(systemfile)
-    systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
-    systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
+    #systemdata=pd.read_csv(systemfile)
+
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
     if downloadtt:
@@ -376,6 +376,9 @@ def create_execDict(feeddata, systemfile):
         
         #print 'Read: ',i
         system=feeddata.ix[i]
+        c2sym=system.c2sym
+        ibsym=system.ibsym   
+        index = systemdata[systemdata.c2sym2==c2sym].index[0]
         #find the current contract
 
         #print system
@@ -402,21 +405,22 @@ def create_execDict(feeddata, systemfile):
             contractInfo=client.get_contract_details(contract)
             contractsDF=contractsDF.append(contractInfo)
             execDict[symbol+contractInfo.expiry[0]]=['PASS', 0, contract]
+            systemdata.set_value(index, 'ibcontract', symbol+contractInfo.expiry[0])
         else:
             execDict[contractsDF.ix[symbol].contracts]=['PASS', 0, contract]
+            systemdata.set_value(index, 'ibcontract', contractsDF.ix[symbol].contracts)
             
         #update system file with correct ibsym and contract expiry
-        c2sym=system.c2sym
-        ibsym=system.ibsym   
-        index = systemdata[systemdata.c2sym2==c2sym].index[0]
         #print index, ibsym, contract.expiry, systemdata.columns
         systemdata.set_value(index, 'ibsym', ibsym)
-        systemdata.set_value(index, 'ibexpiry', contract.expiry)
+        systemdata.set_value(index, 'ibcontractmonth', contract.expiry)
         
 
         #print c2sym, ibsym, systemdata.ix[index].ibsym.values, systemdata.ix[index].c2sym.values, contract.expiry
+    
     #systemdata.to_csv(systemfile, index=False)
-    #print 'updated', systemfile
+    systemdata.to_sql(name='v4futures_moc_live', if_exists='replace', con=writeConn, index=False)
+    print '\nsaved v4futures_moc_live to', dbPath
     
     if downloadtt:
         feeddata=feeddata.set_index('ibsym')
@@ -440,7 +444,7 @@ def create_execDict(feeddata, systemfile):
             
     print '\nCreated exec dict with', len(execDict.keys()), 'contracts:'
     print execDict.keys()
-    return execDict,contractsDF
+    return execDict,contractsDF,systemdata
    
 def update_orders(feeddata, systemdata2, execDict, threadlist):
     global client
@@ -941,7 +945,16 @@ if __name__ == "__main__":
     print durationStr, barSizeSetting, whatToShow
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
-    systemfile=systemPath+'system_v4futures_live.csv'
+    #systemfile=systemPath+'system_v4futures_live.csv'
+    #load last systemfile from vol_adjsize csi
+    systemdata=pd.read_sql('select * from v4futures where timestamp=\
+                            (select max(timestamp) from v4futures as maxtimestamp)', con=readConn)
+    systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
+    systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
+    systemdata = systemdata.set_index('CSIsym')
+    systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
+    systemdata = systemdata.reset_index()
+
     #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
     execDict={}
@@ -949,14 +962,14 @@ if __name__ == "__main__":
     tries = 0
     while (len(execDict)  == 0 or len(contractsDF) == 0) and tries<5:
         try:
-            execDict, contractsDF=create_execDict(feeddata, systemfile)
+            execDict, contractsDF, systemdata=create_execDict(feeddata, systemdata)
         except Exception as e:
             #print e
             traceback.print_exc()
             tries+=1
             if tries==5:
                 sys.exit('failed 5 times to get contract info')
-
+    
     if immediate:
         print 'Running Immediate Process...'
         #include all symbols in threadlist to refresh all orders from selection

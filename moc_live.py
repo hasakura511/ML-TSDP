@@ -232,6 +232,41 @@ def lastCsiDownloadDate():
     
 csidate=lastCsiDownloadDate()
 
+    
+def guessMCdate():
+    cutoff = datetime.time(12, 0, 0, 0)
+    cutoff2 = datetime.time(23, 59, 59)
+    eastern = timezone('US/Eastern')
+    now = dt.now(get_localzone())
+    now = now.astimezone(eastern)
+    today = now.strftime("%Y%m%d")
+    if now.time() > cutoff and now.time() < cutoff2:
+        # M-SUN after cutoff, set next day
+        next = now + datetime.timedelta(days=1)
+        mcdate = next.strftime("%Y%m%d")
+    else:
+        # M-SUN before cutoff, keep same day
+        mcdate = now.strftime("%Y%m%d")
+
+    # overwrite weekends
+    if now.weekday() == 4 and now.time() > cutoff and now.time() < cutoff2:
+        # friday after cutoff so set to monday
+        next = now + datetime.timedelta(days=3)
+        mcdate = next.strftime("%Y%m%d")
+
+    if now.weekday() == 5:
+        # Saturday so set to monday
+        next = now + datetime.timedelta(days=2)
+        mcdate = next.strftime("%Y%m%d")
+
+    if now.weekday() == 6:
+        # Sunday so set to monday
+        next = now + datetime.timedelta(days=1)
+        mcdate = next.strftime("%Y%m%d")
+    return mcdate
+
+mcdate =guessMCdate()
+
 def lastTimeTableDate():
     #load timetable
     ttfiles = os.listdir(timetablePath)
@@ -357,7 +392,7 @@ def create_execDict(feeddata, systemdata):
     global csidate
     global ttdate
     
-    downloadtt = not ttdate>csidate
+    downloadtt = not ttdate>csidate or not ttdate>mcdate
     execDict=dict()
     #need systemdata for the contract expiry
     #systemdata=pd.read_csv(systemfile)
@@ -1071,7 +1106,7 @@ if __name__ == "__main__":
                     print 'skipped c2 orders: No c2 orders to be processed.'
             
             if submitIB and num_iborders!=0:
-                print 'returned to main thread, placing ib orders from', systemfile 
+                print 'returned to main thread, processing ib orders' 
                 try:
                     #clear all orders first
                     print 'requesting global cancel IB orders'

@@ -731,6 +731,7 @@ def vol_adjsize_moc(debug, threadlist):
         systemdata=systemdata.ix[marketList2]
         #qty calc'd from csidata's data
         systemdata.signal = systemDict[key][selectionDict[key][0]]
+        systemdata['selection']=selectionDict[key][0]
         ordersDict[key]=systemdata
         print '\n'
         print key, 'added system',selectionDict[key][0],'to ordersDict for MOC processing.'

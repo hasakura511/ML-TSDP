@@ -280,6 +280,7 @@ def vol_adjsize_immediate(debug, threadlist):
             systemdata = pd.read_sql('select * from %s' % key, con=readConn)
             systemdata.index = [x.split('_')[1] for x in systemdata.System]
             systemdata.signal = systemDict[key][selectionDict[key][0]]
+            systemdata['selection']=selectionDict[key][0]
             orderDict[key]=systemdata.ix[[x[0] for x in threadlist]]
             #print orderDict[key], threadlist
             print key, 'added system',selectionDict[key][0],'to orderDict for IMMEDIATE processing.'

@@ -27,7 +27,7 @@ import traceback
 #logging.basicConfig(filename='/logs/check_systems.log',level=logging.DEBUG)
 
     
-def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
+def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty, signal_check, qty_check):
     errors=0
     print 'position mismatch: ', sym, 's:'+str(sig), 'c2s:'+str(c2sig), 'q:'+str(qty), 'c2q:'+str(c2qty),
     #position size adjustements
@@ -45,55 +45,70 @@ def reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty):
         #Open orders
         if sig==1 and 'BTO' in orders.action.values:
             print 'working sig OK',
+            signal_check ='OK: Open Order: Entry Order'
             #new open adjustment plus existing position equals qty in system file
             if orders[orders.action=='BTO'].quant.values[0] +c2qty2 == qty:
                 print 'qty OK'
+                qty_check ='OK: Open Order: Entry Order'
             else:
                 print 'qty ERROR'
+                qty_check ='ERROR: Open Order: Entry Order'
                 errors+=1
         elif sig==-1 and 'STO' in orders.action.values:
             print 'working sig OK',
+            signal_check ='OK: Open Order: Entry Order'
             if orders[orders.action=='STO'].quant.values[0] +c2qty2== qty:
                 print 'qty OK'
+                qty_check ='OK: Open Order: Entry Order'
             else:
                 print 'qty ERROR'
+                qty_check ='ERROR: Open Order: Entry Order'
                 errors+=1
         #Close Orders where sig/qty = 0
         elif (sig==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values))\
                 or (qty==0 and ('STC' in orders.action.values or 'BTC' in orders.action.values)):
             print 'working sig OK',
+            signal_check ='OK: Open Order: Exit Order'
             if orders.quant.values[0] == c2qty:
                 print 'qty OK'
+                qty_check ='OK: Open Order: Exit Order'
             else:
                 print 'qty ERROR'
+                qty_check ='ERROR: Open Order: Exit Order'
                 errors+=1
         else:
             #Close Orders where qty adjustments
             if sig==c2sig:
                 print 'working sig OK',
+                signal_check ='OK: Open Order: qty adjustments'
                 #check for position adjustment
                 if orders.action.values[0]=='BTC' and c2qty2-orders[orders.action=='BTC'].quant.values[0] == qty:
                     print 'qty OK'
+                    qty_check ='OK: Open Order: qty adjustments'
                 elif orders.action.values[0]=='STC' and c2qty2-orders[orders.action=='STC'].quant.values[0] == qty:
                     print 'qty OK'
+                    qty_check ='OK: Open Order: qty adjustments'
                 else:
                     #unknown scenario
                     print 'Wrong working qty found!'
+                    qty_check ='ERROR: wrong qty found'
                     errors+=1
 
             else:
                 #unknown scenario
                 print 'Wrong working signal found!'
+                signal_check ='ERROR: wrong signal found'
                 errors+=1
     else:
         print 'ERROR no working signals found!'
+        signal_check ='ERROR: no signal found'
         errors+=1
-    return errors
+    return errors, signal_check, qty_check
 
 def check_systems_live(debug, ordersDict, csidate):
     start_time = time.time()
     systems = ordersDict.keys()
-    
+    order_status_dict={}
     if debug:
         #systems = ['v4micro']
         #systems = ['v4futures','v4mini','v4micro']
@@ -172,7 +187,11 @@ def check_systems_live(debug, ordersDict, csidate):
                         
     for sys in c2openpositions.keys():
         print sys, 'Position Checking..'
+        ostatus_cols=['contract','broker','selection','system_signal',\
+                                        'broker_position','signal_check','system_qty','broker_qty','qty_check','openedWhen']
+        order_status_dict[sys]=pd.DataFrame(columns=ostatus_cols)
         exitList=[]
+        broker='c2'
         #sig reconciliation
         c2_count=0
         sys_count=0
@@ -180,18 +199,29 @@ def check_systems_live(debug, ordersDict, csidate):
         exit_count=0
         error_count=0
         c2openpositions[sys]['signal']=np.where(c2openpositions[sys]['long_or_short'].values=='long',1,-1)
+
         #check contracts in c2 file not in system file.
         for sym in c2openpositions[sys].index:
+            contract = sym
             c2_count+=1
             if sym in futuresDict[sys].index:
-
-                c2sig = int(c2openpositions[sys].ix[sym].signal)
-                sig=int(futuresDict[sys].ix[sym].signal)
-                qty=int(futuresDict[sys].ix[sym].c2qty)
-                c2qty=int(c2openpositions[sys].ix[sym].quant_opened)-int(c2openpositions[sys].ix[sym].quant_closed)
+                selection = futuresDict[sys].ix[sym].selection
+                openedWhen=c2openpositions[sys].ix[sym].openedWhen
+                c2sig =broker_position= int(c2openpositions[sys].ix[sym].signal)
+                sig=system_signal=int(futuresDict[sys].ix[sym].signal)
+                qty=system_qty=int(futuresDict[sys].ix[sym].c2qty)
+                c2qty=broker_qty=int(c2openpositions[sys].ix[sym].quant_opened)-int(c2openpositions[sys].ix[sym].quant_closed)
+                signal_check='ERROR' if sig != c2sig else 'OK'
+                qty_check='ERROR' if qty != c2qty else 'OK'
                 if sig != c2sig or qty != c2qty:
                     mismatch_count+=1
-                    error_count+=reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty)
+                    errors, signal_check, qty_check=reconcileWorkingSignals(sys, workingSignals, sym, sig, c2sig, qty, c2qty, signal_check, qty_check)
+                    error_count+=errors
+                    
+                dfdict={}
+                for i in ostatus_cols:
+                    dfdict[i] = locals()[i]
+                order_status_dict[sys]= order_status_dict[sys].append(pd.DataFrame(data=dfdict, index=[sym]))
                     
             else:
                 #exit if not in the main file
@@ -214,14 +244,24 @@ def check_systems_live(debug, ordersDict, csidate):
                     exitList.append(sym+' not in system file. exiting contract!!.. '+response)
         #check contracts in system file not in c2.
         for sym in futuresDict[sys].index:
-            sig=int(futuresDict[sys].ix[sym].signal)
-            qty=int(futuresDict[sys].ix[sym].c2qty)
+            contract = sym
+            selection = futuresDict[sys].ix[sym].selection
+            openedWhen=''
+            sig=system_signal=int(futuresDict[sys].ix[sym].signal)
+            qty=system_qty=int(futuresDict[sys].ix[sym].c2qty)
             systemSym = (sig !=0 and qty !=0)
             if systemSym:
                 sys_count+=1
             if sym not in c2openpositions[sys].index and systemSym:
                 mismatch_count+=1
-                error_count+=reconcileWorkingSignals(sys, workingSignals, sym, sig, 0, qty, 0)
+                broker_position=0
+                broker_qty=0
+                errors, signal_check, qty_check=reconcileWorkingSignals(sys, workingSignals, sym, sig, 0, qty, 0, signal_check, qty_check)
+                error_count+=errors
+                dfdict={}
+                for i in ostatus_cols:
+                    dfdict[i] = locals()[i]
+                order_status_dict[sys]= order_status_dict[sys].append(pd.DataFrame(data=dfdict, index=[sym]))
         totalerrors+=error_count
         for e in exitList:
             print e
@@ -230,4 +270,8 @@ def check_systems_live(debug, ordersDict, csidate):
     pd.DataFrame(pd.Series(data=totalerrors), columns=['totalerrors']).to_sql(name='checkSystems',con=writeConn, index=False, if_exists='replace')
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
+    for name, orderstatus in order_status_dict.items():
+        table='checkSystems_'+name
+        orderstatus.to_sql(name=table,con=writeConn, index=False, if_exists='replace')
+        print 'saved', table,'to',dbPath
     return totalerrors

@@ -35,7 +35,7 @@
         <entry file="file://$PROJECT_DIR$/betting/urls.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="340">
-              <caret line="20" column="1" lean-forward="true" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+              <caret line="20" column="1" lean-forward="false" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
                 <marker date="1482824471241" expanded="true" signature="69:965" ph="..." />
@@ -44,21 +44,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="helpers.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="helpers.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/betting/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="447">
-              <caret line="200" column="0" lean-forward="false" selection-start-line="200" selection-start-column="0" selection-end-line="200" selection-end-column="0" />
+            <state relative-caret-position="393">
+              <caret line="184" column="95" lean-forward="false" selection-start-line="184" selection-start-column="95" selection-end-line="184" selection-end-column="95" />
               <folding>
                 <element signature="e#0#24#0" expanded="true" />
-                <marker date="1482829205467" expanded="true" signature="938:961" ph="select * fro... timetable" />
-                <marker date="1482829205467" expanded="true" signature="3465:3489" ph="select * fro... Dictionary" />
-                <marker date="1482829205467" expanded="true" signature="4684:4707" ph="select * fro... timetable" />
-                <marker date="1482829205467" expanded="true" signature="4773:4797" ph="select * fro... Dictionary" />
-                <marker date="1482829205467" expanded="true" signature="5600:5734" ph="select * fro... ib_accountData" />
-                <marker date="1482829205467" expanded="true" signature="6167:6322" ph="select * fro... ib_accountData" />
-                <marker date="1482829205467" expanded="true" signature="6741:6819" ph="select * fro... *" />
-                <marker date="1482829205467" expanded="true" signature="6756:6802" ph="select * fro... c2_equity" />
+                <marker date="1482974959250" expanded="true" signature="938:961" ph="select * fro... timetable" />
+                <marker date="1482974959250" expanded="true" signature="3465:3489" ph="select * fro... Dictionary" />
+                <marker date="1482974959250" expanded="true" signature="4684:4707" ph="select * fro... timetable" />
+                <marker date="1482974959250" expanded="true" signature="4773:4797" ph="select * fro... Dictionary" />
+                <marker date="1482974959250" expanded="true" signature="5600:5734" ph="select * fro... ib_accountData" />
+                <marker date="1482974959250" expanded="true" signature="6171:6326" ph="select * fro... ib_accountData" />
+                <marker date="1482974959250" expanded="true" signature="6749:6827" ph="select * fro... *" />
+                <marker date="1482974959250" expanded="true" signature="6764:6810" ph="select * fro... c2_equity" />
               </folding>
             </state>
           </provider>
@@ -78,7 +78,7 @@
         <entry file="file://$PROJECT_DIR$/betting/views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="124">
-              <caret line="45" column="0" lean-forward="true" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+              <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -96,11 +96,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="board.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="board.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/betting/templates/board.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+            <state relative-caret-position="102">
+              <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -165,8 +165,8 @@
         <option value="$PROJECT_DIR$/betting/templates/loading_page.html" />
         <option value="$PROJECT_DIR$/betting/templates/show_log.html" />
         <option value="$PROJECT_DIR$/betting/templates/system_charts.html" />
-        <option value="$PROJECT_DIR$/betting/helpers.py" />
         <option value="$PROJECT_DIR$/betting/templates/board.html" />
+        <option value="$PROJECT_DIR$/betting/helpers.py" />
       </list>
     </option>
   </component>
@@ -902,7 +902,7 @@
     <entry file="file://$PROJECT_DIR$/betting/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="124">
-          <caret line="45" column="0" lean-forward="true" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+          <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
@@ -952,28 +952,10 @@
     <entry file="file://$PROJECT_DIR$/betting/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="340">
-          <caret line="20" column="1" lean-forward="true" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+          <caret line="20" column="1" lean-forward="false" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
             <marker date="1482824471241" expanded="true" signature="69:965" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/betting/helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="447">
-          <caret line="200" column="0" lean-forward="false" selection-start-line="200" selection-start-column="0" selection-end-line="200" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-            <marker date="1482829205467" expanded="true" signature="938:961" ph="select * fro... timetable" />
-            <marker date="1482829205467" expanded="true" signature="3465:3489" ph="select * fro... Dictionary" />
-            <marker date="1482829205467" expanded="true" signature="4684:4707" ph="select * fro... timetable" />
-            <marker date="1482829205467" expanded="true" signature="4773:4797" ph="select * fro... Dictionary" />
-            <marker date="1482829205467" expanded="true" signature="5600:5734" ph="select * fro... ib_accountData" />
-            <marker date="1482829205467" expanded="true" signature="6167:6322" ph="select * fro... ib_accountData" />
-            <marker date="1482829205467" expanded="true" signature="6741:6819" ph="select * fro... *" />
-            <marker date="1482829205467" expanded="true" signature="6756:6802" ph="select * fro... c2_equity" />
           </folding>
         </state>
       </provider>
@@ -988,9 +970,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/betting/templates/board.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+        <state relative-caret-position="102">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/betting/helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="393">
+          <caret line="184" column="95" lean-forward="false" selection-start-line="184" selection-start-column="95" selection-end-line="184" selection-end-column="95" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+            <marker date="1482974959250" expanded="true" signature="938:961" ph="select * fro... timetable" />
+            <marker date="1482974959250" expanded="true" signature="3465:3489" ph="select * fro... Dictionary" />
+            <marker date="1482974959250" expanded="true" signature="4684:4707" ph="select * fro... timetable" />
+            <marker date="1482974959250" expanded="true" signature="4773:4797" ph="select * fro... Dictionary" />
+            <marker date="1482974959250" expanded="true" signature="5600:5734" ph="select * fro... ib_accountData" />
+            <marker date="1482974959250" expanded="true" signature="6171:6326" ph="select * fro... ib_accountData" />
+            <marker date="1482974959250" expanded="true" signature="6749:6827" ph="select * fro... *" />
+            <marker date="1482974959250" expanded="true" signature="6764:6810" ph="select * fro... c2_equity" />
+          </folding>
         </state>
       </provider>
     </entry>

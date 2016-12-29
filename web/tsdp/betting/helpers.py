@@ -154,7 +154,7 @@ def getAccountValues():
     accountvalue = int(float(ib_equity.value[0]))
     accountvalues['v4futures'] = {
         'col1title': 'Account Value', 'col1value': accountvalue, \
-        'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p')
+        'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p EST')
     }
 
     ib_urpnl = pd.read_sql('select * from ib_accountData where timestamp=\
@@ -164,7 +164,7 @@ def getAccountValues():
     urpnl = int(float(ib_urpnl.value[0]))
     urpnls['v4futures'] = {
         'col1title': 'UnrealizedPnL', 'col1value': urpnl, \
-        'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p')
+        'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p EST')
     }
 
     # C2
@@ -178,11 +178,11 @@ def getAccountValues():
 
         urpnls[system] = {
             'col1title': 'UnrealizedPnL', 'col1value': urpnl, \
-            'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p')
+            'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p EST')
         }
         accountvalues[system] = {
             'col1title': 'Account Value', 'col1value': accountvalue, \
-            'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p')
+            'col2title': 'Timestamp', 'col2value': timestamp.strftime('%Y-%m-%d %I:%M:%S %p EST')
         }
     '''
     c2_v4micro = pd.read_sql('select * from c2_portfolio where timestamp=\

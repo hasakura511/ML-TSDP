@@ -210,7 +210,6 @@ def check_systems_live(debug, ordersDict, csidate):
         order_status_dict[account]=pd.DataFrame(columns=ostatus_cols)
         exitList=[]
         broker='c2'
-        order_type
         account=account
         Date=int(csidate)
         timestamp=int(calendar.timegm(dt.utcnow().utctimetuple()))
@@ -301,6 +300,7 @@ def check_systems_live(debug, ordersDict, csidate):
     return totalerrors
 
 if __name__ == "__main__":
+    debug=False
     def lastCsiDownloadDate(csiDataPath):
         datafiles = os.listdir(csiDataPath)
         dates = []
@@ -322,5 +322,5 @@ if __name__ == "__main__":
         ordersDict[account]=pd.read_sql('select * from (select * from %s\
                 order by timestamp ASC) group by CSIsym' % (account+'_live'),\
                 con=readcon,  index_col='CSIsym')
-    errors=check_systems_live(True, ordersDict, csidate)
+    errors=check_systems_live(debug, ordersDict, csidate)
     print 'total errors found', errors

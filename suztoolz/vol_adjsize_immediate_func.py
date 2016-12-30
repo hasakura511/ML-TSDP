@@ -283,14 +283,15 @@ def vol_adjsize_immediate(debug, threadlist):
             systemdata['selection']=selectionDict[key][0]
             orderDict[key]=systemdata.ix[[x[0] for x in threadlist]]
             #print orderDict[key], threadlist
-            print key, 'added system',selectionDict[key][0],'to orderDict for IMMEDIATE processing.'
+            print key, 'added system',selectionDict[key][0],'to orderDict: IMMEDIATE==TRUE.'
         else:
-            print key, 'skipped',selectionDict[key][0],'IMMEDIATE==FALSE.'
+            print key, 'skipped adding ',selectionDict[key][0],'to orderDict: IMMEDIATE==FALSE.'
     #save to file and db
     for system in orderDict.keys():
         tablename = system+'_live'
-        orderDict[system].to_sql(name= tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
-        #orderDict[system].to_sql(name='signals_live', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+        orderDict[system]['ordertype']='immediate'
+        orderDict[system].to_sql(name= tablename, if_exists='append', con=writeConn, index=True, index_label='CSIsym')
+        orderDict[system].to_sql(name='signals_live', if_exists='append', con=writeConn, index=True, index_label='CSIsym')
         print tablename, selectionDict[system][0]
         filename = systemPath+'system_'+tablename+'.csv'
         orderDict[system].to_csv(filename, index=True)

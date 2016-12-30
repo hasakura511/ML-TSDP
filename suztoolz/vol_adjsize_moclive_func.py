@@ -732,14 +732,16 @@ def vol_adjsize_moc(debug, threadlist):
         #qty calc'd from csidata's data
         systemdata.signal = systemDict[key][selectionDict[key][0]]
         systemdata['selection']=selectionDict[key][0]
-        ordersDict[key]=systemdata
-        print '\n'
-        print key, 'added system',selectionDict[key][0],'to ordersDict for MOC processing.'
+        systemdata['ordertype']='MOC'
         systemdata['Date']=lastDate
         systemdata['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
+        
+        ordersDict[key]=systemdata
+        print '\n'
+        print key, 'added system',selectionDict[key][0],'to ordersDict for MOC processing.'        
         tablename = key+'_live'
-        systemdata.to_sql(name= tablename, if_exists='replace', con=writeConn, index=True, index_label='CSIsym')
-        #systemdata.to_sql(name='signals_live', if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+        systemdata.to_sql(name= tablename, if_exists='append', con=writeConn, index=True, index_label='CSIsym')
+        systemdata.to_sql(name='signals_live', if_exists='append', con=writeConn, index=True, index_label='CSIsym')
         filename=systemPath+'system_'+key+'_live.csv'
         systemdata.to_csv(filename, index=True)
         print  'Saved to table',tablename, 'and', filename

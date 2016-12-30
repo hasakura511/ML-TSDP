@@ -161,7 +161,7 @@ def check_systems_live(debug, ordersDict, csidate):
         #subprocess.call(['python', 'get_ibpos.py'])       
         print account, 'Getting c2 positions...'
         #systemdata=pd.read_csv(systemPath+'system_'+account+'_live.csv')
-        ordersDict[account]=systemdata=ordersDict[account].reset_index()
+        ordersDict[account]=systemdata=ordersDict[account]
         ordersDict[account].index=ordersDict[account].c2sym
         #portfolio and equity
         #c2list=get_c2_list(systemdata)

@@ -119,8 +119,8 @@ def reconcileWorkingSignals(account, workingSignals, sym, sig, c2sig, qty, c2qty
                 signal_check ='ERROR: wrong signal found'
                 errors+=1
     else:
-        print 'ERROR no working signals found!'
-        signal_check ='ERROR: no signal found'
+        print 'ERROR no working orders found!'
+        #signal_check ='ERROR: no signal found'
         errors+=1
     return errors, signal_check, qty_check
 
@@ -233,8 +233,8 @@ def check_systems_live(debug, ordersDict, csidate):
                 sig=system_signal=int(ordersDict[account].ix[sym].signal)
                 qty=system_qty=int(ordersDict[account].ix[sym].c2qty)
                 c2qty=broker_qty=int(c2openpositions[account].ix[sym].quant_opened)-int(c2openpositions[account].ix[sym].quant_closed)
-                signal_check='ERROR: No Open Orders' if sig != c2sig else 'OK'
-                qty_check='ERROR: No Open Orders' if qty != c2qty else 'OK'
+                signal_check='ERROR: No Open Orders Found' if sig != c2sig else 'OK'
+                qty_check='ERROR: No Open Orders Found' if qty != c2qty else 'OK'
                 if sig != c2sig or qty != c2qty:
                     mismatch_count+=1
                     errors, signal_check, qty_check=reconcileWorkingSignals(account, workingSignals, sym, sig, c2sig, qty, c2qty, signal_check, qty_check)

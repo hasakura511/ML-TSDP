@@ -8,6 +8,7 @@ from tzlocal import get_localzone
 import sqlite3
 import pandas as pd
 from .models import MetaData, AccountData
+from .start_moc import start_moc
 import calendar
 import os
 
@@ -127,6 +128,11 @@ def updateMeta():
     mcdate=MCdate()
     timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc')
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
+    if mcdate not in timetables.columns:
+        print('Running MOC to get new mcdate...')
+        start_moc()
+        mcdate=timetables.drop(['Date','timestamp'],axis=1).columns[-1]
+
     triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
     triggers.index=[x.split()[0] for x in triggers.index]
     triggers.columns = [['Triggertime']]

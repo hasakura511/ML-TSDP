@@ -111,7 +111,7 @@ if webready:
     #selectionDict=eval(selectionDF.selection[0])
     selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
             (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
-    selectionDict=eval(selectionDF.selection[0].values[0])
+    selectionDict=eval(selectionDF.selection.values[0])
     c2system_macro=c2system=selectionDict["v4futures"][0]
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]

@@ -312,7 +312,7 @@ def proc_signal_v4_live(debug, ordersDict):
         #send new orders
         if not checkTableExists(conn, 'c2sigid'):
             pd.DataFrame(pd.Series(data=1), columns=['c2sigid']).to_sql(name='c2sigid',con=conn, index=False)
-        systemdata=systemdata.reset_index()
+        #systemdata=systemdata.reset_index()
         start_trade(systemdata, dbPath)
         sleep(1)
         get_c2executions(systemdata, portfolioPath)

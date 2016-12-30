@@ -104,7 +104,7 @@ else:
 writeConn = sqlite3.connect(dbPath)
 readConn =  sqlite3.connect(dbPath2)
 readWebConn = sqlite3.connect(dbPathWeb)
-webready = False
+webready = True
 if webready:
     #request='http://www.globalsystemsmanagement.net/last_userselection/'
     #selectionDF = pd.DataFrame(requests.get(request).json())

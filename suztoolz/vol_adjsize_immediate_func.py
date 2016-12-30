@@ -32,7 +32,27 @@ import ssl
 from copy import deepcopy
 import logging
 
-def vol_adjsize_immediate(debug, threadlist):
+def getTableColumns(dbconn, tablename):
+    dbcur = dbconn.cursor()
+    dbcur.execute("""
+        PRAGMA table_info('{0}')
+        """.format(tablename.replace('\'', '\'\'')))
+    columns=dbcur.fetchall()
+    dbcur.close()
+    if len(columns)>0:
+        return [x[1] for x in columns]
+    else:
+        return []
+
+def get_write_mode(dbconn, tablename, dataframe):
+    dbcols=getTableColumns(dbconn, tablename)
+    check=[col in dbcols for col in dataframe.columns]
+    if False in check:
+        return 'replace'
+    else:
+        return 'append'
+        
+def vol_adjsize_immediate(debug, threadlist, skipcheck=False):
 
     start_time = time.time()
     version='v4'
@@ -196,53 +216,54 @@ def vol_adjsize_immediate(debug, threadlist):
     '''
     
     #find any changes to userselection
-    if checkTableExists(readConn, 'webSelection') and debug==False:
-        #webSelection = selectionDF.reset_index().drop(['id'],axis=1)
-        #webSelection['Executed']=False
-        #webSelection.to_sql(name='webSelection', if_exists='replace',\
-        #                                con=writeConn, index=False)
-        #print 'appending webSelection to', dbPath
+    if not skipcheck:
+        if checkTableExists(readConn, 'webSelection'):
+            #webSelection = selectionDF.reset_index().drop(['id'],axis=1)
+            #webSelection['Executed']=False
+            #webSelection.to_sql(name='webSelection', if_exists='replace',\
+            #                                con=writeConn, index=False)
+            #print 'appending webSelection to', dbPath
 
-        last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
-        #read from writeconn for debugging purpose
-        last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
-                                (select max(timestamp) from webSelection as maxtimestamp)',\
-                                con=writeConn, index_col='userID').reset_index().to_dict()
-        # if selectionDF is same as before then exit.
-        # need to do this by system. 
-        selectionDict_old=eval(last_selectionBack['selection'][0])
-        if selectionDict == selectionDict_old:
-            #no change sysexit
-            print 'no change in user selection', selectionDict
-            sys.exit('no change in user selection')
-        else:
-            #write new selection to backend db
-            selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
-                        con=writeConn, index=False)
-            print 'new user selection found. appending webSelection to', dbPath
-            #check each system to see if its changed.
-            #need to check each system in between MOC and CSI data release
-            #we don't revert back to the prior day's. this will happen when only one system
-            #changes and others don't.
+            last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
+            #read from writeconn for debugging purpose
+            last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
+                                    (select max(timestamp) from webSelection as maxtimestamp)',\
+                                    con=writeConn, index_col='userID').reset_index().to_dict()
+            # if selectionDF is same as before then exit.
+            # need to do this by system. 
+            selectionDict_old=eval(last_selectionBack['selection'][0])
+            if selectionDict == selectionDict_old:
+                #no change sysexit
+                print 'no change in user selection', selectionDict
+                sys.exit('no change in user selection')
+            else:
+                #write new selection to backend db
+                selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
+                            con=writeConn, index=False)
+                print 'new user selection found. appending webSelection to', dbPath
+                #check each system to see if its changed.
+                #need to check each system in between MOC and CSI data release
+                #we don't revert back to the prior day's. this will happen when only one system
+                #changes and others don't.
+                
+                newselectionDict={}
+                for key in selectionDict.keys():
+                    if selectionDict[key] != selectionDict_old[key]:
+                        print key, 'found new', selectionDict[key], 'old', selectionDict_old[key]
+                        newselectionDict[key]=selectionDict[key]
+                #reset the selection dict with only the systems that's changed.
+                selectionDict = newselectionDict.copy()
             
-            newselectionDict={}
-            for key in selectionDict.keys():
-                if selectionDict[key] != selectionDict_old[key]:
-                    print key, 'found new', selectionDict[key], 'old', selectionDict_old[key]
-                    newselectionDict[key]=selectionDict[key]
-            #reset the selection dict with only the systems that's changed.
-            selectionDict = newselectionDict.copy()
-        
-    else:  
-        #create selection
-        #webSelection = selectionDF.reset_index().drop(['id'],axis=1)
-        #webSelection['Executed']=False
-        #webSelection.to_sql(name='webSelection', if_exists='replace',\
-        #                                con=writeConn, index=False)
-        selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='replace',\
-            con=writeConn, index=False)
-        print 'could not find table webSelection. wrote webSelection to ',dbPath
-    print '\n'
+        else:  
+            #create selection
+            #webSelection = selectionDF.reset_index().drop(['id'],axis=1)
+            #webSelection['Executed']=False
+            #webSelection.to_sql(name='webSelection', if_exists='replace',\
+            #                                con=writeConn, index=False)
+            selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='replace',\
+                con=writeConn, index=False)
+            print 'could not find table webSelection. wrote webSelection to ',dbPath
+        print '\n'
         
     #loadlast futures ATR data. live dumps into table 'futuresATR'
     #using the EOD all because ithink if we are at this point, we are processing immediate orders.
@@ -281,21 +302,39 @@ def vol_adjsize_immediate(debug, threadlist):
             systemdata.index = [x.split('_')[1] for x in systemdata.System]
             systemdata.signal = systemDict[key][selectionDict[key][0]]
             systemdata['selection']=selectionDict[key][0]
+            systemdata['ordertype']='immediate'
             orderDict[key]=systemdata.ix[[x[0] for x in threadlist]]
             #print orderDict[key], threadlist
             print key, 'added system',selectionDict[key][0],'to orderDict: IMMEDIATE==TRUE.'
         else:
             print key, 'skipped adding ',selectionDict[key][0],'to orderDict: IMMEDIATE==FALSE.'
+            
     #save to file and db
     for system in orderDict.keys():
         tablename = system+'_live'
-        orderDict[system]['ordertype']='immediate'
-        orderDict[system].to_sql(name= tablename, if_exists='append', con=writeConn, index=True, index_label='CSIsym')
-        orderDict[system].to_sql(name='signals_live', if_exists='append', con=writeConn, index=True, index_label='CSIsym')
+        mode = get_write_mode(writeConn, tablename, orderDict[system])
+        orderDict[system].to_sql(name= tablename, if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+        
+        tablename2 ='signals_live'
+        mode = get_write_mode(writeConn, tablename2, orderDict[system])        
+        orderDict[system].to_sql(name=tablename2, if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+        
         print tablename, selectionDict[system][0]
         filename = systemPath+'system_'+tablename+'.csv'
         orderDict[system].to_csv(filename, index=True)
-        print  'Saved to table',tablename, dbPath,'and', filename
+        print  'Saved to table',tablename, tablename2, dbPath,'and', filename
 
     return orderDict
+    
+if __name__ == "__main__":
+    if len(sys.argv)==1:
+        debug=True
+        feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    else:
+        debug=False
+        feedfile='./data/systems/system_ibfeed.csv'
         
+    feeddata=pd.read_csv(feedfile,index_col='ibsym')
+    threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
+    orderDict=vol_adjsize_immediate(True, threadlist, skipcheck=True)
+    print orderDict

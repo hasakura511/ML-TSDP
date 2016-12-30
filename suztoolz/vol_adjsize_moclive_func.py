@@ -73,13 +73,33 @@ def checkTableExists(dbconn, tablename):
 
     dbcur.close()
     return False
-    
+
+def getTableColumns(dbconn, tablename):
+    dbcur = dbconn.cursor()
+    dbcur.execute("""
+        PRAGMA table_info('{0}')
+        """.format(tablename.replace('\'', '\'\'')))
+    columns=dbcur.fetchall()
+    dbcur.close()
+    if len(columns)>0:
+        return [x[1] for x in columns]
+    else:
+        return []
+
+def get_write_mode(dbconn, tablename, dataframe):
+    dbcols=getTableColumns(dbconn, tablename)
+    check=[col in dbcols for col in dataframe.columns]
+    if False in check:
+        return 'replace'
+    else:
+        return 'append'
+        
 #debug=True #uncomment line 167
 #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
 #feeddata=pd.read_csv(feedfile,index_col='ibsym')
 #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
 
-def vol_adjsize_moc(debug, threadlist):
+def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     start_time = time.time()
     #signal file version
     version='v4'
@@ -681,31 +701,32 @@ def vol_adjsize_moc(debug, threadlist):
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]
 
-    #find any changes to userselection
-    if checkTableExists(readConn, 'webSelection'):
-        last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
-        #read from writeconn for debugging purpose
-        last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
-                                (select max(timestamp) from webSelection as maxtimestamp)',\
-                                con=readConn, index_col='userID').reset_index().to_dict()
-        # if selectionDF is same as before then exit.
-        # need to do this by system. 
-        selectionDict_old=eval(last_selectionBack['selection'][0])
-        if selectionDict == selectionDict_old:
-            #avoid duplicate entries
-            print 'found no change in user selection', selectionDict
-            print 'skipping save to db'
-        else:
-            #write new selection to backend db
-            selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
-                        con=writeConn, index=False)
-            print 'new user selection found. appending webSelection to', dbPath
+    if not skipcheck:
+        #find any changes to userselection
+        if checkTableExists(readConn, 'webSelection'):
+            last_selectionWeb=selectionDF.reset_index().drop(['id'],axis=1).to_dict()
+            #read from writeconn for debugging purpose
+            last_selectionBack=pd.read_sql('select * from webSelection where timestamp=\
+                                    (select max(timestamp) from webSelection as maxtimestamp)',\
+                                    con=readConn, index_col='userID').reset_index().to_dict()
+            # if selectionDF is same as before then exit.
+            # need to do this by system. 
+            selectionDict_old=eval(last_selectionBack['selection'][0])
+            if selectionDict == selectionDict_old:
+                #avoid duplicate entries
+                print 'found no change in user selection', selectionDict
+                print 'skipping save to db'
+            else:
+                #write new selection to backend db
+                selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
+                            con=writeConn, index=False)
+                print 'new user selection found. appending webSelection to', dbPath
 
-    else:  
-        #create selection
-        selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='replace',\
-                    con=writeConn, index=False)
-        print 'could not find table webSelection. wrote webSelection to ',dbPath
+        else:  
+            #create selection
+            selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='replace',\
+                        con=writeConn, index=False)
+            print 'could not find table webSelection. wrote webSelection to ',dbPath
 
     #system file update.
     #load from daily run, save to live (to update pivot dates)
@@ -738,13 +759,19 @@ def vol_adjsize_moc(debug, threadlist):
         
         ordersDict[key]=systemdata
         print '\n'
-        print key, 'added system',selectionDict[key][0],'to ordersDict for MOC processing.'        
+        print key, 'added system',selectionDict[key][0],'to ordersDict for MOC processing.' 
+        
         tablename = key+'_live'
-        systemdata.to_sql(name= tablename, if_exists='append', con=writeConn, index=True, index_label='CSIsym')
-        systemdata.to_sql(name='signals_live', if_exists='append', con=writeConn, index=True, index_label='CSIsym')
+        mode = get_write_mode(writeConn, tablename, systemdata)
+        systemdata.to_sql(name= tablename, if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+        
+        tablename2= 'signals_live'
+        mode = get_write_mode(writeConn, tablename2, systemdata)
+        systemdata.to_sql(name=tablename2, if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+        
         filename=systemPath+'system_'+key+'_live.csv'
         systemdata.to_csv(filename, index=True)
-        print  'Saved to table',tablename, 'and', filename
+        print  'Saved to table',tablename,tablename2, 'and', filename
         
         #append signals to each board
         futuresDF_boards[key] =  futuresDF[keep_cols].copy()
@@ -760,3 +787,16 @@ def vol_adjsize_moc(debug, threadlist):
 
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     return ordersDict
+    
+if __name__ == "__main__":
+    if len(sys.argv)==1:
+        debug=True
+        feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    else:
+        debug=False
+        feedfile='./data/systems/system_ibfeed.csv'
+
+    feeddata=pd.read_csv(feedfile,index_col='ibsym')
+    threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
+    orderDict=vol_adjsize_moc(True, threadlist, skipcheck=True)
+    print orderDict

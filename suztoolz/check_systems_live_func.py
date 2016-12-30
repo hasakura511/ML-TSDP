@@ -301,12 +301,22 @@ def check_systems_live(debug, ordersDict, csidate):
     return totalerrors
 
 if __name__ == "__main__":
+    def lastCsiDownloadDate(csiDataPath):
+        datafiles = os.listdir(csiDataPath)
+        dates = []
+        for f in datafiles:
+            lastdate = pd.read_csv(csiDataPath+f, index_col=0).index[-1]
+            if lastdate not in dates:
+                dates.append(lastdate)
+                
+        return max(dates)
+        
+    csidate=lastCsiDownloadDate('./data/csidata/v4futures2/')
     dbPathRead='./data/futures.sqlite3'
     readcon= sqlite3.connect(dbPathRead)
-    accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
-            (select max(timestamp) from accountInfo as maxtimestamp)', con=readcon,  index_col='index')
-    csidate=accountInfo.Date[0]
-    systems = [x for x in accountInfo.columns if x not in ['Date','timestamp']]
+    webSelection=pd.read_sql('select * from webSelection where timestamp=\
+            (select max(timestamp) from webSelection)', con=readcon)
+    systems = eval(webSelection.selection[0]).keys()
     ordersDict={}
     for account in systems:
         ordersDict[account]=pd.read_sql('select * from (select * from %s\

@@ -18,7 +18,7 @@ if len(sys.argv)==1:
     debug=True
     showPlots=True
     commission=2.5
-    start_slip=20161128
+    start_slip=20161230
     figsize=(6,8)
     fontsize=12
     dataPath='D:/ML-TSDP/data/'
@@ -35,7 +35,7 @@ else:
     debug=False
     showPlots=False
     commission=2.5
-    start_slip=20161128
+    start_slip=20161230
     figsize=(8,13)
     fontsize=20
     dbPathWrite=dbPathRead='./data/futures.sqlite3'
@@ -58,15 +58,19 @@ systems = eval(webSelection.selection[0]).keys()
 #selectionDict=eval(webSelection.selection.values[0])
 #atrFilename = 'futuresATR.csv'
 #futuresDF = pd.read_csv(dataPath+atrFilename, index_col=0)
-#prevCSIdownloadDate = dt.strptime(futuresDF.index.name, '%Y-%m-%d %H:%M:%S').replace(hour=20)
-#prevCSIdownloadDate = prevCSIdownloadDate.replace(day=prevCSIdownloadDate.day-1)
+#prevTriggerCutoffGuess = dt.strptime(futuresDF.index.name, '%Y-%m-%d %H:%M:%S').replace(hour=20)
+#prevTriggerCutoffGuess = prevTriggerCutoffGuess.replace(day=prevTriggerCutoffGuess.day-1)
 #csidate = futuresDF.index.name.split()[0].replace('-','')
 futuresDF=pd.read_sql('select * from futuresDF_all where timestamp=\
             (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
-csidate=str(futuresDF.Date[0])
-prevCSIdownloadDate=pd.read_sql('select distinct Date from futuresDF_all order by Date ASC', con=readConn).Date.tolist()[-2]
-prevCSIdownloadDate = dt.strptime(str(prevCSIdownloadDate), '%Y%m%d').replace(hour=17)
-#prevCSIdownloadDate = prevCSIdownloadDate.replace(day=prevCSIdownloadDate.day-1)
+csidates=pd.read_sql('select distinct Date from futuresDF_all', con=readConn).Date.tolist()
+#assuming we run this script after csi download and vol_adjsize.
+prevcsidate=str(csidates[-2])
+csidate=str(csidates[-1])
+#prevTriggerCutoffGuess=pd.read_sql('select distinct Date from futuresDF_all order by Date ASC', con=readConn).Date.tolist()[-2]
+triggerCutoffGuess = dt.strptime(str(csidate), '%Y%m%d').replace(hour=17)
+prevTriggerCutoffGuess = dt.strptime(str(prevcsidate), '%Y%m%d').replace(hour=17)
+#prevTriggerCutoffGuess = prevTriggerCutoffGuess.replace(day=prevTriggerCutoffGuess.day-1)
 feeddata=pd.read_csv(feedfile,index_col='c2sym')
 
 fixed_signals = ['RiskOn','RiskOff','Custom','AntiCustom','LastSEA','AntiSEA','AdjSEA','AntiAdjSEA']
@@ -91,7 +95,7 @@ def is_int(s):
         
 def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=False):
     #plt.figure(figsize=(8,13))
-    font = {'family' : 'normal',
+    font = {
             'weight' : 'normal',
             'size'   : 22}
 
@@ -102,10 +106,10 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
     ax2 = ax.twiny()
 
     width=.3
-    slipDF.slippage.plot(kind='barh', color='red',width=width, ax=ax, position=1)
+    slipDF.dollarslip.plot(kind='barh', color='red',width=width, ax=ax, position=1)
     slipDF.delta.plot(kind='barh', color='blue', width=width,ax=ax2, position=0)
 
-    ax.set_xlabel('Slippage % (red)')
+    ax.set_xlabel('$ Slippage (red)')
     ax2.set_xlabel('Slippage Minutes (blue)')
     ax.grid(b=True)
     ax2.grid(b=False)
@@ -148,7 +152,7 @@ else:
 
 
 for systemName in systems:
-    print systemName
+    print '\n\n',systemName
     #selection=selectionDict[systemName][0]
     tradeFilename='c2_'+systemName+'_trades.csv'
     portfolioFilename = 'c2_'+systemName+'_portfolio.csv'
@@ -170,6 +174,7 @@ for systemName in systems:
     tradesDF=tradesDF.ix[[True if type(x)==str else False for x in tradesDF.index]]
     tradesDF=tradesDF.drop(['expir','putcall','strike','symbol_description','underlying','markToMarket_time'], axis=1).dropna()
     tradesDF['closedWhen'] = pd.to_datetime(tradesDF['closedWhen'])
+    tradesDF=tradesDF[tradesDF.closedWhen > prevTriggerCutoffGuess].copy()
     tradesDF = tradesDF.sort_values(by='closedWhen', ascending=False)
     #csi close data
     
@@ -180,38 +185,111 @@ for systemName in systems:
     #newOpen=portfolioDF[portfolioDF['openedWhen']>=futuresDate].symbol.values
     newOpen={}
     system.index= system.c2sym
-    for x in idx_close:
-        sym=x.split()[0]
+    for index in idx_close:
+        sym=index.split()[0]
         if sym in portfolioDF.index:
             if portfolioDF.index.tolist().count(sym) == 1:
-                row=portfolioDF.ix[sym]
+                row=portfolioDF.ix[sym].copy()
             else:
-                row=portfolioDF.ix[sym].iloc[0]
+                row=portfolioDF.ix[sym].iloc[0].copy()
             if csidate in timetable:
+                timestamp=timetable.ix[index][csidate]
                 print sym,
-                #print sym,'close', timetable.ix[x][csidate],
-                if row.openedWhen>=timetable.ix[x][csidate]:
-                    #print 'new open', row.openedWhen,'>=',x,timetable.ix[x][csidate],'adding.. opened after current csi close',csidate
-                    print 'adding.. opened after current csi close',timetable.ix[x][csidate],'opened',row.openedWhen
-                    newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
+                #print sym,'close', timestamp,
+                if row.openedWhen>=timestamp:
+                    #print 'new open', row.openedWhen,'>=',index,timestamp,'adding.. opened after current csi close',csidate
+                    print 'adding.. opened after ',csidate,' timetable close',timestamp,'opened',row.openedWhen
+                    newOpen[row.symbol]=[timestamp, row.quant_opened]
                 else:
-                    #print 'new open', row.openedWhen,'prevCSIdownloadDate',prevCSIdownloadDate,
-                    #selection =accountInfo[systemName].selection
-                    #selection=selectionDict[systemName][0]
-                    #if selection in fixed_signals and row.openedWhen>prevCSIdownloadDate:
-                    if row.openedWhen>prevCSIdownloadDate:
-                        print 'adding..', selection,'opened after prevCSIdownloadDate',prevCSIdownloadDate, 'opened', row.openedWhen
-                        newOpen[row.symbol]=[timetable.ix[x][csidate], row.quant_opened]
+                    if prevcsidate in timetable:
+                        #prevcsidate may not be in timetable
+                        prev_timestamp=timetable.ix[index][prevcsidate]
+                        if row.openedWhen>=prev_timestamp:
+                            print 'adding.. ',selection,'opened after prevcsidate timetable close',prev_timestamp,'opened',row.openedWhen
+                            newOpen[row.symbol]=[timestamp, row.quant_opened]
+                        else:
+                            print 'skipping..', selection,'opened before prevcsidate timetable close',prev_timestamp, 'opened', row.openedWhen
                     else:
-                        print 'skipping..', selection,'opened before prevCSIdownloadDate',prevCSIdownloadDate, 'opened', row.openedWhen
+                        if row.openedWhen>prevTriggerCutoffGuess:
+                            print 'adding..', selection,'opened after prevTriggerCutoffGuess',prevTriggerCutoffGuess, 'opened', row.openedWhen
+                            newOpen[row.symbol]=[timestamp, row.quant_opened]
+                        else:
+                            print 'skipping..', selection,'opened before prevTriggerCutoffGuess',prevTriggerCutoffGuess, 'opened', row.openedWhen
 
             else:
-                print x,csidate,'not found in timetable, skipping..'
+                if row.openedWhen>prevTriggerCutoffGuess:
+                    print 'adding..', selection,'opened after prevTriggerCutoffGuess',prevTriggerCutoffGuess, 'opened', row.openedWhen
+                    newOpen[row.symbol]=[triggerCutoffGuess, row.quant_opened]
+                else:
+                    print 'skipping..', selection,'opened before prevTriggerCutoffGuess',prevTriggerCutoffGuess, 'opened', row.openedWhen
         else:
-            print sym,' no open trades found skipping..'
+            #print sym,' no open trades found skipping..'
+            pass
             
     print systemName, len(newOpen.keys()), 'Open Trades Found'
-    print systemName, newOpen.keys()
+    print systemName, newOpen.keys(),'\n'
+    
+    newCloses=pd.DataFrame()
+    for index in idx_close:
+        sym=index.split()[0]
+        if sym in tradesDF.index:
+            if tradesDF.index.tolist().count(sym) == 1:
+                row=tradesDF.ix[sym].copy()
+            else:
+                row=tradesDF.ix[sym].iloc[0].copy()
+
+            if csidate in timetable:
+                row['closetime']=timetable.ix[index][csidate]
+                print sym,
+                #print sym,'close', timetable.ix[index][csidate],
+                if row.closedWhen>=timetable.ix[index][csidate]:
+                    #print 'new close', row.closedWhen,'>=',index,timetable.ix[index][csidate],'adding.. closed after current csi close',csidate
+                    print 'adding.. closed after current timetable close',timetable.ix[index][csidate],'closed',row.closedWhen
+                    
+                    newCloses = newCloses.append(row)
+                else:
+                    if prevcsidate in timetable:
+                        #prevcsidate may not be in timetable
+                        timestamp=timetable.ix[index][prevcsidate]
+                        if row.closedWhen>=timestamp:
+                            print 'adding.. ',selection,'closed after prevcsidate timetable close',timestamp,'opened',row.closedWhen
+                            
+                            newCloses = newCloses.append(row)
+                        else:
+                            print 'skipping..', selection,'closed before prevcsidate timetable close',timestamp, 'opened', row.closedWhen
+                    else:
+                        if row.closedWhen>prevTriggerCutoffGuess:
+                            print 'adding..', selection,'opened after prevTriggerCutoffGuess',prevTriggerCutoffGuess, 'closed', row.closedWhen
+                            
+                            newCloses = newCloses.append(row)
+                        else:
+                            print 'skipping..', selection,'closed before prevTriggerCutoffGuess',prevTriggerCutoffGuess, 'closed', row.closedWhen
+                    
+            else:
+                #use guess
+                row['closetime']=triggerCutoffGuess
+                print index,csidate,'not found in timetable,',
+                if row.closedWhen>prevTriggerCutoffGuess:
+                    print 'adding..', selection,'opened after prevTriggerCutoffGuess',prevTriggerCutoffGuess, 'closed', row.closedWhen
+                    newCloses = newCloses.append(row)
+                else:
+                    print 'skipping..', selection,'closed before prevTriggerCutoffGuess',prevTriggerCutoffGuess, 'closed', row.closedWhen
+        else:
+            #print sym,' no close trades found skipping..'
+            pass
+            
+    print systemName, newCloses.shape[0], 'Close Trades Found'
+    if newCloses.shape[0]>0:
+        newCloses.index = newCloses.symbol
+        print systemName, newCloses.index
+        for sym in portfolioDF.symbol:
+            if sym in newCloses.index:
+                #only include close trades where new signal is 0, otherwise slippage should cancel out.
+                print sym, 'new signal not 0. dropping.'
+                newCloses =  newCloses.drop([sym], axis=0)
+    print systemName, newCloses.shape[0], 'Close Trades for slip report\n'
+            
+
     for contract in newOpen.keys():
         c2price=portfolioDF[portfolioDF.symbol ==contract].opening_price_VWAP.values[0]
         c2timestamp=pd.Timestamp(portfolioDF[portfolioDF.symbol ==contract].openedWhen.values[0])
@@ -228,7 +306,7 @@ for systemName in systems:
             dollarslip = int(-slippage*signal*qty*cv)
             #print contract, c2price, csiPrice,slippage
             #rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
-            rowName = 'ctwo: '+str(c2timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
+            rowName = 'ctwo opened: '+str(c2timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
             slipDF.set_value(rowName, 'contract', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
@@ -241,46 +319,6 @@ for systemName in systems:
             slipDF.set_value(rowName, 'dollarslip', dollarslip)
             slipDF.set_value(rowName, 'commissions', commissions)
     #newCloses=tradesDF[tradesDF['closedWhen']>=futuresDate]
-    newCloses=pd.DataFrame()
-    
-    for x in idx_close:
-        sym=x.split()[0]
-        if sym in tradesDF.index:
-            if tradesDF.index.tolist().count(sym) == 1:
-                row=tradesDF.ix[sym]
-            else:
-                row=tradesDF.ix[sym].iloc[0]
-
-            if csidate in timetable:
-                print sym,
-                #print sym,'close', timetable.ix[x][csidate],
-                if row.closedWhen>=timetable.ix[x][csidate]:
-                    #print 'new close', row.closedWhen,'>=',x,timetable.ix[x][csidate],'adding.. closed after current csi close',csidate
-                    print 'adding.. closed after current csi close',timetable.ix[x][csidate],'closed',row.closedWhen
-                    row['closetime']=timetable.ix[x][csidate]
-                    newCloses = newCloses.append(row)
-                else:
-                    #print 'new close', row.closedWhen,'prevCSIdownloadDate',prevCSIdownloadDate,
-                    #selection =accountInfo[systemName].selection
-                    #selection=selectionDict[systemName][0]
-                    
-                    #if selection in fixed_signals and row.closedWhen>prevCSIdownloadDate:
-                    if row.closedWhen>prevCSIdownloadDate:
-                        print 'adding..', selection,'opened after prevCSIdownloadDate',prevCSIdownloadDate, 'closed', row.closedWhen
-                        row['closetime']=timetable.ix[x][csidate]
-                        newCloses = newCloses.append(row)
-                    else:
-                        print 'skipping..', selection,'closed before prevCSIdownloadDate',prevCSIdownloadDate, 'closed', row.closedWhen
-                    
-            else:
-                print x,csidate,'not found in timetable, skipping..'
-        else:
-            print sym,' no close trades found skipping..'
-            
-    print systemName, newCloses.shape[0], 'Close Trades Found'
-    if newCloses.shape[0]>0:
-        newCloses.index = newCloses.symbol
-    print systemName, newCloses.index
     
     for contract in newCloses.index:
         c2price=newCloses.ix[contract].closing_price_VWAP
@@ -302,7 +340,7 @@ for systemName in systems:
             dollarslip = int(-slippage*signal*qty*cv)
             #print contract, c2price, csiPrice,slippage
             #rowName = str(c2timestamp)+' ctwo:'+str(c2price)+' csi:'+str(csiPrice)+' '+contract
-            rowName = 'ctwo: '+str(c2timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
+            rowName = 'ctwo closed: '+str(c2timestamp)+' '+str(qty)+' '+contract+' $'+str(dollarslip)
             slipDF.set_value(rowName, 'contract', contract)
             slipDF.set_value(rowName, 'c2timestamp', c2timestamp)
             slipDF.set_value(rowName, 'c2price', c2price)
@@ -325,16 +363,16 @@ for systemName in systems:
         #    print 'Warning! Some values may be mising'
 
         
-        openedTrades = slipDF[slipDF['Type']=='Open'].sort_values(by='abs_slippage', ascending=True)
-        totalslip = int(openedTrades.dollarslip.sum())
-        filename=systemName+'_open_slippage.png'
-        title = systemName+' '+selection+': '+str(openedTrades.shape[0])+' Opened Trades, $'+str(totalslip)\
+        slipTrades = slipDF.sort_values(by='dollarslip', ascending=True)
+        totalslip = int(slipTrades.dollarslip.sum())
+        filename=systemName+'_c2_slippage.png'
+        title = systemName+' '+selection+': '+str(slipTrades.shape[0])+' Trades, $'+str(totalslip)\
                     +' Slippage, CSI Data as of '+str(csidate)
-        if openedTrades.shape[0] !=0:
-            plotSlip(openedTrades, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
+        if slipTrades.shape[0] !=0:
+            plotSlip(slipTrades, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
         else:
             print title
-            
+        '''
         closedTrades = slipDF[slipDF['Type']=='Close'].sort_values(by='abs_slippage', ascending=True)
         totalslip = int(closedTrades.dollarslip.sum())
         title = systemName+': '+str(closedTrades.shape[0])+' Closed Trades, $'+str(totalslip)\
@@ -344,7 +382,7 @@ for systemName in systems:
             plotSlip(closedTrades, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
         else:
             print title
-            
+        '''
         slipDF.index.name = 'rowname'
         filename=systemName+'_slippage_report_'+str(csidate).split()[0].replace('-','')+'.csv'
         slipDF = slipDF.sort_values(by='abs_slippage', ascending=True)

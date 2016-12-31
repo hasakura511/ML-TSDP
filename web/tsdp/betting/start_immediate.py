@@ -9,5 +9,5 @@ def start_immediate():
             #e.flush()
             proc = Popen(['/anaconda2/python', '/ml-tsdp/moc_live.py','1','1','1','1'],\
                          cwd='/ml-tsdp/',stdout=f, stderr=e)
-            proc.wait()
-            print('immediate orders processed.')
+            #proc.wait()
+            print('immediate orders processing...')

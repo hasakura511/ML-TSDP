@@ -391,8 +391,11 @@ def create_execDict(feeddata, systemdata):
     global client
     global csidate
     global ttdate
+    global mcdate
     
-    downloadtt = not ttdate>csidate or not ttdate>mcdate
+    
+    downloadtt = not ttdate>csidate or not ttdate>=int(mcdate)
+    print 'ttdate',ttdate,'csidate',csidate, 'mcdate',mcdate, 'downloadtt', downloadtt
     execDict=dict()
     #need systemdata for the contract expiry
     #systemdata=pd.read_csv(systemfile)

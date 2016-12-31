@@ -88,8 +88,8 @@ def futures(request):
     return render(request, 'futures.html', {})
 
 def order_status(request):
-    logdict={'logfiles':[]}
-
+    context={'logfiles':[]}
+    context['orderstatus']=get_order_status()
     class LogFiles(object):
         def __init__(self, filename):
             self.filename = filename
@@ -101,14 +101,14 @@ def order_status(request):
     files = get_logfiles(search_string='moc_live')
     timestamp = sorted([f[-21:] for f in files])[-1]
     logfile=[f for f in files if 'error' not in f and timestamp in f][-1]
-    logdict['logfiles'].append((logfile,LogFiles(logfile)))
+    context['logfiles'].append((logfile,LogFiles(logfile)))
 
     errorfiles= [f for f in files if logfile[-21:] in f and 'error' in f]
     if len(errorfiles)>0:
         errorfile=errorfiles[-1]
-        logdict['logfiles'].append((errorfile,LogFiles(errorfile)))
+        context['logfiles'].append((errorfile,LogFiles(errorfile)))
 
-    return render(request, 'show_log.html', logdict)
+    return render(request, 'show_log.html', context)
 
 def system_charts(request, symbol):
     imagedir = '/ml-tsdp/web/tsdp/betting/static/images/'

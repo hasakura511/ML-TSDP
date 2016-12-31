@@ -2,6 +2,7 @@ from django import forms
 import time
 import json
 import datetime
+import numpy as np
 from datetime import datetime as dt
 from pytz import timezone
 from tzlocal import get_localzone
@@ -132,8 +133,10 @@ def updateMeta():
         print('Running MOC to get new mcdate...')
         start_moc()
         mcdate=timetables.drop(['Date','timestamp'],axis=1).columns[-1]
-
-    triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
+        triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
+        triggers[mcdate] = 'Not Available'
+    else:
+        triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
     triggers.index=[x.split()[0] for x in triggers.index]
     triggers.columns = [['Triggertime']]
     triggers['Group']=futuresDict.ix[triggers.index].Group.values
@@ -143,6 +146,21 @@ def updateMeta():
                                     timestamp=getTimeStamp())
     record.save()
 
+def get_order_status():
+    readConn = getBackendDB()
+    orderstatus_dict={}
+    accounts = ['v4micro', 'v4mini', 'v4futures']
+
+    for account in accounts:
+        col_order= ['broker','account','order_type','contract','selection','openedWhen','system_signal',\
+                'broker_position','signal_check','system_qty','broker_qty','qty_check']
+        df=pd.read_sql('select * from (select * from %s\
+                order by timestamp ASC) group by contract' % ('checkSystems_'+account),\
+                con=readConn)
+        df['system_signal'] = np.where(df['system_signal'] == 1, 'LONG', 'SHORT')
+        df['broker_position'] = np.where(df['broker_position'] == 1, 'LONG', 'SHORT')
+        orderstatus_dict[account]=df[col_order].to_html()
+    return orderstatus_dict
 
 def getAccountValues():
     readConn = getBackendDB()

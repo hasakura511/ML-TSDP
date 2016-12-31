@@ -6,10 +6,17 @@
 
 {% block content %}
 <base href="/">
+
+{% for name, data in orderstatus.items %}
+    <h1>{{name}}</h1>
+    {{data | safe}}
+{% endfor %}
+
 {% for logfile, obj in logfiles %}
     <h1>{{ logfile }}</h1>
      <p>
        {{obj.display_text_file|linebreaks}}
      </p>
 {% endfor %}
+
 {% endblock %}

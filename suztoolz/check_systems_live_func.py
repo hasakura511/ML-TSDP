@@ -205,7 +205,7 @@ def check_systems_live(debug, ordersDict, csidate):
                         
     for account in c2openpositions.keys():
         print account, 'Position Checking..'
-        ostatus_cols=['account','order_type','contract','broker','selection','system_signal',\
+        ostatus_cols=['account','order_type','contract','broker','selection','urpnl','system_signal',\
                                 'broker_position','signal_check','system_qty','broker_qty','qty_check','openedWhen','Date','timestamp']
         order_status_dict[account]=pd.DataFrame(columns=ostatus_cols)
         exitList=[]
@@ -224,6 +224,7 @@ def check_systems_live(debug, ordersDict, csidate):
         #check contracts in c2 file not in system file.
         for sym in c2openpositions[account].index:
             contract = sym
+            urpnl=c2openpositions[account].PL
             c2_count+=1
             if sym in ordersDict[account].index:
                 selection = ordersDict[account].ix[sym].selection
@@ -270,6 +271,7 @@ def check_systems_live(debug, ordersDict, csidate):
             selection = ordersDict[account].ix[sym].selection
             order_type = ordersDict[account].ix[sym].ordertype
             openedWhen=''
+            urpnl=''
             sig=system_signal=int(ordersDict[account].ix[sym].signal)
             qty=system_qty=int(ordersDict[account].ix[sym].c2qty)
             systemSym = (sig !=0 and qty !=0)
@@ -294,13 +296,24 @@ def check_systems_live(debug, ordersDict, csidate):
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
     for account, orderstatusDF in order_status_dict.items():
-        table='checkSystems_'+account
-        orderstatusDF.to_sql(name=table,con=writeConn, index=False, if_exists='replace')
-        print 'saved', table,'to',dbPath
+        tablename='checkSystems_'+account
+        mode = get_write_mode(writeConn, tablename, orderstatusDF)
+        orderstatusDF.to_sql(name=tablename,con=writeConn, index=False, if_exists=mode)
+        print 'saved', tablename,'to',dbPath,'writemode',mode
     return totalerrors
 
 if __name__ == "__main__":
-    debug=False
+    if len(sys.argv)==1:
+        debug=True
+        feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+        csiPath='D:/ML-TSDP/data/csidata/v4futures2/'
+        dbPathRead='D:/ML-TSDP/data/futures.sqlite3'
+    else:
+        debug=False
+        feedfile='./data/systems/system_ibfeed.csv'
+        csiPath='./data/csidata/v4futures2/'
+        dbPathRead='./data/futures.sqlite3'
+
     def lastCsiDownloadDate(csiDataPath):
         datafiles = os.listdir(csiDataPath)
         dates = []
@@ -311,8 +324,8 @@ if __name__ == "__main__":
                 
         return max(dates)
         
-    csidate=lastCsiDownloadDate('./data/csidata/v4futures2/')
-    dbPathRead='./data/futures.sqlite3'
+    csidate=lastCsiDownloadDate(csiPath)
+    
     readcon= sqlite3.connect(dbPathRead)
     webSelection=pd.read_sql('select * from webSelection where timestamp=\
             (select max(timestamp) from webSelection)', con=readcon)

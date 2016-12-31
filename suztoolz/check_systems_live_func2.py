@@ -119,8 +119,8 @@ def reconcileWorkingSignals(account, workingSignals, sym, sig, c2sig, qty, c2qty
                 signal_check ='ERROR: wrong signal found'
                 errors+=1
     else:
-        print 'ERROR no working signals found!'
-        signal_check ='ERROR: no signal found'
+        print 'ERROR no working orders found!'
+        #signal_check ='ERROR: no signal found'
         errors+=1
     return errors, signal_check, qty_check
 
@@ -161,7 +161,7 @@ def check_systems_live(debug, ordersDict, csidate):
         #subprocess.call(['python', 'get_ibpos.py'])       
         print account, 'Getting c2 positions...'
         #systemdata=pd.read_csv(systemPath+'system_'+account+'_live.csv')
-        ordersDict[account]=systemdata=ordersDict[account].reset_index()
+        ordersDict[account]=systemdata=ordersDict[account]
         ordersDict[account].index=ordersDict[account].c2sym
         #portfolio and equity
         #c2list=get_c2_list(systemdata)
@@ -210,7 +210,6 @@ def check_systems_live(debug, ordersDict, csidate):
         order_status_dict[account]=pd.DataFrame(columns=ostatus_cols)
         exitList=[]
         broker='c2'
-        order_type
         account=account
         Date=int(csidate)
         timestamp=int(calendar.timegm(dt.utcnow().utctimetuple()))
@@ -234,8 +233,8 @@ def check_systems_live(debug, ordersDict, csidate):
                 sig=system_signal=int(ordersDict[account].ix[sym].signal)
                 qty=system_qty=int(ordersDict[account].ix[sym].c2qty)
                 c2qty=broker_qty=int(c2openpositions[account].ix[sym].quant_opened)-int(c2openpositions[account].ix[sym].quant_closed)
-                signal_check='ERROR: No Open Orders' if sig != c2sig else 'OK'
-                qty_check='ERROR: No Open Orders' if qty != c2qty else 'OK'
+                signal_check='ERROR: No Open Orders Found' if sig != c2sig else 'OK'
+                qty_check='ERROR: No Open Orders Found' if qty != c2qty else 'OK'
                 if sig != c2sig or qty != c2qty:
                     mismatch_count+=1
                     errors, signal_check, qty_check=reconcileWorkingSignals(account, workingSignals, sym, sig, c2sig, qty, c2qty, signal_check, qty_check)
@@ -301,16 +300,27 @@ def check_systems_live(debug, ordersDict, csidate):
     return totalerrors
 
 if __name__ == "__main__":
+    debug=False
+    def lastCsiDownloadDate(csiDataPath):
+        datafiles = os.listdir(csiDataPath)
+        dates = []
+        for f in datafiles:
+            lastdate = pd.read_csv(csiDataPath+f, index_col=0).index[-1]
+            if lastdate not in dates:
+                dates.append(lastdate)
+                
+        return max(dates)
+        
+    csidate=lastCsiDownloadDate('./data/csidata/v4futures2/')
     dbPathRead='./data/futures.sqlite3'
     readcon= sqlite3.connect(dbPathRead)
-    accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
-            (select max(timestamp) from accountInfo as maxtimestamp)', con=readcon,  index_col='index')
-    csidate=accountInfo.Date[0]
-    systems = [x for x in accountInfo.columns if x not in ['Date','timestamp']]
+    webSelection=pd.read_sql('select * from webSelection where timestamp=\
+            (select max(timestamp) from webSelection)', con=readcon)
+    systems = eval(webSelection.selection[0]).keys()
     ordersDict={}
     for account in systems:
         ordersDict[account]=pd.read_sql('select * from (select * from %s\
                 order by timestamp ASC) group by CSIsym' % (account+'_live'),\
                 con=readcon,  index_col='CSIsym')
-    errors=check_systems_live(True, ordersDict, csidate)
+    errors=check_systems_live(debug, ordersDict, csidate)
     print 'total errors found', errors

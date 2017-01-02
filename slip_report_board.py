@@ -98,8 +98,18 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
     font = {
             'weight' : 'normal',
             'size'   : 22}
-
     matplotlib.rc('font', **font)
+    
+    def align_xaxis(ax1, v1, ax2, v2):
+        """adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
+        x1, _ = ax1.transData.transform((v1, 0))
+        x2, _ = ax2.transData.transform((v2, 0))
+        inv = ax2.transData.inverted()
+        dx, _  = inv.transform((0, 0)) - inv.transform((x1-x2, 0))
+        minx, maxx = ax2.get_xlim()
+        ax2.set_xlim(minx+dx, maxx+dx)
+
+
     fig = plt.figure(figsize=figsize) # Create matplotlib figure
     ax = fig.add_subplot(111) # Create matplotlib axes
     #ax = slipDF.slippage.plot.bar(color='r', width=0.5)
@@ -113,12 +123,14 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
     ax2.set_xlabel('Slippage Minutes (blue)')
     ax.grid(b=True)
     ax2.grid(b=False)
+    #ax2.set_xlim(-40,140)
     #ax2 = slipDF.hourdelta.plot.bar(color='b', width=0.5)
     #plt.axvline(0, color='k')
     plt.text(0.5, 1.08, title,
              horizontalalignment='center',
              fontsize=fontsize,
              transform = ax2.transAxes)
+    align_xaxis(ax, 0, ax2, 0)
     #plt.ylim(0,80)
     #plt.xticks(np.arange(-1,1.25,.25))
     #plt.grid(True)

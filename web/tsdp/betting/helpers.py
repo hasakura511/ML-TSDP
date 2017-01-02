@@ -12,6 +12,7 @@ from .models import MetaData, AccountData
 from .start_moc import start_moc
 import calendar
 import os
+import re
 
 def getBackendDB():
     dbPath = '/ML-TSDP/data/futures.sqlite3'
@@ -148,17 +149,20 @@ def updateMeta():
 
 def get_order_status():
     readConn = getBackendDB()
+    futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='C2sym')
     orderstatus_dict={}
     accounts = ['v4micro', 'v4mini', 'v4futures']
 
     for account in accounts:
-        col_order= ['broker','account','order_type','contract','selection','openedWhen','system_signal',\
+        col_order= ['broker','account','order_type','contract','description','selection','openedWhen','urpnl','system_signal',\
                 'broker_position','signal_check','system_qty','broker_qty','qty_check']
         df=pd.read_sql('select * from (select * from %s\
                 order by timestamp ASC) group by contract' % ('checkSystems_'+account),\
                 con=readConn)
         df['system_signal'] = np.where(df['system_signal'] == 1, 'LONG', 'SHORT')
         df['broker_position'] = np.where(df['broker_position'] == 1, 'LONG', 'SHORT')
+        desc_list=futuresDict.ix[[x[:-2] for x in df.contract.values]].Desc.values
+        df['description']=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
         orderstatus_dict[account]=df[col_order].to_html()
     return orderstatus_dict
 

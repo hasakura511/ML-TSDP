@@ -10,6 +10,7 @@
 {% for name, data in orderstatus.items %}
     <h1>{{name}}</h1>
     {{data | safe}}
+    <img src="static/images/{{ name }}_c2_slippage.png" width="90%">
 {% endfor %}
 
 {% for logfile, obj in logfiles %}

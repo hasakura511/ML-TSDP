@@ -441,6 +441,7 @@ def create_execDict(feeddata, systemdata):
         print i+1, contract.symbol,
         if downloadtt:
             contractInfo=client.get_contract_details(contract)
+            #print contractInfo
             contractsDF=contractsDF.append(contractInfo)
             execDict[symbol+contractInfo.expiry[0]]=['PASS', 0, contract]
             systemdata.set_value(index, 'ibcontract', symbol+contractInfo.expiry[0])

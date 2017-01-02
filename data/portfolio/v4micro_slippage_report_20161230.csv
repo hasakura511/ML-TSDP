@@ -1,0 +1,3 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2016-12-30 16:48:00 1 QHGH7 $-37,QHGH7,2016-12-30 16:48:00,250.7,2016-12-30 17:00:00,250.55,0.000598682897625,0.000598682897625,Open,1.0,-37.0,2.5,-1 days +23:48:00.000000000,-12.0
+ctwo opened: 2016-12-30 16:48:01 1 @TYH7 $140,@TYH7,2016-12-30 16:48:01,124.14063,2016-12-30 17:00:00,124.28125,-0.00113146592909,0.00113146592909,Open,1.0,140.0,2.5,-1 days +23:48:01.000000000,-12.0

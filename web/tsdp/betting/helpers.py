@@ -9,7 +9,7 @@ from tzlocal import get_localzone
 import sqlite3
 import pandas as pd
 from .models import MetaData, AccountData
-from .start_moc import start_moc
+from .start_moc import start_moc, run_checksystems
 import calendar
 import os
 import re
@@ -171,6 +171,8 @@ def getAccountValues():
     mcdate = MCdate()
     eastern = timezone('US/Eastern')
     utc = timezone('UTC')
+    now = dt.now(get_localzone())
+    now = now.astimezone(eastern)
     accountvalues = {}
     urpnls = {}
 
@@ -199,6 +201,11 @@ def getAccountValues():
     c2_equity = pd.read_sql('select * from (select * from c2_equity order by timestamp ASC) group by system', \
                             con=readConn, index_col='system')
     c2_equity.updatedLastTimeET = pd.to_datetime(c2_equity.updatedLastTimeET)
+
+    #run checksystems and update values if last update >=1 day and not a weekend
+    if (now-eastern.localize(c2_equity.updatedLastTimeET[0])).days>=1 and now.weekday()<5:
+        run_checksystems()
+
     for system in c2_equity.drop(['v4futures'], axis=0).index:
         timestamp = c2_equity.ix[system].updatedLastTimeET
         accountvalue = int(c2_equity.ix[system].modelAccountValue)

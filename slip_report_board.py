@@ -61,9 +61,9 @@ systems = eval(webSelection.selection[0]).keys()
 #prevTriggerCutoffGuess = dt.strptime(futuresDF.index.name, '%Y-%m-%d %H:%M:%S').replace(hour=20)
 #prevTriggerCutoffGuess = prevTriggerCutoffGuess.replace(day=prevTriggerCutoffGuess.day-1)
 #csidate = futuresDF.index.name.split()[0].replace('-','')
-futuresDF=pd.read_sql('select * from futuresDF_all where timestamp=\
-            (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
-csidates=pd.read_sql('select distinct Date from futuresDF_all', con=readConn).Date.tolist()
+futuresDF=pd.read_sql('select * from futuresDF_results where timestamp=\
+            (select max(timestamp) from futuresDF_results as maxtimestamp)', con=readConn,  index_col='CSIsym')
+csidates=pd.read_sql('select distinct Date from futuresDF_results', con=readConn).Date.tolist()
 #assuming we run this script after csi download and vol_adjsize.
 prevcsidate=str(csidates[-2])
 csidate=str(csidates[-1])

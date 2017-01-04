@@ -17,6 +17,7 @@ start_time = time.time()
 if len(sys.argv)==1:
     debug=True
     showPlots=True
+    createAvgSlip=False
     commission=2.5
     start_slip=20161230
     figsize=(6,8)
@@ -34,6 +35,7 @@ if len(sys.argv)==1:
 else:
     debug=False
     showPlots=False
+    createAvgSlip=False
     commission=2.5
     start_slip=20161230
     figsize=(8,13)
@@ -377,7 +379,7 @@ for systemName in systems:
         
         slipTrades = slipDF.sort_values(by='dollarslip', ascending=True)
         totalslip = int(slipTrades.dollarslip.sum())
-        filename=systemName+'_c2_slippage.png'
+        filename=systemName+'_c2_slippage_'+str(csidate)+'.png'
         title = systemName+' '+selection+': '+str(slipTrades.shape[0])+' Trades, $'+str(totalslip)\
                     +' Slippage, CSI Data as of '+str(csidate)
         if slipTrades.shape[0] !=0:
@@ -412,57 +414,58 @@ for systemName in systems:
         print 'Saved '+systemName+' to sql'
 
     ###########################################################
-    #average slippage file/png
-    files=os.listdir(portfolioPath)
-    slipFiles = [x for x in files if systemName+'_slippage_report_' in x]
-    slipFiles = [x for x in slipFiles if is_int(x.split('_')[-1].split('.')[0])]
-    slipFiles = [x for x in slipFiles if int(x.split('_')[-1].split('.')[0])>start_slip]
-    
-    cons = pd.DataFrame()
-    for f in slipFiles:
-        fi = pd.read_csv(portfolioPath+f,index_col='rowname')
-        cons=cons.append(fi)
-    if cons.shape[0] !=0:
-        avgslip=pd.DataFrame()
-        for sym in cons.contract.unique():
-            trades =len(cons[cons.contract==sym].c2timestamp.unique())
-            abs_slip=abs(cons[cons.contract==sym].abs_slippage.mean())
-            delta=cons[cons.contract==sym].delta.mean()
-            #print sym, abs_slip
-            avgslip.set_value(sym, 'slippage', abs_slip)
-            avgslip.set_value(sym, 'delta', delta)
-            avgslip.set_value(sym, 'trades', trades)
-        avgslip=avgslip.sort_values(by='slippage', ascending=True)
-        print systemName, str(avgslip.shape[0]), 'Symbols found in the average absolute slippage DF...'
-        print avgslip.index.values
-        '''
-        i=0
-        for x in futuresDF[futuresDF.finalQTY != 0].Contract:
-            if x not in cons.symbol.unique():
-                i+=1
-                print x,
-        print i, 'Symbols missing!'
-        '''
-        index = str(trades)+'trades '+sym
+    if createAvgSlip:
+        #average slippage file/png
+        files=os.listdir(portfolioPath)
+        slipFiles = [x for x in files if systemName+'_slippage_report_' in x]
+        slipFiles = [x for x in slipFiles if is_int(x.split('_')[-1].split('.')[0])]
+        slipFiles = [x for x in slipFiles if int(x.split('_')[-1].split('.')[0])>start_slip]
         
-        system_sym=[ x for x  in system[system.c2qty !=0].c2sym.values if x in avgslip.index.values]
-        system_slip=avgslip.ix[system_sym].sort_values(by='slippage', ascending=True)
-        system_slip.index = [str(int(system_slip.ix[i].trades))+' trades '+i for i in system_slip.index]
-        filename=systemName+'_avg_slippage.png'
-        if len(slipFiles)>1:
-            title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
-                    +slipFiles[1].split('_')[3][:-4]+' to '+slipFiles[-1].split('_')[3][:-4]
+        cons = pd.DataFrame()
+        for f in slipFiles:
+            fi = pd.read_csv(portfolioPath+f,index_col='rowname')
+            cons=cons.append(fi)
+        if cons.shape[0] !=0:
+            avgslip=pd.DataFrame()
+            for sym in cons.contract.unique():
+                trades =len(cons[cons.contract==sym].c2timestamp.unique())
+                abs_slip=abs(cons[cons.contract==sym].abs_slippage.mean())
+                delta=cons[cons.contract==sym].delta.mean()
+                #print sym, abs_slip
+                avgslip.set_value(sym, 'slippage', abs_slip)
+                avgslip.set_value(sym, 'delta', delta)
+                avgslip.set_value(sym, 'trades', trades)
+            avgslip=avgslip.sort_values(by='slippage', ascending=True)
+            print systemName, str(avgslip.shape[0]), 'Symbols found in the average absolute slippage DF...'
+            print avgslip.index.values
+            '''
+            i=0
+            for x in futuresDF[futuresDF.finalQTY != 0].Contract:
+                if x not in cons.symbol.unique():
+                    i+=1
+                    print x,
+            print i, 'Symbols missing!'
+            '''
+            index = str(trades)+'trades '+sym
+            
+            system_sym=[ x for x  in system[system.c2qty !=0].c2sym.values if x in avgslip.index.values]
+            system_slip=avgslip.ix[system_sym].sort_values(by='slippage', ascending=True)
+            system_slip.index = [str(int(system_slip.ix[i].trades))+' trades '+i for i in system_slip.index]
+            filename=systemName+'_avg_slippage.png'
+            if len(slipFiles)>1:
+                title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
+                        +slipFiles[1].split('_')[3][:-4]+' to '+slipFiles[-1].split('_')[3][:-4]
+            else:
+                title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
+                        +slipFiles[-1].split('_')[3][:-4]
+            plotSlip(system_slip, pngPath, filename, title,figsize, fontsize, showPlots=showPlots)
+            #slippage by system
+
+
+            filename=systemName+'_slip_cons.csv'
+            cons.to_csv(savePath2+filename, index=True)
+            print 'Saved '+savePath2+filename+'\n'
         else:
-            title=systemName+' Avg. Slippage of '+str(system_slip.shape[0])+' Contracts from '\
-                    +slipFiles[-1].split('_')[3][:-4]
-        plotSlip(system_slip, pngPath, filename, title,figsize, fontsize, showPlots=showPlots)
-        #slippage by system
-
-
-        filename=systemName+'_slip_cons.csv'
-        cons.to_csv(savePath2+filename, index=True)
-        print 'Saved '+savePath2+filename+'\n'
-    else:
-        print 'no slippage reports found. skipping consolidated report.'
+            print 'no slippage reports found. skipping consolidated report.'
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

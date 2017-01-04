@@ -89,7 +89,7 @@ def futures(request):
 
 def order_status(request):
     context={'logfiles':[]}
-    context['orderstatus']=get_order_status()
+    context['slippagedates'], context['orderstatus']=get_order_status()
     class LogFiles(object):
         def __init__(self, filename):
             self.filename = filename

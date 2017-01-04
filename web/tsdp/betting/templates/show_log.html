@@ -1,5 +1,7 @@
 ﻿{% extends 'base.html' %}
 {% load staticfiles %}
+{% load tags %}
+
 {%  block head %}
     <title>Order Status</title>
 {% endblock %}
@@ -10,7 +12,7 @@
 {% for name, data in orderstatus.items %}
     <h1>{{name}}</h1>
     {{data | safe}}
-    <img src="static/images/{{ name }}_c2_slippage.png" width="90%">
+    <img src="static/images/{{ name }}_c2_slippage_{{ slippagedates|get_item:name }}.png" width="90%">
 {% endfor %}
 
 {% for logfile, obj in logfiles %}

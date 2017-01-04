@@ -150,7 +150,9 @@ def updateMeta():
 def get_order_status():
     readConn = getBackendDB()
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='C2sym')
+
     orderstatus_dict={}
+    slippage_files={}
     accounts = ['v4micro', 'v4mini', 'v4futures']
 
     def conv_sig(signals):
@@ -171,7 +173,10 @@ def get_order_status():
         desc_list=futuresDict.ix[[x[:-2] for x in df.contract.values]].Desc.values
         df['description']=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
         orderstatus_dict[account]=df[col_order].to_html()
-    return orderstatus_dict
+        csidate = pd.read_sql('select distinct csiDate from slippage where Name=\'{}\''.format(account), con=readConn).csiDate.tolist()[-1]
+        slippage_files[account]=str(csidate)
+
+    return slippage_files, orderstatus_dict
 
 def getAccountValues():
     readConn = getBackendDB()

@@ -153,14 +153,21 @@ def get_order_status():
     orderstatus_dict={}
     accounts = ['v4micro', 'v4mini', 'v4futures']
 
+    def conv_sig(signals):
+        sig = signals.copy()
+        sig[sig == -1] = 'SHORT'
+        sig[sig == 1] = 'LONG'
+        sig[sig == 0] = 'NONE'
+        return sig.values
+
     for account in accounts:
         col_order= ['broker','account','order_type','contract','description','selection','openedWhen','urpnl','system_signal',\
                 'broker_position','signal_check','system_qty','broker_qty','qty_check']
         df=pd.read_sql('select * from (select * from %s\
                 order by timestamp ASC) group by contract' % ('checkSystems_'+account),\
                 con=readConn)
-        df['system_signal'] = np.where(df['system_signal'] == 1, 'LONG', 'SHORT')
-        df['broker_position'] = np.where(df['broker_position'] == 1, 'LONG', 'SHORT')
+        df['system_signal'] = conv_sig(df['system_signal'])
+        df['broker_position'] = conv_sig(df['broker_position'])
         desc_list=futuresDict.ix[[x[:-2] for x in df.contract.values]].Desc.values
         df['description']=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
         orderstatus_dict[account]=df[col_order].to_html()

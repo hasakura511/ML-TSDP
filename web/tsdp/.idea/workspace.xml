@@ -44,34 +44,35 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="helpers.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="helpers.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/betting/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="37" lean-forward="false" selection-start-line="11" selection-start-column="37" selection-end-line="11" selection-end-column="37" />
+            <state relative-caret-position="307">
+              <caret line="169" column="63" lean-forward="true" selection-start-line="169" selection-start-column="63" selection-end-line="169" selection-end-column="63" />
               <folding>
-                <marker date="1483434444790" expanded="true" signature="1018:1041" ph="select * fro... timetable" />
-                <marker date="1483434444790" expanded="true" signature="3545:3569" ph="select * fro... Dictionary" />
-                <marker date="1483434444790" expanded="true" signature="4764:4787" ph="select * fro... timetable" />
-                <marker date="1483434444790" expanded="true" signature="4853:4877" ph="select * fro... Dictionary" />
-                <marker date="1483434444790" expanded="true" signature="5898:5922" ph="select * fro... Dictionary" />
-                <marker date="1483434444790" expanded="true" signature="5978:5981" ph="select * fro... " />
-                <marker date="1483434444790" expanded="true" signature="6302:6392" ph="select * fro... *" />
-                <marker date="1483434444790" expanded="true" signature="6317:6373" ph="select * fro... missing_value" />
-                <marker date="1483434444790" expanded="true" signature="7156:7290" ph="select * fro... ib_accountData" />
-                <marker date="1483434444790" expanded="true" signature="7727:7882" ph="select * fro... ib_accountData" />
-                <marker date="1483434444790" expanded="true" signature="8305:8383" ph="select * fro... *" />
-                <marker date="1483434444790" expanded="true" signature="8320:8366" ph="select * fro... c2_equity" />
+                <element signature="e#0#24#0" expanded="true" />
+                <marker date="1483499413295" expanded="true" signature="1018:1041" ph="select * fro... timetable" />
+                <marker date="1483499413295" expanded="true" signature="3545:3569" ph="select * fro... Dictionary" />
+                <marker date="1483499413295" expanded="true" signature="4764:4787" ph="select * fro... timetable" />
+                <marker date="1483499413295" expanded="true" signature="4853:4877" ph="select * fro... Dictionary" />
+                <marker date="1483499413295" expanded="true" signature="5898:5922" ph="select * fro... Dictionary" />
+                <marker date="1483499413295" expanded="true" signature="5978:5981" ph="select * fro... " />
+                <marker date="1483499413295" expanded="true" signature="6480:6570" ph="select * fro... *" />
+                <marker date="1483499413295" expanded="true" signature="6495:6551" ph="select * fro... missing_value" />
+                <marker date="1483499413295" expanded="true" signature="7290:7424" ph="select * fro... ib_accountData" />
+                <marker date="1483499413295" expanded="true" signature="7861:8016" ph="select * fro... ib_accountData" />
+                <marker date="1483499413295" expanded="true" signature="8439:8517" ph="select * fro... *" />
+                <marker date="1483499413295" expanded="true" signature="8454:8500" ph="select * fro... c2_equity" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="start_moc.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="start_moc.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/betting/start_moc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+            <state relative-caret-position="68">
+              <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
               <folding>
                 <element signature="e#0#56#0" expanded="true" />
               </folding>
@@ -105,7 +106,7 @@
         <entry file="file://$PROJECT_DIR$/betting/start_immediate.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="204">
-              <caret line="12" column="51" lean-forward="true" selection-start-line="12" selection-start-column="51" selection-end-line="12" selection-end-column="51" />
+              <caret line="12" column="51" lean-forward="false" selection-start-line="12" selection-start-column="51" selection-end-line="12" selection-end-column="51" />
               <folding>
                 <element signature="e#0#56#0" expanded="true" />
               </folding>
@@ -163,8 +164,8 @@
         <option value="$PROJECT_DIR$/betting/start_immediate.py" />
         <option value="$PROJECT_DIR$/betting/templates/show_log.html" />
         <option value="$PROJECT_DIR$/bettingboard/settings.py" />
-        <option value="$PROJECT_DIR$/betting/helpers.py" />
         <option value="$PROJECT_DIR$/betting/start_moc.py" />
+        <option value="$PROJECT_DIR$/betting/helpers.py" />
       </list>
     </option>
   </component>
@@ -960,7 +961,17 @@
     <entry file="file://$PROJECT_DIR$/betting/start_immediate.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
-          <caret line="12" column="51" lean-forward="true" selection-start-line="12" selection-start-column="51" selection-end-line="12" selection-end-column="51" />
+          <caret line="12" column="51" lean-forward="false" selection-start-line="12" selection-start-column="51" selection-end-line="12" selection-end-column="51" />
+          <folding>
+            <element signature="e#0#56#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/betting/start_moc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
           <folding>
             <element signature="e#0#56#0" expanded="true" />
           </folding>
@@ -979,31 +990,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/betting/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="37" lean-forward="false" selection-start-line="11" selection-start-column="37" selection-end-line="11" selection-end-column="37" />
+        <state relative-caret-position="307">
+          <caret line="169" column="63" lean-forward="true" selection-start-line="169" selection-start-column="63" selection-end-line="169" selection-end-column="63" />
           <folding>
-            <marker date="1483434444790" expanded="true" signature="1018:1041" ph="select * fro... timetable" />
-            <marker date="1483434444790" expanded="true" signature="3545:3569" ph="select * fro... Dictionary" />
-            <marker date="1483434444790" expanded="true" signature="4764:4787" ph="select * fro... timetable" />
-            <marker date="1483434444790" expanded="true" signature="4853:4877" ph="select * fro... Dictionary" />
-            <marker date="1483434444790" expanded="true" signature="5898:5922" ph="select * fro... Dictionary" />
-            <marker date="1483434444790" expanded="true" signature="5978:5981" ph="select * fro... " />
-            <marker date="1483434444790" expanded="true" signature="6302:6392" ph="select * fro... *" />
-            <marker date="1483434444790" expanded="true" signature="6317:6373" ph="select * fro... missing_value" />
-            <marker date="1483434444790" expanded="true" signature="7156:7290" ph="select * fro... ib_accountData" />
-            <marker date="1483434444790" expanded="true" signature="7727:7882" ph="select * fro... ib_accountData" />
-            <marker date="1483434444790" expanded="true" signature="8305:8383" ph="select * fro... *" />
-            <marker date="1483434444790" expanded="true" signature="8320:8366" ph="select * fro... c2_equity" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/betting/start_moc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="13" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#56#0" expanded="true" />
+            <element signature="e#0#24#0" expanded="true" />
+            <marker date="1483499413295" expanded="true" signature="1018:1041" ph="select * fro... timetable" />
+            <marker date="1483499413295" expanded="true" signature="3545:3569" ph="select * fro... Dictionary" />
+            <marker date="1483499413295" expanded="true" signature="4764:4787" ph="select * fro... timetable" />
+            <marker date="1483499413295" expanded="true" signature="4853:4877" ph="select * fro... Dictionary" />
+            <marker date="1483499413295" expanded="true" signature="5898:5922" ph="select * fro... Dictionary" />
+            <marker date="1483499413295" expanded="true" signature="5978:5981" ph="select * fro... " />
+            <marker date="1483499413295" expanded="true" signature="6480:6570" ph="select * fro... *" />
+            <marker date="1483499413295" expanded="true" signature="6495:6551" ph="select * fro... missing_value" />
+            <marker date="1483499413295" expanded="true" signature="7290:7424" ph="select * fro... ib_accountData" />
+            <marker date="1483499413295" expanded="true" signature="7861:8016" ph="select * fro... ib_accountData" />
+            <marker date="1483499413295" expanded="true" signature="8439:8517" ph="select * fro... *" />
+            <marker date="1483499413295" expanded="true" signature="8454:8500" ph="select * fro... c2_equity" />
           </folding>
         </state>
       </provider>

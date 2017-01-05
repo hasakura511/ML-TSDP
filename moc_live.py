@@ -391,8 +391,6 @@ def create_execDict(feeddata, systemdata):
     global client
     global csidate
     global ttdate
-    global mcdate
-    
     
     downloadtt = not ttdate>csidate or not ttdate>=int(mcdate)
     print 'ttdate',ttdate,'csidate',csidate, 'mcdate',mcdate, 'downloadtt', downloadtt
@@ -403,7 +401,7 @@ def create_execDict(feeddata, systemdata):
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
     if downloadtt:
-        print 'new timetable available, geting new contract details from IB'
+        print 'new timetable due, geting new contract details from IB'
         contractsDF=pd.DataFrame()
     else:
         print 'loading contract details from file'
@@ -440,8 +438,7 @@ def create_execDict(feeddata, systemdata):
         
         print i+1, contract.symbol,
         if downloadtt:
-            contractInfo=client.get_contract_details(contract)
-            #print contractInfo
+            contractInfo=client.get_contract_details(contract)                
             contractsDF=contractsDF.append(contractInfo)
             execDict[symbol+contractInfo.expiry[0]]=['PASS', 0, contract]
             systemdata.set_value(index, 'ibcontract', symbol+contractInfo.expiry[0])
@@ -609,7 +606,25 @@ def update_orders(feeddata, systemdata2, execDict, threadlist):
         execDictMerged.update(execDictExpired)
         return execDictMerged
     else:
-        print 'Could not get open positions from IB'
+        print 'IB returned no positions. Updating execDict from system file.'
+        #resetting ibsym because wasn't updated in system csv at the time i wrote this.
+        systemdata.index=[feeddata.reset_index().set_index('CSIsym').ix[x.split('_')[1]].ibsym for x in systemdata.System]
+        for sym in systemdata.index:
+            system=systemdata.ix[sym]
+            #print sym, [x for x in execDict.keys() if sym in x]
+            execdictkey=[x for x in execDict.keys() if sym in x]
+            if len(execdictkey)>0:
+                key=execdictkey[0]
+                ibquant = systemdata.ix[sym].c2qty
+                if systemdata.ix[sym].signal >0:
+                    action='BOT'
+                else:
+                    action='SLD'
+                execDict[key][0]=action
+                execDict[key][1]=ibquant
+                print 'updated', key, action, ibquant
+            else:
+                print 'could not find', sym, 'in execDict. skipping.'
         return execDict
 
 def get_contractdf(execDict, systemPath):
@@ -981,9 +996,10 @@ def updateWithOpen(iborders, cid):
     #return iborders_lessOpen, { key: execDict[key] for (key,lst) in iborders_lessOpen }
         
 if __name__ == "__main__":
-    print durationStr, barSizeSetting, whatToShow
+    print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
+    #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
     #systemfile=systemPath+'system_v4futures_live.csv'
     #load last systemfile from vol_adjsize csi
     systemdata=pd.read_sql('select * from v4futures where timestamp=\
@@ -1172,7 +1188,6 @@ if __name__ == "__main__":
             print 'Debug mode: skipping orders'
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-
 
 '''
 #debug order executions

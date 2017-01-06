@@ -27,6 +27,13 @@ feed/migrations/*
 IBAPI
 --> settings uncheck readonly API
 --> change port to 7496
+--> master clientid 0
+
+Evan S: It's better to use the master client id.
+Evan S: Because by default, it will only return the commission for the order which placed via this client.
+Evan S: But if you use master client id, then it will return the commission for the orders even if it's placed via TWS manually.
+Evan S: You can use the client 0 as master client id. Because client id 0 should be available for all the method.
+Evan S: If you use other client id as master client id, then such as reqAutoOpenOrder won't be allow to be called.
 
 CSIdata
 -->database -> schedule db update -> wait until everything traded

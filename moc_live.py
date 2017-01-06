@@ -1035,7 +1035,7 @@ if __name__ == "__main__":
     systemdata = systemdata.set_index('CSIsym')
     systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
     systemdata = systemdata.reset_index()
-'''
+
     #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
     execDict={}
@@ -1050,7 +1050,8 @@ if __name__ == "__main__":
             tries+=1
             if tries==5:
                 sys.exit('failed 5 times to get contract info')
-    
+                
+
     if immediate:
         print 'Running Immediate Process...'
         #include all symbols in threadlist to refresh all orders from selection
@@ -1102,20 +1103,7 @@ if __name__ == "__main__":
         totalc2orders =0
         num_iborders=0
         
-    #with open(logPath+'vol_adjsize_live.txt', 'w') as f:
-    #    with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
-    #        f.flush()
-    #        e.flush()
-    #        proc = Popen(runPath2, stdout=f, stderr=e)
-    #        proc.wait()
 
-    #print 'returned to main thread, running check systems if new orders are necessary.'
-    #with open(logPath+'check_systems_live.txt', 'w') as f:
-    #    with open(logPath+'check_systems_live_error.txt', 'w') as e:
-    #        f.flush()
-    #        e.flush()
-    #        proc = Popen(runPath4, stdout=f, stderr=e)
-    #        proc.wait()
     #totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
     
     if totalc2orders ==0 and num_iborders==0:
@@ -1166,14 +1154,14 @@ if __name__ == "__main__":
                     sleep(15)
                     print 'checking executions..'
                     executions=filterIBexec()
-
+                    iborders_lessExec=[]
                     if executions is not None:
                         #check executions
                         executions2 = executions.reset_index().groupby(['contract','side'])[['qty']].max()
                         
                         #check if expired contracts have been exited.
                         #executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
-                        iborders_lessExec=[]
+                        
                         for (sym,[order,qty]) in iborders:
                             if (sym,order) in executions2.index and executions2.ix[sym].qty[0] ==qty:
                                 print 'execution found..',sym, order, qty, executions2.ix[sym].index[0],  executions2.ix[sym].qty[0]
@@ -1215,7 +1203,7 @@ if __name__ == "__main__":
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 
-'''
+
 '''
 #debug order executions
 systemfile='D:/ML-TSDP/data/systems/system_v4futures_live.csv'

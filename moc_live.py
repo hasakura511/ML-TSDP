@@ -41,7 +41,7 @@ from suztoolz.vol_adjsize_immediate_func import vol_adjsize_immediate
 #prepData=dict()
 start_time = time.time()
 callback = IBWrapper()
-client=IBclient(callback, port=7496, clientid=666)
+client=IBclient(callback, port=7496, clientid=0)
 
 
 #systems = ['v4micro','v4mini','v4macro']
@@ -96,7 +96,7 @@ if len(sys.argv)==1:
     csiDataPath3=  'D:/ML-TSDP/data/csidata/v4futures4_debug/'
     signalPathDaily =  'D:/ML-TSDP/data/signals/'
     signalPathMOC =  'D:/ML-TSDP/data/signals2/'
-    logging.basicConfig(filename='C:/logs/ib_live.log',level=logging.DEBUG)
+    logging.basicConfig(filename='C:/logs/broker_live_'+dt.now().strftime('%Y%m%d-%H%M%S')+'.log',level=logging.DEBUG)
 else:
     systems = ['v4micro','v4mini','v4futures']
     debug=False
@@ -139,7 +139,7 @@ else:
     csiDataPath3=  './data/csidata/v4futures4/'
     signalPathDaily =  './data/signals/'
     signalPathMOC =  './data/signals2/'
-    logging.basicConfig(filename='/logs/ib_live.log',level=logging.DEBUG)
+    logging.basicConfig(filename='/logs/broker_live_'+dt.now().strftime('%Y%m%d-%H%M%S')+'.log',level=logging.DEBUG)
 
 writeConn = sqlite3.connect(dbPath)
 readConn =  sqlite3.connect(dbPath2)
@@ -218,7 +218,27 @@ def is_int(s):
         return True
     except ValueError:
         return False
-        
+    
+def getTableColumns(dbconn, tablename):
+    dbcur = dbconn.cursor()
+    dbcur.execute("""
+        PRAGMA table_info('{0}')
+        """.format(tablename.replace('\'', '\'\'')))
+    columns=dbcur.fetchall()
+    dbcur.close()
+    if len(columns)>0:
+        return [x[1] for x in columns]
+    else:
+        return []
+
+def get_write_mode(dbconn, tablename, dataframe):
+    dbcols=getTableColumns(dbconn, tablename)
+    check=[col in dbcols for col in dataframe.columns]
+    if False in check:
+        return 'replace'
+    else:
+        return 'append'
+    
 def lastCsiDownloadDate():
     global csiDataPath
     datafiles = os.listdir(csiDataPath)
@@ -615,7 +635,8 @@ def update_orders(feeddata, systemdata2, execDict, threadlist):
             execdictkey=[x for x in execDict.keys() if sym in x]
             if len(execdictkey)>0:
                 key=execdictkey[0]
-                ibquant = systemdata.ix[sym].c2qty
+                #needs to be type int or ib wrapper will throw an error
+                ibquant = int(systemdata.ix[sym].c2qty)
                 if systemdata.ix[sym].signal >0:
                     action='BOT'
                 else:
@@ -761,7 +782,10 @@ def filterIBexec():
     executions['Date']=csidate
     executions['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     try:
-        executions.to_sql(name='ib_executions', con=writeConn, index=True, if_exists='append', index_label='ibsym')
+        tablename='ib_executions'
+        mode = get_write_mode(writeConn, tablename, executions)
+        executions.to_sql(name=tablename, con=writeConn, index=True, if_exists=mode, index_label='ibsym')
+        print 'saved', tablename,'to',dbPath,'writemode',mode
     except Exception as e:
         #print e
         traceback.print_exc()
@@ -942,7 +966,9 @@ def getIBopen():
         openOrders['Date']=csidate
         openOrders['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         try:
-            openOrders.to_sql(name='ib_openorders', con=writeConn, index=True, if_exists='append', index_label='contract')
+            tablename='ib_openorders'
+            mode = get_write_mode(writeConn, tablename, openOrders)
+            openOrders.to_sql(name=tablename, con=writeConn, index=True, if_exists=mode, index_label='contract')
         except Exception as e:
             #print e
             traceback.print_exc()
@@ -1009,7 +1035,7 @@ if __name__ == "__main__":
     systemdata = systemdata.set_index('CSIsym')
     systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
     systemdata = systemdata.reset_index()
-
+'''
     #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
     execDict={}
@@ -1189,6 +1215,7 @@ if __name__ == "__main__":
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 
+'''
 '''
 #debug order executions
 systemfile='D:/ML-TSDP/data/systems/system_v4futures_live.csv'

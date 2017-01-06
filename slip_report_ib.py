@@ -129,7 +129,7 @@ if lastExecutions.shape[0] >0:
         system = pd.read_sql('select * from (select * from signals_live where Date=%s and Name=\'%s\'\
                             order by timestamp ASC) group by CSIsym' %(csidate, systemName),\
                             con=readConn,  index_col='CSIsym')
-                            
+        selection=system.selection[0]
         if os.path.isfile(timetablePath+str(csidate)+'.csv'):
             timetable = pd.read_csv(timetablePath+str(csidate)+'.csv', index_col=0)
             for col in timetable.columns:
@@ -192,7 +192,7 @@ if lastExecutions.shape[0] >0:
         slipDF= slipDF.sort_values(by='dollarslip', ascending=True)
         totalslip = int(slipDF.dollarslip.sum())
         filename=systemName+'_ib_slippage_'+str(csidate)+'.png'
-        title = systemName+': '+str(slipDF.shape[0])+' Trades, $'+str(totalslip)\
+        title = 'IB '+systemName+' '+selection+': '+str(slipDF.shape[0])+' Trades, $'+str(totalslip)\
                     +' Slippage, CSI Data as of '+str(csidate)
         plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)
 

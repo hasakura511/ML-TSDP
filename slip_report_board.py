@@ -380,7 +380,7 @@ for systemName in systems:
         slipTrades = slipDF.sort_values(by='dollarslip', ascending=True)
         totalslip = int(slipTrades.dollarslip.sum())
         filename=systemName+'_c2_slippage_'+str(csidate)+'.png'
-        title = systemName+' '+selection+': '+str(slipTrades.shape[0])+' Trades, $'+str(totalslip)\
+        title = 'C2' +systemName+' '+selection+': '+str(slipTrades.shape[0])+' Trades, $'+str(totalslip)\
                     +' Slippage, CSI Data as of '+str(csidate)
         if slipTrades.shape[0] !=0:
             plotSlip(slipTrades, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)

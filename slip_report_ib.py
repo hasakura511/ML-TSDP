@@ -57,30 +57,42 @@ IB2CSI_multiplier_adj={
     
 def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=False):
     #plt.figure(figsize=(8,13))
-    font = {'family' : 'normal',
+    font = {
             'weight' : 'normal',
             'size'   : 22}
-
     matplotlib.rc('font', **font)
+    
+    def align_xaxis(ax1, v1, ax2, v2):
+        """adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
+        x1, _ = ax1.transData.transform((v1, 0))
+        x2, _ = ax2.transData.transform((v2, 0))
+        inv = ax2.transData.inverted()
+        dx, _  = inv.transform((0, 0)) - inv.transform((x1-x2, 0))
+        minx, maxx = ax2.get_xlim()
+        ax2.set_xlim(minx+dx, maxx+dx)
+
+
     fig = plt.figure(figsize=figsize) # Create matplotlib figure
     ax = fig.add_subplot(111) # Create matplotlib axes
     #ax = slipDF.slippage.plot.bar(color='r', width=0.5)
     ax2 = ax.twiny()
 
     width=.3
-    slipDF.slippage.plot(kind='barh', color='red',width=width, ax=ax, position=1)
-    slipDF.timedelta.plot(kind='barh', color='blue', width=width,ax=ax2, position=0)
+    slipDF.dollarslip.plot(kind='barh', color='red',width=width, ax=ax, position=1)
+    slipDF.delta.plot(kind='barh', color='blue', width=width,ax=ax2, position=0)
 
-    ax.set_xlabel('Slippage % (red)')
+    ax.set_xlabel('$ Slippage (red)')
     ax2.set_xlabel('Slippage Minutes (blue)')
     ax.grid(b=True)
     ax2.grid(b=False)
+    #ax2.set_xlim(-40,140)
     #ax2 = slipDF.hourdelta.plot.bar(color='b', width=0.5)
     #plt.axvline(0, color='k')
     plt.text(0.5, 1.08, title,
              horizontalalignment='center',
              fontsize=fontsize,
              transform = ax2.transAxes)
+    align_xaxis(ax, 0, ax2, 0)
     #plt.ylim(0,80)
     #plt.xticks(np.arange(-1,1.25,.25))
     #plt.grid(True)
@@ -144,6 +156,13 @@ if lastExecutions.shape[0] >0:
                 csiPrice = futuresDF.ix[CSIsym].LastClose
                 slippage=(ib_price-csiPrice)/csiPrice
                 signal = system.ix[CSIsym].signal
+                #for close trades. 
+                if signal==0:
+                    if executions.ix[contract].side == 'BOT':
+                        signal=-1
+                    else:
+                        signal=1
+                        
                 closetime=timetable.ix[[x for x in idx_close if ibsym in x]][csidate][0]
                 commissions = commission*qty
                 cv = futuresDF.ix[CSIsym].contractValue
@@ -166,13 +185,13 @@ if lastExecutions.shape[0] >0:
                 slipDF.set_value(rowName, 'commissions', commissions)
                 
         #slipDF['timedelta']=slipDF.ib_timestamp-slipDF.closetime
-        slipDF['timedelta']=(slipDF.ib_timestamp-slipDF.closetime).astype('timedelta64[m]')
+        slipDF['delta']=(slipDF.ib_timestamp-slipDF.closetime).astype('timedelta64[m]')
         #slipDF['delta']=slipDF.timedelta/np.timedelta64(1,'D')
         #if slipDF.shape[0] != portfolioDF.shape[0]:
         #    print 'Warning! Some values may be mising'
-
+        slipDF= slipDF.sort_values(by='dollarslip', ascending=True)
         totalslip = int(slipDF.dollarslip.sum())
-        filename=systemName+'_ib_slippage.png'
+        filename=systemName+'_ib_slippage_'+str(csidate)+'.png'
         title = systemName+': '+str(slipDF.shape[0])+' Trades, $'+str(totalslip)\
                     +' Slippage, CSI Data as of '+str(csidate)
         plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=showPlots)

@@ -131,7 +131,7 @@ def place_orders(execDict, clientid):
         order.action = action
         #order.lmtPrice = 140
         order.orderType = 'MKT'
-        order.totalQuantity = quant
+        order.totalQuantity = int(quant)
         #order.algoStrategy = "AD"
         order.tif = 'DAY'
         #order.algoParams = algoParams

@@ -93,10 +93,9 @@ class IBWrapper(EWrapper):
         pass
 
     def commissionReport(self, commission):
-        #print commission
-        #print('%s Commission %s %s P&L: %s' % (commission.execId, commission.currency,
-        #                                    commission.commission,
-        #                                    commission.realizedPNL))
+        print('%s Commission %s %s P&L: %s' % (commission.execId, commission.currency,
+                                            commission.commission,
+                                            commission.realizedPNL))
         filldata=self.data_fill_data
         
         #if reqId not in filldata.keys():
@@ -170,7 +169,7 @@ class IBWrapper(EWrapper):
             
             
             execdetails=dict( symbol_currency=str(currency), side=str(side), times=str(exectime), orderid=str(thisorderid), qty=int(cumQty), price=float(avgprice), symbol=str(symbol), expiry=str(expiry), clientid=str(clientid), execid=str(execid), account=str(account), exchange=str(exchange), permid=int(permid))
-            #print execdetails
+            
             if reqId==FILL_CODE:
                 ## This is a fill from a trade we've just done
                 action_ib_fill(execdetails)
@@ -204,7 +203,7 @@ class IBWrapper(EWrapper):
                         
         setattr(self, "data_order_structure", orderdata)
 
-        
+
     def openOrder(self, orderID, contract, order, orderState):
         """
         Tells us about any orders we are working now
@@ -213,19 +212,10 @@ class IBWrapper(EWrapper):
         
         
         """
+        
         ## Get a selection of interesting things about the order
         orderdetails=dict(symbol=contract.symbol , expiry=contract.expiry,  qty=int(order.totalQuantity) , 
-                       side=order.action , orderid=int(orderID), clientid=order.clientId,
-                        status=orderState.status,
-                        initMargin=orderState.initMargin,
-                        maintMargin=orderState.maintMargin,
-                        equityWithLoan=orderState.equityWithLoan,
-                        commission=orderState.commission,
-                        minCommission=orderState.minCommission,
-                        maxCommission=orderState.maxCommission,
-                        commissionCurrency=orderState.commissionCurrency,
-                        warningText=orderState.warningText ,
-                       ) 
+                       side=order.action , orderid=int(orderID), clientid=order.clientId ) 
         
         self.add_order_data(orderdetails)
 
@@ -755,33 +745,28 @@ class IBclient(object):
         return brokerorderid
 
 
-    def get_margin_info(self, ibcontract):
+    def place_new_IB_order(self, ibcontract, trade, lmtPrice, orderType, orderid=None):
         """
-        Places an what if order
+        Places an order
         
         Returns brokerorderid
     
         raises exception if fails
         """
-
-        self.cb.init_openorders()
-        self.cb.init_error()
-                
-        start_time=time.time()
-        
         iborder = IBOrder()
-        iborder.action = 'BUY'
-        #iborder.lmtPrice = lmtPrice
-        iborder.orderType = 'MKT'
-        iborder.totalQuantity = 1
+        iborder.action = bs_resolve(trade)
+        iborder.lmtPrice = lmtPrice
+        iborder.orderType = orderType
+        iborder.totalQuantity = abs(trade)
         iborder.tif='DAY'
-        #iborder.transmit=True
-        iborder.whatIf=True
+        iborder.transmit=True
+
         ## We can eithier supply our own ID or ask IB to give us the next valid one
-        #if orderid is None:
-        #    logging.info( "Getting orderid from IB")
-        #    orderid=self.get_next_brokerorderid()
-        #logging.info( "Using order id of %d" % orderid)
+        if orderid is None:
+            logging.info( "Getting orderid from IB")
+            orderid=self.get_next_brokerorderid()
+            
+        logging.info( "Using order id of %d" % orderid)
     
          # Place the order
         self.tws.placeOrder(
@@ -789,25 +774,8 @@ class IBclient(object):
                 ibcontract,                                   # contract,
                 iborder                                       # order
             )
-            
-        iserror=False
-        finished=False
-        
-        while not finished and not iserror:
-            finished=self.cb.flag_order_structure_finished
-            iserror=self.cb.flag_iserror
-            if (time.time() - start_time) > MAX_WAIT_SECONDS:
-                ## You should have thought that IB would teldl you we had finished
-                finished=True
-            pass
-        
-        order_structure=self.cb.data_order_structure
-        if iserror:
-            logging.info( self.cb.error_msg)
-            logging.info( "Problem getting open orders")
     
-        return order_structure    
-
+        return orderid
 
     def any_open_orders(self):
         """

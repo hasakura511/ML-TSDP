@@ -24,7 +24,7 @@ def start_moc():
         with open('\logs\moc_live_error_'+fulltimestamp+'.txt', 'w') as e:
             #f.flush()
             #e.flush()
-            proc = Popen(['/anaconda2/python', '/ml-tsdp/moc_live.py','1','1','1','0'],\
+            proc = Popen(['/anaconda2/python', '/ml-tsdp/moc_live.py','0','0','0','0'],\
                          cwd='/ml-tsdp/',stdout=f, stderr=e)
             #proc.wait()
-            print('MOC processing...')
+            print('Attempting to get new timetable...')

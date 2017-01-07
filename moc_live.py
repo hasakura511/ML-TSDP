@@ -101,7 +101,13 @@ else:
     systems = ['v4micro','v4mini','v4futures']
     debug=False
     showPlots=False
-    
+
+    if sys.argv[1]=='1':
+        #run MOC/immediate process
+        run_moc_immediate=True
+    else:
+        run_moc_immediate=False
+        
     if sys.argv[2]=='1':
         submitC2=True
     else:
@@ -1051,7 +1057,9 @@ if __name__ == "__main__":
             if tries==5:
                 sys.exit('failed 5 times to get contract info')
                 
-
+    if not run_moc_immediate:
+        sys.exit('run_moc_immediate = False')
+        
     if immediate:
         print 'Running Immediate Process...'
         #include all symbols in threadlist to refresh all orders from selection
@@ -1103,7 +1111,20 @@ if __name__ == "__main__":
         totalc2orders =0
         num_iborders=0
         
+    #with open(logPath+'vol_adjsize_live.txt', 'w') as f:
+    #    with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+    #        f.flush()
+    #        e.flush()
+    #        proc = Popen(runPath2, stdout=f, stderr=e)
+    #        proc.wait()
 
+    #print 'returned to main thread, running check systems if new orders are necessary.'
+    #with open(logPath+'check_systems_live.txt', 'w') as f:
+    #    with open(logPath+'check_systems_live_error.txt', 'w') as e:
+    #        f.flush()
+    #        e.flush()
+    #        proc = Popen(runPath4, stdout=f, stderr=e)
+    #        proc.wait()
     #totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
     
     if totalc2orders ==0 and num_iborders==0:

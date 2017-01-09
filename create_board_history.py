@@ -121,8 +121,8 @@ componentpairs =[
                 ['Seasonality','Anti-Seasonality'],
                 ]
 
-component_text={'Previous':'Previous trading day\'s signals. For example if gold went up the previous day, the signal would be LONG. ','Anti-Previous':'Opposite of Previous. For example if Gold went down the previous day, signal will be LONG.','RiskOn':'Fixed Signals consisting of Short precious metals and bonds, Long all other risky assets','RiskOff':'Opposite of RiskOn. Fixed Signals consisting of Long precious metals and bonds, Short all other risky assets','Custom':'Custom signals provided by the player.','Anti-Custom':'Opposite of Custom signals provided by the player.','50/50':'Combination of signals from HighestEquity and LowestEquity.','Anti50/50':'Opposite of 50/50.','LowestEquity':'Baysean machine learning system prioritizing signals from worst performing systems.','AntiLowestEquity':'Opposite of LowestEquity.','HighestEquity':'Baysean machine learning system prioritizing signals from best performing systems.','AntiHighestEquity':'Opposite of HighestEquity','Seasonality':'Signals computed from 10 to 30+ years of seasonal daily data.','Anti-Seasonality':'Opposite of Seasonality.',}
-                
+component_text={'Previous':'Previous trading day\'s signals. For example if gold went up the previous day, the signal would be LONG. ','Anti-Previous':'Opposite of Previous signals. For example if Gold went down the previous day, signal will be LONG.','RiskOn':'Fixed Signals consisting of Short precious metals and bonds, Long all other risky assets','RiskOff':'Opposite of RiskOn signals. (Fixed Signals consisting of Long precious metals and bonds, Short all other risky assets)','Custom':'Custom signals provided by the player.','Anti-Custom':'Opposite of Custom signals provided by the player.','50/50':'Combination of signals from HighestEquity and LowestEquity.','Anti50/50':'Opposite of 50/50 signals.','LowestEquity':'Baysean machine learning system prioritizing signals from worst performing systems.','AntiLowestEquity':'Opposite of LowestEquity signals.','HighestEquity':'Baysean machine learning system prioritizing signals from best performing systems.','AntiHighestEquity':'Opposite of HighestEquity signals.','Seasonality':'Signals computed from 10 to 30+ years of seasonal daily data.','Anti-Seasonality':'Opposite of Seasonality signals.',}
+anti_components={'Previous':'Anti-Previous','Anti-Previous':'Previous','RiskOn':'RiskOff','RiskOff':'RiskOn','Custom':'Anti-Custom','Anti-Custom':'Custom','50/50':'Anti50/50','Anti50/50':'50/50','LowestEquity':'AntiLowestEquity','AntiLowestEquity':'LowestEquity','HighestEquity':'AntiHighestEquity','AntiHighestEquity':'HighestEquity','Seasonality':'Anti-Seasonality','Anti-Seasonality':'Seasonality',}
 
 keep_cols = ['Contract', 'ACT','LastPctChg','contractValue','group', 'Date', 'timestamp']
 qtydict={'v4futures':'QTY','v4mini':'QTY_MINI','v4micro':'QTY_MICRO',}
@@ -340,6 +340,48 @@ futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='C
 performance_dict={}
 infodisplay = {key: [reversecomponentsdict[x] for x in componentsdict[key]] for key in componentsdict}
 
+perchgDict={}
+for account in totals_accounts:
+    totalsDF=totals_accounts[account]
+    pnl_cols=[x for x in totalsDF.columns if 'PNL' in x]
+    pnlsDF=totalsDF[pnl_cols].copy()
+    perchgDF=pd.DataFrame()
+    for col in pnlsDF:
+        pnlarr=pnlsDF[col].copy().values
+        pnlarr[0]=pnlarr[0]+accountvalues[account]
+        cumper=(pnlarr.cumsum()/accountvalues[account]-1)*100
+        perchgDF=perchgDF.append(pd.Series(data=cumper, name=col.split('_')[1], index=pnlsDF.index))
+    ranking=perchgDF.transpose().iloc[-1].sort_values(ascending=True)
+    perchgDict[account]=ranking.copy()
+    perchgDict[account].index=[str(len(ranking.index)-idx)+' Rank '+col for idx,col in enumerate(ranking.index)]
+    #perchgDict[account].plot(kind='barh', figsize=(10,15))
+
+def createRankingChart(ranking, account, line, title, filename):
+    plt.figure(1, figsize=(10,15))
+    if is_int(line):
+        anti='Anti-'+line
+        #print line, anti
+    else:
+        if 'Anti' in line and is_int(line.replace('Anti-','')):
+            anti=line.replace('Anti-','')
+            #print line, anti
+        else:
+            #component
+            anti=anti_components[line]
+            #print line, anti
+    color_index=['r' if line==x.split()[2] or anti==x.split()[2] else 'b' for x in ranking.index]
+    pair=sorted([x for x in ranking.index if line==x.split()[2] or anti==x.split()[2]])
+    text=', '.join([index+' '+str(round(ranking.ix[index],1))+'%' for index in pair])
+    newplot=ranking.plot(kind='barh',colors=color_index)
+    plt.xlabel('Cumulative % change', size=12)
+    plt.title(title)
+    plt.savefig(filename, bbox_inches='tight')
+    print 'Saved',filename
+    if debug:
+        plt.show()
+    plt.close()
+    return text
+    
 for account in totals_accounts:
     performance_dict[account]={}
     quantity=futuresDF_current[qtydict[account]].copy()
@@ -359,7 +401,7 @@ for account in totals_accounts:
 
     matplotlib.rc('font', **font)
     for cl in chart_list:
-        fig = plt.figure(figsize=(10,8))
+        fig = plt.figure(0, figsize=(10,8))
         num_plots = len(cl)
         colormap = plt.cm.gist_ncar
         plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 0.9, num_plots)])
@@ -381,6 +423,7 @@ for account in totals_accounts:
 
         date=benchmark_xaxis_label[-1]
         for line in cl[:2]:
+            plt.figure(0)
             filename=pngPath+date+'_'+account+'_'+line.replace('/','')+'.png'
             filename2=date+'_'+account+'_'+line.replace('/','')+'.png'
             plt.savefig(filename, bbox_inches='tight')
@@ -388,20 +431,26 @@ for account in totals_accounts:
 
             if is_int(line):
                 text= 'Voting System consisting of '+', '.join(infodisplay[line])+'.'
-                print line, text, filename2
+                #print line, text, filename2
             else:
                 if 'Anti' in line and is_int(line.replace('Anti-','')):
                     text= 'Opposite signal of Voting '+line.replace('Anti-','')+'.'
-                    print line, text, filename2
+                    #print line, text, filename2
                 else:
                     #component
                     text=component_text[line]
-                    print line, text, filename2
+                    #print line, text, filename2
             signals=(signalsDict[current][line]*quantity).astype(int).copy()
             signals.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in signals.index]
             signals=pd.Series(conv_sig(signals), index=signals.index).to_dict()
             text2='Results shown reflect daily close-to-close timesteps, only applicable to MOC orders. All results are hypothetical.'
+            filename=pngPath+date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
+            filename3=date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
+            title= line+' Ranking from '+benchmark_xaxis_label[0]+' to '+benchmark_xaxis_label[-1]
+            text3 = createRankingChart(perchgDict[account], account, line, title, filename)
             performance_dict[account][line]={
+                                                            'rank_filename':filename3,
+                                                            'rank_text':text3,
                                                             'filename':filename2,
                                                             'infotext':text,
                                                             'infotext2':text2,
@@ -413,6 +462,8 @@ for account in totals_accounts:
         plt.close()
 
         
+
+
     
 #create account value charts
 for account in totals_accounts:
@@ -490,6 +541,8 @@ for account in totals_accounts:
     text='This chart shows results from all betting activities of the player.\
             See order status for the current positions.'
     performance_dict[account]['account_value']={
+                                                'rank_filename':'',
+                                                'rank_text':'',
                                                 'filename':filename2,
                                                 'infotext':text,
                                                 'signals':'',
@@ -514,9 +567,11 @@ for key in performance_dict_by_box:
     for account in performance_dict_by_box[key]:
         newdict[account+'_filename']=performance_dict_by_box[key][account]['filename']
         signals_cons=signals_cons.append(pd.Series(performance_dict_by_box[key][account]['signals'], name=account))
+        newdict[account+'_rank_filename']=performance_dict_by_box[key][account]['rank_filename']
+        newdict[account+'_rank_text']=performance_dict_by_box[key][account]['rank_text']
     newdict['infotext']=performance_dict_by_box[key][account]['infotext']
     if 'infotext2' in performance_dict_by_box[key][account]:
-        newdict['infotext2']=performance_dict_by_box[key][account]['infotext2']
+        newdict['infotext2']=performance_dict_by_box[key][account]['infotext2']        
     newdict['date']=performance_dict_by_box[key][account]['date']
     signals_cons=signals_cons.transpose()
     signals_cons.columns=[web_accountnames[x] for x in signals_cons.columns]
@@ -530,5 +585,7 @@ filename=jsonPath+'performance_data.json'
 with open(filename, 'w') as f:
      json.dump(performance_dict_by_box2, f)
 print 'Saved',filename
+
+
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

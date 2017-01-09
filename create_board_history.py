@@ -419,7 +419,7 @@ for account in totals_accounts:
             plt.xlabel('MOC Date', size=12)
             plt.xticks(range(nrows), benchmark_xaxis_label)
             fig.autofmt_xdate()
-        plt.title(account+' Historical Performance: '+', '.join(cl))
+        plt.title(account+' '+str(lookback)+'Day Historical Performance: '+', '.join(cl))
 
         date=benchmark_xaxis_label[-1]
         for line in cl[:2]:

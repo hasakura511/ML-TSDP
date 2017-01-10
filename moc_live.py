@@ -1058,6 +1058,8 @@ if __name__ == "__main__":
                 sys.exit('failed 5 times to get contract info')
                 
     if not run_moc_immediate:
+        timetable = get_timetable(contractsDF)
+        print str(timetable)
         sys.exit('run_moc_immediate = False')
         
     if immediate:

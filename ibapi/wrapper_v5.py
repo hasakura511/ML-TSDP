@@ -97,21 +97,19 @@ class IBWrapper(EWrapper):
         #print('%s Commission %s %s P&L: %s' % (commission.execId, commission.currency,
         #                                    commission.commission,
         #                                    commission.realizedPNL))
-        filldata=self.data_fill_data
-        
+
         #if reqId not in filldata.keys():
         #    filldata[reqId]={}
-            
-        execid=commission.execId
-        
+
         #execdetails=filldata[execid]
         execdetails={}
+        execdetails['execid']=commission.execId
         execdetails['commission']=commission.commission
         execdetails['commission_currency']=commission.currency
         execdetails['realized_PnL']=commission.realizedPNL
         execdetails['yield_redemption_date']=commission.yieldRedemptionDate
-        filldata[execid].update(execdetails)
-        self.data_fill_data=filldata
+        
+        self.add_fill_data(0, execdetails)
 
 
     """
@@ -131,9 +129,11 @@ class IBWrapper(EWrapper):
         #if reqId not in filldata.keys():
         #    filldata[reqId]={}
             
-        #execid=execdetails['execid']
-        
-        filldata[execdetails['execid']]=execdetails
+        execid=execdetails['execid']
+        if execid in filldata:
+            filldata[execid].update(execdetails)
+        else:
+            filldata[execid]=execdetails
                         
         setattr(self, "data_fill_data", filldata)
 

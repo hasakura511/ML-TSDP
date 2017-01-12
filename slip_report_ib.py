@@ -11,7 +11,8 @@ import seaborn as sns
 import matplotlib
 import sqlite3
 import calendar
-
+from ibapi.moc_live_ib import filterIBexec
+#this needs to run before 12AM EST or IB wipes out the execution data for the day.
 start_time = time.time()
 systemName='v4futures'
 if len(sys.argv)==1:
@@ -109,9 +110,14 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
 contractsDF = pd.read_sql('select * from ib_contracts where timestamp=\
             (select max(timestamp) from ib_contracts as maxtimestamp)', con=readConn,  index_col='ibsym')
 
-lastExecutions= pd.read_sql('select * from ib_executions where timestamp=\
-            (select max(timestamp) from ib_executions as maxtimestamp)', con=readConn,  index_col='contract').drop_duplicates()
-print 'found', lastExecutions.shape[0], 'ib executiions'
+#lastExecutions= pd.read_sql('select * from ib_executions where timestamp=\
+#            (select max(timestamp) from ib_executions as maxtimestamp)', con=readConn,  index_col='contract').drop_duplicates()
+lastExecutions=filterIBexec()
+if lastExecutions==None:
+    print 'IB returned  no executions'
+    sys.exit('IB returned  no executions')
+else:
+    print 'found', lastExecutions.shape[0], 'ib executiions'
 
 
 

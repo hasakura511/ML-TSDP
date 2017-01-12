@@ -110,14 +110,10 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
 contractsDF = pd.read_sql('select * from ib_contracts where timestamp=\
             (select max(timestamp) from ib_contracts as maxtimestamp)', con=readConn,  index_col='ibsym')
 
-#lastExecutions= pd.read_sql('select * from ib_executions where timestamp=\
-#            (select max(timestamp) from ib_executions as maxtimestamp)', con=readConn,  index_col='contract').drop_duplicates()
-lastExecutions=filterIBexec()
-if lastExecutions==None:
-    print 'IB returned  no executions'
-    sys.exit('IB returned  no executions')
-else:
-    print 'found', lastExecutions.shape[0], 'ib executiions'
+print('getting last ib executions..')
+print(filterIBexec())
+lastExecutions= pd.read_sql('select * from ib_executions where timestamp=\
+            (select max(timestamp) from ib_executions as maxtimestamp)', con=readConn,  index_col='contract').drop_duplicates()
 
 
 

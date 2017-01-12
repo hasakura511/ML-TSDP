@@ -175,6 +175,18 @@ def get_order_status():
         orderstatus_dict[account]=df[col_order].to_html()
         csidate = pd.read_sql('select distinct csiDate from slippage where Name=\'{}\''.format(account), con=readConn).csiDate.tolist()[-1]
         slippage_files[account]=str(csidate)
+        if account == "v4futures":
+            col_order=['desc','contracts','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency','status','Date']
+            df = pd.read_sql('select * from (select * from %s\
+                    order by timestamp ASC) group by contracts' % ('checkSystems_ib_' + account), \
+                             con=readConn)
+            desc_list = [futuresDict.reset_index().set_index('IBsym').ix[x].Desc for x in df.ibsym]
+            df['desc'] = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+            orderstatus_dict[account+'_ib'] = df[col_order].to_html()
+            csidate = pd.read_sql('select distinct Date from ib_slippage where Name=\'{}\''.format(account),
+                                  con=readConn).Date.tolist()[-1]
+            slippage_files[account+'_ib'] = str(csidate)
+
 
     return slippage_files, orderstatus_dict
 

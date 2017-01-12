@@ -1082,7 +1082,8 @@ def checkIBpositions(account='v4futures'):
                     text='OK: open order found'
                     print sym, text
                     portfolio.set_value(sym,'status',text)
-    
+                    
+    portfolio['bet']=ordersDF.selection[0]
     portfolio['Date']=csidate
     portfolio['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     tablename='checkSystems_ib_'+account

@@ -10,11 +10,14 @@
 <base href="/">
 
 {% for name, data in orderstatus.items %}
-    <h1>{{name}}</h1>
-    {{data | safe}}
-    <img src="static/images/{{ name }}_c2_slippage_{{ slippagedates|get_item:name }}.png" width="90%">
-    {%  if name == "v4futures" %}
-        <img src="static/images/{{ name }}_ib_slippage_{{ slippagedates|get_item:name }}.png" width="90%">
+    {%  if name == "v4futures_ib" %}
+        <h1>{{name}}</h1>
+        {{ orderstatus|get_item:"v4futures_ib" | safe }}
+        <img src="static/images/{{ name }}_slippage_{{ slippagedates|get_item:name }}.png" width="90%">
+    {%  else %}
+        <h1>{{name}}</h1>
+        {{data | safe}}
+        <img src="static/images/{{ name }}_c2_slippage_{{ slippagedates|get_item:name }}.png" width="90%">
     {% endif %}
 {% endfor %}
 

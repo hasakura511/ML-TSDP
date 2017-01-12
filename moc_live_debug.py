@@ -1082,7 +1082,8 @@ def checkIBpositions(account='v4futures'):
                     text='OK: open order found'
                     print sym, text
                     portfolio.set_value(sym,'status',text)
-    
+                    
+    portfolio['bet']=ordersDF.selection[0]
     portfolio['Date']=csidate
     portfolio['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     tablename='checkSystems_ib_'+account
@@ -1104,7 +1105,10 @@ if __name__ == "__main__":
     systemdata = systemdata.set_index('CSIsym')
     systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
     systemdata = systemdata.reset_index()
-
+    checkIBpositions()
+    
+    
+'''
     #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
     execDict={}
@@ -1256,7 +1260,7 @@ if __name__ == "__main__":
     
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 
-
+'''
     
 #deprecated
 '''

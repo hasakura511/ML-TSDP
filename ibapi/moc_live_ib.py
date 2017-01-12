@@ -353,7 +353,7 @@ def get_ibfutpositions(portfolioPath):
     global client
     global csidate
     (account_value, portfolio_data)=client.get_IB_account_data()
-    
+    client.disconnect()
     if len(account_value) != 0:
         accountSet=pd.DataFrame(account_value,columns=['desc','value','currency','account_id'])
         accountSet=accountSet.set_index(['desc'])
@@ -737,6 +737,7 @@ def filterIBexec():
     global portfolioPath
     
     executions_raw=pd.DataFrame(client.get_executions())
+    client.disconnect()
     if len(executions_raw) ==0:
         print 'IB returned no executions, returning to main thread'
         return None
@@ -950,6 +951,7 @@ def append_data(sym, timetable, loaddate):
 def getIBopen():
     global csidate
     openOrders = pd.DataFrame(client.get_open_orders()).transpose()
+    client.disconnect()
     if len(openOrders) !=0:
         #openOrders=openOrders.set_index('orderid')
         openOrders['contract']=[openOrders.ix[i].symbol+openOrders.ix[i].expiry for i in openOrders.index]

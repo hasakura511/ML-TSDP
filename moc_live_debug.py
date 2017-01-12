@@ -67,6 +67,7 @@ if len(sys.argv)==1:
     #systems = ['v4mini']
     systems = ['v4micro','v4mini','v4futures']
     debug=True
+    run_moc_immediate=True
     immediate=False
     showPlots=True
     submitIB=False
@@ -74,7 +75,7 @@ if len(sys.argv)==1:
     #if trigger time set to value then trigger time in feedfile is ignored.
     triggertimes = None
     #triggertime = 30 #mins
-    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPath='./data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data//futures.sqlite3' 
     runPath='D:/ML-TSDP/run_futures_live.py'
     runPath2= ['python','D:/ML-TSDP/vol_adjsize_live.py']
@@ -83,8 +84,8 @@ if len(sys.argv)==1:
     logPath='C:/logs/'
     dataPath='D:/ML-TSDP/data/'
     #portfolioPath = 'D:/ML-TSDP/data/portfolio/'
-    #savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    savePath = savePath2 = pngPath=portfolioPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    #savePath= './data/results/' 
+    savePath = savePath2 = pngPath=portfolioPath='./data/results/' 
     #systemPath =  'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/'
     systemPath = 'D:/ML-TSDP/data/systems/'
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
@@ -1026,6 +1027,68 @@ def updateWithOpen(iborders, cid):
     return iborders_lessOpen
     #else:
     #return iborders_lessOpen, { key: execDict[key] for (key,lst) in iborders_lessOpen }
+    
+def checkIBpositions(account='v4futures'):
+    ordersDF=pd.read_sql('select * from (select * from %s\
+            order by timestamp ASC) group by CSIsym' % (account+'_live'),\
+            con=readConn,  index_col='ibsym')
+    ordersDF['ibqty']=ordersDF.signal * ordersDF.c2qty
+    #errors=check_systems_live(debug, ordersDict, csidate)
+    #print 'total c2 errors found', errors
+    
+    print 'checking ib positions..'
+    portfolio = get_ibfutpositions(portfolioPath)
+    if not isinstance(portfolio, type(pd.DataFrame())):
+        print 'IB returned no positions. creating zero portfolio.'
+        columns=['contracts','exp', 'qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency']
+        portfolio = pd.DataFrame(data={}, columns=columns,index=ordersDF.index)
+        portfolio.index.name='sym'
+        portfolio.qty=0
+    else:
+        portfolio = portfolio.reset_index().set_index('sym')
+        
+    errors=0
+    adj_syms=[]
+    for sym in ordersDF.index:
+        sysqty = ordersDF.ix[sym].ibqty
+        text=''
+        if sym in portfolio.index:
+            ibqty = portfolio.ix[sym].qty
+            if sysqty == ibqty:
+                text+= 'OK'
+            else:
+                text+= 'ERROR '+str(sysqty-ibqty)+ ' adjustment needed'
+                adj_syms.append((sym, sysqty-ibqty))
+                errors+=1
+        else:
+            if sysqty==0:
+                text+= 'OK'
+            else:
+                text+= 'ERROR '+str(sysqty)+' adjustment needed'
+                adj_syms.append(sym, sysqty)
+                errors+=1
+        print sym,text
+        portfolio.set_value(sym,'status',text)
+    
+    if errors>0:
+        print 'total ib order errors', errors, 'checking open orders.'
+        openorders=getIBopen()
+        if openorders is not 0:
+            openorders = openorders.reset_index().set_index('symbol')
+            openorders['orderqty']=np.where(openorders.side=='SELL',openorders.qty*-1, openorders.qty)
+            for sym, adjqty in adj_syms:
+                if sym in openorders.index and adjqty==openorders.ix[sym].orderqty:
+                    #print sym, adjqty, openorders.ix[sym].orderqty
+                    text='OK: open order found'
+                    print sym, text
+                    portfolio.set_value(sym,'status',text)
+    
+    portfolio['Date']=csidate
+    portfolio['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
+    tablename='checkSystems_ib_'+account
+    mode = get_write_mode(writeConn, tablename, portfolio)
+    portfolio.to_sql(name=tablename,con=writeConn, index=True, if_exists=mode, index_label='ibsym')
+    print 'saved', tablename,'to',dbPath,'writemode',mode
         
 if __name__ == "__main__":
     print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
@@ -1042,6 +1105,218 @@ if __name__ == "__main__":
     systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
     systemdata = systemdata.reset_index()
 
-    executions=filterIBexec()
-    print executions
- 
+    #systemfile=systemPathRO+'system_v4futures_live.csv'
+    #systemfile=systemPath+'system_'+sys+'_live.csv'
+    execDict={}
+    contractsDF=pd.DataFrame()
+    tries = 0
+    while (len(execDict)  == 0 or len(contractsDF) == 0) and tries<5:
+        try:
+            execDict, contractsDF, systemdata=create_execDict(feeddata, systemdata)
+        except Exception as e:
+            #print e
+            traceback.print_exc()
+            tries+=1
+            if tries==5:
+                sys.exit('failed 5 times to get contract info')
+                
+    if not run_moc_immediate:
+        timetable = get_timetable(contractsDF)
+        sys.exit('run_moc_immediate = False')
+
+    if immediate:
+        print 'Running Immediate Process...'
+        #include all symbols in threadlist to refresh all orders from selection
+        threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
+    else:
+        print 'Running MOC Process...'
+        threadlist=find_triggers(feeddata, contractsDF)
+        print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
+        runThreads(threadlist)
+        #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
+        
+    print 'returned to main thread with', len(threadlist), 'threads'
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
+    
+
+    
+    if len(threadlist)>0:
+        if immediate:
+            print 'running vol_adjsize_immediate to process immediate orders'
+            ordersDict = vol_adjsize_immediate(debug, threadlist)
+        else:
+            print 'running vol_adjsize_moc to update system files'
+            ordersDict = vol_adjsize_moc(debug, threadlist)
+        #ordersDict={}
+        #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
+        
+        if isinstance(ordersDict, type({})):
+            #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
+            totalc2orders=check_systems_live(debug, ordersDict, csidate)
+            #check ib positions
+            try:
+                if 'v4futures' in ordersDict.keys():
+                    execDict=update_orders(feeddata, ordersDict['v4futures'], execDict, threadlist)
+                iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+                
+                #get rid of orders if they are already working orders.
+                #dont need this anymore because we reqGlobalCancel
+                #iborders, execDict= updateWithOpen(iborders, execDict=execDict)
+                num_iborders=len(iborders)
+            except Exception as e:
+                #print e
+                traceback.print_exc()
+        else:
+            print 'No orders in orderDict'
+            totalc2orders =0
+            num_iborders=0
+    else:
+        print 'threadlist returning nothing. skipping vol_adjsize_live, check_systems'
+        totalc2orders =0
+        num_iborders=0
+        
+    #with open(logPath+'vol_adjsize_live.txt', 'w') as f:
+    #    with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
+    #        f.flush()
+    #        e.flush()
+    #        proc = Popen(runPath2, stdout=f, stderr=e)
+    #        proc.wait()
+
+    #print 'returned to main thread, running check systems if new orders are necessary.'
+    #with open(logPath+'check_systems_live.txt', 'w') as f:
+    #    with open(logPath+'check_systems_live_error.txt', 'w') as e:
+    #        f.flush()
+    #        e.flush()
+    #        proc = Popen(runPath4, stdout=f, stderr=e)
+    #        proc.wait()
+    #totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
+    
+    if totalc2orders ==0 and num_iborders==0:
+        print 'Found nothing to update!'
+    else:
+        print 'Found', totalc2orders, 'c2 position adjustments.'
+        print 'Found', num_iborders,'ib position adjustments.'
+        #send orders if live mode
+        if debug==False:
+            if submitC2 and totalc2orders !=0:
+                print 'Live mode: running c2 orders'
+                proc_signal_v4_live(debug, ordersDict)
+                #for sys in systems:
+                #    print 'returned to main thread, running c2 orders for',sys
+                #    with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'a') as f:
+                #        with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'a') as e:
+                #            f.flush()
+                #            e.flush()
+                #            proc = Popen(runPath3+[sys], stdout=f, stderr=e)
+                #            proc.wait()
+                            
+                print 'returned to main thread, running check systems again..'
+                totalc2orders=check_systems_live(debug, ordersDict, csidate)
+                #with open(logPath+'check_systems_live.txt', 'a') as f:
+                #    with open(logPath+'check_systems_live_error.txt', 'a') as e:
+                #        f.flush()
+                #        e.flush()
+                #        proc = Popen(runPath4, stdout=f, stderr=e)
+                #        proc.wait()
+            else:
+                if submitC2==False:
+                    print 'skipped c2 orders: submitC2 set to False'
+                if totalc2orders ==0:
+                    print 'skipped c2 orders: No c2 orders to be processed.'
+            
+            if submitIB and num_iborders!=0:
+                print 'returned to main thread, processing ib orders' 
+                try:
+                    #clear all orders first
+                    print 'requesting global cancel IB orders'
+                    client.reqGlobalCancel()
+                    sleep(1)
+                    #set the client date to timestamp to filter out openorders from prior runs.
+                    cid=int(calendar.timegm(dt.utcnow().utctimetuple()))
+                    print 'placing IB orders', iborders
+                    place_iborders(execDict, cid)
+                    #wait for orders to be filled
+                    sleep(15)
+                    checkIBpositions()
+
+                except Exception as e:
+                    #print e
+                    traceback.print_exc()
+
+            else:
+                if submitIB==False:
+                    print 'submitIB set to False'
+                if num_iborders==0:
+                    print 'skipped IB orders: No IB orders to be processed.'
+                    
+            totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
+            print 'Found', totalc2orders, 'c2 position adjustments.'
+        else:
+            print 'Debug mode: skipping orders'
+    
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
+
+
+    
+#deprecated
+'''
+print 'checking executions..'
+executions=filterIBexec()
+iborders_lessExec=[]
+if executions is not None:
+    #check executions
+    executions2 = executions.reset_index().groupby(['contract','side'])[['qty']].max()
+    
+    #check if expired contracts have been exited.
+    #executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
+    
+    for (sym,[order,qty]) in iborders:
+        if (sym,order) in executions2.index and executions2.ix[sym].qty[0] ==qty:
+            print 'execution found..',sym, order, qty, executions2.ix[sym].index[0],  executions2.ix[sym].qty[0]
+            #execDict[sym][0] = 'PASS'
+            #execDict[sym][1] = 0
+        else:
+            print 'There was an error:',sym,'order',  execDict[sym][:2], 
+            if sym in executions2.index:
+                print 'ib returned', executions2.ix[sym].index[0], executions2.ix[sym].qty[0]
+            else:
+                print 'ib execution not found'
+            iborders_lessExec+=[(sym,[order,qty])]
+            
+    #num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+    print 'Found', len(iborders_lessExec),'ib position adjustments after placing orders.'
+    print iborders_lessExec
+else:
+    print 'executions returned None. IB orders could not be verified:'
+    print iborders
+
+if len(iborders_lessExec)>0:
+    print 'checking open orders to see if orders not executed are pending orders..'
+    iborders_lessOpen=updateWithOpen(iborders_lessExec, cid)
+'''
+'''
+#debug order executions
+systemfile='D:/ML-TSDP/data/systems/system_v4futures_live.csv'
+feeddata=pd.read_csv(feedfile,index_col='ibsym')
+#systemfile=systemPath+'system_'+sys+'_live.csv'
+execDict=create_execDict(feeddata, systemfile)
+try:
+    execDict=update_orders(feeddata, systemfile, execDict)
+except Exception as e:
+    #print e
+    traceback.print_exc()
+iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+num_iborders=len([execDict[sym][0] for sym in execDict.keys() if execDict[sym][0] != 'PASS'])
+executions=filterIBexec()
+
+executions=filterIBexec()
+executions2 = executions.reset_index().groupby(['symbol','side'])[['qty']].max()
+
+'''
+
+#place_iborders(execDict)
+#contractsDF = get_contractdf(execDict, systemPath)
+#timetable= get_timetable(execDict, systemPath)
+
+#client.get_realtimebar(contracts[0], tickerId, whatToShow, data, filename)
+#client.get_history(endDateTime, execDict['LE'][2], whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)

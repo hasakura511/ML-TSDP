@@ -1037,15 +1037,19 @@ def checkIBpositions(account='v4futures'):
     #print 'total c2 errors found', errors
     
     print 'checking ib positions..'
-    portfolio = get_ibfutpositions(portfolioPath)
-    if not isinstance(portfolio, type(pd.DataFrame())):
+    raw_portfolio = get_ibfutpositions(portfolioPath)
+    if not isinstance(raw_portfolio, type(pd.DataFrame())):
         print 'IB returned no positions. creating zero portfolio.'
         columns=['contracts','exp', 'qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency']
         portfolio = pd.DataFrame(data={}, columns=columns,index=ordersDF.index)
         portfolio.index.name='sym'
         portfolio.qty=0
     else:
-        portfolio = portfolio.reset_index().set_index('sym')
+        raw_portfolio = raw_portfolio.reset_index().set_index('sym')
+        portfolio=raw_portfolio[raw_portfolio.qty != 0].copy()
+        print portfolio.shape[0],'futures positions found'
+        ##if all executions went through properly all contract should be current. 
+        #portfolio = portfolio.reset_index().groupby(portfolio.index)[['qty']].sum()
         
     errors=0
     adj_syms=[]
@@ -1082,7 +1086,7 @@ def checkIBpositions(account='v4futures'):
                     text='OK: open order found'
                     print sym, text
                     portfolio.set_value(sym,'status',text)
-                    
+    
     portfolio['bet']=ordersDF.selection[0]
     portfolio['Date']=csidate
     portfolio['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
@@ -1237,7 +1241,7 @@ if __name__ == "__main__":
                     print 'placing IB orders', iborders
                     place_iborders(execDict, cid)
                     #wait for orders to be filled
-                    sleep(15)
+                    sleep(10)
                     checkIBpositions()
 
                 except Exception as e:

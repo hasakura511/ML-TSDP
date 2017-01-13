@@ -109,7 +109,9 @@ class IBWrapper(EWrapper):
         execdetails['realized_PnL']=commission.realizedPNL
         execdetails['yield_redemption_date']=commission.yieldRedemptionDate
         
-        self.add_fill_data(0, execdetails)
+        #master client receiving data from place orders
+        if "data_fill_data" in dir(self):
+            self.add_fill_data(0, execdetails)
 
 
     """
@@ -127,6 +129,7 @@ class IBWrapper(EWrapper):
         
         if "data_fill_data" not in dir(self):
             setattr(self, "data_fill_data", {})
+            filldata=self.data_fill_data
         else:
             filldata=self.data_fill_data
             
@@ -670,6 +673,10 @@ class IBclient(object):
         self.tws=tws
         self.cb=callback
         self.accountid=''
+
+    def disconnect(self):
+        logging.info("\nDisconnecting...")
+        tws.eDisconnect()
         
     def reqGlobalCancel(self):
         logging.info( "requesting global cancel")

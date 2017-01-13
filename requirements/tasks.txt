@@ -27,7 +27,9 @@ feed/migrations/*
 IBAPI
 --> settings uncheck readonly API
 --> change port to 7496
---> master clientid 0
+--> master clientid 0?
+Master API client ID - The API client with the specified client ID will receive all orders, even those placed by other API clients. This differs from the Client ID of “0” which will receive all orders sent from the TWS GUI.
+
 
 Evan S: It's better to use the master client id.
 Evan S: Because by default, it will only return the commission for the order which placed via this client.

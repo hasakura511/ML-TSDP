@@ -1013,7 +1013,75 @@ def updateWithOpen(iborders, cid):
     return iborders_lessOpen
     #else:
     #return iborders_lessOpen, { key: execDict[key] for (key,lst) in iborders_lessOpen }
+
+def checkIBpositions(account='v4futures'):
+    ordersDF=pd.read_sql('select * from (select * from %s\
+            order by timestamp ASC) group by CSIsym' % (account+'_live'),\
+            con=readConn,  index_col='ibsym')
+    ordersDF['ibqty']=ordersDF.signal * ordersDF.c2qty
+    #errors=check_systems_live(debug, ordersDict, csidate)
+    #print 'total c2 errors found', errors
+    
+    print 'checking ib positions..'
+    raw_portfolio = get_ibfutpositions(portfolioPath)
+    if not isinstance(raw_portfolio, type(pd.DataFrame())):
+        print 'IB returned no positions. creating zero portfolio.'
+        columns=['contracts','exp', 'qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency']
+        portfolio = pd.DataFrame(data={}, columns=columns,index=ordersDF.index)
+        portfolio.index.name='sym'
+        portfolio.qty=0
+    else:
+        raw_portfolio = raw_portfolio.reset_index().set_index('sym')
+        portfolio=raw_portfolio[raw_portfolio.qty != 0].copy()
+        print portfolio.shape[0],'futures positions found'
+        ##if all executions went through properly all contract should be current. 
+        #portfolio = portfolio.reset_index().groupby(portfolio.index)[['qty']].sum()
         
+    errors=0
+    adj_syms=[]
+    for sym in ordersDF.index:
+        sysqty = ordersDF.ix[sym].ibqty
+        text=''
+        if sym in portfolio.index:
+            ibqty = portfolio.ix[sym].qty
+            if sysqty == ibqty:
+                text+= 'OK'
+            else:
+                text+= 'ERROR '+str(sysqty-ibqty)+ ' adjustment needed'
+                adj_syms.append((sym, sysqty-ibqty))
+                errors+=1
+        else:
+            if sysqty==0:
+                text+= 'OK'
+            else:
+                text+= 'ERROR '+str(sysqty)+' adjustment needed'
+                adj_syms.append(sym, sysqty)
+                errors+=1
+        print sym,text
+        portfolio.set_value(sym,'status',text)
+    
+    if errors>0:
+        print 'total ib order errors', errors, 'checking open orders.'
+        openorders=getIBopen()
+        if openorders is not 0:
+            openorders = openorders.reset_index().set_index('symbol')
+            openorders['orderqty']=np.where(openorders.side=='SELL',openorders.qty*-1, openorders.qty)
+            for sym, adjqty in adj_syms:
+                if sym in openorders.index and adjqty==openorders.ix[sym].orderqty:
+                    #print sym, adjqty, openorders.ix[sym].orderqty
+                    text='OK: open order found'
+                    print sym, text
+                    portfolio.set_value(sym,'status',text)
+    
+    portfolio['bet']=ordersDF.selection[0]
+    portfolio['Date']=csidate
+    portfolio['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
+    tablename='checkSystems_ib_'+account
+    mode = get_write_mode(writeConn, tablename, portfolio)
+    portfolio.to_sql(name=tablename,con=writeConn, index=True, if_exists=mode, index_label='ibsym')
+    print 'saved', tablename,'to',dbPath,'writemode',mode
+    return portfolio
+    
 if __name__ == "__main__":
     print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'

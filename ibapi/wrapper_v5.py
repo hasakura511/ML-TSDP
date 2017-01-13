@@ -676,7 +676,7 @@ class IBclient(object):
 
     def disconnect(self):
         logging.info("\nDisconnecting...")
-        tws.eDisconnect()
+        self.tws.eDisconnect()
         
     def reqGlobalCancel(self):
         logging.info( "requesting global cancel")

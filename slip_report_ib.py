@@ -11,7 +11,7 @@ import seaborn as sns
 import matplotlib
 import sqlite3
 import calendar
-from ibapi.moc_live_ib import filterIBexec
+
 #this needs to run before 12AM EST or IB wipes out the execution data for the day.
 start_time = time.time()
 systemName='v4futures'
@@ -24,10 +24,10 @@ if len(sys.argv)==1:
     fontsize=12
     dataPath='D:/ML-TSDP/data/'
     portfolioPath = 'D:/ML-TSDP/data/portfolio/'
-    dbPathWrite='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPathWrite='D:/Dropbox/Python/TSDP/ml/data/futures.sqlite3' 
     dbPathRead = 'D:/ML-TSDP/data/futures.sqlite3'
-    #savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    savePath = savePath2 = pngPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    #savePath= 'D:/Dropbox/Python/TSDP/ml/data/results/' 
+    savePath = savePath2 = pngPath='D:/Dropbox/Python/TSDP/ml/data/results/' 
     systemPath =  'D:/ML-TSDP/data/systems/'
     #timetablePath=   'D:/ML-TSDP/data/systems/timetables_debug/'
     timetablePath=   'D:/ML-TSDP/data/systems/timetables/'
@@ -46,6 +46,9 @@ else:
     systemPath =  './data/systems/'
     timetablePath=   './data/systems/timetables/'
     feedfile='./data/systems/system_ibfeed.csv'
+    from ibapi.moc_live_ib import filterIBexec
+    print('requesting last executions from IB..')
+    print(filterIBexec())
 
 readConn= sqlite3.connect(dbPathRead)
 writeConn = sqlite3.connect(dbPathWrite)
@@ -110,11 +113,9 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
 contractsDF = pd.read_sql('select * from ib_contracts where timestamp=\
             (select max(timestamp) from ib_contracts as maxtimestamp)', con=readConn,  index_col='ibsym')
 
-print('getting last ib executions..')
-print(filterIBexec())
+
 lastExecutions= pd.read_sql('select * from ib_executions where timestamp=\
             (select max(timestamp) from ib_executions as maxtimestamp)', con=readConn,  index_col='contract').drop_duplicates()
-
 
 
 if lastExecutions.shape[0] >0:
@@ -126,8 +127,8 @@ if lastExecutions.shape[0] >0:
     if executions.shape[0]>0:
         executions['CSIsym']=contractsDF.ix[executions.ibsym].CSIsym.values
         csidate=executions.lastAppend[0]
-        futuresDF=pd.read_sql( 'select * from futuresDF_all where timestamp=\
-                (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
+        futuresDF=pd.read_sql('select * from futuresDF_results where timestamp=\
+                    (select max(timestamp) from futuresDF_results as maxtimestamp) and Date=%s' % (csidate), con=readConn,  index_col='CSIsym')
         system = pd.read_sql('select * from (select * from signals_live where Date=%s and Name=\'%s\'\
                             order by timestamp ASC) group by CSIsym' %(csidate, systemName),\
                             con=readConn,  index_col='CSIsym')

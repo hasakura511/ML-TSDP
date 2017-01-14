@@ -165,8 +165,11 @@ def get_order_status():
     for account in accounts:
         col_order= ['broker','account','order_type','contract','description','selection','openedWhen','urpnl','system_signal',\
                 'broker_position','signal_check','system_qty','broker_qty','qty_check']
-        df=pd.read_sql('select * from (select * from %s\
-                order by timestamp ASC) group by contract' % ('checkSystems_'+account),\
+        webSelection=pd.read_sql('select * from webSelection where timestamp=\
+                (select max(timestamp) from webSelection)'
+        bet = eval(webSelection.selection[0])[account][0]
+        df=pd.read_sql('select * from (select * from %s where selection=%s\
+                order by timestamp ASC) group by contract' % (bet, 'checkSystems_'+account),\
                 con=readConn)
         df['system_signal'] = conv_sig(df['system_signal'])
         df['broker_position'] = conv_sig(df['broker_position'])

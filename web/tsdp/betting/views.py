@@ -44,8 +44,11 @@ def getrecords(request):
     recentdata = [dict((cn, getattr(data, cn)) for cn in ('timestamp', 'mcdate', 'selection')) for data in recent]
     return HttpResponse(json.dumps({"first": firstdata, "recent": recentdata}))
 
-def loading_page(request):
+def index(request):
     return render(request, 'loading_page.html', {})
+
+#def loading_page(request):
+#    return render(request, 'loading_page.html', {})
 
 def board(request):
     lastSelection = UserSelection.objects.all().order_by('-timestamp').first()

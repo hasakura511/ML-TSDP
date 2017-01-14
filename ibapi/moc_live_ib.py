@@ -1074,7 +1074,8 @@ def checkIBpositions(account='v4futures'):
                     portfolio.set_value(sym,'status',text)
     
     portfolio['bet']=ordersDF.selection[0]
-    portfolio['Date']=csidate
+    portfolio['ordertype']=ordersDF.ordertype[0]
+    portfolio['Date']=ordersDF.Date[0]
     portfolio['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
     tablename='checkSystems_ib_'+account
     mode = get_write_mode(writeConn, tablename, portfolio)

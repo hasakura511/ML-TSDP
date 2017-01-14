@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+
+
+{% block content %}
+<base href="/">
+{% if user.is_authenticated %}
+    <img src="static/images/ajax-loading-large.gif">
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/bundle.min.js' %}"></script>
+{% else %}
+    <h1>Please login/Register</h1>
+{% endif %}
+
+
+{% endblock %}
+
+

@@ -796,7 +796,15 @@ def get_timetable(contractsDF):
         else:
             timetable=pd.concat([timetable, pd.DataFrame(thDict,index=[sym+' open',sym+' close',sym+' trigger'])], axis=0)
     
-    filedate=[d for d in timetable.columns.astype(int) if d>csidate][0]
+    filedates=[str(x) for x in [d for d in timetable.columns.astype(int) if d>csidate]]
+    filedate=filedates[0]
+    
+    #fill nans with the next filedate
+    if len(filedates)>1:
+        next_filedate=filedates[1]
+        timetable[filedate]=[timetable[next_filedate].ix[idx] if timetable[filedate].ix[idx] is np.nan \
+                                        else timetable[filedate].ix[idx] for idx in timetable[filedate].index]
+                                        
     filename=timetablePath+str(filedate)+'.csv'
     timetable.to_csv(filename, index=True)
     print 'saved', filename

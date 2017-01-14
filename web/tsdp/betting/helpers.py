@@ -165,11 +165,11 @@ def get_order_status():
     for account in accounts:
         col_order= ['broker','account','order_type','contract','description','selection','openedWhen','urpnl','system_signal',\
                 'broker_position','signal_check','system_qty','broker_qty','qty_check']
-        webSelection=pd.read_sql('select * from webSelection where timestamp=\
-                (select max(timestamp) from webSelection)'
-        bet = eval(webSelection.selection[0])[account][0]
-        df=pd.read_sql('select * from (select * from %s where selection=%s\
-                order by timestamp ASC) group by contract' % (bet, 'checkSystems_'+account),\
+        #webSelection=pd.read_sql('select * from webSelection where timestamp=\
+        #        (select max(timestamp) from webSelection)'
+        #bet = eval(webSelection.selection[0])[account][0]
+        df=pd.read_sql('select * from (select * from %s\
+                order by timestamp ASC) group by c2sym' % ('checkSystems_'+account),\
                 con=readConn)
         df['system_signal'] = conv_sig(df['system_signal'])
         df['broker_position'] = conv_sig(df['broker_position'])
@@ -179,7 +179,7 @@ def get_order_status():
         csidate = pd.read_sql('select distinct csiDate from slippage where Name=\'{}\''.format(account), con=readConn).csiDate.tolist()[-1]
         slippage_files[account]=str(csidate)
         if account == "v4futures":
-            col_order=['desc','contracts','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency','bet','status','Date']
+            col_order=['desc','contracts','qty','price','value','avg_cost','unr_pnl','real_pnl','accountid','currency','bet','ordertype','status','Date']
             df = pd.read_sql('select * from (select * from %s\
                     order by timestamp ASC) group by ibsym' % ('checkSystems_ib_' + account), \
                              con=readConn)

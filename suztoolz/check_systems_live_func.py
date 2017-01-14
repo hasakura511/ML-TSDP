@@ -309,6 +309,7 @@ def check_systems_live(debug, ordersDict, csidate):
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
     for account, orderstatusDF in order_status_dict.items():
+        orderstatusDF['c2sym']=[x[:-2] for x in df.contract]
         tablename='checkSystems_'+account
         mode = get_write_mode(writeConn, tablename, orderstatusDF)
         orderstatusDF.to_sql(name=tablename,con=writeConn, index=False, if_exists=mode)

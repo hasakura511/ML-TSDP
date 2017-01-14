@@ -4,5 +4,6 @@
 
 feed/migrations/*
 /data/results/*.png
+/web/*.png
 /web/tsdp/betting/static/images/*
 /web/tsdp/betting/static/public/images/*

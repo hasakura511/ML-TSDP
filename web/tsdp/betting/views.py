@@ -90,6 +90,9 @@ def symbols(request):
 def futures(request):
     return render(request, 'futures.html', {})
 
+def timetable(request):
+    return render(request, 'timetable.html', {'timetable':get_detailed_timetable()})
+
 def order_status(request):
     context={'logfiles':[]}
     context['slippagedates'], context['orderstatus']=get_order_status()

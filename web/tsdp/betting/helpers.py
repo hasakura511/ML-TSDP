@@ -267,4 +267,71 @@ def getAccountValues():
     record = AccountData(value1=json.dumps(urpnls), value2=json.dumps(accountvalues), mcdate=mcdate, \
                          timestamp=getTimeStamp())
     record.save()
-          
+
+def get_detailed_timetable():
+    active_symbols_ib = {
+        'v4futures': ['AUD', 'ZL', 'GBP', 'ZC', 'CAD', 'CL', 'EUR', 'EMD', 'ES', 'GF', 'ZF', 'GC', 'HG', 'HO', 'JPY',
+                      'LE', 'HE', 'MXP', 'NZD', 'NG', 'NIY', 'NQ', 'PA', 'PL', 'RB', 'ZS', 'CHF', 'SI', 'ZM', 'ZT',
+                      'ZN', 'ZB', 'ZW', 'YM'],
+        'v4mini': ['ZC', 'CL', 'EUR', 'EMD', 'ES', 'HG', 'JPY', 'NG', 'ZM', 'ZT', 'ZN', 'ZW'],
+        'v4micro': ['ZL', 'ES', 'HG', 'NG', 'ZN'],
+        }
+    readConn = getBackendDB()
+    mcdate = MCdate()
+    eastern = timezone('US/Eastern')
+    utc = timezone('UTC')
+    now = dt.now(get_localzone()).astimezone(eastern)
+    futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
+    timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc').drop(['Date', 'timestamp'],
+                                                                                             axis=1)
+
+    if mcdate in timetables:
+        ttdate = mcdate
+        # filter out any dates that have passed
+        ttdates = [x for x in timetables.columns if int(x) >= int(mcdate)]
+        timetables = timetables[ttdates]
+    else:
+        # use old dates
+        ttdate = timetables.columns[0]
+
+    timetableDF = pd.DataFrame()
+    for idx, [sym, value] in enumerate([x.split() for x in timetables.index]):
+        idx2 = sym + ' ' + value
+        timestamp = timetables.ix[idx2].ix[ttdate]
+        timetableDF.set_value(sym, value, timestamp)
+
+    #timetableDF.index.name = 'ibsym'
+    for sym in timetableDF.index:
+        opentime = eastern.localize(dt.strptime(timetableDF.ix[sym].open, '%Y-%m-%d %H:%M'))
+        closetime = eastern.localize(dt.strptime(timetableDF.ix[sym].close, '%Y-%m-%d %H:%M'))
+        if now >= opentime and now < closetime:
+            timetableDF.set_value(sym, 'immediate order type', 'Open: Market Order')
+        else:
+            # market is closed
+            if now < opentime:
+                nextopen = opentime.strftime('%Y-%m-%d %H:%M EST')
+            elif len(timetables.drop(ttdate, axis=1).columns) > 0:
+                next_ttdate = timetables.drop(ttdate, axis=1).columns[0]
+                nextopen = timetables[next_ttdate].ix[sym + ' open']
+                if not (nextopen is not None and nextopen is not np.nan):
+                    nextopen = 'Not Avalable'
+                else:
+                    if now < eastern.localize(dt.strptime(nextopen, '%Y-%m-%d %H:%M')):
+                        pass
+                    else:
+                        nextopen = 'Not Available'
+            else:
+                nextopen = 'Not Available'
+            timetableDF.set_value(sym, 'immediate order type', 'Closed: Market on Open {}'.format(nextopen))
+
+    col_order = ['immediate order type', 'open', 'close', 'trigger']
+    timetableDF = timetableDF[col_order]
+    # print timetableDF
+    #ttDict = {account: timetableDF.ix[active_symbols_ib[account]].to_html() for account in active_symbols_ib}
+    ttDict = {}
+    for account in active_symbols_ib:
+        df = timetableDF.ix[active_symbols_ib[account]]
+        desc_list = futuresDict.ix[df.index].Desc.values
+        df.index = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+        ttDict[account] = df.to_html()
+    return ttDict

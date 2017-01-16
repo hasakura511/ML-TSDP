@@ -188,8 +188,9 @@ volatility_cols=[x for x in totalsDF.columns if 'Vol' in x and 'Total' not in x]
 df=totalsDF[volatility_cols].iloc[-lookback:].transpose()
 ylabel='$ Volatiliy'
 xlabel='Group'
-title=str(lookback)+' Day Volatility by Group'
+title='Day Volatility by Group'
 filename=pngPath+date+'_'+title.replace(' ','')+'.png'
+title=str(lookback)+' Day Volatility by Group'
 width=.8
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename)
 
@@ -199,8 +200,9 @@ change_cols=[x for x in totalsDF.columns if 'Chg' in x and 'Total' not in x]
 df=totalsDF[change_cols].iloc[-lookback:].transpose()
 ylabel='$ Change'
 xlabel='Group'
-title=str(lookback)+' Day Change by Group'
+title='Day Change by Group'
 filename=pngPath+date+'_'+title.replace(' ','')+'.png'
+title=str(lookback)+' Day Change by Group'
 width=.8
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename)
 
@@ -210,8 +212,9 @@ lper_cols=['L%_currency','L%_energy','L%_grain','L%_index','L%_meat','L%_metal',
 df=totalsDF[lper_cols].iloc[-lookback:].transpose()*100
 ylabel='% Long'
 xlabel='Group'
-title=str(lookback)+' Day Long Percent by Group'
+title='Long Percent by Group'
 filename=pngPath+date+'_'+title.replace(' ','')+'.png'
+title=str(lookback)+' Day Long Percent by Group'
 width=.8
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, legend_outside= True)
 
@@ -222,8 +225,9 @@ df=totalsDF[avg_cols].iloc[-lookback:]
 df2=totalsDF['L%_Total'].iloc[-lookback:]*100
 ylabel='Long %'
 #xlabel='Dates'
-title=str(lookback)+' Day Averages by Group'
+title='Day Averages by Group'
 filename=pngPath+date+'_'+title.replace(' ','')+'.png'
+title=str(lookback)+' Day Averages by Group'
 width=.6
 saveCharts(df2, df2=df, ylabel=ylabel, title=title, filename=filename, kind='bar',\
             lookback=2, width=width, legend_outside= True)
@@ -239,9 +243,9 @@ for account in active_symbols:
     df=df.sort_values(by=df.columns[-1])*100
     ylabel='Systems'
     xlabel='% Accuracy'
-    title=str(lookback)+' Day Accuracy by Group'
+    title=' Day Accuracy by Group'
     filename=pngPath+date+'_'+account+'_'+title.replace(' ','')+'.png'
-    title=account+' '+title
+    title=account+' '+str(lookback)+' '+title
     width=.6
     saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
                         lookback=lookback, kind='barh',width=width, twiny=True)
@@ -253,9 +257,9 @@ for account in active_symbols:
     df=df.sort_values(by=df.columns[-1])
     ylabel='Systems'
     xlabel='$ PNL'
-    title=str(lookback)+' Day $ PNL by Group'
+    title=' Day $ PNL by Group'
     filename=pngPath+date+'_'+account+'_'+title.replace(' ','')+'.png'
-    title=account+' '+title
+    title=account+' '+str(lookback)+' '+title
     width=.6
     saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
                         lookback=lookback, kind='barh',width=width, twiny=True)

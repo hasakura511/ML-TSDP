@@ -97,6 +97,7 @@ def saveCharts(df, **kwargs):
     legend_outside=kwargs.get('legend_outside',False)
     figsize=kwargs.get('figsize',(15,13))
     kind=kwargs.get('kind','bar')
+    df2=kwargs.get('df2',None)
     font = {
             'weight' : 'normal',
             'size'   : 22}
@@ -106,21 +107,46 @@ def saveCharts(df, **kwargs):
     colormap = plt.cm.gist_ncar
     plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 0.9, lookback)])
 
-    df.plot(kind=kind, ax=ax, width=width)
+    
+    if df2 is not None:
+        ax.set_xlabel(xlabel, size=24)
+        ax.set_ylabel(ylabel, size=24)
+        ax.grid(False)
+        ax.yaxis.grid(False)
+        ax2 = ax.twinx()
+        ax2.set_ylabel('Avg $', size=24)
+        ax2.grid(False)
+        df.plot(kind=kind, ax=ax, width=width)
+        df2.plot(kind='line', ax=ax2)
+        fig.autofmt_xdate()
+        for label in ax.xaxis.get_majorticklabels():
+            label.set_fontsize(18)
+            label.set_fontname('courier')
+        for label in ax.yaxis.get_majorticklabels():
+            label.set_fontsize(18)
+            label.set_fontname('verdana')
+        for label in ax2.yaxis.get_majorticklabels():
+            label.set_fontsize(18)
+            label.set_fontname('verdana')
+    else:
+        df.plot(kind=kind, ax=ax, width=width)
+        plt.ylabel(ylabel, size=24)
+        #plt.ylabel('Cumulative %change', size=12)
+        plt.xlabel(xlabel, size=24)
+        plt.xticks(fontsize = 24)
+        plt.yticks(fontsize = 24)
+        
     if legend_outside:
         plt.legend(loc='upper center', bbox_to_anchor=(.5, 1.15),prop={'size':24},
           fancybox=True, shadow=True, ncol=3)
     else:
         plt.legend(loc='best', prop={'size':24})
-    plt.xticks(fontsize = 24)
-    plt.yticks(fontsize = 24)
-    plt.ylabel(ylabel, size=24)
-    #plt.ylabel('Cumulative %change', size=12)
-    plt.xlabel(xlabel, size=24)
+        
+
     #plt.xticks(range(nrows), benchmark_xaxis_label)
     #fig.autofmt_xdate()
     plt.title(title, size=30)
-    
+
     #filename2=date+'_'+account+'_'+line.replace('/','')+'.png'
     plt.savefig(filename, bbox_inches='tight')
     print 'Saved',filename
@@ -188,3 +214,16 @@ title=str(lookback)+' Day $ PNL by Group'
 filename=pngPath+account+'_'+title.replace(' ','')+'.png'
 width=.6
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50), kind='barh',width=width)
+
+#average totals
+lookback=5
+avg_cols=[x for x in totalsDF.columns if 'Avg' in x]
+df=totalsDF[avg_cols].iloc[-lookback:]
+df2=totalsDF['L%_Total'].iloc[-lookback:]*100
+ylabel='Long %'
+#xlabel='Dates'
+title=str(lookback)+' Day Averages by Group'
+filename=pngPath+account+'_'+title.replace(' ','')+'.png'
+width=.6
+saveCharts(df2, df2=df, ylabel=ylabel, title=title, filename=filename, kind='bar',\
+            width=width, legend_outside= True)

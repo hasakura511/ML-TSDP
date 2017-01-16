@@ -89,8 +89,8 @@
       <file leaf-file-name="futures2.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/betting/templates/futures2.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="16" column="164" lean-forward="false" selection-start-line="16" selection-start-column="164" selection-end-line="16" selection-end-column="164" />
+            <state relative-caret-position="153">
+              <caret line="9" column="55" lean-forward="false" selection-start-line="9" selection-start-column="55" selection-end-line="9" selection-end-column="55" />
               <folding />
             </state>
           </provider>
@@ -883,7 +883,7 @@
         <state relative-caret-position="493">
           <caret line="29" column="50" lean-forward="false" selection-start-line="29" selection-start-column="50" selection-end-line="29" selection-end-column="50" />
           <folding>
-            <element signature="e#0#56#0" expanded="true" />
+            <element signature="e#0#56#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1004,8 +1004,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/betting/templates/futures2.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="164" lean-forward="false" selection-start-line="16" selection-start-column="164" selection-end-line="16" selection-end-column="164" />
+        <state relative-caret-position="153">
+          <caret line="9" column="55" lean-forward="false" selection-start-line="9" selection-start-column="55" selection-end-line="9" selection-end-column="55" />
           <folding />
         </state>
       </provider>

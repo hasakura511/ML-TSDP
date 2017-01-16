@@ -336,3 +336,13 @@ def get_detailed_timetable():
         df.index = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
         ttDict[account] = df[col_order].sort_values(by='group').to_html()
     return ttDict
+
+def get_overview():
+    readConn = getBackendDB()
+    accounts = ['v4micro', 'v4mini', 'v4futures']
+    overviewDict={}
+    for account in accounts:
+        totalsDF = pd.read_sql('select * from {}'.format('totalsDF_board_' + account), con=readConn, index_col='Date')
+        date = str(totalsDF.index[-1])
+        overviewDict[account]=date
+    return overviewDict

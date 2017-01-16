@@ -98,6 +98,8 @@ def saveCharts(df, **kwargs):
     figsize=kwargs.get('figsize',(15,13))
     kind=kwargs.get('kind','bar')
     df2=kwargs.get('df2',None)
+    lookback=kwargs.get('lookback',5)
+    
     font = {
             'weight' : 'normal',
             'size'   : 22}
@@ -116,18 +118,18 @@ def saveCharts(df, **kwargs):
         ax2 = ax.twinx()
         ax2.set_ylabel('Avg $', size=24)
         ax2.grid(False)
-        df.plot(kind=kind, ax=ax, width=width)
-        df2.plot(kind='line', ax=ax2)
+        df.plot(kind=kind, ax=ax,  color='blue', width=width)
+        df2.plot(kind='line',  colors=['g','r'], ax=ax2)
         fig.autofmt_xdate()
         for label in ax.xaxis.get_majorticklabels():
             label.set_fontsize(18)
-            label.set_fontname('courier')
+            #label.set_fontname('courier')
         for label in ax.yaxis.get_majorticklabels():
             label.set_fontsize(18)
-            label.set_fontname('verdana')
+            #label.set_fontname('verdana')
         for label in ax2.yaxis.get_majorticklabels():
             label.set_fontsize(18)
-            label.set_fontname('verdana')
+            #label.set_fontname('verdana')
     else:
         df.plot(kind=kind, ax=ax, width=width)
         plt.ylabel(ylabel, size=24)
@@ -188,7 +190,7 @@ lper_cols=['L%_currency','L%_energy','L%_grain','L%_index','L%_meat','L%_metal',
 df=totalsDF[lper_cols].iloc[-lookback:].transpose()*100
 ylabel='% Long'
 xlabel='Group'
-title=str(lookback)+' Day Long % by Group'
+title=str(lookback)+' Day Long Percent by Group'
 filename=pngPath+account+'_'+title.replace(' ','')+'.png'
 width=.8
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, legend_outside= True)
@@ -199,10 +201,11 @@ acc_cols=[x for x in totalsDF.columns if 'ACC' in x and 'benchmark' not in x and
 df=totalsDF[acc_cols].iloc[-lookback:].transpose().sort_values(by=df.columns[-1])*100
 ylabel='Systems'
 xlabel='% Accuracy'
-title=str(lookback)+' Day % Accuracy by Group'
+title=str(lookback)+' Day Accuracy by Group'
 filename=pngPath+account+'_'+title.replace(' ','')+'.png'
 width=.6
-saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50), kind='barh',width=width)
+saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
+                    lookback=lookback, kind='barh',width=width)
 
 #accuracy
 lookback=3
@@ -213,7 +216,8 @@ xlabel='$ PNL'
 title=str(lookback)+' Day $ PNL by Group'
 filename=pngPath+account+'_'+title.replace(' ','')+'.png'
 width=.6
-saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50), kind='barh',width=width)
+saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
+                    lookback=lookback, kind='barh',width=width)
 
 #average totals
 lookback=5
@@ -226,4 +230,4 @@ title=str(lookback)+' Day Averages by Group'
 filename=pngPath+account+'_'+title.replace(' ','')+'.png'
 width=.6
 saveCharts(df2, df2=df, ylabel=ylabel, title=title, filename=filename, kind='bar',\
-            width=width, legend_outside= True)
+            lookback=2, width=width, legend_outside= True)

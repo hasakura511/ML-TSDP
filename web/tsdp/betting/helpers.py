@@ -309,7 +309,7 @@ def get_detailed_timetable():
         else:
             # market is closed
             if now < opentime:
-                nextopen = opentime.strftime('%Y-%m-%d %H:%M EST')
+                nextopen = opentime.strftime('%A, %b %d %H:%M EST')
             elif len(timetables.drop(ttdate, axis=1).columns) > 0:
                 next_ttdate = timetables.drop(ttdate, axis=1).columns[0]
                 nextopen = timetables[next_ttdate].ix[sym + ' open']
@@ -322,16 +322,17 @@ def get_detailed_timetable():
                         nextopen = 'Not Available'
             else:
                 nextopen = 'Not Available'
-            timetableDF.set_value(sym, 'immediate order type', 'Closed: Market on Open {}'.format(nextopen))
+            timetableDF.set_value(sym, 'immediate order type', 'Closed: Market on Open ({})'.format(nextopen))
 
-    col_order = ['immediate order type', 'open', 'close', 'trigger']
-    timetableDF = timetableDF[col_order]
+    col_order = ['group', 'immediate order type', 'open', 'close', 'trigger']
+    # timetableDF=timetableDF[col_order]
     # print timetableDF
-    #ttDict = {account: timetableDF.ix[active_symbols_ib[account]].to_html() for account in active_symbols_ib}
+    # ttDict={account:timetableDF.ix[active_symbols_ib[account]].to_html() for account in active_symbols_ib}
     ttDict = {}
     for account in active_symbols_ib:
         df = timetableDF.ix[active_symbols_ib[account]]
+        df['group'] = futuresDict.ix[df.index].Group
         desc_list = futuresDict.ix[df.index].Desc.values
         df.index = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-        ttDict[account] = df.to_html()
+        ttDict[account] = df[col_order].sort_values(by='group').to_html()
     return ttDict

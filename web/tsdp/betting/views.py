@@ -88,7 +88,7 @@ def symbols(request):
     return render(request, 'symbols.html', {'groups':futuresdict})
 
 def futures(request):
-    return render(request, 'futures.html', {})
+    return render(request, 'futures2.html', {})
 
 def timetable(request):
     return render(request, 'timetable.html', {'timetable':get_detailed_timetable()})

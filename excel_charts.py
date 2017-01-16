@@ -210,7 +210,7 @@ saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, fig
 #accuracy
 lookback=3
 pnl_cols=[x for x in totalsDF.columns if 'PNL' in x and 'benchmark' not in x and 'Off' not in x]
-df=totalsDF[pnl_cols].iloc[-lookback:].transpose().sort_values(by=df.columns[-1])*100
+df=totalsDF[pnl_cols].iloc[-lookback:].transpose().sort_values(by=df.columns[-1])
 ylabel='Systems'
 xlabel='$ PNL'
 title=str(lookback)+' Day $ PNL by Group'

@@ -26,6 +26,7 @@ from pytz import timezone
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter, WeekdayLocator,DayLocator,MO, TU, WE, TH, FR, SA, SU,\
                                             MonthLocator, MONDAY, HourLocator, date2num
+start_time = time.time()
 if len(sys.argv)==1:
     debug=True
 else:
@@ -231,3 +232,5 @@ filename=pngPath+account+'_'+title.replace(' ','')+'.png'
 width=.6
 saveCharts(df2, df2=df, ylabel=ylabel, title=title, filename=filename, kind='bar',\
             lookback=2, width=width, legend_outside= True)
+
+print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

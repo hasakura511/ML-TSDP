@@ -100,6 +100,7 @@ def saveCharts(df, **kwargs):
     kind=kwargs.get('kind','bar')
     df2=kwargs.get('df2',None)
     lookback=kwargs.get('lookback',5)
+    twiny=kwargs.get('twiny',False)
     
     font = {
             'weight' : 'normal',
@@ -122,6 +123,7 @@ def saveCharts(df, **kwargs):
         df.plot(kind=kind, ax=ax,  color='blue', width=width)
         df2.plot(kind='line',  colors=['g','r'], ax=ax2)
         fig.autofmt_xdate()
+        plt.title(title, size=30)
         for label in ax.xaxis.get_majorticklabels():
             label.set_fontsize(18)
             #label.set_fontname('courier')
@@ -139,6 +141,17 @@ def saveCharts(df, **kwargs):
         plt.xticks(fontsize = 24)
         plt.yticks(fontsize = 24)
         
+        if twiny:
+            ax2 = ax.twiny()
+            ax2.set_xlim(ax.get_xlim())
+            ax2.set_xticks(ax.get_xticks())
+            for label in ax2.xaxis.get_majorticklabels():
+                label.set_fontsize(18)
+                
+            plt.title(title, size=30,y=1.01)
+        else:
+            plt.title(title, size=30)
+                
     if legend_outside:
         plt.legend(loc='upper center', bbox_to_anchor=(.5, 1.15),prop={'size':24},
           fancybox=True, shadow=True, ncol=3)
@@ -148,7 +161,7 @@ def saveCharts(df, **kwargs):
 
     #plt.xticks(range(nrows), benchmark_xaxis_label)
     #fig.autofmt_xdate()
-    plt.title(title, size=30)
+    
 
     #filename2=date+'_'+account+'_'+line.replace('/','')+'.png'
     plt.savefig(filename, bbox_inches='tight')
@@ -206,7 +219,7 @@ title=str(lookback)+' Day Accuracy by Group'
 filename=pngPath+account+'_'+title.replace(' ','')+'.png'
 width=.6
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
-                    lookback=lookback, kind='barh',width=width)
+                    lookback=lookback, kind='barh',width=width, twiny=True)
 
 #accuracy
 lookback=3
@@ -218,7 +231,7 @@ title=str(lookback)+' Day $ PNL by Group'
 filename=pngPath+account+'_'+title.replace(' ','')+'.png'
 width=.6
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
-                    lookback=lookback, kind='barh',width=width)
+                    lookback=lookback, kind='barh',width=width, twiny=True)
 
 #average totals
 lookback=5

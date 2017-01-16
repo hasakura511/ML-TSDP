@@ -133,6 +133,7 @@ def saveCharts(df, **kwargs):
         for label in ax2.yaxis.get_majorticklabels():
             label.set_fontsize(18)
             #label.set_fontname('verdana')
+
     else:
         df.plot(kind=kind, ax=ax, width=width)
         plt.ylabel(ylabel, size=24)
@@ -156,7 +157,11 @@ def saveCharts(df, **kwargs):
         plt.legend(loc='upper center', bbox_to_anchor=(.5, 1.15),prop={'size':24},
           fancybox=True, shadow=True, ncol=3)
     else:
-        plt.legend(loc='best', prop={'size':24})
+        if twiny:
+            ax.legend(loc='upper center', bbox_to_anchor=(.5, 1.04),prop={'size':24},
+              fancybox=True, shadow=True, ncol=3)
+        else:
+            plt.legend(loc='best', prop={'size':24})
         
 
     #plt.xticks(range(nrows), benchmark_xaxis_label)
@@ -174,6 +179,7 @@ def saveCharts(df, **kwargs):
 
 account='v4futures'
 totalsDF=pd.read_sql('select * from {}'.format('totalsDF_board_'+account), con=readConn,  index_col='Date')
+date=str(totalsDF.index[-1])
 totalsDF.index=totalsDF.index.astype(str).to_datetime().strftime('%A, %b %Y')
 
 #volatility by group
@@ -183,7 +189,7 @@ df=totalsDF[volatility_cols].iloc[-lookback:].transpose()
 ylabel='$ Volatiliy'
 xlabel='Group'
 title=str(lookback)+' Day Volatility by Group'
-filename=pngPath+account+'_'+title.replace(' ','')+'.png'
+filename=pngPath+date+'_'+title.replace(' ','')+'.png'
 width=.8
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename)
 
@@ -194,7 +200,7 @@ df=totalsDF[change_cols].iloc[-lookback:].transpose()
 ylabel='$ Change'
 xlabel='Group'
 title=str(lookback)+' Day Change by Group'
-filename=pngPath+account+'_'+title.replace(' ','')+'.png'
+filename=pngPath+date+'_'+title.replace(' ','')+'.png'
 width=.8
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename)
 
@@ -205,33 +211,9 @@ df=totalsDF[lper_cols].iloc[-lookback:].transpose()*100
 ylabel='% Long'
 xlabel='Group'
 title=str(lookback)+' Day Long Percent by Group'
-filename=pngPath+account+'_'+title.replace(' ','')+'.png'
+filename=pngPath+date+'_'+title.replace(' ','')+'.png'
 width=.8
 saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, legend_outside= True)
-
-#accuracy
-lookback=3
-acc_cols=[x for x in totalsDF.columns if 'ACC' in x and 'benchmark' not in x and 'Off' not in x]
-df=totalsDF[acc_cols].iloc[-lookback:].transpose().sort_values(by=df.columns[-1])*100
-ylabel='Systems'
-xlabel='% Accuracy'
-title=str(lookback)+' Day Accuracy by Group'
-filename=pngPath+account+'_'+title.replace(' ','')+'.png'
-width=.6
-saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
-                    lookback=lookback, kind='barh',width=width, twiny=True)
-
-#accuracy
-lookback=3
-pnl_cols=[x for x in totalsDF.columns if 'PNL' in x and 'benchmark' not in x and 'Off' not in x]
-df=totalsDF[pnl_cols].iloc[-lookback:].transpose().sort_values(by=df.columns[-1])
-ylabel='Systems'
-xlabel='$ PNL'
-title=str(lookback)+' Day $ PNL by Group'
-filename=pngPath+account+'_'+title.replace(' ','')+'.png'
-width=.6
-saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
-                    lookback=lookback, kind='barh',width=width, twiny=True)
 
 #average totals
 lookback=5
@@ -241,9 +223,43 @@ df2=totalsDF['L%_Total'].iloc[-lookback:]*100
 ylabel='Long %'
 #xlabel='Dates'
 title=str(lookback)+' Day Averages by Group'
-filename=pngPath+account+'_'+title.replace(' ','')+'.png'
+filename=pngPath+date+'_'+title.replace(' ','')+'.png'
 width=.6
 saveCharts(df2, df2=df, ylabel=ylabel, title=title, filename=filename, kind='bar',\
             lookback=2, width=width, legend_outside= True)
+            
+for account in active_symbols:
+    totalsDF=pd.read_sql('select * from {}'.format('totalsDF_board_'+account), con=readConn,  index_col='Date')
+    date=str(totalsDF.index[-1])
+    totalsDF.index=totalsDF.index.astype(str).to_datetime().strftime('%A, %b %Y')
+    #accuracy
+    lookback=3
+    acc_cols=[x for x in totalsDF.columns if 'ACC' in x and 'benchmark' not in x and 'Off' not in x]
+    df=totalsDF[acc_cols].iloc[-lookback:].transpose()
+    df=df.sort_values(by=df.columns[-1])*100
+    ylabel='Systems'
+    xlabel='% Accuracy'
+    title=str(lookback)+' Day Accuracy by Group'
+    filename=pngPath+date+'_'+account+'_'+title.replace(' ','')+'.png'
+    title=account+' '+title
+    width=.6
+    saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
+                        lookback=lookback, kind='barh',width=width, twiny=True)
+
+    #pnl
+    lookback=3
+    pnl_cols=[x for x in totalsDF.columns if 'PNL' in x and 'benchmark' not in x and 'Off' not in x]
+    df=totalsDF[pnl_cols].iloc[-lookback:].transpose()
+    df=df.sort_values(by=df.columns[-1])
+    ylabel='Systems'
+    xlabel='$ PNL'
+    title=str(lookback)+' Day $ PNL by Group'
+    filename=pngPath+date+'_'+account+'_'+title.replace(' ','')+'.png'
+    title=account+' '+title
+    width=.6
+    saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
+                        lookback=lookback, kind='barh',width=width, twiny=True)
+
+
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

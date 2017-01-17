@@ -90,6 +90,8 @@ def symbols(request):
 def futures(request):
     context={}
     context['accounts']=get_overview()
+    date=context['accounts']['v4futures']
+    context['date']=dt.strptime(date, '%Y%m%d').strftime('%Y-%m-%d')
     return render(request, 'futures2.html', context)
 
 def timetable(request):

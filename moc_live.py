@@ -1139,7 +1139,6 @@ if __name__ == "__main__":
         sys.exit('run_moc_immediate = False')
 
     if immediate:
-        timetable = get_timetable(contractsDF)
         print 'Running Immediate Process...'
         #include all symbols in threadlist to refresh all orders from selection
         threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]

@@ -400,6 +400,7 @@ def createRankingChart(ranking, account, line, title, filename):
     text=', '.join([index+' '+str(round(ranking.ix[index],1))+'%' for index in pair])
     newplot=ranking.plot(kind='barh',colors=color_index)
     plt.xlabel('Cumulative % change', size=12)
+    title=account+' '+title
     plt.title(title)
     plt.savefig(filename, bbox_inches='tight')
     print 'Saved',filename

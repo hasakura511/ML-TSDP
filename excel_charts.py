@@ -243,7 +243,7 @@ for account in active_symbols:
     df=df.sort_values(by=df.columns[-1])*100
     ylabel='Systems'
     xlabel='% Accuracy'
-    title=' Day Accuracy by Group'
+    title=' Day Accuracy by System'
     filename=pngPath+date+'_'+account+'_'+title.replace(' ','')+'.png'
     title=account+' '+str(lookback)+' '+title
     width=.6
@@ -257,7 +257,7 @@ for account in active_symbols:
     df=df.sort_values(by=df.columns[-1])
     ylabel='Systems'
     xlabel='$ PNL'
-    title=' Day $ PNL by Group'
+    title=' Day $ PNL by System'
     filename=pngPath+date+'_'+account+'_'+title.replace(' ','')+'.png'
     title=account+' '+str(lookback)+' '+title
     width=.6

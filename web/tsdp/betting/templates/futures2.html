@@ -22,9 +22,9 @@
 
 {% for name, date2 in accounts.items %}
     <center><h1>{{ name }}</h1></center><br><center>
-    <center><a href="static/images/{{ date2 }}_{{ name }}_DayAccuracybyGroup.png"><img src="static/images/{{ date2 }}_{{ name }}_DayAccuracybyGroup.png"  width=900 height=1800></a></center>
-    <center><a href="static/images/{{ date2 }}_{{ name }}_Day$PNLbyGroup.png"><img src="static/images/{{ date2 }}_{{ name }}_Day$PNLbyGroup.png"  width=900 height=1800></a></center>
     <center><a href="static/public/images/{{ date }}_{{ name }}_RiskOn_ranking.png"><img src="static/public/images/{{ date }}_{{ name }}_RiskOn_ranking.png"  width=900 height=1800></a></center>
+    <center><a href="static/images/{{ date2 }}_{{ name }}_DayAccuracybySystem.png"><img src="static/images/{{ date2 }}_{{ name }}_DayAccuracybySystem.png"  width=900 height=1800></a></center>
+    <center><a href="static/images/{{ date2 }}_{{ name }}_Day$PNLbySystem.png"><img src="static/images/{{ date2 }}_{{ name }}_Day$PNLbySystem.png"  width=900 height=1800></a></center>
 {% endfor %}
 
 <center><h1>Market Heatmaps</h1></center><br><center>

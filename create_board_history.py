@@ -134,6 +134,7 @@ active_symbols={
                         'v4mini':['C', 'CL', 'CU', 'EMD', 'ES', 'HG', 'JY', 'NG', 'SM', 'TU', 'TY', 'W'],
                         'v4micro':['BO', 'ES', 'HG', 'NG', 'TY'],
                         }
+all_syms=active_symbols['v4futures']
 #maybe replace these with true account values later
 accountvalues={'v4futures':250000,'v4mini':100000,'v4micro':50000,}
 web_accountnames={
@@ -152,24 +153,24 @@ if debug:
     mode = 'replace'
     #marketList=[sys.argv[1]]
     showPlots=False
-    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+    dbPath='./data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
     dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
-    savePath=jsonPath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    pngPath = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+    savePath=jsonPath= './data/results/' 
+    pngPath = './data/results/' 
     feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     #test last>old
     #dataPath2=pngPath
-    #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+    #signalPath = './data/signals/' 
     
     #test last=old
     dataPath2='D:/ML-TSDP/data/'
     
     #signalPath ='D:/ML-TSDP/data/signals2/'
     signalPath ='D:/ML-TSDP/data/signals2/' 
-    signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-    systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
+    signalSavePath = './data/signals/' 
+    systemPath = './data/systems/' 
     readConn = sqlite3.connect(dbPath2)
     writeConn= sqlite3.connect(dbPath)
     #readWebConn = sqlite3.connect(dbPathWeb)
@@ -206,6 +207,30 @@ componentsdict = eval(selectionDF['v4futures'].values[0])
 dates= pd.read_sql('select distinct Date from futuresATRhist', con=readConn).Date.tolist()
 datetup=[(dates[i],dates[i+1]) for i,x in enumerate(dates[:-1])][-lookback:]
 
+def add_missing_rows(df, date, all_syms):
+    global dates
+    global readConn
+    
+    totalnum_sym=len(all_syms)
+    if df.shape[0]<totalnum_sym:
+        missing_syms=[x for x in all_syms if x not in df.index]
+        prev_date=dates[dates.index(date)-1]
+        while len(missing_syms)>0:
+            futuresDF_prev2=pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
+                    order by timestamp ASC) group by CSIsym' %prev_date,\
+                    con=readConn,  index_col='CSIsym')
+            missing_rows=futuresDF_prev2.ix[[x for x in missing_syms if x in futuresDF_prev2.index]].copy()
+            missing_rows.LastPctChg=0
+            missing_rows.ACT=0
+            missing_rows.Date=int(date)
+            df=pd.concat([df, missing_rows], axis=0)
+            print 'Added',missing_syms
+            prev_date=dates[dates.index(prev_date)-1]
+            missing_syms=[x for x in missing_syms if x not in df.index]
+        return df.ix[all_syms]
+    else:
+        return df
+            
 totals_accounts={}
 pnl_accounts={}
 for account in qtydict.keys():
@@ -215,13 +240,14 @@ for account in qtydict.keys():
     totalsDict = {}
     for prev,current in datetup:
         print current,
-        futuresDF_prev=pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
+        futuresDF_prev=add_missing_rows(pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
                         order by timestamp ASC) group by CSIsym' %prev,\
-                        con=readConn,  index_col='CSIsym')
-        futuresDF_current=pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
+                        con=readConn,  index_col='CSIsym'), prev, all_syms)
+        
+        futuresDF_current=add_missing_rows(pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
                         order by timestamp ASC) group by CSIsym' %current,\
-                        con=readConn,  index_col='CSIsym')
-                        
+                        con=readConn,  index_col='CSIsym'), current, all_syms)
+
 
 
         componentsignals=futuresDF_prev[corecomponents]
@@ -320,7 +346,7 @@ for account in qtydict.keys():
     tablename = 'PNL_board_'+account
     pnl_accounts[account]=pnlDF
     pnlDF.to_sql(name= tablename, if_exists=mode, con=writeConn, index=True, index_label='Date')
-    filename = savePath+tablename+'_'+dt.now().strftime("%Y%m%d%H%M")+'.csv'
+    filename = savePath+tablename+'_'+str(current)+'.csv'
     pnlDF.to_csv(filename, index=True)
     print 'Saved', tablename,'from',datetup[0][1],'to',current,'to', dbPath,'and', filename
 

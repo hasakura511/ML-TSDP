@@ -1,4 +1,6 @@
-from django import forms
+import calendar
+import os
+import re
 import time
 import json
 import datetime
@@ -8,11 +10,9 @@ from pytz import timezone
 from tzlocal import get_localzone
 import sqlite3
 import pandas as pd
+from django import forms
 from .models import MetaData, AccountData
 from .start_moc import start_moc, run_checksystems
-import calendar
-import os
-import re
 
 def getBackendDB():
     dbPath = '/ML-TSDP/data/futures.sqlite3'
@@ -71,7 +71,7 @@ def MCdate():
         
     if today in ttdates and ttdates.index(today)==0 and len(ttdates)>1:
         closes = pd.DataFrame(timetables[today].ix[[x for x in timetables.index if 'close' in x]].copy())
-        lastclose=eastern.localize(pd.to_datetime(closes[today]).max().to_pydatetime())
+        lastclose=eastern.localize(max([x for x in pd.to_datetime(closes[today]) if x.day ==now.day]).to_pydatetime())
         if now>=lastclose :
             mcdate = ttdates[1]
         else:

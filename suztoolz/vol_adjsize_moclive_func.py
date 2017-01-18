@@ -149,24 +149,24 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
         mode = 'append'
         #marketList=[sys.argv[1]]
         showPlots=False
-        dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+        dbPath=-'./data/futures.sqlite3' 
         dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
         dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
         dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
-        savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-        pngPath = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+        savePath= './data/results/' 
+        pngPath = './data/results/' 
         feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
         #test last>old
         #dataPath2=pngPath
-        #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+        #signalPath = './data/signals/' 
         
         #test last=old
         dataPath2='D:/ML-TSDP/data/'
         
         #signalPath ='D:/ML-TSDP/data/signals2/'
-        signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-        signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-        systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
+        signalPath = './data/signals/' 
+        signalSavePath = './data/signals/' 
+        systemPath = './data/systems/' 
         readConn = sqlite3.connect(dbPath2)
         writeConn= sqlite3.connect(dbPath)
         readWebConn = sqlite3.connect(dbPathWeb)
@@ -698,6 +698,14 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
             (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
     selectionDict=eval(selectionDF.selection.values[0])
+    newdict={}
+    for k,v in selectionDict.items():
+        key=k
+        value=v
+        if v[0]=='Anti-HighestEquity':
+            value[0]='AntiHighestEquity'
+        newdict[key]=value
+    selectionDict=newdict
     c2system_macro=c2system=selectionDict["v4futures"][0]
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]

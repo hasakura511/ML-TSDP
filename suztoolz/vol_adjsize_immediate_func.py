@@ -123,23 +123,23 @@ def vol_adjsize_immediate(debug, threadlist, skipcheck=False):
         showPlots=False
         #refreshSea tries to recreate the first run futuresATR file after new signals have been generated
         refreshSea=False
-        dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+        dbPath='./data/futures.sqlite3' 
         dbPath2='D:/ML-TSDP/data/futures.sqlite3'
         dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
         dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
-        savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-        pngPath=savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+        savePath= './data/results/' 
+        pngPath=savePath2 = './data/results/' 
         feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
         #test last>old
         #dataPath2=savePath2
-        #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+        #signalPath = './data/signals/' 
         
         #test last=old
         dataPath2='D:/ML-TSDP/data/'
         
         signalPath ='D:/ML-TSDP/data/signals/'
-        signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-        systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
+        signalSavePath = './data/signals/' 
+        systemPath = './data/systems/' 
         logging.basicConfig(filename='C:/logs/vol_adjsize_board_error.log',level=logging.DEBUG)
         
     else:
@@ -202,6 +202,14 @@ def vol_adjsize_immediate(debug, threadlist, skipcheck=False):
     selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
             (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
     selectionDict=eval(selectionDF.selection.values[0])
+    newdict={}
+    for k,v in selectionDict.items():
+        key=k
+        value=v
+        if v[0]=='Anti-HighestEquity':
+            value[0]='AntiHighestEquity'
+        newdict[key]=value
+    selectionDict=newdict
     c2system_macro=c2system=selectionDict["v4futures"][0]
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]
@@ -302,6 +310,7 @@ def vol_adjsize_immediate(debug, threadlist, skipcheck=False):
             #load last csi system file
             systemdata = pd.read_sql('select * from %s' % key, con=readConn)
             systemdata.index = [x.split('_')[1] for x in systemdata.System]
+            #print selectionDict
             systemdata.signal = systemDict[key][selectionDict[key][0]]
             systemdata['selection']=selectionDict[key][0]
             systemdata['ordertype']='immediate'

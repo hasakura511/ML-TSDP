@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import UserSelection
+from .models import UserSelection, get_blends
 from .helpers import *
 from .start_immediate import start_immediate
 from django.contrib.auth import authenticate, login, logout
@@ -12,8 +12,8 @@ import sqlite3
 import json
 import os
 
-dbPath = '/tsdpWEB/tsdp/db.sqlite3'
-readConn = sqlite3.connect(dbPath)
+#dbPath = '/tsdpWEB/tsdp/db.sqlite3'
+#readConn = sqlite3.connect(dbPath)
 
 def downloaddb(request):
     filepath = '/ml-tsdp/data/futures.sqlite3'
@@ -25,9 +25,26 @@ def downloaddb(request):
 #    updateMeta.save()
 
 def addrecord(request):
+    userselection=UserSelection()
+    #json_cloc=request.GET['componentloc']
+    json_cloc = userselection.json_cloc
+    _, list_boxstyles = get_blends(cloc=userselection.cloc)
+    json_boxstyles=json.dumps(list_boxstyles)
+
+    #for user customized styles (maybe later)
+    #list_boxstyles = json.loads(request.GET['boxstyles'])
+    #_, list_boxstyles = UserSelection.get_blends(json.loads(json_cloc), list_boxstyles)
+    #json_boxstyles=json.dumps(list_boxstyles)
+    with open('performance_data.json', 'r') as f:
+        json_performance = json.load(f)
+
     record = UserSelection(userID=request.GET['user_id'], selection=request.GET['Selection'], \
-                           v4futures=request.GET['v4futures'], v4mini=request.GET['v4mini'], \
-                           v4micro=request.GET['v4micro'], mcdate=MCdate(), timestamp=getTimeStamp())
+                            v4futures=request.GET['v4futures'], v4mini=request.GET['v4mini'], \
+                            v4micro=request.GET['v4micro'],
+                            componentloc = json_cloc,
+                            boxstyles = json_boxstyles,
+                            performance = json_performance,
+                            mcdate=MCdate(), timestamp=getTimeStamp())
     record.save()
     return HttpResponse(json.dumps({"id": record.id}))
 

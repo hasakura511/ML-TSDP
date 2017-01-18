@@ -149,24 +149,24 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
         mode = 'append'
         #marketList=[sys.argv[1]]
         showPlots=False
-        dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+        dbPath='./data/futures.sqlite3' 
         dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
         dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
         dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
-        savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-        pngPath = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+        savePath= './data/results/' 
+        pngPath = './data/results/' 
         feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
         #test last>old
         #dataPath2=pngPath
-        #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+        #signalPath = './data/signals/' 
         
         #test last=old
         dataPath2='D:/ML-TSDP/data/'
         
         #signalPath ='D:/ML-TSDP/data/signals2/'
-        signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-        signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-        systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
+        signalPath = './data/signals/' 
+        signalSavePath = './data/signals/' 
+        systemPath = './data/systems/' 
         readConn = sqlite3.connect(dbPath2)
         writeConn= sqlite3.connect(dbPath)
         readWebConn = sqlite3.connect(dbPathWeb)
@@ -178,7 +178,7 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
         feedfile='./data/systems/system_ibfeed.csv'
         dbPath='./data/futures.sqlite3'
         dbPathWeb ='./web/tsdp/db.sqlite3'
-        dataPath='./data/csidata/v4futures2/'
+        dataPath='./data/csidata/v4futures4/'
         #dataPath='./data/csidata/v4futures2/'
         dataPath2='./data/'
         savePath='./data/results/'
@@ -209,13 +209,14 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
                 (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
     fxRates=pd.read_sql('select * from currenciesDF where timestamp=\
                 (select max(timestamp) from currenciesDF as maxtimestamp)', con=readConn,  index_col='CSIsym')
+    
     accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
                 (select max(timestamp) from accountInfo as maxtimestamp)', con=readConn,  index_col='index')
     systems = [x for x in accountInfo.columns if x not in ['Date','timestamp']]
     riskEquity=int(accountInfo.v4futures.riskEquity)
     riskEquity_mini=int(accountInfo.v4mini.riskEquity)
     riskEquity_micro=int(accountInfo.v4micro.riskEquity)  
-     
+    
     #for csv system files
     systemFilename='system_v4futures.csv'
     systemFilename2='system_v4mini.csv'
@@ -236,7 +237,7 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     c2id_macro=int(accountInfo.v4futures.c2id)
     c2id_mini=int(accountInfo.v4mini.c2id)
     c2id_micro=int(accountInfo.v4micro.c2id)
-
+    
     signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                     'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
                     'LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
@@ -697,6 +698,14 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
             (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
     selectionDict=eval(selectionDF.selection.values[0])
+    newdict={}
+    for k,v in selectionDict.items():
+        key=k
+        value=v
+        if v[0]=='Anti-HighestEquity':
+            value[0]='AntiHighestEquity'
+        newdict[key]=value
+    selectionDict=newdict
     c2system_macro=c2system=selectionDict["v4futures"][0]
     c2system_mini=selectionDict["v4mini"][0]
     c2system_micro=selectionDict["v4micro"][0]
@@ -718,6 +727,11 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
                 print 'skipping save to db'
             else:
                 #write new selection to backend db
+                tablename = 'webSelection'
+                mode = get_write_mode(writeConn, tablename, selectionDF.reset_index().drop(['id'],axis=1))
+                selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists=mode,\
+                            con=writeConn, index=False)
+                print 'new user selection found. appending webSelection to', dbPath,mode
                 selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
                             con=writeConn, index=False)
                 print 'new user selection found. appending webSelection to', dbPath

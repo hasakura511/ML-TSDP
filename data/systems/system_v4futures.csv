@@ -1,10 +1,10 @@
 Version,System,Name,c2id,c2api,c2qty,c2sym,c2type,c2submit,ibqty,ibsym,ibcur,ibexch,ibtype,ibsubmit,trade_freq,ibmult,c2mult,iblocalsym,signal
 v4.3,v4_AC,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@ACG7,future,True,2,AC,USD,GLOBEX,FUT,False,60,50,50,AC,1
 v4.3,v4_AD,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,@ADH7,future,True,2,AUD,USD,GLOBEX,FUT,False,60,50,50,AUD,1
-v4.3,v4_AEX,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,AEXF7,future,True,1,AEX,USD,GLOBEX,FUT,False,60,50,50,EOE,1
+v4.3,v4_AEX,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,AEXG7,future,True,1,AEX,USD,GLOBEX,FUT,False,60,50,50,EOE,1
 v4.3,v4_BO,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,2,@BOH7,future,True,4,ZL,USD,GLOBEX,FUT,False,60,50,50,BO,1
 v4.3,v4_BP,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,@BPH7,future,True,1,GBP,USD,GLOBEX,FUT,False,60,50,50,BP,1
-v4.3,v4_C,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,4,@CH7,future,True,2,ZC,USD,GLOBEX,FUT,False,60,50,50,C,1
+v4.3,v4_C,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,3,@CH7,future,True,2,ZC,USD,GLOBEX,FUT,False,60,50,50,C,1
 v4.3,v4_CC,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@CCH7,future,True,3,CC,USD,GLOBEX,FUT,False,60,50,50,CC,1
 v4.3,v4_CD,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,@CDH7,future,True,2,CAD,USD,GLOBEX,FUT,False,60,50,50,CD,1
 v4.3,v4_CGB,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,CBH7,future,True,0,CGB,USD,GLOBEX,FUT,False,60,50,50,CGB,-1
@@ -19,7 +19,7 @@ v4.3,v4_ED,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0
 v4.3,v4_EMD,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,@EMDH7,future,True,1,EMD,USD,GLOBEX,FUT,False,60,50,50,EMD,1
 v4.3,v4_ES,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,@ESH7,future,True,1,ES,USD,GLOBEX,FUT,False,60,50,50,ES,1
 v4.3,v4_FC,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,@GFH7,future,True,1,GF,USD,GLOBEX,FUT,False,60,50,50,GF,1
-v4.3,v4_FCH,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,MTF7,future,True,2,MT,USD,GLOBEX,FUT,False,60,50,50,MT,1
+v4.3,v4_FCH,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,MTG7,future,True,2,MT,USD,GLOBEX,FUT,False,60,50,50,MT,1
 v4.3,v4_FDX,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,DXMH7,future,True,1,XG,USD,GLOBEX,FUT,False,60,50,50,XG,1
 v4.3,v4_FEI,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,IEM7,future,True,0,IE,USD,GLOBEX,FUT,False,60,50,50,I,-1
 v4.3,v4_FFI,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,LFH7,future,True,1,LF,USD,GLOBEX,FUT,False,60,50,50,Z,1
@@ -42,7 +42,7 @@ v4.3,v4_LH,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0
 v4.3,v4_LRC,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,LRCH7,future,True,8,LRC,USD,GLOBEX,FUT,False,60,50,50,SB,1
 v4.3,v4_LSU,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,QWH7,future,True,2,LSU,USD,GLOBEX,FUT,False,60,50,50,SB,1
 v4.3,v4_MEM,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@MMEH7,future,True,2,MEM,USD,GLOBEX,FUT,False,60,50,50,SB,1
-v4.3,v4_MFX,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,IBF7,future,True,1,MFX,USD,GLOBEX,FUT,False,60,50,50,SB,1
+v4.3,v4_MFX,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,IBG7,future,True,1,MFX,USD,GLOBEX,FUT,False,60,50,50,SB,1
 v4.3,v4_MP,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,3,@PXH7,future,True,5,MXP,USD,GLOBEX,FUT,False,60,50,50,PX,1
 v4.3,v4_MW,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@MWH7,future,True,3,MW,USD,GLOBEX,FUT,False,60,50,50,SB,1
 v4.3,v4_NE,v4futures,107146997,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,@NEH7,future,True,3,NZD,USD,GLOBEX,FUT,False,60,50,50,SB,1

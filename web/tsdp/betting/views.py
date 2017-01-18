@@ -52,20 +52,11 @@ def index(request):
 
 def board(request):
     lastSelection = UserSelection.objects.all().order_by('-timestamp').first()
-    lastMCdate = int(lastSelection.mcdate)
-    mcdate = int(MCdate())
-    if lastMCdate<mcdate:
-        #no change in user selection since mcdate change
-        updated_selection=json.dumps({key: [order[0], "False"] for key, order in eval(lastSelection.selection).items()})
-        record = UserSelection(userID=lastSelection.userID, selection=updated_selection, \
-                               v4futures=lastSelection.v4futures, v4mini=lastSelection.v4mini, \
-                               v4micro=lastSelection.v4micro, mcdate=mcdate, timestamp=getTimeStamp())
-        record.save()
-    else:
-        #check if any immediate orders
-        if 'True' in [order[1] for sys, order in eval(lastSelection.selection).items()]:
-            print('processing immediate orders')
-            start_immediate()
+
+    #check if any immediate orders
+    if 'True' in [order[1] for sys, order in eval(lastSelection.selection).items()]:
+        print('processing immediate orders')
+        start_immediate()
 
     updateMeta()
     getAccountValues()

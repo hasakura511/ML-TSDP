@@ -245,25 +245,11 @@ csidate=lastCsiDownloadDate()
 
     
 def guessMCdate():
-    cutoff = datetime.time(12, 0, 0, 0)
-    cutoff2 = datetime.time(23, 59, 59)
     eastern = timezone('US/Eastern')
     now = dt.now(get_localzone())
     now = now.astimezone(eastern)
-    today = now.strftime("%Y%m%d")
-    if now.time() > cutoff and now.time() < cutoff2:
-        # M-SUN after cutoff, set next day
-        next = now + datetime.timedelta(days=1)
-        mcdate = next.strftime("%Y%m%d")
-    else:
-        # M-SUN before cutoff, keep same day
-        mcdate = now.strftime("%Y%m%d")
+    mcdate = now.strftime("%Y%m%d")
 
-    # overwrite weekends
-    if now.weekday() == 4 and now.time() > cutoff and now.time() < cutoff2:
-        # friday after cutoff so set to monday
-        next = now + datetime.timedelta(days=3)
-        mcdate = next.strftime("%Y%m%d")
 
     if now.weekday() == 5:
         # Saturday so set to monday
@@ -677,6 +663,7 @@ def refresh_history(sym, execDict):
     
 def get_tradingHours(sym, contractsDF):
     global triggertimes
+    meats= ['GF','LE','HE']
     fmt = '%Y-%m-%d %H:%M'
     dates = contractsDF.ix[sym].tradingHours.split(";")
     
@@ -723,6 +710,10 @@ def get_tradingHours(sym, contractsDF):
             closedate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8]),\
                 hour=int(closetime[0:2]), minute=int(closetime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
             triggerdate=closedate-datetime.timedelta(minutes=triggertime)
+            #overwrite meats
+            if sym in meats:
+                opendate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8]),\
+                    hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
             thDict[date]=[opendate.strftime(fmt),closedate.strftime(fmt), triggerdate.strftime(fmt)]
     return thDict
         

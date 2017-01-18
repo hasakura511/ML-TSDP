@@ -35,7 +35,7 @@ def addrecord(request):
     #list_boxstyles = json.loads(request.GET['boxstyles'])
     #_, list_boxstyles = UserSelection.get_blends(json.loads(json_cloc), list_boxstyles)
     #json_boxstyles=json.dumps(list_boxstyles)
-    with open('performance_data.json', 'r') as f:
+    with open('/ml-tsdp/web/tsdp/performance_data.json', 'r') as f:
         json_performance = json.load(f)
 
     record = UserSelection(userID=request.GET['user_id'], selection=request.GET['Selection'], \

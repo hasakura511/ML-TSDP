@@ -238,9 +238,11 @@ def vol_adjsize_immediate(debug, threadlist, skipcheck=False):
                 sys.exit('no change in user selection')
             else:
                 #write new selection to backend db
-                selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
+                tablename = 'webSelection'
+                mode = get_write_mode(writeConn, tablename, selectionDF.reset_index().drop(['id'],axis=1))
+                selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists=mode,\
                             con=writeConn, index=False)
-                print 'new user selection found. appending webSelection to', dbPath
+                print 'new user selection found. appending webSelection to', dbPath,mode
                 #check each system to see if its changed.
                 #need to check each system in between MOC and CSI data release
                 #we don't revert back to the prior day's. this will happen when only one system
@@ -286,7 +288,7 @@ def vol_adjsize_immediate(debug, threadlist, skipcheck=False):
     orderDict={}
     for key in selectionDict.keys():
         immediate = eval(selectionDict[key][1])
-        if immediate:
+        if immediate or skipcheck:
             ComponentsDict = eval(selectionDF[key].values[0])
             votingSystems = { key: ComponentsDict[key] for key in [x for x in ComponentsDict if is_int(x)] }
             #add voting systems
@@ -336,5 +338,5 @@ if __name__ == "__main__":
         
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
     threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
-    orderDict=vol_adjsize_immediate(True, threadlist, skipcheck=True)
+    orderDict=vol_adjsize_immediate(debug, threadlist, skipcheck=True)
     print orderDict

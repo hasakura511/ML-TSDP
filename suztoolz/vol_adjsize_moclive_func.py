@@ -209,13 +209,14 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
                 (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
     fxRates=pd.read_sql('select * from currenciesDF where timestamp=\
                 (select max(timestamp) from currenciesDF as maxtimestamp)', con=readConn,  index_col='CSIsym')
+    
     accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
                 (select max(timestamp) from accountInfo as maxtimestamp)', con=readConn,  index_col='index')
     systems = [x for x in accountInfo.columns if x not in ['Date','timestamp']]
     riskEquity=int(accountInfo.v4futures.riskEquity)
     riskEquity_mini=int(accountInfo.v4mini.riskEquity)
     riskEquity_micro=int(accountInfo.v4micro.riskEquity)  
-     
+    
     #for csv system files
     systemFilename='system_v4futures.csv'
     systemFilename2='system_v4mini.csv'
@@ -236,7 +237,7 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     c2id_macro=int(accountInfo.v4futures.c2id)
     c2id_mini=int(accountInfo.v4mini.c2id)
     c2id_micro=int(accountInfo.v4micro.c2id)
-
+    
     signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                     'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
                     'LastSEA','AntiSEA','AdjSEA','AntiAdjSEA',\
@@ -718,6 +719,11 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
                 print 'skipping save to db'
             else:
                 #write new selection to backend db
+                tablename = 'webSelection'
+                mode = get_write_mode(writeConn, tablename, selectionDF.reset_index().drop(['id'],axis=1))
+                selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists=mode,\
+                            con=writeConn, index=False)
+                print 'new user selection found. appending webSelection to', dbPath,mode
                 selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
                             con=writeConn, index=False)
                 print 'new user selection found. appending webSelection to', dbPath
@@ -798,5 +804,5 @@ if __name__ == "__main__":
 
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
     threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
-    orderDict=vol_adjsize_moc(True, threadlist, skipcheck=True)
+    orderDict=vol_adjsize_moc(debug, threadlist, skipcheck=True)
     print orderDict

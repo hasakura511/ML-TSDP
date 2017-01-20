@@ -110,7 +110,15 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
         inv = ax2.transData.inverted()
         dx, _  = inv.transform((0, 0)) - inv.transform((x1-x2, 0))
         minx, maxx = ax2.get_xlim()
-        ax2.set_xlim(minx+dx, maxx+dx)
+        #print minx,maxx,minx+dx, maxx+dx
+        if slipDF.shape[0] ==1:
+            minx2, maxx2 = ax1.get_xlim()
+            minx_=min(minx,minx2)
+            max_=max(maxx,maxx2)
+            ax2.set_xlim(minx_, max_)
+            ax1.set_xlim(minx_, max_)
+        else:
+            ax2.set_xlim(minx-dx, maxx+dx)
 
 
     fig = plt.figure(figsize=figsize) # Create matplotlib figure

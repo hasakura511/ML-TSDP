@@ -14,7 +14,7 @@ def get_blends(cloc=None, list_boxstyles=None):
     if cloc == None:
         cloc = [{'c0': 'Off'}, {'c1': 'RiskOn'}, {'c2': 'RiskOff'}, {'c3': 'LowestEquity'}, {'c4': 'HighestEquity'},
                 {'c5': 'AntiHighestEquity'}, {'c6': 'Anti50/50'}, {'c7': 'Seasonality'}, {'c8': 'Anti-Seasonality'},
-                {'c9': 'Previous'}, {'c10': 'None'}, {'c11': 'Anti_previous'}, {'c12': 'None'}, {'c13': 'None'},
+                {'c9': 'Previous'}, {'c10': 'None'}, {'c11': 'Anti-Previous'}, {'c12': 'None'}, {'c13': 'None'},
                 {'c14': 'None'}, ]
 
     if list_boxstyles == None:

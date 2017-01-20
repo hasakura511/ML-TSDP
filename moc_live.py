@@ -405,7 +405,7 @@ def create_execDict(feeddata, systemdata):
     global csidate
     global ttdate
     
-    downloadtt = not ttdate>csidate or not ttdate>=int(mcdate)
+    downloadtt = not ttdate>csidate or not ttdate>int(mcdate)
     print 'ttdate',ttdate,'csidate',csidate, 'mcdate',mcdate, 'downloadtt', downloadtt
     execDict=dict()
     #need systemdata for the contract expiry

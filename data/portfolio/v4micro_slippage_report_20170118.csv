@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-01-19 16:45:20 1 @ESH7 $-262,@ESH7,2017-01-19 16:45:20,2261.25,2017-01-18 17:00:00,2266.5,-0.00231634679021,0.00231634679021,Open,-1.0,-262.0,2.5,0 days 23:45:20.000000000,1425.0

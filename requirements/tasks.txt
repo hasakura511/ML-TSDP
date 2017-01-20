@@ -38,8 +38,11 @@ Evan S: You can use the client 0 as master client id. Because client id 0 should
 Evan S: If you use other client id as master client id, then such as reqAutoOpenOrder won't be allow to be called.
 
 CSIdata
+--> import futures portfolio
 -->database -> schedule db update -> wait until everything traded
 --> preferences -> ddist2 -> check rolling report
+--> preferences -> ddist2 -> add csi post processing script
+
 np++
 chrome
 procexp

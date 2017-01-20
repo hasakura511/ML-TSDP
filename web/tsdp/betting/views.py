@@ -26,8 +26,8 @@ def downloaddb(request):
 
 def addrecord(request):
     userselection=UserSelection()
-    #json_cloc=request.GET['componentloc']
-    json_cloc = userselection.json_cloc
+    json_cloc=request.GET['componentloc']
+    #json_cloc = userselection.json_cloc
     _, list_boxstyles = get_blends(cloc=userselection.cloc)
     json_boxstyles=json.dumps(list_boxstyles)
 

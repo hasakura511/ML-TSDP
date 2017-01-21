@@ -128,14 +128,15 @@ def check_systems_live(debug, ordersDict, csidate):
     start_time = time.time()
     accounts = ordersDict.keys()
     order_status_dict={}
+    ordersDictWithErrors={}
     if debug:
         #systems = ['v4micro']
         #systems = ['v4futures','v4mini','v4micro']
         logging.basicConfig(filename='C:/logs/c2.log',level=logging.DEBUG)
         logging.info('test')
         #savePath='D:/ML-TSDP/data/portfolio/'
-        systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/'
-        dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+        systemPath = './data/systems/'
+        dbPath='./data/futures.sqlite3' 
         dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
         def place_order2(a,b,c,d,e,f,g):
             return "0"
@@ -301,6 +302,10 @@ def check_systems_live(debug, ordersDict, csidate):
         print order_status_dict[account]
             
         totalerrors+=error_count
+        if error_count>0:
+            ordersDictWithErrors[account]=ordersDict[account]
+            print 'Added', account,'to ordersDictWithErrors'
+            
         for e in exitList:
             print e
         print 'c2:'+str(c2_count)+' account:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)+' errors:'+str(error_count)
@@ -314,7 +319,8 @@ def check_systems_live(debug, ordersDict, csidate):
         mode = get_write_mode(writeConn, tablename, orderstatusDF)
         orderstatusDF.to_sql(name=tablename,con=writeConn, index=False, if_exists=mode)
         print 'saved', tablename,'to',dbPath,'writemode',mode
-    return totalerrors
+    
+    return totalerrors,ordersDictWithErrors
 
 if __name__ == "__main__":
     if len(sys.argv)==1:
@@ -349,5 +355,5 @@ if __name__ == "__main__":
         ordersDict[account]=pd.read_sql('select * from (select * from %s\
                 order by timestamp ASC) group by CSIsym' % (account+'_live'),\
                 con=readcon,  index_col='CSIsym')
-    errors=check_systems_live(debug, ordersDict, csidate)
+    errors,ordersDictWithErrors=check_systems_live(debug, ordersDict, csidate)
     print 'total errors found', errors

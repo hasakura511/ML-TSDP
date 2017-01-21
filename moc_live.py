@@ -1157,7 +1157,7 @@ if __name__ == "__main__":
         
         if isinstance(ordersDict, type({})):
             #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
-            totalc2orders=check_systems_live(debug, ordersDict, csidate)
+            totalc2orders, _ =check_systems_live(debug, ordersDict, csidate)
             #check ib positions
             try:
                 if 'v4futures' in ordersDict.keys():
@@ -1180,21 +1180,6 @@ if __name__ == "__main__":
         totalc2orders =0
         num_iborders=0
         
-    #with open(logPath+'vol_adjsize_live.txt', 'w') as f:
-    #    with open(logPath+'vol_adjsize_live_error.txt', 'w') as e:
-    #        f.flush()
-    #        e.flush()
-    #        proc = Popen(runPath2, stdout=f, stderr=e)
-    #        proc.wait()
-
-    #print 'returned to main thread, running check systems if new orders are necessary.'
-    #with open(logPath+'check_systems_live.txt', 'w') as f:
-    #    with open(logPath+'check_systems_live_error.txt', 'w') as e:
-    #        f.flush()
-    #        e.flush()
-    #        proc = Popen(runPath4, stdout=f, stderr=e)
-    #        proc.wait()
-    #totalc2orders=int(pd.read_sql('select * from checkSystems', con=readConn).iloc[-1])
     
     if totalc2orders ==0 and num_iborders==0:
         print 'Found nothing to update!'
@@ -1206,23 +1191,14 @@ if __name__ == "__main__":
             if submitC2 and totalc2orders !=0:
                 print 'Live mode: running c2 orders'
                 proc_signal_v4_live(debug, ordersDict)
-                #for sys in systems:
-                #    print 'returned to main thread, running c2 orders for',sys
-                #    with open(logPath+'proc_signal_v4_live_'+sys+'.txt', 'a') as f:
-                #        with open(logPath+'proc_signal_v4_live_'+sys+'_error.txt', 'a') as e:
-                #            f.flush()
-                #            e.flush()
-                #            proc = Popen(runPath3+[sys], stdout=f, stderr=e)
-                #            proc.wait()
-                            
                 print 'returned to main thread, running check systems again..'
-                totalc2orders=check_systems_live(debug, ordersDict, csidate)
-                #with open(logPath+'check_systems_live.txt', 'a') as f:
-                #    with open(logPath+'check_systems_live_error.txt', 'a') as e:
-                #        f.flush()
-                #        e.flush()
-                #        proc = Popen(runPath4, stdout=f, stderr=e)
-                #        proc.wait()
+                totalc2orders, ordersDictWithErrors=check_systems_live(debug, ordersDict, csidate)
+                
+                #run orders again if it didn't go through.
+                if totalc2orders>0:
+                    print 'Found', totalc2orders, 'c2 position adjustments. Running orders again..'
+                    proc_signal_v4_live(debug, ordersDictWithErrors)
+                    totalc2orders, ordersDictWithErrors=check_systems_live(debug, ordersDictWithErrors, csidate)
             else:
                 if submitC2==False:
                     print 'skipped c2 orders: submitC2 set to False'

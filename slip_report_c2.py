@@ -103,24 +103,24 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
             'size'   : 22}
     matplotlib.rc('font', **font)
     
-    def align_xaxis(ax1, v1, ax2, v2):
-        """adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
-        x1, _ = ax1.transData.transform((v1, 0))
-        x2, _ = ax2.transData.transform((v2, 0))
-        inv = ax2.transData.inverted()
-        dx, _  = inv.transform((0, 0)) - inv.transform((x1-x2, 0))
-        minx, maxx = ax2.get_xlim()
-        #print minx,maxx,minx+dx, maxx+dx
-        if slipDF.shape[0] ==1:
-            minx2, maxx2 = ax1.get_xlim()
-            minx_=min(minx,minx2)
-            max_=max(maxx,maxx2)
-            ax2.set_xlim(minx_, max_)
-            ax1.set_xlim(minx_, max_)
-        else:
-            ax2.set_xlim(minx-dx, maxx+dx)
 
+    def align_xaxis3(ax1, ax2):
+        """Align zeros of the two axes, zooming them out by same ratio"""
+        axes = (ax1, ax2)
+        extrema = [ax.get_xlim() for ax in axes]
+        tops = [extr[1] / (extr[1] - extr[0]) for extr in extrema]
+        # Ensure that plots (intervals) are ordered bottom to top:
+        if tops[0] > tops[1]:
+            axes, extrema, tops = [list(reversed(l)) for l in (axes, extrema, tops)]
 
+        # How much would the plot overflow if we kept current zoom levels?
+        tot_span = tops[1] + 1 - tops[0]
+
+        b_new_t = extrema[0][0] + tot_span * (extrema[0][1] - extrema[0][0])
+        t_new_b = extrema[1][1] - tot_span * (extrema[1][1] - extrema[1][0])
+        axes[0].set_xlim(extrema[0][0], b_new_t)
+        axes[1].set_xlim(t_new_b, extrema[1][1])
+        
     fig = plt.figure(figsize=figsize) # Create matplotlib figure
     ax = fig.add_subplot(111) # Create matplotlib axes
     #ax = slipDF.slippage.plot.bar(color='r', width=0.5)
@@ -141,7 +141,7 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
              horizontalalignment='center',
              fontsize=fontsize,
              transform = ax2.transAxes)
-    align_xaxis(ax, 0, ax2, 0)
+    align_xaxis3(ax, ax2)
     #plt.ylim(0,80)
     #plt.xticks(np.arange(-1,1.25,.25))
     #plt.grid(True)

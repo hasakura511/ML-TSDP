@@ -404,7 +404,7 @@ def createRankingChart(ranking, account, line, title, filename):
     plt.title(title)
     plt.savefig(filename, bbox_inches='tight')
     print 'Saved',filename
-    if debug:
+    if debug and showPlots:
         plt.show()
     plt.close()
     return text
@@ -484,7 +484,7 @@ for account in totals_accounts:
                                                             'signals':signals,
                                                             'date':date,
                                                             }
-        if debug:
+        if debug and showPlots:
             plt.show()
         plt.close()
 
@@ -494,8 +494,14 @@ for account in totals_accounts:
     
 #create account value charts
 for account in totals_accounts:
-    benchmark_values=benchmark.copy()
+    totalsDF=totals_accounts[account]
+    benchmark_values=totalsDF['PNL_benchmark'].copy()
+    print account, benchmark_values
     benchmark_values.index=benchmark_xaxis_label
+    simulated_moc=pd.read_sql('select * from (select * from v4futures_live where orderType=\'MOC\' order by timestamp)\
+                                            group by Date', con=readConn, index_col='Date').selection
+    simulated_moc.index=[dt.strptime(str(x),'%Y%m%d') for x in simulated_moc.index]
+    
     if account=='v4futures':
         broker='ib'
         accountvalue=pd.read_sql('select * from (select * from ib_accountData where Desc=\'NetLiquidation\'\
@@ -522,12 +528,20 @@ for account in totals_accounts:
     
     benchmark_values=benchmark_values.ix[xaxis_labels].values
     index=[dt.strptime(date, '%Y-%m-%d') for date in xaxis_labels]
+    simulated_moc=simulated_moc.ix[index].fillna('Off')
+    simulated_moc_values=np.array([totalsDF.ix[int(idx.strftime('%Y%m%d'))]['PNL_'+simulated_moc.ix[idx]] for idx in simulated_moc.index])
+    simulated_moc_values[0]=simulated_moc_values[0]+yaxis_values[0]
+    simulated_moc_values=simulated_moc_values.cumsum()
+    simulated_moc_values_percent=np.insert(np.diff(simulated_moc_values).cumsum()/float(simulated_moc_values[0])*100,0,0)
     
     yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
     
     benchmark_values[0]=benchmark_values[0]+yaxis_values[0]
     benchmark_values=benchmark_values.cumsum()
     benchmark_values_percent=np.insert(np.diff(benchmark_values).cumsum()/float(benchmark_values[0])*100,0,0)
+    
+    
+    
     fig = plt.figure(figsize=(10,8))
     #num_plots = 2
     #colormap = plt.cm.gist_ncar
@@ -536,8 +550,13 @@ for account in totals_accounts:
     ax.plot(index, yaxis_values, 'b', alpha=0.5, label=account+' $ account values')
     ax.plot(index, benchmark_values, alpha=0.4, color='r',\
                 label=benchmark_sym+' benchmark $ value')
+    ax.plot(index, simulated_moc_values, alpha=0.4, color='g',\
+                label='Simulated MOC $ value')
+                
     ax.set_ylabel('$ Account Values', size=12)
-    ax.legend(loc='upper left', prop={'size':16})
+    #ax.legend(loc='upper left', prop={'size':16})
+    ax.legend(loc='upper center', bbox_to_anchor=(.1, -0.15),prop={'size':16},
+              fancybox=True, shadow=True, ncol=1)
     ax.xaxis.set_major_formatter(DateFormatter('%b %d %Y'))
     #ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
     ax.xaxis.set_major_locator(WeekdayLocator(MONDAY))
@@ -548,11 +567,15 @@ for account in totals_accounts:
     ax2.plot(index, yaxis_values_percent, 'b', ls=':', alpha=0.5, label=account+' % cumulative change')
     ax2.plot(index, benchmark_values_percent, alpha=0.4, color='r',ls=':',\
                 label=benchmark_sym+' benchmark % cumulative change')
+    ax2.plot(index, simulated_moc_values_percent, alpha=0.4, color='g',ls=':',\
+                label='Simulated MOC % cumulative change')
     ax2.set_ylabel('Cumulative % Change', size=12)
     ax.set_xlabel('MOC Date', size=12)
     #ax.set_xticklabels(xaxis_labels)
-    plt.title(broker+' '+account+' Equity Chart '+str(lookback)+' day lookback')
-    ax2.legend(loc='lower left', prop={'size':16})
+    plt.title(broker+' '+account+' Equity Chart '+str(lookback)+' day lookback', size=16)
+    #ax2.legend(loc='lower left', prop={'size':16})
+    ax2.legend(loc='upper center', bbox_to_anchor=(.7, -0.15),prop={'size':16},
+              fancybox=True, shadow=True, ncol=1)
     #align_yaxis(ax, 0, ax2, 0)
     fig.autofmt_xdate()
     
@@ -561,7 +584,7 @@ for account in totals_accounts:
     filename2=date+'_'+account+'_'+broker+'_account_value.png'    
     plt.savefig(filename, bbox_inches='tight')
     print 'Saved',filename
-    if debug:
+    if debug and showPlots:
         plt.show()
     plt.close()
     

@@ -496,7 +496,7 @@ for account in totals_accounts:
 for account in totals_accounts:
     totalsDF=totals_accounts[account]
     benchmark_values=totalsDF['PNL_benchmark'].copy()
-    print account, benchmark_values
+    #print account, benchmark_values
     benchmark_values.index=benchmark_xaxis_label
     simulated_moc=pd.read_sql('select * from (select * from v4futures_live where orderType=\'MOC\' order by timestamp)\
                                             group by Date', con=readConn, index_col='Date').selection

@@ -27,18 +27,19 @@
     <center><a href="static/images/{{ date2 }}_{{ name }}_Day$PNLbySystem.png"><img src="static/images/{{ date2 }}_{{ name }}_Day$PNLbySystem.png"  width=900 height=1800></a></center>
 {% endfor %}
 
-<center><h1>Market Heatmaps</h1></center><br><center>
-<center><a href="{% static 'images/futures_2.png' %}"><img src="{% static 'images/futures_2.png' %}"  width=800 height=800></a></center>
-<center><a href="{% static 'images/futures_3.png' %}"><img src="{% static 'images/futures_3.png' %}"  width=800 height=800></a></center>
-<center><h1>Custom Signals</h1></center><br><center>
-<center><a href="{% static 'images/custom_currency.png' %}"><img src="{% static 'images/custom_currency.png' %}"  width=800 height=800></a></center>
-<center><a href="{% static 'images/custom_energy.png' %}"><img src="{% static 'images/custom_energy.png' %}"  width=800 height=800></a></center>
-<center><a href="{% static 'images/custom_grain.png' %}"><img src="{% static 'images/custom_grain.png' %}"  width=800 height=800></a></center>
-<center><a href="{% static 'images/custom_index.png' %}"><img src="{% static 'images/custom_index.png' %}"  width=800 height=800></a></center>
-<center><a href="{% static 'images/custom_meat.png' %}"><img src="{% static 'images/custom_meat.png' %}"  width=800 height=800></a></center>
-<center><a href="{% static 'images/custom_metal.png' %}"><img src="{% static 'images/custom_metal.png' %}"  width=800 height=800></a></center>
-<center><a href="{% static 'images/custom_rates.png' %}"><img src="{% static 'images/custom_rates.png' %}"  width=800 height=800></a></center>
-<center><a href="{% static 'images/custom_soft.png' %}"><img src="{% static 'images/custom_soft.png' %}"  width=800 height=800></a></center>
-
+{% if not archive %}
+    <center><h1>Market Heatmaps</h1></center><br><center>
+    <center><a href="{% static 'images/futures_2.png' %}"><img src="{% static 'images/futures_2.png' %}"  width=800 height=800></a></center>
+    <center><a href="{% static 'images/futures_3.png' %}"><img src="{% static 'images/futures_3.png' %}"  width=800 height=800></a></center>
+    <center><h1>Custom Signals</h1></center><br><center>
+    <center><a href="{% static 'images/custom_currency.png' %}"><img src="{% static 'images/custom_currency.png' %}"  width=800 height=800></a></center>
+    <center><a href="{% static 'images/custom_energy.png' %}"><img src="{% static 'images/custom_energy.png' %}"  width=800 height=800></a></center>
+    <center><a href="{% static 'images/custom_grain.png' %}"><img src="{% static 'images/custom_grain.png' %}"  width=800 height=800></a></center>
+    <center><a href="{% static 'images/custom_index.png' %}"><img src="{% static 'images/custom_index.png' %}"  width=800 height=800></a></center>
+    <center><a href="{% static 'images/custom_meat.png' %}"><img src="{% static 'images/custom_meat.png' %}"  width=800 height=800></a></center>
+    <center><a href="{% static 'images/custom_metal.png' %}"><img src="{% static 'images/custom_metal.png' %}"  width=800 height=800></a></center>
+    <center><a href="{% static 'images/custom_rates.png' %}"><img src="{% static 'images/custom_rates.png' %}"  width=800 height=800></a></center>
+    <center><a href="{% static 'images/custom_soft.png' %}"><img src="{% static 'images/custom_soft.png' %}"  width=800 height=800></a></center>
+{% endif %}
 
 {% endblock %}

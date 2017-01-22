@@ -95,15 +95,27 @@ def symbols(request):
     futuresdict = get_futures_dictionary()
     return render(request, 'symbols.html', {'groups':futuresdict})
 
-def futures(request):
+def futures(request, date=None):
     context={}
-    context['accounts']=get_overview()
-    date=context['accounts']['v4futures']
-    context['date']=dt.strptime(date, '%Y%m%d').strftime('%Y-%m-%d')
+    if date==None:
+        context['accounts']=get_overview()
+        date=context['accounts']['v4futures']
+        context['date']=dt.strptime(date, '%Y%m%d').strftime('%Y-%m-%d')
+        context['archive'] = False
+    else:
+        context['accounts']={}
+        accounts = ['v4micro', 'v4mini', 'v4futures']
+        for account in accounts:
+            context['accounts'][account] = date.replace('-','')
+        context['date']=date
+        context['archive']=True
     return render(request, 'futures2.html', context)
 
 def timetable(request):
-    return render(request, 'timetable.html', {'timetable':get_detailed_timetable()})
+    eastern = timezone('US/Eastern')
+    now = dt.now(get_localzone()).astimezone(eastern).strftime('%Y-%m-%d %H:%M:%S %p EST')
+
+    return render(request, 'timetable.html', {'time':now, 'timetable':get_detailed_timetable()})
 
 def order_status(request):
     context={'logfiles':[]}
@@ -183,3 +195,6 @@ def last_userselection(request):
     #        (select max(timestamp) from betting_userselection as maxtimestamp)', con=readConn, index_col='userID')
     lastSelection=UserSelection.objects.all().order_by('-timestamp')[0]
     return JsonResponse(lastSelection.dic())
+
+def archive(request):
+    return render(request, 'archive.html', {'dates':archive_dates()})

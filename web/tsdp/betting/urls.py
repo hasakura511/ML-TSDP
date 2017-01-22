@@ -19,4 +19,6 @@ urlpatterns = [
     url(r'^order_status/$', views.order_status, name='order_status'),
     url(r'^board/$', views.board, name='board'),
     url(r'^timetable/$', views.timetable, name='timetable'),
+    url(r'^archive/$', views.archive, name='archive'),
+    url(r'^archive/(?P<date>[0-9-]+)/$', views.futures, name='futures'),
 ]

@@ -170,8 +170,8 @@ def get_order_status():
         return sig.values
 
     for account in accounts:
-        col_order= ['broker','account','order_type','contract','description','selection','openedWhen','urpnl','system_signal',\
-                'broker_position','signal_check','system_qty','broker_qty','qty_check']
+        col_order= ['broker','account','contract','description','openedWhen','urpnl',\
+                'broker_position','broker_qty','signal_check','qty_check','selection','order_type']
         #webSelection=pd.read_sql('select * from webSelection where timestamp=\
         #        (select max(timestamp) from webSelection)'
         #bet = eval(webSelection.selection[0])[account][0]
@@ -346,3 +346,12 @@ def get_overview():
         date = str(totalsDF.index[-1])
         overviewDict[account]=date
     return overviewDict
+
+def archive_dates():
+    readConn = getBackendDB()
+    dates = pd.read_sql('select distinct Date from futuresATRhist', con=readConn).Date.tolist()
+    startdate = 20170106
+    datetup=[(dt.strptime(str(x), '%Y%m%d').strftime('%A, %b %d, %Y'),\
+              dt.strptime(str(x), '%Y%m%d').strftime('%Y-%m-%d')) for x in\
+             sorted(dates[dates.index(startdate):], reverse=True)]
+    return datetup

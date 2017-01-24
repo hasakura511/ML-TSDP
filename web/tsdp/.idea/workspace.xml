@@ -66,17 +66,17 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="base.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="base.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/betting/templates/base.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="25" column="85" lean-forward="false" selection-start-line="25" selection-start-column="85" selection-end-line="25" selection-end-column="85" />
+            <state relative-caret-position="272">
+              <caret line="16" column="23" lean-forward="false" selection-start-line="16" selection-start-column="23" selection-end-line="16" selection-end-column="23" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="timetable.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="timetable.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/betting/templates/timetable.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="170">
@@ -90,7 +90,7 @@
         <entry file="file://$PROJECT_DIR$/betting/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="278">
-              <caret line="220" column="93" lean-forward="true" selection-start-line="220" selection-start-column="56" selection-end-line="220" selection-end-column="93" />
+              <caret line="220" column="93" lean-forward="false" selection-start-line="220" selection-start-column="56" selection-end-line="220" selection-end-column="93" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
                 <marker date="1485082936294" expanded="true" signature="1018:1041" ph="select * fro... timetable" />
@@ -122,7 +122,7 @@
         <entry file="file://$PROJECT_DIR$/betting/templates/futures2.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="170">
-              <caret line="10" column="35" lean-forward="true" selection-start-line="10" selection-start-column="12" selection-end-line="10" selection-end-column="35" />
+              <caret line="10" column="35" lean-forward="false" selection-start-line="10" selection-start-column="12" selection-end-line="10" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -202,13 +202,13 @@
         <option value="$PROJECT_DIR$/bettingboard/settings.py" />
         <option value="$PROJECT_DIR$/betting/start_immediate.py" />
         <option value="$PROJECT_DIR$/betting/models.py" />
-        <option value="$PROJECT_DIR$/betting/templates/base.html" />
         <option value="$PROJECT_DIR$/betting/urls.py" />
         <option value="$PROJECT_DIR$/betting/templates/futures2.html" />
         <option value="$PROJECT_DIR$/betting/templates/archive.html" />
         <option value="$PROJECT_DIR$/betting/helpers.py" />
         <option value="$PROJECT_DIR$/betting/views.py" />
         <option value="$PROJECT_DIR$/betting/templates/timetable.html" />
+        <option value="$PROJECT_DIR$/betting/templates/base.html" />
       </list>
     </option>
   </component>
@@ -982,18 +982,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/betting/templates/base.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="25" column="85" lean-forward="false" selection-start-line="25" selection-start-column="85" selection-end-line="25" selection-end-column="85" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/betting/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="278">
-          <caret line="220" column="93" lean-forward="true" selection-start-line="220" selection-start-column="56" selection-end-line="220" selection-end-column="93" />
+          <caret line="220" column="93" lean-forward="false" selection-start-line="220" selection-start-column="56" selection-end-line="220" selection-end-column="93" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
             <marker date="1485082936294" expanded="true" signature="1018:1041" ph="select * fro... timetable" />
@@ -1023,7 +1015,7 @@
     <entry file="file://$PROJECT_DIR$/betting/templates/futures2.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
-          <caret line="10" column="35" lean-forward="true" selection-start-line="10" selection-start-column="12" selection-end-line="10" selection-end-column="35" />
+          <caret line="10" column="35" lean-forward="false" selection-start-line="10" selection-start-column="12" selection-end-line="10" selection-end-column="35" />
           <folding />
         </state>
       </provider>
@@ -1042,6 +1034,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="10" column="17" lean-forward="false" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/betting/templates/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="23" lean-forward="false" selection-start-line="16" selection-start-column="23" selection-end-line="16" selection-end-column="23" />
           <folding />
         </state>
       </provider>

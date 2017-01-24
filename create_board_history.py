@@ -200,7 +200,6 @@ readWebConn = sqlite3.connect(dbPathWeb)
 selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
         (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
 #selectionDict=eval(selectionDF.selection.values[0])
-componentsdict = eval(selectionDF['v4futures'].values[0])
 
 #futuresDF_all=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 #this is created after every MOC
@@ -235,6 +234,7 @@ totals_accounts={}
 pnl_accounts={}
 for account in qtydict.keys():
     print '\ncreating history for', account
+    componentsdict = eval(selectionDF[account].values[0])
     futuresDF_boards ={}
     signalsDict={}
     totalsDict = {}
@@ -625,6 +625,7 @@ for key in performance_dict_by_box:
     newdict['date']=performance_dict_by_box[key][account]['date']
     signals_cons=signals_cons.transpose()
     signals_cons.columns=[web_accountnames[x] for x in signals_cons.columns]
+    signals_cons.index.name=key
     if key != 'account_value':
         newdict['signals']= signals_cons[['50K', '100K', '250K']].to_html()
     else:

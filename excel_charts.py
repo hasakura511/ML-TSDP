@@ -180,7 +180,7 @@ def saveCharts(df, **kwargs):
 account='v4futures'
 totalsDF=pd.read_sql('select * from {}'.format('totalsDF_board_'+account), con=readConn,  index_col='Date')
 date=str(totalsDF.index[-1])
-totalsDF.index=totalsDF.index.astype(str).to_datetime().strftime('%A, %b %Y')
+totalsDF.index=totalsDF.index.astype(str).to_datetime().strftime('%A, %b %d %Y')
 
 #volatility by group
 lookback=5
@@ -235,7 +235,7 @@ saveCharts(df2, df2=df, ylabel=ylabel, title=title, filename=filename, kind='bar
 for account in active_symbols:
     totalsDF=pd.read_sql('select * from {}'.format('totalsDF_board_'+account), con=readConn,  index_col='Date')
     date=str(totalsDF.index[-1])
-    totalsDF.index=totalsDF.index.astype(str).to_datetime().strftime('%A, %b %Y')
+    totalsDF.index=totalsDF.index.astype(str).to_datetime().strftime('%A, %b %d %Y')
     #accuracy
     lookback=3
     acc_cols=[x for x in totalsDF.columns if 'ACC' in x and 'benchmark' not in x and 'Off' not in x]

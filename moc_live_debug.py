@@ -1068,7 +1068,7 @@ def checkIBpositions(account='v4futures'):
                 text+= 'OK'
             else:
                 text+= 'ERROR '+str(sysqty)+' adjustment needed'
-                adj_syms.append(sym, sysqty)
+                adj_syms.append((sym, sysqty))
                 errors+=1
         print sym,text
         portfolio.set_value(sym,'status',text)

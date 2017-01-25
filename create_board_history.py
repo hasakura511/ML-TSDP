@@ -623,11 +623,14 @@ for key in performance_dict_by_box:
     if 'infotext2' in performance_dict_by_box[key][account]:
         newdict['infotext2']=performance_dict_by_box[key][account]['infotext2']        
     newdict['date']=performance_dict_by_box[key][account]['date']
-    signals_cons=signals_cons.transpose()
-    signals_cons.columns=[web_accountnames[x] for x in signals_cons.columns]
-    signals_cons.index.name=key
+
     if key != 'account_value':
-        newdict['signals']= signals_cons[['50K', '100K', '250K']].to_html()
+        signals_cons=signals_cons.transpose()
+        signals_cons.columns=[web_accountnames[x] for x in signals_cons.columns]
+        signals_cons.index=['<a href="/static/images/v4_'+[futuresDict.index[i] for i,desc in enumerate(futuresDict.Desc)\
+                                    if re.sub(r'-[^-]*$','',x) in desc][0]+'_BRANK.png" target="_blank">'+x+'</a>' for x in signals_cons.index]
+        signals_cons.index.name=key
+        newdict['signals']= signals_cons[['50K', '100K', '250K']].to_html(escape=False)
     else:
         newdict['signals']=''
     performance_dict_by_box2[key]=newdict

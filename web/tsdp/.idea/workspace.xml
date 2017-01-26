@@ -58,9 +58,41 @@
         <entry file="file://$PROJECT_DIR$/betting/views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="511">
-              <caret line="109" column="75" lean-forward="false" selection-start-line="109" selection-start-column="75" selection-end-line="109" selection-end-column="75" />
+              <caret line="127" column="0" lean-forward="true" selection-start-line="127" selection-start-column="0" selection-end-line="127" selection-end-column="0" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
+                <marker date="1485343857307" expanded="true" signature="10503:10555" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="10557:10637" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="10658:11015" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="10858:10929" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="11042:11209" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="11239:11409" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="11432:11542" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="11610:11807" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="11817:12060" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="12138:12364" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="12392:13205" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="12520:12710" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="12558:12595" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="12633:12710" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="13050:13151" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="13242:13446" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="13479:13593" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="13620:14399" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="13653:14299" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="13720:14299" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="13901:14165" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="13936:14030" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14052:14165" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14183:14299" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14311:14399" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14427:14484" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14509:14803" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14542:14691" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14616:14691" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14701:14803" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14838:15159" ph="..." />
+                <marker date="1485343857307" expanded="true" signature="14843:15042" ph="..." />
               </folding>
             </state>
           </provider>
@@ -133,8 +165,8 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/betting/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="23" lean-forward="false" selection-start-line="8" selection-start-column="23" selection-end-line="8" selection-end-column="23" />
+            <state relative-caret-position="238">
+              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
@@ -181,7 +213,6 @@
         <option value="$PROJECT_DIR$/betting/templates/futures.html" />
         <option value="$PROJECT_DIR$/bettingboard/settings.py" />
         <option value="$PROJECT_DIR$/betting/start_immediate.py" />
-        <option value="$PROJECT_DIR$/betting/models.py" />
         <option value="$PROJECT_DIR$/betting/urls.py" />
         <option value="$PROJECT_DIR$/betting/templates/futures2.html" />
         <option value="$PROJECT_DIR$/betting/templates/archive.html" />
@@ -189,6 +220,7 @@
         <option value="$PROJECT_DIR$/betting/views.py" />
         <option value="$PROJECT_DIR$/betting/templates/timetable.html" />
         <option value="$PROJECT_DIR$/betting/templates/base.html" />
+        <option value="$PROJECT_DIR$/betting/models.py" />
       </list>
     </option>
   </component>
@@ -707,6 +739,38 @@
           <caret line="86" column="27" lean-forward="false" selection-start-line="86" selection-start-column="27" selection-end-line="86" selection-end-column="27" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
+            <marker date="1485343857307" expanded="true" signature="10503:10555" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10557:10637" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10658:11015" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10858:10929" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11042:11209" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11239:11409" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11432:11542" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11610:11807" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11817:12060" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12138:12364" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12392:13205" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12520:12710" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12558:12595" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12633:12710" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13050:13151" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13242:13446" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13479:13593" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13620:14399" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13653:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13720:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13901:14165" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13936:14030" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14052:14165" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14183:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14311:14399" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14427:14484" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14509:14803" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14542:14691" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14616:14691" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14701:14803" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14838:15159" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14843:15042" ph="..." />
           </folding>
         </state>
       </provider>
@@ -751,6 +815,38 @@
           <caret line="86" column="27" lean-forward="false" selection-start-line="86" selection-start-column="27" selection-end-line="86" selection-end-column="27" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
+            <marker date="1485343857307" expanded="true" signature="10503:10555" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10557:10637" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10658:11015" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10858:10929" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11042:11209" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11239:11409" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11432:11542" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11610:11807" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11817:12060" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12138:12364" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12392:13205" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12520:12710" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12558:12595" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12633:12710" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13050:13151" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13242:13446" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13479:13593" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13620:14399" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13653:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13720:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13901:14165" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13936:14030" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14052:14165" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14183:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14311:14399" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14427:14484" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14509:14803" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14542:14691" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14616:14691" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14701:14803" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14838:15159" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14843:15042" ph="..." />
           </folding>
         </state>
       </provider>
@@ -795,6 +891,38 @@
           <caret line="86" column="27" lean-forward="true" selection-start-line="86" selection-start-column="27" selection-end-line="86" selection-end-column="27" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
+            <marker date="1485343857307" expanded="true" signature="10503:10555" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10557:10637" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10658:11015" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10858:10929" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11042:11209" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11239:11409" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11432:11542" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11610:11807" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11817:12060" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12138:12364" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12392:13205" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12520:12710" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12558:12595" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12633:12710" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13050:13151" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13242:13446" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13479:13593" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13620:14399" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13653:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13720:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13901:14165" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13936:14030" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14052:14165" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14183:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14311:14399" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14427:14484" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14509:14803" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14542:14691" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14616:14691" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14701:14803" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14838:15159" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14843:15042" ph="..." />
           </folding>
         </state>
       </provider>
@@ -965,9 +1093,41 @@
     <entry file="file://$PROJECT_DIR$/betting/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="511">
-          <caret line="109" column="75" lean-forward="false" selection-start-line="109" selection-start-column="75" selection-end-line="109" selection-end-column="75" />
+          <caret line="127" column="0" lean-forward="true" selection-start-line="127" selection-start-column="0" selection-end-line="127" selection-end-column="0" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
+            <marker date="1485343857307" expanded="true" signature="10503:10555" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10557:10637" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10658:11015" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="10858:10929" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11042:11209" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11239:11409" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11432:11542" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11610:11807" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="11817:12060" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12138:12364" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12392:13205" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12520:12710" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12558:12595" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="12633:12710" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13050:13151" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13242:13446" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13479:13593" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13620:14399" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13653:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13720:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13901:14165" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="13936:14030" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14052:14165" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14183:14299" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14311:14399" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14427:14484" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14509:14803" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14542:14691" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14616:14691" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14701:14803" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14838:15159" ph="..." />
+            <marker date="1485343857307" expanded="true" signature="14843:15042" ph="..." />
           </folding>
         </state>
       </provider>
@@ -998,8 +1158,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/betting/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="23" lean-forward="false" selection-start-line="8" selection-start-column="23" selection-end-line="8" selection-end-column="23" />
+        <state relative-caret-position="238">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
           </folding>

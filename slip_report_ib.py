@@ -129,8 +129,16 @@ lastExecutions= pd.read_sql('select * from ib_executions where timestamp=\
 if lastExecutions.shape[0] >0:
     lastExecutions.times = pd.to_datetime(lastExecutions.times)
     lastExecutions.lastAppend= pd.to_datetime(lastExecutions.lastAppend).dt.strftime('%Y%m%d')
+    executions=pd.DataFrame()
+    for idx in lastExecutions.index:
+        #print type(lastExecutions.ix[idx]), isinstance(lastExecutions.ix[idx], pd.Series)
+        if not isinstance(lastExecutions.ix[idx], pd.Series):
+            if idx not in executions.index:
+                executions=executions.append(lastExecutions.ix[idx].sort_values(by=['qty'], ascending=False).iloc[0])
+        else:
+            executions=executions.append(lastExecutions.ix[idx])
     #calc slipage for current contracts
-    executions = lastExecutions.ix[[x for x in lastExecutions.index if x in contractsDF.contracts.values]].copy()
+    executions = executions.ix[[x for x in executions.index if x in contractsDF.contracts.values]].copy()
         
     if executions.shape[0]>0:
         executions['CSIsym']=contractsDF.ix[executions.ibsym].CSIsym.values

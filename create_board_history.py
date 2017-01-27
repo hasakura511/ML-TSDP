@@ -142,6 +142,7 @@ web_accountnames={
                     'v4mini':'100K',
                     'v4micro':'50K',
                     }
+lookback_short=5
 lookback=20
 benchmark_sym='ES'
 if len(sys.argv)==1:
@@ -152,7 +153,7 @@ else:
 if debug:
     mode = 'replace'
     #marketList=[sys.argv[1]]
-    showPlots=False
+    showPlots=True
     dbPath='./data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
     dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
@@ -367,6 +368,7 @@ performance_dict={}
 infodisplay = {key: [reversecomponentsdict[x] for x in componentsdict[key]] for key in componentsdict}
 
 perchgDict={}
+#perchgDict_short={}
 for account in totals_accounts:
     totalsDF=totals_accounts[account]
     pnl_cols=[x for x in totalsDF.columns if 'PNL' in x]
@@ -378,12 +380,31 @@ for account in totals_accounts:
         cumper=(pnlarr.cumsum()/accountvalues[account]-1)*100
         perchgDF=perchgDF.append(pd.Series(data=cumper, name=col.split('_')[1], index=pnlsDF.index))
     ranking=perchgDF.transpose().iloc[-1].sort_values(ascending=True)
-    perchgDict[account]=ranking.copy()
-    perchgDict[account].index=[str(len(ranking.index)-idx)+' Rank '+col for idx,col in enumerate(ranking.index)]
-    #perchgDict[account].plot(kind='barh', figsize=(10,15))
+    ranking.name=str(lookback)+'Day Lookback'
 
+    
+    pnlsDF=pnlsDF.iloc[-lookback_short:]
+    perchgDF_short=pd.DataFrame()
+    for col in pnlsDF:
+        pnlarr=pnlsDF[col].copy().values
+        pnlarr[0]=pnlarr[0]+accountvalues[account]
+        cumper=(pnlarr.cumsum()/accountvalues[account]-1)*100
+        perchgDF_short=perchgDF_short.append(pd.Series(data=cumper, name=col.split('_')[1], index=pnlsDF.index))
+    ranking_short=perchgDF_short.transpose().iloc[-1].sort_values(ascending=True)
+    ranking_short.name=str(lookback_short)+'Day Lookback'
+    #perchgDict_short[account]=ranking_short.copy()
+    #perchgDict_short[account].index=[str(len(ranking_short.index)-idx)+' Rank '+col for idx,col in enumerate(ranking_short.index)]
+    
+    combined_ranking=pd.DataFrame([ranking,ranking_short]).transpose().sort_values(by=[ranking.name], ascending=True)
+    perchgDict[account]=combined_ranking
+    #perchgDict[account].plot(kind='barh', figsize=(10,15))
+    perchgDict[account].index=[str(len(combined_ranking.index)-idx)+' Rank '+col for idx,col in enumerate(combined_ranking.index)]
+    
 def createRankingChart(ranking, account, line, title, filename):
-    plt.figure(1, figsize=(10,15))
+    fig=plt.figure(1, figsize=(10,15))
+    ax = fig.add_subplot(111) 
+    colors=['b','g']
+    colors2=['r','g']
     if is_int(line):
         anti='Anti-'+line
         #print line, anti
@@ -395,10 +416,20 @@ def createRankingChart(ranking, account, line, title, filename):
             #component
             anti=anti_components[line]
             #print line, anti
-    color_index=['r' if line==x.split()[2] or anti==x.split()[2] else 'b' for x in ranking.index]
+    color_index_ticks=['r' if line==x.split()[2] or anti==x.split()[2] else 'black' for x in ranking.index]
+    #color_index=[['r','r'] if line==x.split()[2] or anti==x.split()[2] else ['b','g'] for x in ranking.index]
     pair=sorted([x for x in ranking.index if line==x.split()[2] or anti==x.split()[2]])
-    text=', '.join([index+' '+str(round(ranking.ix[index],1))+'%' for index in pair])
-    newplot=ranking.plot(kind='barh',colors=color_index)
+    #ranking.plot(kind='barh', figsize=(10,15), width=0.6)
+    for i,col in enumerate(list(ranking)):
+        #c = colors[col[0]]
+        color_index=[colors2[i] if line==x.split()[2] or anti==x.split()[2] else colors[i] for x in ranking.index]
+        ranking[col].plot(kind='barh', width=0.6, ax=ax,color=color_index)
+        #ranking
+        #pos = positions[i]
+        #DFGSum[col].plot(kind='bar', color=c, position=pos, width=0.05)
+    [x.set_color(i) for i,x in zip(color_index_ticks,ax.yaxis.get_ticklabels())]
+    plt.legend(loc='upper center', bbox_to_anchor=(.5, -0.03),prop={'size':18},
+          fancybox=True, shadow=True, ncol=2)
     plt.xlabel('Cumulative % change', size=12)
     title=account+' '+title
     plt.title(title)
@@ -407,6 +438,15 @@ def createRankingChart(ranking, account, line, title, filename):
     if debug and showPlots:
         plt.show()
     plt.close()
+    
+    lookback_name=str(lookback)+'Day Lookback'
+    text=lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
+    lookback_name=str(lookback_short)+'Day Lookback'
+    ranking=ranking.sort_values(by=[lookback_name], ascending=True)
+    ranking.index=[x.split()[2] for x in ranking.index]
+    ranking.index=[str(len(ranking.index)-idx)+' Rank '+col for idx,col in enumerate(ranking.index)]
+    pair=sorted([x for x in ranking.index if line==x.split()[2] or anti==x.split()[2]])
+    text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
     return text
     
 for account in totals_accounts:

@@ -35,7 +35,7 @@ else:
 if debug:
     mode = 'replace'
     #marketList=[sys.argv[1]]
-    showPlots=False
+    showPlots=True
     dbPath='./data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
     dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
@@ -171,7 +171,7 @@ def saveCharts(df, **kwargs):
     #filename2=date+'_'+account+'_'+line.replace('/','')+'.png'
     plt.savefig(filename, bbox_inches='tight')
     print 'Saved',filename
-    if debug:
+    if debug and showPlots:
         plt.show()
     plt.close()
 
@@ -283,7 +283,7 @@ for account in active_symbols.keys():
         accountvalue.index.name='xaxis'
         newidx=accountvalue.reset_index().xaxis.drop_duplicates().index
         xaxis_values=accountvalue.reset_index().ix[newidx].xaxis.values
-        yaxis_values=accountvalue.reset_index().ix[newidx].value
+        yaxis_values=accountvalue.reset_index().ix[newidx].value.values
     else:
         #broker='c2'
         title='DAD\'s '+account
@@ -292,13 +292,16 @@ for account in active_symbols.keys():
         xaxis_values=[dt.strftime(date,'%Y-%m-%d') for date in pd.to_datetime(accountvalue.updatedLastTimeET)]
         yaxis_values=accountvalue.modelAccountValue.values
     
-    yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
-    av_cumper_df=pd.concat([av_cumper_df,pd.Series(data=yaxis_values_percent, index=xaxis_values, name=title)], axis=1, join='outer')
+    #yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
+    av_cumper_df=pd.concat([av_cumper_df,pd.Series(data=yaxis_values, index=xaxis_values, name=title)], axis=1, join='outer')
     
     
 fig = plt.figure()
 ax = fig.add_subplot(111)
-av_cumper_df=av_cumper_df.dropna()
+av_cumper_df=av_cumper_df.dropna().copy()
+for col in av_cumper_df:
+    yaxis_values=av_cumper_df[col].values
+    av_cumper_df[col]=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
 av_cumper_df.index=pd.to_datetime(av_cumper_df.index)
 av_cumper_df.plot(ax=ax, figsize=(15,13))
 ax.xaxis.set_major_formatter(DateFormatter('%b %d %Y'))

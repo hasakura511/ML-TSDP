@@ -1,9 +1,11 @@
+@echo off
+for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "dt=%%a"
+set "YY=%dt:~2,2%" & set "YYYY=%dt:~0,4%" & set "MM=%dt:~4,2%" & set "DD=%dt:~6,2%"
+set "HH=%dt:~8,2%" & set "Min=%dt:~10,2%" & set "Sec=%dt:~12,2%"
+
+set "datestamp=%YYYY%%MM%%DD%" & set "timestamp=%HH%%Min%%Sec%"
+set "fullstamp=%YYYY%%MM%%DD%_%HH%-%Min%-%Sec%"
+@echo on
+
 cd \ml-tsdp
-\anaconda2\python vol_adjsize_c2.py 1 >> \logs\daily_data.log
-\anaconda2\python vol_adjsize.py 1 >> \logs\daily_data.log
-\anaconda2\python refresh_c2.py >> \logs\daily_futures.log
-\anaconda2\python slip_report_c2.py 1 >> \logs\daily_data.log
-\anaconda2\python slip_report_ib.py 1 >> \logs\daily_data.log
-\anaconda2\python heatmap_futuresCSI.py 1 >> \logs\daily_data.log
-\anaconda2\python run_allsystems.py 1 >> \logs\daily_futures.log
-\anaconda2\python vol_adjsize.py 1 >> \logs\daily_data.log
+\anaconda2\python post_processing_csi.py >> \logs\post_processing_csi_%fullstamp%.txt

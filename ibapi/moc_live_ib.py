@@ -1071,7 +1071,9 @@ def checkIBpositions(account='v4futures'):
                     text='OK: open order found'
                     print sym, text
                     portfolio.set_value(sym,'status',text)
-    
+        else:
+            print 'no open orders found. check IB.'
+            
     portfolio['bet']=ordersDF.selection[0]
     portfolio['ordertype']=ordersDF.ordertype[0]
     portfolio['Date']=ordersDF.Date[0]

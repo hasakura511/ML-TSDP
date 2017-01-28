@@ -149,7 +149,7 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
         mode = 'append'
         #marketList=[sys.argv[1]]
         showPlots=False
-        dbPath=-'./data/futures.sqlite3' 
+        dbPath='./data/futures.sqlite3' 
         dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
         dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
         dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
@@ -724,7 +724,7 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
             if selectionDict == selectionDict_old:
                 #avoid duplicate entries
                 print 'found no change in user selection', selectionDict
-                print 'skipping save to db'
+                print 'skipping save to table webSelection'
             else:
                 #write new selection to backend db
                 tablename = 'webSelection'
@@ -732,9 +732,6 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
                 selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists=mode,\
                             con=writeConn, index=False)
                 print 'new user selection found. appending webSelection to', dbPath,mode
-                selectionDF.reset_index().drop(['id'],axis=1).to_sql(name='webSelection', if_exists='append',\
-                            con=writeConn, index=False)
-                print 'new user selection found. appending webSelection to', dbPath
 
         else:  
             #create selection

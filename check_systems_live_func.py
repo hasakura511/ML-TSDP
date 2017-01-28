@@ -268,6 +268,7 @@ def check_systems_live(debug, ordersDict, csidate):
                     exitList.append(sym+' not in system file. exiting contract!!.. '+response)
         #check contracts in system file not in c2.
         for sym in ordersDict[account].index:
+            sys_count+=1
             #ostatus_cols=['account','order_type','contract','broker','selection','urpnl','system_signal',\
             #                    'broker_position','signal_check','system_qty','broker_qty','qty_check','openedWhen','Date','timestamp']
             contract = sym
@@ -287,7 +288,6 @@ def check_systems_live(debug, ordersDict, csidate):
                 qty_check='OK: signal is 0' if sig == c2sig else 'ERROR: No Open Orders Found'
                 if checkOpen:
                     mismatch_count+=1
-                    sys_count+=1
                     errors, signal_check, qty_check=reconcileWorkingSignals(account, workingSignals, sym, sig, 0, qty, 0, signal_check, qty_check)
                     error_count+=errors
                 
@@ -308,7 +308,7 @@ def check_systems_live(debug, ordersDict, csidate):
             
         for e in exitList:
             print e
-        print 'c2:'+str(c2_count)+' account:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)+' errors:'+str(error_count)
+        print 'c2:'+str(c2_count)+' system:'+str(sys_count)+' mismatch:'+str(mismatch_count)+' exit:'+str(exit_count)+' errors:'+str(error_count)
         print 'DONE!\n'
     pd.DataFrame(pd.Series(data=totalerrors), columns=['totalerrors']).to_sql(name='checkSystems',con=writeConn, index=False, if_exists='replace')
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

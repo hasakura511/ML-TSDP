@@ -265,5 +265,63 @@ for account in active_symbols:
                         lookback=lookback, kind='barh',width=width, twiny=True)
 
 
+av_cumper_df=pd.DataFrame()
+for account in active_symbols.keys():
+    #totalsDF=pd.read_sql('select * from {}'.format('totalsDF_board_'+account), con=readConn,  index_col='Date')
+    #benchmark_values=totalsDF['PNL_benchmark'].copy()
+    #print account, benchmark_values
+    #benchmark_values.index=benchmark_xaxis_label=[dt.strptime(str(x),'%Y%m%d').strftime('%Y-%m-%d') for x in benchmark_values.index]
+    
+    if account=='v4futures':
+        #broker='ib'
+        title='MOM\'s '+account
+        accountvalue=pd.read_sql('select * from (select * from ib_accountData where Desc=\'NetLiquidation\'\
+                                                order by timestamp ASC) group by Date', con=readConn)
+        accountvalue.value=[float(x) for x in accountvalue.value.values]
+        timestamps=[timezone('UTC').localize(dt.utcfromtimestamp(ts)).astimezone(timezone('US/Eastern')) for ts in accountvalue.timestamp]
+        accountvalue.index=[dt.strftime(date,'%Y-%m-%d') for date in timestamps]
+        accountvalue.index.name='xaxis'
+        newidx=accountvalue.reset_index().xaxis.drop_duplicates().index
+        xaxis_values=accountvalue.reset_index().ix[newidx].xaxis.values
+        yaxis_values=accountvalue.reset_index().ix[newidx].value
+    else:
+        #broker='c2'
+        title='DAD\'s '+account
+        accountvalue=pd.read_sql('select * from (select * from c2_equity where\
+                                system=\'{}\' order by timestamp ASC) group by Date'.format(account), con=readConn)
+        xaxis_values=[dt.strftime(date,'%Y-%m-%d') for date in pd.to_datetime(accountvalue.updatedLastTimeET)]
+        yaxis_values=accountvalue.modelAccountValue.values
+    
+    yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
+    av_cumper_df=pd.concat([av_cumper_df,pd.Series(data=yaxis_values_percent, index=xaxis_values, name=title)], axis=1, join='outer')
+    
+    
+fig = plt.figure()
+ax = fig.add_subplot(111)
+av_cumper_df=av_cumper_df.dropna()
+av_cumper_df.index=pd.to_datetime(av_cumper_df.index)
+av_cumper_df.plot(ax=ax, figsize=(15,13))
+ax.xaxis.set_major_formatter(DateFormatter('%b %d %Y'))
+#ax.xaxis.set_major_formatter(tick.FuncFormatter(format_date))
+ax.xaxis.set_major_locator(WeekdayLocator(MONDAY))
+ax.xaxis.set_minor_locator(WeekdayLocator(byweekday=(TU,WE,TH,FR)))
+ax.xaxis.set_minor_formatter(DateFormatter('%d'))
+DateFormatter('%b %d %Y')
+plt.ylabel('Cumulative % Change', size=24)
+plt.xlabel('MOC Date', size=24)
+#ax.set_xticklabels(xaxis_labels)
+plt.title('Account Comparison', size=24)
+#ax2.legend(loc='lower left', prop={'size':16})
+plt.legend(loc='upper center', prop={'size':24},
+          fancybox=True, shadow=True, ncol=3)
+fig.autofmt_xdate()
+    
+date=dt.strftime(av_cumper_df.index[-1], '%Y-%m-%d')
+filename=pngPath+date+'_comparison_account_value.png'
+plt.savefig(filename, bbox_inches='tight')
+print 'Saved',filename
+if debug and showPlots:
+    plt.show()
+plt.close()
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

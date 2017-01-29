@@ -1082,6 +1082,7 @@ def checkIBpositions(account='v4futures'):
             for sym, adjqty in adj_syms:
                 if sym in openorders.index and adjqty==openorders.ix[sym].orderqty:
                     #print sym, adjqty, openorders.ix[sym].orderqty
+                    errors-=1
                     text='OK: open order found'
                     print sym, text
                     portfolio.set_value(sym,'status',text)
@@ -1096,7 +1097,8 @@ def checkIBpositions(account='v4futures'):
     mode = get_write_mode(writeConn, tablename, portfolio)
     portfolio.to_sql(name=tablename,con=writeConn, index=True, if_exists=mode, index_label='ibsym')
     print 'saved', tablename,'to',dbPath,'writemode',mode
-        
+    return errors, portfolio
+    
 if __name__ == "__main__":
     print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
@@ -1111,7 +1113,11 @@ if __name__ == "__main__":
     systemdata = systemdata.set_index('CSIsym')
     systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
     systemdata = systemdata.reset_index()
-    checkIBpositions()
+    
+    errors, portfolio=checkIBpositions()
+    print errors, 'errors found'
+    print portfolio
+    
 '''
     #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'
@@ -1199,8 +1205,11 @@ if __name__ == "__main__":
                 totalc2orders, ordersDictWithErrors=check_systems_live(debug, ordersDict, csidate)
                 
                 #run orders again if it didn't go through.
-                if totalc2orders>0:
-                    print 'Found', totalc2orders, 'c2 position adjustments. Running orders again..'
+                tries = 0
+                while totalc2orders>0 and tries<5:
+                    tries+=1
+                    print '\n\nFound', totalc2orders, 'c2 position adjustments for',ordersDictWithErrors.keys()
+                    print 'Running orders.. Attempt: ',tries
                     proc_signal_v4_live(debug, ordersDictWithErrors)
                     totalc2orders, ordersDictWithErrors=check_systems_live(debug, ordersDictWithErrors, csidate)
             else:
@@ -1222,7 +1231,8 @@ if __name__ == "__main__":
                     place_iborders(execDict, cid)
                     #wait for orders to be filled
                     sleep(10)
-                    checkIBpositions()
+                    errors=checkIBpositions()
+                    print errors, 'errors found'
 
                 except Exception as e:
                     #print e

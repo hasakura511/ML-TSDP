@@ -15,16 +15,28 @@ from django import forms
 from .models import MetaData, AccountData
 from .start_moc import start_moc, run_checksystems
 
+class LogFiles(object):
+    def __init__(self, filename):
+        self.filename = filename
+
+    def display_text_file(self):
+        with open(self.filename) as fp:
+            return fp.read()
+
 def getBackendDB():
     dbPath = '/ML-TSDP/data/futures.sqlite3'
     readConn = sqlite3.connect(dbPath)
     return readConn
 
-def get_logfiles(search_string=''):
+def get_logfiles(search_string='', exclude=False):
     search_dir = "/logs/"
     os.chdir(search_dir)
     files = filter(os.path.isfile, os.listdir(search_dir))
-    files = [os.path.join(search_dir, f) for f in files if search_string in f]  # add path to each file
+    if exclude:
+        files = [os.path.join(search_dir, f) for f in files if search_string not in f]  # add path to each file
+    else:
+        files = [os.path.join(search_dir, f) for f in files if search_string in f]  # add path to each file
+
     files.sort(key=lambda x: os.path.getmtime(x))
     return files
 

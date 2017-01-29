@@ -1068,6 +1068,7 @@ def checkIBpositions(account='v4futures'):
             for sym, adjqty in adj_syms:
                 if sym in openorders.index and adjqty==openorders.ix[sym].orderqty:
                     #print sym, adjqty, openorders.ix[sym].orderqty
+                    errors-=1
                     text='OK: open order found'
                     print sym, text
                     portfolio.set_value(sym,'status',text)
@@ -1082,7 +1083,7 @@ def checkIBpositions(account='v4futures'):
     mode = get_write_mode(writeConn, tablename, portfolio)
     portfolio.to_sql(name=tablename,con=writeConn, index=True, if_exists=mode, index_label='ibsym')
     print 'saved', tablename,'to',dbPath,'writemode',mode
-    return portfolio
+    return errors, portfolio
     
 if __name__ == "__main__":
     print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
@@ -1099,6 +1100,9 @@ if __name__ == "__main__":
     systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
     systemdata = systemdata.reset_index()
 
-    executions=filterIBexec()
-    print executions
+    #executions=filterIBexec()
+    #print executions
+    errors, portfolio=checkIBpositions()
+    print errors, 'errors found'
+    print portfolio
  

@@ -131,14 +131,6 @@ def timetable(request):
 def order_status(request):
     context={'logfiles':[]}
     context['slippagedates'], context['orderstatus']=get_order_status()
-    class LogFiles(object):
-        def __init__(self, filename):
-            self.filename = filename
-
-        def display_text_file(self):
-            with open(self.filename) as fp:
-                return fp.read()
-
     files = get_logfiles(search_string='moc_live')
     timestamp = sorted([f[-21:] for f in files])[-1]
     logfile=[f for f in files if 'error' not in f and timestamp in f][-1]
@@ -150,6 +142,20 @@ def order_status(request):
         context['logfiles'].append((errorfile,LogFiles(errorfile)))
 
     return render(request, 'show_log.html', context)
+
+def errors(request):
+    csidate = pd.read_sql('select distinct Date from futuresDF_results',
+                          con=getBackendDB()).Date.tolist()[-1]
+
+    files = get_logfiles(search_string='_error_')
+    logs=[(logfile,LogFiles(logfile)) for logfile in files if int(logfile.partition('_error_')[-1].split('_')[0]) >= csidate]
+    context = {'logfiles': logs}
+    return render(request, 'show_errors.html', context)
+
+def logs(request,logfile):
+    #files = get_logfiles(search_string='_error_', exclude=True)
+    context = {'logfiles': [(logfile,LogFiles(logfile))]}
+    return render(request, 'show_logs.html', context)
 
 def system_charts(request, symbol):
     imagedir = '/ml-tsdp/web/tsdp/betting/static/images/'

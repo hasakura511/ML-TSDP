@@ -21,4 +21,6 @@ urlpatterns = [
     url(r'^timetable/$', views.timetable, name='timetable'),
     url(r'^archive/$', views.archive, name='archive'),
     url(r'^archive/(?P<date>[0-9-]+)/$', views.futures, name='futures'),
+    url(r'^logs/(.*)$', views.logs, name='logs'),
+    url(r'^errors/$', views.errors, name='errors'),
 ]

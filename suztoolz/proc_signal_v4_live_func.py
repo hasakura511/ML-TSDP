@@ -259,26 +259,26 @@ def proc_signal_v4_live(debug, ordersDict):
     systems = ordersDict.keys()
     if debug:
         showPlots=False
-        #systemfile='C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/system_'+sys.argv[2]+'_live.csv'
+        #systemfile='./data/systems/system_'+sys.argv[2]+'_live.csv'
         #systemfile='D:/ML-TSDP/data/systems/system_v4futures.csv'
-        dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
+        dbPath='./data/futures.sqlite3' 
         dataPath='D:/ML-TSDP/data/csidata/v4futures4_debug/'
-        savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-        savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
+        savePath= './data/results/' 
+        savePath2 = './data/results/' 
         feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
         logging.basicConfig(filename='C:/logs/c2_live.log',level=logging.DEBUG)
         #test last>old
         #dataPath2=savePath2
-        #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
+        #signalPath = './data/signals/' 
         
         #test last=old
         dataPath2='D:/ML-TSDP/data/'
         
         #signalPath ='D:/ML-TSDP/data/signals2/'
-        signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-        signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-        systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
-        portfolioPath = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/c2_' 
+        signalPath = './data/signals/' 
+        signalSavePath = './data/signals/' 
+        systemPath = './data/systems/' 
+        portfolioPath = './data/results/c2_' 
     else:
         #systemfile='./data/systems/system_'+sys.argv[2]+'_live.csv'
         feedfile='./data/systems/system_ibfeed.csv'

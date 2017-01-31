@@ -281,7 +281,7 @@ for account in active_symbols.keys():
         timestamps=[timezone('UTC').localize(dt.utcfromtimestamp(ts)).astimezone(timezone('US/Eastern')) for ts in accountvalue.timestamp]
         accountvalue.index=[dt.strftime(date,'%Y-%m-%d') for date in timestamps]
         accountvalue.index.name='xaxis'
-        newidx=accountvalue.reset_index().xaxis.drop_duplicates().index
+        newidx=accountvalue.reset_index().xaxis.drop_duplicates(keep='last').index
         xaxis_values=accountvalue.reset_index().ix[newidx].xaxis.values
         yaxis_values=accountvalue.reset_index().ix[newidx].value.values
     else:
@@ -289,8 +289,11 @@ for account in active_symbols.keys():
         title='DAD\'s '+account
         accountvalue=pd.read_sql('select * from (select * from c2_equity where\
                                 system=\'{}\' order by timestamp ASC) group by Date'.format(account), con=readConn)
-        xaxis_values=[dt.strftime(date,'%Y-%m-%d') for date in pd.to_datetime(accountvalue.updatedLastTimeET)]
-        yaxis_values=accountvalue.modelAccountValue.values
+        accountvalue.index=[dt.strftime(date,'%Y-%m-%d') for date in pd.to_datetime(accountvalue.updatedLastTimeET)]
+        accountvalue.index.name='xaxis'
+        newidx=accountvalue.reset_index().xaxis.drop_duplicates(keep='last').index
+        xaxis_values=accountvalue.reset_index().ix[newidx].xaxis.values
+        yaxis_values=accountvalue.reset_index().ix[newidx].modelAccountValue.values
     
     #yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
     av_cumper_df=pd.concat([av_cumper_df,pd.Series(data=yaxis_values, index=xaxis_values, name=title)], axis=1, join='outer')

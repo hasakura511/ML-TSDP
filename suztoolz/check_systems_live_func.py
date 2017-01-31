@@ -268,7 +268,7 @@ def check_systems_live(debug, ordersDict, csidate):
                     exitList.append(sym+' not in system file. exiting contract!!.. '+response)
         #check contracts in system file not in c2.
         for sym in ordersDict[account].index:
-            sys_count+=1
+            
             #ostatus_cols=['account','order_type','contract','broker','selection','urpnl','system_signal',\
             #                    'broker_position','signal_check','system_qty','broker_qty','qty_check','openedWhen','Date','timestamp']
             contract = sym
@@ -280,6 +280,8 @@ def check_systems_live(debug, ordersDict, csidate):
             qty=system_qty=int(ordersDict[account].ix[sym].c2qty)
             checkOpen = (sig !=0 and qty !=0)
             #qty==0 if not a system symbol.
+            if qty !=0:
+                sys_count+=1
             if sym not in c2openpositions[account].index and qty !=0:
                 c2sig=broker_position=0
                 c2qty=broker_qty=0

@@ -153,7 +153,7 @@ else:
 if debug:
     mode = 'replace'
     #marketList=[sys.argv[1]]
-    showPlots=True
+    showPlots=False
     dbPath='./data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
     dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
@@ -551,8 +551,12 @@ for account in totals_accounts:
         av_xaxis_label=[dt.strftime(date,'%Y-%m-%d') for date in timestamps]
         accountvalue.index=av_xaxis_label
         xaxis_labels=[x for x in benchmark_xaxis_label if x in av_xaxis_label]
+
         accountvalue=accountvalue.ix[xaxis_labels].copy()
-        yaxis_values=accountvalue.value
+        accountvalue.index.name='xaxis'
+        newidx=accountvalue.reset_index().xaxis.drop_duplicates(keep='last').index
+        xaxis_labels=accountvalue.reset_index().ix[newidx].xaxis.values
+        yaxis_values=accountvalue.reset_index().ix[newidx].value.values
     else:
         broker='c2'
         accountvalue=pd.read_sql('select * from (select * from c2_equity where\
@@ -561,7 +565,10 @@ for account in totals_accounts:
         xaxis_labels=[x for x in benchmark_xaxis_label if x in av_xaxis_label]
         accountvalue.index=av_xaxis_label
         accountvalue=accountvalue.ix[xaxis_labels].copy()
-        yaxis_values=accountvalue.modelAccountValue.values
+        accountvalue.index.name='xaxis'
+        newidx=accountvalue.reset_index().xaxis.drop_duplicates(keep='last').index
+        xaxis_labels=accountvalue.reset_index().ix[newidx].xaxis.values
+        yaxis_values=accountvalue.reset_index().ix[newidx].modelAccountValue.values
     
     #intersect index with benchmark axis
 

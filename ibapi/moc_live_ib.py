@@ -244,25 +244,32 @@ def lastCsiDownloadDate():
 csidate=lastCsiDownloadDate()
 
     
-def guessMCdate():
+def guessServerdate():
     eastern = timezone('US/Eastern')
     now = dt.now(get_localzone())
     now = now.astimezone(eastern)
-    mcdate = now.strftime("%Y%m%d")
+    reset_time = datetime.time(1, 0, 0, 0)
+    
 
-
+    if now.time()>reset_time:
+        #update the date
+        ib_server_reset_date = now.strftime("%Y%m%d")
+    else:
+        #date is not yet updated, keep it previous date.
+        ib_server_reset_date =  (now - datetime.timedelta(days=1)).strftime("%Y%m%d")
+        
     if now.weekday() == 5:
         # Saturday so set to monday
         next = now + datetime.timedelta(days=2)
-        mcdate = next.strftime("%Y%m%d")
+        ib_server_reset_date = next.strftime("%Y%m%d")
 
     if now.weekday() == 6:
         # Sunday so set to monday
         next = now + datetime.timedelta(days=1)
-        mcdate = next.strftime("%Y%m%d")
-    return mcdate
+        ib_server_reset_date = next.strftime("%Y%m%d")
+    return ib_server_reset_date
 
-mcdate =guessMCdate()
+ib_server_reset_date =guessServerdate()
 
 def lastTimeTableDate():
     #load timetable
@@ -389,8 +396,9 @@ def create_execDict(feeddata, systemdata):
     global csidate
     global ttdate
     
-    downloadtt = not ttdate>csidate or not ttdate>int(mcdate)
-    print 'ttdate',ttdate,'csidate',csidate, 'mcdate',mcdate, 'downloadtt', downloadtt
+    #after 1AM EST server reset
+    downloadtt = not ttdate==int(ib_server_reset_date)
+    print 'ttdate',ttdate, 'ib_server_reset_date',ib_server_reset_date, 'downloadtt', downloadtt
     execDict=dict()
     #need systemdata for the contract expiry
     #systemdata=pd.read_csv(systemfile)
@@ -777,7 +785,6 @@ def filterIBexec():
 def get_timetable(contractsDF):
     global client
     global csidate
-    #to be run after csi download
     
 
     for i,sym in enumerate(contractsDF.index):
@@ -815,15 +822,15 @@ def find_triggers(feeddata, contractsDF):
     nowDateTime=dt.now(get_localzone())
     #nowDateTime=dt.now(get_localzone())+datetime.timedelta(days=5)
     nowDateTime=nowDateTime.astimezone(eastern)
-
-    if ttdate>csidate:
-        #timetable file date is greater than the csi download date. 
-        loaddate=str(ttdate)
-    else:
-        #get a new timetable
-        print 'csidate',csidate, '>=', 'ttdate', ttdate, 'getting new timetable'
-        timetable = get_timetable(contractsDF)
-        loaddate=str([d for d in timetable.columns.astype(int) if d>csidate][0])
+    loaddate=str(lastTimeTableDate())
+    #if ttdate>csidate:
+    #    #timetable file date is greater than the csi download date. 
+    #    loaddate=str(ttdate)
+    #else:
+    #    #get a new timetable
+    #    print 'csidate',csidate, '>=', 'ttdate', ttdate, 'getting new timetable'
+    #    timetable = get_timetable(contractsDF)
+    #    loaddate=str([d for d in timetable.columns.astype(int) if d>csidate][0])
         
     filename=timetablePath+loaddate+'.csv'
     timetable=pd.read_csv(filename, index_col=0)

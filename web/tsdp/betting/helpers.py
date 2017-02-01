@@ -13,7 +13,7 @@ import sqlite3
 import pandas as pd
 from django import forms
 from .models import MetaData, AccountData
-from .start_moc import start_moc, run_checksystems
+from .start_moc import get_newtimetable, run_checksystems
 
 class LogFiles(object):
     def __init__(self, filename):
@@ -152,7 +152,7 @@ def updateMeta():
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
     if mcdate not in timetables.columns:
         print('Running MOC to get new mcdate...')
-        start_moc()
+        get_newtimetable()
         mcdate=timetables.drop(['Date','timestamp'],axis=1).columns[-1]
         triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
         triggers[mcdate] = 'Not Available'

@@ -1121,6 +1121,9 @@ if __name__ == "__main__":
     systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
     systemdata = systemdata.reset_index()
     
+    print('requesting last executions from IB..')
+    print(filterIBexec())
+    
     errors, portfolio=checkIBpositions()
     print errors, 'errors found'
     print portfolio

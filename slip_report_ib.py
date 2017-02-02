@@ -46,9 +46,9 @@ else:
     systemPath =  './data/systems/'
     timetablePath=   './data/systems/timetables/'
     feedfile='./data/systems/system_ibfeed.csv'
-    from ibapi.moc_live_ib import filterIBexec
-    print('requesting last executions from IB..')
-    print(filterIBexec())
+    #from ibapi.moc_live_ib import filterIBexec
+    #print('requesting last executions from IB..')
+    #print(filterIBexec())
 
 readConn= sqlite3.connect(dbPathRead)
 writeConn = sqlite3.connect(dbPathWrite)
@@ -144,7 +144,7 @@ if lastExecutions.shape[0] >0:
         executions['CSIsym']=contractsDF.ix[executions.ibsym].CSIsym.values
         csidate=executions.lastAppend[0]
         futuresDF=pd.read_sql('select * from futuresDF_results where timestamp=\
-                    (select max(timestamp) from futuresDF_results as maxtimestamp) and Date=%s' % (csidate), con=readConn,  index_col='CSIsym')
+                    (select max(timestamp) from futuresDF_results where Date=%s)' % (csidate), con=readConn,  index_col='CSIsym')
         system = pd.read_sql('select * from (select * from signals_live where Date=%s and Name=\'%s\'\
                             order by timestamp ASC) group by CSIsym' %(csidate, systemName),\
                             con=readConn,  index_col='CSIsym')

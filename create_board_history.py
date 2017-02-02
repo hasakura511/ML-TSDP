@@ -153,7 +153,7 @@ else:
 if debug:
     mode = 'replace'
     #marketList=[sys.argv[1]]
-    showPlots=False
+    showPlots=True
     dbPath='./data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
     dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
@@ -395,7 +395,12 @@ for account in totals_accounts:
     #perchgDict_short[account]=ranking_short.copy()
     #perchgDict_short[account].index=[str(len(ranking_short.index)-idx)+' Rank '+col for idx,col in enumerate(ranking_short.index)]
     
-    combined_ranking=pd.DataFrame([ranking,ranking_short]).transpose().sort_values(by=[ranking.name], ascending=True)
+    #sort by long ranking
+    #combined_ranking=pd.DataFrame([ranking,ranking_short]).transpose().sort_values(by=[ranking.name], ascending=True)
+    #sort by short ranking
+    combined_ranking=pd.DataFrame([ranking,ranking_short]).transpose().sort_values(by=[ranking_short.name], ascending=True)
+    
+    
     perchgDict[account]=combined_ranking
     #perchgDict[account].plot(kind='barh', figsize=(10,15))
     perchgDict[account].index=[str(len(combined_ranking.index)-idx)+' Rank '+col for idx,col in enumerate(combined_ranking.index)]

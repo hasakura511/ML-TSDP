@@ -44,11 +44,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/betting/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="81" column="0" lean-forward="false" selection-start-line="81" selection-start-column="0" selection-end-line="84" selection-end-column="84" />
+            <state relative-caret-position="-340">
+              <caret line="112" column="45" lean-forward="true" selection-start-line="112" selection-start-column="45" selection-end-line="112" selection-end-column="45" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
                 <marker date="1485684377127" expanded="true" signature="13036:13079" ph="select disti... slippage" />
@@ -68,7 +68,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="helpers.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="helpers.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/betting/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="336">
@@ -1052,18 +1052,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/betting/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="81" column="0" lean-forward="false" selection-start-line="81" selection-start-column="0" selection-end-line="84" selection-end-column="84" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-            <marker date="1485684377127" expanded="true" signature="13036:13079" ph="select disti... slippage" />
-            <marker date="1485684377127" expanded="true" signature="13036:13081" ph="select disti... " />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/betting/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="336">
@@ -1089,6 +1077,18 @@
             <marker date="1485939757116" expanded="true" signature="13101:13124" ph="select * fro... timetable" />
             <marker date="1485939757116" expanded="true" signature="15903:15917" ph="select * fro... missing_value" />
             <marker date="1485939757116" expanded="true" signature="16165:16205" ph="select disti... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/betting/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-340">
+          <caret line="112" column="45" lean-forward="true" selection-start-line="112" selection-start-column="45" selection-end-line="112" selection-end-column="45" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+            <marker date="1485684377127" expanded="true" signature="13036:13079" ph="select disti... slippage" />
+            <marker date="1485684377127" expanded="true" signature="13036:13081" ph="select disti... " />
           </folding>
         </state>
       </provider>

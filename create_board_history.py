@@ -536,7 +536,7 @@ for account in totals_accounts:
         
 
 
-    
+
 #create account value charts
 for account in totals_accounts:
     totalsDF=totals_accounts[account]
@@ -553,27 +553,35 @@ for account in totals_accounts:
                                                 order by timestamp ASC) group by Date', con=readConn)
         accountvalue.value=[float(x) for x in accountvalue.value.values]
         timestamps=[timezone('UTC').localize(dt.utcfromtimestamp(ts)).astimezone(timezone('US/Eastern')) for ts in accountvalue.timestamp]
+        accountvalue.index=timestamps
+        monthly_pctchg=accountvalue.value.resample('M').pct_change().dropna()*100
+        monthly_pctchg.index=[dt.strftime(date,'%Y-%b') for date in monthly_pctchg.index]
+        monthly_pctchg.name='Monthly %Chg'
         av_xaxis_label=[dt.strftime(date,'%Y-%m-%d') for date in timestamps]
         accountvalue.index=av_xaxis_label
         xaxis_labels=[x for x in benchmark_xaxis_label if x in av_xaxis_label]
 
-        accountvalue=accountvalue.ix[xaxis_labels].copy()
-        accountvalue.index.name='xaxis'
-        newidx=accountvalue.reset_index().xaxis.drop_duplicates(keep='last').index
-        xaxis_labels=accountvalue.reset_index().ix[newidx].xaxis.values
-        yaxis_values=accountvalue.reset_index().ix[newidx].value.values
+        accountvalue2=accountvalue.ix[xaxis_labels].copy()
+        accountvalue2.index.name='xaxis'
+        newidx=accountvalue2.reset_index().xaxis.drop_duplicates(keep='last').index
+        xaxis_labels=accountvalue2.reset_index().ix[newidx].xaxis.values
+        yaxis_values=accountvalue2.reset_index().ix[newidx].value.values
     else:
         broker='c2'
         accountvalue=pd.read_sql('select * from (select * from c2_equity where\
                                 system=\'{}\' order by timestamp ASC) group by Date'.format(account), con=readConn)
-        av_xaxis_label=[dt.strftime(date,'%Y-%m-%d') for date in pd.to_datetime(accountvalue.updatedLastTimeET)]
+        accountvalue.index=pd.to_datetime(accountvalue.updatedLastTimeET)
+        monthly_pctchg=accountvalue.modelAccountValue.resample('M').pct_change().dropna()*100
+        monthly_pctchg.index=[dt.strftime(date,'%Y-%b') for date in monthly_pctchg.index]
+        monthly_pctchg.name='Monthly %Chg'
+        av_xaxis_label=[dt.strftime(date,'%Y-%m-%d') for date in accountvalue.index]
         xaxis_labels=[x for x in benchmark_xaxis_label if x in av_xaxis_label]
         accountvalue.index=av_xaxis_label
-        accountvalue=accountvalue.ix[xaxis_labels].copy()
-        accountvalue.index.name='xaxis'
-        newidx=accountvalue.reset_index().xaxis.drop_duplicates(keep='last').index
-        xaxis_labels=accountvalue.reset_index().ix[newidx].xaxis.values
-        yaxis_values=accountvalue.reset_index().ix[newidx].modelAccountValue.values
+        accountvalue2=accountvalue.ix[xaxis_labels].copy()
+        accountvalue2.index.name='xaxis'
+        newidx=accountvalue2.reset_index().xaxis.drop_duplicates(keep='last').index
+        xaxis_labels=accountvalue2.reset_index().ix[newidx].xaxis.values
+        yaxis_values=accountvalue2.reset_index().ix[newidx].modelAccountValue.values
     
     #intersect index with benchmark axis
 
@@ -640,8 +648,9 @@ for account in totals_accounts:
         plt.show()
     plt.close()
     
-    text='This chart shows results from all betting activities of the player.\
-            See order status for the current positions.'
+    text='This chart shows results from all betting activities of the player.<br>'+\
+            pd.DataFrame(monthly_pctchg).transpose().to_html()
+    print text
     performance_dict[account]['account_value']={
                                                 'rank_filename':'',
                                                 'rank_text':'',

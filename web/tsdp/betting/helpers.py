@@ -249,8 +249,8 @@ def getAccountValues():
                             con=readConn, index_col='system')
     c2_equity.updatedLastTimeET = pd.to_datetime(c2_equity.updatedLastTimeET)
 
-    #run checksystems and update values if last update >=1 day and not a weekend
-    if (now-eastern.localize(c2_equity.updatedLastTimeET[0])).days>=1 and now.weekday()<5:
+    #run checksystems and update values if last update >=1 day and not a T,W,TH,F,SA
+    if (now-eastern.localize(c2_equity.updatedLastTimeET[0])).days>=1 and (now.weekday()>0 and now.weekday()<6):
         run_checksystems()
 
     for system in c2_equity.drop(['v4futures'], axis=0).index:

@@ -154,7 +154,8 @@ def errors(request):
 
 def logs(request,logfile):
     #files = get_logfiles(search_string='_error_', exclude=True)
-    context = {'logfiles': [(logfile,LogFiles(logfile))]}
+    print logfile
+    context = {'logfiles': [(logfile,LogFiles('/logs/'+logfile))]}
     return render(request, 'show_logs.html', context)
 
 def system_charts(request, symbol):

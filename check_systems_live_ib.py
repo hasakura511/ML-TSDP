@@ -1122,11 +1122,12 @@ if __name__ == "__main__":
     systemdata = systemdata.reset_index()
     
     print('requesting last executions from IB..')
-    print(filterIBexec())
+    print(filterIBexec().to_csv())
     
     errors, portfolio=checkIBpositions()
     print errors, 'errors found'
-    print portfolio
+    print portfolio.to_csv()
+    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
 '''
     #systemfile=systemPathRO+'system_v4futures_live.csv'

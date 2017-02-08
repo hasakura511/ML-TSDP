@@ -3,7 +3,7 @@ change timezone on windows clock!
 will need to put password for each task in scheduler later if not changed.
 
 anaconda
---> downgrade pandas version pandas 0.17.1
+--> downgrade pandas version 'pip install pandas==0.17.1'
 python -m pip install --upgrade pip
 pip install arch
 pip install pytz
@@ -40,8 +40,10 @@ Evan S: If you use other client id as master client id, then such as reqAutoOpen
 CSIdata
 --> import futures portfolio
 -->database -> schedule db update -> wait until everything traded
---> preferences -> ddist2 -> check rolling report
+--> preferences -> ddist1 -> uncheck display message when done
+--> preferences -> ddist2 -> uncheck display rolling report/ display update report
 --> preferences -> ddist2 -> add csi post processing script
+--> preferences -> download preferences  -> auto schedule 8:00PM, check wait for weekday
 
 np++
 chrome

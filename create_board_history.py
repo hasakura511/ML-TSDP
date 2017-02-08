@@ -476,7 +476,8 @@ for account in totals_accounts:
         fig = plt.figure(0, figsize=(10,8))
         num_plots = len(cl)
         colormap = plt.cm.gist_ncar
-        plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 0.9, num_plots)])
+        #plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1, num_plots)])
+        plt.gca().set_color_cycle(['b','g','r'])
         # Plot several different functions...
         for line in cl:
             pnl=totalsDF['PNL_'+line].copy().values

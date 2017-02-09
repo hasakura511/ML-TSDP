@@ -1110,11 +1110,11 @@ if __name__ == "__main__":
     print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
-    #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
+    threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
     #systemfile=systemPath+'system_v4futures_live.csv'
     #load last systemfile from vol_adjsize csi
-    systemdata=pd.read_sql('select * from v4futures where timestamp=\
-                            (select max(timestamp) from v4futures as maxtimestamp)', con=readConn)
+    systemdata=pd.read_sql('select * from v4futures_live where timestamp=\
+                            (select max(timestamp) from v4futures_live as maxtimestamp)', con=readConn)
     systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
     systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
     systemdata = systemdata.set_index('CSIsym')
@@ -1129,6 +1129,50 @@ if __name__ == "__main__":
     print portfolio.to_csv()
     print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
     
+    if errors >0:
+        execDict={}
+        contractsDF=pd.DataFrame()
+        tries = 0
+        while (len(execDict)  == 0 or len(contractsDF) == 0) and tries<5:
+            try:
+                execDict, contractsDF, systemdata=create_execDict(feeddata, systemdata)
+            except Exception as e:
+                #print e
+                traceback.print_exc()
+                tries+=1
+                if tries==5:
+                    sys.exit('failed 5 times to get contract info')
+                
+        try:
+            execDict=update_orders(feeddata, systemdata, execDict, threadlist)
+            iborders = [(sym, execDict[sym][:2]) for sym in execDict.keys() if execDict[sym][0] != 'PASS']
+            
+            #get rid of orders if they are already working orders.
+            #dont need this anymore because we reqGlobalCancel
+            #iborders, execDict= updateWithOpen(iborders, execDict=execDict)
+            num_iborders=len(iborders)
+        except Exception as e:
+            #print e
+            traceback.print_exc()
+            
+        try:
+            #clear all orders first
+            print 'requesting global cancel IB orders'
+            client.reqGlobalCancel()
+            sleep(1)
+            #set the client date to timestamp to filter out openorders from prior runs.
+            cid=int(calendar.timegm(dt.utcnow().utctimetuple()))
+            print 'placing IB orders', iborders
+            place_iborders(execDict, cid)
+            #wait for orders to be filled
+            sleep(10)
+            errors=checkIBpositions()
+            print errors, 'errors found'
+
+        except Exception as e:
+            #print e
+            traceback.print_exc()
+
 '''
     #systemfile=systemPathRO+'system_v4futures_live.csv'
     #systemfile=systemPath+'system_'+sys+'_live.csv'

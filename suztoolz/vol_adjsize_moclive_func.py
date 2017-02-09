@@ -164,7 +164,7 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
         dataPath2='D:/ML-TSDP/data/'
         
         #signalPath ='D:/ML-TSDP/data/signals2/'
-        signalPath = './data/signals/' 
+        signalPath = 'D:/ML-TSDP/data/signals2/' 
         signalSavePath = './data/signals/' 
         systemPath = './data/systems/' 
         readConn = sqlite3.connect(dbPath2)
@@ -204,9 +204,9 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
         print 'Found no symbols to update:', updatedSymbols
         return
     #fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
-    #futuresDF_all=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
-    futuresDF_all=pd.read_sql('select * from futuresDF_all where timestamp=\
-                (select max(timestamp) from futuresDF_all as maxtimestamp)', con=readConn,  index_col='CSIsym')
+    #futuresDF_results=pd.read_csv(dataPath2+'futuresATR.csv', index_col=0)
+    futuresDF_results=pd.read_sql('select * from futuresDF_results where timestamp=\
+                (select max(timestamp) from futuresDF_results as maxtimestamp)', con=readConn,  index_col='CSIsym')
     fxRates=pd.read_sql('select * from currenciesDF where timestamp=\
                 (select max(timestamp) from currenciesDF as maxtimestamp)', con=readConn,  index_col='CSIsym')
     
@@ -366,9 +366,9 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
                     }
 
 
-    #futuresDF_all=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
+    #futuresDF_results=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 
-    #oldDate=dt.strptime(futuresDF_all.index.name,"%Y-%m-%d %H:%M:%S")
+    #oldDate=dt.strptime(futuresDF_results.index.name,"%Y-%m-%d %H:%M:%S")
     futuresDF=pd.DataFrame()
     corrDF=pd.DataFrame()
 
@@ -426,12 +426,12 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     futuresDF.index.name = lastDate
 
 
-    print ".. skipping seasonalClassifier, copying seasonality from futuresDF_all"
+    print ".. skipping seasonalClassifier, copying seasonality from futuresDF_results"
     #second time load  "old" file for seasonality signals.
     nextColOrder = ['0.75LastSIG','0.5LastSIG','1LastSIG','LastSEA','LastSRUN','vSTART']
-    futuresDF['vSTART']=futuresDF_all.vSTART
-    futuresDF['LastSEA']=futuresDF_all.LastSEA
-    futuresDF['LastSRUN']=futuresDF_all.LastSRUN
+    futuresDF['vSTART']=futuresDF_results.vSTART
+    futuresDF['LastSEA']=futuresDF_results.LastSEA
+    futuresDF['LastSRUN']=futuresDF_results.LastSRUN
 
 
         

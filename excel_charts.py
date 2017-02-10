@@ -54,6 +54,7 @@ if debug:
     signalPath ='D:/ML-TSDP/data/signals2/' 
     signalSavePath = './data/signals/' 
     systemPath = './data/systems/' 
+    stylePath =  './web/tsdp/'
     readConn = sqlite3.connect(dbPath2)
     writeConn= sqlite3.connect(dbPath)
     #readWebConn = sqlite3.connect(dbPathWeb)
@@ -74,6 +75,7 @@ else:
     signalSavePath = './data/signals2/' 
     pngPath =  './web/tsdp/betting/static/images/'
     systemPath =  './data/systems/'
+    stylePath =  './web/tsdp/'
     readConn = writeConn= sqlite3.connect(dbPath)
     #readWebConn = sqlite3.connect(dbPathWeb)
     #logging.basicConfig(filename='/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
@@ -298,7 +300,29 @@ for account in active_symbols.keys():
     #yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
     av_cumper_df=pd.concat([av_cumper_df,pd.Series(data=yaxis_values, index=xaxis_values, name=title)], axis=1, join='outer')
     
-    
+##update chip
+filename = stylePath+'boxstyles_data.json'
+if isfile(filename):
+    with open(filename, 'r') as f:
+        boxstyles_data = json.load(f)
+
+accounts = {x.split()[1]:x for x in av_cumper_df.columns.tolist()}
+for dic in boxstyles_data:
+    key=dic.keys()[0]
+    if len(key.split('_'))>1:
+        key2 =key.split('_')[1]
+    else:
+        key2=''
+    if key2 in accounts:
+        index=boxstyles_data.index(dic)
+        av=int(av_cumper_df[accounts[key2]][-1])
+        chip_value=str(av/1000)+'K'
+        print key, key2, index,dic[key]['text'],av, chip_value
+        dic[key]['text']=chip_value
+with open(filename, 'w') as f:
+     json.dump(boxstyles_data, f)
+print 'Saved',filename
+
 fig = plt.figure()
 ax = fig.add_subplot(111)
 av_cumper_df=av_cumper_df.dropna().copy()

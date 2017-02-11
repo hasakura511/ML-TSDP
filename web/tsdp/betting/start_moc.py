@@ -9,7 +9,7 @@ def run_checksystems():
     with open('\logs\checksystems_live_' + fulltimestamp + '.txt', 'w') as f:
         with open('\logs\checksystems_live_error_'+fulltimestamp+'.txt', 'w') as e:
             print('processing Check Systems...')
-            proc = Popen(['/anaconda2/python', '/ml-tsdp/check_systems_live_ib.py','1'],\
+            proc = Popen(['/anaconda2/python', '/ml-tsdp/check_systems_live_ib.py','1','1','1','0'],\
                          cwd='/ml-tsdp/',stdout=f, stderr=e)
             proc.wait()
             f.flush()

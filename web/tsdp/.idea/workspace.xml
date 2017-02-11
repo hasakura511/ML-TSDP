@@ -71,29 +71,29 @@
       <file leaf-file-name="helpers.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/betting/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="697">
-              <caret line="251" column="84" lean-forward="false" selection-start-line="251" selection-start-column="84" selection-end-line="251" selection-end-column="84" />
+            <state relative-caret-position="612">
+              <caret line="252" column="110" lean-forward="false" selection-start-line="252" selection-start-column="110" selection-end-line="252" selection-end-column="110" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
-                <marker date="1486375172839" expanded="true" signature="1390:1413" ph="select * fro... timetable" />
-                <marker date="1486375172839" expanded="true" signature="4380:4404" ph="select * fro... Dictionary" />
-                <marker date="1486375172839" expanded="true" signature="5599:5622" ph="select * fro... timetable" />
-                <marker date="1486375172839" expanded="true" signature="5688:5712" ph="select * fro... Dictionary" />
-                <marker date="1486375172839" expanded="true" signature="6740:6764" ph="select * fro... Dictionary" />
-                <marker date="1486375172839" expanded="true" signature="7515:7602" ph="select * fro... *" />
-                <marker date="1486375172839" expanded="true" signature="7530:7586" ph="select * fro... missing_value" />
-                <marker date="1486375172839" expanded="true" signature="8039:8094" ph="select disti... slippage" />
-                <marker date="1486375172839" expanded="true" signature="8412:8503" ph="select * fro... *" />
-                <marker date="1486375172839" expanded="true" signature="8427:8487" ph="select * fro... missing_value" />
-                <marker date="1486375172839" expanded="true" signature="8867:8922" ph="select disti... " />
-                <marker date="1486375172839" expanded="true" signature="9396:9530" ph="select * fro... ib_accountData" />
-                <marker date="1486375172839" expanded="true" signature="9967:10122" ph="select * fro... ib_accountData" />
-                <marker date="1486375172839" expanded="true" signature="10545:10623" ph="select * fro... *" />
-                <marker date="1486375172839" expanded="true" signature="10560:10606" ph="select * fro... c2_equity" />
-                <marker date="1486375172839" expanded="true" signature="13037:13061" ph="select * fro... Dictionary" />
-                <marker date="1486375172839" expanded="true" signature="13127:13150" ph="select * fro... timetable" />
-                <marker date="1486375172839" expanded="true" signature="15929:15943" ph="select * fro... missing_value" />
-                <marker date="1486375172839" expanded="true" signature="16191:16231" ph="select disti... " />
+                <marker date="1486856365919" expanded="true" signature="1390:1413" ph="select * fro... timetable" />
+                <marker date="1486856365919" expanded="true" signature="4380:4404" ph="select * fro... Dictionary" />
+                <marker date="1486856365919" expanded="true" signature="5599:5622" ph="select * fro... timetable" />
+                <marker date="1486856365919" expanded="true" signature="5688:5712" ph="select * fro... Dictionary" />
+                <marker date="1486856365919" expanded="true" signature="6740:6764" ph="select * fro... Dictionary" />
+                <marker date="1486856365919" expanded="true" signature="7515:7602" ph="select * fro... *" />
+                <marker date="1486856365919" expanded="true" signature="7530:7586" ph="select * fro... missing_value" />
+                <marker date="1486856365919" expanded="true" signature="8039:8094" ph="select disti... slippage" />
+                <marker date="1486856365919" expanded="true" signature="8412:8503" ph="select * fro... *" />
+                <marker date="1486856365919" expanded="true" signature="8427:8487" ph="select * fro... missing_value" />
+                <marker date="1486856365919" expanded="true" signature="8867:8922" ph="select disti... " />
+                <marker date="1486856365919" expanded="true" signature="9396:9530" ph="select * fro... ib_accountData" />
+                <marker date="1486856365919" expanded="true" signature="9967:10122" ph="select * fro... ib_accountData" />
+                <marker date="1486856365919" expanded="true" signature="10545:10623" ph="select * fro... *" />
+                <marker date="1486856365919" expanded="true" signature="10560:10606" ph="select * fro... c2_equity" />
+                <marker date="1486856365919" expanded="true" signature="13037:13061" ph="select * fro... Dictionary" />
+                <marker date="1486856365919" expanded="true" signature="13127:13150" ph="select * fro... timetable" />
+                <marker date="1486856365919" expanded="true" signature="15929:15943" ph="select * fro... missing_value" />
+                <marker date="1486856365919" expanded="true" signature="16191:16231" ph="select disti... " />
               </folding>
             </state>
           </provider>
@@ -213,7 +213,7 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="width" value="1112" />
-    <option name="height" value="728" />
+    <option name="height" value="1010" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -637,7 +637,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1112" height="728" extended-state="0" />
+    <frame x="0" y="0" width="1112" height="1010" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1052,29 +1052,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/betting/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="697">
-          <caret line="251" column="84" lean-forward="false" selection-start-line="251" selection-start-column="84" selection-end-line="251" selection-end-column="84" />
+        <state relative-caret-position="612">
+          <caret line="252" column="110" lean-forward="false" selection-start-line="252" selection-start-column="110" selection-end-line="252" selection-end-column="110" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-            <marker date="1486375172839" expanded="true" signature="1390:1413" ph="select * fro... timetable" />
-            <marker date="1486375172839" expanded="true" signature="4380:4404" ph="select * fro... Dictionary" />
-            <marker date="1486375172839" expanded="true" signature="5599:5622" ph="select * fro... timetable" />
-            <marker date="1486375172839" expanded="true" signature="5688:5712" ph="select * fro... Dictionary" />
-            <marker date="1486375172839" expanded="true" signature="6740:6764" ph="select * fro... Dictionary" />
-            <marker date="1486375172839" expanded="true" signature="7515:7602" ph="select * fro... *" />
-            <marker date="1486375172839" expanded="true" signature="7530:7586" ph="select * fro... missing_value" />
-            <marker date="1486375172839" expanded="true" signature="8039:8094" ph="select disti... slippage" />
-            <marker date="1486375172839" expanded="true" signature="8412:8503" ph="select * fro... *" />
-            <marker date="1486375172839" expanded="true" signature="8427:8487" ph="select * fro... missing_value" />
-            <marker date="1486375172839" expanded="true" signature="8867:8922" ph="select disti... " />
-            <marker date="1486375172839" expanded="true" signature="9396:9530" ph="select * fro... ib_accountData" />
-            <marker date="1486375172839" expanded="true" signature="9967:10122" ph="select * fro... ib_accountData" />
-            <marker date="1486375172839" expanded="true" signature="10545:10623" ph="select * fro... *" />
-            <marker date="1486375172839" expanded="true" signature="10560:10606" ph="select * fro... c2_equity" />
-            <marker date="1486375172839" expanded="true" signature="13037:13061" ph="select * fro... Dictionary" />
-            <marker date="1486375172839" expanded="true" signature="13127:13150" ph="select * fro... timetable" />
-            <marker date="1486375172839" expanded="true" signature="15929:15943" ph="select * fro... missing_value" />
-            <marker date="1486375172839" expanded="true" signature="16191:16231" ph="select disti... " />
+            <marker date="1486856365919" expanded="true" signature="1390:1413" ph="select * fro... timetable" />
+            <marker date="1486856365919" expanded="true" signature="4380:4404" ph="select * fro... Dictionary" />
+            <marker date="1486856365919" expanded="true" signature="5599:5622" ph="select * fro... timetable" />
+            <marker date="1486856365919" expanded="true" signature="5688:5712" ph="select * fro... Dictionary" />
+            <marker date="1486856365919" expanded="true" signature="6740:6764" ph="select * fro... Dictionary" />
+            <marker date="1486856365919" expanded="true" signature="7515:7602" ph="select * fro... *" />
+            <marker date="1486856365919" expanded="true" signature="7530:7586" ph="select * fro... missing_value" />
+            <marker date="1486856365919" expanded="true" signature="8039:8094" ph="select disti... slippage" />
+            <marker date="1486856365919" expanded="true" signature="8412:8503" ph="select * fro... *" />
+            <marker date="1486856365919" expanded="true" signature="8427:8487" ph="select * fro... missing_value" />
+            <marker date="1486856365919" expanded="true" signature="8867:8922" ph="select disti... " />
+            <marker date="1486856365919" expanded="true" signature="9396:9530" ph="select * fro... ib_accountData" />
+            <marker date="1486856365919" expanded="true" signature="9967:10122" ph="select * fro... ib_accountData" />
+            <marker date="1486856365919" expanded="true" signature="10545:10623" ph="select * fro... *" />
+            <marker date="1486856365919" expanded="true" signature="10560:10606" ph="select * fro... c2_equity" />
+            <marker date="1486856365919" expanded="true" signature="13037:13061" ph="select * fro... Dictionary" />
+            <marker date="1486856365919" expanded="true" signature="13127:13150" ph="select * fro... timetable" />
+            <marker date="1486856365919" expanded="true" signature="15929:15943" ph="select * fro... missing_value" />
+            <marker date="1486856365919" expanded="true" signature="16191:16231" ph="select disti... " />
           </folding>
         </state>
       </provider>

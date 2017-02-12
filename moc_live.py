@@ -1113,22 +1113,27 @@ if __name__ == "__main__":
     #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
     #systemfile=systemPath+'system_v4futures_live.csv'
     #load last systemfile from vol_adjsize csi
-    systemdata=pd.read_sql('select * from v4futures where timestamp=\
-                            (select max(timestamp) from v4futures as maxtimestamp)', con=readConn)
-    systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
-    systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
-    systemdata = systemdata.set_index('CSIsym')
-    systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
-    systemdata = systemdata.reset_index()
+    #systemdata=pd.read_sql('select * from v4futures where timestamp=\
+    #                        (select max(timestamp) from v4futures as maxtimestamp)', con=readConn)
+    #systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
+    #systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
+    #systemdata = systemdata.set_index('CSIsym')
+    #systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
+    #systemdata = systemdata.reset_index()
 
-    #systemfile=systemPathRO+'system_v4futures_live.csv'
-    #systemfile=systemPath+'system_'+sys+'_live.csv'
+    futuresDF_results=pd.read_sql('select * from futuresDF_results where timestamp=\
+        (select max(timestamp) from futuresDF_results)', con=readConn,  index_col='CSIsym')
+    futuresDF = futuresDF_results.ix[feeddata.CSIsym.tolist()].copy()
+    futuresDF = futuresDF.reset_index()
+    futuresDF.rename(columns=lambda x: x.replace('Contract', 'c2sym'), inplace=True)
+    futuresDF['c2sym2']=[x[:-2] for x in futuresDF.c2sym]
+    
     execDict={}
     contractsDF=pd.DataFrame()
     tries = 0
     while (len(execDict)  == 0 or len(contractsDF) == 0) and tries<5:
         try:
-            execDict, contractsDF, systemdata=create_execDict(feeddata, systemdata)
+            execDict, contractsDF, futuresDF=create_execDict(feeddata, futuresDF)
         except Exception as e:
             #print e
             traceback.print_exc()

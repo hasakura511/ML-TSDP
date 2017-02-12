@@ -1095,17 +1095,17 @@ def checkIBpositions(account='v4futures'):
 if __name__ == "__main__":
     print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
-    feeddata=pd.read_csv(feedfile,index_col='ibsym')
+    #feeddata=pd.read_csv(feedfile,index_col='ibsym')
     #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
     #systemfile=systemPath+'system_v4futures_live.csv'
     #load last systemfile from vol_adjsize csi
-    systemdata=pd.read_sql('select * from v4futures where timestamp=\
-                            (select max(timestamp) from v4futures as maxtimestamp)', con=readConn)
-    systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
-    systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
-    systemdata = systemdata.set_index('CSIsym')
-    systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
-    systemdata = systemdata.reset_index()
+    #systemdata=pd.read_sql('select * from v4futures where timestamp=\
+    #                        (select max(timestamp) from v4futures as maxtimestamp)', con=readConn)
+    #systemdata['c2sym2']=[x[:-2] for x in systemdata.c2sym]
+    #systemdata['CSIsym']=[x.split('_')[1] for x in systemdata.System]
+    #systemdata = systemdata.set_index('CSIsym')
+    #systemdata = systemdata.ix[feeddata.CSIsym.tolist()]
+    #systemdata = systemdata.reset_index()
 
     #executions=filterIBexec()
     #print executions

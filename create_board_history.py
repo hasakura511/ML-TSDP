@@ -142,8 +142,8 @@ web_accountnames={
                     'v4mini':'100K',
                     'v4micro':'50K',
                     }
-lookback_short=5
-lookback=20
+lookback_short=2
+lookback=5
 benchmark_sym='ES'
 if len(sys.argv)==1:
     debug=True

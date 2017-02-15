@@ -547,10 +547,8 @@ for account in totals_accounts:
             plt.show()
         plt.close()
 
-        
 
-
-
+account_values={}
 #create account value charts
 for account in totals_accounts:
     totalsDF=totals_accounts[account]
@@ -658,6 +656,11 @@ for account in totals_accounts:
     filename2=date+'_'+account+'_'+broker+'_account_value.png'    
     plt.savefig(filename, bbox_inches='tight')
     print 'Saved',filename
+    
+    account_values[account]=pd.DataFrame(data={'yaxis_values':yaxis_values, 'benchmark_values':benchmark_values,
+                                'simulated_moc_values':simulated_moc_values,'yaxis_values_percent':yaxis_values_percent,
+                                'benchmark_values_percent':benchmark_values_percent,
+                                'simulated_moc_values_percent':simulated_moc_values_percent }, index=index)
     if debug and showPlots:
         plt.show()
     plt.close()
@@ -726,6 +729,12 @@ for account in perchgDict:
     perchgDict[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
                     index_label='Ranking'+str(lookback_short)+'D')
     print 'saved',tablename, 'to',dbPathWebCharts
-                    
+
+for account in account_values:
+    tablename=account+'_accountvalues'
+    perchgDict[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
+                    index_label='Date')
+    print 'saved',tablename, 'to',dbPathWebCharts
+    
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

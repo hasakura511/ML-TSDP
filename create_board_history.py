@@ -158,6 +158,7 @@ if debug:
     dbPath='./data/futures.sqlite3' 
     dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
     dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
+    dbPathWebCharts = './web/tsdp/db_charts.sqlite3'
     dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
     savePath=jsonPath= './data/results/' 
     pngPath = './data/results/' 
@@ -184,6 +185,7 @@ else:
     feedfile='./data/systems/system_ibfeed.csv'
     dbPath='./data/futures.sqlite3'
     dbPathWeb ='./web/tsdp/db.sqlite3'
+    dbPathWebCharts = './tsdp/db_charts.sqlite3'
     jsonPath ='./web/tsdp/'
     dataPath='./data/csidata/v4futures2/'
     #dataPath='./data/csidata/v4futures2/'
@@ -198,6 +200,7 @@ else:
     #logging.basicConfig(filename='/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
     
 readWebConn = sqlite3.connect(dbPathWeb)
+writeWebChartsConn = sqlite3.connect(dbPathWebCharts)
 
 selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
         (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
@@ -712,6 +715,17 @@ with open(filename, 'w') as f:
      json.dump(performance_dict_by_box2, f)
 print 'Saved',filename
 
-
+for account in totals_accounts:
+    tablename=account+'_totals'
+    totals_accounts[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
+                    index_label='Date')
+    print 'saved',tablename, 'to',dbPathWebCharts
+    
+for account in perchgDict:
+    tablename=account+'_ranking'
+    perchgDict[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
+                    index_label='Ranking'+str(lookback_short)+'D')
+    print 'saved',tablename, 'to',dbPathWebCharts
+                    
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

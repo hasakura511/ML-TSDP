@@ -143,7 +143,8 @@ web_accountnames={
                     'v4micro':'50K',
                     }
 lookback_short=2
-lookback=5
+lookback_mid=5
+lookback=20
 benchmark_sym='ES'
 if len(sys.argv)==1:
     debug=True
@@ -382,14 +383,23 @@ for account in totals_accounts:
     ranking=perchgDF.transpose().iloc[-1].sort_values(ascending=True)
     ranking.name=str(lookback)+'Day Lookback'
 
-    
-    pnlsDF=pnlsDF.iloc[-lookback_short:]
-    perchgDF_short=pd.DataFrame()
-    for col in pnlsDF:
-        pnlarr=pnlsDF[col].copy().values
+    pnlsDF_mid=pnlsDF.iloc[-lookback_mid:]
+    perchgDF_mid=pd.DataFrame()
+    for col in pnlsDF_mid:
+        pnlarr=pnlsDF_mid[col].copy().values
         pnlarr[0]=pnlarr[0]+accountvalues[account]
         cumper=(pnlarr.cumsum()/accountvalues[account]-1)*100
-        perchgDF_short=perchgDF_short.append(pd.Series(data=cumper, name=col.split('_')[1], index=pnlsDF.index))
+        perchgDF_mid=perchgDF_mid.append(pd.Series(data=cumper, name=col.split('_')[1], index=pnlsDF_mid.index))
+    ranking_mid=perchgDF_mid.transpose().iloc[-1].sort_values(ascending=True)
+    ranking_mid.name=str(lookback_mid)+'Day Lookback'
+    
+    pnlsDF_short=pnlsDF.iloc[-lookback_short:]
+    perchgDF_short=pd.DataFrame()
+    for col in pnlsDF_short:
+        pnlarr=pnlsDF_short[col].copy().values
+        pnlarr[0]=pnlarr[0]+accountvalues[account]
+        cumper=(pnlarr.cumsum()/accountvalues[account]-1)*100
+        perchgDF_short=perchgDF_short.append(pd.Series(data=cumper, name=col.split('_')[1], index=pnlsDF_short.index))
     ranking_short=perchgDF_short.transpose().iloc[-1].sort_values(ascending=True)
     ranking_short.name=str(lookback_short)+'Day Lookback'
     #perchgDict_short[account]=ranking_short.copy()
@@ -398,7 +408,7 @@ for account in totals_accounts:
     #sort by long ranking
     #combined_ranking=pd.DataFrame([ranking,ranking_short]).transpose().sort_values(by=[ranking.name], ascending=True)
     #sort by short ranking
-    combined_ranking=pd.DataFrame([ranking,ranking_short]).transpose().sort_values(by=[ranking_short.name], ascending=True)
+    combined_ranking=pd.DataFrame([ranking,ranking_mid,ranking_short]).transpose().sort_values(by=[ranking_short.name], ascending=True)
     
     
     perchgDict[account]=combined_ranking
@@ -408,8 +418,8 @@ for account in totals_accounts:
 def createRankingChart(ranking, account, line, title, filename):
     fig=plt.figure(1, figsize=(10,15))
     ax = fig.add_subplot(111) 
-    colors=['b','g']
-    colors2=['r','g']
+    colors=['b','y','g']
+    colors2=['b','y','r']
     if is_int(line):
         anti='Anti-'+line
         #print line, anti
@@ -434,7 +444,7 @@ def createRankingChart(ranking, account, line, title, filename):
         #DFGSum[col].plot(kind='bar', color=c, position=pos, width=0.05)
     [x.set_color(i) for i,x in zip(color_index_ticks,ax.yaxis.get_ticklabels())]
     plt.legend(loc='upper center', bbox_to_anchor=(.5, -0.03),prop={'size':18},
-          fancybox=True, shadow=True, ncol=2)
+          fancybox=True, shadow=True, ncol=len(colors))
     plt.xlabel('Cumulative % change', size=12)
     title=account+' '+title
     plt.title(title)

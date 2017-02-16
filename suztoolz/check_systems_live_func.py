@@ -301,7 +301,7 @@ def check_systems_live(debug, ordersDict, csidate):
             else:
                 #already checked above. (case of order dict sym in c2 open positions)
                 pass
-        print order_status_dict[account]
+        print order_status_dict[account].to_csv()
             
         totalerrors+=error_count
         if error_count>0:

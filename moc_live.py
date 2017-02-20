@@ -1110,6 +1110,11 @@ if __name__ == "__main__":
     print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
     #feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
     feeddata=pd.read_csv(feedfile,index_col='ibsym')
+    #update margin function here
+    feeddata['Date']=csidate
+    feeddata['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
+    feeddata.to_sql(name='feeddata', con=writeConn, index=True, if_exists='replace', index_label='CSIsym')
+
     #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
     #systemfile=systemPath+'system_v4futures_live.csv'
     #load last systemfile from vol_adjsize csi

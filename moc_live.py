@@ -1113,7 +1113,7 @@ if __name__ == "__main__":
     #update margin function here
     feeddata['Date']=csidate
     feeddata['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
-    feeddata.to_sql(name='feeddata', con=writeConn, index=True, if_exists='replace', index_label='CSIsym')
+    feeddata.to_sql(name='feeddata', con=writeConn, index=True, if_exists='replace', index_label='IBsym')
 
     #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
     #systemfile=systemPath+'system_v4futures_live.csv'

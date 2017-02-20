@@ -1,5 +1,5 @@
 Version,System,Name,c2id,c2api,c2qty,c2sym,c2type,c2submit,ibqty,ibsym,ibcur,ibexch,ibtype,ibsubmit,trade_freq,ibmult,c2mult,iblocalsym,signal
-v4.3,v4_AC,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@ACH7,future,True,2,AC,USD,GLOBEX,FUT,False,60,50,50,AC,1
+v4.3,v4_AC,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@ACJ7,future,True,2,AC,USD,GLOBEX,FUT,False,60,50,50,AC,1
 v4.3,v4_AD,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@ADH7,future,True,2,AUD,USD,GLOBEX,FUT,False,60,50,50,AUD,1
 v4.3,v4_AEX,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,AEXH7,future,True,1,AEX,USD,GLOBEX,FUT,False,60,50,50,EOE,1
 v4.3,v4_BO,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,@BOK7,future,True,4,ZL,USD,GLOBEX,FUT,False,60,50,50,BO,1
@@ -30,7 +30,7 @@ v4.3,v4_GC,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,
 v4.3,v4_HCM,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,HHIG7,future,True,2,HHI.HK,USD,GLOBEX,FUT,False,60,50,50,HHI.HK,1
 v4.3,v4_HG,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,1,QHGK7,future,True,2,HG,USD,GLOBEX,FUT,False,60,50,50,HG,1
 v4.3,v4_HIC,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,HSIG7,future,True,1,SB,USD,GLOBEX,FUT,False,60,50,50,HSI,1
-v4.3,v4_HO,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,QHOH7,future,True,1,HO,USD,GLOBEX,FUT,False,60,50,50,HO,1
+v4.3,v4_HO,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,QHOJ7,future,True,1,HO,USD,GLOBEX,FUT,False,60,50,50,HO,1
 v4.3,v4_JY,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@JYH7,future,True,1,JPY,USD,GLOBEX,FUT,False,60,50,50,JY,-1
 v4.3,v4_KC,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@KCK7,future,True,1,KC,USD,GLOBEX,FUT,False,60,50,50,KC,1
 v4.3,v4_KW,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@KWK7,future,True,4,SB,USD,GLOBEX,FUT,False,60,50,50,SB,1
@@ -59,7 +59,7 @@ v4.3,v4_RS,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,
 v4.3,v4_S,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@SK7,future,True,1,ZS,USD,GLOBEX,FUT,False,60,50,50,S,1
 v4.3,v4_SB,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@SBK7,future,True,2,SB,USD,GLOBEX,FUT,False,60,50,50,SB,1
 v4.3,v4_SF,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@SFH7,future,True,3,CHF,USD,GLOBEX,FUT,False,60,50,50,SF,1
-v4.3,v4_SI,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,QSIH7,future,True,1,SI,USD,GLOBEX,FUT,False,60,50,50,SI,-1
+v4.3,v4_SI,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,QSIK7,future,True,1,SI,USD,GLOBEX,FUT,False,60,50,50,SI,-1
 v4.3,v4_SIN,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,ING7,future,True,6,SIN,USD,GLOBEX,FUT,False,60,50,50,SB,1
 v4.3,v4_SJB,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,BBH7,future,True,5,SJB,USD,GLOBEX,FUT,False,60,50,50,SB,-1
 v4.3,v4_SM,v4micro,101533256,tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w,0,@SMK7,future,True,2,ZM,USD,GLOBEX,FUT,False,60,50,50,SM,1

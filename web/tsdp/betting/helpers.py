@@ -157,7 +157,11 @@ def updateMeta():
         triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
         triggers[mcdate] = 'Not Available'
     else:
-        triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
+        if timetables[mcdate].dropna().shape[0] == timetables.shape[0]:
+            triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
+        else:
+            triggers = pd.DataFrame(timetables[timetables.columns[0]].ix[[x for x in timetables.index if 'trigger' in x]].copy())
+
     triggers.index=[x.split()[0] for x in triggers.index]
     triggers.columns = [['Triggertime']]
     triggers['Group']=futuresDict.ix[triggers.index].Group.values
@@ -295,10 +299,9 @@ def get_detailed_timetable():
     utc = timezone('UTC')
     now = dt.now(get_localzone()).astimezone(eastern)
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
-    timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc').drop(['Date', 'timestamp'],
-                                                                                             axis=1)
+    timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc').drop(['Date', 'timestamp'], axis=1)
 
-    if mcdate in timetables:
+    if mcdate in timetables and timetables[mcdate].dropna().shape[0]==timetables.shape[0]:
         ttdate = mcdate
         # filter out any dates that have passed
         ttdates = [x for x in timetables.columns if int(x) >= int(mcdate)]

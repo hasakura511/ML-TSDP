@@ -349,7 +349,18 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     'YT2':['HTS',fxDict['AUD'],2800,'rates',-1,1],
     'YT3':['HXS',fxDict['AUD'],8000,'rates',-1,1],
         }
-        
+
+
+    filename='./web/tsdp/custom_signals_data.json'
+    if isfile(filename):
+        with open(filename, 'r') as f:
+            custom_signals_data = json.load(f)
+            
+    for sym in custom_signals_data:
+        #print c2contractSpec[sym], custom_signals_data[sym]['signals']
+        c2contractSpec[sym][5]=int(custom_signals_data[sym]['signals'])
+    print 'loaded and updated custom signals from', filename
+    
     months = {
                     1:'F',
                     2:'G',

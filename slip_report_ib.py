@@ -120,8 +120,8 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
 #feeddata=pd.read_csv(feedfile,index_col='ibsym')
 #feeddata = pd.read_sql('select * from ib_contracts where timestamp=\
 #            (select max(timestamp) from ib_contracts as maxtimestamp)', con=readConn,  index_col='ibsym')
-feeddata = pd.read_sql('select * from ib_contracts where timestamp=\
-            (select max(timestamp) from ib_contracts as maxtimestamp)', con=readConn,  index_col='IBsym')
+feeddata = pd.read_sql('select * from feeddata where timestamp=\
+            (select max(timestamp) from feeddata as maxtimestamp)', con=readConn,  index_col='IBsym')
 
 lastExecutions= pd.read_sql('select * from ib_executions where timestamp=\
             (select max(timestamp) from ib_executions as maxtimestamp)', con=readConn,  index_col='contract').drop_duplicates()

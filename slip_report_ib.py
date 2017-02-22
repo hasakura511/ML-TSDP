@@ -118,9 +118,10 @@ def plotSlip(slipDF, pngPath, filename, title, figsize, fontsize, showPlots=Fals
     plt.close()
     
 #feeddata=pd.read_csv(feedfile,index_col='ibsym')
-contractsDF = pd.read_sql('select * from ib_contracts where timestamp=\
-            (select max(timestamp) from ib_contracts as maxtimestamp)', con=readConn,  index_col='ibsym')
-
+#feeddata = pd.read_sql('select * from ib_contracts where timestamp=\
+#            (select max(timestamp) from ib_contracts as maxtimestamp)', con=readConn,  index_col='ibsym')
+feeddata = pd.read_sql('select * from ib_contracts where timestamp=\
+            (select max(timestamp) from ib_contracts as maxtimestamp)', con=readConn,  index_col='IBsym')
 
 lastExecutions= pd.read_sql('select * from ib_executions where timestamp=\
             (select max(timestamp) from ib_executions as maxtimestamp)', con=readConn,  index_col='contract').drop_duplicates()
@@ -138,10 +139,10 @@ if lastExecutions.shape[0] >0:
         else:
             executions=executions.append(lastExecutions.ix[idx])
     #calc slipage for current contracts
-    executions = executions.ix[[x for x in executions.index if x in contractsDF.contracts.values]].copy()
+    executions = executions.ix[[x for x in executions.index if x in feeddata.contracts.values]].copy()
         
     if executions.shape[0]>0:
-        executions['CSIsym']=contractsDF.ix[executions.ibsym].CSIsym.values
+        executions['CSIsym']=feeddata.ix[executions.ibsym].CSIsym.values
         csidate=executions.lastAppend[0]
         futuresDF=pd.read_sql('select * from futuresDF_results where timestamp=\
                     (select max(timestamp) from futuresDF_results where Date=%s)' % (csidate), con=readConn,  index_col='CSIsym')
@@ -170,7 +171,7 @@ if lastExecutions.shape[0] >0:
                 
             ib_timestamp=executions.ix[contract].times
             qty =executions.ix[contract].qty
-            #current contracts in contractsDF taken from system file which creates directly from csidata
+            #current contracts in feeddata taken from system file which creates directly from csidata
             if CSIsym in futuresDF.index:
                 csiPrice = futuresDF.ix[CSIsym].LastClose
                 slippage=(ib_price-csiPrice)/csiPrice

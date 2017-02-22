@@ -22,7 +22,7 @@ def place_order(dbPath, action, quant, sym, type, systemid, submit,apikey, paren
     
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
     #sigid=int(sigid)+1
-    parentsig= "" if parentsig=None else parentsig
+    parentsig= "" if parentsig==None else parentsig
     data = { 
     		"apikey":   apikey, # "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
     		"systemid": systemid, 

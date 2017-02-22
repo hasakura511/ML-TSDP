@@ -14,15 +14,15 @@ import sqlite3
 
         
 def place_order(dbPath, action, quant, sym, type, systemid, submit,apikey, parentsig=None):
-    conn = sqlite3.connect(dbPath)
-    sigid=int(pd.read_sql('select * from c2sigid', con=conn).iloc[-1])
+    #conn = sqlite3.connect(dbPath)
+    #sigid=int(pd.read_sql('select * from c2sigid', con=conn).iloc[-1])
     if submit == False:
         return 0;
     url = 'https://collective2.com/world/apiv2/submitSignal'
     
     headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
-    sigid=int(sigid)+1
-    
+    #sigid=int(sigid)+1
+    parentsig= "" if parentsig=None else parentsig
     data = { 
     		"apikey":   apikey, # "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
     		"systemid": systemid, 
@@ -33,20 +33,20 @@ def place_order(dbPath, action, quant, sym, type, systemid, submit,apikey, paren
     	   		"typeofsymbol": type, 
     	   		"market": 1, 	#"limit": 31.05, 
     	   		"duration": "DAY", 
-               "signalid": sigid,
+               "signalid": "",
                "conditionalupon": parentsig
     		} 
     	}
-    logging.info( 'sigid is: ' + str( sigid ))
-    dataf=pd.DataFrame([[sigid]], columns=['sigid'])
-    dataf.to_sql(name='c2sigid',con=conn,if_exists='replace', index=False)
+    #logging.info( 'sigid is: ' + str( sigid ))
+    #dataf=pd.DataFrame([[sigid]], columns=['sigid'])
+    #dataf.to_sql(name='c2sigid',con=conn,if_exists='replace', index=False)
     params={}
     
     r=requests.post(url, params=params, json=data);
     #sleep(2)
     print r.text
     logging.info( str(r.text)  )
-    return sigid
+    return r.json()['signalid']
 
 def place_order2(dbPath, action, quant, sym, type, systemid, submit,apikey, parentsig=None):
     conn = sqlite3.connect(dbPath)

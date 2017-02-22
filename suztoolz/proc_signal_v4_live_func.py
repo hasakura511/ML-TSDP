@@ -266,7 +266,7 @@ def proc_signal_v4_live(debug, ordersDict):
         savePath= './data/results/' 
         savePath2 = './data/results/' 
         feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
-        logging.basicConfig(filename='C:/logs/c2_live.log',level=logging.DEBUG)
+        #logging.basicConfig(filename='C:/logs/c2_live.log',level=logging.DEBUG)
         #test last>old
         #dataPath2=savePath2
         #signalPath = './data/signals/' 
@@ -291,7 +291,7 @@ def proc_signal_v4_live(debug, ordersDict):
         savePath2 = './data/results/'
         systemPath =  './data/systems/'
         portfolioPath = './data/portfolio/c2_' 
-        logging.basicConfig(filename='/logs/c2_live.log',level=logging.DEBUG)
+        #logging.basicConfig(filename='/logs/c2_live.log',level=logging.DEBUG)
 
     conn = sqlite3.connect(dbPath)
     for sys in systems:

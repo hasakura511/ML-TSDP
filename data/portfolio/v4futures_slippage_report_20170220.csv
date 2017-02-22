@@ -1,0 +1,3 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-02-20 12:49:10 1 QSIK7 $-59,QSIK7,2017-02-20 12:49:10,18.115,2017-02-20 13:00:00,18.103,0.000662873556869,0.000662873556869,Open,1.0,-59.0,2.5,-1 days +23:49:10.000000000,-11.0
+ctwo opened: 2017-02-20 12:49:06 1 QHOJ7 $356,QHOJ7,2017-02-20 12:49:06,1.6551,2017-02-20 13:00:00,1.6466,0.00516215231386,0.00516215231386,Open,-1.0,356.0,2.5,-1 days +23:49:06.000000000,-11.0

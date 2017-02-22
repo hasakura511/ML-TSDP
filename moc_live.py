@@ -421,6 +421,7 @@ def create_execDict(feeddata, systemdata):
 
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
+    #if True:
     if downloadtt:
         print 'new timetable due, geting new contract details from IB'
         contractsDF=pd.DataFrame()
@@ -488,7 +489,7 @@ def create_execDict(feeddata, systemdata):
         contractsDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         #print contractsDF.index
         #print feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1).head()
-        contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur'],axis=1),contractsDF], axis=1)
+        contractsDF = pd.concat([ feeddata.ix[contractsDF.index].drop(['ibexch','ibtype','ibcur','Date','timestamp'],axis=1),contractsDF], axis=1)
         try:
             contractsDF.to_sql(name='ib_contracts', con=writeConn, index=True, if_exists='replace', index_label='ibsym')
             print '\nsaved ib_contracts to',dbPath

@@ -1,0 +1,2 @@
+rowname,contract,ibsym,CSIsym,ib_timestamp,ib_price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,delta
+ib: 2017-02-20 12:50:49 1.0 ZT20170331 $-15,ZT20170331,ZT,TU,2017-02-20 12:50:49,108.4453125,2017-02-20 13:00:00,108.4375,7.20461095101e-05,7.20461095101e-05,Open,1.0,-15.0,2.5,-10.0

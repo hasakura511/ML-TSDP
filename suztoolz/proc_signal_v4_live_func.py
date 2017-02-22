@@ -1,3 +1,7 @@
+import sys
+import os
+#print os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import json
 from pandas.io.json import json_normalize
 from c2api.sig_adj import get_working_signals, cancel_signal
@@ -317,3 +321,41 @@ def proc_signal_v4_live(debug, ordersDict):
         sleep(1)
         get_c2executions(systemdata, portfolioPath)
 
+if __name__ == "__main__":
+    if len(sys.argv)==1:
+        debug=True
+        feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+        csiPath='D:/ML-TSDP/data/csidata/v4futures2/'
+        dbPathRead='D:/ML-TSDP/data/futures.sqlite3'
+    else:
+        debug=False
+        feedfile='./data/systems/system_ibfeed.csv'
+        csiPath='./data/csidata/v4futures2/'
+        dbPathRead='./data/futures.sqlite3'
+
+    def lastCsiDownloadDate(csiDataPath):
+        datafiles = os.listdir(csiDataPath)
+        dates = []
+        for f in datafiles:
+            lastdate = pd.read_csv(csiDataPath+f, index_col=0).index[-1]
+            if lastdate not in dates:
+                dates.append(lastdate)
+                
+        return max(dates)
+        
+    csidate=lastCsiDownloadDate(csiPath)
+    
+    readcon= sqlite3.connect(dbPathRead)
+    webSelection=pd.read_sql('select * from webSelection where timestamp=\
+            (select max(timestamp) from webSelection)', con=readcon)
+    systems = eval(webSelection.selection[0]).keys()
+    ordersDict={}
+    for account in systems:
+        ordersDict[account]=pd.read_sql('select * from (select * from %s\
+                order by timestamp ASC) group by CSIsym' % (account+'_live'),\
+                con=readcon,  index_col='CSIsym')
+    
+    #proc_signal_v4_live(debug, ordersDict)
+    proc_signal_v4_live(debug, {'v4micro':ordersDict['v4micro']})
+    #errors,ordersDictWithErrors=check_systems_live(debug, ordersDict, csidate)
+    #print 'total errors found', errors

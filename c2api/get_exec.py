@@ -44,7 +44,7 @@ def place_order(dbPath, action, quant, sym, type, systemid, submit,apikey, paren
     
     r=requests.post(url, params=params, json=data);
     #sleep(2)
-    #print r.text
+    print r.text
     logging.info( str(r.text)  )
     return sigid
 

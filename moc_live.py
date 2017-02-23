@@ -123,6 +123,12 @@ else:
         immediate=True
     else:
         immediate=False
+        
+    if sys.argv[1]=='0' and sys.argv[2]=='0' and sys.argv[3]=='0' and sys.argv[4]=='0':
+        refresh_timetable=True
+    else:
+        refresh_timetable=False
+        
     triggertimes = None
     #triggertime = 30 #mins
     dbPath=dbPath2='./data/futures.sqlite3'
@@ -414,7 +420,7 @@ def create_execDict(feeddata, systemdata):
     
     #after 1AM EST server reset
     downloadtt = not ttdate==int(ib_server_reset_date)
-    print 'ttdate',ttdate, 'ib_server_reset_date',ib_server_reset_date, 'downloadtt', downloadtt
+    print 'ttdate',ttdate, 'ib_server_reset_date',ib_server_reset_date, 'downloadtt', downloadtt,'refresh_timetable',refresh_timetable
     execDict=dict()
     #need systemdata for the contract expiry
     #systemdata=pd.read_csv(systemfile)
@@ -422,7 +428,8 @@ def create_execDict(feeddata, systemdata):
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
     #if True:
-    if downloadtt:
+    if downloadtt or refresh_timetable:
+        downloadtt=True
         print 'new timetable due, geting new contract details from IB'
         contractsDF=pd.DataFrame()
     else:
@@ -1149,6 +1156,7 @@ if __name__ == "__main__":
                 
     if not run_moc_immediate:
         timetable = get_timetable(contractsDF)
+        print timetable.to_csv()
         sys.exit('run_moc_immediate = False')
 
     if immediate:

@@ -154,7 +154,7 @@ else:
 if debug:
     mode = 'replace'
     #marketList=[sys.argv[1]]
-    showPlots=True
+    showPlots=False
     dbPath='./data/futures.sqlite3' 
     dbPath2='./data/futures.sqlite3' 
     dbPathWeb = './web/tsdp/db.sqlite3'
@@ -466,8 +466,10 @@ def createRankingChart(ranking, account, line, title, filename):
     pair=sorted([x for x in ranking.index if line==x.split()[2] or anti==x.split()[2]])
     text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
     return text
-    
+
+performance_chart_dict={} 
 for account in totals_accounts:
+    performance_chart_dict[account]=pd.DataFrame()
     performance_dict[account]={}
     quantity=futuresDF_current[qtydict[account]].copy()
     quantity.ix[[sym for sym in quantity.index if sym not in active_symbols[account]]]=0
@@ -497,6 +499,8 @@ for account in totals_accounts:
             pnl[0]=pnl[0]+accountvalues[account]
             label = benchmark_sym+' '+line if line=='benchmark' else line
             plotvalues=pnl.cumsum()
+            performance_chart_dict[account][line]=plotvalues
+            performance_chart_dict[account][line+'_cumper']=plotvalues/pnl[0]
             #plotvalues=(pnl.cumsum()/accountvalues[account]-1)*100
             plt.plot(range(nrows), plotvalues, label=line)
             plt.legend(loc='best', prop={'size':16})
@@ -546,7 +550,7 @@ for account in totals_accounts:
         if debug and showPlots:
             plt.show()
         plt.close()
-
+    performance_chart_dict[account].index=benchmark_xaxis_label
 
 account_values={}
 #create account value charts
@@ -722,6 +726,12 @@ print 'Saved',filename
 for account in totals_accounts:
     tablename=account+'_totals'
     totals_accounts[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
+                    index_label='Date')
+    print 'saved',tablename, 'to',dbPathWebCharts
+
+for account in totals_accounts:
+    tablename=account+'_performance'
+    performance_chart_dict[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
                     index_label='Date')
     print 'saved',tablename, 'to',dbPathWebCharts
     

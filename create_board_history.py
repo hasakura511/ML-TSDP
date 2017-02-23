@@ -156,22 +156,22 @@ if debug:
     #marketList=[sys.argv[1]]
     showPlots=True
     dbPath='./data/futures.sqlite3' 
-    dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
-    dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
+    dbPath2='./data/futures.sqlite3' 
+    dbPathWeb = './web/tsdp/db.sqlite3'
     dbPathWebCharts = './web/tsdp/db_charts.sqlite3'
-    dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
+    dataPath='./data/csidata/v4futures2/'
     savePath=jsonPath= './data/results/' 
     pngPath = './data/results/' 
-    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    feedfile='./data/systems/system_ibfeed.csv'
     #test last>old
     #dataPath2=pngPath
     #signalPath = './data/signals/' 
     
     #test last=old
-    dataPath2='D:/ML-TSDP/data/'
+    dataPath2='./data/'
     
     #signalPath ='D:/ML-TSDP/data/signals2/'
-    signalPath ='D:/ML-TSDP/data/signals2/' 
+    signalPath ='./signals2/' 
     signalSavePath = './data/signals/' 
     systemPath = './data/systems/' 
     readConn = sqlite3.connect(dbPath2)
@@ -185,7 +185,7 @@ else:
     feedfile='./data/systems/system_ibfeed.csv'
     dbPath='./data/futures.sqlite3'
     dbPathWeb ='./web/tsdp/db.sqlite3'
-    dbPathWebCharts = './tsdp/db_charts.sqlite3'
+    dbPathWebCharts = './web/tsdp/db_charts.sqlite3'
     jsonPath ='./web/tsdp/'
     dataPath='./data/csidata/v4futures2/'
     #dataPath='./data/csidata/v4futures2/'
@@ -529,7 +529,7 @@ for account in totals_accounts:
             signals=(signalsDict[current][line]*quantity).astype(int).copy()
             signals.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in signals.index]
             signals=pd.Series(conv_sig(signals), index=signals.index).to_dict()
-            text2='Results shown reflect daily close-to-close timesteps, only applicable to MOC orders. All results are hypothetical.'
+            text2='Results shown reflect daily close-to-close timesteps, only applicable to MOC orders. All results are hypothetical. Excludes slippage and commission costs.'
             filename=pngPath+date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
             filename3=date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
             title= line+' Ranking from '+benchmark_xaxis_label[0]+' to '+benchmark_xaxis_label[-1]
@@ -660,7 +660,8 @@ for account in totals_accounts:
     account_values[account]=pd.DataFrame(data={'yaxis_values':yaxis_values, 'benchmark_values':benchmark_values,
                                 'simulated_moc_values':simulated_moc_values,'yaxis_values_percent':yaxis_values_percent,
                                 'benchmark_values_percent':benchmark_values_percent,
-                                'simulated_moc_values_percent':simulated_moc_values_percent }, index=index)
+                                'simulated_moc_values_percent':simulated_moc_values_percent,
+                                'selection':simulated_moc}, index=index)
     if debug and showPlots:
         plt.show()
     plt.close()
@@ -732,7 +733,7 @@ for account in perchgDict:
 
 for account in account_values:
     tablename=account+'_accountvalues'
-    perchgDict[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
+    account_values[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
                     index_label='Date')
     print 'saved',tablename, 'to',dbPathWebCharts
     

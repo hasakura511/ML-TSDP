@@ -663,6 +663,7 @@ def get_status():
     readConn = getBackendDB()
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='C2sym')
     futuresDict2 = pd.read_sql('select * from Dictionary', con=readConn, index_col='CSIsym')
+
     #col_order = ['broker', 'account', 'contract', 'description', 'openedWhen', 'urpnl', \
     #             'broker_position', 'broker_qty', 'signal_check', 'qty_check', 'selection', 'order_type']
     #col_order_ib = ['desc', 'contracts', 'qty', 'price', 'value', 'avg_cost', 'unr_pnl', 'real_pnl', 'accountid',
@@ -706,7 +707,7 @@ def get_status():
         orderstatus_dict[account]['pnl_text']='This table displays the details of your open positions in your account portfolio.<br><br>Last Update: '+str(timestamp)
         csidate = pd.read_sql('select distinct csiDate from slippage where Name=\'{}\''.format(account), con=readConn).csiDate.tolist()[-1]
         orderstatus_dict[account]['slippage']=pngPath+account+'_c2_slippage_'+str(csidate)+'.png'
-        orderstatus_dict[account]['slippage_text']='The slippage graph shows the datetime your last orders were entered and how much it differs from the official close price.<br><br>Last Update: '+str(timestamp)
+        orderstatus_dict[account]['slippage_text']='The slippage graph shows the datetime your last orders were entered and how much it differs from the official close price. With immediate orders slippage will show the net loss/gain you get from entering earlier than at the MOC<br><br>Last Update: '+str(timestamp)
         if account == "v4futures":
             df = pd.read_sql('select * from (select * from %s\
                     order by timestamp ASC) group by ibsym' % ('checkSystems_ib_' + account), \
@@ -728,6 +729,6 @@ def get_status():
                                   con=readConn).Date.tolist()[-1]
             #slippage_files[account+'_ib'] = str(csidate)
             orderstatus_dict[account]['slippage'] = pngPath+account + '_ib_slippage_' + str(csidate) + '.png'
-            orderstatus_dict[account]['slippage_text']='The slippage graph shows the datetime your last orders were entered and how much it differs from the official close price.<br><br>Last Update: ' + str(
+            orderstatus_dict[account]['slippage_text']='The slippage graph shows the datetime your last orders were entered and how much it differs from the official close price. With immediate orders slippage will show the net loss/gain you get from entering earlier than at the MOC<br><br>Last Update: ' + str(
                 timestamp)
     return orderstatus_dict

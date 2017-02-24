@@ -499,8 +499,8 @@ for account in totals_accounts:
             pnl[0]=pnl[0]+accountvalues[account]
             label = benchmark_sym+' '+line if line=='benchmark' else line
             plotvalues=pnl.cumsum()
-            performance_chart_dict[account][line]=plotvalues
-            performance_chart_dict[account][line+'_cumper']=plotvalues/pnl[0]-1
+            performance_chart_dict[account][line]=[int(x) for x in plotvalues]
+            performance_chart_dict[account][line+'_cumper']=[round(x,2) for x in (plotvalues/pnl[0]-1)*100]
             #plotvalues=(pnl.cumsum()/accountvalues[account]-1)*100
             plt.plot(range(nrows), plotvalues, label=line)
             plt.legend(loc='best', prop={'size':16})

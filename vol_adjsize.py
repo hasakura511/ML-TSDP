@@ -256,10 +256,11 @@ filename='./web/tsdp/custom_signals_data.json'
 if isfile(filename):
     with open(filename, 'r') as f:
         custom_signals_data = json.load(f)
+        custom_signals_data=custom_signals_data[custom_signals_data.keys()[0]]
         
 for sym in custom_signals_data:
     #print c2contractSpec[sym], custom_signals_data[sym]['signals']
-    c2contractSpec[sym][5]=int(custom_signals_data[sym]['signals'])
+    c2contractSpec[sym][5]=int(custom_signals_data[sym])
 print 'loaded and updated custom signals from', filename
 months = {
                 1:'F',

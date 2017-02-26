@@ -4,6 +4,10 @@ Created on Sat Feb 27 10:46:08 2016
 
 @author: Hidemi
 """
+import sys
+import os
+#print os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import time
 import math
 import numpy as np
@@ -28,7 +32,6 @@ import calendar
 import inspect
 import os
 import os.path
-import sys
 import ssl
 import logging
 from copy import deepcopy
@@ -36,6 +39,7 @@ from suztoolz.transform import ATR2
 import matplotlib.pyplot as plt
 import seaborn as sns
 from suztoolz.datatools.seasonalClass import seasonalClassifier
+
 
 def fixTypes(original, transformed):
     for x in original.index:
@@ -355,10 +359,11 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     if isfile(filename):
         with open(filename, 'r') as f:
             custom_signals_data = json.load(f)
+            custom_signals_data=custom_signals_data[custom_signals_data.keys()[0]]
             
     for sym in custom_signals_data:
         #print c2contractSpec[sym], custom_signals_data[sym]['signals']
-        c2contractSpec[sym][5]=int(custom_signals_data[sym]['signals'])
+        c2contractSpec[sym][5]=int(custom_signals_data[sym])
     print 'loaded and updated custom signals from', filename
     
     months = {

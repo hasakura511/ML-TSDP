@@ -12,9 +12,8 @@ from tzlocal import get_localzone
 import sqlite3
 import pandas as pd
 from django import forms
-from .models import UserSelection
-from .start_moc import get_newtimetable, run_checksystems, run_vol_adjsize,\
-                        update_chartdb
+from .models import MetaData, AccountData
+from .start_moc import get_newtimetable, run_checksystems
 
 class LogFiles(object):
     def __init__(self, filename):
@@ -146,20 +145,6 @@ def getComponents():
                     }
     return ComponentsDict
 
-def getAntiComponents():
-    componentpairs =[
-                ['Previous','Anti-Previous'],
-                ['RiskOn','RiskOff'],
-                ['Custom','Anti-Custom'],
-                ['50/50','Anti50/50'],
-                ['LowestEquity','AntiLowestEquity'],
-                ['HighestEquity','AntiHighestEquity'],
-                ['Seasonality','Anti-Seasonality'],
-                ]
-    anti_component_dict={l[0]:l[1] for l in componentpairs}
-    anti_component_dict.update({l[1]:l[0] for l in componentpairs})
-    return anti_component_dict
-
 def updateMeta():
     readConn = getBackendDB()
     mcdate=MCdate()
@@ -181,14 +166,10 @@ def updateMeta():
     triggers.columns = [['Triggertime']]
     triggers['Group']=futuresDict.ix[triggers.index].Group.values
     triggers['Date']=mcdate
-    #record = MetaData(components=json.dumps(getComponents()), triggers=json.dumps(triggers.transpose().to_dict()),\
-    #                                mcdate=mcdate,\
-    #                                timestamp=getTimeStamp())
-    #record.save()
-    metadata= {'components':getComponents(),'anticomponents':getAntiComponents(),
-                         'triggers':triggers.transpose().to_dict(),
-                                    'mcdate':mcdate, 'timestamp':getTimeStamp()}
-    return metadata
+    record = MetaData(components=json.dumps(getComponents()), triggers=json.dumps(triggers.transpose().to_dict()),\
+                                    mcdate=mcdate,\
+                                    timestamp=getTimeStamp())
+    record.save()
 
 def get_order_status():
     readConn = getBackendDB()
@@ -300,52 +281,9 @@ def getAccountValues():
           (select max(timestamp) from c2_portfolio where system=\'v4futures\')', con=readConn)
     '''
 
-    #record = AccountData(value1=json.dumps(urpnls), value2=json.dumps(accountvalues),mcdate=mcdate,\
-    #                                timestamp=getTimeStamp())
-    #record.save()
-    accountdata={'value1':urpnls, 'value2':accountvalues,'mcdate':mcdate,\
-                                    'timestamp':getTimeStamp()}
-    return accountdata
-
-def getCustomSignals():
-    readConn=getBackendDB()
-    lastdate= pd.read_sql('select distinct Date from futuresATRhist',\
-                          con=readConn).Date.tolist()[-1]
-    futuresDF=pd.read_sql('select * from (select * from futuresATRhist\
-                                          where Date=%s\
-                    order by timestamp ASC) group by CSIsym'%lastdate,\
-                        con=readConn,  index_col='CSIsym')
-
-    futuresDict = pd.read_sql('select * from Dictionary', con=readConn,\
-                              index_col='CSIsym')
-
-    desc_list = futuresDict.ix[futuresDF.index].Desc.values
-    desc_hyperlink = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-    desc_hyperlink = ['<a href="/static/images/v4_' + [futuresDict.index[i]\
-                           for i, desc in enumerate(futuresDict.Desc) \
-                  if re.sub(r'-[^-]*$', '', x) in desc][0] + \
-                '_BRANK.png" target="_blank">' + x + '</a>' \
-                for x in desc_hyperlink]
-    df=pd.DataFrame(data=dict(signals=futuresDF.Custom.values,\
-                              group=futuresDF.group.values,\
-                              desc=desc_hyperlink), index=futuresDF.index)
-
-    customsignals=df.sort_values(by=['group']).transpose().to_json()
-    return customsignals
-
-def recreateCharts(custom_signals=False):
-    if custom_signals is not None:
-        filename='custom_signals_data.json'
-        with open(filename, 'w') as f:
-            json.dump(custom_signals, f)
-        print 'Saved', filename
-        print('updating custom signals')
-        #run_vol_adjsize()
-        pass
-
-    #time.sleep(15)
-    #update_chartdb()
-    pass
+    record = AccountData(value1=json.dumps(urpnls), value2=json.dumps(accountvalues), mcdate=mcdate, \
+                         timestamp=getTimeStamp())
+    record.save()
 
 def get_detailed_timetable():
     active_symbols_ib = {
@@ -435,7 +373,7 @@ def archive_dates():
     return datetup
     
 
-def get_blends(cloc=None, list_boxstyles=None, returnVotingComponents=False):
+def get_blends(cloc=None, list_boxstyles=None):
     def is_int(s):
         try:
             int(s)
@@ -498,11 +436,6 @@ def get_blends(cloc=None, list_boxstyles=None, returnVotingComponents=False):
     boxstyleDict = {boxid: [component_styles[x] for x in boxidDict[boxid] if component_names[x] is not 'None'] for
                     boxid
                     in boxidDict}
-    if returnVotingComponents:
-        votingComponents = {boxid: [getComponents()[component_names[x]][0] for x in clist if component_names[x] != 'None']
-                            for boxid, clist in boxidDict.items()}
-        print [[x, votingComponents[x]] for x in sorted(votingComponents.keys(), key=int)]
-        return votingComponents
 
     blendedboxstyleDict = {}
     for boxid, list_of_styles in boxstyleDict.items():
@@ -571,164 +504,3 @@ def get_blends(cloc=None, list_boxstyles=None, returnVotingComponents=False):
         json.dump(list_boxstyles, f)
     print 'Saved', filename
     # return cloc, list_boxstyles
-
-def get_timetables():
-    active_symbols_ib = {
-        'v4futures': ['AUD', 'ZL', 'GBP', 'ZC', 'CAD', 'CL', 'EUR', 'EMD', 'ES', 'GF', 'ZF', 'GC', 'HG', 'HO', 'JPY',
-                      'LE', 'HE', 'MXP', 'NZD', 'NG', 'NIY', 'NQ', 'PA', 'PL', 'RB', 'ZS', 'CHF', 'SI', 'ZM', 'ZT',
-                      'ZN', 'ZB', 'ZW', 'YM'],
-        'v4mini': ['ZC', 'CL', 'EUR', 'EMD', 'ES', 'HG', 'JPY', 'NG', 'ZM', 'ZT', 'ZN', 'ZW'],
-        'v4micro': ['ZL', 'ES', 'HG', 'NG', 'ZN'],
-        }
-    readConn = getBackendDB()
-    mcdate = MCdate()
-    eastern = timezone('US/Eastern')
-    utc = timezone('UTC')
-    now = dt.now(get_localzone()).astimezone(eastern)
-    now_str=now.strftime('%Y-%m-%d %I:%M:%S %p EST')
-    futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
-    timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc').drop(['Date', 'timestamp'],
-                                                                                             axis=1)
-
-    if mcdate in timetables:
-        ttdate = mcdate
-        # filter out any dates that have passed
-        ttdates = [x for x in timetables.columns if int(x) >= int(mcdate)]
-        timetables = timetables[ttdates]
-    else:
-        # use old dates
-        ttdate = timetables.columns[0]
-
-    timetableDF = pd.DataFrame()
-    for idx, [sym, value] in enumerate([x.split() for x in timetables.index]):
-        idx2 = sym + ' ' + value
-        timestamp = timetables.ix[idx2].ix[ttdate]
-        timetableDF.set_value(sym, value, timestamp)
-
-    #timetableDF.index.name = 'ibsym'
-    for sym in timetableDF.index:
-        opentime = eastern.localize(dt.strptime(timetableDF.ix[sym].open, '%Y-%m-%d %H:%M'))
-        closetime = eastern.localize(dt.strptime(timetableDF.ix[sym].close, '%Y-%m-%d %H:%M'))
-        if now >= opentime and now < closetime:
-            timetableDF.set_value(sym, 'immediate order type', 'Open: Market Order')
-        else:
-            # market is closed
-            if now < opentime:
-                nextopen = opentime.strftime('%A, %b %d %H:%M EST')
-            elif len(timetables.drop(ttdate, axis=1).columns) > 0:
-                next_ttdate = timetables.drop(ttdate, axis=1).columns[0]
-                nextopen = timetables[next_ttdate].ix[sym + ' open']
-                if not (nextopen is not None and nextopen is not np.nan):
-                    nextopen = 'Not Avalable'
-                else:
-                    if now < eastern.localize(dt.strptime(nextopen, '%Y-%m-%d %H:%M')):
-                        pass
-                    else:
-                        nextopen = 'Not Available'
-            else:
-                nextopen = 'Not Available'
-            timetableDF.set_value(sym, 'immediate order type', 'Closed: Market on Open ({})'.format(nextopen))
-
-    col_order2 = ['group', 'open', 'close', 'trigger']
-    col_order = ['group', 'immediate order type']
-    # timetableDF=timetableDF[col_order]
-    # print timetableDF
-    # ttDict={account:timetableDF.ix[active_symbols_ib[account]].to_html() for account in active_symbols_ib}
-    ttDict = {}
-    for account in active_symbols_ib:
-        df = timetableDF.ix[active_symbols_ib[account]]
-        df['group'] = futuresDict.ix[df.index].Group
-        desc_list = futuresDict.ix[df.index].Desc.values
-        df.index = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-        df.index = ['<a href="/static/images/v4_' + [futuresDict.index[i] for i, desc in enumerate(futuresDict.Desc) \
-                      if re.sub(r'-[^-]*$', '', x) in desc][0] + '_BRANK.png" target="_blank">' + x + '</a>' for x in df.index]
-        text='This table lets you know what order types will be used for '+account+' if immediate is entered now.<br><br>Server Time: '+now_str
-        ttDict[account] = {
-                            'text':text,
-                            'html':df[col_order].sort_values(by='group').to_html(escape=False),
-                            }
-        if account == 'v4futures':
-            text = 'Detailed Timetable.<br>All times in Eastern Standard Time.<br><br>Server Time: ' + now_str
-            ttDict['info'] = {
-                            'text':text,
-                            'html':df[col_order2].sort_values(by='group').to_html(escape=False)
-                            }
-    return ttDict
-
-
-def get_status():
-    eastern = timezone('US/Eastern')
-    utc = timezone('UTC')
-    pngPath='static/images/'
-    readConn = getBackendDB()
-    futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='C2sym')
-    futuresDict2 = pd.read_sql('select * from Dictionary', con=readConn, index_col='CSIsym')
-
-    #col_order = ['broker', 'account', 'contract', 'description', 'openedWhen', 'urpnl', \
-    #             'broker_position', 'broker_qty', 'signal_check', 'qty_check', 'selection', 'order_type']
-    #col_order_ib = ['desc', 'contracts', 'qty', 'price', 'value', 'avg_cost', 'unr_pnl', 'real_pnl', 'accountid',
-    #             'currency', 'bet', 'ordertype', 'status', 'Date']
-    col_order_status = ['selection', 'order_type', 'signal_check', 'qty_check']
-    col_order_status_ib = ['bet', 'ordertype', 'status']
-    col_order_pnl = ['contract', 'urpnl','broker_position', 'broker_qty', 'openedWhen']
-    col_order_pnl_ib = ['contracts', 'unr_pnl', 'real_pnl', 'currency', 'value', 'qty', 'Date']
-    orderstatus_dict={}
-    #slippage_files={}
-    accounts = ['v4micro', 'v4mini', 'v4futures']
-
-    def conv_sig(signals):
-        sig = signals.copy()
-        sig[sig == -1] = 'SHORT'
-        sig[sig == 1] = 'LONG'
-        sig[sig == 0] = 'NONE'
-        return sig.values
-
-    for account in accounts:
-        orderstatus_dict[account]={}
-        orderstatus_dict[account]['tab_list'] = ['Status', 'UnrealizedPNL', 'Slippage']
-        #webSelection=pd.read_sql('select * from webSelection where timestamp=\
-        #        (select max(timestamp) from webSelection)'
-        #bet = eval(webSelection.selection[0])[account][0]
-        df=pd.read_sql('select * from (select * from %s\
-                order by timestamp ASC) group by c2sym' % ('checkSystems_'+account),\
-                con=readConn)
-        timestamp=utc.localize(dt.utcfromtimestamp(df.timestamp[0])).astimezone(eastern).strftime('%Y-%m-%d %I:%M:%S %p EST')
-        df['system_signal'] = conv_sig(df['system_signal'])
-        df['broker_position'] = conv_sig(df['broker_position'])
-        desc_list=futuresDict.ix[[x[:-2] for x in df.contract.values]].Desc.values
-        df['description']=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-        df=df.set_index(['description'])
-        df.index=['<a href="/static/images/v4_' + [futuresDict2.index[i] for i, desc in enumerate(futuresDict2.Desc) \
-                  if re.sub(r'-[^-]*$', '', x) in desc][0] + '_BRANK.png" target="_blank">' + x + '</a>' for x in df.index]
-        orderstatus_dict[account]['title_txt']=account+' Order Status'
-        orderstatus_dict[account]['status']=df[col_order_status].to_html(escape=False)
-        orderstatus_dict[account]['status_text']='This table lets you know the status of your last bet/orders. For example, if your bet was correctly transmitted and received by your broker, it would say OK.<br><br>Last Update: '+timestamp
-        orderstatus_dict[account]['pnl'] = df[col_order_pnl].to_html(escape=False)
-        orderstatus_dict[account]['pnl_text']='This table displays the details of your open positions in your account portfolio.<br><br>Last Update: '+str(timestamp)
-        csidate = pd.read_sql('select distinct csiDate from slippage where Name=\'{}\''.format(account), con=readConn).csiDate.tolist()[-1]
-        orderstatus_dict[account]['slippage']=pngPath+account+'_c2_slippage_'+str(csidate)+'.png'
-        orderstatus_dict[account]['slippage_text']='The slippage graph shows the datetime your last orders were entered and how much it differs from the official close price. With immediate orders slippage will show the net loss/gain you get from entering earlier than at the MOC<br><br>Last Update: '+str(timestamp)
-        if account == "v4futures":
-            df = pd.read_sql('select * from (select * from %s\
-                    order by timestamp ASC) group by ibsym' % ('checkSystems_ib_' + account), \
-                             con=readConn)
-            timestamp = utc.localize(dt.utcfromtimestamp(df.timestamp[0])).astimezone(eastern).strftime(
-                '%Y-%m-%d %I:%M:%S %p EST')
-            desc_list = [futuresDict.reset_index().set_index('IBsym').ix[x].Desc for x in df.ibsym]
-            df['desc'] = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-            df=df.set_index(['desc'])
-            df.index = ['<a href="/static/images/v4_' + [futuresDict2.index[i] for i, desc in enumerate(futuresDict2.Desc) \
-                         if re.sub(r'-[^-]*$', '', x) in desc][0] + '_BRANK.png" target="_blank">' + x + '</a>' for x in df.index]
-            #orderstatus_dict[account+'_ib'] = df[col_order].to_html()
-            orderstatus_dict[account]['title_txt'] = account + ' Order Status'
-            orderstatus_dict[account]['status'] = df[col_order_status_ib].to_html(escape=False)
-            orderstatus_dict[account]['status_text']='This table lets you know the status of your last bet/orders. For example, if your bet was correctly transmitted and received by your broker, it would say OK.<br><br>Last Update: '+timestamp
-            orderstatus_dict[account]['pnl'] = df[col_order_pnl_ib].to_html(escape=False)
-            orderstatus_dict[account]['pnl_text']='This table displays the details of your open positions in your account portfolio.<br><br>Last Update: '+str(timestamp)
-            csidate = pd.read_sql('select distinct Date from ib_slippage where Name=\'{}\''.format(account),
-                                  con=readConn).Date.tolist()[-1]
-            #slippage_files[account+'_ib'] = str(csidate)
-            orderstatus_dict[account]['slippage'] = pngPath+account + '_ib_slippage_' + str(csidate) + '.png'
-            orderstatus_dict[account]['slippage_text']='The slippage graph shows the datetime your last orders were entered and how much it differs from the official close price. With immediate orders slippage will show the net loss/gain you get from entering earlier than at the MOC<br><br>Last Update: ' + str(
-                timestamp)
-    return orderstatus_dict

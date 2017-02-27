@@ -107,6 +107,7 @@ def getrecords(request):
     recentdata = [dict((cn, getattr(data, cn)) for cn in ('timestamp', 'mcdate', 'selection')) for data in recent]
     returndata={"first": firstdata, "recent": recentdata}
     #print(returndata)
+    print len(returndata)
     return HttpResponse(json.dumps(returndata))
     
 def index(request):
@@ -141,26 +142,30 @@ def newboard(request):
 
 def gettimetable(request):
     returndata = get_timetables()
-    print(returndata)
+    #print(returndata)
+    print len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getstatus(request):
     returndata = get_status()
-    print(returndata)
+    #print(returndata)
+    print len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getmetadata(request):
     #returnrec = MetaData.objects.order_by('-timestamp').first()
     #returndata = returnrec.dic()
     returndata=updateMeta()
-    print(returndata)
+    #print(returndata)
+    print len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getaccountdata(request):
     #returnrec = AccountData.objects.order_by('-timestamp').first()
     #returndata = returnrec.dic()
     returndata= getAccountValues()    
-    print(returndata)
+    #print(returndata)
+    print len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def symbols(request):

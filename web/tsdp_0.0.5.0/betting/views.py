@@ -134,7 +134,7 @@ def board(request):
             print('New Board config found')
             recreateCharts()
     '''
-    return render(request, 'index.html', {})
+    return render(request, 'board.html', {})
 
 def newboard(request):
     return render(request, 'newboard.html', {})

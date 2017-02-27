@@ -303,7 +303,7 @@ def getAccountValues():
     #record = AccountData(value1=json.dumps(urpnls), value2=json.dumps(accountvalues),mcdate=mcdate,\
     #                                timestamp=getTimeStamp())
     #record.save()
-    accountdata={'value1':urpnls, 'value2':accountvalues,'mcdate':mcdate,\
+    accountdata={'value1':json.dumps(urpnls), 'value2':json.dumps(accountvalues),'mcdate':mcdate,\
                                     'timestamp':getTimeStamp()}
     return accountdata
 

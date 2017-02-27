@@ -23,7 +23,4 @@ urlpatterns = [
     url(r'^archive/(?P<date>[0-9-]+)/$', views.futures, name='futures'),
     url(r'^logs/(.*)$', views.logs, name='logs'),
     url(r'^errors/$', views.errors, name='errors'),
-    url(r'^gettimetable$', views.gettimetable),
-    url(r'^getstatus', views.getstatus),
-    url(r'^newboard/$', views.newboard),
 ]

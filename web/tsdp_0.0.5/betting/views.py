@@ -11,7 +11,7 @@ import pandas as pd
 import sqlite3
 import json
 import os
-
+from os.path import isfile, join
 #dbPath = '/tsdpWEB/tsdp/db.sqlite3'
 #readConn = sqlite3.connect(dbPath)
 

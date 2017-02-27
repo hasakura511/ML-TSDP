@@ -149,14 +149,16 @@ def getstatus(request):
     return HttpResponse(json.dumps(returndata))
 
 def getmetadata(request):
-    returnrec = MetaData.objects.order_by('-timestamp').first()
-    returndata = returnrec.dic()
+    #returnrec = MetaData.objects.order_by('-timestamp').first()
+    #returndata = returnrec.dic()
+    returndata=updateMeta()
     print(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getaccountdata(request):
-    returnrec = AccountData.objects.order_by('-timestamp').first()
-    returndata = returnrec.dic()
+    #returnrec = AccountData.objects.order_by('-timestamp').first()
+    #returndata = returnrec.dic()
+    returndata= getAccountValues()    
     print(returndata)
     return HttpResponse(json.dumps(returndata))
 

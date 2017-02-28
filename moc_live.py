@@ -1117,7 +1117,7 @@ def checkIBpositions(account='v4futures'):
     mode = get_write_mode(writeConn, tablename, portfolio)
     portfolio.to_sql(name=tablename,con=writeConn, index=True, if_exists=mode, index_label='ibsym')
     print 'saved', tablename,'to',dbPath,'writemode',mode
-    print errors, 'errors found'
+    return errors, portfolio
     
 if __name__ == "__main__":
     print 'IB get history seetings:', durationStr, barSizeSetting, whatToShow
@@ -1270,8 +1270,9 @@ if __name__ == "__main__":
                     place_iborders(execDict, cid)
                     #wait for orders to be filled
                     sleep(10)
-                    errors=checkIBpositions()
+                    errors, portfolio=checkIBpositions()
                     print errors, 'errors found'
+                    print portfolio.to_csv()
 
                 except Exception as e:
                     #print e

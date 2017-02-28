@@ -422,6 +422,7 @@ def create_execDict(feeddata, systemdata):
     #openPositions=get_ibfutpositions(portfolioPath)
     #print feeddata.columns
     if downloadtt:
+        downloadtt=True
         print 'new timetable due, geting new contract details from IB'
         contractsDF=pd.DataFrame()
     else:
@@ -1127,7 +1128,7 @@ if __name__ == "__main__":
     errors, portfolio=checkIBpositions()
     print errors, 'errors found'
     print portfolio.to_csv()
-    print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
+    
     
     if errors >0:
         execDict={}
@@ -1172,6 +1173,9 @@ if __name__ == "__main__":
         except Exception as e:
             #print e
             traceback.print_exc()
+        print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
+    else:
+        print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 
 '''
     #systemfile=systemPathRO+'system_v4futures_live.csv'

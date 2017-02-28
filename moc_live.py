@@ -128,7 +128,12 @@ else:
         refresh_timetable=True
     else:
         refresh_timetable=False
-        
+
+    if sys.argv[1]=='0' and sys.argv[2]=='0' and sys.argv[3]=='1' and sys.argv[4]=='1':
+        post_processing=True
+    else:
+        post_processing=False
+
     triggertimes = None
     #triggertime = 30 #mins
     dbPath=dbPath2='./data/futures.sqlite3'
@@ -1154,10 +1159,21 @@ if __name__ == "__main__":
             if tries==5:
                 sys.exit('failed 5 times to get contract info')
                 
-    if not run_moc_immediate:
+    if refresh_timetable:
         timetable = get_timetable(contractsDF)
         print timetable.to_csv()
         sys.exit('run_moc_immediate = False')
+
+    if post_processing:
+        skipcheck=True
+        print('requesting last executions from IB..')
+        print(filterIBexec().to_csv())
+        
+        errors, portfolio=checkIBpositions()
+        print errors, 'errors found'
+        print portfolio.to_csv()
+    else:
+        skipcheck=False
 
     if immediate:
         print 'Running Immediate Process...'
@@ -1178,7 +1194,7 @@ if __name__ == "__main__":
     if len(threadlist)>0:
         if immediate:
             print 'running vol_adjsize_immediate to process immediate orders'
-            ordersDict = vol_adjsize_immediate(debug, threadlist)
+            ordersDict = vol_adjsize_immediate(debug, threadlist, skipcheck=skipcheck)
         else:
             print 'running vol_adjsize_moc to update system files'
             ordersDict = vol_adjsize_moc(debug, threadlist)
@@ -1187,7 +1203,10 @@ if __name__ == "__main__":
         
         if isinstance(ordersDict, type({})):
             #ordersDict['v4futures']=pd.read_csv(systemfile)[-4:]
-            totalc2orders, _ =check_systems_live(debug, ordersDict, csidate)
+            if not post_processing:
+                totalc2orders, _ =check_systems_live(debug, ordersDict, csidate)
+            else:
+                totalc2orders=0
             #check ib positions
             try:
                 if 'v4futures' in ordersDict.keys():

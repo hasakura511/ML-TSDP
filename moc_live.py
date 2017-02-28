@@ -1172,7 +1172,9 @@ if __name__ == "__main__":
     if post_processing:
         skipcheck=True
         print('requesting last executions from IB..')
-        print(filterIBexec().to_csv())
+        executions = filterIBexec().to_csv()
+        if executions is not None:
+            print(filterIBexec().to_csv())
         
         errors, portfolio=checkIBpositions()
         print errors, 'errors found'

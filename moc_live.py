@@ -1067,6 +1067,7 @@ def checkIBpositions(account='v4futures'):
         raw_portfolio = raw_portfolio.reset_index().set_index('sym')
         portfolio=raw_portfolio[raw_portfolio.qty != 0].copy()
         print portfolio.shape[0],'futures positions found'
+        print portfolio
         ##if all executions went through properly all contract should be current. 
         #portfolio = portfolio.reset_index().groupby(portfolio.index)[['qty']].sum()
         

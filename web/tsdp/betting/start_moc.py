@@ -29,34 +29,7 @@ def get_newtimetable():
             proc = Popen(['/anaconda2/python', '/ml-tsdp/moc_live.py','0','0','0','0'],\
                          cwd='/ml-tsdp/',stdout=f, stderr=e)
             #proc.wait()
-            
-def run_vol_adjsize():
-    fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
-    with open('\logs\update_custom_signals_' + fulltimestamp + '.txt', 'w') as f:
-        with open('\logs\update_custom_signals_error_'+fulltimestamp+'.txt', 'w') as e:
-            print('processing custom signal update...')
-            proc = Popen(['/anaconda2/python', '/ml-tsdp/vol_adjsize.py','1'],\
-                         cwd='/ml-tsdp/',stdout=f, stderr=e)
-            proc.wait()
-            f.flush()
-            e.flush()
-            proc = Popen(['/anaconda2/python', '/ml-tsdp/suztoolz/vol_adjsize_moclive_func.py','1'],\
-                         cwd='/ml-tsdp/',stdout=f, stderr=e)
-            proc.wait()
-            
-def update_chartdb():
-    fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
-    with open('\logs\update_chartdb_' + fulltimestamp + '.txt', 'w') as f:
-        with open('\logs\update_chartdb_error_'+fulltimestamp+'.txt', 'w') as e:
-            print('processing chartdb update...')
-            proc = Popen(['/anaconda2/python', '/ml-tsdp/create_board_history.py','1'],\
-                         cwd='/ml-tsdp/',stdout=f, stderr=e)
-            proc.wait()
-            f.flush()
-            e.flush()
-            proc = Popen(['/anaconda2/python', '/ml-tsdp/excel_charts.py','1'],\
-                         cwd='/ml-tsdp/',stdout=f, stderr=e)
-            proc.wait()
+
 
 if __name__ == "__main__":
     get_newtimetable()

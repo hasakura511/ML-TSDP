@@ -120,9 +120,10 @@ def board(request):
     lastSelection = UserSelection.objects.all().order_by('-timestamp').first()
 
     #check if any immediate orders
-    if 'True' in [order[1] for sys, order in eval(lastSelection.selection).items()]:
-        print('processing immediate orders')
-        start_immediate()
+    if lastSelection is not None:
+        if 'True' in [order[1] for sys, order in eval(lastSelection.selection).items()]:
+            print('processing immediate orders')
+            start_immediate()
 
     '''
     # Please wait 10-15 minutes for the charts to be recreated.

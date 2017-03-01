@@ -321,19 +321,20 @@ def vol_adjsize_immediate(debug, threadlist, skipcheck=False):
             print key, 'skipped adding ',selectionDict[key][0],'to orderDict: IMMEDIATE==FALSE.'
             
     #save to file and db
-    for system in orderDict.keys():
-        tablename = system+'_live'
-        mode = get_write_mode(writeConn, tablename, orderDict[system])
-        orderDict[system].to_sql(name= tablename, if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
-        
-        tablename2 ='signals_live'
-        mode = get_write_mode(writeConn, tablename2, orderDict[system])        
-        orderDict[system].to_sql(name=tablename2, if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
-        
-        print tablename, selectionDict[system][0]
-        filename = systemPath+'system_'+tablename+'.csv'
-        orderDict[system].to_csv(filename, index=True)
-        print  'Saved to table',tablename, tablename2, dbPath,'and', filename
+    if not skipcheck:
+        for system in orderDict.keys():
+            tablename = system+'_live'
+            mode = get_write_mode(writeConn, tablename, orderDict[system])
+            orderDict[system].to_sql(name= tablename, if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+            
+            tablename2 ='signals_live'
+            mode = get_write_mode(writeConn, tablename2, orderDict[system])        
+            orderDict[system].to_sql(name=tablename2, if_exists=mode, con=writeConn, index=True, index_label='CSIsym')
+            
+            print tablename, selectionDict[system][0]
+            filename = systemPath+'system_'+tablename+'.csv'
+            orderDict[system].to_csv(filename, index=True)
+            print  'Saved to table',tablename, tablename2, dbPath,'and', filename
 
     return orderDict
     

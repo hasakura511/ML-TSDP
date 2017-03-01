@@ -1067,7 +1067,7 @@ def checkIBpositions(account='v4futures'):
         raw_portfolio = raw_portfolio.reset_index().set_index('sym')
         portfolio=raw_portfolio[raw_portfolio.qty != 0].copy()
         print portfolio.shape[0],'futures positions found'
-        print portfolio
+        #print portfolio
         port2=portfolio.reset_index().groupby(['sym'])['exp'].max()
         index=[sym+str(port2.ix[sym]) for sym in port2.index]
         portfolio=portfolio.reset_index().set_index('contracts').ix[index].set_index('sym').copy()

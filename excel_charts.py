@@ -315,7 +315,9 @@ for dic in boxstyles_data:
         key2=''
     if key2 in accounts:
         index=boxstyles_data.index(dic)
-        av=int(av_cumper_df[accounts[key2]][-1])
+        #print av_cumper_df
+        #print accounts[key2], av_cumper_df[accounts[key2]][-1]
+        av=int(av_cumper_df[accounts[key2]].dropna()[-1])
         chip_value=str(av/1000)+'K'
         print key, key2, index,dic[key]['text'],av, chip_value
         dic[key]['text']=chip_value

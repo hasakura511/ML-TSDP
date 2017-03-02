@@ -10,9 +10,9 @@ set "fullstamp=%YYYY%%MM%%DD%_%HH%-%Min%-%Sec%"
 cd \ML-TSDP\
 \anaconda2\python post_processing.py >> \logs\post_processing_%fullstamp%.txt
 
-cd \ml-tsdp\web\tsdp\
-wmic process where "Commandline like '%%manage.py runserver%%' and name like '%%python.exe%%'" call terminate
-\anaconda2\python runserver.py
+rem cd \ml-tsdp\web\tsdp\
+rem wmic process where "Commandline like '%%manage.py runserver%%' and name like '%%python.exe%%'" call terminate
+rem \anaconda2\python runserver.py
 
 rem wmic process where "name like '%%ibgateway.exe%%'" call terminate
 rem start C:\Jts\ibgateway\952\ibgateway.exe

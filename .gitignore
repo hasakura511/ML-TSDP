@@ -11,3 +11,5 @@ feed/migrations/*
 !/web/tsdp/betting/static/public/images/chip*.*
 !/web/tsdp/betting/static/public/images/logo*
 !/web/tsdp/betting/static/public/images/avatar*
+!/web/tsdp/betting/static/public/images/*button*
+!/web/tsdp/betting/static/public/images/mark*

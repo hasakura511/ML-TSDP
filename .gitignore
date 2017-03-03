@@ -5,4 +5,9 @@
 feed/migrations/*
 /data/results/*.png
 /web/tsdp/betting/static/images/*
+!/web/tsdp/betting/static/images/logo*.*
+!/web/tsdp/betting/static/images/*.gif
 /web/tsdp/betting/static/public/images/*
+!/web/tsdp/betting/static/public/images/chip*.*
+!/web/tsdp/betting/static/public/images/logo*
+!/web/tsdp/betting/static/public/images/avatar*

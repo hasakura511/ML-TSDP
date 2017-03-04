@@ -9,3 +9,7 @@ set "fullstamp=%YYYY%%MM%%DD%_%HH%-%Min%-%Sec%"
 
 cd \ml-tsdp
 \anaconda2\python post_processing_csi.py >> \logs\post_processing_csi_%fullstamp%.txt
+
+cd \ml-tsdp\web\tsdp\
+wmic process where "Commandline like '%%manage.py runserver%%' and name like '%%python.exe%%'" call terminate
+\anaconda2\python runserver.py

@@ -15,6 +15,14 @@ from django import forms
 from .models import UserSelection
 from .start_moc import get_newtimetable, run_checksystems, run_vol_adjsize,\
                         update_chartdb
+debug = False
+
+if debug:
+    dbPath='futures.sqlite3'
+    search_dir='./logs/'
+else:
+    search_dir = "/logs/"
+    dbPath = '/ML-TSDP/data/futures.sqlite3'
 
 class LogFiles(object):
     def __init__(self, filename):
@@ -25,12 +33,12 @@ class LogFiles(object):
             return fp.read()
 
 def getBackendDB():
-    dbPath = '/ML-TSDP/data/futures.sqlite3'
+    global dbPath
     readConn = sqlite3.connect(dbPath)
     return readConn
 
 def get_logfiles(search_string='', exclude=False):
-    search_dir = "/logs/"
+    global search_dir
     os.chdir(search_dir)
     files = filter(os.path.isfile, os.listdir(search_dir))
     if exclude:
@@ -167,7 +175,8 @@ def updateMeta():
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
     if mcdate not in timetables.columns:
         print('Running MOC to get new mcdate...')
-        get_newtimetable()
+        if not debug:
+            get_newtimetable()
         mcdate=timetables.drop(['Date','timestamp'],axis=1).columns[-1]
         triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
         triggers[mcdate] = 'Not Available'
@@ -274,7 +283,8 @@ def getAccountValues():
 
     #run checksystems and update values if last update >=1 day and not a T,W,TH,F,SA
     if (now-eastern.localize(c2_equity.updatedLastTimeET[0])).days>=1 and (now.weekday()>0 and now.weekday()<5):
-        run_checksystems()
+        if not debug:
+            run_checksystems()
 
     for system in c2_equity.drop(['v4futures'], axis=0).index:
         timestamp = c2_equity.ix[system].updatedLastTimeET
@@ -495,14 +505,14 @@ def get_blends(cloc=None, list_boxstyles=None, returnVotingComponents=False):
         boxidDict[str(boxid)] += ['c' + str(o_component)]
         boxidDict[str(boxid)] += vboxdict[boxid % table_height]
 
-    print boxidDict
+    print 'boxidDict\n',boxidDict
     boxstyleDict = {boxid: [component_styles[x] for x in boxidDict[boxid] if component_names[x] is not 'None'] for
                     boxid
                     in boxidDict}
     if returnVotingComponents:
         votingComponents = {boxid: [getComponents()[component_names[x]][0] for x in clist if component_names[x] != 'None']
                             for boxid, clist in boxidDict.items()}
-        print [[x, votingComponents[x]] for x in sorted(votingComponents.keys(), key=int)]
+        print 'votingComponents\n',[[x, votingComponents[x]] for x in sorted(votingComponents.keys(), key=int)]
         return votingComponents
 
     blendedboxstyleDict = {}

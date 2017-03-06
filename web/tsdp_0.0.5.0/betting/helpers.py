@@ -254,6 +254,9 @@ def getAccountValues():
     now = now.astimezone(eastern)
     accountvalues = {}
     urpnls = {}
+    
+    if not debug:
+        get_newtimetable()
 
     # ib
     ib_equity = pd.read_sql('select * from ib_accountData where timestamp=\

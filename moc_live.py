@@ -1189,6 +1189,7 @@ if __name__ == "__main__":
                 print  'Saved',account,'c2_equity to sql db',dbPath
             else:
                 print 'Could not get last equity from c2'
+        print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
         sys.exit('refresh_timetable and account values')
 
     if post_processing:

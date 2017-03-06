@@ -245,7 +245,7 @@ def get_order_status():
 
     return slippage_files, orderstatus_dict
 
-def getAccountValues():
+def getAccountValues(refresh=False):
     readConn = getBackendDB()
     mcdate = MCdate()
     eastern = timezone('US/Eastern')
@@ -255,7 +255,7 @@ def getAccountValues():
     accountvalues = {}
     urpnls = {}
     
-    if not debug:
+    if not debug and refresh:
         get_newtimetable()
 
     # ib

@@ -169,7 +169,12 @@ def getmetadata(request):
 def getaccountdata(request):
     #returnrec = AccountData.objects.order_by('-timestamp').first()
     #returndata = returnrec.dic()
-    returndata= getAccountValues()    
+    #request.GET['refresh']=='True'
+    #    returndata= getAccountValues(refresh=True)
+    #else:
+    #    returndata= getAccountValues()
+
+    returndata= getAccountValues()
     #print(returndata)
     print len(returndata)
     return HttpResponse(json.dumps(returndata))

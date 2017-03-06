@@ -1167,7 +1167,29 @@ if __name__ == "__main__":
     if refresh_timetable:
         timetable = get_timetable(contractsDF)
         print timetable.to_csv()
-        sys.exit('run_moc_immediate = False')
+        ib_portfolio=get_ibfutpositions(portfolioPath)
+        print ib_portfolio
+
+        from c2api.get_exec import getSystemDetails
+        accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
+            (select max(timestamp) from accountInfo as maxtimestamp)', con=readConn,  index_col='index')
+        systems = [x for x in accountInfo.columns if x not in ['Date','timestamp']]
+        for account in systems:
+            c2id=accountInfo[account].c2id
+            c2key=accountInfo[account].c2key
+            jsondata = json.loads(getSystemDetails(c2id, c2key))
+            #logging.info('\n Length jsondata'+str(len(jsondata['equity_data'])))
+            equity=json_normalize(jsondata['response']['marginEquityData'])
+            if len(equity)>0 and 'modelAccountValue' in equity.columns:
+                print account, equity['modelAccountValue'][0]
+                equity['system']=account
+                equity['Date']=csidate
+                equity['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
+                equity.to_sql(name='c2_equity',con=writeConn, index=False, if_exists='append')
+                print  'Saved',account,'c2_equity to sql db',dbPath
+            else:
+                print 'Could not get last equity from c2'
+        sys.exit('refresh_timetable and account values')
 
     if post_processing:
         skipcheck=True

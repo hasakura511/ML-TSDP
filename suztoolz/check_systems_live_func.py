@@ -1,3 +1,4 @@
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import requests
 import os
 import numpy as np

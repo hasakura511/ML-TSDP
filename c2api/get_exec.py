@@ -333,7 +333,7 @@ def get_c2livepos(systemid, apikey, systemname):
     data=get_exec_open(systemid,apikey);
     
     jsondata = json.loads(data)
-    logging.info('\n Length jsondata'+str(len(jsondata['response'])))
+    #logging.info('\n Length jsondata'+str(len(jsondata['response'])))
     
     if len(jsondata['response']) > 0:
         dataSet=json_normalize(jsondata['response'])

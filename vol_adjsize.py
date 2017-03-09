@@ -53,10 +53,16 @@ currencyFile = 'currenciesATR.csv'
 systemFilename='system_v4futures.csv'
 systemFilename2='system_v4mini.csv'
 systemFilename3='system_v4micro.csv'
-c2id_macro=107146997
-c2id_mini=101359768
-c2id_micro=101533256
-c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
+
+c2id_macro=110126294
+c2id_mini=110125449
+c2id_micro=110125347
+c2key='O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx'
+
+#c2id_macro=107146997
+#c2id_mini=101359768
+#c2id_micro=101533256
+#c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
 
 
 if len(sys.argv)==1:

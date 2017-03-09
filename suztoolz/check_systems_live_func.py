@@ -1,3 +1,5 @@
+
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import requests
 import os
@@ -20,7 +22,6 @@ from c2api.get_exec import get_c2livepos, retrieveSignalsWorking, get_c2lastEqui
 #from seitoolz.get_exec import get_executions
 from time import gmtime, strftime, localtime, sleep
 import logging
-import sys
 import threading
 from datetime import datetime as dt
 import sqlite3

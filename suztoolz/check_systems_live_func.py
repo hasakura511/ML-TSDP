@@ -148,7 +148,7 @@ def check_systems_live(debug, ordersDict, csidate):
         #savePath='./data/portfolio/'
         systemPath =  './data/systems/'
         dbPath=dbPath2='./data/futures.sqlite3'
-        from c2api.place_order import place_order2
+        from c2api.get_exec import place_order as place_order2
 
     #conn = sqlite3.connect(dbPath)
     writeConn = sqlite3.connect(dbPath)
@@ -176,6 +176,7 @@ def check_systems_live(debug, ordersDict, csidate):
         c2openpositions[account]=get_c2livepos(systemid, apikey, account)
         c2open=c2openpositions[account].copy()
         if len(c2open)>0:
+            c2openpositions[account]['signal']=np.where(c2openpositions[account]['long_or_short'].values=='long',1,-1)
             c2open['system']=account
             c2open['Date']=csidate
             c2open['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
@@ -221,7 +222,7 @@ def check_systems_live(debug, ordersDict, csidate):
         mismatch_count=0
         exit_count=0
         error_count=0
-        c2openpositions[account]['signal']=np.where(c2openpositions[account]['long_or_short'].values=='long',1,-1)
+        
 
         #check contracts in c2 file not in system file.
         for sym in c2openpositions[account].index:
@@ -266,7 +267,7 @@ def check_systems_live(debug, ordersDict, csidate):
                     #place order to exit the contract.
 
                     #old contract does not exist in system file so use the new contract c2id and api
-                    response = place_order2(action, c2qty, sym, symInfo.c2type, symInfo.c2id, True, symInfo.c2api)
+                    response = place_order2(dbPath, action, c2qty, sym, symInfo.c2type, symInfo.c2id, True, symInfo.c2api)
                     exitList.append(sym+' not in system file. exiting contract!!.. '+response)
         #check contracts in system file not in c2.
         for sym in ordersDict[account].index:

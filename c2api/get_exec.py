@@ -331,11 +331,12 @@ def get_c2pos(systemdata):
 
 def get_c2livepos(systemid, apikey, systemname):
     data=get_exec_open(systemid,apikey);
-    
+    print systemid, apikey, data
     jsondata = json.loads(data)
     #logging.info('\n Length jsondata'+str(len(jsondata['response'])))
     
     if len(jsondata['response']) > 0:
+    #if 'response' in jsondata:
         dataSet=json_normalize(jsondata['response'])
         dataSet=dataSet.set_index('symbol')
         filename='./data/portfolio/c2_' + systemname + '_portfolio.csv'
@@ -343,13 +344,7 @@ def get_c2livepos(systemid, apikey, systemname):
         print 'saved', filename
         return dataSet
     else:
-        if os.path.isfile('./data/portfolio/c2_' + systemname + '_portfolio.csv'):
-            dataSet=get_c2pos_from_csv(systemname);
-            dataSet=dataSet[dataSet.index == ''].copy()
-            filename = './data/portfolio/c2_' + systemname + '_portfolio.csv'
-            dataSet.to_csv(filename)
-            print 'saved', filename
-            return dataSet
+        return pd.DataFrame()
         
         
         

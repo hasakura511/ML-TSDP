@@ -99,7 +99,7 @@ def get_write_mode(dbconn, tablename, dataframe):
         return 'append'
         
 #debug=True #uncomment line 167
-#feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+#feedfile='./data/systems/system_ibfeed.csv'
 #feeddata=pd.read_csv(feedfile,index_col='ibsym')
 #threadlist = [(feeddata.ix[x].CSIsym,x) for x in feeddata.index]
 
@@ -154,27 +154,27 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
         #marketList=[sys.argv[1]]
         showPlots=False
         dbPath='./data/futures.sqlite3' 
-        dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
-        dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
-        dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
+        dbPath2='./data/futures.sqlite3' 
+        dbPathWeb = './web/tsdp/db.sqlite3'
+        dataPath='./data/csidata/v4futures2/'
         savePath= './data/results/' 
         pngPath = './data/results/' 
-        feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+        feedfile='./data/systems/system_ibfeed.csv'
         #test last>old
         #dataPath2=pngPath
         #signalPath = './data/signals/' 
         
         #test last=old
-        dataPath2='D:/ML-TSDP/data/'
+        dataPath2='./data/'
         
-        #signalPath ='D:/ML-TSDP/data/signals2/'
-        signalPath = 'D:/ML-TSDP/data/signals2/' 
+        #signalPath ='./data/signals2/'
+        signalPath = './data/signals2/' 
         signalSavePath = './data/signals/' 
         systemPath = './data/systems/' 
         readConn = sqlite3.connect(dbPath2)
         writeConn= sqlite3.connect(dbPath)
         readWebConn = sqlite3.connect(dbPathWeb)
-        logging.basicConfig(filename='C:/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
+        logging.basicConfig(filename='/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
     else:
         mode= 'append'
         #marketList=[sys.argv[1]]
@@ -238,9 +238,7 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     c2system_mini=accountInfo.v4mini.selection
     c2system_micro=accountInfo.v4micro.selection
 
-    c2id_macro=int(accountInfo.v4futures.c2id)
-    c2id_mini=int(accountInfo.v4mini.c2id)
-    c2id_micro=int(accountInfo.v4micro.c2id)
+
     
     signals = ['ACT','prevACT','AntiPrevACT','RiskOn','RiskOff','Custom','AntiCustom',\
                     'LastSIG', '0.75LastSIG','0.5LastSIG','1LastSIG','Anti1LastSIG','Anti0.75LastSIG','Anti0.5LastSIG',\
@@ -781,6 +779,9 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
         systemdata.signal = systemDict[key][selectionDict[key][0]]
         systemdata['selection']=selectionDict[key][0]
         systemdata['ordertype']='MOC'
+        systemdata['c2id']=int(accountInfo[key].c2id)
+        systemdata['c2api']=accountInfo[key].c2key
+
         systemdata['Date']=lastDate
         systemdata['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
         
@@ -818,7 +819,7 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
 if __name__ == "__main__":
     if len(sys.argv)==1:
         debug=True
-        feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+        feedfile='./data/systems/system_ibfeed.csv'
     else:
         debug=False
         feedfile='./data/systems/system_ibfeed.csv'

@@ -154,7 +154,7 @@ else:
 if debug:
     mode = 'replace'
     #marketList=[sys.argv[1]]
-    showPlots=False
+    showPlots=True
     dbPath='./data/futures.sqlite3' 
     dbPath2='./data/futures.sqlite3' 
     dbPathWeb = './web/tsdp/db.sqlite3'
@@ -435,12 +435,15 @@ def createRankingChart(ranking, account, line, title, filename):
             anti=anti_components[line]
             #print line, anti
     color_index_ticks=['r' if line==x.split()[2] or anti==x.split()[2] else 'black' for x in ranking.index]
+    color_index_ticks=[color_index_ticks[i] if (x.split()[2] not in component_text.keys() or color_index_ticks[i] == 'r')\
+                       else 'b' for i,x in enumerate(ranking.index)]
     #color_index=[['r','r'] if line==x.split()[2] or anti==x.split()[2] else ['b','g'] for x in ranking.index]
     pair=sorted([x for x in ranking.index if line==x.split()[2] or anti==x.split()[2]])
     #ranking.plot(kind='barh', figsize=(10,15), width=0.6)
     for i,col in enumerate(list(ranking)):
         #c = colors[col[0]]
         color_index=[colors2[i] if line==x.split()[2] or anti==x.split()[2] else colors[i] for x in ranking.index]
+        #color_index2=[color_index[i] if x.split()[2] not in component_text.keys() else 'b' for x in ranking.index]
         ranking[col].plot(kind='barh', width=0.6, ax=ax,color=color_index)
         #ranking
         #pos = positions[i]
@@ -666,6 +669,8 @@ for account in totals_accounts:
                                 'benchmark_values_percent':benchmark_values_percent,
                                 'simulated_moc_values_percent':simulated_moc_values_percent,
                                 'selection':simulated_moc}, index=index)
+    account_values[account]['benchmark_sym']=benchmark_sym
+    
     if debug and showPlots:
         plt.show()
     plt.close()
@@ -702,7 +707,7 @@ for key in performance_dict_by_box:
         signals_cons=signals_cons.append(pd.Series(performance_dict_by_box[key][account]['signals'], name=account))
         newdict[account+'_rank_filename']=performance_dict_by_box[key][account]['rank_filename']
         newdict[account+'_rank_text']=performance_dict_by_box[key][account]['rank_text']
-    newdict['infotext']=performance_dict_by_box[key][account]['infotext']
+        newdict[account+'_infotext']=performance_dict_by_box[key][account]['infotext']
     if 'infotext2' in performance_dict_by_box[key][account]:
         newdict['infotext2']=performance_dict_by_box[key][account]['infotext2']        
     newdict['date']=performance_dict_by_box[key][account]['date']

@@ -669,7 +669,7 @@ for account in totals_accounts:
                                 'benchmark_values_percent':benchmark_values_percent,
                                 'simulated_moc_values_percent':simulated_moc_values_percent,
                                 'selection':simulated_moc}, index=index)
-    account_values[account]['benchmark_sym']=benchmark_sym
+    #account_values[account]['benchmark_sym']=benchmark_sym
     
     if debug and showPlots:
         plt.show()
@@ -707,7 +707,8 @@ for key in performance_dict_by_box:
         signals_cons=signals_cons.append(pd.Series(performance_dict_by_box[key][account]['signals'], name=account))
         newdict[account+'_rank_filename']=performance_dict_by_box[key][account]['rank_filename']
         newdict[account+'_rank_text']=performance_dict_by_box[key][account]['rank_text']
-        newdict[account+'_infotext']=performance_dict_by_box[key][account]['infotext']
+        newdict['infotext']=performance_dict_by_box[key][account]['infotext']
+        #newdict[account+'_infotext']=performance_dict_by_box[key][account]['infotext']
     if 'infotext2' in performance_dict_by_box[key][account]:
         newdict['infotext2']=performance_dict_by_box[key][account]['infotext2']        
     newdict['date']=performance_dict_by_box[key][account]['date']

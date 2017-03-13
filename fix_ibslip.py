@@ -33,6 +33,7 @@ for i,sf in enumerate(slippage_files):
     if 'timedelta' in slippage_df.columns:
         cols[cols.index('timedelta')]='delta'
         slippage_df.columns=cols
+    slippage_df['Name']='v4futures'
     slippage_df['Date']=slippage_df.closetime[0][:10].replace('-','')
     slippage_df['timestamp']=int(calendar.timegm(pd.to_datetime(slippage_df.closetime)[0].to_datetime().utctimetuple()))
     if i==0:

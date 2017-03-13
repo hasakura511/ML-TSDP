@@ -226,7 +226,7 @@ if lastExecutions.shape[0] >0:
         slipDF['Name']=systemName
         slipDF['Date']=csidate
         slipDF['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
-        slipDF.to_sql(name= 'ib_slippage', if_exists='replace', con=writeConn, index=False)
+        slipDF.to_sql(name= 'ib_slippage', if_exists='append', con=writeConn, index=False)
         print 'Saved ib_slippage to',dbPathWrite
     else:
         print 'Only found executions for expired contracts'

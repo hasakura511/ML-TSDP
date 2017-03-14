@@ -416,7 +416,25 @@ for account in totals_accounts:
     
     perchgDict[account]=combined_ranking
     #perchgDict[account].plot(kind='barh', figsize=(10,15))
-    perchgDict[account].index=[str(len(combined_ranking.index)-idx)+' Rank '+col for idx,col in enumerate(combined_ranking.index)]
+
+    i2=0
+    i=0
+    rank_num=[]
+    for x in ranking_short.index:
+        if ranking_short[x]<0:
+            i2-=1
+            rank_num.append(i2)
+            #print i2,x, ranking_short[x]
+        else:
+            if i==0:
+                i=len(ranking_short)+i2
+            else:
+                i-=1
+            rank_num.append(i)
+            #print i,x, ranking_short[x]
+            
+    #perchgDict[account].index=[str(len(combined_ranking.index)-idx)+' Rank '+col for idx,col in enumerate(combined_ranking.index)]
+    perchgDict[account].index=[str(rank_num[idx])+' Rank '+col for idx,col in enumerate(combined_ranking.index)]
     
 def createRankingChart(ranking, account, line, title, filename):
     fig=plt.figure(1, figsize=(10,15))

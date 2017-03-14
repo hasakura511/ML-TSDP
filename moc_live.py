@@ -846,10 +846,12 @@ def get_timetable(contractsDF):
 def find_triggers(feeddata, contractsDF):
     global csidate
     global ttdate
-    eastern=timezone(tzDict['EST'])
-    nowDateTime=dt.now(get_localzone())
+    #make sure servertime is in EST
+    nowDateTime=dt.now()
+    #eastern=timezone(tzDict['EST'])
+    #nowDateTime=dt.now(get_localzone())
     #nowDateTime=dt.now(get_localzone())+datetime.timedelta(days=5)
-    nowDateTime=nowDateTime.astimezone(eastern)
+    #nowDateTime=nowDateTime.astimezone(eastern)
     loaddate=str(lastTimeTableDate())
     #if ttdate>csidate:
     #    #timetable file date is greater than the csi download date. 
@@ -875,7 +877,8 @@ def find_triggers(feeddata, contractsDF):
             continue
             
         fmt = '%Y-%m-%d %H:%M'
-        tdate=dt.strptime(triggers.ix[t],fmt).replace(tzinfo=eastern)
+        #tdate=dt.strptime(triggers.ix[t],fmt).replace(tzinfo=eastern)
+        tdate=dt.strptime(triggers.ix[t],fmt)
         if nowDateTime>tdate:
             #print 'checking trigger:',
             filename = csiDataPath3+csiFileSym+'_B.CSV'

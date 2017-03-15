@@ -575,7 +575,7 @@ try:
         print system.ix[idx].c2sym
     system.Name=systemFilename.split('_')[1][:-4]
     system.c2id=c2id_macro
-
+    system.c2api=c2key
     #mini
     for sys in system_mini.System:
         sym=sys.split('_')[1]
@@ -590,7 +590,7 @@ try:
         print system_mini.ix[idx].c2sym
     system_mini.Name=systemFilename2.split('_')[1][:-4]
     system_mini.c2id=c2id_mini
-
+    system_mini.c2api=c2key
     #micro
     for sys in system_micro.System:
         sym=sys.split('_')[1]
@@ -605,7 +605,7 @@ try:
         print system_micro.ix[idx].c2sym
     system_micro.Name=systemFilename3.split('_')[1][:-4]
     system_micro.c2id=c2id_micro 
-        
+    system_micro.c2api=c2key
     #signalDF=signalDF.sort_index()
     #print signalDF
     #signalDF.to_csv(savePath+'futuresSignals.csv')

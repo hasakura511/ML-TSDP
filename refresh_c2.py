@@ -17,7 +17,7 @@ start_time = time.time()
 systems = ['v4futures','v4mini', 'v4micro']
 for system in systems:
     #subprocess.call(['python', 'get_ibpos.py'])       
-    systemdata=pd.read_csv('./data/systems/system_'+system+'.csv')
+    systemdata=pd.read_csv('./data/systems/system_'+system+'_live.csv')
     systemdata=systemdata.reset_index()
     get_c2pos(systemdata)
     get_executions(systemdata)

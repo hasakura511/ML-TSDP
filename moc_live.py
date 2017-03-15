@@ -732,26 +732,28 @@ def get_tradingHours(sym, contractsDF):
                 date2=dates[0].split(':')[0]
                 if date != date2:
                     #print 'last day of previous month in timetable. opendate', date2
-                    opendate=dt(year=int(date2[0:4]), month=int(date2[4:6]), day=int(date2[6:8]),\
-                        hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+                    opendate=tz.localize(dt(year=int(date2[0:4]), month=int(date2[4:6]), day=int(date2[6:8]),\
+                        hour=int(opentime[0:2]), minute=int(opentime[2:4]))).astimezone(timezone(tzDict['EST']))
                 else:
                     date3 = (dt.strptime(date2,'%Y%m%d')-datetime.timedelta(days=1)).strftime('%Y%m%d')
                     #print 'last day of previous month not in timetable. opendate', date3
-                    opendate=dt(year=int(date3[0:4]), month=int(date3[4:6]), day=int(date3[6:8]),\
-                        hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+                    opendate=tz.localize(dt(year=int(date3[0:4]), month=int(date3[4:6]), day=int(date3[6:8]),\
+                        hour=int(opentime[0:2]), minute=int(opentime[2:4]))).astimezone(timezone(tzDict['EST']))
             else:
                 #print 'not a first day of month', date
-                opendate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8])-1,\
-                    hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+                opendate=tz.localize(dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8])-1,\
+                    hour=int(opentime[0:2]), minute=int(opentime[2:4]))).astimezone(timezone(tzDict['EST']))
             closetime = openclosetimes[-1]
-            closedate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8]),\
-                hour=int(closetime[0:2]), minute=int(closetime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+            closedate=tz.localize(dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8]),\
+                hour=int(closetime[0:2]), minute=int(closetime[2:4]))).astimezone(timezone(tzDict['EST']))
             triggerdate=closedate-datetime.timedelta(minutes=triggertime)
+            
             #overwrite meats
             if sym in meats:
-                opendate=dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8]),\
-                    hour=int(opentime[0:2]), minute=int(opentime[2:4]), tzinfo=tz).astimezone(timezone(tzDict['EST']))
+                opendate=tz.localize(dt(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8]),\
+                    hour=int(opentime[0:2]), minute=int(opentime[2:4]))).astimezone(timezone(tzDict['EST']))
             thDict[date]=[opendate.strftime(fmt),closedate.strftime(fmt), triggerdate.strftime(fmt)]
+
     return thDict
         
 

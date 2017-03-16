@@ -446,7 +446,7 @@ else:
     #symbol=ticker[0:3]
     #currency=ticker[3:6]
     signalPath = './data/signals2/'
-    dataPath = './data/csidata/v4futures2/'
+    dataPath = './data/csidata/v4futures4/'
     feedfile='./data/systems/system_ibfeed.csv'
     chartSavePath =  './web/tsdp/betting/static/images/'+version+'_'+ticker
     

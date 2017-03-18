@@ -929,11 +929,14 @@ def find_triggers(feeddata, contractsDF):
                         threadlist.append((csiRunSym,popenArgs))
                     else:
                         print 'live mode'
-                        popenArgs = ['python', runPath,csiRunSym,'0']
+                        popenArgs = ['python', runPath,csiRunSym,'1']
                         #popenArgs2 = ['python', runPath2, csiFileSym,'1']
                         threadlist.append((csiRunSym,popenArgs))
                 else:
-                    print 'skipping runsystem append_data returned 0'
+                    print 'skipping runsystem append_data returned 0, using last saved signals.'
+                        popenArgs = ['python', runPath,csiRunSym,'0']
+                        #popenArgs2 = ['python', runPath2, csiFileSym,'1']
+                        threadlist.append((csiRunSym,popenArgs))
             else:
                 if dayofweek>=5:
                     print 'skipping append.. day of week', days[dayofweek]

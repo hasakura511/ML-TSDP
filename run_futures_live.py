@@ -407,14 +407,20 @@ else:
         endDate = datetime.date(endDate.year, endDate.month, endDate.day)
         validationSetLength = np.busday_count(startDate, endDate)
 
-       
+       bias=['gainAhead','zigZag','buyHold','sellHold']
+
+       if sys.argv[2] == '1':
+            dataPath = './data/csidata/v4futures4/'
+        else:
+            dataPath = './data/csidata/v4futures2/'
+       '''
         if sys.argv[2] == '1':
             bias=['buyHold']
         elif sys.argv[2] == '-1':
             bias=['sellHold']
         else:
             bias=['gainAhead','zigZag','buyHold','sellHold']
-
+        '''
         adfPvalue=3
 
     else:

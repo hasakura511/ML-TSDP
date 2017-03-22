@@ -22,16 +22,16 @@ if len(sys.argv)==1:
     start_slip=20161230
     figsize=(6,8)
     fontsize=12
-    dataPath='D:/ML-TSDP/data/'
-    portfolioPath = 'D:/ML-TSDP/data/portfolio/'
-    dbPathWrite='D:/Dropbox/Python/TSDP/ml/data/futures.sqlite3' 
-    dbPathRead = 'D:/ML-TSDP/data/futures.sqlite3'
+    dataPath='./data/'
+    portfolioPath = './data/portfolio/'
+    dbPathWrite='./data/futures.sqlite3' 
+    dbPathRead = './data/futures.sqlite3'
     #savePath= 'D:/Dropbox/Python/TSDP/ml/data/results/' 
-    savePath = savePath2 = pngPath='D:/Dropbox/Python/TSDP/ml/data/results/' 
-    systemPath =  'D:/ML-TSDP/data/systems/'
-    #timetablePath=   'D:/ML-TSDP/data/systems/timetables_debug/'
-    timetablePath=   'D:/ML-TSDP/data/systems/timetables/'
-    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    savePath = savePath2 = pngPath='./ml/data/results/' 
+    systemPath =  './data/systems/'
+    #timetablePath=   './data/systems/timetables_debug/'
+    timetablePath=   './data/systems/timetables/'
+    feedfile='./data/systems/system_ibfeed.csv'
 else:
     debug=False
     showPlots=False
@@ -181,9 +181,13 @@ for systemName in systems:
     portfolioFilename = 'c2_'+systemName+'_portfolio.csv'
     #systemFilename='system_'+systemName+'.csv'
     #system = pd.read_csv(systemPath+systemFilename)
+    #csidate='20170330'
     tablename=systemName+'_live'
     system=pd.read_sql('select * from (select * from {} where Date={} order by timestamp ASC)\
                                     group by CSIsym'.format(tablename,csidate), con=readConn)
+    if system.shape[0]<1:
+        print 'csidate not in', tablename
+        continue
     selection=system.selection[0]
     #entry trades
     portfolioDF = pd.read_csv(portfolioPath+portfolioFilename)

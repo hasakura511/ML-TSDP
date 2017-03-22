@@ -7,6 +7,7 @@ set "datestamp=%YYYY%%MM%%DD%" & set "timestamp=%HH%%Min%%Sec%"
 set "fullstamp=%YYYY%%MM%%DD%_%HH%-%Min%-%Sec%"
 @echo on
 
+cd \ml-tsdp\
 rem copy /Y \ml-tsdp\data\csidata\v4futures2\*.csv \ml-tsdp\data\csidata\v4futures4\
 \anaconda2\python post_processing_csi.py >> \logs\post_processing_csi_%fullstamp%.txt
 

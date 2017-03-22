@@ -2,6 +2,18 @@ from subprocess import Popen, PIPE, check_output, STDOUT
 import datetime
 fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
 
+import os
+import shutil
+src='\ml-tsdp\data\csidata\\v4futures2\\'
+dest='\ml-tsdp\data\csidata\\v4futures4\\'
+src_files = [x for x in os.listdir(src) if '.csv' in x.lower()]
+for file_name in src_files:
+    full_file_name = os.path.join(src, file_name)
+    if (os.path.isfile(full_file_name)):
+        shutil.copy(full_file_name, dest)
+        print 'copied', full_file_name, 'to', dest
+
+
 with open('\logs\post_processing_csi_error_'+fulltimestamp+'.txt', 'w') as e:
     #f.flush()
     #e.flush()

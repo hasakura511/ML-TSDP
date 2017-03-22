@@ -25,7 +25,7 @@ def place_order(dbPath, action, quant, sym, type, systemid, submit,apikey, paren
     parentsig= "" if parentsig==None else parentsig
     data = { 
     		"apikey":   apikey, # "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
-    		"systemid": systemid, 
+    		"systemid": str(systemid), 
     		"signal":{ 
     	   		"action": action, 
     	   		"quant": quant, 

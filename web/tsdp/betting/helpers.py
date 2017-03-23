@@ -15,7 +15,7 @@ from django import forms
 from .models import UserSelection
 from .start_moc import get_newtimetable, run_checksystems, run_vol_adjsize,\
                         update_chartdb
-debug = False
+debug = True
 
 if debug:
     dbPath='futures.sqlite3'
@@ -36,6 +36,96 @@ def getBackendDB():
     global dbPath
     readConn = sqlite3.connect(dbPath)
     return readConn
+
+def getChartDB():
+    dbPath = 'db_charts.sqlite3'
+    readConn = sqlite3.connect(dbPath)
+    return readConn
+
+def getNews():
+    with open('news.txt','r') as f:
+        newslines=f.readlines()    
+        #print newslines    
+    return newslines
+
+def getTables(dbconn):
+    dbcur = dbconn.cursor()
+    dbcur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    #dbcur.execute("PRAGMA table_info(table-name);")
+    tables=[x[0] for x in dbcur.fetchall()]
+    dbcur.close()
+    return tables
+
+def getChartsDict():
+    readConn=getChartDB()
+    tables=getTables(readConn)
+    chart_table_dict={}
+    for table in tables:
+        df = pd.read_sql('select * from {}'.format(table), con=readConn)
+        print table, 'index:', df.columns[0]
+        df=df.set_index(df.columns[0])
+        chart_table_dict[table]=df.to_dict()
+    return chart_table_dict
+
+def getCustomizeChip():
+    readConn=getBackendDB()
+    futuresDict = pd.read_sql('select * from Dictionary', con=readConn,\
+                              index_col='CSIsym')
+    feeddata = pd.read_sql('select * from feeddata', con=readConn,\
+                              index_col='CSIsym')
+    lastdate= pd.read_sql('select distinct Date from futuresATRhist',\
+                          con=readConn).Date.tolist()[-1]
+    futuresDF=pd.read_sql('select * from (select * from futuresATRhist\
+                                          where Date=%s\
+                    order by timestamp ASC) group by CSIsym'%lastdate,\
+                        con=readConn,  index_col='CSIsym')
+
+    accountInfo=pd.read_sql('select * from accountInfo where timestamp=\
+                    (select max(timestamp) from accountInfo)',\
+                    con=readConn,  index_col='index').drop(['timestamp','Date'],axis=1)
+    ai_dict=accountInfo.to_dict()
+    for account in ai_dict:
+        ai_dict[account]['offline']=[x for x in\
+                                       eval(accountInfo[account].offline)\
+                                       if x in feeddata.index]
+        
+    images=listdir('./betting/static/public/images/')
+    chip_images=filter(lambda x: 'chip_' in x, images)
+
+    desc_list = futuresDict.ix[futuresDF.index].Desc.values
+    desc_hyperlink = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+    desc_hyperlink = ['<a href="/static/images/v4_' + [futuresDict.index[i]\
+                           for i, desc in enumerate(futuresDict.Desc) \
+                  if re.sub(r'-[^-]*$', '', x) in desc][0] + \
+                '_BRANK.png" target="_blank">' + x + '</a>' \
+                for x in desc_hyperlink]
+    markets_df=pd.concat([futuresDF[['usdATR','QTY','QTY_MINI','QTY_MICRO',\
+                        'group']],feeddata[['Desc','margin']]],\
+                        axis=1).sort_values(by=['group'])
+    desc_list = markets_df.Desc.values
+    desc_hyperlink = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+    desc_hyperlink = ['<a href="/static/images/v4_' + [futuresDict.index[i]\
+                           for i, desc in enumerate(futuresDict.Desc) \
+                  if re.sub(r'-[^-]*$', '', x) in desc][0] + \
+                '_BRANK.png" target="_blank">' + x + '</a>' \
+                for x in desc_hyperlink]
+    markets_df['Desc']=desc_hyperlink
+
+    for account in ai_dict:
+        markets_df[account]=[False if sym in ai_dict[account]['offline']\
+                   else True for sym in markets_df.index]
+    ai_dict2={account:{key:value for key,value in dic.items() if key\
+                       not in ['selection','offline']} for account, dic\
+                        in ai_dict.items()}
+        
+    markets_df=markets_df.transpose()
+    json_markets_df=markets_df.to_json()
+    modify_chip_dict={
+            'accountinfo':ai_dict2,
+           'chip_images':chip_images,
+           'json_markets':json_markets_df
+            }
+    return modify_chip_dict
 
 def get_logfiles(search_string='', exclude=False):
     global search_dir
@@ -254,7 +344,7 @@ def getAccountValues(refresh=False):
     now = now.astimezone(eastern)
     accountvalues = {}
     urpnls = {}
-    
+
     if not debug and refresh:
         get_newtimetable()
 
@@ -322,6 +412,8 @@ def getAccountValues(refresh=False):
 
 def getCustomSignals():
     readConn=getBackendDB()
+    readPriceConn=getChartDB()
+
     lastdate= pd.read_sql('select distinct Date from futuresATRhist',\
                           con=readConn).Date.tolist()[-1]
     futuresDF=pd.read_sql('select * from (select * from futuresATRhist\
@@ -339,12 +431,55 @@ def getCustomSignals():
                   if re.sub(r'-[^-]*$', '', x) in desc][0] + \
                 '_BRANK.png" target="_blank">' + x + '</a>' \
                 for x in desc_hyperlink]
-    df=pd.DataFrame(data=dict(signals=futuresDF.Custom.values,\
-                              group=futuresDF.group.values,\
-                              desc=desc_hyperlink), index=futuresDF.index)
+    df=pd.DataFrame(data=dict(Group=futuresDF.group.values,\
+                              Markets=desc_hyperlink,
+                                Default=futuresDF.Custom.values),
+                                index=futuresDF.index)
 
-    customsignals=df.sort_values(by=['group']).transpose().to_json()
-    return customsignals
+    filename='custom_signals_data.json'
+    if isfile(filename):
+        with open(filename, 'r') as f:
+            custom_signals_data = json.load(f)
+        #custom_signals_data=custom_signals_data[custom_signals_data.keys()[0]]
+        name=custom_signals_data['name']
+        df['signals']=pd.Series(custom_signals_data['customsignals'])
+    else:
+        name='Custom'
+        custom_signals_data={'name':name,
+                'customsignals':df.sort_values(by=['Group'])['Default']\
+                                                     .transpose().to_dict()}
+        with open(filename, 'w') as f:
+            json.dump(custom_signals_data,f)
+        print 'Couldn\'t find',filename,'Saved new file'
+        df['signals']=df['Default'].copy()
+        
+        
+    df=df[['Markets','Group','signals','Default']]
+    df['Anti-Default']=np.where(df.Default>0,-1,1)
+
+    for sym in df.index:
+        filename=dataPath+futuresDict.Filename.ix[sym]+'_B.CSV'
+        print sym, isfile(filename)
+        if isfile(filename):
+            data=pd.read_csv(filename)
+            data.columns = columns
+            tablename = 'pricedata_'+sym
+            data.to_sql(name=tablename,con=readPriceConn, index=False,
+                        if_exists='replace')
+            print 'Wrote', tablename,'to db_charts.sqlite3'
+            data2=data[-max(lookbacks)-1:]
+            #print data2.shape
+            for lookback in lookbacks:
+                col_name=str(lookback)+'-Day %Chg'
+                pctchg=data2.Close.pct_change(periods=lookback).values[-1]
+                signal=1 if pctchg>0 else -1
+                df.set_value(sym, col_name, signal)
+                df.set_value(sym, 'Anti-'+col_name, -signal)
+                #print col_name, pctchg, signal
+
+    customsignals=df.sort_values(by=['Group']).transpose().to_json()
+
+    return {'name':name, 'customsignals':customsignals}
 
 def recreateCharts(custom_signals=False):
     if custom_signals is not None:
@@ -352,13 +487,36 @@ def recreateCharts(custom_signals=False):
         with open(filename, 'w') as f:
             json.dump(custom_signals, f)
         print 'Saved', filename
-        print('updating custom signals')
+
+        firstrec = UserSelection.objects.order_by('-timestamp').first()
+        cloc=eval(firstrec.dic()['componentloc'])
+        if 'Custom' in [dic.values()[0] for dic in cloc]:
+            #load boxstyles text name
+            cloc=[dic.keys()[0] for dic in cloc if dic.values()[0]=='Custom'][0]
+            filename='boxstyles_data.json'
+            if isfile(filename):
+                with open(filename, 'r') as f:
+                    boxstyles = json.load(f)
+                    
+                for dic in boxstyles:
+                    if loc in dic.keys():
+                        print dic, dic[loc]['text']
+                        dic[loc]['text']=name
+                        print dic[loc]['text']
+                        
+                with open(filename, 'w') as f:
+                    json.dump(boxstyles, f)
+                    print 'Saved',filename,'updated custom name',name
+            else:
+                print filename,'could not be found'
+
+        print('updating chart db with custom signals')
         #run_vol_adjsize()
-        pass
+        
 
     #time.sleep(15)
-    #update_chartdb()
-    pass
+    update_chartdb()
+    return
 
 def get_detailed_timetable():
     active_symbols_ib = {
@@ -448,7 +606,7 @@ def archive_dates():
     return datetup
     
 
-def get_blends(cloc=None, list_boxstyles=None, returnVotingComponents=False):
+def get_blends(cloc, list_boxstyles=None, returnVotingComponents=True):
     def is_int(s):
         try:
             int(s)
@@ -456,15 +614,19 @@ def get_blends(cloc=None, list_boxstyles=None, returnVotingComponents=False):
         except ValueError:
             return False
 
-    if cloc == None:
-        cloc = UserSelection.default_cloc
+    #if cloc == None:
+    #    firstrec=UserSelection.objects.order_by('-timestamp').first()
+    #    cloc = eval(firstrec.dic()['componentloc'])
+    #    print cloc
 
     if list_boxstyles == None:
-        list_boxstyles = UserSelection.default_list_boxstyles
-    else:
-        list_boxstyles = [d for d in list_boxstyles if not is_int(d.keys()[0])]
-
-    # print([cl.keys()[0] for cl in cloc])
+        filename='boxstyles_data.json'
+        with open(filename, 'r') as f:
+            list_boxstyles = json.load(f)
+        #list_boxstyles = UserSelection.default_list_boxstyles
+    #else:
+    #    list_boxstyles = [d for d in list_boxstyles if not is_int(d.keys()[0])]
+    #print([cl.keys()[0] for cl in cloc])
     component_styles = {bs.keys()[0]: bs.values()[0] for bs in list_boxstyles if
                         bs.keys()[0] in [cl.keys()[0] for cl in cloc]}
     component_names = {cl.keys()[0]: cl.values()[0] for cl in cloc}
@@ -508,15 +670,10 @@ def get_blends(cloc=None, list_boxstyles=None, returnVotingComponents=False):
         boxidDict[str(boxid)] += ['c' + str(o_component)]
         boxidDict[str(boxid)] += vboxdict[boxid % table_height]
 
-    print 'boxidDict\n',boxidDict
-    boxstyleDict = {boxid: [component_styles[x] for x in boxidDict[boxid] if component_names[x] is not 'None'] for
+    boxstyleDict = {boxid: [component_styles[x] for x in boxidDict[boxid] if component_names[x] != 'None'] for
                     boxid
                     in boxidDict}
-    if returnVotingComponents:
-        votingComponents = {boxid: [getComponents()[component_names[x]][0] for x in clist if component_names[x] != 'None']
-                            for boxid, clist in boxidDict.items()}
-        print 'votingComponents\n',[[x, votingComponents[x]] for x in sorted(votingComponents.keys(), key=int)]
-        return votingComponents
+
 
     blendedboxstyleDict = {}
     for boxid, list_of_styles in boxstyleDict.items():
@@ -576,14 +733,27 @@ def get_blends(cloc=None, list_boxstyles=None, returnVotingComponents=False):
                                           'text-font': 'Arial Black',
                                           'text-size': '18',
                                           'text-style': 'bold'}
-    keys = blendedboxstyleDict.keys()
-    keys.sort(key=int)
-    list_boxstyles += [{key: blendedboxstyleDict[key]} for key in keys]
+    #keys = blendedboxstyleDict.keys()
+    #keys.sort(key=int)
+    indices = [i for i,d in enumerate(list_boxstyles) if is_int(d.keys()[0])]
+    #list_boxstyles += [{key: blendedboxstyleDict[key]} for key in keys]
+    for i in indices:
+        key=list_boxstyles[i].keys()[0]
+        list_boxstyles[i]={key: blendedboxstyleDict[key]}
+        print(list_boxstyles[i])
 
+    print(list_boxstyles)
     filename = 'boxstyles_data.json'
     with open(filename, 'w') as f:
         json.dump(list_boxstyles, f)
-    print 'Saved', filename
+    print('Saved', filename)
+
+    if returnVotingComponents:
+        votingComponents = {boxid: [getComponents()[component_names[x]][0] for x in clist if component_names[x] != 'None']
+                            for boxid, clist in boxidDict.items()}
+        #print [[x, votingComponents[x]] for x in sorted(votingComponents.keys(), key=int)]
+        print(votingComponents)
+        return votingComponents
     # return cloc, list_boxstyles
 
 def get_timetables():

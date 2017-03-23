@@ -740,9 +740,9 @@ def get_blends(cloc, list_boxstyles=None, returnVotingComponents=True):
     for i in indices:
         key=list_boxstyles[i].keys()[0]
         list_boxstyles[i]={key: blendedboxstyleDict[key]}
-        print(list_boxstyles[i])
+        #print(list_boxstyles[i])
 
-    print(list_boxstyles)
+    #print(list_boxstyles)
     filename = 'boxstyles_data.json'
     with open(filename, 'w') as f:
         json.dump(list_boxstyles, f)
@@ -752,7 +752,7 @@ def get_blends(cloc, list_boxstyles=None, returnVotingComponents=True):
         votingComponents = {boxid: [getComponents()[component_names[x]][0] for x in clist if component_names[x] != 'None']
                             for boxid, clist in boxidDict.items()}
         #print [[x, votingComponents[x]] for x in sorted(votingComponents.keys(), key=int)]
-        print(votingComponents)
+        #print(votingComponents)
         return votingComponents
     # return cloc, list_boxstyles
 

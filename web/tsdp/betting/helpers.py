@@ -1,5 +1,6 @@
 import calendar
 import os
+from os.path import isfile
 import re
 import time
 import math

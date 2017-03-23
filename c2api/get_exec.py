@@ -331,7 +331,7 @@ def get_c2pos(systemdata):
 
 def get_c2livepos(systemid, apikey, systemname):
     data=get_exec_open(systemid,apikey);
-    print systemid, apikey, data
+    #print systemid, apikey, data
     jsondata = json.loads(data)
     #logging.info('\n Length jsondata'+str(len(jsondata['response'])))
     

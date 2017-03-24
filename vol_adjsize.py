@@ -262,7 +262,7 @@ filename='./web/tsdp/custom_signals_data.json'
 if isfile(filename):
     with open(filename, 'r') as f:
         custom_signals_data = json.load(f)
-        custom_signals_data=custom_signals_data[custom_signals_data.keys()[0]]
+        custom_signals_data={sym:custom_signals_data[sym]['signals'] for sym in custom_signals_data.keys()}
         
 for sym in custom_signals_data:
     #print c2contractSpec[sym], custom_signals_data[sym]['signals']

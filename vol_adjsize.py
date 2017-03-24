@@ -267,8 +267,10 @@ if isfile(filename):
 #print custom_signals
 for sym in custom_signals:
     #print sym, custom_signals[sym]
-    c2contractSpec[sym][5]=int(custom_signals[sym])
+    if custom_signals[sym] is not None:
+        c2contractSpec[sym][5]=int(custom_signals[sym])
 print 'loaded and updated custom signals from', filename
+
 months = {
                 1:'F',
                 2:'G',

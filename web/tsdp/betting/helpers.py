@@ -265,12 +265,12 @@ def updateMeta():
     timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc')
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
     if mcdate not in timetables.columns:
-        print('Running MOC to get new mcdate...')
-        if not debug:
-            get_newtimetable()
+        #print('Running MOC to get new mcdate...')
+        #if not debug:
+        #    get_newtimetable()
         mcdate=timetables.drop(['Date','timestamp'],axis=1).columns[-1]
         triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
-        triggers[mcdate] = 'Not Available'
+        triggers[mcdate] = 'Not Yet Available'
     else:
         if timetables[mcdate].dropna().shape[0] == timetables.shape[0]:
             triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
@@ -376,9 +376,9 @@ def getAccountValues(refresh=False):
     c2_equity.updatedLastTimeET = pd.to_datetime(c2_equity.updatedLastTimeET)
 
     #run checksystems and update values if last update >=1 day and not a T,W,TH,F,SA
-    if (now-eastern.localize(c2_equity.updatedLastTimeET[0])).days>=1 and (now.weekday()>0 and now.weekday()<5):
-        if not debug:
-            run_checksystems()
+    #if (now-eastern.localize(c2_equity.updatedLastTimeET[0])).days>=1 and (now.weekday()>0 and now.weekday()<5):
+    #    if not debug:
+    #        run_checksystems()
 
     for system in c2_equity.drop(['v4futures'], axis=0).index:
         timestamp = c2_equity.ix[system].updatedLastTimeET

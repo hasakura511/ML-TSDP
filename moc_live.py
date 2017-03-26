@@ -1175,7 +1175,7 @@ if __name__ == "__main__":
             execDict, contractsDF, futuresDF=create_execDict(feeddata, futuresDF)
         except Exception as e:
             #print e
-            slack.notify(text=str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
+            slack.notify(text=str(traceback.print_exc()), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             traceback.print_exc()
             tries+=1
             if tries==5:

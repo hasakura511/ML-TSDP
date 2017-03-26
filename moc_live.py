@@ -37,6 +37,14 @@ from suztoolz.check_systems_live_func import check_systems_live
 from suztoolz.proc_signal_v4_live_func import proc_signal_v4_live
 from suztoolz.vol_adjsize_moclive_func import vol_adjsize_moc
 from suztoolz.vol_adjsize_immediate_func import vol_adjsize_immediate
+
+import slackweb
+fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H_%M_%S')
+slackhook='https://hooks.slack.com/services/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'
+slack = slackweb.Slack(url=slackhook)
+slack_channel="#logs"
+
+
 #currencyPairsDict=dict()
 #prepData=dict()
 start_time = time.time()
@@ -1167,6 +1175,7 @@ if __name__ == "__main__":
             execDict, contractsDF, futuresDF=create_execDict(feeddata, futuresDF)
         except Exception as e:
             #print e
+            slack.notify(text=str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             traceback.print_exc()
             tries+=1
             if tries==5:

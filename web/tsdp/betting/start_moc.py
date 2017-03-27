@@ -67,4 +67,5 @@ def restart_webserver():
                          cwd='/ml-tsdp/web/tsdp/',stdout=f, stderr=e)
 
 if __name__ == "__main__":
+    get_newtimetable()
     restart_webserver()

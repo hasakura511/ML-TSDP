@@ -60,8 +60,8 @@ def update_chartdb():
 
 def restart_webserver():
     fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
-    with open('\logs\restart_webserver_' + fulltimestamp + '.txt', 'w') as e:
-        with open('\logs\restart_webserver_error_'+fulltimestamp+'.txt', 'w') as f:
+    with open('\logs\\restart_webserver_' + fulltimestamp + '.txt', 'w') as e:
+        with open('\logs\\restart_webserver_error_'+fulltimestamp+'.txt', 'w') as f:
             print('restarting webserver...')
             proc = Popen(['./stop_webserver.bat'],\
                          cwd='/ml-tsdp/web/tsdp/',stdout=f, stderr=e)

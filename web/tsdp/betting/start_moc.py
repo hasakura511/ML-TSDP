@@ -6,8 +6,8 @@ import shutil
 def run_checksystems():
     fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
     shutil.copy('/ml-tsdp/suztoolz/check_systems_live_func.py', '/ml-tsdp/check_systems_live_func.py')
-    with open('\logs\checksystems_live_' + fulltimestamp + '.txt', 'w') as f:
-        with open('\logs\checksystems_live_error_'+fulltimestamp+'.txt', 'w') as e:
+    with open('/logs/checksystems_live_' + fulltimestamp + '.txt', 'w') as f:
+        with open('/logs/checksystems_live_error_'+fulltimestamp+'.txt', 'w') as e:
             print('processing Check Systems...')
             proc = Popen(['/anaconda2/python', '/ml-tsdp/check_systems_live_ib.py','1','1','1','0'],\
                          cwd='/ml-tsdp/',stdout=f, stderr=e)
@@ -21,8 +21,8 @@ def run_checksystems():
 
 def get_newtimetable():
     fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
-    with open('\logs\get_timetable_' + fulltimestamp + '.txt', 'w') as f:
-        with open('\logs\get_timetable_error_'+fulltimestamp+'.txt', 'w') as e:
+    with open('/logs/get_timetable_' + fulltimestamp + '.txt', 'w') as f:
+        with open('/logs/get_timetable_error_'+fulltimestamp+'.txt', 'w') as e:
             #f.flush()
             #e.flush()
             print('Attempting to get new timetable...')
@@ -32,8 +32,8 @@ def get_newtimetable():
             
 def run_vol_adjsize():
     fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
-    with open('\logs\update_custom_signals_' + fulltimestamp + '.txt', 'w') as f:
-        with open('\logs\update_custom_signals_error_'+fulltimestamp+'.txt', 'w') as e:
+    with open('/logs/update_custom_signals_' + fulltimestamp + '.txt', 'w') as f:
+        with open('/logs/update_custom_signals_error_'+fulltimestamp+'.txt', 'w') as e:
             print('processing custom signal update...')
             proc = Popen(['/anaconda2/python', '/ml-tsdp/vol_adjsize.py','1'],\
                          cwd='/ml-tsdp/',stdout=f, stderr=e)
@@ -46,8 +46,8 @@ def run_vol_adjsize():
             
 def update_chartdb():
     fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
-    with open('\logs\update_chartdb_' + fulltimestamp + '.txt', 'w') as f:
-        with open('\logs\update_chartdb_error_'+fulltimestamp+'.txt', 'w') as e:
+    with open('/logs/update_chartdb_' + fulltimestamp + '.txt', 'w') as f:
+        with open('/logs/update_chartdb_error_'+fulltimestamp+'.txt', 'w') as e:
             print('processing chartdb update...')
             proc = Popen(['/anaconda2/python', '/ml-tsdp/create_board_history.py','1'],\
                          cwd='/ml-tsdp/',stdout=f, stderr=e)
@@ -60,8 +60,8 @@ def update_chartdb():
 
 def restart_webserver():
     fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
-    with open('\logs\\restart_webserver_' + fulltimestamp + '.txt', 'w') as e:
-        with open('\logs\\restart_webserver_error_'+fulltimestamp+'.txt', 'w') as f:
+    with open('/logs/restart_webserver_' + fulltimestamp + '.txt', 'w') as e:
+        with open('/logs/restart_webserver_error_'+fulltimestamp+'.txt', 'w') as f:
             print('restarting webserver...')
             proc = Popen(['./stop_webserver.bat'],\
                          cwd='/ml-tsdp/web/tsdp/',stdout=f, stderr=e)

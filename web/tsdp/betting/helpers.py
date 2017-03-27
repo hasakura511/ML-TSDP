@@ -482,7 +482,7 @@ def getCustomSignals():
 
     return {'name':name, 'customsignals':customsignals}
 
-def recreateCharts(custom_signals=False):
+def recreateCharts(custom_signals=None):
     if custom_signals is not None:
         filename='custom_signals_data.json'
         with open(filename, 'w') as f:

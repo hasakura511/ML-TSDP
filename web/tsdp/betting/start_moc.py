@@ -63,8 +63,8 @@ def restart_webserver():
     with open('/logs/restart_webserver_' + fulltimestamp + '.txt', 'w') as e:
         with open('/logs/restart_webserver_error_'+fulltimestamp+'.txt', 'w') as f:
             print('restarting webserver...')
-            proc = Popen(['start_webserver.bat'],\
+            proc = Popen(['/ml-tsdp/web/tsdp/start_webserver.bat'],\
                          cwd='/ml-tsdp/web/tsdp/',stdout=f, stderr=e)
 
 if __name__ == "__main__":
-    get_newtimetable()
+    restart_webserver()

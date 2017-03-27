@@ -58,5 +58,19 @@ def update_chartdb():
                          cwd='/ml-tsdp/',stdout=f, stderr=e)
             proc.wait()
 
+def restart_webserver():
+    fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
+    with open('\logs\restart_webserver_' + fulltimestamp + '.txt', 'w') as e:
+        with open('\logs\restart_webserver_error_'+fulltimestamp+'.txt', 'w') as f:
+            print('restarting webserver...')
+            proc = Popen(['./stop_webserver.bat'],\
+                         cwd='/ml-tsdp/web/tsdp/',stdout=f, stderr=e)
+            proc.wait()
+            f.flush()
+            e.flush()
+            proc = Popen(['/anaconda2/python', 'manage.py','runserver','0.0.0.0:80','--noreload'],\
+                         cwd='/ml-tsdp/web/tsdp/',stdout=f, stderr=e)
+            #proc.wait()
+
 if __name__ == "__main__":
     get_newtimetable()

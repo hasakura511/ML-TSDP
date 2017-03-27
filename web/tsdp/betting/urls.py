@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^gettimetable$', views.gettimetable),
     url(r'^getstatus', views.getstatus),
     url(r'^newboard/$', views.newboard),
+    url(r'^restart/$', views.restart, name='restart'),
 ]

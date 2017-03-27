@@ -53,7 +53,7 @@ def addrecord(request):
     # Please wait up to five minutes for immediate orders to be processed.
     if 'True' in [order[1] for sys, order in eval(selections[0].selection).items()]:
         print('Immediate Orders found')
-        start_immediate()
+        #start_immediate()
 
     return HttpResponse(json.dumps({"id": record.id}))
 
@@ -121,6 +121,9 @@ def index(request):
 
 #def loading_page(request):
 #    return render(request, 'loading_page.html', {})
+def restart(request):
+    restart_webserver()
+    return render(request, 'board.html', {})
 
 def board(request):
     return render(request, 'board.html', {})

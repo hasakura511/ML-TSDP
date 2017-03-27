@@ -15,7 +15,7 @@ import pandas as pd
 from django import forms
 from .models import UserSelection
 from .start_moc import get_newtimetable, run_checksystems, run_vol_adjsize,\
-                        update_chartdb
+                        update_chartdb, restart_webserver
 debug = False
 
 if debug:

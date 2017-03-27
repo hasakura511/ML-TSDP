@@ -122,7 +122,7 @@ def index(request):
 #def loading_page(request):
 #    return render(request, 'loading_page.html', {})
 def restart(request):
-    restart_webserver()
+    #restart_webserver()
     return render(request, 'board.html', {})
 
 def board(request):

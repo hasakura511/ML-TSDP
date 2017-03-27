@@ -123,7 +123,7 @@ def index(request):
 #    return render(request, 'loading_page.html', {})
 def restart(request):
     #restart_webserver()
-    return render(request, 'board.html', {})
+    return render(request, 'loading_page.html', {})
 
 def board(request):
     return render(request, 'board.html', {})

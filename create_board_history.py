@@ -209,31 +209,38 @@ selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
 #futuresDF_all=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
 #this is created after every MOC
 dates= pd.read_sql('select distinct Date from futuresATRhist', con=readConn).Date.tolist()
-datetup=[(dates[i],dates[i+1]) for i,x in enumerate(dates[:-1])][-lookback:]
+dates_csi= pd.read_sql('select distinct Date from futuresDF_all', con=readConn).Date.tolist()
+#datetup=[(dates[i],dates[i+1]) for i,x in enumerate(dates[:-1])][-lookback:]
+#datetup_csi=[(dates_csi[i],dates_csi[i+1]) for i,x in enumerate(dates_csi[:-1])][-lookback:]
+missing_dates=list(set(dates_csi) -set(dates))
+dates+=missing_dates
+dates.sort()
+date_loc=[(x, 'futuresATRhist') if x not in missing_dates else (x, 'futuresDF_all') for x in dates]
+datetup=[(date_loc[i],date_loc[i+1]) for i,x in enumerate(date_loc[:-1])][-lookback:]
 
-def add_missing_rows(df, date, all_syms):
-    global dates
+def add_missing_rows(df, datetup, all_syms):
+    global date_loc
     global readConn
     
     totalnum_sym=len(all_syms)
     if df.shape[0]<totalnum_sym:
         missing_syms=[x for x in all_syms if x not in df.index]
-        prev_date=dates[dates.index(date)-1]
+        prev=date_loc[date_loc.index(datetup)-1]
         while len(missing_syms)>0:
-            futuresDF_prev2=pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
-                    order by timestamp ASC) group by CSIsym' %prev_date,\
+            futuresDF_prev2=pd.read_sql('select * from (select * from %s where Date=%s\
+                    order by timestamp ASC) group by CSIsym' % (prev[1], prev[0]),\
                     con=readConn,  index_col='CSIsym')
             missing_rows=futuresDF_prev2.ix[[x for x in missing_syms if x in futuresDF_prev2.index]].copy()
             missing_rows.LastPctChg=0
             missing_rows.ACT=0
-            missing_rows.Date=int(date)
+            missing_rows.Date=int(datetup[0])
             df=pd.concat([df, missing_rows], axis=0)
             print 'Added',missing_syms
-            prev_date=dates[dates.index(prev_date)-1]
+            prev=date_loc[date_loc.index(datetup)-1]
             missing_syms=[x for x in missing_syms if x not in df.index]
         return df.ix[all_syms]
     else:
-        return df
+        return df.ix[all_syms]
             
 totals_accounts={}
 pnl_accounts={}
@@ -244,13 +251,14 @@ for account in qtydict.keys():
     signalsDict={}
     totalsDict = {}
     for prev,current in datetup:
-        print current,
-        futuresDF_prev=add_missing_rows(pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
-                        order by timestamp ASC) group by CSIsym' %prev,\
+        currentdate=current[0]
+        print currentdate,
+        futuresDF_prev=add_missing_rows(pd.read_sql('select * from (select * from %s where Date=%s\
+                        order by timestamp ASC) group by CSIsym' %(prev[1], prev[0]),\
                         con=readConn,  index_col='CSIsym'), prev, all_syms)
         
-        futuresDF_current=add_missing_rows(pd.read_sql('select * from (select * from futuresATRhist where Date=%s\
-                        order by timestamp ASC) group by CSIsym' %current,\
+        futuresDF_current=add_missing_rows(pd.read_sql('select * from (select * from %s where Date=%s\
+                        order by timestamp ASC) group by CSIsym' %(current[1], current[0]),\
                         con=readConn,  index_col='CSIsym'), current, all_syms)
 
 
@@ -259,79 +267,79 @@ for account in qtydict.keys():
 
         votingSystems = { key: componentsdict[key] for key in [x for x in componentsdict if is_int(x)] }
         #add voting systems
-        signalsDict[current]={key: to_signals(futuresDF_prev[componentsdict[key]].sum(axis=1)) for key in votingSystems.keys()}
+        signalsDict[currentdate]={key: to_signals(futuresDF_prev[componentsdict[key]].sum(axis=1)) for key in votingSystems.keys()}
         #add anti-voting systems
-        signalsDict[current].update({'Anti-'+key: to_signals(futuresDF_prev[componentsdict[key]].sum(axis=1), Anti=True)\
+        signalsDict[currentdate].update({'Anti-'+key: to_signals(futuresDF_prev[componentsdict[key]].sum(axis=1), Anti=True)\
                                                 for key in votingSystems.keys()})
         #check (signalsDict[key]['1']+signalsDict[key]['Anti-1']).sum()
-        signalsDict[current].update({ reversecomponentsdict[key]: componentsignals[key] for key in componentsignals})
+        signalsDict[currentdate].update({ reversecomponentsdict[key]: componentsignals[key] for key in componentsignals})
         
         #add benchmark
         benchmark_signals=futuresDF_prev['None'].copy()
         benchmark_signals.ix[benchmark_sym]=1
-        signalsDict[current]['benchmark']=benchmark_signals
+        signalsDict[currentdate]['benchmark']=benchmark_signals
         
         #append signals to each board
-        totalsDict[current]=pd.DataFrame()
-        futuresDF_boards[current] =  futuresDF_current[keep_cols+[qtydict[account]]].copy()
-        nrows=futuresDF_boards[current].shape[0]
+        totalsDict[currentdate]=pd.DataFrame()
+        futuresDF_boards[currentdate] =  futuresDF_current[keep_cols+[qtydict[account]]].copy()
+        nrows=futuresDF_boards[currentdate].shape[0]
         #zero out quantities for offlien symbols
-        quantity=futuresDF_boards[current][qtydict[account]].copy()
+        quantity=futuresDF_boards[currentdate][qtydict[account]].copy()
         quantity.ix[[sym for sym in quantity.index if sym not in active_symbols[account]]]=0
-        futuresDF_boards[current]['chgValue'] =  futuresDF_boards[current].LastPctChg*\
-                                                                    futuresDF_boards[current].contractValue*\
+        futuresDF_boards[currentdate]['chgValue'] =  futuresDF_boards[currentdate].LastPctChg*\
+                                                                    futuresDF_boards[currentdate].contractValue*\
                                                                     quantity
-        futuresDF_boards[current]['abs_chgValue'] =abs(futuresDF_boards[current]['chgValue'])
-        for col in signalsDict[current]:
-            signalsDict[current][col].name = col
-            futuresDF_boards[current]=futuresDF_boards[current].join(signalsDict[current][col])
-            futuresDF_boards[current]['PNL_'+col]=futuresDF_boards[current][col]*futuresDF_boards[current]['chgValue']
+        futuresDF_boards[currentdate]['abs_chgValue'] =abs(futuresDF_boards[currentdate]['chgValue'])
+        for col in signalsDict[currentdate]:
+            signalsDict[currentdate][col].name = col
+            futuresDF_boards[currentdate]=futuresDF_boards[currentdate].join(signalsDict[currentdate][col])
+            futuresDF_boards[currentdate]['PNL_'+col]=futuresDF_boards[currentdate][col]*futuresDF_boards[currentdate]['chgValue']
             #benchmarked to sym 1x leverage of account value
             if col=='benchmark':
-                futuresDF_boards[current].set_value(benchmark_sym,'PNL_benchmark',\
-                                        futuresDF_boards[current].ix[benchmark_sym].LastPctChg*accountvalues[account])
-            totalsDict[current].set_value(current, 'ACC_'+col, sum(futuresDF_boards[current][col]==futuresDF_boards[current].ACT)/float(nrows))
-            totalsDict[current].set_value(current, 'L%_'+col, sum(futuresDF_boards[current][col]==1)/float(nrows))
+                futuresDF_boards[currentdate].set_value(benchmark_sym,'PNL_benchmark',\
+                                        futuresDF_boards[currentdate].ix[benchmark_sym].LastPctChg*accountvalues[account])
+            totalsDict[currentdate].set_value(currentdate, 'ACC_'+col, sum(futuresDF_boards[currentdate][col]==futuresDF_boards[currentdate].ACT)/float(nrows))
+            totalsDict[currentdate].set_value(currentdate, 'L%_'+col, sum(futuresDF_boards[currentdate][col]==1)/float(nrows))
 
-        totals =futuresDF_boards[current][[x for x in futuresDF_boards[current] if 'PNL' in x]].sum()
+        totals =futuresDF_boards[currentdate][[x for x in futuresDF_boards[currentdate] if 'PNL' in x]].sum()
         for i,value in enumerate(totals):
-            totalsDict[current].set_value(current, totals.index[i], value)
+            totalsDict[currentdate].set_value(currentdate, totals.index[i], value)
         
         #change in value
-        chgValuegroup = futuresDF_boards[current].groupby(['group']).chgValue
+        chgValuegroup = futuresDF_boards[currentdate].groupby(['group']).chgValue
         avg_chg_by_group = chgValuegroup.sum()/chgValuegroup.count()        
-        chg_total = futuresDF_boards[current]['chgValue'].sum()
+        chg_total = futuresDF_boards[currentdate]['chgValue'].sum()
         avg_chg_total = chg_total/nrows
         for i,value in enumerate(avg_chg_by_group):
-            #print current, 'Vol_'+avg_chg_by_group.index[i], value
-            totalsDict[current].set_value(current, 'Chg_'+avg_chg_by_group.index[i], value)
-        totalsDict[current].set_value(current, 'Chg_Total', chg_total)
-        totalsDict[current].set_value(current, 'Chg_Avg', avg_chg_total)
+            #print currentdate, 'Vol_'+avg_chg_by_group.index[i], value
+            totalsDict[currentdate].set_value(currentdate, 'Chg_'+avg_chg_by_group.index[i], value)
+        totalsDict[currentdate].set_value(currentdate, 'Chg_Total', chg_total)
+        totalsDict[currentdate].set_value(currentdate, 'Chg_Avg', avg_chg_total)
         
         #change in volatility
-        abschgValuegroup = futuresDF_boards[current].groupby(['group']).abs_chgValue
+        abschgValuegroup = futuresDF_boards[currentdate].groupby(['group']).abs_chgValue
         avg_vol_by_group = abschgValuegroup.sum()/abschgValuegroup.count()
-        vol_total = futuresDF_boards[current]['abs_chgValue'].sum()
+        vol_total = futuresDF_boards[currentdate]['abs_chgValue'].sum()
         avg_vol_total = vol_total/nrows
         for i,value in enumerate(avg_vol_by_group):
-            #print current, 'Vol_'+avg_vol_by_group.index[i], value
-            totalsDict[current].set_value(current, 'Vol_'+avg_vol_by_group.index[i], value)
-        totalsDict[current].set_value(current, 'Vol_Total', vol_total)
-        totalsDict[current].set_value(current, 'Vol_Avg', avg_vol_total)
+            #print currentdate, 'Vol_'+avg_vol_by_group.index[i], value
+            totalsDict[currentdate].set_value(currentdate, 'Vol_'+avg_vol_by_group.index[i], value)
+        totalsDict[currentdate].set_value(currentdate, 'Vol_Total', vol_total)
+        totalsDict[currentdate].set_value(currentdate, 'Vol_Avg', avg_vol_total)
         
         #change in long percent
-        long_percent_by_group = pd.concat([futuresDF_boards[current]['ACT']==1, futuresDF_boards[current]['group']],axis=1).groupby(['group'])
+        long_percent_by_group = pd.concat([futuresDF_boards[currentdate]['ACT']==1, futuresDF_boards[currentdate]['group']],axis=1).groupby(['group'])
         longPerByGroup =long_percent_by_group.sum()/long_percent_by_group.count()
-        longPerByGroup_all=(futuresDF_boards[current]['ACT']==1).sum()/float(nrows)
+        longPerByGroup_all=(futuresDF_boards[currentdate]['ACT']==1).sum()/float(nrows)
         for i in longPerByGroup.index:
-            #print current, 'L%_'+i, longPerByGroup.ix[i][0]
+            #print currentdate, 'L%_'+i, longPerByGroup.ix[i][0]
             value = longPerByGroup.ix[i][0]
-            totalsDict[current].set_value(current, 'L%_'+i, value)
-        totalsDict[current].set_value(current, 'L%_Total', longPerByGroup_all)
+            totalsDict[currentdate].set_value(currentdate, 'L%_'+i, value)
+        totalsDict[currentdate].set_value(currentdate, 'L%_Total', longPerByGroup_all)
 
-        #print totalsDict[current].sort_index().transpose()
-        #totalsDict[current]['Date']=current
-        totalsDict[current]['timestamp']=futuresDF_boards[current].timestamp[0]
+        #print totalsDict[currentdate].sort_index().transpose()
+        #totalsDict[currentdate]['Date']=currentdate
+        totalsDict[currentdate]['timestamp']=futuresDF_boards[currentdate].timestamp[0]
     
     totalsDF=pd.DataFrame()
     for key in totalsDict.keys():
@@ -341,7 +349,7 @@ for account in qtydict.keys():
     totals_accounts[account]=totalsDF
     tablename = 'totalsDF_board_'+account
     totalsDF.to_sql(name=tablename,con=writeConn, index=True, if_exists=mode, index_label='Date')
-    print '\nSaved', tablename,'from',datetup[0][1],'to',current,'to', dbPath
+    print '\nSaved', tablename,'from',datetup[0][1],'to',currentdate,'to', dbPath
 
     pnlDF=pd.DataFrame()
     for key in futuresDF_boards.keys():
@@ -351,9 +359,9 @@ for account in qtydict.keys():
     tablename = 'PNL_board_'+account
     pnl_accounts[account]=pnlDF
     pnlDF.to_sql(name= tablename, if_exists=mode, con=writeConn, index=True, index_label='Date')
-    filename = savePath+tablename+'_'+str(current)+'.csv'
+    filename = savePath+tablename+'_'+str(currentdate)+'.csv'
     pnlDF.to_csv(filename, index=True)
-    print 'Saved', tablename,'from',datetup[0][1],'to',current,'to', dbPath,'and', filename
+    print 'Saved', tablename,'from',datetup[0][1],'to',currentdate,'to', dbPath,'and', filename
 
 #create charts
 def conv_sig(signals):
@@ -416,7 +424,7 @@ for account in totals_accounts:
     
     perchgDict[account]=combined_ranking
     #perchgDict[account].plot(kind='barh', figsize=(10,15))
-
+    
     i2=0
     i=0
     rank_num=[]
@@ -522,6 +530,7 @@ for account in totals_accounts:
             plotvalues=pnl.cumsum()
             performance_chart_dict[account][line]=[int(x) for x in plotvalues]
             performance_chart_dict[account][line+'_cumper']=[round(x,2) for x in (plotvalues/pnl[0]-1)*100]
+            performance_chart_dict[account][line+'_pnl']=totalsDF['PNL_'+line].tolist()
             #plotvalues=(pnl.cumsum()/accountvalues[account]-1)*100
             plt.plot(range(nrows), plotvalues, label=line)
             plt.legend(loc='best', prop={'size':16})
@@ -551,7 +560,7 @@ for account in totals_accounts:
                     #component
                     text=component_text[line]
                     #print line, text, filename2
-            signals=(signalsDict[current][line]*quantity).astype(int).copy()
+            signals=(signalsDict[currentdate][line]*quantity).astype(int).copy()
             signals.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in signals.index]
             signals=pd.Series(conv_sig(signals), index=signals.index).to_dict()
             text2='Results shown reflect daily close-to-close timesteps, only applicable to MOC orders. All results are hypothetical. Excludes slippage and commission costs.'
@@ -603,6 +612,14 @@ for account in totals_accounts:
         newidx=accountvalue2.reset_index().xaxis.drop_duplicates(keep='last').index
         xaxis_labels=accountvalue2.reset_index().ix[newidx].xaxis.values
         yaxis_values=accountvalue2.reset_index().ix[newidx].value.values
+        yaxis_pnl=accountvalue2.reset_index().ix[newidx].value.diff().fillna(0).values
+        dates=accountvalue2.reset_index().ix[newidx].Date.values
+        slippage=[]
+        commissions=[]
+        for date in dates:
+            slip_df=pd.read_sql('select * from ib_slippage where timestamp=(select max(timestamp) from ib_slippage where Date=\'{}\' and name=\'{}\')'.format(str(date), account), con=readConn)
+            slippage.append(slip_df.dollarslip.sum())
+            commissions.append(slip_df.commissions.sum())
     else:
         broker='c2'
         accountvalue=pd.read_sql('select * from (select * from c2_equity where\
@@ -619,14 +636,24 @@ for account in totals_accounts:
         newidx=accountvalue2.reset_index().xaxis.drop_duplicates(keep='last').index
         xaxis_labels=accountvalue2.reset_index().ix[newidx].xaxis.values
         yaxis_values=accountvalue2.reset_index().ix[newidx].modelAccountValue.values
+        yaxis_pnl=accountvalue2.reset_index().ix[newidx].equity.values
+        dates=accountvalue2.reset_index().ix[newidx].Date.values
+        slippage=[]
+        commissions=[]
+        for date in dates:
+            slip_df=pd.read_sql('select * from slippage where timestamp=(select max(timestamp) from slippage where csiDate=\'{}\' and name=\'{}\')'.format(str(date), account), con=readConn)
+            slippage.append(slip_df.dollarslip.sum())
+            commissions.append(slip_df.commissions.sum())
     
     #intersect index with benchmark axis
 
-    
+    benchmark_pnl=benchmark_values.ix[xaxis_labels].copy().values
     benchmark_values=benchmark_values.ix[xaxis_labels].values
+    
     index=[dt.strptime(date, '%Y-%m-%d') for date in xaxis_labels]
     simulated_moc=simulated_moc.ix[index].fillna('Off')
     simulated_moc_values=np.array([totalsDF.ix[int(idx.strftime('%Y%m%d'))]['PNL_'+simulated_moc.ix[idx]] for idx in simulated_moc.index])
+    simulated_moc_pnl=simulated_moc_values.copy()
     simulated_moc_values[0]=simulated_moc_values[0]+yaxis_values[0]
     simulated_moc_values=simulated_moc_values.cumsum()
     simulated_moc_values_percent=np.insert(np.diff(simulated_moc_values).cumsum()/float(simulated_moc_values[0])*100,0,0)
@@ -686,8 +713,11 @@ for account in totals_accounts:
                                 'simulated_moc_values':simulated_moc_values,'yaxis_values_percent':yaxis_values_percent,
                                 'benchmark_values_percent':benchmark_values_percent,
                                 'simulated_moc_values_percent':simulated_moc_values_percent,
-                                'selection':simulated_moc}, index=index)
-    #account_values[account]['benchmark_sym']=benchmark_sym
+                                'yaxis_pnl':yaxis_pnl, 'benchmark_pnl':benchmark_pnl,
+                                'simulated_moc_pnl':simulated_moc_pnl,
+                                'selection':simulated_moc, 'slippage':slippage,
+                                'commissions':commissions}, index=index)
+    account_values[account]['benchmark_sym']=benchmark_sym
     
     if debug and showPlots:
         plt.show()
@@ -725,8 +755,7 @@ for key in performance_dict_by_box:
         signals_cons=signals_cons.append(pd.Series(performance_dict_by_box[key][account]['signals'], name=account))
         newdict[account+'_rank_filename']=performance_dict_by_box[key][account]['rank_filename']
         newdict[account+'_rank_text']=performance_dict_by_box[key][account]['rank_text']
-        newdict['infotext']=performance_dict_by_box[key][account]['infotext']
-        #newdict[account+'_infotext']=performance_dict_by_box[key][account]['infotext']
+        newdict[account+'_infotext']=performance_dict_by_box[key][account]['infotext']
     if 'infotext2' in performance_dict_by_box[key][account]:
         newdict['infotext2']=performance_dict_by_box[key][account]['infotext2']        
     newdict['date']=performance_dict_by_box[key][account]['date']
@@ -753,7 +782,7 @@ for account in totals_accounts:
                     index_label='Date')
     print 'saved',tablename, 'to',dbPathWebCharts
 
-for account in totals_accounts:
+for account in performance_chart_dict:
     tablename=account+'_performance'
     performance_chart_dict[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
                     index_label='Date')

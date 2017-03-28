@@ -42,3 +42,7 @@ with open('\logs\post_processing_csi_error_'+fulltimestamp+'.txt', 'w') as e:
     e.flush()
     proc = Popen(['python', 'vol_adjsize.py','1'], stderr=e)
     proc.wait()
+    e.flush()
+    #in case moc didnt process
+    proc = Popen(['python', 'create_board_history.py','1'], stderr=e)
+    proc.wait()

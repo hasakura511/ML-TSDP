@@ -352,7 +352,6 @@ def vol_adjsize_moc(debug, threadlist, skipcheck=False):
     'YT3':['HXS',fxDict['AUD'],8000,'rates',-1,1],
         }
 
-
     filename='./web/tsdp/custom_signals_data.json'
     if isfile(filename):
         with open(filename, 'r') as f:

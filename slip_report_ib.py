@@ -22,16 +22,16 @@ if len(sys.argv)==1:
     start_slip=20161128
     figsize=(6,8)
     fontsize=12
-    dataPath='D:/ML-TSDP/data/'
-    portfolioPath = 'D:/ML-TSDP/data/portfolio/'
-    dbPathWrite='D:/Dropbox/Python/TSDP/ml/data/futures.sqlite3' 
-    dbPathRead = 'D:/ML-TSDP/data/futures.sqlite3'
+    dataPath='./data/'
+    portfolioPath = './data/portfolio/'
+    dbPathWrite='./data/futures.sqlite3' 
+    dbPathRead = './data/futures.sqlite3'
     #savePath= 'D:/Dropbox/Python/TSDP/ml/data/results/' 
-    savePath = savePath2 = pngPath='D:/Dropbox/Python/TSDP/ml/data/results/' 
-    systemPath =  'D:/ML-TSDP/data/systems/'
-    #timetablePath=   'D:/ML-TSDP/data/systems/timetables_debug/'
-    timetablePath=   'D:/ML-TSDP/data/systems/timetables/'
-    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    savePath = savePath2 = pngPath='./data/results/' 
+    systemPath =  './data/systems/'
+    #timetablePath=   './data/systems/timetables_debug/'
+    timetablePath=   './data/systems/timetables/'
+    feedfile='./data/systems/system_ibfeed.csv'
 else:
     debug=False
     showPlots=False
@@ -143,11 +143,15 @@ if lastExecutions.shape[0] >0:
     if executions.shape[0]>0:
         executions['CSIsym']=contractsDF.ix[executions.ibsym].CSIsym.values
         csidate=executions.lastAppend[0]
+        #csidate='20170422'
         futuresDF=pd.read_sql('select * from futuresDF_results where timestamp=\
                     (select max(timestamp) from futuresDF_results where Date=%s)' % (csidate), con=readConn,  index_col='CSIsym')
         system = pd.read_sql('select * from (select * from signals_live where Date=%s and Name=\'%s\'\
                             order by timestamp ASC) group by CSIsym' %(csidate, systemName),\
                             con=readConn,  index_col='CSIsym')
+        
+        if system.shape[0]<1:
+            sys.exit('{} not in signals_live'.format(csidate))
         selection=system.selection[0]
         if os.path.isfile(timetablePath+str(csidate)+'.csv'):
             timetable = pd.read_csv(timetablePath+str(csidate)+'.csv', index_col=0)

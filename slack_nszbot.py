@@ -64,6 +64,7 @@ def handle_command(command, channel):
         filename=files[-1]
         print filename
         response=filename+'\n'
+        time.sleep(2)
         with open(filename, 'r') as f:
             for line in f: response+=line
 

@@ -62,7 +62,7 @@ def handle_command(command, channel):
         restart_webserver()
         files=get_logfiles(search_string='runserver')
         filename=files[-1]
-        print filenname
+        print filename
         response=filename+'\n'
         with open(filename, 'r') as f:
             for line in f: response+=line

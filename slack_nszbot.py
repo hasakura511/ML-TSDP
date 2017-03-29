@@ -60,7 +60,7 @@ def handle_command(command, channel):
 
     if command.startswith('restart server'):
         restart_webserver()
-        files=get_logfiles(search_string='runserver')
+        files=get_logfiles(search_string='restart_webserver_error')
         filename=files[-1]
         print filename
         response=filename+'\n'

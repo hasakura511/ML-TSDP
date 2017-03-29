@@ -14,7 +14,7 @@ from slackclient import SlackClient
 from c2api.c2api import setDesiredPositions, get_working_signals, clear_signals,\
                         retrieveSystemEquity
 from web.tsdp.betting.start_moc import restart_webserver
-from web.tsdp.betting.helpers import get_logfiles
+#from web.tsdp.betting.helpers import get_logfiles
 c2id = "107146997"
 c2key = "tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w"
 BOT_NAME = 'nsz'
@@ -23,6 +23,18 @@ BOT_NAME = 'nsz'
 SLACK_BOT_TOKEN='xoxb-159267896464-7paxh6FQWGz5x82qpCYNlqcs'
 BOT_ID='U4P7VSCDN'
 slack_client = SlackClient(SLACK_BOT_TOKEN)
+
+def get_logfiles(search_string='', exclude=False):
+    search_dir='/logs/'
+    os.chdir(search_dir)
+    files = filter(os.path.isfile, os.listdir(search_dir))
+    if exclude:
+        files = [os.path.join(search_dir, f) for f in files if search_string not in f]  # add path to each file
+    else:
+        files = [os.path.join(search_dir, f) for f in files if search_string in f]  # add path to each file
+
+    files.sort(key=lambda x: os.path.getmtime(x))
+    return files
 
 def handle_command(command, channel):
     print command
@@ -49,9 +61,10 @@ def handle_command(command, channel):
     if command.startswith('restart server'):
         restart_webserver()
         files=get_logfiles(search_string='runserver')
-
-        response=files[-1]+'\n'
-        with open('masters.txt', 'r') as f:
+        filename=files[-1]
+        print filenname
+        response=filename+'\n'
+        with open(filename, 'r') as f:
             for line in f: response+=line
 
     if command.startswith('buy'):

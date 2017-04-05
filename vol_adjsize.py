@@ -70,24 +70,24 @@ if len(sys.argv)==1:
     showPlots=False
     #refreshSea tries to recreate the first run futuresATR file after new signals have been generated
     refreshSea=False
-    dbPath='C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/futures.sqlite3' 
-    dbPath2='D:/ML-TSDP/data/futures.sqlite3'
-    dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
-    dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
-    savePath= 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    pngPath=savePath2 = 'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
-    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    dbPath='./data/futures.sqlite3' 
+    dbPath2='./data/futures.sqlite3'
+    dbPathWeb = './web/tsdp/db.sqlite3'
+    dataPath='./data/csidata/v4futures2/'
+    savePath= './data/results/' 
+    pngPath=savePath2 = './data/results/' 
+    feedfile='.data/systems/system_ibfeed.csv'
     #test last>old
     #dataPath2=savePath2
     #signalPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
     
     #test last=old
-    dataPath2='D:/ML-TSDP/data/'
+    dataPath2='./data/'
     
-    signalPath ='D:/ML-TSDP/data/signals/'
-    signalSavePath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/signals/' 
-    systemPath = 'C:/Users/Hidemi/Desktop/Python/SharedTSDP/data/systems/' 
-    logging.basicConfig(filename='C:/logs/vol_adjsize_error.log',level=logging.DEBUG)
+    signalPath ='./data/signals/'
+    signalSavePath = './data/signals/' 
+    systemPath = './data/systems/' 
+    logging.basicConfig(filename='/logs/vol_adjsize_error.log',level=logging.DEBUG)
     
 else:
     debug=False
@@ -327,9 +327,12 @@ try:
         #print sym, atr[-1], c2contractSpec[sym][2], c2contractSpec[sym][1]
         usdATR = atr[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
         cValue = data.Close[-1]*c2contractSpec[sym][2]/c2contractSpec[sym][1]
-        qty = int(max(math.floor(riskEquity/usdATR),1))
-        qty_mini = int(math.ceil(riskEquity_mini/usdATR))
-        qty_micro = int(math.ceil(riskEquity_micro/usdATR))
+        var=riskEquity/usdATR
+        qty = int(math.floor(var) if var>1 else math.ceil(var))
+        var=riskEquity_mini/usdATR
+        qty_mini = int(math.floor(var) if var>1 else math.ceil(var))
+        var=riskEquity_micro/usdATR
+        qty_micro = int(math.floor(var) if var>1 else math.ceil(var))
         #print sym, data.R[-1], contractName
         #signalFilename='v4_'+sym+'.csv'
         corrDF[sym]=pc

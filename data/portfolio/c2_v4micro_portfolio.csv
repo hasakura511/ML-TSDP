@@ -1,2 +1,4 @@
 symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-@TYM7,-438,1491425268,,,125.18750,,future,long,2017-04-05 16:47:48,1491425268,open,2017-04-05 16:47:46,125.17188,1000,,0,1,,,110741934,
+QNGK7,0,1491857606,,,3.24300,,future,short,2017-04-10 16:53:26,1491857606,open,2017-04-10 16:53:24,3.24100,10000,,0,1,,,110891826,
+@BOK7,-6,1491848046,,,31.37000,,future,short,2017-04-10 14:14:06,1491848046,open,2017-04-10 14:14:05,31.36000,600,,0,1,,,110887145,
+@ESM7,0,1491857606,,,2354.00000,,future,long,2017-04-10 16:53:26,1491857606,open,2017-04-10 16:53:23,2353.75000,50,,0,1,,,110891824,

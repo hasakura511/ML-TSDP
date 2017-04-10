@@ -1,0 +1,3 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-04-06 14:13:55 1 @CK7 $0,@CK7,2017-04-06 14:13:55,360.75,2017-04-06 14:20:00,360.75,0.0,0.0,Open,-1.0,0.0,2.5,-1 days +23:53:55.000000000,-7.0
+ctwo opened: 2017-04-06 14:13:56 1 @SMK7 $-40,@SMK7,2017-04-06 14:13:56,309.1,2017-04-06 14:20:00,308.7,0.0012957563978,0.0012957563978,Open,1.0,-40.0,2.5,-1 days +23:53:56.000000000,-7.0

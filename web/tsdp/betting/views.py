@@ -25,7 +25,8 @@ def downloaddb(request):
 #    updateMeta.save()
 
 def addrecord(request):
-    
+    #accountinfo = json.loads(request.POST.get('accountinfo'))
+    #custom_signals = json.loads(request.POST.get('custom_signals'))
     list_boxstyles = json.loads(request.POST.get('boxstyles'))
     
     if list_boxstyles != []:
@@ -48,14 +49,24 @@ def addrecord(request):
     record.save()
     if list_boxstyles != []:
         recreateCharts()
+    '''
+    if accountinfo != {}:
+        recreateCharts(accountinfo=accountinfo)
 
+    if custom_signals != {}:
+        recreateCharts(custom_signals=custom_signals)
+    '''
     selections = UserSelection.objects.all().order_by('-timestamp')
     # Please wait up to five minutes for immediate orders to be processed.
     if 'True' in [order[1] for sys, order in eval(selections[0].selection).items()]:
         print('Immediate Orders found')
         #start_immediate()
 
-    return HttpResponse(json.dumps({"id": record.id}))
+    recent = UserSelection.objects.order_by('-timestamp')[:20]
+    recentdata = [dict((cn, getattr(data, cn)) for cn in ('timestamp', 'mcdate', 'selection')) for data in recent]
+    returndata={"id": record.id, "recent": recentdata}    
+
+    return HttpResponse(json.dumps(returndata))
 
 
 def getrecords(request):
@@ -174,7 +185,11 @@ def getchartdata(request):
     return HttpResponse(json.dumps(returndata))
 
 def getcustomchip(request):
-    returndata = getCustomizeChip()
+    if 'target' in request.GET:
+        returndata = getCustomizeChip(target=int(request.GET['target']))      
+    else:     
+        returndata = getCustomizeChip()
+
     #print(returndata)
     print len(returndata)
     return HttpResponse(json.dumps(returndata))

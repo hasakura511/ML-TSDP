@@ -68,7 +68,7 @@ def getChartsDict():
         chart_table_dict[table]=df.to_dict()
     return chart_table_dict
 
-def getCustomizeChip():
+def getCustomizeChip(target=None):
     readConn=getBackendDB()
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn,\
                               index_col='CSIsym')
@@ -101,8 +101,9 @@ def getCustomizeChip():
                 '_BRANK.png" target="_blank">' + x + '</a>' \
                 for x in desc_hyperlink]
     markets_df=pd.concat([futuresDF[['usdATR','QTY','QTY_MINI','QTY_MICRO',\
-                        'group']],feeddata[['Desc','margin']]],\
+                        'group']],feeddata[['Desc']]],\
                         axis=1).sort_values(by=['group'])
+    markets_df.columns=[u'usdATR', u'QTY_v4futures', u'QTY_v4mini', u'QTY_v4micro', u'group', u'Desc']
     desc_list = markets_df.Desc.values
     desc_hyperlink = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
     desc_hyperlink = ['<a href="/static/images/v4_' + [futuresDict.index[i]\
@@ -111,14 +112,17 @@ def getCustomizeChip():
                 '_BRANK.png" target="_blank">' + x + '</a>' \
                 for x in desc_hyperlink]
     markets_df['Desc']=desc_hyperlink
+    markets_df['margin_v4futures']=feeddata.margin*markets_df.QTY_v4futures
+    markets_df['margin_v4mini']=feeddata.margin*markets_df.QTY_v4mini
+    markets_df['margin_v4micro']=feeddata.margin*markets_df.QTY_v4micro
 
     for account in ai_dict:
-        markets_df[account]=[False if sym in ai_dict[account]['offline']\
+        markets_df['online_'+account]=[False if sym in ai_dict[account]['offline']\
                    else True for sym in markets_df.index]
     ai_dict2={account:{key:value for key,value in dic.items() if key\
                        not in ['selection','offline']} for account, dic\
                         in ai_dict.items()}
-        
+
     markets_df=markets_df.transpose()
     json_markets_df=markets_df.to_json()
     modify_chip_dict={
@@ -265,12 +269,12 @@ def updateMeta():
     timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc')
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
     if mcdate not in timetables.columns:
-        #print('Running MOC to get new mcdate...')
-        #if not debug:
-        #    get_newtimetable()
+        print('Running MOC to get new mcdate...')
+        if not debug:
+            get_newtimetable()
         mcdate=timetables.drop(['Date','timestamp'],axis=1).columns[-1]
         triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
-        triggers[mcdate] = 'Not Yet Available'
+        triggers[mcdate] = 'Not Available'
     else:
         if timetables[mcdate].dropna().shape[0] == timetables.shape[0]:
             triggers = pd.DataFrame(timetables[mcdate].ix[[x for x in timetables.index if 'trigger' in x]].copy())
@@ -376,9 +380,9 @@ def getAccountValues(refresh=False):
     c2_equity.updatedLastTimeET = pd.to_datetime(c2_equity.updatedLastTimeET)
 
     #run checksystems and update values if last update >=1 day and not a T,W,TH,F,SA
-    #if (now-eastern.localize(c2_equity.updatedLastTimeET[0])).days>=1 and (now.weekday()>0 and now.weekday()<5):
-    #    if not debug:
-    #        run_checksystems()
+    if (now-eastern.localize(c2_equity.updatedLastTimeET[0])).days>=1 and (now.weekday()>0 and now.weekday()<5):
+        if not debug:
+            run_checksystems()
 
     for system in c2_equity.drop(['v4futures'], axis=0).index:
         timestamp = c2_equity.ix[system].updatedLastTimeET
@@ -482,7 +486,7 @@ def getCustomSignals():
 
     return {'name':name, 'customsignals':customsignals}
 
-def recreateCharts(custom_signals=None):
+def recreateCharts(custom_signals=None, accountinfo=None):
     if custom_signals is not None:
         filename='custom_signals_data.json'
         with open(filename, 'w') as f:
@@ -513,11 +517,19 @@ def recreateCharts(custom_signals=None):
 
         print('updating chart db with custom signals')
         #run_vol_adjsize()
-        
+        pass
 
+    if accountinfo is not None:
+        print accountinfo
+        filename='accountinfo_data.json'
+        #save_dict={'name':name, 'customsignals':custom_signals_data}
+        with open(filename, 'w') as f:
+             json.dump(accountinfo, f)
+        print 'Saved',filename
+        
     #time.sleep(15)
-    update_chartdb()
-    return
+    #update_chartdb()
+    pass
 
 def get_detailed_timetable():
     active_symbols_ib = {
@@ -741,9 +753,9 @@ def get_blends(cloc, list_boxstyles=None, returnVotingComponents=True):
     for i in indices:
         key=list_boxstyles[i].keys()[0]
         list_boxstyles[i]={key: blendedboxstyleDict[key]}
-        #print(list_boxstyles[i])
+        print(list_boxstyles[i])
 
-    #print(list_boxstyles)
+    print(list_boxstyles)
     filename = 'boxstyles_data.json'
     with open(filename, 'w') as f:
         json.dump(list_boxstyles, f)
@@ -753,7 +765,7 @@ def get_blends(cloc, list_boxstyles=None, returnVotingComponents=True):
         votingComponents = {boxid: [getComponents()[component_names[x]][0] for x in clist if component_names[x] != 'None']
                             for boxid, clist in boxidDict.items()}
         #print [[x, votingComponents[x]] for x in sorted(votingComponents.keys(), key=int)]
-        #print(votingComponents)
+        print(votingComponents)
         return votingComponents
     # return cloc, list_boxstyles
 

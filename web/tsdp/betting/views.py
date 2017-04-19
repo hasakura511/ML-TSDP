@@ -95,16 +95,18 @@ def getrecords(request):
         with open(filename, 'w') as f:
             json.dump(list_performance, f)
         print 'Saved', filename
+        json_performance = json.dumps(list_performance)
 
     filename = 'boxstyles_data.json'
     if isfile(filename):
         with open(filename, 'r') as f:
             json_boxstyles = json.load(f)
-        #print json_boxstyles
+        print json_boxstyles
     else:
         with open(filename, 'w') as f:
             json.dump(UserSelection.default_list_boxstyles, f)
         print 'Saved', filename
+        json_boxstyles=json.dumps(UserSelection.default_list_boxstyles)
 
     filename = 'customboard_data.json'
     if isfile(filename):
@@ -114,6 +116,7 @@ def getrecords(request):
         with open(filename, 'w') as f:
             json.dump(UserSelection.default_list_customboard, f)
         print 'Saved', filename
+        json_customstyles=json.dumps(UserSelection.default_list_customboard)
 
     firstdata = firstrec.dic()
     firstdata['performance'] = json_performance

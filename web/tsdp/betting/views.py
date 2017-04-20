@@ -120,9 +120,9 @@ def getrecords(request):
         json_customstyles=json.dumps(UserSelection.default_list_customboard)
 
     firstdata = firstrec.dic()
-    print '\n\njson_preformance\n',json_performance
+    print '\n\njson_preformance\n',len(json_performance)
     firstdata['performance'] = json_performance
-    print '\n\njson_boxstyles\n',json_boxstyles
+    print '\n\njson_boxstyles\n',len(json_boxstyles)
     firstdata['boxstyles'] = json_boxstyles
     firstdata['customstyles'] = json_customstyles
     # print(json.dumps(firstdata))
@@ -151,13 +151,13 @@ def newboard(request):
 def gettimetable(request):
     returndata = get_timetables()
     #print(returndata)
-    print len(returndata)
+    print 'gettimetable',len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getstatus(request):
     returndata = get_status()
     #print(returndata)
-    print len(returndata)
+    print 'getstatus',len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getmetadata(request):
@@ -165,7 +165,7 @@ def getmetadata(request):
     #returndata = returnrec.dic()
     returndata=updateMeta()
     #print(returndata)
-    print len(returndata)
+    print 'getmetadata',len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getaccountdata(request):
@@ -175,19 +175,19 @@ def getaccountdata(request):
     #    returndata= getAccountValues()
     returndata= getAccountValues()    
     #print(returndata)
-    print len(returndata)
+    print 'getaccountdata', len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getcustomsignals(request):
     returndata = getCustomSignals()
     #print(returndata)
-    print len(returndata)
+    print 'getcustomsignals',len(returndata)
     return HttpResponse(returndata)
 
 def getchartdata(request):
     returndata = getChartsDict()
     #print(returndata)
-    print len(returndata)
+    print 'getchartdata',len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getcustomchip(request):
@@ -197,13 +197,13 @@ def getcustomchip(request):
         returndata = getCustomizeChip()
 
     #print(returndata)
-    print len(returndata)
+    print 'getcustomchip',len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def getnewsdata(request):
     returndata = getNews()
     #print(returndata)
-    print len(returndata)
+    print 'getnewsdata',len(returndata)
     return HttpResponse(json.dumps(returndata))
 
 def symbols(request):

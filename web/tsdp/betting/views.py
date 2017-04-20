@@ -92,16 +92,16 @@ def getrecords(request):
             json_performance = json.load(f)
     else:
         list_performance = []
-        with open(filename, 'w') as f:
-            json.dump(list_performance, f)
-        print 'Saved', filename
+        #with open(filename, 'w') as f:
+        #    json.dump(list_performance, f)
+        #print 'Saved', filename
         json_performance = json.dumps(list_performance)
 
     filename = 'boxstyles_data.json'
     if isfile(filename):
         with open(filename, 'r') as f:
             json_boxstyles = json.load(f)
-        print json_boxstyles
+        
     else:
         with open(filename, 'w') as f:
             json.dump(UserSelection.default_list_boxstyles, f)
@@ -119,7 +119,9 @@ def getrecords(request):
         json_customstyles=json.dumps(UserSelection.default_list_customboard)
 
     firstdata = firstrec.dic()
+    print '\n\njson_preformance\n',json_performance
     firstdata['performance'] = json_performance
+    print '\n\njson_boxstyles\n',json_boxstyles
     firstdata['boxstyles'] = json_boxstyles
     firstdata['customstyles'] = json_customstyles
     # print(json.dumps(firstdata))
@@ -127,7 +129,7 @@ def getrecords(request):
     recentdata = [dict((cn, getattr(data, cn)) for cn in ('timestamp', 'mcdate', 'selection')) for data in recent]
     returndata={"first": firstdata, "recent": recentdata}
     #print(returndata)
-    print len(returndata)
+    print 'getrecords',len(returndata)
     return HttpResponse(json.dumps(returndata))
     
 def index(request):

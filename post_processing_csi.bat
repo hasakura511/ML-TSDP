@@ -11,6 +11,6 @@ cd \ml-tsdp\
 rem copy /Y \ml-tsdp\data\csidata\v4futures2\*.csv \ml-tsdp\data\csidata\v4futures4\
 \anaconda2\python post_processing_csi.py >> \logs\post_processing_csi_%fullstamp%.txt
 
-cd \ml-tsdp\web\tsdp\
-wmic process where "Commandline like '%%manage.py runserver%%' and name like '%%python.exe%%'" call terminate
-\anaconda2\python runserver.py
+rem cd \ml-tsdp\web\tsdp\
+rem wmic process where "Commandline like '%%manage.py runserver%%' and name like '%%python.exe%%'" call terminate
+rem \anaconda2\python runserver.py

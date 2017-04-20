@@ -87,16 +87,16 @@ def getrecords(request):
         firstrec = UserSelection.objects.order_by('-timestamp').first()
 
     filename = 'performance_data.json'
-    if isfile(filename):
-        with open(filename, 'r') as f:
-            json_performance = json.load(f)
-    else:
-        print filename, 'not found'
-        list_performance = []
+    #if isfile(filename):
+    with open(filename, 'r') as f:
+        json_performance = json.load(f)
+    #else:
+    #    print filename, 'not found'
+    #    list_performance = []
         #with open(filename, 'w') as f:
         #    json.dump(list_performance, f)
         #print 'Saved', filename
-        json_performance = json.dumps(list_performance)
+    #    json_performance = json.dumps(list_performance)
 
     filename = 'boxstyles_data.json'
     if isfile(filename):

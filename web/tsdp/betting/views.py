@@ -60,7 +60,7 @@ def addrecord(request):
     # Please wait up to five minutes for immediate orders to be processed.
     if 'True' in [order[1] for sys, order in eval(selections[0].selection).items()]:
         print('Immediate Orders found')
-        #start_immediate()
+        start_immediate()
 
     recent = UserSelection.objects.order_by('-timestamp')[:20]
     recentdata = [dict((cn, getattr(data, cn)) for cn in ('timestamp', 'mcdate', 'selection')) for data in recent]

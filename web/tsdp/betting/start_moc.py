@@ -68,4 +68,4 @@ def restart_webserver():
 
 if __name__ == "__main__":
     get_newtimetable()
-    restart_webserver()
+    #restart_webserver()

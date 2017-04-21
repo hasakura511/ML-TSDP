@@ -90,6 +90,15 @@ def getrecords(request):
     #if isfile(filename):
     with open(filename, 'r') as f:
         json_performance = json.load(f)
+
+    print '\n\njson_preformance\n',len(json_performance)
+    while len(json_performance) == 0:
+        print json_performance
+        #filename = 'performance_data.json'
+        #if isfile(filename):
+        with open(filename, 'r') as f:
+            json_performance = json.load(f)
+
     #else:
     #    print filename, 'not found'
     #    list_performance = []
@@ -120,14 +129,8 @@ def getrecords(request):
         json_customstyles=json.dumps(UserSelection.default_list_customboard)
 
     firstdata = firstrec.dic()
-    print '\n\njson_preformance\n',len(json_performance)
-    while len(json_performance) == 0:
-        print json_performance
-        filename = 'performance_data.json'
-        #if isfile(filename):
-        with open(filename, 'r') as f:
-            json_performance = json.load(f)
-            
+
+
     firstdata['performance'] = json_performance
     print '\n\njson_boxstyles\n',len(json_boxstyles)
     firstdata['boxstyles'] = json_boxstyles

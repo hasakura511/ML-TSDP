@@ -87,10 +87,16 @@ def getrecords(request):
         firstrec = UserSelection.objects.order_by('-timestamp').first()
 
     filename = 'performance_data.json'
-    #if isfile(filename):
-    with open(filename, 'r') as f:
-        json_performance = json.load(f)
-
+    if isfile(filename):
+        with open(filename, 'r') as f:
+            json_performance = json.load(f)
+    else:
+        print 'does not exist. recreating performance data json'
+        #recreateCharts()
+        #with open(filename, 'r') as f:
+        #    json_performance = json.load(f)
+        pass
+        
     print '\n\njson_preformance\n',len(json_performance)
     while len(json_performance) == 0:
         print json_performance

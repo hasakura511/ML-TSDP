@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-04-18 16:51:42 1 QNGM7 $19,QNGM7,2017-04-18 16:51:42,3.238,2017-04-18 17:00:00,3.236,0.00061804697157,0.00061804697157,Open,-1.0,19.0,2.5,-1 days +23:51:42.000000000,-9.0

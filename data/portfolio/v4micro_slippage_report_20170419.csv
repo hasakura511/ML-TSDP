@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-04-19 16:51:07 1 QHGN7 $-175,QHGN7,2017-04-19 16:51:07,254.2,2017-04-19 17:00:00,254.9,-0.00274617497058,0.00274617497058,Open,-1.0,-175.0,2.5,-1 days +23:51:07.000000000,-9.0

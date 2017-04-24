@@ -31,14 +31,14 @@ class UserSelection(models.Model):
                           u'riskEquity': u'250'}}
 
     filename='accountinfo_data.json'
-    if isfile(filename):
-        with open(filename, 'r') as f:
-            json_accountinfo = json.load(f)
-    else:
+    if not isfile(filename):
+    #    with open(filename, 'r') as f:
+    #        json_accountinfo = json.load(f)
+    #else:
         with open(filename, 'w') as f:
             json.dump(default_accountinfo, f)
         print 'Saved', filename
-
+    '''
     filename='performance_data.json'
     if isfile(filename):
         with open(filename, 'r') as f:
@@ -48,30 +48,28 @@ class UserSelection(models.Model):
         with open(filename, 'w') as f:
             json.dump(list_performance, f)
         print 'Saved', filename
+    '''
 
     filename='boxstyles_data.json'
-    if isfile(filename):
-        with open(filename, 'r') as f:
-            json_boxstyles = json.load(f)
-    else:
+    if not isfile(filename):
         with open(filename, 'w') as f:
             json.dump(default_list_boxstyles, f)
         print 'Saved', filename
-        
+    
     filename='customboard_data.json'
-    if isfile(filename):
-        with open(filename, 'r') as f:
-            json_customstyles = json.load(f)
-    else:
+    if not isfile(filename):
+    #    with open(filename, 'r') as f:
+    #        json_customstyles = json.load(f)
+    #else:
         with open(filename, 'w') as f:
             json.dump(default_list_customboard, f)
         print 'Saved', filename
 
     filename='custom_signals_data.json'
-    if isfile(filename):
-        with open(filename, 'r') as f:
-            json_customsignals = json.load(f)
-    else:
+    if not isfile(filename):
+    #    with open(filename, 'r') as f:
+    #        json_customsignals = json.load(f)
+    #else:
         with open(filename, 'w') as f:
             json.dump(default_custom_signals, f)
         print 'Saved', filename

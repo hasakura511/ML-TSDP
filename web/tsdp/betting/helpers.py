@@ -356,7 +356,8 @@ def getAccountValues(refresh=False):
     # ib
     ib_equity = pd.read_sql('select * from ib_accountData where timestamp=\
                 (select max(timestamp) from ib_accountData) and Desc=\'NetLiquidation\'', \
-                            con=readConn, index_col='Desc')
+                            con=readConn, index_col='Desc').iloc[0].to_frame().transpose()
+    #print ib_equity
     timestamp = utc.localize(dt.utcfromtimestamp(ib_equity.timestamp)).astimezone(eastern)
     accountvalue = int(float(ib_equity.value[0]))
     accountvalues['v4futures'] = {
@@ -366,7 +367,7 @@ def getAccountValues(refresh=False):
 
     ib_urpnl = pd.read_sql('select * from ib_accountData where timestamp=\
                 (select max(timestamp) from ib_accountData) and Desc=\'UnrealizedPnL\' and currency=\'BASE\'', \
-                           con=readConn, index_col='Desc')
+                           con=readConn, index_col='Desc').iloc[0].to_frame().transpose()
     timestamp = utc.localize(dt.utcfromtimestamp(ib_urpnl.timestamp)).astimezone(eastern)
     urpnl = int(float(ib_urpnl.value[0]))
     urpnls['v4futures'] = {

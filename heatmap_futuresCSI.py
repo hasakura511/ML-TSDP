@@ -26,7 +26,7 @@ ib_contracts = pd.read_csv('./data/systems/ib_contracts.csv', index_col='CSIsym2
 
 debug=False
 
-if not debug:
+if debug:
     dataPath ='D:/ML-TSDP/data/csidata/v4futures2/'
     savePath =  'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     #pairPath='D:/ML-TSDP/data/csidata/v4futures/'

@@ -8,25 +8,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime as dt
 import time
-import sqlite3
-import re
-
 
 start_time = time.time()
-#with open('./data/futures.txt') as f:
-#    futures = f.read().splitlines()
-def getBackendDB():
-    dbPath = './data/futures.sqlite3'
-    readConn = sqlite3.connect(dbPath)
-    return readConn
-
-readConn = getBackendDB()
-
-ib_contracts = pd.read_csv('./data/systems/ib_contracts.csv', index_col='CSIsym2')
-
-debug=False
-
-if not debug:
+with open('./data/futures.txt') as f:
+    futures = f.read().splitlines()
+    
+if len(sys.argv)==1:
     dataPath ='D:/ML-TSDP/data/csidata/v4futures2/'
     savePath =  'C:/Users/Hidemi/Desktop/Python/TSDP/ml/data/results/' 
     #pairPath='D:/ML-TSDP/data/csidata/v4futures/'
@@ -38,8 +25,8 @@ else:
 lookback=1
 futuresMatrix=pd.DataFrame()
 files = [ f for f in listdir(dataPath) if isfile(join(dataPath,f)) ]
-#auxFutures = [x.split('_')[0] for x in files]
-auxFutures=ib_contracts.index
+auxFutures = [x.split('_')[0] for x in files]
+
 
 for contract in auxFutures:    
     #if 'F_'+contract+'.txt' in files and (ticker[0:3] in contract or ticker[3:6] in contract):
@@ -90,15 +77,7 @@ for contract in auxFutures:
         contract=contract.split('_')[0]
     futuresMatrix.set_value(contract,'Avg',futuresMatrix.ix[contract].dropna().mean())
     
-futuresMatrix=futuresMatrix.sort_values(by='Avg', ascending=False).drop('Avg', axis=1)
-futuresDict = pd.read_sql('select * from Dictionary', con=readConn,\
-                          index_col='CSIsym')
-
-desc_list =  futuresDict.ix[futuresMatrix.columns].Desc
-futuresMatrix.columns = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-desc_list =  futuresDict.ix[futuresMatrix.index].Desc
-futuresMatrix.index = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-
+futuresMatrix=futuresMatrix.sort_values(by='Avg', ascending=False)
 #rankByMean=futuresMatrix['Avg'].sort_values(ascending=False)
 
 #with open(savePath+'futures_1.html','w') as f:

@@ -758,6 +758,7 @@ for key in performance_dict_by_box:
         if key=='account_value':
             newdict[account+'_infotext']=performance_dict_by_box[key][account]['infotext']
         else:
+            print key, performance_dict_by_box[key][account]['infotext']
             newdict['infotext']=performance_dict_by_box[key][account]['infotext']
     if 'infotext2' in performance_dict_by_box[key][account]:
         newdict['infotext2']=performance_dict_by_box[key][account]['infotext2']        

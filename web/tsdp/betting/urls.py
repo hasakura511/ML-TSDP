@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^getrecords$', views.getrecords),
     url(r'^getmetadata$', views.getmetadata),
     url(r'^getaccountdata$', views.getaccountdata),
+    url(r'^getchartdata$', views.getchartdata),
     url(r'^$', views.board, name='board'),
     url(r'^login/$', views.login_view, name='login'),
     url(r'^logout/$', views.logout_view, name='logout'),

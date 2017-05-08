@@ -204,7 +204,7 @@ def getchartdata(request):
     returndata = getChartsDict()
     print(returndata)
     print 'getchartdata',len(returndata)
-    return HttpResponse(json.dumps(returndata))
+    return HttpResponse(json.dumps(returndata, sort_keys=True))
 
 def getcustomchip(request):
     if 'target' in request.GET:

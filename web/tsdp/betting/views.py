@@ -202,7 +202,7 @@ def getcustomsignals(request):
 
 def getchartdata(request):
     returndata = getChartsDict()
-    print(returndata)
+    #print(returndata)
     print 'getchartdata',len(returndata)
     return HttpResponse(json.dumps(returndata, sort_keys=True))
 

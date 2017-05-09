@@ -754,7 +754,7 @@ def get_blends(cloc, list_boxstyles=None, returnVotingComponents=True):
     for i in indices:
         key=list_boxstyles[i].keys()[0]
         list_boxstyles[i]={key: blendedboxstyleDict[key]}
-        print(list_boxstyles[i])
+        #print(list_boxstyles[i])
 
     #print(list_boxstyles)
     filename = 'boxstyles_data.json'

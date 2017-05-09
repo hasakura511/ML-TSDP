@@ -35,7 +35,8 @@ def addrecord(request):
         ##create new boxstyles json
         votingComponents=get_blends(cloc, list_boxstyles=list_boxstyles)
     else:
-        cloc = eval(UserSelection.objects.order_by('-timestamp').first().dic()['componentloc'])
+        #cloc = eval(UserSelection.objects.order_by('-timestamp').first().dic()['componentloc'])
+        cloc= json.loads(request.POST.get("componentloc"))
         print cloc
         votingComponents=get_blends(cloc)
 

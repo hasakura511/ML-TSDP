@@ -30,6 +30,8 @@ ALLOWED_HOSTS = [
     'globalsystemsmanagement.com',
     'www.globalsystemsmanagement.com',
 	'localhost',
+    'http://globalsystemsmanagement.com',
+    '0.0.0.0',
 ]
 
 

@@ -530,8 +530,8 @@ def recreateCharts(custom_signals=None, accountinfo=None):
         print 'Saved',filename
         
     #time.sleep(15)
-    #update_chartdb()
-    pass
+    update_chartdb()
+    #pass
 
 def get_detailed_timetable():
     active_symbols_ib = {

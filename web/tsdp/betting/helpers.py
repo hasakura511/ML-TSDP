@@ -65,7 +65,8 @@ def getChartsDict():
         df = pd.read_sql('select * from {}'.format(table), con=readConn)
         print table, 'index:', df.columns[0]
         df=df.set_index(str(df.columns[0]))
-        chart_table_dict[table]=df.to_dict()
+
+        chart_table_dict[table]=df.to_json()
     return chart_table_dict
 
 def getCustomizeChip(target=None):

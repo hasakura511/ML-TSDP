@@ -204,8 +204,22 @@ def getcustomsignals(request):
 def getchartdata(request):
     returndata = getChartsDict()
     #print(returndata)
-    print 'getchartdata',len(returndata)
-    return HttpResponse(json.dumps(returndata, sort_keys=True))
+    data = '{'
+    count = 1
+    count_len = len(returndata)
+    print count_len
+    for some_vars in returndata:
+        data += '"'
+        data += some_vars
+        data += '":'
+        data += returndata[some_vars]
+        if(count==count_len):
+            data += ''
+        else:
+            data += ','
+        count = count + 1
+    data += '}'
+    return HttpResponse(data)
 
 def getcustomchip(request):
     if 'target' in request.GET:

@@ -45,6 +45,10 @@ $(document).on('click', '.chart-pane-tab', function(event) {
           var anti_system = [];
           var benchmark = [];
           var cumper = [];
+
+          var anti_system_cum = [];
+          var benchmark_cum = [];
+
           var chart_title = '';
 
           if(tab_value==tab_value_index[2] + "K")
@@ -195,6 +199,16 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                       });
                   }
+                  if(l=='Anti-'+board_value+'_cumper')
+                  {
+                      anti_system_cum_val = 'Anti-'+ board_value+'_Cum %';
+                      $.each(this, function(k, v) {
+
+                      	  v = v + " %";
+                          anti_system_cum.push(v);
+
+                      });
+                  }
               }
              
               if(l=='benchmark')
@@ -202,6 +216,15 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                   $.each(this, function(k, v) {
 
                       benchmark.push(v);
+
+                  });
+              }
+              if(l=='benchmark_cumper')
+              {
+                  $.each(this, function(k, v) {
+
+                  	  v = v + " %";
+                      benchmark_cum.push(v);
 
                   });
               }
@@ -364,6 +387,15 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                       });
                   }
+                  if(l=='Anti-'+board_value+'_cumper')
+                  {
+                      anti_system_cum_val = 'Anti-'+ board_value+'_Cum %';
+                      $.each(this, function(k, v) {
+
+                          anti_system_cum.push(v);
+
+                      });
+                  }
               }
 
 
@@ -375,6 +407,15 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                   });
               }
+              if(l=='benchmark_cumper')
+              {
+                  $.each(this, function(k, v) {
+
+                      benchmark_cum.push(v);
+
+                  });
+              }
+
               if(l==board_value+"_cumper")
               {
                   $.each(this, function(k, v) {
@@ -532,6 +573,15 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                       });
                   }
+                  if(l=='Anti-'+board_value+'_cumper')
+                  {
+                      anti_system_cum_val = 'Anti-'+ board_value+'_Cum %';
+                      $.each(this, function(k, v) {
+
+                          anti_system_cum.push(v);
+
+                      });
+                  }
               }
 
               
@@ -540,6 +590,14 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                   $.each(this, function(k, v) {
 
                       benchmark.push(v);
+
+                  });
+              }
+              if(l=='benchmark_cumper')
+              {
+                  $.each(this, function(k, v) {
+
+                      benchmark_cum.push(v);
 
                   });
               }
@@ -678,6 +736,46 @@ $(document).on('click', '.chart-pane-tab', function(event) {
               "line-color":"#ff0000",
               "line-style":"line",
               "text": "Cum %",
+              "legend-item": {
+                "background-color": "#007790",
+                "borderRadius": "5",
+                "font-color": "white"
+                },
+                "marker": {
+                  "background-color": "#da534d",
+                  "border-width": 0,
+                  "shadow": 0 ,
+                  "border-color": "#faa39f"
+                },
+                "highlight-marker": {
+                  "size": 6,
+                  "background-color": "#da534d",
+                }
+              },
+              {"values":anti_system_cum,
+              "line-color":"#ff0000",
+              "line-style":"line",
+              "text": anti_system_cum_val,
+              "legend-item": {
+                "background-color": "#007790",
+                "borderRadius": "5",
+                "font-color": "white"
+                },
+                "marker": {
+                  "background-color": "#da534d",
+                  "border-width": 0,
+                  "shadow": 0 ,
+                  "border-color": "#faa39f"
+                },
+                "highlight-marker": {
+                  "size": 6,
+                  "background-color": "#da534d",
+                }
+              },
+              {"values":benchmark_cum,
+              "line-color":"#ff0000",
+              "line-style":"line",
+              "text": "Benchmark Cum %",
               "legend-item": {
                 "background-color": "#007790",
                 "borderRadius": "5",

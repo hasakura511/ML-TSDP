@@ -11,10 +11,21 @@ import pandas as pd
 import sqlite3
 import json
 import os
+import numpy as np
 from os.path import isfile, join
 #dbPath = '/tsdpWEB/tsdp/db.sqlite3'
 #readConn = sqlite3.connect(dbPath)
-
+class MyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(MyEncoder, self).default(obj)
+            
 def downloaddb(request):
     filepath = '/ml-tsdp/data/futures.sqlite3'
     return serve(request, os.path.basename(filepath), os.path.dirname(filepath))

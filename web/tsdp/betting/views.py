@@ -13,6 +13,8 @@ import json
 import os
 import numpy as np
 from os.path import isfile, join
+import sys
+
 #dbPath = '/tsdpWEB/tsdp/db.sqlite3'
 #readConn = sqlite3.connect(dbPath)
 class MyEncoder(json.JSONEncoder):
@@ -110,12 +112,25 @@ def getrecords(request):
         pass
         
     print '\n\njson_preformance\n',len(json_performance)
-    while len(json_performance) == 0:
+    if len(json_performance) == 0:
         print json_performance
+        from subprocess import Popen, PIPE, check_output, STDOUT
+        import datetime
+        fulltimestamp=datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')
+
+        with open('/logs/runserver_' + fulltimestamp + '.txt', 'w') as e:
+            with open('/logs/runserver_error_'+fulltimestamp+'.txt', 'w') as f:
+                #f.flush()
+                #e.flush()
+                proc = Popen(['python', 'manage.py','runserver','0.0.0.0:80','--noreload'], stdout=f, stderr=e)
+                #proc = Popen(['python', 'manage.py','runserver','0.0.0.0:80'], stderr=e)
+                #proc.wait()
+            
+        sys.exit('json_performance not loading')
         #filename = 'performance_data.json'
         #if isfile(filename):
-        with open(filename, 'r') as f:
-            json_performance = json.load(f)
+        #with open(filename, 'r') as f:
+        #    json_performance = json.load(f)
 
     #else:
     #    print filename, 'not found'

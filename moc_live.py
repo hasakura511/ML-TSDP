@@ -478,9 +478,10 @@ def create_execDict(feeddata, systemdata):
         contract.exchange = system['ibexch']
         contract.currency = system['ibcur']
         
-        print i+1, contract.symbol,
+        print i+1, contract.symbol, contract.expiry
         if downloadtt:
-            contractInfo=client.get_contract_details(contract)                
+            contractInfo=client.get_contract_details(contract)
+            #print contractInfo
             contractsDF=contractsDF.append(contractInfo)
             execDict[symbol+contractInfo.expiry[0]]=['PASS', 0, contract]
             systemdata.set_value(index, 'ibcontract', symbol+contractInfo.expiry[0])
@@ -725,7 +726,9 @@ def get_tradingHours(sym, contractsDF):
         triggertime = triggertimes
         
     thDict = {}
+    print sym, dates
     for th in dates:
+        print th
         thlist = th.split(':')
         date = thlist[0]
         if thlist[1] =='CLOSED':

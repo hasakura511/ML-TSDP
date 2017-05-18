@@ -1185,7 +1185,13 @@ if __name__ == "__main__":
                 sys.exit('failed 5 times to get contract info')
                 
     if refresh_timetable:
-        timetable = get_timetable(contractsDF)
+        try:
+            timetable = get_timetable(contractsDF)
+        except Exception as e:
+            #print e
+            slack.notify(text='get_timetable: '+str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
+            traceback.print_exc()
+                        
         print timetable.to_csv()
         ib_portfolio=get_ibfutpositions(portfolioPath)
         print ib_portfolio

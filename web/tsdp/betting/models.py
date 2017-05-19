@@ -38,17 +38,17 @@ class UserSelection(models.Model):
         with open(filename, 'w') as f:
             json.dump(default_accountinfo, f)
         print 'Saved', filename
-    '''
+    
     filename='performance_data.json'
     if isfile(filename):
         with open(filename, 'r') as f:
             json_performance = json.load(f)
-    else:
-        list_performance=[]
-        with open(filename, 'w') as f:
-            json.dump(list_performance, f)
-        print 'Saved', filename
-    '''
+    #else:
+    #    list_performance=[]
+    #    with open(filename, 'w') as f:
+    #        json.dump(list_performance, f)
+    #    print 'Saved', filename
+    
 
     filename='boxstyles_data.json'
     if not isfile(filename):

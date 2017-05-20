@@ -154,13 +154,14 @@ else:
 if debug:
     mode = 'replace'
     #marketList=[sys.argv[1]]
-    showPlots=True
+    showPlots=False
     dbPath='./data/futures.sqlite3' 
     dbPath2='./data/futures.sqlite3' 
     dbPathWeb = './web/tsdp/db.sqlite3'
     dbPathWebCharts = './web/tsdp/db_charts.sqlite3'
     dataPath='./data/csidata/v4futures2/'
-    savePath=jsonPath= './data/results/' 
+    savePath= './data/results/' 
+    jsonPath ='./web/tsdp/'
     pngPath = './data/results/' 
     feedfile='./data/systems/system_ibfeed.csv'
     #test last>old
@@ -551,7 +552,7 @@ for account in totals_accounts:
 
             if is_int(line):
                 text= 'Voting System consisting of '+', '.join(infodisplay[line])+'.'
-                #print line, text, filename2
+                print line, text, filename2
             else:
                 if 'Anti' in line and is_int(line.replace('Anti-','')):
                     text= 'Opposite signal of Voting '+line.replace('Anti-','')+'.'
@@ -656,14 +657,14 @@ for account in totals_accounts:
     simulated_moc_pnl=simulated_moc_values.copy()
     simulated_moc_values[0]=simulated_moc_values[0]+yaxis_values[0]
     simulated_moc_values=simulated_moc_values.cumsum()
-    simulated_moc_values_percent=np.insert(np.diff(simulated_moc_values).cumsum()/float(simulated_moc_values[0])*100,0,0)
-    
-    yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
-    
+    #simulated_moc_values_percent=np.insert(np.diff(simulated_moc_values).cumsum()/float(simulated_moc_values[0])*100,0,0)
+    simulated_moc_values_percent=pd.Series(simulated_moc_values).pct_change().fillna(0).values
+    #yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
+    y_axis_values_percent=pd.Series(yaxis_values).pct_change().fillna(0).values
     benchmark_values[0]=benchmark_values[0]+yaxis_values[0]
     benchmark_values=benchmark_values.cumsum()
-    benchmark_values_percent=np.insert(np.diff(benchmark_values).cumsum()/float(benchmark_values[0])*100,0,0)
-    
+    #benchmark_values_percent=np.insert(np.diff(benchmark_values).cumsum()/float(benchmark_values[0])*100,0,0)
+    benchmark_values_percent= pd.Series(benchmark_values).pct_change().fillna(0).values
     
     
     fig = plt.figure(figsize=(10,8))
@@ -688,12 +689,12 @@ for account in totals_accounts:
     ax.xaxis.set_minor_formatter(DateFormatter('%d'))
     DateFormatter('%b %d %Y')
     ax2 = ax.twinx()
-    ax2.plot(index, yaxis_values_percent, 'b', ls=':', alpha=0.5, label=account+' % cumulative change')
+    ax2.plot(index, yaxis_values_percent, 'b', ls=':', alpha=0.5, label=account+' daily % change')
     ax2.plot(index, benchmark_values_percent, alpha=0.4, color='r',ls=':',\
-                label=benchmark_sym+' benchmark % cumulative change')
+                label=benchmark_sym+' benchmark daily % change')
     ax2.plot(index, simulated_moc_values_percent, alpha=0.4, color='g',ls=':',\
-                label='Simulated MOC % cumulative change')
-    ax2.set_ylabel('Cumulative % Change', size=12)
+                label='Simulated MOC daily % change')
+    ax2.set_ylabel('% Change', size=12)
     ax.set_xlabel('MOC Date', size=12)
     #ax.set_xticklabels(xaxis_labels)
     plt.title(broker+' '+account+' Equity Chart '+str(lookback)+' day lookback', size=16)

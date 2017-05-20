@@ -660,7 +660,7 @@ for account in totals_accounts:
     #simulated_moc_values_percent=np.insert(np.diff(simulated_moc_values).cumsum()/float(simulated_moc_values[0])*100,0,0)
     simulated_moc_values_percent=pd.Series(simulated_moc_values).pct_change().fillna(0).values
     #yaxis_values_percent=np.insert(np.diff(yaxis_values).cumsum()/float(yaxis_values[0])*100,0,0)
-    y_axis_values_percent=pd.Series(yaxis_values).pct_change().fillna(0).values
+    yaxis_values_percent=pd.Series(yaxis_values).pct_change().fillna(0).values
     benchmark_values[0]=benchmark_values[0]+yaxis_values[0]
     benchmark_values=benchmark_values.cumsum()
     #benchmark_values_percent=np.insert(np.diff(benchmark_values).cumsum()/float(benchmark_values[0])*100,0,0)

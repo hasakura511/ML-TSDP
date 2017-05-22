@@ -751,13 +751,53 @@ function day1(test)
                 }
             }
 
+            console.log("test");
             var data  = [];
             var i = 0;
             count = 0;
+			identify_color = "#000000";
+            value_1_color = "#0B850C";
+            value_2_color = "#0000FF";
+            value_3_color = "#F7C143";
+
+            // console.log(board_value);
 
             $.each(rank, function(k,v) {
 
+            	i_color = "";
+            	identify_color = "#000000";
+            	value_1_color = "#0B850C";
+	            value_2_color = "#0000FF";
+	            value_3_color = "#F7C143";
+
             	v = rank_index(v);
+            	// console.log(v);
+
+            	if(board_value == v   ||   "Anti-" + board_value == v)
+            	{
+            		i_color = "#FF0000";
+            		if(btn_click == 1)
+            		{
+            			value_3_color = "#FF0000";
+            		}
+            		else if(btn_click == 2)
+            		{
+            			value_2_color = "#FF0000";
+            		}
+            		else if(btn_click == 3)
+            		{
+            			value_1_color = "#FF0000";
+            		}
+            	}
+
+            	if(v ==  "Previous"  	||  v ==  "Anti-Previous"  	|| v ==  "LowestEquity"	||  v ==  "AntiLowestEquity"||
+            	   v ==  "RiskOff"		||  v ==  "RiskOn"  		|| v ==  "Custom"		||  v ==  "Anti-Custom"  	||
+            	   v ==  "Seasonality"	||  v ==  "Anti-Seasonality"|| v ==  "HighestEquity"||  v ==  "AntiHighestEquity"||
+            	   v ==  "50/50"		||  v ==  "Anti50/50"  		|| v ==  "Off"			||  v ==  "on"  			||
+            	   v ==  "benchmark"  )
+            	{
+            		i_color = "#0000FF";
+            	}
 
             	if(btn_click == 1)
             	{
@@ -809,45 +849,58 @@ function day1(test)
 
 				if(check[0] == 0 && check[1] == 1 && check[2] == 2 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						},{
 							"start" : 0,	
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						}]
 					});
+					i_color = '';
 				}
 
 				else if(check[0] == 0 && check[1] == 2 && check[2] == 1 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						},{
 							"start" : 0,
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						}]
 					});
@@ -855,22 +908,28 @@ function day1(test)
 
 				else if(check[0] == 1 && check[1] == 0 && check[2] == 2 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						},{
 							"start" : 0,	
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						}]
 					});
@@ -878,22 +937,28 @@ function day1(test)
 
 				else if(check[0] == 1 && check[1] == 2 && check[2] == 0 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						},{
 							"start" : 0,
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						}]
 					});
@@ -901,22 +966,28 @@ function day1(test)
 
 				else if(check[0] == 2 && check[1] == 0 && check[2] == 1 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						}]
 					});
@@ -924,22 +995,28 @@ function day1(test)
 
 				else if(check[0] == 2 && check[1] == 1 && check[2] == 0 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						}]
 					});
@@ -947,6 +1024,8 @@ function day1(test)
 
                 i = i + 1;
             });
+			
+			console.log(test);
 
             var d = new Date();
             rank_startdate = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
@@ -971,49 +1050,65 @@ function day1(test)
             
 
             var chart = AmCharts.makeChart( "ranking_chart", {
-                "type": "gantt",
-                "theme": "none",
-                "titles": [{
-                    "text": rank_title,
-                    "size": 16
-                }],
-                "marginRight": 70,
-                "columnWidth": 1,
-                "valueAxis": {
-                    "type": "number"
-                },
-                "brightnessStep": 10,
-                "graph": {
-                    "fillAlphas": 4,
-                    "balloonText": "Series '[[task]] Lookback Point [[v]]<br>Value:[[value]]",
-                    "pointerWidth": 50,
-                },
-                "rotate": true,
-                "categoryField": "category",
-                "segmentsField": "segments",
-                "colorField": "color",
-                "startDate": "2015-01-01",
-                "startField": "start",
-                "endField": "end",
-                "durationField": "duration",
-                "dataProvider": data,
-                "valueScrollbar": {
-                    "autoGridCount":true
-                },
-                "chartCursor": {
-                    "cursorColor":"#55bb76",
-                    "valueBalloonsEnabled": false,
-                    "cursorAlpha": 0,
-                    "valueLineAlpha":0.5,
-                    "valueLineBalloonEnabled": true,
-                    "valueLineEnabled": true,
-                    "zoomable":false,
-                    "valueZoomable":true
-                },  
-                "export": {
-                    "enabled": true
-                }
-            } );
+				"type": "gantt",
+				"theme": "none",
+				"titles": [{
+					"text": rank_title,
+					"size": 16
+				}],
+				"marginRight": 70,
+				"columnWidth": 1,
+				"valueAxis": {
+					"type": "number"
+				},
+				"brightnessStep": 10,
+				"graph": {
+					"fillAlphas": 4,
+					"balloonText": "Series '[[task]] Lookback Point [[v]]<br>Value:[[value]]",
+          			"pointerWidth": 50,
+				},
+				"rotate": true,
+				"addClassNames": true,
+				"categoryField": "category",
+				"segmentsField": "segments",
+				"colorField": "colors",
+				"startDate": "2015-01-01",
+				"startField": "start",
+				"endField": "end",
+				"durationField": "duration",
+			    "listeners": [{
+				    "event": "resized",
+				    "method": updateLabels
+			    }],
+				"dataProvider": data,
+				"chartCursor": {
+					"cursorColor":"#55bb76",
+					"valueBalloonsEnabled": false,
+					"cursorAlpha": 0,
+					"valueLineAlpha":0.5,
+					"valueLineBalloonEnabled": true,
+					"valueLineEnabled": true,
+					"zoomable":false,
+					"valueZoomable":true
+				},  
+				"export": {
+					"enabled": true
+				}
+			} );
+
+			function updateLabels(event) { 
+	          	var labels = event.chart.chartDiv.getElementsByClassName("amcharts-axis-label");
+	          	// console.log(labels.length);
+
+	          	for (var i = 0; i < (labels.length); i++) {
+	            	var color = event.chart.dataProvider[i].color; 
+	            	// console.log(labels[i]);
+	            	// console.log(color);
+			            if (color !== undefined)  { 
+			              	labels[i].setAttribute("fill", color);
+			            }
+	          	}
+	        }
 
 
             /* ------------------
@@ -2017,13 +2112,37 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                 });
 			}
 
+			console.log("test");
 			var data  = [];
             var i = 0;
             count = 0;
+            identify_color = "#000000";
+            value_1_color = "#0B850C";
+            value_2_color = "#0000FF";
+            value_3_color = "#F7C143";
 
             $.each(rank, function(k,v) {
 
+            	i_color = "";
+            	identify_color = "#000000";
+            	value_1_color = "#0B850C";
+
             	v = rank_index(v);
+
+            	if(board_value == v   ||   "Anti-" + board_value == v)
+            	{
+            		i_color = "#FF0000";
+            		value_1_color = "#FF0000";
+            	}
+
+            	if(v ==  "Previous"  	||  v ==  "Anti-Previous"  	|| v ==  "LowestEquity"	||  v ==  "AntiLowestEquity"||
+            	   v ==  "RiskOff"		||  v ==  "RiskOn"  		|| v ==  "Custom"		||  v ==  "Anti-Custom"  	||
+            	   v ==  "Seasonality"	||  v ==  "Anti-Seasonality"|| v ==  "HighestEquity"||  v ==  "AntiHighestEquity"||
+            	   v ==  "50/50"		||  v ==  "Anti50/50"  		|| v ==  "Off"			||  v ==  "on"  			||
+            	   v ==  "benchmark"  )
+            	{
+            		i_color = "#0000FF";
+            	}
 
             	if(btn_click == 3)
             	{
@@ -2051,45 +2170,58 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 			
 				if(check[0] == 0 && check[1] == 1 && check[2] == 2 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						},{
 							"start" : 0,	
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						}]
 					});
+					i_color = '';
 				}
 
 				else if(check[0] == 0 && check[1] == 2 && check[2] == 1 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						},{
 							"start" : 0,
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						}]
 					});
@@ -2097,22 +2229,28 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
 				else if(check[0] == 1 && check[1] == 0 && check[2] == 2 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						},{
 							"start" : 0,	
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						}]
 					});
@@ -2120,22 +2258,28 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
 				else if(check[0] == 1 && check[1] == 2 && check[2] == 0 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						},{
 							"start" : 0,
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						}]
 					});
@@ -2143,22 +2287,28 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
 				else if(check[0] == 2 && check[1] == 0 && check[2] == 1 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						}]
 					});
@@ -2166,22 +2316,28 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
 				else if(check[0] == 2 && check[1] == 1 && check[2] == 0 )
 				{
+					if(i_color !== '')
+					{
+						identify_color = i_color;
+					}
+
 					data.push({
 						"category" : v,
+						"color" : identify_color,
 						"segments" : [{
 							"start" : 0,
 							"end" : value_3[i],
-							"color" : "#F7C143",
+							"colors" : value_3_color,
 							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],
-							"color" : "#0000ff",
+							"colors" : value_2_color,
 							"task": "5Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
-							"color" : "#0B850C",
+							"colors" : value_1_color,
 							"task": "20Day"
 						}]
 					});
@@ -2190,7 +2346,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                 i = i + 1;
             });
 
-			// console.log(data);
+			// console.log(data.length);
 
 			var d = new Date();
 			rank_startdate = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
@@ -2231,17 +2387,19 @@ $(document).on('click', '.chart-pane-tab', function(event) {
           			"pointerWidth": 50,
 				},
 				"rotate": true,
+				"addClassNames": true,
 				"categoryField": "category",
 				"segmentsField": "segments",
-				"colorField": "color",
+				"colorField": "colors",
 				"startDate": "2015-01-01",
 				"startField": "start",
 				"endField": "end",
 				"durationField": "duration",
+			    "listeners": [{
+				    "event": "resized",
+				    "method": updateLabels
+			    }],
 				"dataProvider": data,
-				"valueScrollbar": {
-					"autoGridCount":true
-				},
 				"chartCursor": {
 					"cursorColor":"#55bb76",
 					"valueBalloonsEnabled": false,
@@ -2256,6 +2414,18 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 					"enabled": true
 				}
 			} );
+
+			function updateLabels(event) { 
+	          	var labels = event.chart.chartDiv.getElementsByClassName("amcharts-axis-label");
+	          	// console.log(labels.length);
+
+	          	for (var i = 0; i < (labels.length - 5); i++) {
+	            	var color = event.chart.dataProvider[i].color; 
+			            if (color !== undefined)  { 
+			              	labels[i].setAttribute("fill", color);
+			            }
+	          	}
+	        }
 
 			/* ------------------
 			---------------------

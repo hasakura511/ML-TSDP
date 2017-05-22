@@ -20,6 +20,1015 @@ $(document).on('click', '.chart-button', function(event) {
         tab_value_index[i] = arr[i];
 
 });
+function indexOf(arr) {
+	var len = arr.length;
+	var indices = new Array(len);
+	for (var i = 0; i < len; ++i) indices[i] = i;
+	indices.sort(function (a, b) { return arr[a] < arr[b] ? -1 : arr[a] > arr[b] ? 1 : 0; });
+
+    return indices.reverse();
+}
+
+function sortObject(obj) {
+    var arr = [];
+    var prop;
+    for (prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            arr.push({
+                'key': prop,
+                'value': obj[prop]
+            });
+        }
+    }
+    arr.sort(function(a, b) {
+        return a.value - b.value;
+    });
+    return arr; // returns array
+}
+
+function rank_index(str)
+{
+	var search1 = str.search("k");
+	var res1 = str.substr(search1+2);
+
+	return res1;
+}
+
+function day1(test)
+{
+
+
+    var board_value = $('.chart-title-text').html();
+    board_value=board_value.split(":");
+    board_value=board_value[1].replace(/\s+/g, '');
+
+    var tab_value=$('.chart-pane-tab-on').text();
+    tab_value = tab_value.replace(/\s+/g, '');
+
+
+
+    var anti_val = '';
+
+    $.ajax
+    ({
+        url: '/getchartdata',
+        type: 'get',
+        dataType: 'json', // added data type
+        success: function(result)
+        {
+
+          var date = [];
+          var system = [];
+          var anti_system = [];
+          var benchmark = [];
+          var cumper = [];
+
+          var anti_system_cum = [];
+          var benchmark_cum = [];
+
+          var chart_title = '';
+          
+  			/* ------------------
+            ---------------------
+            Ranking Chart
+            ---------------------
+            --------------------- */
+      
+            var rank = [];
+            var value_1 = [];
+            var value_2 = [];
+            var value_3 = [];
+            btn_click = 0;
+            // var date_len = date.length-1;
+
+            if(tab_value==tab_value_index[2] + "K")
+            {
+                $.each(result.v4micro_performance, function(l,m) {
+                  if(l==board_value)
+                  {
+                      $.each(this, function(k, v) {
+
+                          date.push(k);
+                          system.push(v);
+
+                      });
+                  }
+                });
+                var rank_title = "v4micro " + board_value + " ‘Ranking from’ " + date[0] + " to " + date[date.length-1]; 
+
+                if(test==1)
+                {
+                	btn_click = 1;
+                    var day1 = sortObject(result.v4micro_ranking['1Day Lookback']);
+
+                    var day5 = result.v4micro_ranking['5Day Lookback'];
+
+                    var day20 = result.v4micro_ranking['20Day Lookback'];
+
+                    $.each(day1, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                            {
+
+
+                                if(vv==0)
+                                {
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+
+                                    value_3.push(v);
+                                    vv=0;                                    
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day5, function(o, p) {
+                        	if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+                                  	value_2.push(p);
+                                }
+
+                            }
+                        });
+
+                        $.each(day20, function(o, p) {
+                        	if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+                                	value_1.push(p);
+								}
+                            }
+
+                        });
+                    });
+                }
+                 else if(test==5)
+                {
+                	btn_click = 2;
+                    var day5 = sortObject(result.v4micro_ranking['5Day Lookback']);
+
+                    var day20 = result.v4micro_ranking['20Day Lookback'];
+
+                    var day1 = result.v4micro_ranking['1Day Lookback'];
+
+                    $.each(day5, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                            {
+                                if(vv==0)
+                                {
+                                    
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+                                    
+                                    value_2.push(v);
+                                    vv=0;
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day20, function(o, p) {
+
+                        	if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+	                                
+	                                value_1.push(p);
+
+	                            }
+	                        }
+                        });
+
+                        $.each(day1, function(o, p) {
+                        	if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+	                                
+	                                value_3.push(p);
+
+	                            }
+	                        }
+
+                        });
+                    });
+                }
+
+                else if(test==20)
+                {
+                	btn_click = 3;
+                    var day20 = sortObject(result.v4micro_ranking['20Day Lookback']);
+
+                    var day5 = result.v4micro_ranking['5Day Lookback'];
+
+                    var day1 = result.v4micro_ranking['1Day Lookback'];
+
+                    $.each(day20, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                            {
+                                if(vv==0)
+                                {
+                                    
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+                                    
+                                    value_1.push(v);
+                                    vv=0;
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day5, function(o, p) {
+                        	if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                value_2.push(p);
+
+	                            }
+	                        }
+                        });
+
+                        $.each(day1, function(o, p) {
+                        	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_3.push(p);
+
+	                            }
+	                        }
+
+                        });
+                    });
+                }
+            }
+            else if(tab_value==tab_value_index[1] + "K")
+            {
+                $.each(result.v4mini_performance, function(l,m) {
+                  if(l==board_value)
+                  {
+                      $.each(this, function(k, v) {
+
+                          date.push(k);
+                          system.push(v);
+
+                      });
+                  }
+                });
+                var rank_title = "v4mini " + board_value + " ‘Ranking from’ " + date[0] + " to " + date[date.length-1]; 
+
+                if(test==1)
+                {
+                	btn_click = 1;
+                    var day1 = sortObject(result.v4mini_ranking['1Day Lookback']);
+
+                    var day5 = result.v4mini_ranking['5Day Lookback'];
+
+                    var day20 = result.v4mini_ranking['20Day Lookback'];
+
+                    $.each(day1, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+                                if(vv==0)
+                                {
+                                    
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+                                    
+                                    value_3.push(v);
+                                    vv=0;
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day5, function(o, p) {
+                        	if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_2.push(p);
+
+	                            }
+	                        }
+                        });
+
+                        $.each(day20, function(o, p) {
+                        	if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_1.push(p);
+
+	                            }
+	                        }
+
+                        });
+                    });
+                }
+                 else if(test==5)
+                {
+                	btn_click = 2;
+                    var day5 = sortObject(result.v4mini_ranking['5Day Lookback']);
+
+                    var day20 = result.v4mini_ranking['20Day Lookback'];
+
+                    var day1 = result.v4mini_ranking['1Day Lookback'];
+
+                    $.each(day5, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+                                if(vv==0)
+                                {
+                                    
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+                                    
+                                    value_2.push(v);
+                                    vv=0;
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day20, function(o, p) {
+                        	if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_1.push(p);
+
+	                            }
+	                        }
+                        });
+
+                        $.each(day1, function(o, p) {
+                        	if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_3.push(p);
+
+	                            }
+	                        }
+
+                        });
+                    });
+                }
+
+                else if(test==20)
+                {
+                	btn_click = 3;
+                    var day20 = sortObject(result.v4mini_ranking['20Day Lookback']);
+
+                    var day5 = result.v4mini_ranking['5Day Lookback'];
+
+                    var day1 = result.v4mini_ranking['1Day Lookback'];
+
+                    $.each(day20, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+                                if(vv==0)
+                                {
+                                    
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+                                    
+                                    value_1.push(v);
+                                    vv=0;
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day5, function(o, p) {
+                        	if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_2.push(p);
+
+	                            }
+	                        }
+                        });
+
+                        $.each(day1, function(o, p) {
+                        	if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_3.push(p);
+
+	                            }
+	                        }
+
+                        });
+                    });
+                }
+            }
+            
+            else if(tab_value==tab_value_index[0] + "K")
+            {
+                $.each(result.v4mini_performance, function(l,m) {
+                  if(l==board_value)
+                  {
+                      $.each(this, function(k, v) {
+
+                          date.push(k);
+                          system.push(v);
+
+                      });
+                  }
+                });   
+                var rank_title = "v4futures " + board_value + " ‘Ranking from’ " + date[0] + " to " + date[date.length-1]; 
+
+                if(test==1)
+                {
+                	btn_click = 1;
+                    var day1 = sortObject(result.v4futures_ranking['1Day Lookback']);
+
+                    var day5 = result.v4futures_ranking['5Day Lookback'];
+
+                    var day20 = result.v4futures_ranking['20Day Lookback'];
+
+                    $.each(day1, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+                                if(vv==0)
+                                {
+                                    
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+                                    
+                                    value_3.push(v);
+                                    vv=0;
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day5, function(o, p) {
+                        	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_2.push(p);
+
+	                            }
+	                        }
+                        });
+
+                        $.each(day20, function(o, p) {
+                        	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_1.push(p);
+
+	                            }
+	                        }
+
+                        });
+                    });
+                }
+                 else if(test==5)
+                {
+                	btn_click = 2;
+                    var day5 = sortObject(result.v4futures_ranking['5Day Lookback']);
+
+                    var day20 = result.v4futures_ranking['20Day Lookback'];
+
+                    var day1 = result.v4futures_ranking['1Day Lookback'];
+
+                    $.each(day5, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+                                if(vv==0)
+                                {
+                                    
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+                                    
+                                    value_2.push(v);
+                                    vv=0;
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day20, function(o, p) {
+                        	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_1.push(p);
+
+	                            }
+	                        }
+                        });
+
+                        $.each(day1, function(o, p) {
+                        	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_3.push(p);
+
+	                            }
+	                        }
+
+                        });
+                    });
+                }
+
+                else if(test==20)
+                {
+                	btn_click = 3;
+                    var day20 = sortObject(result.v4futures_ranking['20Day Lookback']);
+
+                    var day5 = result.v4futures_ranking['5Day Lookback'];
+
+                    var day1 = result.v4futures_ranking['1Day Lookback'];
+
+                    $.each(day20, function(l,m) {
+
+                        var vv=0;
+                        $.each(this, function(k, v) {
+
+                            if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+                                if(vv==0)
+                                {
+                                    
+                                    rank.push(v);
+                                    vv=vv+1;
+
+                                }
+                                else
+                                {
+                                    
+                                    value_1.push(v);
+                                    vv=0;
+
+                                }   
+                            }
+                        });
+                    });
+
+                 
+                    $.each(rank, function(k, v) {
+                           
+                        $.each(day5, function(o, p) {
+                        	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_2.push(p);
+
+	                            }
+	                        }
+                        });
+
+                        $.each(day1, function(o, p) {
+                        	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+                            {
+
+	                            if(o==v)
+	                            {
+
+	                                
+	                                  value_3.push(p);
+
+	                            }
+	                        }
+
+                        });
+                    });
+                }
+            }
+
+            var data  = [];
+            var i = 0;
+            count = 0;
+
+            $.each(rank, function(k,v) {
+
+            	v = rank_index(v);
+
+            	if(btn_click == 1)
+            	{
+            		if(value_3[i] == value_3[i-1])
+            		{
+            			v = v + " (" + count + ")";
+            		}
+            		else
+            		{
+            			count = count + 1;
+            			v = v + " (" + count + ")";            			
+            		}
+            	}
+            	else if(btn_click == 2)
+            	{
+            		if(value_2[i] == value_2[i-1])
+            		{
+            			v = v + " (" + count + ")";
+            		}
+            		else
+            		{
+            			count = count + 1;
+            			v = v + " (" + count + ")";            			
+            		}
+            	}
+            	else if(btn_click == 3)
+            	{
+            		if(value_1[i] == value_1[i-1])
+            		{
+            			v = v + " (" + count + ")";
+            		}
+            		else
+            		{
+            			count = count + 1;
+            			v = v + " (" + count + ")";            			
+            		}
+            	}
+
+            	if(value_1[i]<0 || value_2[i]<0 || value_3[i]<0 )
+            	{
+            		v1 = Math.abs(value_1[i])
+            		v2 = Math.abs(value_2[i])
+            		v3 = Math.abs(value_3[i])
+            	}
+
+            	var arr = [v1,v2,v3];
+
+				var check = indexOf(arr);
+
+				if(check[0] == 0 && check[1] == 1 && check[2] == 2 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						},{
+							"start" : 0,
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						},{
+							"start" : 0,	
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 0 && check[1] == 2 && check[2] == 1 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						},{
+							"start" : 0,
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						},{
+							"start" : 0,	
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 1 && check[1] == 0 && check[2] == 2 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						},{
+							"start" : 0,
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						},{
+							"start" : 0,	
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 1 && check[1] == 2 && check[2] == 0 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						},{
+							"start" : 0,
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						},{
+							"start" : 0,	
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 2 && check[1] == 0 && check[2] == 1 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						},{
+							"start" : 0,
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						},{
+							"start" : 0,	
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 2 && check[1] == 1 && check[2] == 0 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						},{
+							"start" : 0,
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						},{
+							"start" : 0,	
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						}]
+					});
+				}
+
+                i = i + 1;
+            });
+
+            var d = new Date();
+            rank_startdate = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
+            rank_enddate = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();;
+
+
+            AmCharts.addInitHandler( function ( chart ) {
+
+
+                // set base values
+                var categoryWidth = 25;
+                  
+                // calculate bottom margin based on number of data points
+                var chartHeight = categoryWidth * chart.dataProvider.length;
+                
+                // set the value
+                chart.div.style.height = chartHeight + 'px';
+        
+            }, ['gantt'] );
+            
+
+            
+
+            var chart = AmCharts.makeChart( "ranking_chart", {
+                "type": "gantt",
+                "theme": "none",
+                "titles": [{
+                    "text": rank_title,
+                    "size": 16
+                }],
+                "marginRight": 70,
+                "columnWidth": 1,
+                "valueAxis": {
+                    "type": "number"
+                },
+                "brightnessStep": 10,
+                "graph": {
+                    "fillAlphas": 4,
+                    "balloonText": "Series '[[task]] Lookback Point [[v]]<br>Value:[[value]]",
+                    "pointerWidth": 50,
+                },
+                "rotate": true,
+                "categoryField": "category",
+                "segmentsField": "segments",
+                "colorField": "color",
+                "startDate": "2015-01-01",
+                "startField": "start",
+                "endField": "end",
+                "durationField": "duration",
+                "dataProvider": data,
+                "valueScrollbar": {
+                    "autoGridCount":true
+                },
+                "chartCursor": {
+                    "cursorColor":"#55bb76",
+                    "valueBalloonsEnabled": false,
+                    "cursorAlpha": 0,
+                    "valueLineAlpha":0.5,
+                    "valueLineBalloonEnabled": true,
+                    "valueLineEnabled": true,
+                    "zoomable":false,
+                    "valueZoomable":true
+                },  
+                "export": {
+                    "enabled": true
+                }
+            } );
+
+
+            /* ------------------
+            ---------------------
+            Ranking Chart Done
+            ---------------------
+            --------------------- */
+
+
+        }
+    });
+
+}
+
+
 
 
 $(document).on('click', '.chart-pane-tab', function(event) {
@@ -50,6 +1059,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
           var benchmark_cum = [];
 
           var chart_title = '';
+          btn_click = 3;
 
           if(tab_value==tab_value_index[2] + "K")
           {
@@ -83,6 +1093,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+
+                 anti_system_cum_val = board_value+'_Cum %';
+                      $.each(this, function(k, v) {
+
+                          anti_system_cum.push(v);
+
+                      });
               }
 
 
@@ -629,8 +1646,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
           var max = Math.max(max_system, max_anti_system, max_benchmark);
           var min = Math.min(min_system, min_anti_system, min_benchmark);
           
-          max = max + 5000;
-          min = min - 5000;
+          max = Math.round(max) + 5000;
+    	  min = Math.round(min) - 5000;
 
           var tot='';
           tot+=min.toString();
@@ -836,6 +1853,416 @@ $(document).on('click', '.chart-pane-tab', function(event) {
             id: 'performance_chart',
             data: myConfig,
           });
+
+
+			/* ------------------
+			---------------------
+			Ranking Chart
+			---------------------
+			--------------------- */
+
+			var rank = [];
+			var value_1 = [];
+			var value_2 = [];
+			var value_3 = [];
+			var date_len = date.length-1;
+
+
+			if(tab_value==tab_value_index[2] + "K")
+			{
+				var rank_title = "v4micro " + board_value + " Ranking from’ " + date[0] + " to " + date[date_len];
+				$.each(result.v4micro_ranking, function(l,m) {
+					if(l=='20Day Lookback')
+					{
+						$.each(this, function(k, v) {
+
+			                if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+			                {
+								rank.push(k);
+								value_1.push(v); 
+			                }
+						});
+					}
+					if(l=='5Day Lookback')
+					{
+						$.each(this, function(k, v) {
+
+			                if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+			                {
+						       value_2.push(v);
+			                }
+
+						});
+					}
+					if(l=='1Day Lookback')
+					{
+						$.each(this, function(k, v) {
+
+			                if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+			                {
+						       value_3.push(v);
+			                }
+
+						});
+					}
+				});
+			}
+			else if(tab_value==tab_value_index[1] + "K")
+			{         
+				var rank_title = "v4mini " + board_value + " ‘Ranking from’ " + date[0] + " to " + date[date_len];
+				$.each(result.v4mini_ranking, function(l,m) {
+					if(l=='20Day Lookback')
+		          	{
+			            $.each(this, function(k, v) {
+
+			                if(k!='-4 Rank RiskOff' && k!='3 Rank RiskOn')
+			                {
+			                    rank.push(k);
+			                    value_1.push(v);
+                              
+			                }
+
+			            });
+		          	}
+		          	if(l=='5Day Lookback')
+			            {
+			              	$.each(this, function(k, v) {
+
+			                if(k!='-4 Rank RiskOff' && k!='3 Rank RiskOn')
+			                {
+			                     value_2.push(v);
+			                }
+
+			            });
+		          	}
+		          	if(l=='1Day Lookback')
+		          	{
+			            $.each(this, function(k, v) {
+
+			                if(k!='-4 Rank RiskOff' && k!='3 Rank RiskOn')
+			                {
+			                     value_3.push(v);
+			                }
+
+			            });
+		          	}
+				});
+			}
+			else if(tab_value==tab_value_index[0] + "K")
+			{      
+				var rank_title = "v4futures " + board_value + " ‘Ranking from’ " + date[0] + " to " + date[date_len]; 
+                
+                var day20 = sortObject(result.v4futures_ranking['20Day Lookback']);
+
+                var day5 = result.v4futures_ranking['5Day Lookback'];
+
+                var day1 = result.v4futures_ranking['1Day Lookback'];
+    
+				$.each(day20, function(l,m) {
+
+                    var vv=0;
+    	            $.each(this, function(k, v) {
+
+    	                if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+    	                {
+                            if(vv==0)
+                            {
+                                
+                                rank.push(v);
+                                vv=vv+1;
+
+                            }
+                            else
+                            {
+                                
+                                value_1.push(v);
+                                vv=0;
+
+                            }   
+    	                }
+    	            });
+				});
+
+             
+                $.each(rank, function(k, v) {
+                       
+                    $.each(day5, function(o, p) {
+                    	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+    	                {
+
+	                        if(o==v)
+	                        {
+
+	                            
+	                              value_2.push(p);
+
+	                        }
+	                    }
+                    });
+
+                    $.each(day1, function(o, p) {
+                    	if(k!='-20 Rank RiskOff' && k!='20 Rank RiskOn')
+    	                {
+
+	                        if(o==v)
+	                        {
+
+	                            
+	                              value_3.push(p);
+
+	                        }
+	                    }
+
+                    });
+                });
+			}
+
+			var data  = [];
+            var i = 0;
+            count = 0;
+
+            $.each(rank, function(k,v) {
+
+            	v = rank_index(v);
+
+            	if(btn_click == 3)
+            	{
+            		if(value_1[i] == value_1[i-1])
+            		{
+            			v = v + " (" + count + ")";
+            		}
+            		else
+            		{
+            			count = count + 1;
+            			v = v + " (" + count + ")";            			
+            		}
+            	}
+
+            	if(value_1[i]<0 || value_2[i]<0 || value_3[i]<0 )
+            	{
+            		v1 = Math.abs(value_1[i])
+            		v2 = Math.abs(value_2[i])
+            		v3 = Math.abs(value_3[i])
+            	}
+
+            	var arr = [v1,v2,v3];
+
+				var check = indexOf(arr);
+			
+				if(check[0] == 0 && check[1] == 1 && check[2] == 2 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						},{
+							"start" : 0,
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						},{
+							"start" : 0,	
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 0 && check[1] == 2 && check[2] == 1 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						},{
+							"start" : 0,
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						},{
+							"start" : 0,	
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 1 && check[1] == 0 && check[2] == 2 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						},{
+							"start" : 0,
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						},{
+							"start" : 0,	
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 1 && check[1] == 2 && check[2] == 0 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						},{
+							"start" : 0,
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						},{
+							"start" : 0,	
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 2 && check[1] == 0 && check[2] == 1 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						},{
+							"start" : 0,
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						},{
+							"start" : 0,	
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						}]
+					});
+				}
+
+				else if(check[0] == 2 && check[1] == 1 && check[2] == 0 )
+				{
+					data.push({
+						"category" : v,
+						"segments" : [{
+							"start" : 0,
+							"end" : value_3[i],
+							"color" : "#F7C143",
+							"task": "2Day"
+						},{
+							"start" : 0,
+							"end" : value_2[i],
+							"color" : "#0000ff",
+							"task": "5Day"
+						},{
+							"start" : 0,	
+							"end" : value_1[i],
+							"color" : "#0B850C",
+							"task": "20Day"
+						}]
+					});
+				}
+
+                i = i + 1;
+            });
+
+			// console.log(data);
+
+			var d = new Date();
+			rank_startdate = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
+			rank_enddate = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();;
+
+
+    		AmCharts.addInitHandler( function ( chart ) {
+
+		        // set base values
+		        var categoryWidth = 25;
+		          
+		        // calculate bottom margin based on number of data points
+		        var chartHeight = categoryWidth * chart.dataProvider.length;
+
+		        chart.div.style.height = chartHeight + 'px';
+        
+      		}, ['gantt'] );
+			
+
+			
+
+			var chart = AmCharts.makeChart( "ranking_chart", {
+				"type": "gantt",
+				"theme": "none",
+				"titles": [{
+					"text": rank_title,
+					"size": 16
+				}],
+				"marginRight": 70,
+				"columnWidth": 1,
+				"valueAxis": {
+					"type": "number"
+				},
+				"brightnessStep": 10,
+				"graph": {
+					"fillAlphas": 4,
+					"balloonText": "Series '[[task]] Lookback Point [[v]]<br>Value:[[value]]",
+          			"pointerWidth": 50,
+				},
+				"rotate": true,
+				"categoryField": "category",
+				"segmentsField": "segments",
+				"colorField": "color",
+				"startDate": "2015-01-01",
+				"startField": "start",
+				"endField": "end",
+				"durationField": "duration",
+				"dataProvider": data,
+				"valueScrollbar": {
+					"autoGridCount":true
+				},
+				"chartCursor": {
+					"cursorColor":"#55bb76",
+					"valueBalloonsEnabled": false,
+					"cursorAlpha": 0,
+					"valueLineAlpha":0.5,
+					"valueLineBalloonEnabled": true,
+					"valueLineEnabled": true,
+					"zoomable":false,
+					"valueZoomable":true
+				},  
+				"export": {
+					"enabled": true
+				}
+			} );
+
+			/* ------------------
+			---------------------
+			Ranking Chart finish
+			---------------------
+			--------------------- */
+
         }
     });
 });

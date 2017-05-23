@@ -41,7 +41,7 @@ function sortObject(obj) {
         }
     }
     arr.sort(function(a, b) {
-        return a.value - b.value;
+        return b.value - a.value;
     });
     return arr; // returns array
 }
@@ -751,14 +751,14 @@ function day1(test)
                 }
             }
 
-            console.log("test");
+            // console.log("test");
             var data  = [];
             var i = 0;
             count = 0;
 			identify_color = "#000000";
-            value_1_color = "#0B850C";
-            value_2_color = "#0000FF";
-            value_3_color = "#F7C143";
+            value_1_color = "#0000FF";
+            value_2_color = "#F7C143";
+            value_3_color = "#0B850C";
 
             // console.log(board_value);
 
@@ -766,9 +766,9 @@ function day1(test)
 
             	i_color = "";
             	identify_color = "#000000";
-            	value_1_color = "#0B850C";
-	            value_2_color = "#0000FF";
-	            value_3_color = "#F7C143";
+            	value_1_color = "#0000FF";
+	            value_2_color = "#F7C143";
+	            value_3_color = "#0B850C";
 
             	v = rank_index(v);
             	// console.log(v);
@@ -871,7 +871,7 @@ function day1(test)
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						}]
 					});
 					i_color = '';
@@ -896,7 +896,7 @@ function day1(test)
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
@@ -930,7 +930,7 @@ function day1(test)
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						}]
 					});
 				}
@@ -954,7 +954,7 @@ function day1(test)
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
@@ -978,7 +978,7 @@ function day1(test)
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
@@ -1007,7 +1007,7 @@ function day1(test)
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],
@@ -1025,7 +1025,7 @@ function day1(test)
                 i = i + 1;
             });
 			
-			console.log(test);
+			// console.log(test);
 
             var d = new Date();
             rank_startdate = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
@@ -1077,6 +1077,9 @@ function day1(test)
 				"endField": "end",
 				"durationField": "duration",
 			    "listeners": [{
+					"event": "rendered",
+					"method": updateLabels
+					},{
 				    "event": "resized",
 				    "method": updateLabels
 			    }],
@@ -1098,12 +1101,12 @@ function day1(test)
 
 			function updateLabels(event) { 
 	          	var labels = event.chart.chartDiv.getElementsByClassName("amcharts-axis-label");
-	          	// console.log(labels.length);
+	          	console.log(data.length);
 
-	          	for (var i = 0; i < (labels.length); i++) {
+	          	for (var i = 0; i < (data.length); i++) {
 	            	var color = event.chart.dataProvider[i].color; 
 	            	// console.log(labels[i]);
-	            	// console.log(color);
+	            	console.log(color);
 			            if (color !== undefined)  { 
 			              	labels[i].setAttribute("fill", color);
 			            }
@@ -1966,82 +1969,136 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 			if(tab_value==tab_value_index[2] + "K")
 			{
 				var rank_title = "v4micro " + board_value + " Ranking from’ " + date[0] + " to " + date[date_len];
-				$.each(result.v4micro_ranking, function(l,m) {
-					if(l=='20Day Lookback')
-					{
-						$.each(this, function(k, v) {
 
-			                if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
-			                {
-								rank.push(k);
-								value_1.push(v); 
-			                }
-						});
-					}
-					if(l=='5Day Lookback')
-					{
-						$.each(this, function(k, v) {
+				var day20 = sortObject(result.v4micro_ranking['20Day Lookback']);
 
-			                if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
-			                {
-						       value_2.push(v);
-			                }
+                var day5 = result.v4micro_ranking['5Day Lookback'];
 
-						});
-					}
-					if(l=='1Day Lookback')
-					{
-						$.each(this, function(k, v) {
+                var day1 = result.v4micro_ranking['1Day Lookback'];
 
-			                if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
-			                {
-						       value_3.push(v);
-			                }
+                $.each(day20, function(l,m) {
 
-						});
-					}
-				});
+                    var vv=0;
+                    $.each(this, function(k, v) {
+
+                        if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                        {
+                            if(vv==0)
+                            {
+                                
+                                rank.push(v);
+                                vv=vv+1;
+
+                            }
+                            else
+                            {
+                                
+                                value_1.push(v);
+                                vv=0;
+
+                            }   
+                        }
+                    });
+                });
+
+                 
+                $.each(rank, function(k, v) {
+                       
+                    $.each(day5, function(o, p) {
+                        if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                        {
+
+                            if(o==v)
+                            {
+
+                                  value_2.push(p);
+
+                            }
+                        }
+                    });
+
+                    $.each(day1, function(o, p) {
+                        if(k!='-8 Rank RiskOff' && k!='9 Rank RiskOn')
+                        {
+
+                            if(o==v)
+                            {
+
+                                  value_3.push(p);
+
+                            }
+                        }
+
+                    });
+                });
 			}
 			else if(tab_value==tab_value_index[1] + "K")
 			{         
 				var rank_title = "v4mini " + board_value + " ‘Ranking from’ " + date[0] + " to " + date[date_len];
-				$.each(result.v4mini_ranking, function(l,m) {
-					if(l=='20Day Lookback')
-		          	{
-			            $.each(this, function(k, v) {
 
-			                if(k!='-4 Rank RiskOff' && k!='3 Rank RiskOn')
-			                {
-			                    rank.push(k);
-			                    value_1.push(v);
-                              
-			                }
+				var day20 = sortObject(result.v4mini_ranking['20Day Lookback']);
 
-			            });
-		          	}
-		          	if(l=='5Day Lookback')
-			            {
-			              	$.each(this, function(k, v) {
+                var day5 = result.v4mini_ranking['5Day Lookback'];
 
-			                if(k!='-4 Rank RiskOff' && k!='3 Rank RiskOn')
-			                {
-			                     value_2.push(v);
-			                }
+                var day1 = result.v4mini_ranking['1Day Lookback'];
 
-			            });
-		          	}
-		          	if(l=='1Day Lookback')
-		          	{
-			            $.each(this, function(k, v) {
+				$.each(day20, function(l,m) {
 
-			                if(k!='-4 Rank RiskOff' && k!='3 Rank RiskOn')
-			                {
-			                     value_3.push(v);
-			                }
+                    var vv=0;
+                    $.each(this, function(k, v) {
 
-			            });
-		          	}
-				});
+                        if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                        {
+                            if(vv==0)
+                            {
+                                
+                                rank.push(v);
+                                vv=vv+1;
+
+                            }
+                            else
+                            {
+                                
+                                value_1.push(v);
+                                vv=0;
+
+                            }   
+                        }
+                    });
+                });
+
+                 
+                $.each(rank, function(k, v) {
+                       
+                    $.each(day5, function(o, p) {
+                    	if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                        {
+
+                            if(o==v)
+                            {
+
+                                
+                                  value_2.push(p);
+
+                            }
+                        }
+                    });
+
+                    $.each(day1, function(o, p) {
+                    	if(k!='-4 Rank RiskOff' && k!='4 Rank RiskOn')
+                        {
+
+                            if(o==v)
+                            {
+
+                                
+                                  value_3.push(p);
+
+                            }
+                        }
+
+                    });
+                });
 			}
 			else if(tab_value==tab_value_index[0] + "K")
 			{      
@@ -2112,20 +2169,23 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                 });
 			}
 
-			console.log("test");
+			// console.log("test");
 			var data  = [];
             var i = 0;
             count = 0;
             identify_color = "#000000";
-            value_1_color = "#0B850C";
-            value_2_color = "#0000FF";
-            value_3_color = "#F7C143";
+            value_1_color = "#0000FF";
+            value_2_color = "#F7C143";
+            value_3_color = "#0B850C";
+            var v1 = '';
+            var v2 = '';
+            var v3 = '';
 
             $.each(rank, function(k,v) {
 
             	i_color = "";
             	identify_color = "#000000";
-            	value_1_color = "#0B850C";
+            	value_1_color = "#0000FF";
 
             	v = rank_index(v);
 
@@ -2192,7 +2252,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						}]
 					});
 					i_color = '';
@@ -2217,7 +2277,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
@@ -2251,7 +2311,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						}]
 					});
 				}
@@ -2275,7 +2335,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
@@ -2299,7 +2359,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
@@ -2328,7 +2388,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "2Day"
+							"task": "1Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],
@@ -2396,6 +2456,9 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 				"endField": "end",
 				"durationField": "duration",
 			    "listeners": [{
+					"event": "rendered",
+					"method": updateLabels
+					},{
 				    "event": "resized",
 				    "method": updateLabels
 			    }],
@@ -2417,11 +2480,12 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
 			function updateLabels(event) { 
 	          	var labels = event.chart.chartDiv.getElementsByClassName("amcharts-axis-label");
-	          	// console.log(labels.length);
+	          	console.log(data.length);
 
-	          	for (var i = 0; i < (labels.length - 5); i++) {
+	          	for (var i = 0; i < (data.length); i++) {
 	            	var color = event.chart.dataProvider[i].color; 
 			            if (color !== undefined)  { 
+			            	console.log(color);
 			              	labels[i].setAttribute("fill", color);
 			            }
 	          	}

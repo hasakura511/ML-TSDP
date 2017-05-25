@@ -2552,7 +2552,6 @@ $(document).on('click', '.chip-button', function(event) {
     tab_value=tab_value.replace(/\s+/g, '');
 
     var account_value_str = $('.bet-info-table').find('.chip-avatar-text').text();
-    var account_value_str = "50K50K50K50K100K100K100K100K250K250K250K250K";
 
     var n = account_value_str.match(/K/g);
 
@@ -2634,6 +2633,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %";
                                 benchmark_values_percent.push(v);
@@ -2668,6 +2668,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %"
                                 yaxis_values_percent.push(v);
@@ -2722,6 +2723,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %"
                                 simulated_moc_values_percent.push(v);
@@ -2758,6 +2760,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %";
                                 benchmark_values_percent.push(v);
@@ -2792,6 +2795,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %"
                                 yaxis_values_percent.push(v);
@@ -2846,6 +2850,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %"
                                 simulated_moc_values_percent.push(v);
@@ -2881,6 +2886,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %";
                                 benchmark_values_percent.push(v);
@@ -2915,6 +2921,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %"
                                 yaxis_values_percent.push(v);
@@ -2969,6 +2976,7 @@ $(document).on('click', '.chip-button', function(event) {
                         {
                             $.each(this, function(k, v) {
 
+                                v = v * 100;
                                 v = parseFloat(v).toFixed(2);
                                 v = v + " %"
                                 simulated_moc_values_percent.push(v);
@@ -3119,7 +3127,7 @@ $(document).on('click', '.chip-button', function(event) {
                     {"values":benchmark_values_percent,
                     "line-color":"#FF0000",
                     "line-style":"line",
-                    "text": "Benchmark % chartHeight",
+                    "text": "Benchmark % Chg",
                     "legend-item": {
                       "background-color": "#007790",
                       "borderRadius": "5",

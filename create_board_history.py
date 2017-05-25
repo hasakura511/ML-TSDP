@@ -489,6 +489,12 @@ def createRankingChart(ranking, account, line, title, filename):
     
     lookback_name=str(lookback)+'Day Lookback'
     text=lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
+    lookback_name=str(lookback_mid)+'Day Lookback'
+    ranking=ranking.sort_values(by=[lookback_name], ascending=True)
+    ranking.index=[x.split()[2] for x in ranking.index]
+    ranking.index=[str(len(ranking.index)-idx)+' Rank '+col for idx,col in enumerate(ranking.index)]
+    pair=sorted([x for x in ranking.index if line==x.split()[2] or anti==x.split()[2]])
+    text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
     lookback_name=str(lookback_short)+'Day Lookback'
     ranking=ranking.sort_values(by=[lookback_name], ascending=True)
     ranking.index=[x.split()[2] for x in ranking.index]

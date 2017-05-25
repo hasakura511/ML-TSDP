@@ -230,7 +230,7 @@ def getcustomsignals(request):
     return HttpResponse(returndata)
 
 def getchartdata(request):
-    returndata = getChartsDict()
+    returndata = UserSelection.json_chartdata
     #print(returndata)
     data = '{'
     count = 1

@@ -1,6 +1,34 @@
 from django.db import models
 import json
 from os.path import isfile, join
+import sqlite3
+import pandas as pd
+
+def getChartDB():
+    dbPath = 'db_charts.sqlite3'
+    readConn = sqlite3.connect(dbPath)
+    return readConn
+
+
+def getTables(dbconn):
+    dbcur = dbconn.cursor()
+    dbcur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    #dbcur.execute("PRAGMA table_info(table-name);")
+    tables=[x[0] for x in dbcur.fetchall()]
+    dbcur.close()
+    return tables
+
+def getChartsDict():
+    readConn=getChartDB()
+    tables=getTables(readConn)
+    chart_table_dict={}
+    for table in tables:
+        df = pd.read_sql('select * from {}'.format(table), con=readConn)
+        #print table, 'index:', df.columns[0]
+        df=df.set_index(str(df.columns[0]))
+
+        chart_table_dict[table]=df.to_json()
+    return chart_table_dict
 
 class UserSelection(models.Model):
     #defaults
@@ -74,6 +102,8 @@ class UserSelection(models.Model):
             json.dump(default_custom_signals, f)
         print 'Saved', filename
 
+    json_chartdata=getChartsDict()
+    
     userID = models.IntegerField()
     selection = models.TextField()
     v4futures = models.TextField()

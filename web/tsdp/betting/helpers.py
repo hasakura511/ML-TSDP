@@ -38,16 +38,19 @@ def getBackendDB():
     readConn = sqlite3.connect(dbPath)
     return readConn
 
-def getChartDB():
-    dbPath = 'db_charts.sqlite3'
-    readConn = sqlite3.connect(dbPath)
-    return readConn
-
 def getNews():
     with open('news.txt','r') as f:
         newslines=f.readlines()    
         #print newslines    
     return newslines
+    
+'''
+def getChartDB():
+    dbPath = 'db_charts.sqlite3'
+    readConn = sqlite3.connect(dbPath)
+    return readConn
+
+
 
 def getTables(dbconn):
     dbcur = dbconn.cursor()
@@ -68,7 +71,7 @@ def getChartsDict():
 
         chart_table_dict[table]=df.to_json()
     return chart_table_dict
-
+'''
 def getCustomizeChip(target=None):
     readConn=getBackendDB()
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn,\

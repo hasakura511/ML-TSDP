@@ -2500,3 +2500,816 @@ $(document).on('click', '.chart-pane-tab', function(event) {
         }
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---------------------------------
+------------------------------------
+Account_performance_chart Done
+------------------------------------
+--------------------------------- */
+
+// zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
+// ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "ee6b7db5b51705a13dc2339db3edaf6d"];
+
+function getOnlyDate(strr)
+{
+    var str = new Date(strr);
+    var d = str.getDate();
+    var m = str.getMonth();
+    var y = str.getFullYear();
+
+    return y + "-" + m + "-" + d;
+}
+
+
+$(document).on('click', '.chip-button', function(event) {
+
+    var board_value = $('.chart-title-text').html();
+    board_value=board_value.replace(/\s+/g, '');
+
+    var tab_value = $('.chart-icon-text').html();
+    tab_value=tab_value.replace(/\s+/g, '');
+
+    var account_value_str = $('.bet-info-table').find('.chip-avatar-text').text();
+    var account_value_str = "50K50K50K50K100K100K100K100K250K250K250K250K";
+
+    var n = account_value_str.match(/K/g);
+
+    var j = 0;
+
+    var account_value = [];
+
+    for(var i = 0; i<n.length; i++)
+    {
+        var c = account_value_str.search("K");
+
+        var sub = account_value_str.substr(0,c);
+
+        if(account_value[j-1] != sub)
+        {
+            account_value[j] = sub;
+            j = j + 1;
+        }
+        
+        account_value_str = account_value_str.substr(c+1);  
+    }
+
+    console.log(account_value);
+    
+    var anti_val = '';
+    if(board_value == 'AccountPerformanceChart' && tab_value != '')
+    {
+        $.ajax
+        ({
+            url: '/getchartdata',
+            type: 'get',
+            dataType: 'json', // added data type
+            success: function(result)
+            {   
+                /* ------------------
+                ---------------------
+                Account_performance_chart
+                ---------------------
+                --------------------- */
+
+                var date = [];
+
+                var benchmark_values = [];
+                var benchmark_values_percent = [];
+                var benchmark_sym = [];
+
+                var yaxis_values = [];
+                var yaxis_values_percent = [];
+                var selection = [];
+                var slippage = [];
+                var commissions = [];
+
+                var simulated_moc_values = [];
+                var simulated_moc_values_percent = [];
+
+                if(tab_value == account_value[0] + "K")
+                {
+                    $.each(result.v4micro_accountvalues, function(l,m) {
+
+                        /*----------------
+                        Red Solid Line
+                        ------------------*/
+
+                        if(l=='benchmark_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                k = getOnlyDate(k);
+                                // console.log(k);
+
+                                date.push(k);
+                                v = Math.round(v);
+                                benchmark_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='benchmark_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %";
+                                benchmark_values_percent.push(v);
+
+                            });
+                        }
+
+                        if(l=='benchmark_sym')
+                        {
+                            $.each(this, function(k, v) {
+
+                                benchmark_sym.push(v);
+
+                            });
+                        }
+
+                        /*----------------
+                        Blue Solid Line
+                        ------------------*/
+
+                        if(l=='yaxis_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                yaxis_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='yaxis_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %"
+                                yaxis_values_percent.push(v);
+
+                            });
+                        }
+
+                        if(l=='selection')
+                        {
+                            $.each(this, function(k, v) {
+
+                                selection.push(v);
+
+                            });
+                        }
+
+                        if(l=='slippage')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                slippage.push(v);
+
+                            });
+                        }
+
+                        if(l=='commissions')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                commissions.push(v);
+
+                            });
+                        }
+
+                        /*----------------
+                        Green Solid Line
+                        ------------------*/
+
+                        if(l=='simulated_moc_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                simulated_moc_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='simulated_moc_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %"
+                                simulated_moc_values_percent.push(v);
+
+                            });
+                        }
+                        
+                    });
+                }
+
+                else if(tab_value == account_value[1] + "K")
+                {
+                    $.each(result.v4mini_accountvalues, function(l,m) {
+
+                        /*----------------
+                        Red Solid Line
+                        ------------------*/
+
+                        if(l=='benchmark_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                k = getOnlyDate(k);
+                                // console.log(k);
+
+                                date.push(k);
+                                v = Math.round(v);
+                                benchmark_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='benchmark_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %";
+                                benchmark_values_percent.push(v);
+
+                            });
+                        }
+
+                        if(l=='benchmark_sym')
+                        {
+                            $.each(this, function(k, v) {
+
+                                benchmark_sym.push(v);
+
+                            });
+                        }
+
+                        /*----------------
+                        Blue Solid Line
+                        ------------------*/
+
+                        if(l=='yaxis_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                yaxis_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='yaxis_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %"
+                                yaxis_values_percent.push(v);
+
+                            });
+                        }
+
+                        if(l=='selection')
+                        {
+                            $.each(this, function(k, v) {
+
+                                selection.push(v);
+
+                            });
+                        }
+
+                        if(l=='slippage')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                slippage.push(v);
+
+                            });
+                        }
+
+                        if(l=='commissions')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                commissions.push(v);
+
+                            });
+                        }
+
+                        /*----------------
+                        Green Solid Line
+                        ------------------*/
+
+                        if(l=='simulated_moc_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                simulated_moc_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='simulated_moc_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %"
+                                simulated_moc_values_percent.push(v);
+
+                            });
+                        }
+                    });
+                }
+
+                else if(tab_value == account_value[2] + "K")
+                {
+                    $.each(result.v4futures_accountvalues, function(l,m) {
+
+                        /*----------------
+                        Red Solid Line
+                        ------------------*/
+
+                        if(l=='benchmark_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                k = getOnlyDate(k);
+                                // console.log(k);
+
+                                date.push(k);
+                                v = Math.round(v);
+                                benchmark_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='benchmark_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %";
+                                benchmark_values_percent.push(v);
+
+                            });
+                        }
+
+                        if(l=='benchmark_sym')
+                        {
+                            $.each(this, function(k, v) {
+
+                                benchmark_sym.push(v);
+
+                            });
+                        }
+
+                        /*----------------
+                        Blue Solid Line
+                        ------------------*/
+
+                        if(l=='yaxis_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                yaxis_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='yaxis_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %"
+                                yaxis_values_percent.push(v);
+
+                            });
+                        }
+
+                        if(l=='selection')
+                        {
+                            $.each(this, function(k, v) {
+
+                                selection.push(v);
+
+                            });
+                        }
+
+                        if(l=='slippage')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                slippage.push(v);
+
+                            });
+                        }
+
+                        if(l=='commissions')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                commissions.push(v);
+
+                            });
+                        }
+
+                        /*----------------
+                        Green Solid Line
+                        ------------------*/
+
+                        if(l=='simulated_moc_values')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = Math.round(v);
+                                simulated_moc_values.push(v);
+
+                            });
+                        }
+
+                        if(l=='simulated_moc_values_percent')
+                        {
+                            $.each(this, function(k, v) {
+
+                                v = parseFloat(v).toFixed(2);
+                                v = v + " %"
+                                simulated_moc_values_percent.push(v);
+
+                            });
+                        }
+                    });
+                }
+                else
+                {
+                    console.log("NO BOARD");
+                }
+
+                /*----------------
+                Chart Title
+                ------------------*/
+
+                if(tab_value == account_value[0] + "K")
+                {
+                    chart_title = "v4 micro Equity Chart " + date.length + " Day Lookback";
+                }
+                else if(tab_value == account_value[1] + "K")
+                {
+                    chart_title = "v4mini Equity Chart " + date.length + " Day Lookback";
+                }
+                else if(tab_value == account_value[2] + "K")
+                {
+                    chart_title = "v4future Equity Chart " + date.length + " Day Lookback";
+                }
+                else
+                {
+                    console.log("No Title");
+                }
+
+                var max_benchmark_values = Math.max.apply(Math,benchmark_values);
+                var min_benchmark_values = Math.min.apply(Math,benchmark_values);
+
+                var max_yaxis_values = Math.max.apply(Math,yaxis_values);
+                var min_yaxis_values = Math.min.apply(Math,yaxis_values);
+
+                var max_simulated_moc_values = Math.max.apply(Math,simulated_moc_values);
+                var min_simulated_moc_values = Math.min.apply(Math,simulated_moc_values);
+
+                var max = Math.max(max_benchmark_values, max_yaxis_values, max_simulated_moc_values);
+                var min = Math.min(min_benchmark_values, min_yaxis_values, min_simulated_moc_values);
+
+                max = Math.round(max) + 5000;
+                min = Math.round(min) - 5000;
+
+                var tot='';
+                tot+=min.toString();
+                tot+=":";
+                tot+=max.toString();
+                tot+=":1000";
+
+                var account_performance =  {
+                  "type":"line",
+                  "utc": true,
+                  "title": {
+                    "text": chart_title,
+                    "font-size": "14px",
+                    "adjust-layout": true
+                  },
+                  "plotarea": {
+                    "margin": "dynamic 45 60 dynamic",
+                  },
+                  "scale-x":{
+                    "values":date,
+                    "transform": {
+                      "type": "date",
+                      "all": "%d %M %Y",
+                      "guide": {
+                        "visible": false
+                      },
+                    },
+                    "item":{  
+                      "font-angle":315,  
+                    } 
+                  },
+                  "scale-y":{
+                    "values":tot,
+                    "guide": {
+                      "line-style": "dashed"
+                    },
+                    "thousands-separator":",",
+                  },
+                  "plot": {
+                    "highlight": true,
+                    "tooltip-text": "%t: %v<br>Date:%k",
+                    "shadow": 0,
+                    "line-width": "2px",
+                    "marker": {
+                      "type": "circle",
+                      "size": 1
+                    },
+                    "highlight-state": {
+                      "line-width": 3
+                    },
+                    "animation": {
+                      "effect": 1,
+                      "sequence": 2,
+                      "speed": 100,
+                    },
+                  },
+                  "crosshair-x": {
+                    "line-color": "#efefef",
+                    "plot-label": {
+                      "border-radius": "5px",
+                      "border-width": "1px",
+                      "border-color": "#f6f7f8",
+                      "padding": "10px",
+                      "font-weight": "bold",
+                      "thousands-separator":",",
+                    },
+                    "scale-label": {
+                      "font-color": "#000",
+                      "background-color": "#f6f7f8",
+                      "border-radius": "5px"
+                    },
+                    // "plot-label": {
+                    //     "text":"%t : $ %v"
+                    //   },
+                  },
+                  "tooltip": {
+                    "visible": false
+                  },
+                  "series":[
+                    {"values":benchmark_values,
+                    "line-color":"#FF0000",
+                    "line-style":"line",
+                    "text": "Benchmark Value ($)",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":benchmark_values_percent,
+                    "line-color":"#FF0000",
+                    "line-style":"line",
+                    "text": "Benchmark % chartHeight",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":benchmark_sym,
+                    "line-color":"#FF0000",
+                    "line-style":"line",
+                    "text": "Symbol",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":yaxis_values,
+                    "line-color":"#0000FF",
+                    "line-style":"line",
+                    "text": "Account Value ($)",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":yaxis_values_percent,
+                    "line-color":"#0000FF",
+                    "line-style":"line",
+                    "text": "Account % Chg",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":selection,
+                    "line-color":"#0000FF",
+                    "line-style":"line",
+                    "text": "Bet",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":slippage,
+                    "line-color":"#0000FF",
+                    "line-style":"line",
+                    "text": "Slippage ($)",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":commissions,
+                    "line-color":"#0000FF",
+                    "line-style":"line",
+                    "text": "Commission ($)",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":simulated_moc_values,
+                    "line-color":"#0B850C",
+                    "line-style":"line",
+                    "text": "Simulated MOC Value ($)",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                    {"values":simulated_moc_values_percent,
+                    "line-color":"#0B850C",
+                    "line-style":"line",
+                    "text": "MOC % Chg",
+                    "legend-item": {
+                      "background-color": "#007790",
+                      "borderRadius": "5",
+                      "font-color": "white"
+                      },
+                      "marker": {
+                        "background-color": "#da534d",
+                        "border-width": 0,
+                        "shadow": 0 ,
+                        "border-color": "#faa39f"
+                      },
+                      "highlight-marker": {
+                        "size": 6,
+                        "background-color": "#da534d",
+                      }
+                    },
+                  ],
+                };
+
+                zingchart.render({
+                  id: 'account_performance_chart',
+                  data: account_performance,
+                });
+
+                /* ---------------------------------
+                ------------------------------------
+                Account_performance_chart Done
+                ------------------------------------
+                --------------------------------- */
+            }
+        });
+    }
+});

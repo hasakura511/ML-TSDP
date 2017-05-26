@@ -153,6 +153,7 @@ else:
     
 if debug:
     mode = 'replace'
+    savePlots=False
     #marketList=[sys.argv[1]]
     showPlots=False
     dbPath='./data/futures.sqlite3' 
@@ -181,6 +182,7 @@ if debug:
     #logging.basicConfig(filename='C:/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
 else:
     mode= 'replace'
+    savePlots=True
     #marketList=[sys.argv[1]]
     showPlots=False
     feedfile='./data/systems/system_ibfeed.csv'
@@ -481,8 +483,9 @@ def createRankingChart(ranking, account, line, title, filename):
     plt.xlabel('Cumulative % change', size=12)
     title=account+' '+title
     plt.title(title)
-    plt.savefig(filename, bbox_inches='tight')
-    print 'Saved',filename
+    if savePlots:
+        plt.savefig(filename, bbox_inches='tight')
+        print 'Saved',filename
     if debug and showPlots:
         plt.show()
     plt.close()
@@ -553,8 +556,9 @@ for account in totals_accounts:
             plt.figure(0)
             filename=pngPath+date+'_'+account+'_'+line.replace('/','')+'.png'
             filename2=date+'_'+account+'_'+line.replace('/','')+'.png'
-            plt.savefig(filename, bbox_inches='tight')
-            print 'Saved',filename
+            if savePlots:
+                plt.savefig(filename, bbox_inches='tight')
+                print 'Saved',filename
 
             if is_int(line):
                 text= 'Voting System consisting of '+', '.join(infodisplay[line])+'.'
@@ -626,7 +630,7 @@ for account in totals_accounts:
         for date in dates:
             slip_df=pd.read_sql('select * from ib_slippage where timestamp=(select max(timestamp) from ib_slippage where Date=\'{}\' and name=\'{}\')'.format(str(date), account), con=readConn)
             slippage.append(slip_df.dollarslip.sum())
-            commissions.append(slip_df.commissions.sum())
+            commissions.append(-slip_df.commissions.sum())
     else:
         broker='c2'
         accountvalue=pd.read_sql('select * from (select * from c2_equity where\
@@ -650,7 +654,7 @@ for account in totals_accounts:
         for date in dates:
             slip_df=pd.read_sql('select * from slippage where timestamp=(select max(timestamp) from slippage where csiDate=\'{}\' and name=\'{}\')'.format(str(date), account), con=readConn)
             slippage.append(slip_df.dollarslip.sum())
-            commissions.append(slip_df.commissions.sum())
+            commissions.append(-slip_df.commissions.sum())
     
     #intersect index with benchmark axis
 
@@ -712,9 +716,10 @@ for account in totals_accounts:
     
     date=dt.strftime(index[-1], '%Y-%m-%d')
     filename=pngPath+date+'_'+account+'_'+broker+'_account_value.png'
-    filename2=date+'_'+account+'_'+broker+'_account_value.png'    
-    plt.savefig(filename, bbox_inches='tight')
-    print 'Saved',filename
+    filename2=date+'_'+account+'_'+broker+'_account_value.png'
+    if savePlots:
+        plt.savefig(filename, bbox_inches='tight')
+        print 'Saved',filename
     
     account_values[account]=pd.DataFrame(data={'yaxis_values':yaxis_values, 'benchmark_values':benchmark_values,
                                 'simulated_moc_values':simulated_moc_values,'yaxis_values_percent':yaxis_values_percent,

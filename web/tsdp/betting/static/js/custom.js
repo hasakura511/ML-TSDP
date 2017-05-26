@@ -14,7 +14,7 @@ $(document).on('click', '.chart-button', function(event) {
         get_all_tab= $(".chart-tab-icon-text" ).text();
     });
 
-    arr = get_all_tab.split('K');
+    arr = get_all_tab.split('K'); 
 
     for(i=0; i < arr.length; i++)
         tab_value_index[i] = arr[i];
@@ -836,12 +836,9 @@ function day1(test)
             		}
             	}
 
-            	if(value_1[i]<0 || value_2[i]<0 || value_3[i]<0 )
-            	{
-            		v1 = Math.abs(value_1[i])
-            		v2 = Math.abs(value_2[i])
-            		v3 = Math.abs(value_3[i])
-            	}
+        		v1 = Math.abs(value_1[i])
+        		v2 = Math.abs(value_2[i])
+        		v3 = Math.abs(value_3[i])
 
             	var arr = [v1,v2,v3];
 
@@ -2217,12 +2214,9 @@ $(document).on('click', '.chart-pane-tab', function(event) {
             		}
             	}
 
-            	if(value_1[i]<0 || value_2[i]<0 || value_3[i]<0 )
-            	{
-            		v1 = Math.abs(value_1[i])
-            		v2 = Math.abs(value_2[i])
-            		v3 = Math.abs(value_3[i])
-            	}
+        		v1 = Math.abs(value_1[i])
+        		v2 = Math.abs(value_2[i])
+        		v3 = Math.abs(value_3[i])
 
             	var arr = [v1,v2,v3];
 
@@ -2234,9 +2228,9 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 					{
 						identify_color = i_color;
 					}
-                    
-                    console.log("1");
-    
+
+					console.log("1");
+
 					data.push({
 						"category" : v,
 						"color" : identify_color,
@@ -2266,8 +2260,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 					{
 						identify_color = i_color;
 					}
-                    
-                    console.log("2");
+
+					console.log("2");
 
 					data.push({
 						"category" : v,
@@ -2297,8 +2291,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 					{
 						identify_color = i_color;
 					}
-                    
-                    console.log("3");
+
+					console.log("3");
 
 					data.push({
 						"category" : v,
@@ -2329,6 +2323,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 						identify_color = i_color;
 					}
 
+					console.log("4");
+
 					data.push({
 						"category" : v,
 						"color" : identify_color,
@@ -2358,6 +2354,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 						identify_color = i_color;
 					}
 
+					console.log("5");
+
 					data.push({
 						"category" : v,
 						"color" : identify_color,
@@ -2386,6 +2384,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 					{
 						identify_color = i_color;
 					}
+
+					console.log("6");
 
 					data.push({
 						"category" : v,
@@ -2486,12 +2486,12 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
 			function updateLabels(event) { 
 	          	var labels = event.chart.chartDiv.getElementsByClassName("amcharts-axis-label");
-	          	//console.log(data.length);
+	          	console.log(data.length);
 
 	          	for (var i = 0; i < (data.length); i++) {
 	            	var color = event.chart.dataProvider[i].color; 
 			            if (color !== undefined)  { 
-			            	//console.log(color);
+			            	console.log(color);
 			              	labels[i].setAttribute("fill", color);
 			            }
 	          	}
@@ -2550,6 +2550,8 @@ function getOnlyDate(strr)
 
 
 $(document).on('click', '.chip-button', function(event) {
+
+	// $("p").hide();
 
     var board_value = $('.chart-title-text').html();
     board_value=board_value.replace(/\s+/g, '');
@@ -3096,22 +3098,20 @@ $(document).on('click', '.chip-button', function(event) {
                       "padding": "10px",
                       "font-weight": "bold",
                       "thousands-separator":",",
+                      "font-size": "15px",
                     },
                     "scale-label": {
                       "font-color": "#000",
                       "background-color": "#f6f7f8",
                       "border-radius": "5px"
                     },
-                    // "plot-label": {
-                    //     "text":"%t : $ %v"
-                    //   },
                   },
                   "tooltip": {
                     "visible": false
                   },
                   "series":[
                     {"values":benchmark_values,
-                    "line-color":"#FF0000",
+                    "line-color":"#FF00FF",
                     "line-style":"line",
                     "text": "Benchmark Value ($)",
                     "legend-item": {
@@ -3131,7 +3131,7 @@ $(document).on('click', '.chip-button', function(event) {
                       }
                     },
                     {"values":benchmark_values_percent,
-                    "line-color":"#FF0000",
+                    "line-color":"#FF00FF",
                     "line-style":"line",
                     "text": "Benchmark % Chg",
                     "legend-item": {

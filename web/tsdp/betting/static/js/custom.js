@@ -2234,7 +2234,9 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 					{
 						identify_color = i_color;
 					}
-
+                    
+                    console.log("1");
+    
 					data.push({
 						"category" : v,
 						"color" : identify_color,
@@ -2264,6 +2266,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 					{
 						identify_color = i_color;
 					}
+                    
+                    console.log("2");
 
 					data.push({
 						"category" : v,
@@ -2293,6 +2297,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 					{
 						identify_color = i_color;
 					}
+                    
+                    console.log("3");
 
 					data.push({
 						"category" : v,
@@ -2480,12 +2486,12 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
 			function updateLabels(event) { 
 	          	var labels = event.chart.chartDiv.getElementsByClassName("amcharts-axis-label");
-	          	console.log(data.length);
+	          	//console.log(data.length);
 
 	          	for (var i = 0; i < (data.length); i++) {
 	            	var color = event.chart.dataProvider[i].color; 
 			            if (color !== undefined)  { 
-			            	console.log(color);
+			            	//console.log(color);
 			              	labels[i].setAttribute("fill", color);
 			            }
 	          	}

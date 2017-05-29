@@ -800,11 +800,13 @@ def get_timetables():
     else:
         # use old dates
         ttdate = timetables.columns[0]
-
+    #print mcdate, ttdate
     timetableDF = pd.DataFrame()
+    #print timetables
     for idx, [sym, value] in enumerate([x.split() for x in timetables.index]):
         idx2 = sym + ' ' + value
         timestamp = timetables.ix[idx2].ix[ttdate]
+        #print sym, value, timestamp
         timetableDF.set_value(sym, value, timestamp)
 
     #timetableDF.index.name = 'ibsym'

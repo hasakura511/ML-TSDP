@@ -1167,6 +1167,9 @@ $(document).on('click', '.chart-pane-tab', function(event) {
           var anti_system_cum = [];
           var benchmark_cum = [];
 
+          var system_pnl = [];
+          var system_pnl_percent = [];
+
           var chart_title = '';
           btn_click = 3;
 
@@ -1184,7 +1187,6 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                   });
               }
-
               if(board_value=='AntiHighestEquity' && l=='HighestEquity')
               {
                   anti_val = 'HighestEquity';
@@ -1202,13 +1204,6 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
-
-                 anti_system_cum_val = board_value+'_Cum %';
-                      $.each(this, function(k, v) {
-
-                          anti_system_cum.push(v);
-
-                      });
               }
 
 
@@ -1327,16 +1322,17 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                   }
                   if(l=='Anti-'+board_value+'_cumper')
                   {
-                      anti_system_cum_val = 'Anti-'+ board_value+'_Cum %';
+                      anti_system_cum_val = 'Anti-'+ board_value+' Cum %';
                       $.each(this, function(k, v) {
 
-                      	  v = v + " %";
+                          v = v + " %";
                           anti_system_cum.push(v);
 
                       });
                   }
               }
-             
+
+              
               if(l=='benchmark')
               {
                   $.each(this, function(k, v) {
@@ -1349,7 +1345,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
               {
                   $.each(this, function(k, v) {
 
-                  	  v = v + " %";
+                      v = v + " %";
                       benchmark_cum.push(v);
 
                   });
@@ -1358,8 +1354,33 @@ $(document).on('click', '.chart-pane-tab', function(event) {
               {
                   $.each(this, function(k, v) {
 
+                      cumper_val = board_value + " Cum %";
                       v = v + " %";
                       cumper.push(v);
+
+                  });
+              }
+              if(l == board_value + "_pnl")
+              {
+                  $.each(this, function(k, v) {
+
+                      system_pnl_val = board_value + " Daily P&L %";
+                      v = v * 100;
+                      v = parseFloat(v).toFixed(2);
+                      v = v + " %";
+                      system_pnl.push(v);
+
+                  });
+              }
+              if(l == "Anti-" + board_value + "_pnl")
+              {
+                  $.each(this, function(k, v) {
+
+                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
+                      v = v * 100;
+                      v = parseFloat(v).toFixed(2);
+                      v = v + " %";
+                      system_pnl_percent.push(v);
 
                   });
               }
@@ -1378,8 +1399,6 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                   });
               }
-
-
               if(board_value=='AntiHighestEquity' && l=='HighestEquity')
               {
                   anti_val = 'HighestEquity';
@@ -1515,16 +1534,17 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                   }
                   if(l=='Anti-'+board_value+'_cumper')
                   {
-                      anti_system_cum_val = 'Anti-'+ board_value+'_Cum %';
+                      anti_system_cum_val = 'Anti-'+ board_value+' Cum %';
                       $.each(this, function(k, v) {
 
+                          v = v + " %";
                           anti_system_cum.push(v);
 
                       });
                   }
               }
 
-
+              
               if(l=='benchmark')
               {
                   $.each(this, function(k, v) {
@@ -1537,17 +1557,42 @@ $(document).on('click', '.chart-pane-tab', function(event) {
               {
                   $.each(this, function(k, v) {
 
+                      v = v + " %";
                       benchmark_cum.push(v);
 
                   });
               }
-
               if(l==board_value+"_cumper")
               {
                   $.each(this, function(k, v) {
 
+                      cumper_val = board_value + " Cum %";
                       v = v + " %";
                       cumper.push(v);
+
+                  });
+              }
+              if(l == board_value + "_pnl")
+              {
+                  $.each(this, function(k, v) {
+
+                      system_pnl_val = board_value + " Daily P&L %";
+                      v = v * 100;
+                      v = parseFloat(v).toFixed(2);
+                      v = v + " %";
+                      system_pnl.push(v);
+
+                  });
+              }
+              if(l == "Anti-" + board_value + "_pnl")
+              {
+                  $.each(this, function(k, v) {
+
+                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
+                      v = v * 100;
+                      v = parseFloat(v).toFixed(2);
+                      v = v + " %";
+                      system_pnl_percent.push(v);
 
                   });
               }
@@ -1701,9 +1746,10 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                   }
                   if(l=='Anti-'+board_value+'_cumper')
                   {
-                      anti_system_cum_val = 'Anti-'+ board_value+'_Cum %';
+                      anti_system_cum_val = 'Anti-'+ board_value+' Cum %';
                       $.each(this, function(k, v) {
 
+                          v = v + " %";
                           anti_system_cum.push(v);
 
                       });
@@ -1723,6 +1769,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
               {
                   $.each(this, function(k, v) {
 
+                      v = v + " %";
                       benchmark_cum.push(v);
 
                   });
@@ -1730,8 +1777,34 @@ $(document).on('click', '.chart-pane-tab', function(event) {
               if(l==board_value+"_cumper")
               {
                   $.each(this, function(k, v) {
+
+                      cumper_val = board_value + " Cum %";
                       v = v + " %";
                       cumper.push(v);
+
+                  });
+              }
+              if(l == board_value + "_pnl")
+              {
+                  $.each(this, function(k, v) {
+
+                      system_pnl_val = board_value + " Daily P&L %";
+                      v = v * 100;
+                      v = parseFloat(v).toFixed(2);
+                      v = v + " %";
+                      system_pnl.push(v);
+
+                  });
+              }
+              if(l == "Anti-" + board_value + "_pnl")
+              {
+                  $.each(this, function(k, v) {
+
+                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
+                      v = v * 100;
+                      v = parseFloat(v).toFixed(2);
+                      v = v + " %";
+                      system_pnl_percent.push(v);
 
                   });
               }
@@ -1797,9 +1870,47 @@ $(document).on('click', '.chart-pane-tab', function(event) {
               },
               "thousands-separator":",",
             },
+            "plot": {
+              "highlight": true,
+              "tooltip-text": "%t: %v<br>Date:%k",
+              "shadow": 0,
+              "line-width": "2px",
+              "marker": {
+                "type": "circle",
+                "size": 1
+              },
+              "highlight-state": {
+                "line-width": 3
+              },
+              "animation": {
+                "effect": 1,
+                "sequence": 2,
+                "speed": 100,
+              },
+            },
+            "crosshair-x": {
+              "line-color": "#efefef",
+              "plot-label": {
+                "border-radius": "5px",
+                "border-width": "1px",
+                "border-color": "#f6f7f8",
+                "padding": "10px",
+                "font-weight": "bold",
+                "thousands-separator":",",
+                "font-size": "14px",
+              },
+              "scale-label": {
+                "font-color": "#000",
+                "background-color": "#f6f7f8",
+                "border-radius": "5px"
+              },
+            },
+            "tooltip": {
+              "visible": false
+            },
             "series":[
               {"values":system,
-              "line-color":"#0000ff",
+              "line-color":"#0000FF",
               "line-style":"line",
               "text": board_value,
               "legend-item": {
@@ -1811,6 +1922,46 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                   "background-color": "#da534d",
                   "border-width": 0,
                   "shadow": 0,
+                  "border-color": "#faa39f"
+                },
+                "highlight-marker": {
+                  "size": 6,
+                  "background-color": "#da534d",
+                }
+              },
+              {"values":system_pnl,
+              "line-color":"#0000FF",
+              "line-style":"line",
+              "text": system_pnl_val,
+              "legend-item": {
+                "background-color": "#007790",
+                "borderRadius": "5",
+                "font-color": "white"
+                },
+                "marker": {
+                  "background-color": "#da534d",
+                  "border-width": 0,
+                  "shadow": 0 ,
+                  "border-color": "#faa39f"
+                },
+                "highlight-marker": {
+                  "size": 6,
+                  "background-color": "#da534d",
+                }
+              },
+              {"values":cumper,
+              "line-color":"#0000FF",
+              "line-style":"line",
+              "text": cumper_val,
+              "legend-item": {
+                "background-color": "#007790",
+                "borderRadius": "5",
+                "font-color": "white"
+                },
+                "marker": {
+                  "background-color": "#da534d",
+                  "border-width": 0,
+                  "shadow": 0 ,
                   "border-color": "#faa39f"
                 },
                 "highlight-marker": {
@@ -1838,30 +1989,10 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                   "background-color": "#da534d",
                 }
               },
-              {"values":benchmark,
-              "line-color":"#ff0000",
+              {"values":system_pnl_percent,
+              "line-color":"#0B850C",
               "line-style":"line",
-              "text": "Benchmark",
-              "legend-item": {
-                "background-color": "#007790",
-                "borderRadius": "5",
-                "font-color": "white"
-                },
-                "marker": {
-                  "background-color": "#da534d",
-                  "border-width": 0,
-                  "shadow": 0 ,
-                  "border-color": "#faa39f"
-                },
-                "highlight-marker": {
-                  "size": 6,
-                  "background-color": "#da534d",
-                }
-              },
-              {"values":cumper,
-              "line-color":"#ff0000",
-              "line-style":"line",
-              "text": "Cum %",
+              "text": system_pnl_percent_val,
               "legend-item": {
                 "background-color": "#007790",
                 "borderRadius": "5",
@@ -1879,9 +2010,29 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                 }
               },
               {"values":anti_system_cum,
-              "line-color":"#ff0000",
+              "line-color":"#0B850C",
               "line-style":"line",
               "text": anti_system_cum_val,
+              "legend-item": {
+                "background-color": "#007790",
+                "borderRadius": "5",
+                "font-color": "white"
+                },
+                "marker": {
+                  "background-color": "#da534d",
+                  "border-width": 0,
+                  "shadow": 0 ,
+                  "border-color": "#faa39f"
+                },
+                "highlight-marker": {
+                  "size": 6,
+                  "background-color": "#da534d",
+                }
+              },
+              {"values":benchmark,
+              "line-color":"#ff0000",
+              "line-style":"line",
+              "text": "Benchmark",
               "legend-item": {
                 "background-color": "#007790",
                 "borderRadius": "5",
@@ -1919,43 +2070,6 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                 }
               },
             ],
-            "plot": {
-              "highlight": true,
-              "tooltip-text": "%t: %v<br>Date:%k",
-              "shadow": 0,
-              "line-width": "2px",
-              "marker": {
-                "type": "circle",
-                "size": 1
-              },
-              "highlight-state": {
-                "line-width": 3
-              },
-              "animation": {
-                "effect": 1,
-                "sequence": 2,
-                "speed": 100,
-              },
-            },
-            "crosshair-x": {
-              "line-color": "#efefef",
-              "plot-label": {
-                "border-radius": "5px",
-                "border-width": "1px",
-                "border-color": "#f6f7f8",
-                "padding": "10px",
-                "font-weight": "bold",
-                "thousands-separator":",",
-              },
-              "scale-label": {
-                "font-color": "#000",
-                "background-color": "#f6f7f8",
-                "border-radius": "5px"
-              },
-            },
-            "tooltip": {
-              "visible": false
-            },
           };
 
           zingchart.render({

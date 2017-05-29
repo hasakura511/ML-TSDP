@@ -12,6 +12,7 @@ $(document).on('click', '.chart-button', function(event) {
 
     $( ".chart-pane-tab" ).each(function() {
         get_all_tab= $(".chart-tab-icon-text" ).text();
+
     });
 
     arr = get_all_tab.split('K'); 
@@ -56,7 +57,7 @@ function rank_index(str)
 
 function day1(test)
 {
-
+	$(".chart_loader").show();
 
     var board_value = $('.chart-title-text').html();
     board_value=board_value.split(":");
@@ -64,8 +65,6 @@ function day1(test)
 
     var tab_value=$('.chart-pane-tab-on').text();
     tab_value = tab_value.replace(/\s+/g, '');
-
-
 
     var anti_val = '';
 
@@ -76,6 +75,14 @@ function day1(test)
         dataType: 'json', // added data type
         success: function(result)
         {
+
+          /* ------------------
+          ---------------------
+          Ranking_chart
+          ---------------------
+          --------------------- */
+
+          $(".chart_loader").hide();
 
           var date = [];
           var system = [];
@@ -1137,6 +1144,11 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
     var anti_val = '';
 
+    if(tab_value==tab_value_index[2] + "K" || tab_value==tab_value_index[1] + "K"  ||  tab_value==tab_value_index[0] + "K")
+    {
+    	$(".chart_loader").show();
+    }
+
     $.ajax
     ({
         url: '/getchartdata',
@@ -1144,6 +1156,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
         dataType: 'json', // added data type
         success: function(result)
         {
+          $(".chart_loader").hide();
+
           var date = [];
           var system = [];
           var anti_system = [];
@@ -2551,7 +2565,7 @@ function getOnlyDate(strr)
 
 $(document).on('click', '.chip-button', function(event) {
 
-	// $("p").hide();
+	$(".chart_loader").show();
 
     var board_value = $('.chart-title-text').html();
     board_value=board_value.replace(/\s+/g, '');
@@ -2594,6 +2608,7 @@ $(document).on('click', '.chip-button', function(event) {
             dataType: 'json', // added data type
             success: function(result)
             {   
+            	$(".chart_loader").hide();
                 /* ------------------
                 ---------------------
                 Account_performance_chart

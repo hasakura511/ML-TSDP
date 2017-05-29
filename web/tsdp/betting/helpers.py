@@ -879,7 +879,12 @@ def get_status():
     orderstatus_dict={}
     #slippage_files={}
     accounts = ['v4micro', 'v4mini', 'v4futures']
-
+    records_urls={
+        'v4micro':'<a href="https://collective2.com/details/110125347" target="_blank">Collective 2: v4micro</a>',
+        'v4mini':'<a href="https://collective2.com/details/110125449" target="_blank">Collective 2: v4mini</a>',
+        'v4futures':'<a href="https://collective2.com/details/110126294" target="_blank">Collective 2: v4futures</a>'
+        }
+        
     def conv_sig(signals):
         sig = signals.copy()
         sig[sig == -1] = 'SHORT'
@@ -908,7 +913,7 @@ def get_status():
         orderstatus_dict[account]['status']=df[col_order_status].to_html(escape=False)
         orderstatus_dict[account]['status_text']='This table lets you know the status of your last bet/orders. For example, if your bet was correctly transmitted and received by your broker, it would say OK.<br><br>Last Update: '+timestamp
         orderstatus_dict[account]['pnl'] = df[col_order_pnl].to_html(escape=False)
-        orderstatus_dict[account]['pnl_text']='This table displays the details of your open positions in your account portfolio.<br><br>Last Update: '+str(timestamp)
+        orderstatus_dict[account]['pnl_text']='This table displays the details of your open positions in your account portfolio.<br>Last Updated: '+str(timestamp)+'<br><br>For the closed trading record please go here: '+records_urls[account]
         csidate = pd.read_sql('select distinct csiDate from slippage where Name=\'{}\''.format(account), con=readConn).csiDate.tolist()[-1]
         orderstatus_dict[account]['slippage']=pngPath+account+'_c2_slippage_'+str(csidate)+'.png'
         orderstatus_dict[account]['slippage_text']='The slippage graph shows the datetime your last orders were entered and how much it differs from the official close price. With immediate orders slippage will show the net loss/gain you get from entering earlier than at the MOC<br><br>Last Update: '+str(timestamp)
@@ -928,7 +933,7 @@ def get_status():
             orderstatus_dict[account]['status'] = df[col_order_status_ib].to_html(escape=False)
             orderstatus_dict[account]['status_text']='This table lets you know the status of your last bet/orders. For example, if your bet was correctly transmitted and received by your broker, it would say OK.<br><br>Last Update: '+timestamp
             orderstatus_dict[account]['pnl'] = df[col_order_pnl_ib].to_html(escape=False)
-            orderstatus_dict[account]['pnl_text']='This table displays the details of your open positions in your account portfolio.<br><br>Last Update: '+str(timestamp)
+            orderstatus_dict[account]['pnl_text']='This table displays the details of your open positions in your account portfolio.<br>Last Updated: '+str(timestamp)+'<br><br>For the closed trading record please go here: '+records_urls[account]
             csidate = pd.read_sql('select distinct Date from ib_slippage where Name=\'{}\''.format(account),
                                   con=readConn).Date.tolist()[-1]
             #slippage_files[account+'_ib'] = str(csidate)

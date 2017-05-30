@@ -1105,12 +1105,12 @@ function day1(test)
 
 			function updateLabels(event) { 
 	          	var labels = event.chart.chartDiv.getElementsByClassName("amcharts-axis-label");
-	          	console.log(data.length);
+	          	// console.log(data.length);
 
 	          	for (var i = 0; i < (data.length); i++) {
 	            	var color = event.chart.dataProvider[i].color; 
 	            	// console.log(labels[i]);
-	            	console.log(color);
+	            	// console.log(color);
 			            if (color !== undefined)  { 
 			              	labels[i].setAttribute("fill", color);
 			            }
@@ -1171,6 +1171,8 @@ $(document).on('click', '.chart-pane-tab', function(event) {
           var system_pnl_percent = [];
 
           var chart_title = '';
+          var anti_system_cum_title = '';
+          var system_pnl_percent_title = '';
           btn_click = 3;
 
           if(tab_value==tab_value_index[2] + "K")
@@ -1195,6 +1197,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='AntiHighestEquity' && board_value=='HighestEquity')
               {
@@ -1204,6 +1213,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                 anti_system_cum_title = l +'_cumper';
+                 system_pnl_percent_title = l + '_pnl';
+
+                 anti_system_cum_val = l +' Cum %';
+                 system_pnl_percent_val = l + " Daily P&L %";
+
+                 chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1216,6 +1232,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='Previous' && board_value=='Anti-Previous')
               {
@@ -1225,6 +1248,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1237,6 +1267,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='RiskOn' && board_value=='RiskOff')
               {
@@ -1246,6 +1283,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1258,6 +1302,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='50/50' && board_value=='Anti50/50')
               { 
@@ -1267,6 +1318,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1279,6 +1337,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='LowestEquity' && board_value=='AntiLowestEquity')
               {
@@ -1288,6 +1353,46 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
+              }
+
+              else if(board_value=='Custom' && l=='Anti-Custom')
+              {
+                  anti_val = 'Anti-Custom';
+                  $.each(this, function(k, v) {
+
+                            anti_system.push(v);
+
+                        });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
+              }
+              else if(l=='Custom' && board_value=='Anti-Custom')
+              {
+                  anti_val = 'Custom';
+                  $.each(this, function(k, v) {
+
+                            anti_system.push(v);
+
+                        });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1299,6 +1404,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='Seasonality' && board_value=='Anti-Seasonality')
               {
@@ -1308,6 +1420,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else
               {
@@ -1319,19 +1438,23 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                           anti_system.push(v);
 
                       });
-                  }
-                  if(l=='Anti-'+board_value+'_cumper')
-                  {
+                      anti_system_cum_title = 'Anti-'+board_value+'_cumper';
+                      system_pnl_percent_title = "Anti-" + board_value + "_pnl";
+
                       anti_system_cum_val = 'Anti-'+ board_value+' Cum %';
-                      $.each(this, function(k, v) {
-
-                          v = v + " %";
-                          anti_system_cum.push(v);
-
-                      });
+                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
                   }
               }
 
+              if(l==anti_system_cum_title)
+              {
+                  $.each(this, function(k, v) {
+
+                      v = v + " %";
+                      anti_system_cum.push(v);
+
+                  });
+              }
               
               if(l=='benchmark')
               {
@@ -1372,11 +1495,10 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                   });
               }
-              if(l == "Anti-" + board_value + "_pnl")
+              if(l == system_pnl_percent_title )
               {
                   $.each(this, function(k, v) {
 
-                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
                       v = v * 100;
                       v = parseFloat(v).toFixed(2);
                       v = v + " %";
@@ -1407,6 +1529,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='AntiHighestEquity' && board_value=='HighestEquity')
               {
@@ -1416,6 +1545,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                 anti_system_cum_title = l +'_cumper';
+                 system_pnl_percent_title = l + '_pnl';
+
+                 anti_system_cum_val = l +' Cum %';
+                 system_pnl_percent_val = l + " Daily P&L %";
+
+                 chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1428,6 +1564,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='Previous' && board_value=='Anti-Previous')
               {
@@ -1437,6 +1580,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1449,6 +1599,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='RiskOn' && board_value=='RiskOff')
               {
@@ -1458,6 +1615,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1470,6 +1634,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='50/50' && board_value=='Anti50/50')
               { 
@@ -1479,6 +1650,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1491,6 +1669,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='LowestEquity' && board_value=='AntiLowestEquity')
               {
@@ -1500,6 +1685,46 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
+              }
+
+              else if(board_value=='Custom' && l=='Anti-Custom')
+              {
+                  anti_val = 'Anti-Custom';
+                  $.each(this, function(k, v) {
+
+                            anti_system.push(v);
+
+                        });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
+              }
+              else if(l=='Custom' && board_value=='Anti-Custom')
+              {
+                  anti_val = 'Custom';
+                  $.each(this, function(k, v) {
+
+                            anti_system.push(v);
+
+                        });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1511,6 +1736,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='Seasonality' && board_value=='Anti-Seasonality')
               {
@@ -1520,6 +1752,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else
               {
@@ -1531,19 +1770,23 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                           anti_system.push(v);
 
                       });
-                  }
-                  if(l=='Anti-'+board_value+'_cumper')
-                  {
+                      anti_system_cum_title = 'Anti-'+board_value+'_cumper';
+                      system_pnl_percent_title = "Anti-" + board_value + "_pnl";
+
                       anti_system_cum_val = 'Anti-'+ board_value+' Cum %';
-                      $.each(this, function(k, v) {
-
-                          v = v + " %";
-                          anti_system_cum.push(v);
-
-                      });
+                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
                   }
               }
 
+              if(l==anti_system_cum_title)
+              {
+                  $.each(this, function(k, v) {
+
+                      v = v + " %";
+                      anti_system_cum.push(v);
+
+                  });
+              }
               
               if(l=='benchmark')
               {
@@ -1584,11 +1827,10 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                   });
               }
-              if(l == "Anti-" + board_value + "_pnl")
+              if(l == system_pnl_percent_title )
               {
                   $.each(this, function(k, v) {
 
-                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
                       v = v * 100;
                       v = parseFloat(v).toFixed(2);
                       v = v + " %";
@@ -1619,6 +1861,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='AntiHighestEquity' && board_value=='HighestEquity')
               {
@@ -1628,6 +1877,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                 anti_system_cum_title = l +'_cumper';
+                 system_pnl_percent_title = l + '_pnl';
+
+                 anti_system_cum_val = l +' Cum %';
+                 system_pnl_percent_val = l + " Daily P&L %";
+
+                 chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1640,6 +1896,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='Previous' && board_value=='Anti-Previous')
               {
@@ -1649,6 +1912,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1661,6 +1931,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='RiskOn' && board_value=='RiskOff')
               {
@@ -1670,6 +1947,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1682,6 +1966,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='50/50' && board_value=='Anti50/50')
               { 
@@ -1691,6 +1982,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1703,6 +2001,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='LowestEquity' && board_value=='AntiLowestEquity')
               {
@@ -1712,6 +2017,46 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
+              }
+
+              else if(board_value=='Custom' && l=='Anti-Custom')
+              {
+                  anti_val = 'Anti-Custom';
+                  $.each(this, function(k, v) {
+
+                            anti_system.push(v);
+
+                        });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
+              }
+              else if(l=='Custom' && board_value=='Anti-Custom')
+              {
+                  anti_val = 'Custom';
+                  $.each(this, function(k, v) {
+
+                            anti_system.push(v);
+
+                        });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
 
 
@@ -1723,6 +2068,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else if(l=='Seasonality' && board_value=='Anti-Seasonality')
               {
@@ -1732,6 +2084,13 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                             anti_system.push(v);
 
                         });
+                  anti_system_cum_title = l +'_cumper';
+                  system_pnl_percent_title = l + '_pnl';
+
+                  anti_system_cum_val = l +' Cum %';
+                  system_pnl_percent_val = l + " Daily P&L %";
+
+                  chart_title = "v4futures 20Days Historical Performance: "+board_value+", " + l + ", Benchmark";
               }
               else
               {
@@ -1743,19 +2102,23 @@ $(document).on('click', '.chart-pane-tab', function(event) {
                           anti_system.push(v);
 
                       });
-                  }
-                  if(l=='Anti-'+board_value+'_cumper')
-                  {
+                      anti_system_cum_title = 'Anti-'+board_value+'_cumper';
+                      system_pnl_percent_title = "Anti-" + board_value + "_pnl";
+
                       anti_system_cum_val = 'Anti-'+ board_value+' Cum %';
-                      $.each(this, function(k, v) {
-
-                          v = v + " %";
-                          anti_system_cum.push(v);
-
-                      });
+                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
                   }
               }
 
+              if(l==anti_system_cum_title)
+              {
+                  $.each(this, function(k, v) {
+
+                      v = v + " %";
+                      anti_system_cum.push(v);
+
+                  });
+              }
               
               if(l=='benchmark')
               {
@@ -1796,11 +2159,10 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                   });
               }
-              if(l == "Anti-" + board_value + "_pnl")
+              if(l == system_pnl_percent_title )
               {
                   $.each(this, function(k, v) {
 
-                      system_pnl_percent_val = "Anti-" + board_value + " Daily P&L %";
                       v = v * 100;
                       v = parseFloat(v).toFixed(2);
                       v = v + " %";
@@ -1808,6 +2170,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                   });
               }
+
             });
           }
           else
@@ -1837,7 +2200,9 @@ $(document).on('click', '.chart-pane-tab', function(event) {
           tot+=max.toString();
           tot+=":1000";
 
-          
+          // console.log(anti_system);
+          // console.log(system_pnl_percent);
+          // console.log(anti_system_cum);
       
           var myConfig =  {
             "type":"line",
@@ -2357,7 +2722,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 						identify_color = i_color;
 					}
 
-					console.log("1");
+					// console.log("1");
 
 					data.push({
 						"category" : v,
@@ -2389,7 +2754,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 						identify_color = i_color;
 					}
 
-					console.log("2");
+					// console.log("2");
 
 					data.push({
 						"category" : v,
@@ -2420,7 +2785,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 						identify_color = i_color;
 					}
 
-					console.log("3");
+					// console.log("3");
 
 					data.push({
 						"category" : v,
@@ -2451,7 +2816,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 						identify_color = i_color;
 					}
 
-					console.log("4");
+					// console.log("4");
 
 					data.push({
 						"category" : v,
@@ -2482,7 +2847,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 						identify_color = i_color;
 					}
 
-					console.log("5");
+					// console.log("5");
 
 					data.push({
 						"category" : v,
@@ -2513,7 +2878,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 						identify_color = i_color;
 					}
 
-					console.log("6");
+					// console.log("6");
 
 					data.push({
 						"category" : v,
@@ -2614,12 +2979,12 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
 			function updateLabels(event) { 
 	          	var labels = event.chart.chartDiv.getElementsByClassName("amcharts-axis-label");
-	          	console.log(data.length);
+	          	// console.log(data.length);
 
 	          	for (var i = 0; i < (data.length); i++) {
 	            	var color = event.chart.dataProvider[i].color; 
 			            if (color !== undefined)  { 
-			            	console.log(color);
+			            	// console.log(color);
 			              	labels[i].setAttribute("fill", color);
 			            }
 	          	}
@@ -2710,7 +3075,7 @@ $(document).on('click', '.chip-button', function(event) {
         account_value_str = account_value_str.substr(c+1);  
     }
 
-    console.log(account_value);
+    // console.log(account_value);
     
     var anti_val = '';
     if(board_value == 'AccountPerformanceChart' && tab_value != '')
@@ -3280,7 +3645,7 @@ $(document).on('click', '.chip-button', function(event) {
                       }
                     },
                     {"values":benchmark_sym,
-                    "line-color":"#FF0000",
+                    "line-color":"#FF00FF",
                     "line-style":"line",
                     "text": "Symbol",
                     "legend-item": {

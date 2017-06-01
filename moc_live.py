@@ -1196,6 +1196,8 @@ if __name__ == "__main__":
         
         #print timetable.to_csv()
         delta=dt.strptime(str(ttdate),'%Y%m%d')-dt.strptime(str(csidate),'%Y%m%d')
+        txt = 'Delta: {}, Last timetable date: {}, Last csidate: {}'.format(delta.days, ttdate, csidate)
+        print txt
         if delta.days >0:
             txt = 'Delta: {}, Last timetable date: {}, Last csidate: {}'.format(delta.days, ttdate, csidate)
             slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")

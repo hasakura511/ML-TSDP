@@ -1193,8 +1193,15 @@ if __name__ == "__main__":
             #print e
             slack.notify(text='get_timetable: '+str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             traceback.print_exc()
-                        
-        print timetable.to_csv()
+        
+        #print timetable.to_csv()
+        delta=dt.strptime(str(ttdate),'%Y%m%d')-dt.strptime(str(csidate),'%Y%m%d')
+        if delta.days >0:
+            txt = 'Delta: {}, Last timetable date: {}, Last csidate: {}'.format(delta.days, ttdate, csidate)
+            slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
+
+
+
         ib_portfolio=get_ibfutpositions(portfolioPath)
         print ib_portfolio
 

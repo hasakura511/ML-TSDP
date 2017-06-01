@@ -46,10 +46,11 @@ systemFilename='system_v4futures.csv'
 systemFilename2='system_v4mini.csv'
 systemFilename3='system_v4micro.csv'
 
-#c2id_macro=107146997
-#c2id_mini=101359768
-#c2id_micro=101533256
-#c2key='tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w'
+c2id_macro=110126294
+c2id_mini=110125449
+c2id_micro=110125347
+c2key=c2key_micro=c2key_mini=c2key_macro='O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx'
+
 
 
 if len(sys.argv)==1:
@@ -252,14 +253,14 @@ riskEquity_micro=int(acctinfo['v4micro']['riskEquity'])
 offline=[sym for sym in c2contractSpec.keys() if sym not in eval(acctinfo['v4futures']['online'])]
 offline_mini=[sym for sym in c2contractSpec.keys() if sym not in eval(acctinfo['v4mini']['online'])]
 offline_micro=[sym for sym in c2contractSpec.keys() if sym not in eval(acctinfo['v4micro']['online'])]
-
+'''
 c2id_macro=acctinfo['v4futures']['c2id']
 c2id_mini=acctinfo['v4mini']['c2id']
 c2id_micro=acctinfo['v4micro']['c2id']
 c2key_macro=acctinfo['v4futures']['c2key']
 c2key_mini=acctinfo['v4mini']['c2key']
 c2key_micro=acctinfo['v4micro']['c2key']
-
+'''
 accountInfo = pd.DataFrame(data=[[c2system, c2system_mini, c2system_micro]],columns=systems,index=['selection'])
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2id_macro, c2id_mini, c2id_micro]],columns=systems,index=['c2id']))
 accountInfo = accountInfo.append(pd.DataFrame(data=[[c2key_macro, c2key_mini, c2key_micro]],columns=systems,index=['c2key']))

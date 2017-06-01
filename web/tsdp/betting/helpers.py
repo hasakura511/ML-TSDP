@@ -520,8 +520,8 @@ def recreateCharts(custom_signals=None, accountinfo=None):
             else:
                 print filename,'could not be found'
 
-        print('updating chart db with custom signals')
-        #run_vol_adjsize()
+        print('run_vol_adjsize: updating db with custom signals')
+        run_vol_adjsize()
         pass
 
     if accountinfo is not None:
@@ -531,6 +531,8 @@ def recreateCharts(custom_signals=None, accountinfo=None):
         with open(filename, 'w') as f:
              json.dump(accountinfo, f)
         print 'Saved',filename
+        print('run_vol_adjsize: updating db with new account info')
+        run_vol_adjsize()
         
     #time.sleep(15)
     update_chartdb()

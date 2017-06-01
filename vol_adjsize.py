@@ -39,25 +39,12 @@ import logging
 start_time = time.time()
 version='v4'
 systems = ['v4futures','v4mini','v4micro']
-riskEquity=1000
-riskEquity_mini=250
-riskEquity_micro=250        
-offline =['AC','AEX','CC','CGB','CT','DX','EBL','EBM','EBS','ED','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','KC','KW','LB','LCO','LGO','LRC','LSU','MEM','MFX','MW','O','OJ','RR','RS','SB','SIN','SJB','SMI','SSG','STW','SXE','TF','VX','YA','YB','YT2','YT3',]
-offline_mini = ['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM','EBS','ED','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SMI','SSG','STW','SXE','TF','US','VX','YA','YB','YM','YT2','YT3',]
-offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3',]
-
-
 lookback=20
 refresh=False
 currencyFile = 'currenciesATR.csv'
 systemFilename='system_v4futures.csv'
 systemFilename2='system_v4mini.csv'
 systemFilename3='system_v4micro.csv'
-
-c2id_macro=110126294
-c2id_mini=110125449
-c2id_micro=110125347
-c2key='O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx'
 
 #c2id_macro=107146997
 #c2id_mini=101359768
@@ -145,16 +132,6 @@ ComponentsDict ={
                             'Seasonality':'LastSEA',
                             'Anti-Seasonality':'AntiSEA',
                             }
-
-accountInfo = pd.DataFrame(data=[[c2system, c2system_mini, c2system_micro]],columns=systems,index=['selection'])
-accountInfo = accountInfo.append(pd.DataFrame(data=[[c2id_macro, c2id_mini, c2id_micro]],columns=systems,index=['c2id']))
-accountInfo = accountInfo.append(pd.DataFrame(data=[[c2key, c2key, c2key]],columns=systems,index=['c2key']))
-accountInfo = accountInfo.append(pd.DataFrame(data=[[riskEquity, riskEquity_mini, riskEquity_micro]],columns=systems,index=['riskEquity']))
-accountInfo = accountInfo.append(pd.DataFrame(data=[[str(offline), str(offline_mini), str(offline_micro)]],columns=systems,index=['offline']))
-#range (-1 to 1) postive for counter-trend negative for trend i.e.
-#-1 would 0 safef ==1 and double safef==2
-#1 would 0 safef ==2 and double safef==1
-safefAdjustment=0
 
 
 fxRates=pd.read_csv(dataPath2+currencyFile, index_col=0)
@@ -257,6 +234,41 @@ c2contractSpec = {
 'YT2':['HTS',fxDict['AUD'],2800,'rates',-1,1],
 'YT3':['HXS',fxDict['AUD'],8000,'rates',-1,1],
     }
+
+##ACCTINFO
+acctinfofile='./web/tsdp/accountinfo_data.json'
+with open(acctinfofile, 'r') as f:
+     acctinfo=json.load(f)
+     
+
+riskEquity=int(acctinfo['v4futures']['riskEquity'])
+riskEquity_mini=int(acctinfo['v4mini']['riskEquity'])
+riskEquity_micro=int(acctinfo['v4micro']['riskEquity'])
+
+#offline =['AC','AEX','CC','CGB','CT','DX','EBL','EBM','EBS','ED','FCH','FDX','FEI','FFI','FLG','FSS','HCM','HIC','KC','KW','LB','LCO','LGO','LRC','LSU','MEM','MFX','MW','O','OJ','RR','RS','SB','SIN','SJB','SMI','SSG','STW','SXE','TF','VX','YA','YB','YT2','YT3',]
+#offline_mini = ['AC','AD','AEX','BO','BP','CC','CD','CGB','CT','DX','EBL','EBM','EBS','ED','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SMI','SSG','STW','SXE','TF','US','VX','YA','YB','YM','YT2','YT3',]
+#offline_micro =['AC','AD','AEX','BP','C','CC','CD','CGB','CL','CT','CU','DX','EBL','EBM','EBS','ED','EMD','FC','FCH','FDX','FEI','FFI','FLG','FSS','FV','GC','HCM','HIC','HO','JY','KC','KW','LB','LC','LCO','LGO','LH','LRC','LSU','MEM','MFX','MP','MW','NE','NIY','NQ','O','OJ','PA','PL','RB','RR','RS','S','SB','SF','SI','SIN','SJB','SM','SMI','SSG','STW','SXE','TF','TU','US','VX','W','YA','YB','YM','YT2','YT3',]
+
+offline=[sym for sym in c2contractSpec.keys() if sym not in eval(acctinfo['v4futures']['online'])]
+offline_mini=[sym for sym in c2contractSpec.keys() if sym not in eval(acctinfo['v4mini']['online'])]
+offline_micro=[sym for sym in c2contractSpec.keys() if sym not in eval(acctinfo['v4micro']['online'])]
+
+c2id_macro=acctinfo['v4futures']['c2id']
+c2id_mini=acctinfo['v4mini']['c2id']
+c2id_micro=acctinfo['v4micro']['c2id']
+c2key_macro=acctinfo['v4futures']['c2key']
+c2key_mini=acctinfo['v4mini']['c2key']
+c2key_micro=acctinfo['v4micro']['c2key']
+
+accountInfo = pd.DataFrame(data=[[c2system, c2system_mini, c2system_micro]],columns=systems,index=['selection'])
+accountInfo = accountInfo.append(pd.DataFrame(data=[[c2id_macro, c2id_mini, c2id_micro]],columns=systems,index=['c2id']))
+accountInfo = accountInfo.append(pd.DataFrame(data=[[c2key_macro, c2key_mini, c2key_micro]],columns=systems,index=['c2key']))
+accountInfo = accountInfo.append(pd.DataFrame(data=[[riskEquity, riskEquity_mini, riskEquity_micro]],columns=systems,index=['riskEquity']))
+accountInfo = accountInfo.append(pd.DataFrame(data=[[str(offline), str(offline_mini), str(offline_micro)]],columns=systems,index=['offline']))
+#range (-1 to 1) postive for counter-trend negative for trend i.e.
+#-1 would 0 safef ==1 and double safef==2
+#1 would 0 safef ==2 and double safef==1
+safefAdjustment=0
 
 filename='./web/tsdp/custom_signals_data.json'
 if isfile(filename):
@@ -581,7 +593,7 @@ try:
         print system.ix[idx].c2sym
     system.Name=systemFilename.split('_')[1][:-4]
     system.c2id=c2id_macro
-    system.c2api=c2key
+    system.c2api=c2key_macro
     #mini
     for sys in system_mini.System:
         sym=sys.split('_')[1]
@@ -596,7 +608,7 @@ try:
         print system_mini.ix[idx].c2sym
     system_mini.Name=systemFilename2.split('_')[1][:-4]
     system_mini.c2id=c2id_mini
-    system_mini.c2api=c2key
+    system_mini.c2api=c2key_mini
     #micro
     for sys in system_micro.System:
         sym=sys.split('_')[1]
@@ -611,7 +623,7 @@ try:
         print system_micro.ix[idx].c2sym
     system_micro.Name=systemFilename3.split('_')[1][:-4]
     system_micro.c2id=c2id_micro 
-    system_micro.c2api=c2key
+    system_micro.c2api=c2key_micro
     #signalDF=signalDF.sort_index()
     #print signalDF
     #signalDF.to_csv(savePath+'futuresSignals.csv')

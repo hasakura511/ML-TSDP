@@ -1,0 +1,3 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-05-30 14:19:24 1 @BON7 $-18,@BON7,2017-05-30 14:19:24,31.39,2017-05-30 14:20:00,31.42,-0.000954805856143,0.000954805856143,Open,-1.0,-18.0,2.5,-1 days +23:59:24.000000000,-1.0
+ctwo opened: 2017-05-30 16:44:41 1 QHGN7 $-137,QHGN7,2017-05-30 16:44:41,256.95,2017-05-30 17:00:00,256.4,0.00214508580343,0.00214508580343,Open,1.0,-137.0,2.5,-1 days +23:44:41.000000000,-16.0

@@ -1,6 +1,6 @@
-symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
-@ESM7,-100,1496263515,,,2414.25000,,future,long,2017-05-31 16:45:15,1496263515,open,2017-05-31 16:45:12,2414.25000,50,,0,1,,,111859409,
-@TYU7,31,1496263515,,,126.21875,,future,short,2017-05-31 16:45:15,1496263515,open,2017-05-31 16:45:13,126.21875,1000,,0,1,,,111859414,
-QNGN7,80,1496263515,,,3.07800,,future,long,2017-05-31 16:45:15,1496263515,open,2017-05-31 16:45:13,3.07800,10000,,0,1,,,111859412,
-@BON7,42,1496254727,,,31.31000,,future,long,2017-05-31 14:18:47,1496254727,open,2017-05-31 14:18:45,31.31000,600,,0,1,,,111856280,
-QHGN7,300,1496177083,,,256.95000,,future,long,2017-05-30 16:44:43,1496177083,open,2017-05-30 16:44:41,256.95000,250,,0,1,,,111837848,
+symbol,PL,closeVWAP_timestamp,closedWhen,closedWhenUnixTimeStamp,closing_price_VWAP,currency,expir,instrument,long_or_short,markToMarket_time,openVWAP_timestamp,open_or_closed,openedWhen,opening_price_VWAP,ptValue,putcall,quant_closed,quant_opened,strike,symbol_description,trade_id,underlying
+@ESM7,788,1496263515,,,2414.25000,USD,,future,long,2017-05-31 16:45:15,1496263515,open,2017-05-31 16:45:12,2414.25000,50,,0,1,,,111859409,
+@TYU7,0,1496263515,,,126.21875,USD,,future,short,2017-05-31 16:45:15,1496263515,open,2017-05-31 16:45:13,126.21875,1000,,0,1,,,111859414,
+QNGN7,-400,1496263515,,,3.07800,USD,,future,long,2017-05-31 16:45:15,1496263515,open,2017-05-31 16:45:13,3.07800,10000,,0,1,,,111859412,
+@BON7,-24,1496254727,,,31.31000,USD,,future,long,2017-05-31 14:18:47,1496254727,open,2017-05-31 14:18:45,31.31000,600,,0,1,,,111856280,
+QHGN7,225,1496177083,,,256.95000,USD,,future,long,2017-05-30 16:44:43,1496177083,open,2017-05-30 16:44:41,256.95000,250,,0,1,,,111837848,

@@ -3037,6 +3037,8 @@ function getOnlyDate(strr)
     var d = str.getDate();
     var m = str.getMonth();
     var y = str.getFullYear();
+    
+    m = m + 1;
 
     return y + "-" + m + "-" + d;
 }

@@ -1202,7 +1202,8 @@ if __name__ == "__main__":
             slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
 
 
-
+        '''
+        #dont do this because it will mess up account values timing.
         ib_portfolio=get_ibfutpositions(portfolioPath)
         print ib_portfolio
 
@@ -1225,8 +1226,9 @@ if __name__ == "__main__":
                 print  'Saved',account,'c2_equity to sql db',dbPath
             else:
                 print 'Could not get last equity from c2'
+        '''
         print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
-        sys.exit('refresh_timetable and account values')
+        sys.exit('refresh_timetable')
 
     if post_processing:
         skipcheck=True

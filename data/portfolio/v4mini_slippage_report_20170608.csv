@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-06-08 16:45:20 1 @TUU7 $15,@TUU7,2017-06-08 16:45:20,108.16406,2017-06-08 17:00:00,108.15625,7.22103438313e-05,7.22103438313e-05,Open,-1.0,15.0,2.5,-1 days +23:45:20.000000000,-15.0

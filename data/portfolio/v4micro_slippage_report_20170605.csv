@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-06-05 16:46:27 1 @ESM7 $-125,@ESM7,2017-06-05 16:46:27,2435.25,2017-06-05 17:00:00,2437.75,-0.00102553584248,0.00102553584248,Open,-1.0,-125.0,2.5,-1 days +23:46:27.000000000,-14.0

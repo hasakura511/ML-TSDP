@@ -600,8 +600,9 @@ for account in totals_accounts:
     benchmark_values=totalsDF['PNL_benchmark'].copy()
     #print account, benchmark_values
     benchmark_values.index=benchmark_xaxis_label
+    #shift 1 because moc results delayed by one day.
     simulated_moc=pd.read_sql('select * from (select * from v4futures_live where orderType=\'MOC\' order by timestamp)\
-                                            group by Date', con=readConn, index_col='Date').selection
+                                            group by Date', con=readConn, index_col='Date').selection.shift(1).dropna()
     simulated_moc.index=[dt.strptime(str(x),'%Y%m%d') for x in simulated_moc.index]
     
     if account=='v4futures':

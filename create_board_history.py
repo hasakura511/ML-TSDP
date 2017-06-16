@@ -247,6 +247,7 @@ def add_missing_rows(df, datetup, all_syms):
             
 totals_accounts={}
 pnl_accounts={}
+boards_dict={}
 for account in qtydict.keys():
     print '\ncreating history for', account
     componentsdict = eval(selectionDF[account].values[0])
@@ -343,6 +344,7 @@ for account in qtydict.keys():
         #print totalsDict[currentdate].sort_index().transpose()
         #totalsDict[currentdate]['Date']=currentdate
         totalsDict[currentdate]['timestamp']=futuresDF_boards[currentdate].timestamp[0]
+        
     
     totalsDF=pd.DataFrame()
     for key in totalsDict.keys():
@@ -365,7 +367,31 @@ for account in qtydict.keys():
     filename = savePath+tablename+'_'+str(currentdate)+'.csv'
     pnlDF.to_csv(filename, index=True)
     print 'Saved', tablename,'from',datetup[0][1],'to',currentdate,'to', dbPath,'and', filename
+    boards_dict[account]=futuresDF_boards.copy()
 
+#for customize signals
+signalsDF=pd.DataFrame(signalsDict[currentdate])
+signalsDF['Date']=currentdate
+tablename='last_signals'
+signalsDF.to_sql(name=tablename, if_exists=mode, con=writeWebChartsConn, index=True, index_label='CSIsym')
+print 'Saved', tablename, 'for', currentdate
+
+#for customize chip
+market_pnl_by_date=boards_dict['v4futures']
+mpbd={}
+for key in market_pnl_by_date:
+    for sym in market_pnl_by_date[key].index:
+        if sym not in mpbd:
+            mpbd[sym]=pd.DataFrame({key:market_pnl_by_date[key].ix[sym]})
+        else:
+            mpbd[sym]=pd.concat([mpbd[sym], pd.DataFrame({key:market_pnl_by_date[key].ix[sym]})], axis=1)
+mpbd2={}
+for sym in mpbd:
+    pnlcols=[x for x in mpbd[sym].index if x.split('_')[0]=='PNL']
+    mpbd2[sym]=mpbd[sym].transpose()[pnlcols].cumsum()
+    mpbd2[sym].index=[dt.strptime(str(x),'%Y%m%d') for x in mpbd2[sym].index]
+    #mpbd2[sym].plot(title=sym)
+    
 #create charts
 def conv_sig(signals):
     sig = signals.copy()
@@ -601,9 +627,10 @@ for account in totals_accounts:
     #print account, benchmark_values
     benchmark_values.index=benchmark_xaxis_label
     #shift 1 because moc results delayed by one day.
-    simulated_moc=pd.read_sql('select * from (select * from v4futures_live where orderType=\'MOC\' order by timestamp)\
-                                            group by Date', con=readConn, index_col='Date').selection.shift(1).dropna()
+    simulated_moc=pd.read_sql('select * from (select * from {}_live where orderType=\'MOC\' order by timestamp)\
+                                            group by Date'.format(account), con=readConn, index_col='Date').selection.shift(1).dropna()
     simulated_moc.index=[dt.strptime(str(x),'%Y%m%d') for x in simulated_moc.index]
+    #print account,simulated_moc[-5:]
     
     if account=='v4futures':
         broker='ib'

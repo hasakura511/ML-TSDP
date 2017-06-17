@@ -32,6 +32,13 @@ class LogFiles(object):
     def display_text_file(self):
         with open(self.filename) as fp:
             return fp.read()
+            
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
 
 def getBackendDB():
     global dbPath
@@ -430,6 +437,8 @@ def getCustomSignals():
                                           where Date=%s\
                     order by timestamp ASC) group by CSIsym'%lastdate,\
                         con=readConn,  index_col='CSIsym')
+    signalsDict=pd.read_sql('select * from last_signals', con=readPriceConn,\
+                              index_col='CSIsym').drop(['Date','benchmark'],axis=1)
 
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn,\
                               index_col='CSIsym')
@@ -443,6 +452,7 @@ def getCustomSignals():
                 for x in desc_hyperlink]
     df=pd.DataFrame(data=dict(Group=futuresDF.group.values,\
                               Markets=desc_hyperlink,
+                              signals=signalsDict.Custom.values,
                                 Default=futuresDF.Custom.values),
                                 index=futuresDF.index)
 
@@ -452,15 +462,15 @@ def getCustomSignals():
             custom_signals_data = json.load(f)
         #custom_signals_data=custom_signals_data[custom_signals_data.keys()[0]]
         name=custom_signals_data['name']
-        df['signals']=pd.Series(custom_signals_data['customsignals'])
+        #df['signals']=pd.DataFrame(json.loads(custom_signals_data['customsignals'])).transpose().signals
     else:
         name='Custom'
-        custom_signals_data={'name':name,
-                'customsignals':df.sort_values(by=['Group'])['Default']\
-                                                     .transpose().to_dict()}
-        with open(filename, 'w') as f:
-            json.dump(custom_signals_data,f)
-        print 'Couldn\'t find',filename,'Saved new file'
+        #custom_signals_data={'name':name,
+        #        'customsignals':df.sort_values(by=['Group'])['Default']\
+        #                                             .transpose().to_dict()}
+        #with open(filename, 'w') as f:
+        #    json.dump(custom_signals_data,f)
+        #print 'Couldn\'t find',filename,'Saved new file'
         df['signals']=df['Default'].copy()
         
         
@@ -486,7 +496,34 @@ def getCustomSignals():
                 df.set_value(sym, col_name, signal)
                 df.set_value(sym, 'Anti-'+col_name, -signal)
                 #print col_name, pctchg, signal
+                
+    a=[x for x in signalsDict.keys() if is_int(x)]
+    a.sort(key=int)
+    b=['Anti-'+x for x in a]
+    numorder=[]
+    for i in range(len(a)):
+        numorder.append(a[i])
+        numorder.append(b[i])
+        
+    namedorder=['HighestEquity',
+     'AntiHighestEquity',
+     'LowestEquity',
+     'AntiLowestEquity',
+     '50/50',
+     'Anti50/50',
+     'RiskOn',
+     'RiskOff',
+     'Previous',
+     'Anti-Previous',
+     'Anti-Seasonality',
+     'Seasonality',
+     'Custom',
+     'Anti-Custom',
+     'Off']
 
+    firstorder=df.columns.tolist()
+    df=pd.concat([df,signalsDict],axis=1)
+    df=df[firstorder+namedorder+numorder]
     customsignals=df.sort_values(by=['Group']).transpose().to_json()
 
     return {'name':name, 'customsignals':customsignals}
@@ -627,12 +664,6 @@ def archive_dates():
     
 
 def get_blends(cloc, list_boxstyles=None, returnVotingComponents=True):
-    def is_int(s):
-        try:
-            int(s)
-            return True
-        except ValueError:
-            return False
 
     #if cloc == None:
     #    firstrec=UserSelection.objects.order_by('-timestamp').first()

@@ -341,6 +341,7 @@ def get_order_status():
             df = pd.read_sql('select * from (select * from %s\
                     order by timestamp ASC) group by ibsym' % ('checkSystems_ib_' + account), \
                              con=readConn)
+            df['contracts']=[df.ix[i].ibsym+df.ix[i].exp for i in df.index]
             desc_list = [futuresDict.reset_index().set_index('IBsym').ix[x].Desc for x in df.ibsym]
             df['desc'] = [re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
             orderstatus_dict[account+'_ib'] = df[col_order].to_html()

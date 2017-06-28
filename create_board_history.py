@@ -519,6 +519,7 @@ def createRankingChart(ranking, account, line, title, filename):
     
     #pnl text
     pnl=market_pnl_by_date[currentdate]['PNL_'+line].ix[active_symbols[account]].astype(int)
+    pnl.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in pnl.index]
     pnl['Total']=pnl.sum()
     pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
     text='<br>'+pd.DataFrame(pnl).to_html()

@@ -142,7 +142,7 @@ web_accountnames={
                     'v4mini':'100K',
                     'v4micro':'50K',
                     }
-lookback_short=2
+lookback_short=1
 lookback_mid=5
 lookback=20
 benchmark_sym='ES'
@@ -474,6 +474,7 @@ for account in totals_accounts:
     perchgDict[account].index=[str(rank_num[idx])+' Rank '+col for idx,col in enumerate(combined_ranking.index)]
     
 def createRankingChart(ranking, account, line, title, filename):
+    global currentdate
     fig=plt.figure(1, figsize=(10,15))
     ax = fig.add_subplot(111) 
     colors=['b','y','g']
@@ -530,6 +531,10 @@ def createRankingChart(ranking, account, line, title, filename):
     ranking.index=[str(len(ranking.index)-idx)+' Rank '+col for idx,col in enumerate(ranking.index)]
     pair=sorted([x for x in ranking.index if line==x.split()[2] or anti==x.split()[2]])
     text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
+    pnl=market_pnl_by_date[currentdate]['PNL_'+line].ix[active_symbols[account]].astype(int)
+    pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
+    text+='<br>'+pd.DataFrame(pnl).to_html()
+    
     return text
 
 performance_chart_dict={} 

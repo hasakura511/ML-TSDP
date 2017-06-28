@@ -1,0 +1,3 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-06-26 16:50:04 1 @ESU7 $-12,@ESU7,2017-06-26 16:50:04,2436.25,2017-06-26 17:00:00,2436.0,0.0001026272578,0.0001026272578,Open,1.0,-12.0,2.5,-1 days +23:50:04.000000000,-10.0
+ctwo opened: 2017-06-26 16:50:05 1 QNGQ7 $209,QNGQ7,2017-06-26 16:50:05,3.07,2017-06-26 17:00:00,3.049,0.0068875040997,0.0068875040997,Open,-1.0,209.0,2.5,-1 days +23:50:05.000000000,-10.0

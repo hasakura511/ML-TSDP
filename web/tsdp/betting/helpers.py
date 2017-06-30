@@ -955,7 +955,7 @@ def get_status():
             df = pd.read_sql('select * from (select * from %s\
                     order by timestamp ASC) group by ibsym' % ('checkSystems_ib_' + account), \
                              con=readConn)
-            df['contracts']=[df.ix[i].ibsym+df.ix[i].exp for i in df.index]
+            df['contracts']=[df.ix[i].ibsym+df.ix[i].exp if df.ix[i].exp is not None else '' for i in df.index]
             timestamp = utc.localize(dt.utcfromtimestamp(df.timestamp[0])).astimezone(eastern).strftime(
                 '%Y-%m-%d %I:%M:%S %p EST')
             desc_list = [futuresDict.reset_index().set_index('IBsym').ix[x].Desc for x in df.ibsym]

@@ -404,7 +404,7 @@ def getAccountValues(refresh=False):
         df=pd.read_sql('select * from (select * from %s\
                 order by timestamp ASC) group by c2sym' % ('checkSystems_'+system),\
                 con=readConn)
-        urpnl=df.urpnl.astype(int).sum()
+        urpnl=int(df.urpnl.astype(int).sum())
 
         urpnls[system] = {
             'col1title': 'UnrealizedPnL', 'col1value': urpnl, \

@@ -400,7 +400,11 @@ def getAccountValues(refresh=False):
     for system in c2_equity.drop(['v4futures'], axis=0).index:
         timestamp = c2_equity.ix[system].updatedLastTimeET
         accountvalue = int(c2_equity.ix[system].modelAccountValue)
-        urpnl = int(c2_equity.ix[system].equity)
+        #urpnl = int(c2_equity.ix[system].equity)
+        df=pd.read_sql('select * from (select * from %s\
+                order by timestamp ASC) group by c2sym' % ('checkSystems_'+system),\
+                con=readConn)
+        urpnl=df.urpnl.astype(int).sum()
 
         urpnls[system] = {
             'col1title': 'UnrealizedPnL', 'col1value': urpnl, \

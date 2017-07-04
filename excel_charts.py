@@ -57,7 +57,7 @@ if debug:
     systemPath = './data/systems/' 
     stylePath =  './web/tsdp/'
     readConn = sqlite3.connect(dbPath2)
-    readWebConn= sqlite3.connect(dbPath3)
+    readChartConn= sqlite3.connect(dbPath3)
     writeConn= sqlite3.connect(dbPath)
     #readWebConn = sqlite3.connect(dbPathWeb)
     #logging.basicConfig(filename='C:/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
@@ -80,7 +80,7 @@ else:
     stylePath =  './web/tsdp/'
     readConn = writeConn= sqlite3.connect(dbPath)
     dbPath3='./web/tsdp/db_charts.sqlite3'
-    readWebConn= sqlite3.connect(dbPath3)
+    readChartConn= sqlite3.connect(dbPath3)
     #readWebConn = sqlite3.connect(dbPathWeb)
     #logging.basicConfig(filename='/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
     
@@ -364,7 +364,7 @@ date2=str(totalsDF.index[-1])
 for account in active_symbols.keys():
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ranking=pd.read_sql('select * from {}'.format(account+'_ranking'), con=readWebConn)
+    ranking=pd.read_sql('select * from {}'.format(account+'_ranking'), con=readChartConn)
     indexname=[x for x in ranking.columns if 'Ranking' in x][0]
     index=[x.split('Rank')[1] for i,x in enumerate(ranking[indexname])]
     combinedranking=pd.DataFrame(index=index)

@@ -19,6 +19,8 @@ from pytz import timezone
 from tzlocal import get_localzone
 import sqlite3
 import pandas as pd
+import requests
+from pandas.io.json import json_normalize
 
 dbPath='./data/futures.sqlite3'
 def getBackendDB():
@@ -27,9 +29,29 @@ def getBackendDB():
     return readConn
 
 readConn=getBackendDB()
-accountvalue=pd.read_sql('select * from (select * from c2_equity where\
-                        system=\'{}\' order by timestamp ASC) group by Date'.format(account), con=readConn)
-accountvalue.index=pd.to_datetime(accountvalue.updatedLastTimeET)
+#accountvalue=pd.read_sql('select * from (select * from c2_equity where\
+#                        system=\'{}\' order by timestamp ASC) group by Date'.format(account), con=readConn)
+#accountvalue.index=pd.to_datetime(accountvalue.updatedLastTimeET)
+apikey='O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx'
+systemid="110126294"
+
+def requestAllTrades(systemid, apikey):
+    url = 'https://collective2.com/world/apiv3/requestAllTrades_overview'
+    headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
+    data = { 
+    		"apikey":   str(apikey),    #"tXFaL4E6apdfmLtGasIovtGnUDXH_CQso7uBpOCUDYGVcm1w0w", 
+    		"systemid": str(systemid),
+         "show_component_signals": 1,
+          }
+
+    params={}
+    
+    r=requests.post(url, params=params, json=data);
+    #print r.text
+    #logging.info(r.text)
+    data=json.loads(r.text)
+    #print systemid, apikey, data
+    return data
 
 
 

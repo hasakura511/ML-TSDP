@@ -142,7 +142,7 @@ web_accountnames={
                     'v4mini':'100K',
                     'v4micro':'50K',
                     }
-lookback_short=1
+lookback_short=2
 lookback_mid=5
 lookback=20
 benchmark_sym='ES'

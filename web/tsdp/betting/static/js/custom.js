@@ -126,7 +126,7 @@ function day1(test)
                 if(test==1)
                 {
                 	btn_click = 1;
-                    var day1 = sortObject(result.v4micro_ranking['1Day Lookback']);
+                    var day1 = sortObject(result.v4micro_ranking['2Day Lookback']);
 
                     var day5 = result.v4micro_ranking['5Day Lookback'];
 
@@ -193,7 +193,7 @@ function day1(test)
 
                     var day20 = result.v4micro_ranking['20Day Lookback'];
 
-                    var day1 = result.v4micro_ranking['1Day Lookback'];
+                    var day1 = result.v4micro_ranking['2Day Lookback'];
 
                     $.each(day5, function(l,m) {
 
@@ -260,7 +260,7 @@ function day1(test)
 
                     var day5 = result.v4micro_ranking['5Day Lookback'];
 
-                    var day1 = result.v4micro_ranking['1Day Lookback'];
+                    var day1 = result.v4micro_ranking['2Day Lookback'];
 
                     $.each(day20, function(l,m) {
 
@@ -338,7 +338,7 @@ function day1(test)
                 if(test==1)
                 {
                 	btn_click = 1;
-                    var day1 = sortObject(result.v4mini_ranking['1Day Lookback']);
+                    var day1 = sortObject(result.v4mini_ranking['2Day Lookback']);
 
                     var day5 = result.v4mini_ranking['5Day Lookback'];
 
@@ -409,7 +409,7 @@ function day1(test)
 
                     var day20 = result.v4mini_ranking['20Day Lookback'];
 
-                    var day1 = result.v4mini_ranking['1Day Lookback'];
+                    var day1 = result.v4mini_ranking['2Day Lookback'];
 
                     $.each(day5, function(l,m) {
 
@@ -477,7 +477,7 @@ function day1(test)
 
                     var day5 = result.v4mini_ranking['5Day Lookback'];
 
-                    var day1 = result.v4mini_ranking['1Day Lookback'];
+                    var day1 = result.v4mini_ranking['2Day Lookback'];
 
                     $.each(day20, function(l,m) {
 
@@ -557,7 +557,7 @@ function day1(test)
                 if(test==1)
                 {
                 	btn_click = 1;
-                    var day1 = sortObject(result.v4futures_ranking['1Day Lookback']);
+                    var day1 = sortObject(result.v4futures_ranking['2Day Lookback']);
 
                     var day5 = result.v4futures_ranking['5Day Lookback'];
 
@@ -628,7 +628,7 @@ function day1(test)
 
                     var day20 = result.v4futures_ranking['20Day Lookback'];
 
-                    var day1 = result.v4futures_ranking['1Day Lookback'];
+                    var day1 = result.v4futures_ranking['2Day Lookback'];
 
                     $.each(day5, function(l,m) {
 
@@ -696,7 +696,7 @@ function day1(test)
 
                     var day5 = result.v4futures_ranking['5Day Lookback'];
 
-                    var day1 = result.v4futures_ranking['1Day Lookback'];
+                    var day1 = result.v4futures_ranking['2Day Lookback'];
 
                     $.each(day20, function(l,m) {
 
@@ -875,7 +875,7 @@ function day1(test)
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						}]
 					});
 					i_color = '';
@@ -900,7 +900,7 @@ function day1(test)
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
@@ -934,7 +934,7 @@ function day1(test)
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						}]
 					});
 				}
@@ -958,7 +958,7 @@ function day1(test)
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
@@ -982,7 +982,7 @@ function day1(test)
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
@@ -1011,7 +1011,7 @@ function day1(test)
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],
@@ -2464,7 +2464,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                 var day5 = result.v4micro_ranking['5Day Lookback'];
 
-                var day1 = result.v4micro_ranking['1Day Lookback'];
+                var day1 = result.v4micro_ranking['2Day Lookback'];
 
                 $.each(day20, function(l,m) {
 
@@ -2530,7 +2530,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                 var day5 = result.v4mini_ranking['5Day Lookback'];
 
-                var day1 = result.v4mini_ranking['1Day Lookback'];
+                var day1 = result.v4mini_ranking['2Day Lookback'];
 
 				$.each(day20, function(l,m) {
 
@@ -2598,7 +2598,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 
                 var day5 = result.v4futures_ranking['5Day Lookback'];
 
-                var day1 = result.v4futures_ranking['1Day Lookback'];
+                var day1 = result.v4futures_ranking['2Day Lookback'];
     
 				$.each(day20, function(l,m) {
 
@@ -2741,7 +2741,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						}]
 					});
 					i_color = '';
@@ -2768,7 +2768,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
@@ -2804,7 +2804,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						}]
 					});
 				}
@@ -2830,7 +2830,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
@@ -2856,7 +2856,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
@@ -2887,7 +2887,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],

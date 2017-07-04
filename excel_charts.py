@@ -37,25 +37,27 @@ if debug:
     #marketList=[sys.argv[1]]
     showPlots=True
     dbPath='./data/futures.sqlite3' 
-    dbPath2='D:/ML-TSDP/data/futures.sqlite3' 
-    dbPathWeb = 'D:/ML-TSDP/web/tsdp/db.sqlite3'
-    dataPath='D:/ML-TSDP/data/csidata/v4futures2/'
+    dbPath2='./data/futures.sqlite3' 
+    dbPath3='./web/tsdp/db_charts.sqlite3'
+    dbPathWeb = './web/tsdp/db.sqlite3'
+    dataPath='./data/csidata/v4futures2/'
     savePath=jsonPath= './data/results/' 
     pngPath = './data/results/' 
-    feedfile='D:/ML-TSDP/data/systems/system_ibfeed.csv'
+    feedfile='./data/systems/system_ibfeed.csv'
     #test last>old
     #dataPath2=pngPath
     #signalPath = './data/signals/' 
     
     #test last=old
-    dataPath2='D:/ML-TSDP/data/'
+    dataPath2='./data/'
     
-    #signalPath ='D:/ML-TSDP/data/signals2/'
-    signalPath ='D:/ML-TSDP/data/signals2/' 
+    #signalPath ='./data/signals2/'
+    signalPath ='./data/signals2/' 
     signalSavePath = './data/signals/' 
     systemPath = './data/systems/' 
     stylePath =  './web/tsdp/'
     readConn = sqlite3.connect(dbPath2)
+    readWebConn= sqlite3.connect(dbPath3)
     writeConn= sqlite3.connect(dbPath)
     #readWebConn = sqlite3.connect(dbPathWeb)
     #logging.basicConfig(filename='C:/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
@@ -77,6 +79,8 @@ else:
     systemPath =  './data/systems/'
     stylePath =  './web/tsdp/'
     readConn = writeConn= sqlite3.connect(dbPath)
+    dbPath3='./web/tsdp/db_charts.sqlite3'
+    readWebConn= sqlite3.connect(dbPath3)
     #readWebConn = sqlite3.connect(dbPathWeb)
     #logging.basicConfig(filename='/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
     
@@ -355,5 +359,33 @@ print 'Saved',filename
 if debug and showPlots:
     plt.show()
 plt.close()
+
+date2=str(totalsDF.index[-1])
+for account in active_symbols.keys():
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ranking=pd.read_sql('select * from {}'.format(account+'_ranking'), con=readWebConn)
+    indexname=[x for x in ranking.columns if 'Ranking' in x][0]
+    index=[x.split('Rank')[1] for i,x in enumerate(ranking[indexname])]
+    combinedranking=pd.DataFrame(index=index)
+    for col in ranking.drop([indexname],axis=1).columns:
+        combinedranking[col]=((ranking[col]-ranking[col].mean())/ranking[col].std()).values
+    combinedranking['Score']=combinedranking.sum(axis=1)
+    combinedranking=combinedranking.sort_values(by='Score', ascending=True)
+    combinedranking.index=[x+' ({})'.format(str(len(combinedranking.index)-i)) for i,x in enumerate(combinedranking.index)]
+    combinedranking.plot(ax=ax, kind='barh', figsize=(12,24))
+    plt.ylabel('Ranking', size=24)
+    plt.xlabel('Z Score', size=24)
+    #ax.set_xticklabels(xaxis_labels)
+    plt.title(account+' Scores as of '+date2, size=24)
+    #ax2.legend(loc='lower left', prop={'size':16})
+    plt.legend(loc='upper center', prop={'size':18}, bbox_to_anchor=(.4, -0.03),
+              fancybox=True, shadow=True, ncol=4)
+    filename=pngPath+date+'_'+account+'_'+'ranking_zscores.png'
+    plt.savefig(filename, bbox_inches='tight')
+    print 'Saved',filename
+    if debug and showPlots:
+        plt.show()
+    plt.close()
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

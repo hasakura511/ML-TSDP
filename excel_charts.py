@@ -361,15 +361,30 @@ if debug and showPlots:
 plt.close()
 
 date2=str(totalsDF.index[-1])
+
 for account in active_symbols.keys():
     fig = plt.figure()
     ax = fig.add_subplot(111)
+    performance=pd.read_sql('select * from {}'.format(account+'_performance'), con=readChartConn)
+    performance=performance[[x for x in performance.columns if '_pnl' in x]]
+    
     ranking=pd.read_sql('select * from {}'.format(account+'_ranking'), con=readChartConn)
     indexname=[x for x in ranking.columns if 'Ranking' in x][0]
-    index=[x.split('Rank')[1] for i,x in enumerate(ranking[indexname])]
+    index=[x.split('Rank')[1].strip() for i,x in enumerate(ranking[indexname])]
     combinedranking=pd.DataFrame(index=index)
-    for col in ranking.drop([indexname],axis=1).columns:
+    
+    for system in index:
+        if system != 'Off':
+            returns = performance[system+'_pnl']
+            combinedranking.set_value(system,'Sharpe',np.sqrt(20) * returns.mean() / returns.std())
+        else:
+            combinedranking.set_value(system,'Sharpe',0)
+    combinedranking['Sharpe']=(combinedranking['Sharpe']-combinedranking['Sharpe'].mean())/combinedranking['Sharpe'].std()
+    
+    for col in [ranking.drop([indexname],axis=1).columns[-1]]:
         combinedranking[col]=((ranking[col]-ranking[col].mean())/ranking[col].std()).values
+        
+        
     combinedranking['Score']=combinedranking.sum(axis=1)
     combinedranking=combinedranking.sort_values(by='Score', ascending=True)
     combinedranking.index=[x+' ({})'.format(str(len(combinedranking.index)-i)) for i,x in enumerate(combinedranking.index)]
@@ -387,5 +402,6 @@ for account in active_symbols.keys():
     if debug and showPlots:
         plt.show()
     plt.close()
+    
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

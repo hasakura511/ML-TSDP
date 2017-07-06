@@ -368,6 +368,15 @@ for account in active_symbols.keys():
     performance=pd.read_sql('select * from {}'.format(account+'_performance'), con=readChartConn)
     performance=performance[[x for x in performance.columns if '_pnl' in x]]
     
+    listofsystems=[]
+    for col in performance:
+        lastthree=performance[col].values[-3:]
+        if (lastthree[0]<0 and lastthree[1]>0 and lastthree[2]>0) or\
+                (lastthree[0]>0 and lastthree[1]<0 and lastthree[2]<0):
+            listofsystems+=[col]
+            
+    listofsystems=[x.split('_pnl')[0] for x in listofsystems]
+        
     ranking=pd.read_sql('select * from {}'.format(account+'_ranking'), con=readChartConn)
     indexname=[x for x in ranking.columns if 'Ranking' in x][0]
     index=[x.split('Rank')[1].strip() for i,x in enumerate(ranking[indexname])]
@@ -386,7 +395,7 @@ for account in active_symbols.keys():
         
         
     combinedranking['Score']=combinedranking.sum(axis=1)
-    combinedranking=combinedranking.sort_values(by='Score', ascending=True)
+    combinedranking=combinedranking.ix[listofsystems].sort_values(by='Score', ascending=True)
     combinedranking.index=[x+' ({})'.format(str(len(combinedranking.index)-i)) for i,x in enumerate(combinedranking.index)]
     combinedranking.plot(ax=ax, kind='barh', figsize=(12,24))
     plt.ylabel('Ranking', size=24)

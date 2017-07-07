@@ -25,7 +25,7 @@ v4.3,v4_FEI,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlE
 v4.3,v4_FFI,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,LFU7,future,True,1,LF,USD,GLOBEX,FUT,False,60,50,50,Z,1
 v4.3,v4_FLG,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,LGU7,future,True,3,LG,USD,GLOBEX,FUT,False,60,50,50,R,-1
 v4.3,v4_FSS,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,LLZ7,future,True,0,I,USD,GLOBEX,FUT,False,60,50,50,I,-1
-v4.3,v4_FV,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,4,@FVU7,future,True,6,ZF,USD,GLOBEX,FUT,False,60,50,50,ZF,-1
+v4.3,v4_FV,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,3,@FVU7,future,True,6,ZF,USD,GLOBEX,FUT,False,60,50,50,ZF,-1
 v4.3,v4_GC,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,QGCQ7,future,True,1,GC,USD,GLOBEX,FUT,False,60,50,50,GC,-1
 v4.3,v4_HCM,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,HHIN7,future,True,2,HHI.HK,USD,GLOBEX,FUT,False,60,50,50,HHI.HK,1
 v4.3,v4_HG,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,QHGU7,future,True,2,HG,USD,GLOBEX,FUT,False,60,50,50,HG,1

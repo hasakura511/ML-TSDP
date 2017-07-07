@@ -197,3 +197,7 @@ for account in active_symbols_ib:
                         'text':text,
                         'html':df[col_order2].sort_values(by='group').to_html(escape=False)
                         }
+        
+c2_equity = pd.read_sql('select * from (select * from c2_equity order by timestamp ASC) group by system', \
+                        con=readConn, index_col='system')
+c2_equity.updatedLastTimeET = pd.to_datetime(c2_equity.updatedLastTimeET)

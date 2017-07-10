@@ -126,15 +126,7 @@ anti_components={'Previous':'Anti-Previous','Anti-Previous':'Previous','RiskOn':
 
 keep_cols = ['Contract', 'ACT','LastPctChg','contractValue','group', 'Date', 'timestamp']
 qtydict={'v4futures':'QTY','v4mini':'QTY_MINI','v4micro':'QTY_MICRO',}
-active_symbols={
-                        'v4futures':['AD', 'BO', 'BP', 'C', 'CD', 'CL', 'CU', 'EMD', 'ES', 'FC',
-                                           'FV', 'GC', 'HG', 'HO', 'JY', 'LC', 'LH', 'MP', 'NE', 'NG',
-                                           'NIY', 'NQ', 'PA', 'PL', 'RB', 'S', 'SF', 'SI', 'SM', 'TU',
-                                           'TY', 'US', 'W', 'YM'],
-                        'v4mini':['C', 'CL', 'CU', 'EMD', 'ES', 'HG', 'JY', 'NG', 'SM', 'TU', 'TY', 'W'],
-                        'v4micro':['BO', 'ES', 'HG', 'NG', 'TY'],
-                        }
-all_syms=active_symbols['v4futures']
+
 #maybe replace these with true account values later
 accountvalues={'v4futures':250000,'v4mini':100000,'v4micro':50000,}
 web_accountnames={
@@ -204,6 +196,26 @@ else:
     
 readWebConn = sqlite3.connect(dbPathWeb)
 writeWebChartsConn = sqlite3.connect(dbPathWebCharts)
+
+filename=jsonPath+'accountinfo_data.json'
+with open(filename, 'r') as f:
+     accountinfo=json.load(f)
+
+active_symbols={}
+for account in accountinfo.keys():
+    active_symbols[account]=eval(accountinfo[account]['online'])
+    
+'''
+active_symbols={
+                        'v4futures':['AD', 'BO', 'BP', 'C', 'CD', 'CL', 'CU', 'EMD', 'ES', 'FC',
+                                           'FV', 'GC', 'HG', 'HO', 'JY', 'LC', 'LH', 'MP', 'NE', 'NG',
+                                           'NIY', 'NQ', 'PA', 'PL', 'RB', 'S', 'SF', 'SI', 'SM', 'TU',
+                                           'TY', 'US', 'W', 'YM'],
+                        'v4mini':['C', 'CL', 'CU', 'EMD', 'ES', 'HG', 'JY', 'NG', 'SM', 'TU', 'TY', 'W'],
+                        'v4micro':['BO', 'ES', 'HG', 'NG', 'TY'],
+                        }
+'''
+all_syms=active_symbols['v4futures']
 
 selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
         (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')

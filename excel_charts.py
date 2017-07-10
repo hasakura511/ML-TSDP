@@ -41,7 +41,7 @@ if debug:
     dbPath3='./web/tsdp/db_charts.sqlite3'
     dbPathWeb = './web/tsdp/db.sqlite3'
     dataPath='./data/csidata/v4futures2/'
-    savePath=jsonPath= './data/results/' 
+    savePath= './data/results/' 
     pngPath = './data/results/' 
     feedfile='./data/systems/system_ibfeed.csv'
     #test last>old
@@ -55,7 +55,7 @@ if debug:
     signalPath ='./data/signals2/' 
     signalSavePath = './data/signals/' 
     systemPath = './data/systems/' 
-    stylePath =  './web/tsdp/'
+    stylePath =jsonPath=  './web/tsdp/'
     readConn = sqlite3.connect(dbPath2)
     readChartConn= sqlite3.connect(dbPath3)
     writeConn= sqlite3.connect(dbPath)
@@ -86,14 +86,22 @@ else:
     
 readWebConn = sqlite3.connect(dbPathWeb)
 
-active_symbols={
-                        'v4futures':['AD', 'BO', 'BP', 'C', 'CD', 'CL', 'CU', 'EMD', 'ES', 'FC',
-                                           'FV', 'GC', 'HG', 'HO', 'JY', 'LC', 'LH', 'MP', 'NE', 'NG',
-                                           'NIY', 'NQ', 'PA', 'PL', 'RB', 'S', 'SF', 'SI', 'SM', 'TU',
-                                           'TY', 'US', 'W', 'YM'],
-                        'v4mini':['C', 'CL', 'CU', 'EMD', 'ES', 'HG', 'JY', 'NG', 'SM', 'TU', 'TY', 'W'],
-                        'v4micro':['BO', 'ES', 'HG', 'NG', 'TY'],
-                        }
+filename=jsonPath+'accountinfo_data.json'
+with open(filename, 'r') as f:
+     accountinfo=json.load(f)
+
+active_symbols={}
+for account in accountinfo.keys():
+    active_symbols[account]=eval(accountinfo[account]['online'])
+    
+#active_symbols={
+#                        'v4futures':['AD', 'BO', 'BP', 'C', 'CD', 'CL', 'CU', 'EMD', 'ES', 'FC',
+#                                           'FV', 'GC', 'HG', 'HO', 'JY', 'LC', 'LH', 'MP', 'NE', 'NG',
+#                                           'NIY', 'NQ', 'PA', 'PL', 'RB', 'S', 'SF', 'SI', 'SM', 'TU',
+#                                           'TY', 'US', 'W', 'YM'],
+#                        'v4mini':['C', 'CL', 'CU', 'EMD', 'ES', 'HG', 'JY', 'NG', 'SM', 'TU', 'TY', 'W'],
+#                        'v4micro':['BO', 'ES', 'HG', 'NG', 'TY'],
+#                        }
                         
 def saveCharts(df, **kwargs):
     ylabel=kwargs.get('ylabel','')

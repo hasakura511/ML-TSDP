@@ -25,6 +25,11 @@ else:
     search_dir = "/logs/"
     dbPath = '/ML-TSDP/data/futures.sqlite3'
 
+filename='accountinfo_data.json'
+with open(filename, 'r') as f:
+     accountinfo=json.load(f)
+
+
 class LogFiles(object):
     def __init__(self, filename):
         self.filename = filename
@@ -44,6 +49,27 @@ def getBackendDB():
     global dbPath
     readConn = sqlite3.connect(dbPath)
     return readConn
+    
+futuresDict = pd.read_sql('select * from Dictionary', con=getBackendDB(),\
+                          index_col='CSIsym')
+filename='accountinfo_data.json'
+with open(filename, 'r') as f:
+     accountinfo=json.load(f)
+
+active_symbols_ib={}
+for account in accountinfo.keys():
+    csisyms=eval(accountinfo[account]['online'])
+    active_symbols_ib[account]=futuresDict.ix[csisyms].IBsym.tolist()
+'''
+active_symbols_ib = {
+        'v4futures': ['AUD', 'ZL', 'GBP', 'ZC', 'CAD', 'CL', 'EUR', 'EMD', 'ES', 'GF', 'ZF', 'GC', 'HG', 'HO', 'JPY',
+                      'LE', 'HE', 'MXP', 'NZD', 'NG', 'NIY', 'NQ', 'PA', 'PL', 'RB', 'ZS', 'CHF', 'SI', 'ZM', 'ZT',
+                      'ZN', 'ZB', 'ZW', 'YM'],
+        'v4mini': ['ZC', 'CL', 'EUR', 'EMD', 'ES', 'HG', 'JPY', 'NG', 'ZM', 'ZT', 'ZN', 'ZW'],
+        'v4micro': ['ZL', 'ES', 'HG', 'NG', 'ZN'],
+        }
+'''
+
 
 def getNews():
     with open('news.txt','r') as f:
@@ -581,13 +607,7 @@ def recreateCharts(custom_signals=None, accountinfo=None):
     #pass
 
 def get_detailed_timetable():
-    active_symbols_ib = {
-        'v4futures': ['AUD', 'ZL', 'GBP', 'ZC', 'CAD', 'CL', 'EUR', 'EMD', 'ES', 'GF', 'ZF', 'GC', 'HG', 'HO', 'JPY',
-                      'LE', 'HE', 'MXP', 'NZD', 'NG', 'NIY', 'NQ', 'PA', 'PL', 'RB', 'ZS', 'CHF', 'SI', 'ZM', 'ZT',
-                      'ZN', 'ZB', 'ZW', 'YM'],
-        'v4mini': ['ZC', 'CL', 'EUR', 'EMD', 'ES', 'HG', 'JPY', 'NG', 'ZM', 'ZT', 'ZN', 'ZW'],
-        'v4micro': ['ZL', 'ES', 'HG', 'NG', 'ZN'],
-        }
+    global active_symbols_ib
     readConn = getBackendDB()
     mcdate = MCdate()
     eastern = timezone('US/Eastern')
@@ -813,13 +833,7 @@ def get_blends(cloc, list_boxstyles=None, returnVotingComponents=True):
     # return cloc, list_boxstyles
 
 def get_timetables():
-    active_symbols_ib = {
-        'v4futures': ['AUD', 'ZL', 'GBP', 'ZC', 'CAD', 'CL', 'EUR', 'EMD', 'ES', 'GF', 'ZF', 'GC', 'HG', 'HO', 'JPY',
-                      'LE', 'HE', 'MXP', 'NZD', 'NG', 'NIY', 'NQ', 'PA', 'PL', 'RB', 'ZS', 'CHF', 'SI', 'ZM', 'ZT',
-                      'ZN', 'ZB', 'ZW', 'YM'],
-        'v4mini': ['ZC', 'CL', 'EUR', 'EMD', 'ES', 'HG', 'JPY', 'NG', 'ZM', 'ZT', 'ZN', 'ZW'],
-        'v4micro': ['ZL', 'ES', 'HG', 'NG', 'ZN'],
-        }
+    global active_symbols_ib
     readConn = getBackendDB()
     mcdate = MCdate()
     eastern = timezone('US/Eastern')

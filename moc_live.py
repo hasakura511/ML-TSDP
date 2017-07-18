@@ -1241,6 +1241,7 @@ if __name__ == "__main__":
         errors, portfolio=checkIBpositions()
         print errors, 'errors found'
         print portfolio.to_csv()
+        sys.exit('post_processing')
     else:
         skipcheck=False
 

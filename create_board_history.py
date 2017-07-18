@@ -675,11 +675,11 @@ for account in totals_accounts:
         yaxis_values=accountvalue2.reset_index().ix[newidx].value.values
         yaxis_pnl=accountvalue2.reset_index().ix[newidx].value.diff().fillna(0).values
         dates=accountvalue2.reset_index().ix[newidx].Date.values
-        slippage=[]
+        #slippage=[]
         commissions=[]
         for date in dates:
             slip_df=pd.read_sql('select * from ib_slippage where timestamp=(select max(timestamp) from ib_slippage where Date=\'{}\' and name=\'{}\')'.format(str(date), account), con=readConn)
-            slippage.append(slip_df.dollarslip.sum())
+            #slippage.append(slip_df.dollarslip.sum())
             commissions.append(-slip_df.commissions.sum())
     else:
         broker='c2'
@@ -699,11 +699,11 @@ for account in totals_accounts:
         yaxis_values=accountvalue2.reset_index().ix[newidx].modelAccountValue.values
         yaxis_pnl=accountvalue2.reset_index().ix[newidx].equity.values
         dates=accountvalue2.reset_index().ix[newidx].Date.values
-        slippage=[]
+        #slippage=[]
         commissions=[]
         for date in dates:
             slip_df=pd.read_sql('select * from slippage where timestamp=(select max(timestamp) from slippage where csiDate=\'{}\' and name=\'{}\')'.format(str(date), account), con=readConn)
-            slippage.append(slip_df.dollarslip.sum())
+            #slippage.append(slip_df.dollarslip.sum())
             commissions.append(-slip_df.commissions.sum())
     
     #intersect index with benchmark axis
@@ -726,7 +726,9 @@ for account in totals_accounts:
     #benchmark_values_percent=np.insert(np.diff(benchmark_values).cumsum()/float(benchmark_values[0])*100,0,0)
     benchmark_values_percent= pd.Series(benchmark_values).pct_change().fillna(0).values
     
-    
+    #can't get non-trade prices from c2/ib at the time of moc so slip is a plug. 
+    slippage=yaxis_values-simulated_moc_values
+        
     fig = plt.figure(figsize=(10,8))
     #num_plots = 2
     #colormap = plt.cm.gist_ncar

@@ -671,9 +671,10 @@ for account in totals_accounts:
         accountvalue2=accountvalue.ix[xaxis_labels].copy()
         accountvalue2.index.name='xaxis'
         newidx=accountvalue2.reset_index().xaxis.drop_duplicates(keep='last').index
-        xaxis_labels=accountvalue2.reset_index().ix[newidx].xaxis.values
-        yaxis_values=accountvalue2.reset_index().ix[newidx].value.values
-        yaxis_pnl=accountvalue2.reset_index().ix[newidx].value.diff().fillna(0).values
+        accountvalue2=accountvalue2.reset_index().ix[newidx]
+        xaxis_labels=accountvalue2.xaxis.values
+        yaxis_values=accountvalue2.value.values
+        yaxis_pnl=accountvalue2.value.diff().fillna(0).values
         dates=accountvalue2.reset_index().ix[newidx].Date.values
         #slippage=[]
         commissions=[]
@@ -695,10 +696,11 @@ for account in totals_accounts:
         accountvalue2=accountvalue.ix[xaxis_labels].copy()
         accountvalue2.index.name='xaxis'
         newidx=accountvalue2.reset_index().xaxis.drop_duplicates(keep='last').index
-        xaxis_labels=accountvalue2.reset_index().ix[newidx].xaxis.values
-        yaxis_values=accountvalue2.reset_index().ix[newidx].modelAccountValue.values
-        yaxis_pnl=accountvalue2.reset_index().ix[newidx].equity.values
-        dates=accountvalue2.reset_index().ix[newidx].Date.values
+        accountvalue2=accountvalue2.reset_index().ix[newidx]
+        xaxis_labels=accountvalue2.xaxis.values
+        yaxis_values=accountvalue2.modelAccountValue.values
+        yaxis_pnl=accountvalue2.modelAccountValue.diff().fillna(0).values
+        dates=accountvalue2.Date.values
         #slippage=[]
         commissions=[]
         for date in dates:

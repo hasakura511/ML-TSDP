@@ -727,7 +727,7 @@ for account in totals_accounts:
     benchmark_values_percent= pd.Series(benchmark_values).pct_change().fillna(0).values
     
     #can't get non-trade prices from c2/ib at the time of moc so slip is a plug. 
-    slippage=yaxis_values-simulated_moc_values-commissions
+    slippage=yaxis_pnl-simulated_moc_pnl-commissions
         
     fig = plt.figure(figsize=(10,8))
     #num_plots = 2

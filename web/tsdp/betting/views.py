@@ -28,9 +28,9 @@ class MyEncoder(json.JSONEncoder):
         else:
             return super(MyEncoder, self).default(obj)
             
-def downloaddb(request):
-    filepath = '/ml-tsdp/data/futures.sqlite3'
-    return serve(request, os.path.basename(filepath), os.path.dirname(filepath))
+#def downloaddb(request):
+#    filepath = '/ml-tsdp/data/futures.sqlite3'
+#    return serve(request, os.path.basename(filepath), os.path.dirname(filepath))
 
 # Create your views here.
 #def refreshMetaData(request):

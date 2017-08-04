@@ -1198,7 +1198,7 @@ if __name__ == "__main__":
         delta=dt.strptime(str(ttdate),'%Y%m%d')-dt.strptime(str(csidate),'%Y%m%d')
         txt = 'Warning! Delta: {}, Last timetable date: {}, Last csidate: {}'.format(delta.days, ttdate, csidate)
         print txt
-        if delta.days >1:
+        if delta.days >1 or (delta.days ==1 and dt.today().day in [2,3,4,5]):
             slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
 
 

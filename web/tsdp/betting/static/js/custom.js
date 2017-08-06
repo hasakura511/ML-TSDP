@@ -2736,12 +2736,12 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_2[i],
 							"colors" : value_2_color,
-							"task": "3Day"
+							"task": "5Day"
 						},{
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						}]
 					});
 					i_color = '';
@@ -2768,12 +2768,12 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_2[i],
 							"colors" : value_2_color,
-							"task": "3Day"
+							"task": "5Day"
 						}]
 					});
 				}
@@ -2794,7 +2794,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_2[i],
 							"colors" : value_2_color,
-							"task": "3Day"
+							"task": "5Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
@@ -2804,7 +2804,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,	
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						}]
 					});
 				}
@@ -2825,12 +2825,12 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_2[i],
 							"colors" : value_2_color,
-							"task": "3Day"
+							"task": "5Day"
 						},{
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],
@@ -2856,7 +2856,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_1[i],
@@ -2866,7 +2866,7 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,	
 							"end" : value_2[i],
 							"colors" : value_2_color,
-							"task": "3Day"
+							"task": "5Day"
 						}]
 					});
 				}
@@ -2887,12 +2887,12 @@ $(document).on('click', '.chart-pane-tab', function(event) {
 							"start" : 0,
 							"end" : value_3[i],
 							"colors" : value_3_color,
-							"task": "1Day"
+							"task": "2Day"
 						},{
 							"start" : 0,
 							"end" : value_2[i],
 							"colors" : value_2_color,
-							"task": "3Day"
+							"task": "5Day"
 						},{
 							"start" : 0,	
 							"end" : value_1[i],

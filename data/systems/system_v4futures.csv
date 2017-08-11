@@ -32,8 +32,8 @@ v4.3,v4_HG,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEV
 v4.3,v4_HIC,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,HSIQ7,future,True,1,SB,USD,GLOBEX,FUT,False,60,50,50,HSI,1
 v4.3,v4_HO,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,QHOU7,future,True,1,HO,USD,GLOBEX,FUT,False,60,50,50,HO,1
 v4.3,v4_JY,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,@JYU7,future,True,1,JPY,USD,GLOBEX,FUT,False,60,50,50,JY,-1
-v4.3,v4_KC,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,@KCU7,future,True,1,KC,USD,GLOBEX,FUT,False,60,50,50,KC,1
-v4.3,v4_KW,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,@KWU7,future,True,4,SB,USD,GLOBEX,FUT,False,60,50,50,SB,1
+v4.3,v4_KC,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,@KCZ7,future,True,1,KC,USD,GLOBEX,FUT,False,60,50,50,KC,1
+v4.3,v4_KW,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,@KWZ7,future,True,4,SB,USD,GLOBEX,FUT,False,60,50,50,SB,1
 v4.3,v4_LB,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,@LBU7,future,True,2,LB,USD,GLOBEX,FUT,False,60,50,50,LB,1
 v4.3,v4_LC,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,@LEV7,future,True,2,LE,USD,GLOBEX,FUT,False,60,50,50,LE,1
 v4.3,v4_LCO,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,EBV7,future,True,1,COIL,USD,GLOBEX,FUT,False,60,50,50,COIL,1
@@ -68,11 +68,11 @@ v4.3,v4_SSG,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlE
 v4.3,v4_STW,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,TWQ7,future,True,3,STW,USD,GLOBEX,FUT,False,60,50,50,STW,1
 v4.3,v4_SXE,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,EXU7,future,True,2,ESTX50,USD,GLOBEX,FUT,False,60,50,50,ESTX50,1
 v4.3,v4_TF,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,@TFSU7,future,True,1,TFS,USD,GLOBEX,FUT,False,60,50,50,TFS,1
-v4.3,v4_TU,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,8,@TUU7,future,True,9,ZT,USD,GLOBEX,FUT,False,60,50,50,TU,-1
+v4.3,v4_TU,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,9,@TUU7,future,True,9,ZT,USD,GLOBEX,FUT,False,60,50,50,TU,-1
 v4.3,v4_TY,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,2,@TYU7,future,True,4,ZN,USD,GLOBEX,FUT,False,60,50,50,TY,-1
 v4.3,v4_US,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,@USU7,future,True,1,ZB,USD,GLOBEX,FUT,False,60,50,50,US,-1
-v4.3,v4_VX,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,@VXQ7,future,True,1,VIX,USD,GLOBEX,FUT,False,60,50,50,VIX,-1
-v4.3,v4_W,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,@WU7,future,True,2,ZW,USD,GLOBEX,FUT,False,60,50,50,W,1
+v4.3,v4_VX,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,@VXU7,future,True,1,VIX,USD,GLOBEX,FUT,False,60,50,50,VIX,-1
+v4.3,v4_W,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,@WZ7,future,True,2,ZW,USD,GLOBEX,FUT,False,60,50,50,W,1
 v4.3,v4_YA,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,APU7,future,True,1,SPI,USD,GLOBEX,FUT,False,60,50,50,SPI,1
 v4.3,v4_YB,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,0,HBSZ7,future,True,0,IR,USD,GLOBEX,FUT,False,60,50,50,IR,-1
 v4.3,v4_YM,v4futures,110126294,O9WoxVj7DNXkpifMY_blqHpFg5cp3Fjqc7Aiu4KQjb8mXQlEVx,1,@YMU7,future,True,2,YM,USD,GLOBEX,FUT,False,60,50,50,YM,1

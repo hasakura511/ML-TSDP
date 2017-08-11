@@ -405,20 +405,23 @@ for account in active_symbols.keys():
     combinedranking['Score']=combinedranking.sum(axis=1)
     combinedranking=combinedranking.ix[listofsystems].sort_values(by='Score', ascending=True)
     combinedranking.index=[x+' ({})'.format(str(len(combinedranking.index)-i)) for i,x in enumerate(combinedranking.index)]
-    combinedranking.plot(ax=ax, kind='barh', figsize=(12,24))
-    plt.ylabel('Ranking', size=24)
-    plt.xlabel('Z Score', size=24)
-    #ax.set_xticklabels(xaxis_labels)
-    plt.title(account+' Scores as of '+date2, size=24)
-    #ax2.legend(loc='lower left', prop={'size':16})
-    plt.legend(loc='upper center', prop={'size':18}, bbox_to_anchor=(.4, -0.03),
-              fancybox=True, shadow=True, ncol=4)
-    filename=pngPath+date+'_'+account+'_'+'ranking_zscores.png'
-    plt.savefig(filename, bbox_inches='tight')
-    print 'Saved',filename
-    if debug and showPlots:
-        plt.show()
-    plt.close()
+    if combinedranking.shape[0]>0:
+        combinedranking.plot(ax=ax, kind='barh', figsize=(12,24))
+        plt.ylabel('Ranking', size=24)
+        plt.xlabel('Z Score', size=24)
+        #ax.set_xticklabels(xaxis_labels)
+        plt.title(account+' Scores as of '+date2, size=24)
+        #ax2.legend(loc='lower left', prop={'size':16})
+        plt.legend(loc='upper center', prop={'size':18}, bbox_to_anchor=(.4, -0.03),
+                  fancybox=True, shadow=True, ncol=4)
+        filename=pngPath+date+'_'+account+'_'+'ranking_zscores.png'
+        plt.savefig(filename, bbox_inches='tight')
+        print 'Saved',filename
+        if debug and showPlots:
+            plt.show()
+        plt.close()
+    else:
+        print 'combined ranking for {} returned zero datapoints'.format(account)
     
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()

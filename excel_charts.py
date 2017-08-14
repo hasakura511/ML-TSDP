@@ -278,6 +278,44 @@ for account in active_symbols:
     saveCharts(df, ylabel=ylabel, xlabel=xlabel, title=title, filename=filename, figsize=(15,50),\
                         lookback=lookback, kind='barh',width=width, twiny=True)
 
+    #ranking heatmap
+    df2 = totalsDF[pnl_cols].transpose()
+    matrix=pd.DataFrame(index=df.index)
+    for col in df2.columns:
+        df3=df2[col].sort_values(ascending=False)
+        rank_num=[]
+        for i,x in enumerate(df3.values):
+            if i==0:
+                rank_num.append(i+1)
+                lastval=x
+                #print rank_num, lastval
+            else:
+                if lastval==x:
+                    rank_num.append(rank_num[-1])
+                else:
+                    rank_num.append(rank_num[-1]+1)
+                lastval=x
+                #print rank_num, lastval
+        matrix[col]=pd.Series(data=rank_num, index=df3.index)
+    matrix['avg']=matrix.mean(axis=1)
+    matrix=matrix.sort_values(by=['avg'])
+    fig,ax = plt.subplots(figsize=(15,21))
+    #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
+    title='{} Heatmap Lookback {}: {} to {}'.format(account,len(df2.columns), df2.columns[0], df2.columns[-1])
+    ax.set_title(title)
+    sns.heatmap(ax=ax, data=matrix)
+    
+    filename=pngPath+date+'_'+account+'_ranking_heatmap.png'
+    plt.savefig(filename, bbox_inches='tight')
+    print 'Saved',filename
+    if debug and showPlots:
+        plt.show()
+    plt.close()
+    tablename=account+'_ranking_heatmap'
+    matrix.to_sql(name=tablename,con=readChartConn, index=True,
+                if_exists='replace')
+    print 'Wrote', tablename,'to db_charts.sqlite3'
+    
 
 av_cumper_df=pd.DataFrame()
 for account in active_symbols.keys():

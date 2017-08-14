@@ -305,7 +305,8 @@ for account in active_symbols:
     title='{} Heatmap Lookback {}: {} to {}'.format(account,len(df2.columns), df2.columns[0], df2.columns[-1])
     ax.set_title(title)
     sns.heatmap(ax=ax, data=matrix)
-    
+    plt.yticks(rotation=0) 
+    plt.xticks(rotation=90) 
     filename=pngPath+date2+'_'+account+'_ranking_heatmap.png'
     plt.savefig(filename, bbox_inches='tight')
     print 'Saved',filename

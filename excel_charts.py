@@ -279,6 +279,7 @@ for account in active_symbols:
                         lookback=lookback, kind='barh',width=width, twiny=True)
 
     #ranking heatmap
+    date2=date[:4]+'-'+date[4:6]+'-'+date[6:]
     df2 = totalsDF[pnl_cols].transpose()
     matrix=pd.DataFrame(index=df.index)
     for col in df2.columns:
@@ -305,7 +306,7 @@ for account in active_symbols:
     ax.set_title(title)
     sns.heatmap(ax=ax, data=matrix)
     
-    filename=pngPath+date+'_'+account+'_ranking_heatmap.png'
+    filename=pngPath+date2+'_'+account+'_ranking_heatmap.png'
     plt.savefig(filename, bbox_inches='tight')
     print 'Saved',filename
     if debug and showPlots:

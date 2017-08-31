@@ -826,7 +826,8 @@ for key in performance_dict_by_box:
     for account in performance_dict_by_box[key]:
         newdict[account+'_filename']=performance_dict_by_box[key][account]['filename']
         signals_cons=signals_cons.append(pd.Series(performance_dict_by_box[key][account]['signals'], name=account))
-        signals_cons_prev=signals_cons_prev.append(pd.Series(prev_signals[account][key]['signals'], name=account))
+        if key != 'account_value':
+            signals_cons_prev=signals_cons_prev.append(pd.Series(prev_signals[account][key]['signals'], name=account))
         newdict[account+'_rank_filename']=performance_dict_by_box[key][account]['rank_filename']
         newdict[account+'_rank_text']=performance_dict_by_box[key][account]['rank_text']
         if key=='account_value':

@@ -134,8 +134,8 @@ web_accountnames={
                     'v4mini':'100K',
                     'v4micro':'50K',
                     }
-lookback_short=2
-lookback_mid=5
+lookback_short=1
+lookback_mid=3
 lookback=20
 benchmark_sym='ES'
 if len(sys.argv)==1:
@@ -222,10 +222,9 @@ selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
 #selectionDict=eval(selectionDF.selection.values[0])
 
 #futuresDF_all=pd.read_csv(dataPath2+'futuresATR_Signals.csv', index_col=0)
+#this is created after every MOC
 dates= pd.read_sql('select distinct Date from futuresATRhist', con=readConn).Date.tolist()
 dates_csi= pd.read_sql('select distinct Date from futuresDF_all', con=readConn).Date.tolist()
-
-#this is created after every MOC
 #datetup=[(dates[i],dates[i+1]) for i,x in enumerate(dates[:-1])][-lookback:]
 #datetup_csi=[(dates_csi[i],dates_csi[i+1]) for i,x in enumerate(dates_csi[:-1])][-lookback:]
 missing_dates=list(set(dates_csi) -set(dates))
@@ -554,10 +553,9 @@ def createRankingChart(ranking, account, line, title, filename):
 
     
     return text
-prev_signals={}
+
 performance_chart_dict={} 
 for account in totals_accounts:
-    prev_signals[account]={}
     performance_chart_dict[account]=pd.DataFrame()
     performance_dict[account]={}
     quantity=futuresDF_current[qtydict[account]].copy()
@@ -624,11 +622,6 @@ for account in totals_accounts:
             signals=(signalsDict[currentdate][line]*quantity).astype(int).copy()
             signals.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in signals.index]
             signals=pd.Series(conv_sig(signals), index=signals.index).to_dict()
-            prevdate=sorted(signalsDict.keys())[-2]
-            prevsig=(signalsDict[prevdate][line]*quantity).astype(int).copy()
-            prevsig.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in prevsig.index]
-            prevsig=pd.Series(conv_sig(prevsig), index=prevsig.index).to_dict()    
-            prev_signals[account][line]={'signals':prevsig}
             text2='Results shown reflect daily close-to-close timesteps, only applicable to MOC orders. All results are hypothetical. Excludes slippage and commission costs.'
             filename=pngPath+date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
             filename3=date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
@@ -737,6 +730,7 @@ for account in totals_accounts:
     
     #can't get non-trade prices from c2/ib at the time of moc so slip is a plug. 
     slippage=yaxis_pnl-simulated_moc_pnl-commissions
+        
     fig = plt.figure(figsize=(10,8))
     #num_plots = 2
     #colormap = plt.cm.gist_ncar
@@ -822,11 +816,9 @@ performance_dict_by_box2={}
 for key in performance_dict_by_box:
     newdict={}
     signals_cons=pd.DataFrame()
-    signals_cons_prev=pd.DataFrame()
     for account in performance_dict_by_box[key]:
         newdict[account+'_filename']=performance_dict_by_box[key][account]['filename']
         signals_cons=signals_cons.append(pd.Series(performance_dict_by_box[key][account]['signals'], name=account))
-        signals_cons_prev=signals_cons_prev.append(pd.Series(prev_signals[account][key]['signals'], name=account))
         newdict[account+'_rank_filename']=performance_dict_by_box[key][account]['rank_filename']
         newdict[account+'_rank_text']=performance_dict_by_box[key][account]['rank_text']
         if key=='account_value':
@@ -844,14 +836,7 @@ for key in performance_dict_by_box:
         signals_cons.index=['<a href="/static/images/v4_'+[futuresDict.index[i] for i,desc in enumerate(futuresDict.Desc)\
                                     if re.sub(r'-[^-]*$','',x) in desc][0]+'_BRANK.png" target="_blank">'+x+'</a>' for x in signals_cons.index]
         signals_cons.index.name=key
-        signals_cons_prev=signals_cons_prev.transpose()
-        signals_cons_prev.columns=[web_accountnames[x] for x in signals_cons_prev.columns]
-        signals_cons_prev.index=['<a href="/static/images/v4_'+[futuresDict.index[i] for i,desc in enumerate(futuresDict.Desc)\
-                                    if re.sub(r'-[^-]*$','',x) in desc][0]+'_BRANK.png" target="_blank">'+x+'</a>' for x in signals_cons_prev.index]
-        signals_cons_prev.index.name=key
-        
         newdict['signals']= signals_cons[['50K', '100K', '250K']].to_html(escape=False)
-        newdict['signals']+= '<br>Signals as of {} <br>'.format(prevdate)+signals_cons_prev[['50K', '100K', '250K']].to_html(escape=False)
     else:
         newdict['signals']=''
     performance_dict_by_box2[key]=newdict

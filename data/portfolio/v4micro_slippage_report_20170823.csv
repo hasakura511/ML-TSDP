@@ -1,0 +1,3 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-08-23 16:47:28 1 QNGV7 $0,QNGV7,2017-08-23 16:47:28,2.96,2017-08-23 17:00:00,2.96,0.0,0.0,Open,1.0,0.0,2.5,-1 days +23:47:28.000000000,-13.0
+ctwo opened: 2017-08-23 16:47:30 1 @TYU7 $0,@TYU7,2017-08-23 16:47:30,126.92188,2017-08-23 17:00:00,126.921875,3.93943124586e-08,3.93943124586e-08,Open,-1.0,0.0,2.5,-1 days +23:47:30.000000000,-13.0

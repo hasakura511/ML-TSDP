@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-08-29 14:13:22 1 @BOZ7 $0,@BOZ7,2017-08-29 14:13:22,34.65,2017-08-29 14:20:00,34.65,0.0,0.0,Open,1.0,0.0,2.5,-1 days +23:53:22.000000000,-7.0

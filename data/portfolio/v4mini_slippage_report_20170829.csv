@@ -1,0 +1,3 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-08-29 14:13:06 1 @WZ7 $12,@WZ7,2017-08-29 14:13:06,430.0,2017-08-29 14:20:00,429.75,0.000581733566027,0.000581733566027,Open,-1.0,12.0,2.5,-1 days +23:53:06.000000000,-7.0
+ctwo opened: 2017-08-29 16:49:05 1 @EUU7 $231,@EUU7,2017-08-29 16:49:05,1.19845,2017-08-29 17:00:00,1.2003,-0.00154128134633,0.00154128134633,Open,1.0,231.0,2.5,-1 days +23:49:05.000000000,-11.0

@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-08-22 16:46:23 1 QHGZ7 $-37,QHGZ7,2017-08-22 16:46:23,300.9,2017-08-22 17:00:00,300.75,0.000498753117207,0.000498753117207,Open,1.0,-37.0,2.5,-1 days +23:46:23.000000000,-14.0

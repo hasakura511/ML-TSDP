@@ -850,6 +850,7 @@ def get_timetables():
         
     else:
         # use old dates
+        ttdate=timetables.columns[0]
         ttdates = [timetables.columns[0]]
         
     timetables = timetables[ttdates]

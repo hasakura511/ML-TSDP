@@ -139,7 +139,8 @@ if mcdate in timetables and not timetables[mcdate].isnull().values.any():
     
 else:
     # use old dates
-    ttdate = timetables.columns[0]
+    ttdate=timetables.columns[0]
+    ttdates = [timetables.columns[0]]
     
 timetables = timetables[ttdates]
 #print mcdate, ttdate

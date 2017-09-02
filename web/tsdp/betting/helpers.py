@@ -843,25 +843,24 @@ def get_timetables():
     futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='IBsym')
     timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc').drop(['Date', 'timestamp'],
                                                                                              axis=1)
-
-	if mcdate in timetables and not timetables[mcdate].isnull().values.any():
-	    ttdate = mcdate
-	    # filter out any dates that have passed
-	    ttdates = [x for x in timetables.columns if int(x) >= int(mcdate)]
-	    
-	else:
-	    # use old dates
-	    ttdates = [timetables.columns[0]]
-	    
-	timetables = timetables[ttdates]
-	#print mcdate, ttdate
-	timetableDF = pd.DataFrame()
-	#print timetables
-	for idx, [sym, value] in enumerate([x.split() for x in timetables.index]):
-	    idx2 = sym + ' ' + value
-	    timestamp = timetables.ix[idx2].ix[ttdate]
-	    #print sym, value, timestamp
-	    timetableDF.set_value(sym, value, timestamp)
+    if mcdate in timetables and not timetables[mcdate].isnull().values.any():
+        ttdate = mcdate
+        # filter out any dates that have passed
+        ttdates = [x for x in timetables.columns if int(x) >= int(mcdate)]
+        
+    else:
+        # use old dates
+        ttdates = [timetables.columns[0]]
+        
+    timetables = timetables[ttdates]
+    #print mcdate, ttdate
+    timetableDF = pd.DataFrame()
+    #print timetables
+    for idx, [sym, value] in enumerate([x.split() for x in timetables.index]):
+        idx2 = sym + ' ' + value
+        timestamp = timetables.ix[idx2].ix[ttdate]
+        #print sym, value, timestamp
+        timetableDF.set_value(sym, value, timestamp)
 
     #timetableDF.index.name = 'ibsym'
     for sym in timetableDF.index:

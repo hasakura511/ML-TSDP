@@ -132,14 +132,16 @@ futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='I
 timetables = pd.read_sql('select * from timetable', con=readConn, index_col='Desc').drop(['Date', 'timestamp'],
                                                                                          axis=1)
 
-if mcdate in timetables:
+if mcdate in timetables and not timetables[mcdate].isnull().values.any():
     ttdate = mcdate
     # filter out any dates that have passed
     ttdates = [x for x in timetables.columns if int(x) >= int(mcdate)]
-    timetables = timetables[ttdates]
+    
 else:
     # use old dates
     ttdate = timetables.columns[0]
+    
+timetables = timetables[ttdates]
 #print mcdate, ttdate
 timetableDF = pd.DataFrame()
 #print timetables

@@ -280,19 +280,19 @@ for account in qtydict.keys():
 
 
 
-        componentsignals=futuresDF_current[corecomponents]
+        componentsignals=futuresDF_prev[corecomponents]
 
         votingSystems = { key: componentsdict[key] for key in [x for x in componentsdict if is_int(x)] }
         #add voting systems
-        signalsDict[currentdate]={key: to_signals(futuresDF_current[componentsdict[key]].sum(axis=1)) for key in votingSystems.keys()}
+        signalsDict[currentdate]={key: to_signals(futuresDF_prev[componentsdict[key]].sum(axis=1)) for key in votingSystems.keys()}
         #add anti-voting systems
-        signalsDict[currentdate].update({'Anti-'+key: to_signals(futuresDF_current[componentsdict[key]].sum(axis=1), Anti=True)\
+        signalsDict[currentdate].update({'Anti-'+key: to_signals(futuresDF_prev[componentsdict[key]].sum(axis=1), Anti=True)\
                                                 for key in votingSystems.keys()})
         #check (signalsDict[key]['1']+signalsDict[key]['Anti-1']).sum()
         signalsDict[currentdate].update({ reversecomponentsdict[key]: componentsignals[key] for key in componentsignals})
         
         #add benchmark
-        benchmark_signals=futuresDF_current['None'].copy()
+        benchmark_signals=futuresDF_prev['None'].copy()
         benchmark_signals.ix[benchmark_sym]=1
         signalsDict[currentdate]['benchmark']=benchmark_signals
         

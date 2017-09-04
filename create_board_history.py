@@ -266,6 +266,7 @@ for account in qtydict.keys():
     componentsdict = eval(selectionDF[account].values[0])
     futuresDF_boards ={}
     signalsDict={}
+    signalsDict2={}
     totalsDict = {}
     for prev,current in datetup:
         currentdate=current[0]
@@ -279,22 +280,36 @@ for account in qtydict.keys():
                         con=readConn,  index_col='CSIsym'), current, all_syms)
 
 
-
-        componentsignals=futuresDF_current[corecomponents]
+        componentsignals=futuresDF_prev[corecomponents]
 
         votingSystems = { key: componentsdict[key] for key in [x for x in componentsdict if is_int(x)] }
         #add voting systems
-        signalsDict[currentdate]={key: to_signals(futuresDF_current[componentsdict[key]].sum(axis=1)) for key in votingSystems.keys()}
+        signalsDict[currentdate]={key: to_signals(futuresDF_prev[componentsdict[key]].sum(axis=1)) for key in votingSystems.keys()}
         #add anti-voting systems
-        signalsDict[currentdate].update({'Anti-'+key: to_signals(futuresDF_current[componentsdict[key]].sum(axis=1), Anti=True)\
+        signalsDict[currentdate].update({'Anti-'+key: to_signals(futuresDF_prev[componentsdict[key]].sum(axis=1), Anti=True)\
                                                 for key in votingSystems.keys()})
         #check (signalsDict[key]['1']+signalsDict[key]['Anti-1']).sum()
         signalsDict[currentdate].update({ reversecomponentsdict[key]: componentsignals[key] for key in componentsignals})
         
         #add benchmark
-        benchmark_signals=futuresDF_current['None'].copy()
+        benchmark_signals=futuresDF_prev['None'].copy()
         benchmark_signals.ix[benchmark_sym]=1
         signalsDict[currentdate]['benchmark']=benchmark_signals
+        
+        
+        '''hotfix for signal display'''
+        componentsignals2=futuresDF_current[corecomponents]
+
+        #votingSystems = { key: componentsdict[key] for key in [x for x in componentsdict if is_int(x)] }
+        #add voting systems
+        signalsDict2[currentdate]={key: to_signals(futuresDF_current[componentsdict[key]].sum(axis=1)) for key in votingSystems.keys()}
+        #add anti-voting systems
+        signalsDict2[currentdate].update({'Anti-'+key: to_signals(futuresDF_current[componentsdict[key]].sum(axis=1), Anti=True)\
+                                                for key in votingSystems.keys()})
+        #check (signalsDict[key]['1']+signalsDict[key]['Anti-1']).sum()
+        signalsDict2[currentdate].update({ reversecomponentsdict[key]: componentsignals2[key] for key in componentsignals2})
+
+        signalsDict2[currentdate]['benchmark']=benchmark_signals
         
         #append signals to each board
         totalsDict[currentdate]=pd.DataFrame()
@@ -621,11 +636,12 @@ for account in totals_accounts:
                     #component
                     text=component_text[line]
                     #print line, text, filename2
-            signals=(signalsDict[currentdate][line]*quantity).astype(int).copy()
+            #signals dict is one day behind
+            signals=(signalsDict2[currentdate][line]*quantity).astype(int).copy()
             signals.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in signals.index]
             signals=pd.Series(conv_sig(signals), index=signals.index).to_dict()
-            prevdate=sorted(signalsDict.keys())[-2]
-            prevsig=(signalsDict[prevdate][line]*quantity).astype(int).copy()
+            prevdate=sorted(signalsDict2.keys())[-2]
+            prevsig=(signalsDict2[prevdate][line]*quantity).astype(int).copy()
             prevsig.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in prevsig.index]
             prevsig=pd.Series(conv_sig(prevsig), index=prevsig.index).to_dict()    
             prev_signals[account][line]={'signals':prevsig}

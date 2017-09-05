@@ -8,16 +8,22 @@
 
 {% block content %}
 <base href="/">
-{% for name, date2 in accounts.items %}
-    <center><h1>{{ name }}</h1></center><br><center>
-    <center><a href="static/public/images/{{ date }}_{{ name }}_RiskOn_ranking2.png"><img src="static/public/images/{{ date }}_{{ name }}_RiskOn_ranking2.png"  width=900 height=1800></a></center>
-{% endfor %}
+
+<ul><center><h1>Signals Heatmaps</h1></center><br><center>
+<center><a href="static/images/{{ date }}_Components_heatmap.png"><img src="static/images/{{ date }}_Components_heatmap.png"  width=900 height=1800></a></center>
+<center><a href="static/images/{{ date }}_Voting_heatmap.png"><img src="static/images/{{ date }}_Voting_heatmap.png"  width=900 height=1800></a></center>
+<center><a href="static/images/{{ date }}_Antivoting_heatmap.png"><img src="static/images/{{ date }}_Antivoting_heatmap.png"  width=900 height=1800></a></center>
 
 <ul><center><h1>Account Values</h1></center><br><center>
 <center><a href="static/images/{{ date }}_comparison_account_value.png"><img src="static/images/{{ date }}_comparison_account_value.png"  width=800 height=800></a></center>
 <center><a href="static/public/images/{{ date }}_v4mini_c2_account_value.png"><img src="static/public/images/{{ date }}_v4mini_c2_account_value.png"  width=800 height=800></a></center>
 <center><a href="static/public/images/{{ date }}_v4futures_ib_account_value.png"><img src="static/public/images/{{ date }}_v4futures_ib_account_value.png"  width=800 height=800></a></center>
 <center><a href="static/public/images/{{ date }}_v4micro_c2_account_value.png"><img src="static/public/images/{{ date }}_v4micro_c2_account_value.png"  width=800 height=800></a></center>
+
+{% for name, date2 in accounts.items %}
+    <center><h1>{{ name }}</h1></center><br><center>
+    <center><a href="static/public/images/{{ date }}_{{ name }}_RiskOn_ranking2.png"><img src="static/public/images/{{ date }}_{{ name }}_RiskOn_ranking2.png"  width=900 height=1800></a></center>
+{% endfor %}
 
 <ul><center><h1>Ranking Heatmaps</h1></center><br><center>
 <center><a href="static/images/{{ date }}_v4micro_ranking_heatmap.png"><img src="static/images/{{ date }}_v4micro_ranking_heatmap.png"  width=900 height=1800></a></center>

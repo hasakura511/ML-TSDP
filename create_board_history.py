@@ -924,7 +924,7 @@ for d in sorted(signalsDict2.keys())[-1:]:
             df=pd.concat([df, signalsDict2[d][k]],axis=1)
         desc_list=futuresDict.ix[df.index].Desc.values
         df.index=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-        fig,ax = plt.subplots(figsize=(15,21))
+        fig,ax = plt.subplots(figsize=(15,15))
         #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
         title='{} {} Signals Heatmap'.format(d, name)
         ax.set_title(title)

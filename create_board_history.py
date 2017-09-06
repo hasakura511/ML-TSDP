@@ -902,18 +902,33 @@ for account in account_values:
                     index_label='Date')
     print 'saved',tablename, 'to',dbPathWebCharts
 
+
 #signals list
 for d in sorted(signalsDict2.keys())[-1:]:
-    print 'signals charts for', d
-    d2=str(d)[:4]+'-'+str(d)[4:6]+'-'+str(d)[6:]
+    print d
     keys=signalsDict2[d].keys()
     voting_keys=sorted([x.split('Anti-')[1] for x in keys if 'Anti-' in x and is_int(x.split('Anti-')[1])], key=int)
     anti_voting_keys=['Anti-'+x for x in voting_keys]
     component_keys=[x for x in keys if x not in voting_keys and x not in anti_voting_keys]
     component_keys.remove('Off')
     component_keys.remove('benchmark')
-    component_keys=sorted(component_keys)
-    cmap = sns.diverging_palette(0, 255, sep=2, as_cmap=True)
+    #component_keys=sorted(component_keys)
+    component_keys=['Custom',
+     'RiskOn',
+     'HighestEquity',
+     '50/50',
+     'LowestEquity',
+     'RiskOff',
+     'Seasonality',
+     'Previous',
+     #'Anti-Custom',
+     #'Anti-Previous',
+     #'Anti-Seasonality',
+     #'Anti50/50',
+     #'AntiHighestEquity',
+     #'AntiLowestEquity'
+     ]
+    cmap = sns.diverging_palette(350, 120, sep=2, as_cmap=True)
     
     
     for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voting_keys,'Antivoting')]:
@@ -922,6 +937,7 @@ for d in sorted(signalsDict2.keys())[-1:]:
             #print k
             signalsDict2[d][k].name=k
             df=pd.concat([df, signalsDict2[d][k]],axis=1)
+        df=df.ix[futuresDict.ix[df.index].sort_values(by=['Group','Desc']).index]
         desc_list=futuresDict.ix[df.index].Desc.values
         df.index=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
         fig,ax = plt.subplots(figsize=(15,15))
@@ -931,12 +947,13 @@ for d in sorted(signalsDict2.keys())[-1:]:
         sns.heatmap(ax=ax, data=df,cmap=cmap)
         plt.yticks(rotation=0) 
         plt.xticks(rotation=90) 
-        filename=pngPath+d2+'_'+name+'_heatmap.png'
+        filename=pngPath+str(d)+'_'+name+'_heatmap.png'
         plt.savefig(filename, bbox_inches='tight')
         print 'Saved',filename
         if debug and showPlots:
             plt.show()
         plt.close()
+        
             
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

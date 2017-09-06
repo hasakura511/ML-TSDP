@@ -905,7 +905,8 @@ for account in account_values:
 
 #signals list
 for d in sorted(signalsDict2.keys())[-1:]:
-    print d
+    print 'signals charts for', d
+    d2=str(d)[:4]+'-'+str(d)[4:6]+'-'+str(d)[6:]
     keys=signalsDict2[d].keys()
     voting_keys=sorted([x.split('Anti-')[1] for x in keys if 'Anti-' in x and is_int(x.split('Anti-')[1])], key=int)
     anti_voting_keys=['Anti-'+x for x in voting_keys]
@@ -947,7 +948,7 @@ for d in sorted(signalsDict2.keys())[-1:]:
         sns.heatmap(ax=ax, data=df,cmap=cmap)
         plt.yticks(rotation=0) 
         plt.xticks(rotation=90) 
-        filename=pngPath+str(d)+'_'+name+'_heatmap.png'
+        filename=pngPath+d2+'_'+name+'_heatmap.png'
         plt.savefig(filename, bbox_inches='tight')
         print 'Saved',filename
         if debug and showPlots:

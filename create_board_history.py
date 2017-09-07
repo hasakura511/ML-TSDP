@@ -956,7 +956,62 @@ for d in sorted(signalsDict2.keys())[-1:]:
         if debug and showPlots:
             plt.show()
         plt.close()
+
+#last signal accuracy by market by system
+prev_signals=pd.DataFrame()
+prev_acc=pd.DataFrame()
+for sys in signalsDict2[prev[0]]:
+    series=signalsDict2[prev[0]][sys]
+    series.name=sys
+    prev_signals=pd.concat([prev_signals,series], axis=1)
         
+        
+
+for col in prev_signals:
+    acc=pd.DataFrame(index=prev_signals[col].index)
+    nonzero=prev_signals[col][prev_signals[col] !=0].copy()
+    correct=nonzero==futuresDF_current.ACT.ix[nonzero.index]
+    for sym in acc.index:
+        if sym in correct.index:
+            if correct.ix[sym]:
+                acc.set_value(sym,col,1)
+            else:
+                acc.set_value(sym,col,-1)
+        else:
+            acc.set_value(sym,col,0)
+    prev_acc=pd.concat([prev_acc,acc],axis=1)
+    
+prev_acc=prev_acc.ix[futuresDict.ix[prev_acc.index].sort_values(by=['Group','Desc']).index]
+desc_list=futuresDict.ix[prev_acc.index].Desc.values
+idx2=futuresDF_current.ix[prev_acc.index].LastPctChg.values*100
+idx1=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+prev_acc.index=[x+' '+str(round(idx2[i],2))+'%' for i,x in enumerate(idx1)]
+
+cmap = sns.diverging_palette(0, 255, sep=2, as_cmap=True)
+for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voting_keys,'Antivoting')]:
+    df=prev_acc[l]
+    colnames=[]
+    for col in df.columns:
+        nonzero=df[col][df[col]!=0]
+        if len(nonzero)>0:
+            acc= str(round(float(len(nonzero[nonzero==1]))/len(nonzero)*100,1))+'%'
+        else:
+            acc='0%'
+        colnames.append(col+' '+acc)
+    df.columns=colnames
+    fig,ax = plt.subplots(figsize=(15,15))
+    #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
+    title='{} {} Signals Accuracy Heatmap'.format(prev[0], name)
+    ax.set_title(title)
+    sns.heatmap(ax=ax, data=df,cmap=cmap)
+    plt.yticks(rotation=0) 
+    plt.xticks(rotation=90) 
+    filename=pngPath+d2+'_'+name+'_accuracy_heatmap.png'
+    plt.savefig(filename, bbox_inches='tight')
+    print 'Saved',filename
+    if debug and showPlots:
+        plt.show()
+    plt.close()
             
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

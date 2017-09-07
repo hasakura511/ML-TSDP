@@ -940,7 +940,9 @@ for d in sorted(signalsDict2.keys())[-1:]:
             df=pd.concat([df, signalsDict2[d][k]],axis=1)
         df=df.ix[futuresDict.ix[df.index].sort_values(by=['Group','Desc']).index]
         desc_list=futuresDict.ix[df.index].Desc.values
-        df.index=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+        idx2=futuresDF_current.ix[df.index].LastPctChg.values*100
+        idx1=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+        df.index=[x+' '+str(round(idx2[i],2))+'%' for i,x in enumerate(idx1)]
         fig,ax = plt.subplots(figsize=(15,15))
         #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
         title='{} {} Signals Heatmap'.format(d, name)

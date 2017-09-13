@@ -1,0 +1,3 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-09-06 16:50:55 1 @TYZ7 $0,@TYZ7,2017-09-06 16:50:55,127.09375,2017-09-06 17:00:00,127.09375,0.0,0.0,Open,1.0,0.0,2.5,-1 days +23:50:55.000000000,-10.0
+ctwo opened: 2017-09-06 16:50:53 1 QHGZ7 $175,QHGZ7,2017-09-06 16:50:53,315.85,2017-09-06 17:00:00,315.15,0.00222116452483,0.00222116452483,Open,-1.0,175.0,2.5,-1 days +23:50:53.000000000,-10.0

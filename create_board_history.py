@@ -957,6 +957,7 @@ for d in sorted(signalsDict2.keys())[-1:]:
             plt.show()
         plt.close()
 
+
 #last signal accuracy by market by system
 prev_signals=pd.DataFrame()
 prev_acc=pd.DataFrame()
@@ -971,13 +972,26 @@ for col in prev_signals:
     acc=pd.DataFrame(index=prev_signals[col].index)
     nonzero=prev_signals[col][prev_signals[col] !=0].copy()
     correct=nonzero==futuresDF_current.ACT.ix[nonzero.index]
+    
     for sym in acc.index:
         if sym in correct.index:
             if correct.ix[sym]:
-                acc.set_value(sym,col,1)
+                #correct long 2
+                if futuresDF_current.ACT.ix[sym]>0:
+                    acc.set_value(sym,col,2)
+                #correct short -2
+                if futuresDF_current.ACT.ix[sym]<0:
+                    acc.set_value(sym,col,-2)
+                
             else:
-                acc.set_value(sym,col,-1)
+                #incorrect long 1
+                if futuresDF_current.ACT.ix[sym]>0:
+                    acc.set_value(sym,col,1)
+                #incorrect short -1
+                if futuresDF_current.ACT.ix[sym]<0:
+                    acc.set_value(sym,col,-1)
         else:
+            #off 0
             acc.set_value(sym,col,0)
     prev_acc=pd.concat([prev_acc,acc],axis=1)
     
@@ -1001,7 +1015,7 @@ for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voti
     df.columns=colnames
     fig,ax = plt.subplots(figsize=(15,15))
     #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
-    title='{} {} Signals Accuracy Heatmap'.format(prev[0], name)
+    title='{} {} Signals Accuracy Heatmap (light-incorrect, dark-correct, blue-long, red-short)'.format(prev[0], name)
     ax.set_title(title)
     sns.heatmap(ax=ax, data=df,cmap=cmap)
     plt.yticks(rotation=0) 
@@ -1012,6 +1026,6 @@ for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voti
     if debug and showPlots:
         plt.show()
     plt.close()
-            
+
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

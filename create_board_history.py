@@ -969,26 +969,28 @@ for sys in signalsDict2[prev[0]]:
         
 
 for col in prev_signals:
+    #print col
     acc=pd.DataFrame(index=prev_signals[col].index)
     nonzero=prev_signals[col][prev_signals[col] !=0].copy()
     correct=nonzero==futuresDF_current.ACT.ix[nonzero.index]
     
     for sym in acc.index:
         if sym in correct.index:
+            signal=prev_signals[col].ix[sym]
             if correct.ix[sym]:
                 #correct long 2
-                if futuresDF_current.ACT.ix[sym]>0:
+                if signal>0:
                     acc.set_value(sym,col,2)
                 #correct short -2
-                if futuresDF_current.ACT.ix[sym]<0:
+                elif signal<0:
                     acc.set_value(sym,col,-2)
                 
             else:
                 #incorrect long 1
-                if futuresDF_current.ACT.ix[sym]>0:
+                if signal>0:
                     acc.set_value(sym,col,1)
                 #incorrect short -1
-                if futuresDF_current.ACT.ix[sym]<0:
+                if signal<0:
                     acc.set_value(sym,col,-1)
         else:
             #off 0
@@ -1008,7 +1010,7 @@ for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voti
     for col in df.columns:
         nonzero=df[col][df[col]!=0]
         if len(nonzero)>0:
-            acc= str(round(float(len(nonzero[nonzero==1]))/len(nonzero)*100,1))+'%'
+            acc= str(round(float(len(nonzero[abs(nonzero)==2]))/len(nonzero)*100,1))+'%'
         else:
             acc='0%'
         colnames.append(col+' '+acc)

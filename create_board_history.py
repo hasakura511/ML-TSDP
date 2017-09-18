@@ -1003,17 +1003,19 @@ prev_acc=prev_acc.ix[futuresDict.ix[prev_acc.index].sort_values(by=['Group','Des
 cmap = sns.diverging_palette(0, 255, sep=2, as_cmap=True)
 for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voting_keys,'Antivoting')]:
     df=prev_acc[l]
-    colnames=[]
-    for col in df.columns:
-        nonzero=df[col][df[col]!=0]
-        if len(nonzero)>0:
-            acc= str(round(float(len(nonzero[abs(nonzero)==2]))/len(nonzero)*100,1))+'%'
-        else:
-            acc='0%'
-        colnames.append(col+' '+acc)
-    df.columns=colnames
+
     for account in performance_dict:
         df2=df.ix[active_symbols[account]].copy()
+        colnames=[]
+        for col in df2.columns:
+            nonzero=df2[col][df2[col]!=0]
+            if len(nonzero)>0:
+                acc= str(round(float(len(nonzero[abs(nonzero)==2]))/len(nonzero)*100,1))+'%'
+            else:
+                acc='0%'
+            colnames.append(col+' '+acc)
+        df2.columns=colnames
+        
         desc_list=futuresDict.ix[df2.index].Desc.values
         idx2=futuresDF_current.ix[df2.index].LastPctChg.values*100
         idx1=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]

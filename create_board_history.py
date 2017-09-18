@@ -135,7 +135,7 @@ web_accountnames={
                     'v4micro':'50K',
                     }
 lookback_short=1
-lookback_mid=3
+lookback_mid=2
 lookback=20
 benchmark_sym='ES'
 if len(sys.argv)==1:
@@ -998,10 +998,7 @@ for col in prev_signals:
     prev_acc=pd.concat([prev_acc,acc],axis=1)
     
 prev_acc=prev_acc.ix[futuresDict.ix[prev_acc.index].sort_values(by=['Group','Desc']).index]
-desc_list=futuresDict.ix[prev_acc.index].Desc.values
-idx2=futuresDF_current.ix[prev_acc.index].LastPctChg.values*100
-idx1=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
-prev_acc.index=[x+' '+str(round(idx2[i],2))+'%' for i,x in enumerate(idx1)]
+
 
 cmap = sns.diverging_palette(0, 255, sep=2, as_cmap=True)
 for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voting_keys,'Antivoting')]:
@@ -1015,19 +1012,26 @@ for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voti
             acc='0%'
         colnames.append(col+' '+acc)
     df.columns=colnames
-    fig,ax = plt.subplots(figsize=(15,15))
-    #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
-    title='{} {} Signals Accuracy Heatmap (light-incorrect, dark-correct, blue-long, red-short)'.format(prev[0], name)
-    ax.set_title(title)
-    sns.heatmap(ax=ax, data=df,cmap=cmap)
-    plt.yticks(rotation=0) 
-    plt.xticks(rotation=90) 
-    filename=pngPath+d2+'_'+name+'_accuracy_heatmap.png'
-    plt.savefig(filename, bbox_inches='tight')
-    print 'Saved',filename
-    if debug and showPlots:
-        plt.show()
-    plt.close()
+    for account in performance_dict:
+        df2=df.ix[active_symbols[account]].copy()
+        desc_list=futuresDict.ix[df2.index].Desc.values
+        idx2=futuresDF_current.ix[df2.index].LastPctChg.values*100
+        idx1=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+        df2.index=[x+' '+str(round(idx2[i],2))+'%' for i,x in enumerate(idx1)]
+        
+        fig,ax = plt.subplots(figsize=(15,15))
+        #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
+        title='{} {} {} Signals Accuracy Heatmap (light-incorrect, dark-correct, blue-long, red-short)'.format(account, prev[0], name)
+        ax.set_title(title)
+        sns.heatmap(ax=ax, data=df2,cmap=cmap)
+        plt.yticks(rotation=0) 
+        plt.xticks(rotation=90) 
+        filename=pngPath+d2+'_'+account+'_'+name+'_accuracy_heatmap.png'
+        plt.savefig(filename, bbox_inches='tight')
+        print 'Saved',filename
+        if debug and showPlots:
+            plt.show()
+        plt.close()
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

@@ -549,13 +549,13 @@ def createRankingChart(ranking, account, line, title, filename):
     prevdate=sorted(signalsDict2.keys())[-2]
     prevsig=signalsDict2[prevdate][line].astype(int).copy()
     prevsig=(signalsDict2[prevdate][line]*quantity).astype(int).copy()
-    prevsig[prevsig == -1] = 'SHORT'
-    prevsig[prevsig == 1] = 'LONG'
-    prevsig[prevsig == 0] = 'OFF'
+    #prevsig[prevsig == -1] = 'SHORT'
+    #prevsig[prevsig == 1] = 'LONG'
+    #prevsig[prevsig == 0] = 'OFF'
     pnl=market_pnl_by_date[currentdate]['PNL_'+line].ix[active_symbols[account]].astype(int)
     pnl['Total']=pnl.sum()
     pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
-    prev_pnl=pd.DataFrame({'Signals':prevsig.ix[pnl.index], pnl.name:pnl})
+    prev_pnl=pd.DataFrame({'Qty':prevsig.ix[pnl.index], pnl.name:pnl})
     prev_pnl.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) if sym in futuresDict.index else 'Total' for sym in pnl.index ]    
     text='<br>'+pd.DataFrame(prev_pnl).to_html()
     

@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-09-18 16:44:08 1 QNGX7 $-70,QNGX7,2017-09-18 16:44:08,3.202,2017-09-18 17:00:00,3.195,0.00219092331768,0.00219092331768,Open,1.0,-70.0,2.5,-1 days +23:44:08.000000000,-16.0

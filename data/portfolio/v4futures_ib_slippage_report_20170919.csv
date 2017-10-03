@@ -1,0 +1,2 @@
+rowname,contract,ibsym,CSIsym,ib_timestamp,ib_price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,delta
+ib: 2017-09-19 14:13:40 1.0 ZL20171214 $0,ZL20171214,ZL,BO,2017-09-19 14:13:40,34.76,2017-09-19 14:20:00,34.76,0.0,0.0,Open,1.0,0.0,2.5,-7.0

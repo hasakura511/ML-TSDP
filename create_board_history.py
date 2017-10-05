@@ -557,7 +557,7 @@ def createRankingChart(ranking, account, line, title, filename):
     pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
     prev_pnl=pd.DataFrame({'Qty':prevsig.ix[pnl.index], pnl.name:pnl})
     prev_pnl.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in pnl.index ]
-    text='<br>'+pd.DataFrame(prev_pnl).to_html()
+    text='<br>'+pd.DataFrame(prev_pnl).to_html(escape=False)
     
     
     lookback_name=str(lookback)+'Day Lookback'

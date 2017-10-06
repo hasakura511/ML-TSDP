@@ -550,7 +550,7 @@ def createRankingChart(ranking, account, line, title, filename):
     prev_pnl=pd.DataFrame()
     prevdates=sorted(signalsDict2.keys())[:-1]
     currentdates=sorted(signalsDict2.keys())[1:]
-    for prevdate, currentdate in zip(prevdates, currentdates):
+    for prevdate, currentdate in zip(sorted(prevdates, reverse=True), sorted(currentdates, reverse=True)):
         #print prevdate, currentdate
         prevsig=signalsDict2[prevdate][line].astype(int).copy()
         prevsig=(signalsDict2[prevdate][line]*quantity).astype(int).copy()

@@ -9,6 +9,10 @@ with open('\logs\post_processing_error_'+fulltimestamp+'.txt', 'w') as e:
     proc = Popen(['python', 'moc_live.py','0','0','1','1'], stderr=e)
     proc.wait()
     e.flush()
+    proc = Popen(['/anaconda2/python', '/ml-tsdp/suztoolz/check_systems_live_func.py','1'],\
+                     cwd='/ml-tsdp/ml-tsdp/suztoolz/', stderr=e)
+    proc.wait()
+    e.flush() 
     proc = Popen(['python', 'create_board_history.py','1'], stderr=e)
     proc.wait()
     e.flush()

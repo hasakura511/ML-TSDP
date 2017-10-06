@@ -352,8 +352,11 @@ def get_order_status():
         #webSelection=pd.read_sql('select * from webSelection where timestamp=\
         #        (select max(timestamp) from webSelection)'
         #bet = eval(webSelection.selection[0])[account][0]
-        df=pd.read_sql('select * from (select * from %s\
-                order by timestamp ASC) group by c2sym' % ('checkSystems_'+account),\
+        #df=pd.read_sql('select * from (select * from %s\
+        #        order by timestamp ASC) group by c2sym' % ('checkSystems_'+account),\
+        #        con=readConn)
+        
+        df=pd.read_sql('select * from %s where timestamp=(select max(timestamp) from %s)' % ('checkSystems_'+account, 'checkSystems_'+account),\
                 con=readConn)
         df['system_signal'] = conv_sig(df['system_signal'])
         df['broker_position'] = conv_sig(df['broker_position'])
@@ -952,8 +955,10 @@ def get_status():
         #webSelection=pd.read_sql('select * from webSelection where timestamp=\
         #        (select max(timestamp) from webSelection)'
         #bet = eval(webSelection.selection[0])[account][0]
-        df=pd.read_sql('select * from (select * from %s\
-                order by timestamp ASC) group by c2sym' % ('checkSystems_'+account),\
+        #df=pd.read_sql('select * from (select * from %s\
+        #        order by timestamp ASC) group by c2sym' % ('checkSystems_'+account),\
+        #        con=readConn)
+        df=pd.read_sql('select * from %s where timestamp=(select max(timestamp) from %s)' % ('checkSystems_'+account, 'checkSystems_'+account),\
                 con=readConn)
         timestamp=utc.localize(dt.utcfromtimestamp(df.timestamp[0])).astimezone(eastern).strftime('%Y-%m-%d %I:%M:%S %p EST')
         df['system_signal'] = conv_sig(df['system_signal'])
@@ -972,9 +977,11 @@ def get_status():
         orderstatus_dict[account]['slippage']=pngPath+account+'_c2_slippage_'+str(csidate)+'.png'
         orderstatus_dict[account]['slippage_text']='The slippage graph shows the datetime your last orders were entered and how much it differs from the official close price. With immediate orders slippage will show the net loss/gain you get from entering earlier than at the MOC<br><br>Last Update: '+str(timestamp)
         if account == "v4futures":
-            df = pd.read_sql('select * from (select * from %s\
-                    order by timestamp ASC) group by ibsym' % ('checkSystems_ib_' + account), \
-                             con=readConn)
+            #df = pd.read_sql('select * from (select * from %s\
+            #        order by timestamp ASC) group by ibsym' % ('checkSystems_ib_' + account), \
+            #                 con=readConn)
+            df=pd.read_sql('select * from %s where timestamp=(select max(timestamp) from %s)' % ('checkSystems_ib_'+account, 'checkSystems_ib_'+account),\
+                con=readConn)
             df['contracts']=[df.ix[i].ibsym+df.ix[i].exp if df.ix[i].exp is not None else '' for i in df.index]
             timestamp = utc.localize(dt.utcfromtimestamp(df.timestamp[0])).astimezone(eastern).strftime(
                 '%Y-%m-%d %I:%M:%S %p EST')

@@ -135,7 +135,7 @@ web_accountnames={
                     'v4micro':'50K',
                     }
 lookback_short=1
-lookback_mid=3
+lookback_mid=2
 lookback=20
 benchmark_sym='ES'
 if len(sys.argv)==1:
@@ -977,7 +977,7 @@ for d in sorted(signalsDict2.keys())[-1:]:
      #'AntiHighestEquity',
      #'AntiLowestEquity'
      ]
-    cmap = sns.diverging_palette(0, 120, sep=2, as_cmap=True)
+    cmap = sns.diverging_palette(350, 120, sep=2, as_cmap=True)
     
     
     for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voting_keys,'Antivoting')]:

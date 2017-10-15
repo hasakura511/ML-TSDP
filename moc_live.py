@@ -699,7 +699,7 @@ def refresh_all_histories(execDict):
         tickerId=random.randint(100,9999)
         contract = execDict[sym][2]
         print sym, 'getting data from IB',
-        data = client.get_history(endDateTime, contract, whatToShow, data ,filename,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
+        data = client.get_history(endDateTime, contract, whatToShow, data ,None,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
         filename=csiDataPath2+feeddata.ix[sym].CSIsym2+'.csv'
         data.to_csv(filename, index=True)
         print 'saved', filename
@@ -1203,6 +1203,8 @@ if __name__ == "__main__":
             #print e
             slack.notify(text='get_timetable: '+str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             traceback.print_exc()
+        print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
+        sys.exit('get_lastquotes')
 
     if refresh_timetable:
         try:

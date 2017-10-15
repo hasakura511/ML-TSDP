@@ -1198,12 +1198,12 @@ if __name__ == "__main__":
     
     if get_lastquotes:
         try:
-            refresh_all_histories(execDict):
+            refresh_all_histories(execDict)
         except Exception as e:
             #print e
             slack.notify(text='get_timetable: '+str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             traceback.print_exc()
-            
+
     if refresh_timetable:
         try:
             timetable = get_timetable(contractsDF)

@@ -700,7 +700,7 @@ def refresh_all_histories(execDict):
         contract = execDict[sym][2]
         print sym, 'getting data from IB',
         data = client.get_history(endDateTime, contract, whatToShow, data ,None,tickerId, minDataPoints, durationStr, barSizeSetting, formatDate=1)
-        filename=csiDataPath2+feeddata.ix[sym].CSIsym2+'.csv'
+        filename=csiDataPath4+feeddata.ix[sym[:-8]].CSIsym2+'.csv'
         data.to_csv(filename, index=True)
         print 'saved', filename
         

@@ -135,7 +135,7 @@ web_accountnames={
                     'v4micro':'50K',
                     }
 lookback_short=1
-lookback_mid=3
+lookback_mid=2
 lookback=20
 benchmark_sym='ES'
 if len(sys.argv)==1:
@@ -266,6 +266,7 @@ for account in qtydict.keys():
     componentsdict = eval(selectionDF[account].values[0])
     futuresDF_boards ={}
     signalsDict={}
+    signalsDict2={}
     totalsDict = {}
     for prev,current in datetup:
         currentdate=current[0]
@@ -277,7 +278,6 @@ for account in qtydict.keys():
         futuresDF_current=add_missing_rows(pd.read_sql('select * from (select * from %s where Date=%s\
                         order by timestamp ASC) group by CSIsym' %(current[1], current[0]),\
                         con=readConn,  index_col='CSIsym'), current, all_syms)
-
 
 
         componentsignals=futuresDF_prev[corecomponents]
@@ -295,6 +295,21 @@ for account in qtydict.keys():
         benchmark_signals=futuresDF_prev['None'].copy()
         benchmark_signals.ix[benchmark_sym]=1
         signalsDict[currentdate]['benchmark']=benchmark_signals
+        
+        
+        '''hotfix for signal display'''
+        componentsignals2=futuresDF_current[corecomponents]
+
+        #votingSystems = { key: componentsdict[key] for key in [x for x in componentsdict if is_int(x)] }
+        #add voting systems
+        signalsDict2[currentdate]={key: to_signals(futuresDF_current[componentsdict[key]].sum(axis=1)) for key in votingSystems.keys()}
+        #add anti-voting systems
+        signalsDict2[currentdate].update({'Anti-'+key: to_signals(futuresDF_current[componentsdict[key]].sum(axis=1), Anti=True)\
+                                                for key in votingSystems.keys()})
+        #check (signalsDict[key]['1']+signalsDict[key]['Anti-1']).sum()
+        signalsDict2[currentdate].update({ reversecomponentsdict[key]: componentsignals2[key] for key in componentsignals2})
+
+        signalsDict2[currentdate]['benchmark']=benchmark_signals
         
         #append signals to each board
         totalsDict[currentdate]=pd.DataFrame()
@@ -531,11 +546,25 @@ def createRankingChart(ranking, account, line, title, filename):
     plt.close()
     
     #pnl text
-    pnl=market_pnl_by_date[currentdate]['PNL_'+line].ix[active_symbols[account]].astype(int)
-    pnl.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in pnl.index]
-    pnl['Total']=pnl.sum()
-    pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
-    text='<br>'+pd.DataFrame(pnl).to_html()
+    #prevdate=sorted(signalsDict2.keys())[-2]
+    prev_pnl=pd.DataFrame()
+    prevdates=sorted(signalsDict2.keys())[:-1]
+    currentdates=sorted(signalsDict2.keys())[1:]
+    for prevdate, currentdate in zip(sorted(prevdates, reverse=True), sorted(currentdates, reverse=True)):
+        #print prevdate, currentdate
+        prevsig=signalsDict2[prevdate][line].astype(int).copy()
+        prevsig=(signalsDict2[prevdate][line]*quantity).astype(int).copy()
+        #prevsig[prevsig == -1] = 'SHORT'
+        #prevsig[prevsig == 1] = 'LONG'
+        #prevsig[prevsig == 0] = 'OFF'
+        pnl=market_pnl_by_date[currentdate]['PNL_'+line].ix[active_symbols[account]].astype(int)
+        pnl['Total']=pnl.sum()
+        #pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
+        pnl.name='MOC{}'.format(currentdate)
+        prev_pnl=pd.concat([prev_pnl,pd.DataFrame({'Qty':prevsig.ix[pnl.index], pnl.name:pnl})], axis=1)
+    prev_pnl.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in pnl.index ]
+    text='<br>'+pd.DataFrame(prev_pnl).to_html(escape=False)
+    
     
     lookback_name=str(lookback)+'Day Lookback'
     text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
@@ -621,11 +650,12 @@ for account in totals_accounts:
                     #component
                     text=component_text[line]
                     #print line, text, filename2
-            signals=(signalsDict[currentdate][line]*quantity).astype(int).copy()
+            #signals dict is one day behind
+            signals=(signalsDict2[currentdate][line]*quantity).astype(int).copy()
             signals.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in signals.index]
             signals=pd.Series(conv_sig(signals), index=signals.index).to_dict()
-            prevdate=sorted(signalsDict.keys())[-2]
-            prevsig=(signalsDict[prevdate][line]*quantity).astype(int).copy()
+            prevdate=sorted(signalsDict2.keys())[-2]
+            prevsig=(signalsDict2[prevdate][line]*quantity).astype(int).copy()
             prevsig.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in prevsig.index]
             prevsig=pd.Series(conv_sig(prevsig), index=prevsig.index).to_dict()    
             prev_signals[account][line]={'signals':prevsig}
@@ -885,6 +915,139 @@ for account in account_values:
     account_values[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
                     index_label='Date')
     print 'saved',tablename, 'to',dbPathWebCharts
+
+
+#signals list
+for d in sorted(signalsDict2.keys())[-1:]:
+    print 'signals charts for', d
+    d2=str(d)[:4]+'-'+str(d)[4:6]+'-'+str(d)[6:]
+    keys=signalsDict2[d].keys()
+    voting_keys=sorted([x.split('Anti-')[1] for x in keys if 'Anti-' in x and is_int(x.split('Anti-')[1])], key=int)
+    anti_voting_keys=['Anti-'+x for x in voting_keys]
+    component_keys=[x for x in keys if x not in voting_keys and x not in anti_voting_keys]
+    component_keys.remove('Off')
+    component_keys.remove('benchmark')
+    #component_keys=sorted(component_keys)
+    component_keys=['Custom',
+     'RiskOn',
+     'HighestEquity',
+     '50/50',
+     'LowestEquity',
+     'RiskOff',
+     'Seasonality',
+     'Previous',
+     #'Anti-Custom',
+     #'Anti-Previous',
+     #'Anti-Seasonality',
+     #'Anti50/50',
+     #'AntiHighestEquity',
+     #'AntiLowestEquity'
+     ]
+    cmap = sns.diverging_palette(350, 120, sep=2, as_cmap=True)
     
+    
+    for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voting_keys,'Antivoting')]:
+        df=pd.DataFrame()
+        for k in l:
+            #print k
+            signalsDict2[d][k].name=k
+            df=pd.concat([df, signalsDict2[d][k]],axis=1)
+        df=df.ix[futuresDict.ix[df.index].sort_values(by=['Group','Desc']).index]
+        desc_list=futuresDict.ix[df.index].Desc.values
+        idx2=futuresDF_current.ix[df.index].LastPctChg.values*100
+        idx1=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+        df.index=[x+' '+str(round(idx2[i],2))+'%' for i,x in enumerate(idx1)]
+        fig,ax = plt.subplots(figsize=(15,15))
+        #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
+        title='{} {} Signals Heatmap'.format(d, name)
+        ax.set_title(title)
+        sns.heatmap(ax=ax, data=df,cmap=cmap)
+        plt.yticks(rotation=0) 
+        plt.xticks(rotation=90) 
+        filename=pngPath+d2+'_'+name+'_heatmap.png'
+        plt.savefig(filename, bbox_inches='tight')
+        print 'Saved',filename
+        if debug and showPlots:
+            plt.show()
+        plt.close()
+
+
+#last signal accuracy by market by system
+prev_signals=pd.DataFrame()
+prev_acc=pd.DataFrame()
+for sys in signalsDict2[prev[0]]:
+    series=signalsDict2[prev[0]][sys]
+    series.name=sys
+    prev_signals=pd.concat([prev_signals,series], axis=1)
+        
+        
+
+for col in prev_signals:
+    #print col
+    acc=pd.DataFrame(index=prev_signals[col].index)
+    nonzero=prev_signals[col][prev_signals[col] !=0].copy()
+    correct=nonzero==futuresDF_current.ACT.ix[nonzero.index]
+    
+    for sym in acc.index:
+        if sym in correct.index:
+            signal=prev_signals[col].ix[sym]
+            if correct.ix[sym]:
+                #correct long 2
+                if signal>0:
+                    acc.set_value(sym,col,2)
+                #correct short -2
+                elif signal<0:
+                    acc.set_value(sym,col,-2)
+                
+            else:
+                #incorrect long 1
+                if signal>0:
+                    acc.set_value(sym,col,1)
+                #incorrect short -1
+                if signal<0:
+                    acc.set_value(sym,col,-1)
+        else:
+            #off 0
+            acc.set_value(sym,col,0)
+    prev_acc=pd.concat([prev_acc,acc],axis=1)
+    
+prev_acc=prev_acc.ix[futuresDict.ix[prev_acc.index].sort_values(by=['Group','Desc']).index]
+
+
+cmap = sns.diverging_palette(0, 255, sep=2, as_cmap=True)
+for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voting_keys,'Antivoting')]:
+    df=prev_acc[l]
+
+    for account in performance_dict:
+        df2=df.ix[active_symbols[account]].copy()
+        colnames=[]
+        for col in df2.columns:
+            nonzero=df2[col][df2[col]!=0]
+            if len(nonzero)>0:
+                acc= str(round(float(len(nonzero[abs(nonzero)==2]))/len(nonzero)*100,1))+'%'
+            else:
+                acc='0%'
+            colnames.append(col+' '+acc)
+        df2.columns=colnames
+        
+        desc_list=futuresDict.ix[df2.index].Desc.values
+        idx2=futuresDF_current.ix[df2.index].LastPctChg.values*100
+        idx1=[re.sub(r'\(.*?\)', '', desc) for desc in desc_list]
+        df2.index=[x+' '+str(round(idx2[i],2))+'%' for i,x in enumerate(idx1)]
+        
+        fig,ax = plt.subplots(figsize=(15,15))
+        #title = 'Lookback '+str(lookback)+' '+data.index[-lookback-1].strftime('%Y-%m-%d')+' to '+data.index[-1].strftime('%Y-%m-%d')
+        title='{} {} {} Signals Accuracy Heatmap (light-incorrect, dark-correct, blue-long, red-short)'.format(account, prev[0], name)
+        ax.set_title(title)
+        sns.heatmap(ax=ax, data=df2,cmap=cmap)
+        plt.yticks(rotation=0) 
+        plt.xticks(rotation=90) 
+        filename=pngPath+d2+'_'+account+'_'+name+'_accuracy_heatmap.png'
+        plt.savefig(filename, bbox_inches='tight')
+        print 'Saved',filename
+        if debug and showPlots:
+            plt.show()
+        plt.close()
+
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

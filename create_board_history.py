@@ -135,7 +135,7 @@ web_accountnames={
                     'v4micro':'50K',
                     }
 lookback_short=1
-lookback_mid=2
+lookback_mid=3
 lookback=20
 benchmark_sym='ES'
 if len(sys.argv)==1:
@@ -163,7 +163,7 @@ if debug:
     
     #test last=old
     dataPath2='./data/'
-    
+    lastquotePath='./data/csidata/v4futures_last/'
     #signalPath ='D:/ML-TSDP/data/signals2/'
     signalPath ='./signals2/' 
     signalSavePath = './data/signals/' 
@@ -190,6 +190,7 @@ else:
     signalSavePath = './data/signals2/' 
     pngPath = './web/tsdp/betting/static/public/images/'
     systemPath =  './data/systems/'
+    lastquotePath='./data/csidata/v4futures_last/'
     readConn = writeConn= sqlite3.connect(dbPath)
     #readWebConn = sqlite3.connect(dbPathWeb)
     #logging.basicConfig(filename='/logs/vol_adjsize_live_func_error.log',level=logging.DEBUG)
@@ -216,7 +217,7 @@ active_symbols={
                         }
 '''
 all_syms=active_symbols['v4futures']
-
+futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='CSIsym')
 selectionDF=pd.read_sql('select * from betting_userselection where timestamp=\
         (select max(timestamp) from betting_userselection as maxtimestamp)', con=readWebConn, index_col='userID')
 #selectionDict=eval(selectionDF.selection.values[0])
@@ -280,6 +281,7 @@ for account in qtydict.keys():
                         con=readConn,  index_col='CSIsym'), current, all_syms)
 
 
+
         componentsignals=futuresDF_prev[corecomponents]
 
         votingSystems = { key: componentsdict[key] for key in [x for x in componentsdict if is_int(x)] }
@@ -310,6 +312,7 @@ for account in qtydict.keys():
         signalsDict2[currentdate].update({ reversecomponentsdict[key]: componentsignals2[key] for key in componentsignals2})
 
         signalsDict2[currentdate]['benchmark']=benchmark_signals
+                
         
         #append signals to each board
         totalsDict[currentdate]=pd.DataFrame()
@@ -404,6 +407,30 @@ tablename='last_signals'
 signalsDF.to_sql(name=tablename, if_exists=mode, con=writeWebChartsConn, index=True, index_label='CSIsym')
 print 'Saved', tablename, 'for', currentdate
 
+#last quote df
+IB2CSI_multiplier_adj={
+    'HG2':100,
+    'SI2':100,
+    'JY':100,
+    }
+lastquotes=pd.DataFrame()
+futuresDict2=futuresDict.ix[futuresDF_current.index].reset_index().set_index('Filename')
+for sym in futuresDict2.index:
+    lastquote=pd.read_csv(lastquotePath+sym+'.csv').iloc[-1]
+    lastquote.name=futuresDict2.ix[sym].CSIsym
+    if sym in IB2CSI_multiplier_adj.keys():
+        lastquote2=IB2CSI_multiplier_adj[sym]*lastquote[['Open','High','Low','Close']]
+        lastquote2['Date']=lastquote['Date']
+        lastquote2['Volume']=lastquote['Volume']
+        lastquotes=lastquotes.append(lastquote2)
+    else:
+        lastquotes=lastquotes.append(lastquote)
+        
+lastquotes['LastDate']=current[0]
+lastquotes['Last']=futuresDF_current.LastClose
+lastquotes['Chg']=(lastquotes.Close-lastquotes.Last)/lastquotes.Last
+lastquotes['PNL']=lastquotes.Chg*futuresDF_current.contractValue
+
 #for customize chip
 market_pnl_by_date=boards_dict['v4futures']
 mpbd={}
@@ -432,7 +459,7 @@ def conv_sig(signals):
     sig.ix[shorts]=['Long '+str(signals.ix[x]) for x in shorts]
     sig.ix[off] = 'Off 0'
     return sig.values
-futuresDict = pd.read_sql('select * from Dictionary', con=readConn, index_col='CSIsym')
+
 performance_dict={}
 infodisplay = {key: [reversecomponentsdict[x] for x in componentsdict[key]] for key in componentsdict}
 
@@ -501,7 +528,7 @@ for account in totals_accounts:
     #perchgDict[account].index=[str(len(combined_ranking.index)-idx)+' Rank '+col for idx,col in enumerate(combined_ranking.index)]
     perchgDict[account].index=[str(rank_num[idx])+' Rank '+col for idx,col in enumerate(combined_ranking.index)]
     
-def createRankingChart(ranking, account, line, title, filename):
+def createRankingChart(ranking, account, line, title, filename, quantity):
     global currentdate
     fig=plt.figure(1, figsize=(10,15))
     ax = fig.add_subplot(111) 
@@ -550,6 +577,14 @@ def createRankingChart(ranking, account, line, title, filename):
     prev_pnl=pd.DataFrame()
     prevdates=sorted(signalsDict2.keys())[:-1]
     currentdates=sorted(signalsDict2.keys())[1:]
+    currentsig=signalsDict2[currentdates[-1]][line].astype(int).copy()
+    currentsig=(signalsDict2[currentdates[-1]][line]*quantity).astype(int).copy()
+    lq=lastquotes[['Date','PNL']].copy()
+    lq['PNL2']=lq['PNL']*currentsig
+    lq=lq.ix[active_symbols[account]][['Date','PNL2']]
+    lq.name=line
+    lq.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in lq.index ]
+    text='Current PNL<br>'+pd.DataFrame(lq).to_html(escape=False)
     for prevdate, currentdate in zip(sorted(prevdates, reverse=True), sorted(currentdates, reverse=True)):
         #print prevdate, currentdate
         prevsig=signalsDict2[prevdate][line].astype(int).copy()
@@ -563,8 +598,7 @@ def createRankingChart(ranking, account, line, title, filename):
         pnl.name='MOC{}'.format(currentdate)
         prev_pnl=pd.concat([prev_pnl,pd.DataFrame({'Qty':prevsig.ix[pnl.index], pnl.name:pnl})], axis=1)
     prev_pnl.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in pnl.index ]
-    text='<br>'+pd.DataFrame(prev_pnl).to_html(escape=False)
-    
+    text+='<br>'+pd.DataFrame(prev_pnl).to_html(escape=False)
     
     lookback_name=str(lookback)+'Day Lookback'
     text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
@@ -663,7 +697,7 @@ for account in totals_accounts:
             filename=pngPath+date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
             filename3=date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
             title= line+' Ranking from '+benchmark_xaxis_label[0]+' to '+benchmark_xaxis_label[-1]
-            text3 = createRankingChart(perchgDict[account], account, line, title, filename)
+            text3 = createRankingChart(perchgDict[account], account, line, title, filename, quantity)
             performance_dict[account][line]={
                                                             'rank_filename':filename3,
                                                             'rank_text':text3,
@@ -915,7 +949,7 @@ for account in account_values:
     account_values[account].to_sql(name=tablename,con=writeWebChartsConn, index=True, if_exists='replace',\
                     index_label='Date')
     print 'saved',tablename, 'to',dbPathWebCharts
-
+    
 
 #signals list
 for d in sorted(signalsDict2.keys())[-1:]:
@@ -943,7 +977,7 @@ for d in sorted(signalsDict2.keys())[-1:]:
      #'AntiHighestEquity',
      #'AntiLowestEquity'
      ]
-    cmap = sns.diverging_palette(350, 120, sep=2, as_cmap=True)
+    cmap = sns.diverging_palette(0, 120, sep=2, as_cmap=True)
     
     
     for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voting_keys,'Antivoting')]:

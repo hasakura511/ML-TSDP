@@ -581,9 +581,14 @@ def createRankingChart(ranking, account, line, title, filename, quantity):
     currentsig=(signalsDict2[currentdates[-1]][line]*quantity).astype(int).copy()
     lq=lastquotes[['Date','PNL']].copy()
     lq['PNL2']=lq['PNL']*currentsig
-    lq=lq.ix[active_symbols[account]][['Date','PNL2']]
-    lq.name=line
+    lq['Qty']=currentsig
+    lq=lq.ix[active_symbols[account]][['Date','PNL2','Qty']]
+    lq.columns=['Timestamp','PNL','Qty']
+    lq.index.name=line
     lq.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in lq.index ]
+    lq.set_value('Total', 'PNL', lq.PNL.sum())
+    lq.set_value('Total', 'Timestamp', '')
+    lq.PNL=lq.PNL.astype(int)
     text='Current PNL<br>'+pd.DataFrame(lq).to_html(escape=False)
     for prevdate, currentdate in zip(sorted(prevdates, reverse=True), sorted(currentdates, reverse=True)):
         #print prevdate, currentdate
@@ -598,7 +603,8 @@ def createRankingChart(ranking, account, line, title, filename, quantity):
         pnl.name='MOC{}'.format(currentdate)
         prev_pnl=pd.concat([prev_pnl,pd.DataFrame({'Qty':prevsig.ix[pnl.index], pnl.name:pnl})], axis=1)
     prev_pnl.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in pnl.index ]
-    text+='<br>'+pd.DataFrame(prev_pnl).to_html(escape=False)
+    prev_pnl.index.name=line
+    text+='<br>Historical PNL<br>'+pd.DataFrame(prev_pnl).to_html(escape=False)
     
     lookback_name=str(lookback)+'Day Lookback'
     text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])

@@ -574,22 +574,23 @@ def createRankingChart(ranking, account, line, title, filename, quantity):
     
     #pnl text
     #prevdate=sorted(signalsDict2.keys())[-2]
-    prev_pnl=pd.DataFrame()
+    #prev_pnl=pd.DataFrame()
     prevdates=sorted(signalsDict2.keys())[:-1]
     currentdates=sorted(signalsDict2.keys())[1:]
     currentsig=signalsDict2[currentdates[-1]][line].astype(int).copy()
     currentsig=(signalsDict2[currentdates[-1]][line]*quantity).astype(int).copy()
-    lq=lastquotes[['Date','PNL']].copy()
+    lq=lastquotes[['Date','PNL']].ix[futuresDict.ix[lastquotes.index].sort_values(by=['Group', 'Desc']).index].copy()
+    lq['Group']=futuresDict.ix[lq.index].Group
     lq['PNL2']=lq['PNL']*currentsig
     lq['Qty']=currentsig
-    lq=lq.ix[active_symbols[account]][['Date','PNL2','Qty']]
-    lq.columns=['Timestamp','PNL','Qty']
+    lq=lq.ix[active_symbols[account]][['Group','Date','PNL2','Qty']]
+    lq.columns=['Group','Timestamp','PNL','Qty']
     lq.index.name=line
-    lq.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in lq.index ]
+    #lq.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in lq.index ]
     lq.set_value('Total', 'PNL', lq.PNL.sum())
     lq.set_value('Total', 'Timestamp', '')
     lq.PNL=lq.PNL.astype(int)
-    text='Current PNL<br>'+pd.DataFrame(lq).to_html(escape=False)
+    #text='Current PNL<br>'+pd.DataFrame(lq).to_html(escape=False)
     for prevdate, currentdate in zip(sorted(prevdates, reverse=True), sorted(currentdates, reverse=True)):
         #print prevdate, currentdate
         prevsig=signalsDict2[prevdate][line].astype(int).copy()
@@ -601,10 +602,10 @@ def createRankingChart(ranking, account, line, title, filename, quantity):
         pnl['Total']=pnl.sum()
         #pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
         pnl.name='MOC{}'.format(currentdate)
-        prev_pnl=pd.concat([prev_pnl,pd.DataFrame({'Qty':prevsig.ix[pnl.index], pnl.name:pnl})], axis=1)
-    prev_pnl.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in pnl.index ]
-    prev_pnl.index.name=line
-    text+='<br>Historical PNL<br>'+pd.DataFrame(prev_pnl).to_html(escape=False)
+        lq=pd.concat([lq,pd.DataFrame({'Qty':prevsig.ix[pnl.index], pnl.name:pnl})], axis=1)
+    lq.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in pnl.index ]
+    lq.index.name=line
+    text='<br>PNL<br>'+pd.DataFrame(lq).to_html(escape=False)
     
     lookback_name=str(lookback)+'Day Lookback'
     text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])

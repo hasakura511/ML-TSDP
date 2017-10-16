@@ -583,9 +583,10 @@ def createRankingChart(ranking, account, line, title, filename, quantity):
     lq['Group']=futuresDict.ix[lq.index].Group
     lq['PNL2']=lq['PNL']*currentsig
     lq['Qty']=currentsig
-    lq=lq.ix[active_symbols[account]][['Group','Date','PNL2','Qty']]
+    sym_order=[x for x in lq.index if x in active_symbols[account]]
+    lq=lq.ix[sym_order][['Group','Date','PNL2','Qty']]
     lq.columns=['Group','Timestamp','PNL','Qty']
-    lq.index.name=line
+    #lq.index.name=line
     #lq.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in lq.index ]
     lq.set_value('Total', 'PNL', lq.PNL.sum())
     lq.set_value('Total', 'Timestamp', '')
@@ -598,7 +599,7 @@ def createRankingChart(ranking, account, line, title, filename, quantity):
         #prevsig[prevsig == -1] = 'SHORT'
         #prevsig[prevsig == 1] = 'LONG'
         #prevsig[prevsig == 0] = 'OFF'
-        pnl=market_pnl_by_date[currentdate]['PNL_'+line].ix[active_symbols[account]].astype(int)
+        pnl=market_pnl_by_date[currentdate]['PNL_'+line].ix[sym_order].astype(int)
         pnl['Total']=pnl.sum()
         #pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
         pnl.name='MOC{}'.format(currentdate)

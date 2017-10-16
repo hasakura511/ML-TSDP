@@ -11,7 +11,7 @@ cd \ML-TSDP\
 \anaconda2\python post_processing.py >> \logs\post_processing_%fullstamp%.txt
 
 cd \ml-tsdp\web\tsdp\
-wmic process where "Commandline like '%%manage.py runserver%%' and name like '%%python.exe%%'" call terminate
+wmic process where "Commandline like '%%manage.py runserver%%' and name like '%%python.exe%%'" call terminate >> \logs\post_processing_%fullstamp%.txt
 \anaconda2\python runserver.py
 
 rem wmic process where "name like '%%ibgateway.exe%%'" call terminate

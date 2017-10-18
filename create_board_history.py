@@ -604,6 +604,7 @@ def createRankingChart(ranking, account, line, title, filename, quantity):
         #pnl.name='{} as of MOC {}'.format(pnl.name,currentdate)
         pnl.name='MOC{}'.format(currentdate)
         lq=pd.concat([lq,pd.DataFrame({'Qty':prevsig.ix[pnl.index], pnl.name:pnl})], axis=1)
+    lq2=lq.copy()
     lq.index=['<a href="/static/images/v4_'+sym+'_BRANK.png" target="_blank">'+re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc)+'</a>' if sym in futuresDict.index else 'Total' for sym in pnl.index ]
     lq.index.name=line
     text='<br>PNL<br>'+pd.DataFrame(lq).to_html(escape=False)
@@ -624,10 +625,12 @@ def createRankingChart(ranking, account, line, title, filename, quantity):
     text+='<br>'+lookback_name+': '+', '.join([index+' '+str(round(ranking.ix[index].ix[lookback_name],1))+'%' for index in pair])
 
     
-    return text
+    return text, lq2
+lq_dict={}
 prev_signals={}
 performance_chart_dict={} 
 for account in totals_accounts:
+    lq_dict[account]={}
     prev_signals[account]={}
     performance_chart_dict[account]=pd.DataFrame()
     performance_dict[account]={}
@@ -705,7 +708,8 @@ for account in totals_accounts:
             filename=pngPath+date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
             filename3=date+'_'+account+'_'+line.replace('/','')+'_ranking.png'
             title= line+' Ranking from '+benchmark_xaxis_label[0]+' to '+benchmark_xaxis_label[-1]
-            text3 = createRankingChart(perchgDict[account], account, line, title, filename, quantity)
+            text3, lq = createRankingChart(perchgDict[account], account, line, title, filename, quantity)
+            lq_dict[account][line]=lq
             performance_dict[account][line]={
                                                             'rank_filename':filename3,
                                                             'rank_text':text3,
@@ -1090,6 +1094,34 @@ for l,name in [(component_keys,'Components'), (voting_keys,'Voting'), (anti_voti
         if debug and showPlots:
             plt.show()
         plt.close()
+
+lq_dict2={}
+for account in totals_accounts:
+    lq_df=pd.DataFrame()
+    for line in lq_dict[account].keys():
+        total=lq_dict[account][line]['PNL'].Total
+        lq_df.set_value(line, 'TotalPNL',total)
+        #print account, line, total
+    lq_dict2[account]=lq_df.sort_values(by='TotalPNL')
+    
+    fig=plt.figure(1, figsize=(10,15))
+    ax = fig.add_subplot(111) 
+    color_index=['b' if x in anti_components.keys() else 'black' for x in lq_dict2[account].index]
+    
+    #[x.set_color(i) for i,x in zip(color_index,ax.yaxis.get_ticklabels())]
+    
+    lq_dict2[account].plot(kind='barh', width=0.6, ax=ax, color=color_index)
+
+    plt.xlabel('Total PNL', size=12)
+    title=account+' Total Current PNL as of '+lq.Timestamp.values.max()
+    plt.title(title)
+    filename=pngPath+d2+'_'+account+'_current_total_pnl.png'
+    if savePlots:
+        plt.savefig(filename, bbox_inches='tight')
+        print 'Saved',filename
+    if debug and showPlots:
+        plt.show()
+    plt.close()
 
 print 'Elapsed time: ', round(((time.time() - start_time)/60),2), ' minutes ', dt.now()
 

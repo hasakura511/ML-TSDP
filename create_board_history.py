@@ -696,6 +696,7 @@ for account in totals_accounts:
                     text=component_text[line]
                     #print line, text, filename2
             #signals dict is one day behind
+            currentdate=sorted(signalsDict2.keys())[-1]
             signals=(signalsDict2[currentdate][line]*quantity).astype(int).copy()
             signals.index=[re.sub(r'\(.*?\)', '', futuresDict.ix[sym].Desc) for sym in signals.index]
             signals=pd.Series(conv_sig(signals), index=signals.index).to_dict()

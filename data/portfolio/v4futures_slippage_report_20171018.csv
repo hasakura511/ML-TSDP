@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-10-18 14:02:21 1 @GFF8 $-12,@GFF8,2017-10-18 14:02:21,150.15,2017-10-18 14:05:00,150.125,0.000166527893422,0.000166527893422,Open,1.0,-12.0,2.5,-1 days +23:57:21.000000000,-3.0

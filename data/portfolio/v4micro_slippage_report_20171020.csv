@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-10-20 16:44:43 1 @JYZ7 $-12,@JYZ7,2017-10-20 16:44:43,0.00883,2017-10-20 17:00:00,0.008831,-0.000113237458952,0.000113237458952,Open,-1.0,-12.0,2.5,-1 days +23:44:43.000000000,-16.0

@@ -430,8 +430,10 @@ def getAccountValues(refresh=False):
         timestamp = c2_equity.ix[system].updatedLastTimeET
         accountvalue = int(c2_equity.ix[system].modelAccountValue)
         #urpnl = int(c2_equity.ix[system].equity)
-        df=pd.read_sql('select * from (select * from %s\
-                order by timestamp ASC) group by c2sym' % ('checkSystems_'+system),\
+        #df=pd.read_sql('select * from (select * from %s\
+        #        order by timestamp ASC) group by c2sym' % ('checkSystems_'+system),\
+        #        con=readConn)
+        df=pd.read_sql('select * from %s where timestamp=(select max(timestamp) from %s)' % ('checkSystems_'+system, 'checkSystems_'+system),\
                 con=readConn)
         urpnl=int(df.urpnl.replace('',0).astype(int).sum())
 

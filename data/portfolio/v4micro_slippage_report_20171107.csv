@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-11-07 16:48:52 1 @NQZ7 $-10,@NQZ7,2017-11-07 16:48:52,6315.5,2017-11-07 17:00:00,6316.0,-7.91640278657e-05,7.91640278657e-05,Open,-1.0,-10.0,2.5,-1 days +23:48:52.000000000,-12.0

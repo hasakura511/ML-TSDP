@@ -232,7 +232,13 @@ def MCdate():
             #now<lastclose
             mcdate =today
     elif len(ttdates)>0:
-        next_ttdate = ttdates[-1]
+        #next_ttdate = ttdates[-1]
+        for i,d in enumerate(ttdates):
+            next_day= (now + datetime.timedelta(days=i+1)).strftime('%Y%m%d')
+            if next_day in ttdates:
+                next_ttdate = next_day
+                break
+                
         closes = pd.DataFrame(timetables[next_ttdate].ix[[x for x in timetables.index if 'close' in x]].copy())
         lastclose=eastern.localize(pd.to_datetime(closes[next_ttdate]).max().to_pydatetime())
         if now>=lastclose :

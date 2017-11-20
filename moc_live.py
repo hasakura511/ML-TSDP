@@ -1221,8 +1221,11 @@ if __name__ == "__main__":
         if delta.days >1 or (delta.days ==1 and dt.today().day in [2,3,4,5]):
             slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
 
-
-        '''
+        print timetable[timetable.columns[0]]
+        if timetable[timetable.columns[0]].isnull().any():
+            txt='nans in timetable for '+str(timetable.columns[0])
+            slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
+            '''
         #dont do this because it will mess up account values timing.
         ib_portfolio=get_ibfutpositions(portfolioPath)
         print ib_portfolio

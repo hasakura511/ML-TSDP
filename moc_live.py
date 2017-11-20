@@ -4,6 +4,7 @@ from os import listdir
 from os.path import isfile, join
 import random
 import sys
+from shutil import copyfile
 from subprocess import Popen, PIPE, check_output
 import pandas as pd
 import numpy as np
@@ -1221,9 +1222,18 @@ if __name__ == "__main__":
         if delta.days >1 or (delta.days ==1 and dt.today().day in [2,3,4,5]):
             slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
 
-        print timetable[timetable.columns[0]]
-        if timetable[timetable.columns[0]].isnull().any():
-            txt='nans in timetable for '+str(timetable.columns[0])
+        currentdate=timetable.columns[0]
+        print timetable[currentdate]
+        if timetable[currentdate].isnull().any():
+            #load previous file.
+            dates=sorted([int(x.split('.csv')[0]) for x in listdir(timetablePath) if is_int(x.split('.csv')[0])])
+            if int(currentdate) in dates:
+                dates.remove(int(currentdate))
+            lastdate=str(dates[-1])
+            src=timetablePath+lastdate+'.csv'
+            dest=timetablePath+currentdate+'.csv'
+            copyfile(src,dest)
+            txt='nans in timetable for {}. Copied {} to {}.'.format(currentdate, src, dest)
             slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             '''
         #dont do this because it will mess up account values timing.

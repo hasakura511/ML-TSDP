@@ -1232,7 +1232,20 @@ if __name__ == "__main__":
             lastdate=str(dates[-1])
             src=timetablePath+lastdate+'.csv'
             dest=timetablePath+currentdate+'.csv'
-            copyfile(src,dest)
+            #copyfile(src,dest)
+            timetable2=pd.read_csv(src, index_col=0)
+            dates2=[x for x in timetable2.columns if int(x)>=int(currentdate)]
+            timetable2=timetable2[dates2]
+            timetable2.to_csv(dest, index=True)
+            print 'saved', dest
+            timetable2['Date']=csidate
+            timetable2['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
+            try:
+                timetable2.to_sql(name='timetable', con=writeConn, index=True, if_exists='replace', index_label='Desc')
+            except Exception as e:
+                #print e
+                traceback.print_exc()
+
             txt='nans in timetable for {}. Copied {} to {}.'.format(currentdate, src, dest)
             slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             '''

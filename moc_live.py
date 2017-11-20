@@ -1237,6 +1237,8 @@ if __name__ == "__main__":
             dates2=[x for x in timetable2.columns if int(x)>=int(currentdate)]
             timetable2=timetable2[dates2]
             timetable2.to_csv(dest, index=True)
+            txt='nans in timetable for {}. Copied {} to {}.'.format(currentdate, src, dest)
+            slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             print 'saved', dest
             timetable2['Date']=csidate
             timetable2['timestamp']=int(calendar.timegm(dt.utcnow().utctimetuple()))
@@ -1244,10 +1246,10 @@ if __name__ == "__main__":
                 timetable2.to_sql(name='timetable', con=writeConn, index=True, if_exists='replace', index_label='Desc')
             except Exception as e:
                 #print e
+                slack.notify(text='get_timetable: '+str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
                 traceback.print_exc()
 
-            txt='nans in timetable for {}. Copied {} to {}.'.format(currentdate, src, dest)
-            slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
+
             '''
         #dont do this because it will mess up account values timing.
         ib_portfolio=get_ibfutpositions(portfolioPath)

@@ -1236,8 +1236,16 @@ if __name__ == "__main__":
             timetable2=pd.read_csv(src, index_col=0)
             dates2=[x for x in timetable2.columns if int(x)>=int(currentdate)]
             timetable2=timetable2[dates2]
+            if timetable2[currentdate].isnull().any():
+                #copy over the next trigger times from the next date.
+                print 'copying data from {} to {} for nans'.format(dates2[1], currentdate)
+                timetable2[currentdate][timetable[currentdate].isnull()]=timetable[dates2[1]][timetable[currentdate].isnull()]
+                if timetable2[currentdate].isnull().any():
+                    slack.notify(text='there\'s still nans...', channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
+            
             timetable2.to_csv(dest, index=True)
             txt='nans in timetable for {}. Copied {} to {}.'.format(currentdate, src, dest)
+            print txt
             slack.notify(text=txt, channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
             print 'saved', dest
             timetable2['Date']=csidate

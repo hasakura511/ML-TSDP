@@ -1,0 +1,2 @@
+rowname,contract,c2timestamp,c2price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,timedelta,delta
+ctwo opened: 2017-11-27 16:48:41 1 QGCG8 $40,QGCG8,2017-11-27 16:48:41,1298.5,2017-11-27 17:00:00,1298.9,-0.000307952883209,0.000307952883209,Open,1.0,40.0,2.5,-1 days +23:48:41.000000000,-12.0

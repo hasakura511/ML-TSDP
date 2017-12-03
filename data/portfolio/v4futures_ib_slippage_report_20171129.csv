@@ -1,0 +1,2 @@
+rowname,contract,ibsym,CSIsym,ib_timestamp,ib_price,closetime,csiPrice,slippage,abs_slippage,Type,signal,dollarslip,commissions,delta
+ib: 2017-11-29 16:47:01 1.0 AUD20171218 $50,AUD20171218,AUD,AD,2017-11-29 16:47:01,0.7571,2017-11-29 17:00:00,0.7576,-0.000659978880676,0.000659978880676,Open,1.0,50.0,2.5,-13.0

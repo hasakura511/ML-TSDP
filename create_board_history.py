@@ -425,9 +425,9 @@ for sym in futuresDict2.index:
         lastquote=pd.read_csv(lastquotePath+sym+'.csv').iloc[-1]
     except Exception as e:
         #print e
-        slack.notify(text='pd.read_csv(lastquotePath+sym+.csv).iloc[-1]: '+str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
+        slack.notify(text=sym+': pd.read_csv(lastquotePath+sym+.csv).iloc[-1]: '+str(e), channel=slack_channel, username="ibot", icon_emoji=":robot_face:")
         traceback.print_exc()
-        
+
     lastquote.name=futuresDict2.ix[sym].CSIsym
     if sym in IB2CSI_multiplier_adj.keys():
         lastquote2=IB2CSI_multiplier_adj[sym]*lastquote[['Open','High','Low','Close']]

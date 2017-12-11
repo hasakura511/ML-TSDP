@@ -21,6 +21,6 @@ def start_immediate():
     #if lastMCdate<mcdate:
     updated_selection=json.dumps({key: [order[0], "False"] for key, order in eval(lastSelection.selection).items()})
     record = UserSelection(userID=lastSelection.userID, selection=updated_selection, \
-                           v4futures=lastSelection.v4futures, v4mini=lastSelection.v4mini, \
-                           v4micro=lastSelection.v4micro, mcdate=mcdate, timestamp=getTimeStamp())
+                           v4futures=lastSelection.v4futures, v4mini=lastSelection.v4mini,\
+                           v4micro=lastSelection.v4micro, componentloc =lastSelection.componentloc, mcdate=mcdate, timestamp=getTimeStamp())
     record.save()
